@@ -18,11 +18,11 @@ public final class SchemaUtility {
 		// no instances
 	}
 
-	private static final String Q_CREATE = "create table VERSION (Schema INT NOT NULL)";
+	private static final String Q_CREATE = "create table VERSION (N INT NOT NULL)";
 	private static final String Q_DELETE = "drop table VERSION";
-	private static final String Q_SELECT = "select Schema from VERSION";
+	private static final String Q_SELECT = "select N from VERSION";
 	private static final String Q_INSERT = "insert into VERSION values (0)";
-	private static final String Q_UPDATE = "update VERSION set Schema=";
+	private static final String Q_UPDATE = "update VERSION set N=";
 
 	/**
 	 * Checks the passed database connection is at the correct version. Versions
@@ -38,7 +38,7 @@ public final class SchemaUtility {
 	 * 
 	 * <pre>
 	 * create table Version (
-	 * 	 Schema INT NOT NULL
+	 * 	 N INT NOT NULL
 	 * );
 	 * </pre>
 	 * 
@@ -64,7 +64,7 @@ public final class SchemaUtility {
 	 * @throws IOException
 	 *             if a problem occurs reading an SQL script.
 	 */
-	public void check(Connection c, URL[] sqlScripts, Runnable[] actions)
+	public static void checkAndUpdate(Connection c, URL[] sqlScripts, Runnable[] actions)
 			throws SQLException, IOException {
 		/*
 		 * Check preconditions
