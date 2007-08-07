@@ -64,7 +64,7 @@ public final class SchemaUtility {
 	 * @throws IOException
 	 *             if a problem occurs reading an SQL script.
 	 */
-	public static void checkAndUpdate(Connection c, URL[] sqlScripts, Runnable[] actions)
+	public static void checkAndUpdate(Connection c, URL[] sqlScripts, SchemaAction[] actions)
 			throws SQLException, IOException {
 		/*
 		 * Check preconditions
@@ -110,7 +110,7 @@ public final class SchemaUtility {
 						 */
 						if (actions != null)
 							if (actions[i] != null)
-								actions[i].run();
+								actions[i].run(c);
 					}
 				}
 
