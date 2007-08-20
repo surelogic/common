@@ -170,7 +170,7 @@ public final class SchemaUtility {
 		} catch (SQLException e) {
 			/*
 			 * Ignore, this exception occurred because the schema was not found
-			 * within the embedded database.
+			 * within the database.
 			 */
 		}
 		return result;
