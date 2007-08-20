@@ -64,8 +64,8 @@ public final class SchemaUtility {
 	 * @throws IOException
 	 *             if a problem occurs reading an SQL script.
 	 */
-	public static void checkAndUpdate(Connection c, URL[] sqlScripts, SchemaAction[] actions)
-			throws SQLException, IOException {
+	public static void checkAndUpdate(Connection c, URL[] sqlScripts,
+			SchemaAction[] actions) throws SQLException, IOException {
 		/*
 		 * Check preconditions
 		 */
@@ -192,7 +192,22 @@ public final class SchemaUtility {
 		st.execute(Q_UPDATE + version);
 	}
 
-	private static void runScript(final URL script, final Statement st)
+	/**
+	 * Runs the given SQL script by reading each SQL statement from the file and
+	 * then using the passed JDBC statement to execute the statement on the
+	 * database.
+	 * 
+	 * @param script
+	 *            the script to load and run on the database.
+	 * @param st
+	 *            an open JDBC statement to use.
+	 * @throws SQLException
+	 *             if an unexpected problem interacting with the database
+	 *             occurs.
+	 * @throws IOException
+	 *             if the script cannot be found or read.
+	 */
+	public static void runScript(final URL script, final Statement st)
 			throws SQLException, IOException {
 		assert script != null;
 		assert st != null;
