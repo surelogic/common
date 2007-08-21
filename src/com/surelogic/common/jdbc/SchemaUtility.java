@@ -10,6 +10,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public final class SchemaUtility {
@@ -79,7 +80,7 @@ public final class SchemaUtility {
 			if (f == null)
 				throw new IllegalArgumentException(
 						"elements of SQL script array cannot be null: "
-								+ sqlScripts);
+								+ Arrays.toString(sqlScripts));
 		if (actions != null && sqlScripts.length != actions.length)
 			throw new IllegalArgumentException(
 					"sqlScripts.length == actions.length when actions != null");
