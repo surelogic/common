@@ -233,6 +233,20 @@ public final class SchemaUtility {
 						+ st.getConnection());
 	}
 
+	/**
+	 * Runs the given schema action on the database.
+	 * 
+	 * @param action
+	 *            the schema action to run on the database, may not be
+	 *            <code>null</code>.
+	 * @param c
+	 *            the database connection to use.
+	 * @throws SQLException
+	 *             if an unexpected problem interacting with the database
+	 *             occurs.
+	 * @throws NullPointerException
+	 *             if action is <code>null</code>.
+	 */
 	public static void runAction(final SchemaAction action, final Connection c)
 			throws SQLException {
 		action.run(c);
