@@ -100,6 +100,34 @@ public class SLLogger {
 	}
 
 	/**
+	 * Internal method to get a logger.
+	 * <p>
+	 * It is a precondition that a lock on this class be held when invoking this
+	 * method.
+	 * 
+	 * @param name
+	 *            the logger name.
+	 * @return a suitable Logger.
+	 */
+	private static Logger getLoggerInternal(final String name) {
+		assert name != null;
+
+		Logger logger = f_nameToLogger.get(name);
+		if (logger == null) {
+			logger = Logger.getLogger(name);
+			logger.setLevel(LEVEL);
+			f_nameToLogger.put(name, logger); // add to cache
+
+			/*
+			 * Setup this logger for use.
+			 */
+			logger.setUseParentHandlers(false);
+			addAllHandlersTo(logger);
+		}
+		return logger;
+	}
+
+	/**
 	 * Find or create a logger for a named subsystem. All names passed to this
 	 * method become prefixed by <code>com.surelogic</code>. For example if
 	 * the code is <code>SLLogger.getLogger("flashlight")</code> the name of
@@ -115,8 +143,9 @@ public class SLLogger {
 	 * the LogManager global name space.
 	 * 
 	 * @param name
-	 *            name for the logger. All names passed to this method become
-	 *            prefixed by <code>com.surelogic</code>.
+	 *            name for the logger, may not be <code>null</code>. All
+	 *            names passed to this method become prefixed by
+	 *            <code>com.surelogic</code>.
 	 * @return a suitable Logger.
 	 * @throws NullPointerException
 	 *             if the name is null.
@@ -127,19 +156,8 @@ public class SLLogger {
 		final String loggerName = "com.surelogic"
 				+ ("".equals(name) ? "" : "." + name);
 
-		Logger logger = f_nameToLogger.get(loggerName);
-		if (logger == null) {
-			logger = Logger.getLogger(loggerName);
-			logger.setLevel(LEVEL);
-			f_nameToLogger.put(loggerName, logger); // add to cache
+		return getLoggerInternal(loggerName);
 
-			/*
-			 * Setup this logger for use.
-			 */
-			logger.setUseParentHandlers(false);
-			addAllHandlersTo(logger);
-		}
-		return logger;
 	}
 
 	/**
@@ -155,5 +173,20 @@ public class SLLogger {
 	 */
 	public static synchronized Logger getLogger() {
 		return getLogger("");
+	}
+
+	/**
+	 * Find or create a logger for a class using the class name as the named
+	 * subsystem for the logger.
+	 * 
+	 * @param aClass
+	 *            the class object, may not be <code>null</code>.
+	 * @return a suitable Logger.
+	 */
+	public static synchronized Logger getLoggerFor(Class<?> aClass) {
+		if (aClass == null)
+			throw new NullPointerException("class must be non-null");
+		final String className = aClass.getName();
+		return getLoggerInternal(className);
 	}
 }
