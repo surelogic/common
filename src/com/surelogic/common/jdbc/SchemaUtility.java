@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.surelogic.common.logging.SLLogger;
+
 public final class SchemaUtility {
 
 	private SchemaUtility() {
@@ -122,6 +124,14 @@ public final class SchemaUtility {
 				 */
 				if (programSchemaVersion != 0)
 					setVersion(programSchemaVersion, st);
+
+				SLLogger.getLogger().info(
+						"Database updated to schema version "
+								+ programSchemaVersion + " : " + c);
+			} else {
+				SLLogger.getLogger().fine(
+						"Database at schema version " + programSchemaVersion
+								+ " : " + c);
 			}
 		} finally {
 			st.close();
