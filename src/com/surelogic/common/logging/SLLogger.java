@@ -9,6 +9,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -17,21 +18,30 @@ import java.util.logging.Logger;
 public class SLLogger {
 
 	/**
+	 * Setting this system property allows easy configuration of the logging
+	 * level. For example <code>-DSLLoggingLevel=FINE</code> will now show
+	 * fine logging messages to the console and the file (the Eclipse handler
+	 * always shows SEVERE, WARNING, and INFO).
+	 */
+	public static final Level LEVEL = Level.parse(System.getProperty(
+			"SLLoggingLevel", "INFO"));
+
+	/**
 	 * Everyone can reuse the same instance of this formatter because the
 	 * format() method uses no instance state.
 	 */
-	public static final AtomicReference<SLFormatter> f_formatter = new AtomicReference<SLFormatter>(
+	private static final AtomicReference<SLFormatter> f_formatter = new AtomicReference<SLFormatter>(
 			new SLFormatter());
 
 	/**
 	 * A simple cache of loggers we have already configured.
 	 */
-	public static final Map<String, Logger> f_nameToLogger = new HashMap<String, Logger>();
+	private static final Map<String, Logger> f_nameToLogger = new HashMap<String, Logger>();
 
 	/**
 	 * A list of the handlers we manage for logging.
 	 */
-	public static final List<Handler> f_handlers = new ArrayList<Handler>();
+	private static final List<Handler> f_handlers = new ArrayList<Handler>();
 
 	/**
 	 * Adds all the handlers to the given logger.
@@ -73,10 +83,15 @@ public class SLLogger {
 	}
 
 	static {
-		addHandler(new ConsoleHandler());
+		final ConsoleHandler ch = new ConsoleHandler();
+		ch.setLevel(LEVEL);
+		addHandler(ch);
 		try {
-			addHandler(new FileHandler(System.getProperty("java.io.tmpdir")
-					+ File.separator + "SureLogic_Log.txt", true));
+			FileHandler fh = new FileHandler(System
+					.getProperty("java.io.tmpdir")
+					+ File.separator + "SureLogic_Log.txt", true);
+			fh.setLevel(LEVEL);
+			addHandler(fh);
 		} catch (Exception e) {
 			throw new IllegalStateException(
 					"Unable to create FileHandler object for SureLogic logger",
@@ -115,6 +130,7 @@ public class SLLogger {
 		Logger logger = f_nameToLogger.get(loggerName);
 		if (logger == null) {
 			logger = Logger.getLogger(loggerName);
+			logger.setLevel(LEVEL);
 			f_nameToLogger.put(loggerName, logger); // add to cache
 
 			/*

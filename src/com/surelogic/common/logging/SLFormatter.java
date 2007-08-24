@@ -38,26 +38,37 @@ public final class SLFormatter extends Formatter {
 	 */
 	@Override
 	public String format(final LogRecord record) {
-		StringBuilder buf = new StringBuilder(1000);
-		buf.append("[").append(tl_format.get().format(new Date()));
+		StringBuilder b = new StringBuilder();
+		b.append("[").append(tl_format.get().format(new Date()));
 		String level = record.getLevel().getName();
 		int padding = 8 - level.length();
 		for (int i = 0; i < padding; i++)
-			buf.append(" ");
-		buf.append(record.getLevel().getName()).append("] ");
+			b.append(" ");
+		b.append(record.getLevel().getName()).append("] ");
 
-		buf.append(formatMessage(record));
+		formatMsgTail(b, formatMessage(record), record.getSourceClassName(),
+				record.getSourceMethodName());
 
-		buf.append(" [").append(record.getSourceClassName()).append(".")
-				.append(record.getSourceMethodName()).append("() in \"");
-		buf.append(Thread.currentThread().getName()).append("\"]");
-		buf.append(System.getProperty("line.separator"));
+		b.append(System.getProperty("line.separator"));
 		Throwable t = record.getThrown();
 		if (t != null) {
 			StringWriter sw = new StringWriter();
 			t.printStackTrace(new PrintWriter(sw));
-			buf.append(sw.toString());
+			b.append(sw.toString());
 		}
-		return buf.toString();
+		return b.toString();
+	}
+
+	/*
+	 * This tail format code is used by this formatter as well as the Eclipse
+	 * handler, therefore it is broken out into this utility method.
+	 */
+	public static void formatMsgTail(final StringBuilder b,
+			final String message, final String className,
+			final String methodName) {
+		b.append(message).append(" (in method ");
+		b.append(className).append(".").append(methodName).append(
+				"(-) thread \"");
+		b.append(Thread.currentThread().getName()).append("\")");
 	}
 }

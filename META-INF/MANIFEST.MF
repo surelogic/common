@@ -5,4 +5,5 @@ Bundle-SymbolicName: com.surelogic.common
 Bundle-Version: 1.4.0
 Bundle-Vendor: SureLogic, Inc.
 Export-Package: com.surelogic.common,
- com.surelogic.common.jdbc
+ com.surelogic.common.jdbc,
+ com.surelogic.common.logging
