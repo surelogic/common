@@ -113,7 +113,7 @@ public final class SchemaUtility {
 						 */
 						if (actions != null)
 							if (actions[i] != null)
-								actions[i].run(c);
+								runAction(actions[i], c);
 					}
 				}
 
@@ -227,6 +227,18 @@ public final class SchemaUtility {
 		for (StringBuilder b : stmts) {
 			st.execute(b.toString());
 		}
+
+		SLLogger.getLogger().fine(
+				"SQL script " + script.getPath() + " run on "
+						+ st.getConnection());
+	}
+
+	public static void runAction(final SchemaAction action, final Connection c)
+			throws SQLException {
+		action.run(c);
+
+		SLLogger.getLogger().fine(
+				"SQL action " + action.getClass().getName() + " run on " + c);
 	}
 
 	/**
