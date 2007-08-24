@@ -49,8 +49,8 @@ public final class SLFormatter extends Formatter {
 		buf.append(formatMessage(record));
 
 		buf.append(" [").append(record.getSourceClassName()).append(".")
-				.append(record.getSourceMethodName()).append("() in ");
-		buf.append(Thread.currentThread().getName()).append("]");
+				.append(record.getSourceMethodName()).append("() in \"");
+		buf.append(Thread.currentThread().getName()).append("\"]");
 		buf.append(System.getProperty("line.separator"));
 		Throwable t = record.getThrown();
 		if (t != null) {

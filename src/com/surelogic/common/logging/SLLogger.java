@@ -9,19 +9,12 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * A utility for obtaining SureLogic loggers.
+ * A utility for obtaining SureLogic loggers. This class is thread-safe.
  */
 public class SLLogger {
-	public static void main(String[] args) {
-		Logger l = getLogger("foo");
-		l.info("test of info");
-		l.log(Level.WARNING, "test of warning", new IllegalArgumentException(
-				"my wacky message"));
-	}
 
 	/**
 	 * Everyone can reuse the same instance of this formatter because the
@@ -41,8 +34,10 @@ public class SLLogger {
 	public static final List<Handler> f_handlers = new ArrayList<Handler>();
 
 	/**
-	 * Adds all the handlers to the given logger. It is a precondition that a
-	 * lock on this class be held when invoking this method.
+	 * Adds all the handlers to the given logger.
+	 * <p>
+	 * It is a precondition that a lock on this class be held when invoking this
+	 * method.
 	 * 
 	 * @param logger
 	 *            the logger to add handlers to.
