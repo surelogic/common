@@ -1,7 +1,9 @@
 package com.surelogic.common.logging;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -87,9 +89,13 @@ public class SLLogger {
 		ch.setLevel(LEVEL);
 		addHandler(ch);
 		try {
+			final SimpleDateFormat dateFormat = new SimpleDateFormat(
+					"-yyyy.MM.dd-'at'-HH.mm.ss.SSS");
 			FileHandler fh = new FileHandler(System
 					.getProperty("java.io.tmpdir")
-					+ File.separator + "SureLogic_Log.txt", true);
+					+ File.separator
+					+ "SureLogic"
+					+ dateFormat.format(new Date()) + ".txt", true);
 			fh.setLevel(LEVEL);
 			addHandler(fh);
 		} catch (Exception e) {
