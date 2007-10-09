@@ -225,7 +225,13 @@ public final class SchemaUtility {
 
 		final List<StringBuilder> stmts = getSQLStatements(script);
 		for (StringBuilder b : stmts) {
-			st.execute(b.toString());
+			try {
+				st.execute(b.toString());
+			} catch (SQLException e) {
+				throw new IllegalStateException("The statement:\n"
+						+ b.toString() + "\n has failed to execute properly.",
+						e);
+			}
 		}
 
 		SLLogger.getLogger().fine(
@@ -288,12 +294,12 @@ public final class SchemaUtility {
 				buffer = buffer.trim();
 				if (buffer.startsWith("--") || buffer.equals("")) {
 					// comment or blank line -- ignore this line
-				} else if (buffer.endsWith(";")) {
+				} else if (buffer.endsWith("<<>>")) {
 					// end of an SQL statement -- add to our resulting list
 					if (b.length() > 0)
 						b.append("\n");
 					b.append(buffer);
-					b.deleteCharAt(b.length() - 1); // remove the ";"
+					b.delete(b.length() - 4, b.length());
 					result.add(b);
 					b = new StringBuilder();
 				} else {
