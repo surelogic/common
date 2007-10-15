@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: SureLogic Common Code Plug-in
 Bundle-SymbolicName: com.surelogic.common
-Bundle-Version: 1.4.1
+Bundle-Version: 1.5.0
 Bundle-Vendor: SureLogic, Inc.
 Export-Package: com.surelogic.common,
  com.surelogic.common.jdbc,
