@@ -229,8 +229,9 @@ public final class SchemaUtility {
 				st.execute(b.toString());
 			} catch (SQLException e) {
 				throw new IllegalStateException("The statement:\n"
-						+ b.toString() + "\n has failed to execute properly.",
-						e);
+						+ b.toString()
+						+ "\n has failed to execute properly in script "
+						+ script + ".", e);
 			}
 		}
 
