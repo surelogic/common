@@ -85,23 +85,33 @@ public class SLLogger {
 	}
 
 	static {
-		final ConsoleHandler ch = new ConsoleHandler();
-		ch.setLevel(LEVEL);
-		addHandler(ch);
-		try {
-			final SimpleDateFormat dateFormat = new SimpleDateFormat(
-					"-yyyy.MM.dd-'at'-HH.mm.ss.SSS");
-			FileHandler fh = new FileHandler(System
-					.getProperty("java.io.tmpdir")
-					+ File.separator
-					+ "SureLogic"
-					+ dateFormat.format(new Date()) + ".txt", true);
-			fh.setLevel(LEVEL);
-			addHandler(fh);
-		} catch (Exception e) {
-			throw new IllegalStateException(
-					"Unable to create FileHandler object for SureLogic logger",
-					e);
+		/*
+		 * We use a property scheme to try to avoid duplicate logging on the EJB
+		 * container. The EJB container, due to re-deployments, can load this
+		 * class many times. We use a System property to avoid doing this
+		 * SureLogic logging setup more than a single time.
+		 */
+		final String registered = "SLLoggingIsRegistered";
+		if (System.getProperty(registered) == null) {
+			System.setProperty(registered, "T");
+			final ConsoleHandler ch = new ConsoleHandler();
+			ch.setLevel(LEVEL);
+			addHandler(ch);
+			try {
+				final SimpleDateFormat dateFormat = new SimpleDateFormat(
+						"-yyyy.MM.dd-'at'-HH.mm.ss.SSS");
+				FileHandler fh = new FileHandler(System
+						.getProperty("java.io.tmpdir")
+						+ File.separator
+						+ "SureLogic"
+						+ dateFormat.format(new Date()) + ".txt", true);
+				fh.setLevel(LEVEL);
+				addHandler(fh);
+			} catch (Exception e) {
+				throw new IllegalStateException(
+						"Unable to create FileHandler object for SureLogic logger",
+						e);
+			}
 		}
 	}
 
