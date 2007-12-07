@@ -316,4 +316,51 @@ public final class SchemaUtility {
 		}
 		return result;
 	}
+	
+	 /**
+   * Pads the given positive integer with 0s and returns a string of at least
+   * 4 characters. For example: <code>getZeroPadded(0)</code> results in the
+   * string <code>"0000"</code>; <code>getZeroPadded(436)</code> results
+   * in the string <code>"0456"</code>; <code>getZeroPadded(56900)</code>
+   * results in the string <code>"56900"</code>.
+   * (FIX copied from SierraSchemaUtility)
+   * 
+   * @param n
+   *            a non-negative integer (i.e., n >=0).
+   * @return a
+   */
+  public static String getZeroPadded(final int n) {
+    assert n >= 0;
+
+    String result = "" + n;
+    while (result.length() < 4) {
+      result = "0" + result;
+    }
+    return result;
+  }
+  
+  /**
+   * Returns null if the class is not found
+   * 
+   * FIX copied from SierraSchemaUtility
+   */
+  public static SchemaAction getSchemaAction(final String fullyQualifiedClassName) {
+    SchemaAction result = null;
+    try {
+      result = (SchemaAction) Class.forName(fullyQualifiedClassName)
+          .newInstance();
+    } catch (InstantiationException e) {
+      throw new IllegalStateException(e);
+    } catch (IllegalAccessException e) {
+      throw new IllegalStateException(e);
+    } catch (ClassNotFoundException e) {
+      // It is okay to not have any jobs for this version, do
+      // nothing.
+    } catch (IllegalArgumentException e) {
+      throw new IllegalStateException(e);
+    } catch (SecurityException e) {
+      throw new IllegalStateException(e);
+    }
+    return result;
+  }
 }
