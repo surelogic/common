@@ -33,12 +33,12 @@ public final class Entities {
 
 	public static void addAttribute(final String name, final int value,
 			final StringBuilder b) {
-		add(name, "" + value, b);
+		add(name, Integer.toString(value), b);
 	}
 
 	public static void addAttribute(final String name, final long value,
 			final StringBuilder b) {
-		add(name, "" + value, b);
+		add(name, Long.toString(value), b);
 	}
 
 	public static void addEscaped(final String value, final StringBuilder b) {
@@ -73,9 +73,9 @@ public final class Entities {
 	 *            character considered for the purpose of escaping the string.
 	 * @return a new up-to index.
 	 */
-	private int upTo(StringBuilder b, int upToIndex) {
+	private int upTo(final StringBuilder b, int upToIndex) {
 		for (Tuple t : f_NameValue) {
-			int start = upToIndex + 1 - t.f_value.length();
+		  final int start = upToIndex + 1 - t.f_value.length();
 			if (start >= 0) {
 				if (b.substring(start).startsWith(t.f_value)) {
 					final String escape = "&" + t.f_name + ";";
@@ -96,7 +96,7 @@ public final class Entities {
 	 * @return an escaped version of the text.
 	 */
 	public String escape(final String text) {
-		StringBuilder b = new StringBuilder(text);
+		final StringBuilder b = new StringBuilder(text);
 		int upToIndex = 0;
 		while (upToIndex < b.length()) {
 			upToIndex = upTo(b, upToIndex);

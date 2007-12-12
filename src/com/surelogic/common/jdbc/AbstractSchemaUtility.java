@@ -9,7 +9,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 public abstract class AbstractSchemaUtility implements ISchemaUtility {
-  public void checkAndUpdate(final Connection c, boolean serverDB)
+  public void checkAndUpdate(final Connection c, final boolean serverDB)
     throws SQLException, IOException 
   {
     final int arrayLength = getSchemaVersion() + 1;

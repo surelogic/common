@@ -100,7 +100,7 @@ public class SLLogger {
 			try {
 				final SimpleDateFormat dateFormat = new SimpleDateFormat(
 						"-yyyy.MM.dd-'at'-HH.mm.ss.SSS");
-				FileHandler fh = new FileHandler(System
+				final FileHandler fh = new FileHandler(System
 						.getProperty("java.io.tmpdir")
 						+ File.separator
 						+ "SureLogic"
@@ -199,7 +199,7 @@ public class SLLogger {
 	 *            the class object, may not be <code>null</code>.
 	 * @return a suitable Logger.
 	 */
-	public static synchronized Logger getLoggerFor(Class<?> aClass) {
+	public static synchronized Logger getLoggerFor(final Class<?> aClass) {
 		if (aClass == null)
 			throw new NullPointerException("class must be non-null");
 		final String className = aClass.getName();

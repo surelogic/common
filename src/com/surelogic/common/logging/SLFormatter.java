@@ -38,10 +38,10 @@ public final class SLFormatter extends Formatter {
 	 */
 	@Override
 	public String format(final LogRecord record) {
-		StringBuilder b = new StringBuilder();
+		final StringBuilder b = new StringBuilder();
 		b.append("[").append(tl_format.get().format(new Date()));
-		String level = record.getLevel().getName();
-		int padding = 8 - level.length();
+		final String level = record.getLevel().getName();
+		final int padding = 8 - level.length();
 		for (int i = 0; i < padding; i++)
 			b.append(" ");
 		b.append(record.getLevel().getName()).append("] ");
@@ -50,9 +50,9 @@ public final class SLFormatter extends Formatter {
 				record.getSourceMethodName());
 
 		b.append(System.getProperty("line.separator"));
-		Throwable t = record.getThrown();
+		final Throwable t = record.getThrown();
 		if (t != null) {
-			StringWriter sw = new StringWriter();
+		  final StringWriter sw = new StringWriter();
 			t.printStackTrace(new PrintWriter(sw));
 			b.append(sw.toString());
 		}

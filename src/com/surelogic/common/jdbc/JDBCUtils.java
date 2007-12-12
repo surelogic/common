@@ -23,8 +23,8 @@ public class JDBCUtils {
 	 * @param string
 	 * @throws SQLException
 	 */
-	public static void setNullableString(int idx, PreparedStatement st,
-			String string) throws SQLException {
+	public static void setNullableString(final int idx, PreparedStatement st,
+	    final String string) throws SQLException {
 		if (string == null) {
 			st.setNull(idx, Types.VARCHAR);
 		} else {
@@ -40,8 +40,8 @@ public class JDBCUtils {
 	 * @param longValue
 	 * @throws SQLException
 	 */
-	public static void setNullableLong(int idx, PreparedStatement st,
-			Long longValue) throws SQLException {
+	public static void setNullableLong(final int idx, PreparedStatement st,
+	    final Long longValue) throws SQLException {
 		if (longValue == null) {
 			st.setNull(idx, Types.BIGINT);
 		} else {
@@ -57,8 +57,8 @@ public class JDBCUtils {
 	 * @param intValue
 	 * @throws SQLException
 	 */
-	public static void setNullableInt(int idx, PreparedStatement st,
-			Integer intValue) throws SQLException {
+	public static void setNullableInt(final int idx, PreparedStatement st,
+	    final Integer intValue) throws SQLException {
 		if (intValue == null) {
 			st.setNull(idx, Types.INTEGER);
 		} else {
@@ -74,8 +74,8 @@ public class JDBCUtils {
 	 * @param dateValue
 	 * @throws SQLException
 	 */
-	public static void setNullableTimestamp(int idx, PreparedStatement st,
-			Date dateValue) throws SQLException {
+	public static void setNullableTimestamp(final int idx, PreparedStatement st,
+	    final Date dateValue) throws SQLException {
 		if (dateValue == null) {
 			st.setNull(idx, Types.TIMESTAMP);
 		} else {
@@ -92,9 +92,9 @@ public class JDBCUtils {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static Long getNullableLong(int idx, ResultSet set)
+	public static Long getNullableLong(final int idx, ResultSet set)
 			throws SQLException {
-		long l = set.getLong(idx);
+	  final long l = set.getLong(idx);
 		if (set.wasNull()) {
 			return null;
 		} else {
@@ -111,9 +111,9 @@ public class JDBCUtils {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static Integer getNullableInteger(int idx, ResultSet set)
+	public static Integer getNullableInteger(final int idx, ResultSet set)
 			throws SQLException {
-		int i = set.getInt(idx);
+	  final int i = set.getInt(idx);
 		if (set.wasNull()) {
 			return null;
 		} else {
@@ -136,7 +136,7 @@ public class JDBCUtils {
 	 * @param string
 	 * @return
 	 */
-	public static String escapeString(String string) {
+	public static String escapeString(final String string) {
 		return string.replaceAll("'", "''");
 	}
 }

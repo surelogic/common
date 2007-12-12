@@ -29,8 +29,8 @@ public class LockFileUtility {
 	 * @return
 	 * @throws IOException
 	 */
-	public boolean obtainLockFile(String productName, String projectName,
-			String folderPath) throws IOException {
+	public boolean obtainLockFile(final String productName, String projectName,
+	    final String folderPath) throws IOException {
 
 		File lockFile = new File(folderPath + File.separator + productName
 				+ "-" + projectName + ".lock");
@@ -43,9 +43,9 @@ public class LockFileUtility {
 
 	}
 
-	public boolean clearLockFile(String productName, String projectName,
-			String folderPath) {
-		File lockFile = new File(folderPath + File.separator + productName
+	public boolean clearLockFile(final String productName, String projectName,
+	    final String folderPath) {
+	  final File lockFile = new File(folderPath + File.separator + productName
 				+ "-" + projectName + ".lock");
 
 		if (lockFile.delete()) {

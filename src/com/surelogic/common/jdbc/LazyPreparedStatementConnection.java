@@ -32,13 +32,13 @@ public class LazyPreparedStatementConnection implements InvocationHandler {
 		this.statements = new HashSet<PreparedStatement>();
 	}
 
-	public static Connection wrap(Connection conn) {
+	public static Connection wrap(final Connection conn) {
 		return (Connection) Proxy.newProxyInstance(Connection.class
 				.getClassLoader(), new Class[] { Connection.class },
 				new LazyPreparedStatementConnection(conn));
 	}
 
-	public Object invoke(Object proxy, Method method, Object[] args)
+	public Object invoke(Object proxy, Method method, final Object[] args)
 			throws Throwable {
 		if ("prepareStatement".equals(method.getName())) {
 			return Proxy.newProxyInstance(PreparedStatement.class
@@ -52,7 +52,7 @@ public class LazyPreparedStatementConnection implements InvocationHandler {
 		try {
 			return method.invoke(conn, args);
 		} catch (InvocationTargetException e) {
-			Throwable target = e.getTargetException();
+		  final Throwable target = e.getTargetException();
 			if (target instanceof Exception) {
 				throw (Exception) target;
 			} else {
@@ -71,7 +71,7 @@ public class LazyPreparedStatementConnection implements InvocationHandler {
 
 				public PreparedStatement call() throws Exception {
 					try {
-						PreparedStatement st = (PreparedStatement) method
+					  final PreparedStatement st = (PreparedStatement) method
 								.invoke(conn, args);
 						statements.add(st);
 						return st;
@@ -94,7 +94,7 @@ public class LazyPreparedStatementConnection implements InvocationHandler {
 			}
 		}
 
-		public Object invoke(Object proxy, Method method, Object[] args)
+		public Object invoke(Object proxy, Method method, final Object[] args)
 				throws Throwable {
 			check();
 			try {
@@ -104,7 +104,7 @@ public class LazyPreparedStatementConnection implements InvocationHandler {
 				}
 				return val;
 			} catch (InvocationTargetException e) {
-				Throwable target = e.getTargetException();
+			  final Throwable target = e.getTargetException();
 				if (target instanceof Exception) {
 					throw (Exception) target;
 				} else {

@@ -67,8 +67,8 @@ public final class SchemaUtility {
 	 * @throws IOException
 	 *             if a problem occurs reading an SQL script.
 	 */
-	public static void checkAndUpdate(Connection c, URL[] sqlScripts,
-			SchemaAction[] actions) throws SQLException, IOException {
+	public static void checkAndUpdate(final Connection c, URL[] sqlScripts,
+	    final SchemaAction[] actions) throws SQLException, IOException {
 		/*
 		 * Check preconditions
 		 */
@@ -282,7 +282,7 @@ public final class SchemaUtility {
 		if (sqlScript == null)
 			throw new IllegalArgumentException("sqlFile must be non-null");
 
-		List<StringBuilder> result = new ArrayList<StringBuilder>();
+		final List<StringBuilder> result = new ArrayList<StringBuilder>();
 
 		final InputStream is = sqlScript.openStream();
 		final InputStreamReader isr = new InputStreamReader(is);
