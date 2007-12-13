@@ -84,6 +84,13 @@ public class SLLogger {
 		}
 	}
 
+	/**
+	 * The filename used for logging this run of the program. Each run will have
+	 * a different name, for example:
+	 * <code>/tmp/SureLogic-2007.12.13-at-15.05.50.267.txt</code>
+	 */
+	public static final String LOG_FILE_NAME;
+
 	static {
 		/*
 		 * We use a property scheme to try to avoid duplicate logging on the EJB
@@ -92,19 +99,17 @@ public class SLLogger {
 		 * SureLogic logging setup more than a single time.
 		 */
 		final String registered = "SLLoggingIsRegistered";
+		final SimpleDateFormat dateFormat = new SimpleDateFormat(
+				"-yyyy.MM.dd-'at'-HH.mm.ss.SSS");
+		LOG_FILE_NAME = System.getProperty("java.io.tmpdir") + File.separator
+				+ "SureLogic" + dateFormat.format(new Date()) + ".txt";
 		if (System.getProperty(registered) == null) {
 			System.setProperty(registered, "T");
 			final ConsoleHandler ch = new ConsoleHandler();
 			ch.setLevel(LEVEL);
 			addHandler(ch);
 			try {
-				final SimpleDateFormat dateFormat = new SimpleDateFormat(
-						"-yyyy.MM.dd-'at'-HH.mm.ss.SSS");
-				final FileHandler fh = new FileHandler(System
-						.getProperty("java.io.tmpdir")
-						+ File.separator
-						+ "SureLogic"
-						+ dateFormat.format(new Date()) + ".txt", true);
+				final FileHandler fh = new FileHandler(LOG_FILE_NAME, true);
 				fh.setLevel(LEVEL);
 				addHandler(fh);
 			} catch (Exception e) {
