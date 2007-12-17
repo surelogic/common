@@ -332,7 +332,7 @@ public final class SchemaUtility {
   public static String getZeroPadded(final int n) {
     assert n >= 0;
 
-    String result = "" + n;
+    String result = Integer.toString(n);
     while (result.length() < 4) {
       result = "0" + result;
     }
