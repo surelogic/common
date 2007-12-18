@@ -45,6 +45,10 @@ public final class Entities {
 		b.append(E.escape(value));
 	}
 
+	public static String trimInternal(final String value) {
+		return value.replaceAll("\\s+", " ");
+	}
+
 	/**
 	 * A private type to store names and values that we want escaped.
 	 */
@@ -75,7 +79,7 @@ public final class Entities {
 	 */
 	private int upTo(final StringBuilder b, int upToIndex) {
 		for (Tuple t : f_NameValue) {
-		  final int start = upToIndex + 1 - t.f_value.length();
+			final int start = upToIndex + 1 - t.f_value.length();
 			if (start >= 0) {
 				if (b.substring(start).startsWith(t.f_value)) {
 					final String escape = "&" + t.f_name + ";";
