@@ -128,4 +128,14 @@ public interface SLProgressMonitor {
 	 *            a non-negative number of work units just completed
 	 */
 	public void worked(int work);
+	
+	/**
+	 * Notifies that the task failed with the given Throwable
+	 */
+	public void failed(Throwable t);
+	
+	/**
+	 * @return non-null if there was a failure
+	 */
+	public Throwable getFailureTrace();
 }
