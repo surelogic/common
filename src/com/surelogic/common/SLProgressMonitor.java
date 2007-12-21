@@ -129,10 +129,25 @@ public interface SLProgressMonitor {
 	 */
 	public void worked(int work);
 	
+  /**
+   * Notifies that the task encountered a non-fatal error
+   */
+  public void error(String msg);
+  
+  /**
+   * Notifies that the task encountered a non-fatal error
+   */
+  public void error(String msg, Throwable t);
+	
+	 /**
+   * Notifies that the task failed with the given message
+   */
+	public void failed(String msg);
+	
 	/**
 	 * Notifies that the task failed with the given Throwable
 	 */
-	public void failed(Throwable t);
+	public void failed(String msg, Throwable t);
 	
 	/**
 	 * @return non-null if there was a failure
