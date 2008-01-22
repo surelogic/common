@@ -1,6 +1,7 @@
 package com.surelogic.common.xml;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -27,11 +28,11 @@ public class XMLUtil {
     return sp;
   }
   
-  public static void parseResource(Logger log, SAXParser sp, String resource,
+  public static void parseResource(Logger log, SAXParser sp, 
+                                   InputStream in,
                                    DefaultHandler handler, String errMsg) {
     try {
-      sp.parse(Thread.currentThread().getContextClassLoader()
-          .getResourceAsStream(resource), handler);
+      sp.parse(in, handler);
     } catch (SAXException e) {
       log.log(Level.WARNING, errMsg, e);
     } catch (IOException e) {
