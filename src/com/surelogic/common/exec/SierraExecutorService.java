@@ -35,26 +35,25 @@ public class SierraExecutorService implements ExecutorService {
 		service.execute(command);
 	}
 
-	public <T> List<Future<T>> invokeAll(
-			Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit)
+	public <T> List<Future<T>> invokeAll(Collection<Callable<T>> arg0,
+			long arg1, TimeUnit arg2) throws InterruptedException {
+		return service.invokeAll(arg0, arg1, arg2);
+	}
+
+	public <T> List<Future<T>> invokeAll(Collection<Callable<T>> arg0)
 			throws InterruptedException {
-		return service.invokeAll(tasks, timeout, unit);
+		return service.invokeAll(arg0);
 	}
 
-	public <T> List<Future<T>> invokeAll(Collection<? extends Callable<T>> tasks)
-			throws InterruptedException {
-		return service.invokeAll(tasks);
+	public <T> T invokeAny(Collection<Callable<T>> arg0, long arg1,
+			TimeUnit arg2) throws InterruptedException, ExecutionException,
+			TimeoutException {
+		return service.invokeAny(arg0, arg1, arg2);
 	}
 
-	public <T> T invokeAny(Collection<? extends Callable<T>> tasks,
-			long timeout, TimeUnit unit) throws InterruptedException,
-			ExecutionException, TimeoutException {
-		return service.invokeAny(tasks, timeout, unit);
-	}
-
-	public <T> T invokeAny(Collection<? extends Callable<T>> tasks)
+	public <T> T invokeAny(Collection<Callable<T>> arg0)
 			throws InterruptedException, ExecutionException {
-		return service.invokeAny(tasks);
+		return service.invokeAny(arg0);
 	}
 
 	public boolean isShutdown() {
