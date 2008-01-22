@@ -6,4 +6,5 @@ Bundle-Version: 1.0.1.qualifier
 Bundle-Vendor: SureLogic, Inc.
 Export-Package: com.surelogic.common,
  com.surelogic.common.jdbc,
- com.surelogic.common.logging
+ com.surelogic.common.logging,
+ com.surelogic.common.xml
