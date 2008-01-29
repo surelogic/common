@@ -22,11 +22,34 @@ public class SLLogger {
 	/**
 	 * Setting this system property allows easy configuration of the logging
 	 * level. For example <code>-DSLLoggingLevel=FINE</code> will now show
-	 * fine logging messages to the console and the file (the Eclipse handler
-	 * always shows SEVERE, WARNING, and INFO).
+	 * fine logging messages and above to the console and the file.
+	 * <p>
+	 * The default is to show all logged messages.
 	 */
 	public static final Level LEVEL = Level.parse(System.getProperty(
-			"SLLoggingLevel", "INFO"));
+			"SLLoggingLevel", "ALL"));
+
+	private static final ConsoleHandler CONSOLE_HANDLER;
+
+	private static final FileHandler FILE_HANDLER;
+
+	/**
+	 * Changes the logging level of the console and file handlers managed by
+	 * this class. Calling this method causes the <code>SLLoggingLevel</code>
+	 * property to be ignored.
+	 * <p>
+	 * This method is used by the Eclipse platform debug tracing facility to
+	 * change the output level.
+	 * 
+	 * @param newLevel
+	 *            the new value for the log level.
+	 */
+	public static void setLevel(Level newLevel) {
+		if (CONSOLE_HANDLER != null)
+			CONSOLE_HANDLER.setLevel(newLevel);
+		if (FILE_HANDLER != null)
+			FILE_HANDLER.setLevel(newLevel);
+	}
 
 	/**
 	 * Everyone can reuse the same instance of this formatter because the
@@ -105,18 +128,31 @@ public class SLLogger {
 				+ "SureLogic" + dateFormat.format(new Date()) + ".txt";
 		if (System.getProperty(registered) == null) {
 			System.setProperty(registered, "T");
-			final ConsoleHandler ch = new ConsoleHandler();
-			ch.setLevel(LEVEL);
-			addHandler(ch);
+			/*
+			 * Change the console hander to output to System.out not System.err
+			 * since we often work in Eclipse and this makes our output "fit in"
+			 * better.
+			 */
+			final class MyCH extends ConsoleHandler {
+				MyCH() {
+					setOutputStream(System.out);
+				}
+			}
+			CONSOLE_HANDLER = new MyCH();
+			CONSOLE_HANDLER.setLevel(LEVEL);
+			addHandler(CONSOLE_HANDLER);
 			try {
-				final FileHandler fh = new FileHandler(LOG_FILE_NAME, true);
-				fh.setLevel(LEVEL);
-				addHandler(fh);
+				FILE_HANDLER = new FileHandler(LOG_FILE_NAME, true);
+				FILE_HANDLER.setLevel(LEVEL);
+				addHandler(FILE_HANDLER);
 			} catch (Exception e) {
 				throw new IllegalStateException(
 						"Unable to create FileHandler object for SureLogic logger",
 						e);
 			}
+		} else {
+			CONSOLE_HANDLER = null;
+			FILE_HANDLER = null;
 		}
 	}
 
