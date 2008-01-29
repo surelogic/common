@@ -24,10 +24,10 @@ public class SLLogger {
 	 * level. For example <code>-DSLLoggingLevel=FINE</code> will now show
 	 * fine logging messages and above to the console and the file.
 	 * <p>
-	 * The default is to show all logged messages.
+	 * The default is to show all logged messages at INFO and above.
 	 */
 	public static final Level LEVEL = Level.parse(System.getProperty(
-			"SLLoggingLevel", "ALL"));
+			"SLLoggingLevel", "INFO"));
 
 	private static final ConsoleHandler CONSOLE_HANDLER;
 
