@@ -40,7 +40,7 @@ public class SLLogger {
 	 * @param newLevel
 	 *            the new value for the log level.
 	 */
-	public static void setLevel(Level newLevel) {
+	public static synchronized void setLevel(Level newLevel) {
 		LEVEL.set(newLevel);
 
 		for (Handler handler : f_handlers) {
