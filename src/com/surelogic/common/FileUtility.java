@@ -1,13 +1,12 @@
 package com.surelogic.common;
 
 import java.io.File;
-import java.util.logging.Logger;
 
+import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.logging.SLLogger;
 
 public final class FileUtility {
-  private static final Logger LOG = SLLogger.getLogger("common");
-  
+
 	private FileUtility() {
 		// no instances
 	}
@@ -15,14 +14,15 @@ public final class FileUtility {
 	static public boolean deleteDirectoryAndContents(final File path) {
 		if (path.exists()) {
 			for (File file : path.listFiles()) {
-			  boolean success;
+				boolean success;
 				if (file.isDirectory()) {
 					success = deleteDirectoryAndContents(file);
 				} else {
 					success = file.delete();
 				}
 				if (!success) {
-				  LOG.warning("Could not delete: "+file.getAbsolutePath());
+					SLLogger.getLogger().warning(
+							I18N.err(11, file.getAbsolutePath()));
 				}
 			}
 		}

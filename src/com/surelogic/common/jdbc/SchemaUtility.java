@@ -12,7 +12,9 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
 
+import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.logging.SLLogger;
 
 public final class SchemaUtility {
@@ -68,7 +70,7 @@ public final class SchemaUtility {
 	 *             if a problem occurs reading an SQL script.
 	 */
 	public static void checkAndUpdate(final Connection c, URL[] sqlScripts,
-	    final SchemaAction[] actions) throws SQLException, IOException {
+			final SchemaAction[] actions) throws SQLException, IOException {
 		/*
 		 * Check preconditions
 		 */
@@ -126,12 +128,11 @@ public final class SchemaUtility {
 					setVersion(programSchemaVersion, st);
 
 				SLLogger.getLogger().info(
-						"Database updated to schema version "
-								+ programSchemaVersion + " : " + c);
+						I18N.msg("db.updatedVersion", programSchemaVersion, c));
 			} else {
-				SLLogger.getLogger().fine(
-						"Database at schema version " + programSchemaVersion
-								+ " : " + c);
+				if (SLLogger.getLogger().isLoggable(Level.FINE))
+					SLLogger.getLogger().fine(
+							I18N.msg("db.atVersion", programSchemaVersion, c));
 			}
 		} finally {
 			st.close();
@@ -228,16 +229,15 @@ public final class SchemaUtility {
 			try {
 				st.execute(b.toString());
 			} catch (SQLException e) {
-				throw new IllegalStateException("The statement:\n"
-						+ b.toString()
-						+ "\n has failed to execute properly in script "
-						+ script + ".", e);
+				throw new IllegalStateException(I18N.err(12, b.toString(),
+						script), e);
 			}
 		}
 
-		SLLogger.getLogger().fine(
-				"SQL script " + script.getPath() + " run on "
-						+ st.getConnection());
+		if (SLLogger.getLogger().isLoggable(Level.FINE))
+			SLLogger.getLogger().fine(
+					I18N.msg("db.ranSQLScript", script.getPath(), st
+							.getConnection()));
 	}
 
 	/**
@@ -258,8 +258,11 @@ public final class SchemaUtility {
 			throws SQLException {
 		action.run(c);
 
-		SLLogger.getLogger().fine(
-				"SQL action " + action.getClass().getName() + " run on " + c);
+		if (SLLogger.getLogger().isLoggable(Level.FINE))
+			SLLogger.getLogger()
+					.fine(
+							I18N.msg("db.ranSQLAction", action.getClass()
+									.getName(), c));
 	}
 
 	/**
@@ -316,51 +319,52 @@ public final class SchemaUtility {
 		}
 		return result;
 	}
-	
-	 /**
-   * Pads the given positive integer with 0s and returns a string of at least
-   * 4 characters. For example: <code>getZeroPadded(0)</code> results in the
-   * string <code>"0000"</code>; <code>getZeroPadded(436)</code> results
-   * in the string <code>"0456"</code>; <code>getZeroPadded(56900)</code>
-   * results in the string <code>"56900"</code>.
-   * (FIX copied from SierraSchemaUtility)
-   * 
-   * @param n
-   *            a non-negative integer (i.e., n >=0).
-   * @return a
-   */
-  public static String getZeroPadded(final int n) {
-    assert n >= 0;
 
-    String result = Integer.toString(n);
-    while (result.length() < 4) {
-      result = "0" + result;
-    }
-    return result;
-  }
-  
-  /**
-   * Returns null if the class is not found
-   * 
-   * FIX copied from SierraSchemaUtility
-   */
-  public static SchemaAction getSchemaAction(final String fullyQualifiedClassName) {
-    SchemaAction result = null;
-    try {
-      result = (SchemaAction) Class.forName(fullyQualifiedClassName)
-          .newInstance();
-    } catch (InstantiationException e) {
-      throw new IllegalStateException(e);
-    } catch (IllegalAccessException e) {
-      throw new IllegalStateException(e);
-    } catch (ClassNotFoundException e) {
-      // It is okay to not have any jobs for this version, do
-      // nothing.
-    } catch (IllegalArgumentException e) {
-      throw new IllegalStateException(e);
-    } catch (SecurityException e) {
-      throw new IllegalStateException(e);
-    }
-    return result;
-  }
+	/**
+	 * Pads the given positive integer with 0s and returns a string of at least
+	 * 4 characters. For example: <code>getZeroPadded(0)</code> results in the
+	 * string <code>"0000"</code>; <code>getZeroPadded(436)</code> results
+	 * in the string <code>"0456"</code>; <code>getZeroPadded(56900)</code>
+	 * results in the string <code>"56900"</code>. (FIX copied from
+	 * SierraSchemaUtility)
+	 * 
+	 * @param n
+	 *            a non-negative integer (i.e., n >=0).
+	 * @return a
+	 */
+	public static String getZeroPadded(final int n) {
+		assert n >= 0;
+
+		String result = Integer.toString(n);
+		while (result.length() < 4) {
+			result = "0" + result;
+		}
+		return result;
+	}
+
+	/**
+	 * Returns null if the class is not found
+	 * 
+	 * FIX copied from SierraSchemaUtility
+	 */
+	public static SchemaAction getSchemaAction(
+			final String fullyQualifiedClassName) {
+		SchemaAction result = null;
+		try {
+			result = (SchemaAction) Class.forName(fullyQualifiedClassName)
+					.newInstance();
+		} catch (InstantiationException e) {
+			throw new IllegalStateException(e);
+		} catch (IllegalAccessException e) {
+			throw new IllegalStateException(e);
+		} catch (ClassNotFoundException e) {
+			// It is okay to not have any jobs for this version, do
+			// nothing.
+		} catch (IllegalArgumentException e) {
+			throw new IllegalStateException(e);
+		} catch (SecurityException e) {
+			throw new IllegalStateException(e);
+		}
+		return result;
+	}
 }

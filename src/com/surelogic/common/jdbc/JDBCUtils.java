@@ -8,15 +8,15 @@ import java.sql.Types;
 import java.util.Date;
 
 /**
- * A collection of utility methods to help w/ using JDBC.
- * (a subset copied from Sierra)
+ * A collection of utility methods to help w/ using JDBC. (a subset copied from
+ * Sierra)
  * 
  * @author nathan
  */
 public class JDBCUtils {
-	
+
 	/**
-	 * Set a paramter to the specified String, or to null if none is supplied.
+	 * Set a parameter to the specified String, or to null if none is supplied.
 	 * 
 	 * @param idx
 	 * @param st
@@ -24,7 +24,7 @@ public class JDBCUtils {
 	 * @throws SQLException
 	 */
 	public static void setNullableString(final int idx, PreparedStatement st,
-	    final String string) throws SQLException {
+			final String string) throws SQLException {
 		if (string == null) {
 			st.setNull(idx, Types.VARCHAR);
 		} else {
@@ -41,7 +41,7 @@ public class JDBCUtils {
 	 * @throws SQLException
 	 */
 	public static void setNullableLong(final int idx, PreparedStatement st,
-	    final Long longValue) throws SQLException {
+			final Long longValue) throws SQLException {
 		if (longValue == null) {
 			st.setNull(idx, Types.BIGINT);
 		} else {
@@ -58,7 +58,7 @@ public class JDBCUtils {
 	 * @throws SQLException
 	 */
 	public static void setNullableInt(final int idx, PreparedStatement st,
-	    final Integer intValue) throws SQLException {
+			final Integer intValue) throws SQLException {
 		if (intValue == null) {
 			st.setNull(idx, Types.INTEGER);
 		} else {
@@ -74,8 +74,8 @@ public class JDBCUtils {
 	 * @param dateValue
 	 * @throws SQLException
 	 */
-	public static void setNullableTimestamp(final int idx, PreparedStatement st,
-	    final Date dateValue) throws SQLException {
+	public static void setNullableTimestamp(final int idx,
+			PreparedStatement st, final Date dateValue) throws SQLException {
 		if (dateValue == null) {
 			st.setNull(idx, Types.TIMESTAMP);
 		} else {
@@ -94,7 +94,7 @@ public class JDBCUtils {
 	 */
 	public static Long getNullableLong(final int idx, ResultSet set)
 			throws SQLException {
-	  final long l = set.getLong(idx);
+		final long l = set.getLong(idx);
 		if (set.wasNull()) {
 			return null;
 		} else {
@@ -113,7 +113,7 @@ public class JDBCUtils {
 	 */
 	public static Integer getNullableInteger(final int idx, ResultSet set)
 			throws SQLException {
-	  final int i = set.getInt(idx);
+		final int i = set.getInt(idx);
 		if (set.wasNull()) {
 			return null;
 		} else {

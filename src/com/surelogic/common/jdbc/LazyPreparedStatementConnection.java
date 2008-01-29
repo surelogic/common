@@ -46,13 +46,13 @@ public class LazyPreparedStatementConnection implements InvocationHandler {
 					new LazyPreparedStatement(method, args));
 		} else if ("close".equals(method.getName())) {
 			for (PreparedStatement st : statements) {
-					st.close();
+				st.close();
 			}
 		}
 		try {
 			return method.invoke(conn, args);
 		} catch (InvocationTargetException e) {
-		  final Throwable target = e.getTargetException();
+			final Throwable target = e.getTargetException();
 			if (target instanceof Exception) {
 				throw (Exception) target;
 			} else {
@@ -71,7 +71,7 @@ public class LazyPreparedStatementConnection implements InvocationHandler {
 
 				public PreparedStatement call() throws Exception {
 					try {
-					  final PreparedStatement st = (PreparedStatement) method
+						final PreparedStatement st = (PreparedStatement) method
 								.invoke(conn, args);
 						statements.add(st);
 						return st;
@@ -99,12 +99,12 @@ public class LazyPreparedStatementConnection implements InvocationHandler {
 			check();
 			try {
 				Object val = method.invoke(st, args);
-				if("close".equals(method.getName())) {
+				if ("close".equals(method.getName())) {
 					statements.remove(st);
 				}
 				return val;
 			} catch (InvocationTargetException e) {
-			  final Throwable target = e.getTargetException();
+				final Throwable target = e.getTargetException();
 				if (target instanceof Exception) {
 					throw (Exception) target;
 				} else {
@@ -112,6 +112,5 @@ public class LazyPreparedStatementConnection implements InvocationHandler {
 				}
 			}
 		}
-
 	}
 }

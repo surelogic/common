@@ -10,7 +10,6 @@ import java.util.concurrent.TimeUnit;
  * mainly serves to ease instantiation of the service in Jetty.
  * 
  * @author nathan
- * 
  */
 public class SierraExecutorService extends ThreadPoolExecutor {
 
@@ -18,5 +17,4 @@ public class SierraExecutorService extends ThreadPoolExecutor {
 		super(1, 1, 0L, TimeUnit.MILLISECONDS,
 				new LinkedBlockingQueue<Runnable>());
 	}
-
 }

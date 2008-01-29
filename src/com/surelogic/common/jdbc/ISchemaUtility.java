@@ -1,6 +1,3 @@
-/*
- * Created on Dec 7, 2007
- */
 package com.surelogic.common.jdbc;
 
 import java.io.IOException;
