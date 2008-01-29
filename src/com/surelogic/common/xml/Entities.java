@@ -1,4 +1,4 @@
-package com.surelogic.common;
+package com.surelogic.common.xml;
 
 import java.util.ArrayList;
 import java.util.List;
