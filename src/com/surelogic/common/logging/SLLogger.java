@@ -26,12 +26,8 @@ public class SLLogger {
 	 * <p>
 	 * The default is to show all logged messages at INFO and above.
 	 */
-	public static final Level LEVEL = Level.parse(System.getProperty(
-			"SLLoggingLevel", "INFO"));
-
-	private static final ConsoleHandler CONSOLE_HANDLER;
-
-	private static final FileHandler FILE_HANDLER;
+	public static final AtomicReference<Level> LEVEL = new AtomicReference<Level>(
+			Level.parse(System.getProperty("SLLoggingLevel", "INFO")));
 
 	/**
 	 * Changes the logging level of the console and file handlers managed by
@@ -45,10 +41,11 @@ public class SLLogger {
 	 *            the new value for the log level.
 	 */
 	public static void setLevel(Level newLevel) {
-		if (CONSOLE_HANDLER != null)
-			CONSOLE_HANDLER.setLevel(newLevel);
-		if (FILE_HANDLER != null)
-			FILE_HANDLER.setLevel(newLevel);
+		LEVEL.set(newLevel);
+
+		for (Handler handler : f_handlers) {
+			handler.setLevel(newLevel);
+		}
 	}
 
 	/**
@@ -138,21 +135,18 @@ public class SLLogger {
 					setOutputStream(System.out);
 				}
 			}
-			CONSOLE_HANDLER = new MyCH();
-			CONSOLE_HANDLER.setLevel(LEVEL);
-			addHandler(CONSOLE_HANDLER);
+			final ConsoleHandler ch = new MyCH();
+			ch.setLevel(LEVEL.get());
+			addHandler(ch);
 			try {
-				FILE_HANDLER = new FileHandler(LOG_FILE_NAME, true);
-				FILE_HANDLER.setLevel(LEVEL);
-				addHandler(FILE_HANDLER);
+				final FileHandler fh = new FileHandler(LOG_FILE_NAME, true);
+				fh.setLevel(LEVEL.get());
+				addHandler(fh);
 			} catch (Exception e) {
 				throw new IllegalStateException(
 						"Unable to create FileHandler object for SureLogic logger",
 						e);
 			}
-		} else {
-			CONSOLE_HANDLER = null;
-			FILE_HANDLER = null;
 		}
 	}
 
@@ -172,7 +166,7 @@ public class SLLogger {
 		Logger logger = f_nameToLogger.get(name);
 		if (logger == null) {
 			logger = Logger.getLogger(name);
-			logger.setLevel(LEVEL);
+			logger.setLevel(Level.ALL);
 			f_nameToLogger.put(name, logger); // add to cache
 
 			/*
