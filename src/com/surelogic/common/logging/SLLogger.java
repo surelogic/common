@@ -20,6 +20,17 @@ import java.util.logging.Logger;
 public class SLLogger {
 
 	/**
+	 * The key used to set a the log file name via a call to
+	 * {@link System#setProperty(String, String)}.
+	 * <p>
+	 * If you do not want the log to output to a file then set this property to
+	 * {@link #NO_FILE_OUTPUT}.
+	 */
+	static public final String LOG_FILE_NAME_PROPERTY = "SLLoggingFileName";
+
+	static public final String NO_FILE_OUTPUT = "OFF";
+
+	/**
 	 * Setting this system property allows easy configuration of the logging
 	 * level. For example <code>-DSLLoggingLevel=FINE</code> will now show
 	 * fine logging messages and above to the console and the file.
@@ -115,6 +126,23 @@ public class SLLogger {
 	public static final String LOG_FILE_NAME;
 
 	static {
+		final String envLogFileName = System
+				.getProperty(LOG_FILE_NAME_PROPERTY);
+		if (envLogFileName != null) {
+			/*
+			 * Use the filename given by the environment variable.
+			 */
+			LOG_FILE_NAME = envLogFileName;
+		} else {
+			/*
+			 * Generate a filename based upon the current date and time.
+			 */
+			final SimpleDateFormat dateFormat = new SimpleDateFormat(
+					"-yyyy.MM.dd-'at'-HH.mm.ss.SSS");
+			LOG_FILE_NAME = System.getProperty("java.io.tmpdir")
+					+ File.separator + "SureLogic"
+					+ dateFormat.format(new Date()) + ".txt";
+		}
 		/*
 		 * We use a property scheme to try to avoid duplicate logging on the EJB
 		 * container. The EJB container, due to re-deployments, can load this
@@ -122,23 +150,21 @@ public class SLLogger {
 		 * SureLogic logging setup more than a single time.
 		 */
 		final String registered = "SLLoggingIsRegistered";
-		final SimpleDateFormat dateFormat = new SimpleDateFormat(
-				"-yyyy.MM.dd-'at'-HH.mm.ss.SSS");
-		LOG_FILE_NAME = System.getProperty("java.io.tmpdir") + File.separator
-				+ "SureLogic" + dateFormat.format(new Date()) + ".txt";
 		if (System.getProperty(registered) == null) {
 			System.setProperty(registered, "T");
 			final ConsoleHandler ch = new ConsoleHandler();
 			ch.setLevel(LEVEL.get());
 			addHandler(ch);
-			try {
-				final FileHandler fh = new FileHandler(LOG_FILE_NAME, true);
-				fh.setLevel(LEVEL.get());
-				addHandler(fh);
-			} catch (Exception e) {
-				throw new IllegalStateException(
-						"Unable to create FileHandler object for SureLogic logger",
-						e);
+			if (!NO_FILE_OUTPUT.equals(LOG_FILE_NAME)) {
+				try {
+					final FileHandler fh = new FileHandler(LOG_FILE_NAME, true);
+					fh.setLevel(LEVEL.get());
+					addHandler(fh);
+				} catch (Exception e) {
+					throw new IllegalStateException(
+							"Unable to create FileHandler object for SureLogic logger",
+							e);
+				}
 			}
 		}
 	}
