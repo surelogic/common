@@ -46,6 +46,9 @@ public class SLLogger {
 		for (Handler handler : f_handlers) {
 			handler.setLevel(newLevel);
 		}
+		for (Logger logger : f_nameToLogger.values()) {
+			logger.setLevel(newLevel);
+		}
 	}
 
 	/**
@@ -156,7 +159,7 @@ public class SLLogger {
 		Logger logger = f_nameToLogger.get(name);
 		if (logger == null) {
 			logger = Logger.getLogger(name);
-			logger.setLevel(Level.ALL);
+			logger.setLevel(LEVEL.get());
 			f_nameToLogger.put(name, logger); // add to cache
 
 			/*
