@@ -125,17 +125,7 @@ public class SLLogger {
 				+ "SureLogic" + dateFormat.format(new Date()) + ".txt";
 		if (System.getProperty(registered) == null) {
 			System.setProperty(registered, "T");
-			/*
-			 * Change the console hander to output to System.out not System.err
-			 * since we often work in Eclipse and this makes our output "fit in"
-			 * better.
-			 */
-			final class MyCH extends ConsoleHandler {
-				MyCH() {
-					setOutputStream(System.out);
-				}
-			}
-			final ConsoleHandler ch = new MyCH();
+			final ConsoleHandler ch = new ConsoleHandler();
 			ch.setLevel(LEVEL.get());
 			addHandler(ch);
 			try {
