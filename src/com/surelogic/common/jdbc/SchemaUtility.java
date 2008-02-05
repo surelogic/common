@@ -103,7 +103,7 @@ public final class SchemaUtility {
 			/*
 			 * Check if the database is too new for this code
 			 */
-			if (programSchemaVersion < dbSchemaVersion || true) {
+			if (programSchemaVersion < dbSchemaVersion) {
 				throw new FutureDatabaseException(programSchemaVersion,
 						dbSchemaVersion);
 			}
