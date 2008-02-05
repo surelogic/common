@@ -11,8 +11,7 @@ public class FeatureVersions extends Properties implements IFeatureVersionMap {
   
   private FeatureVersions(String location) throws IOException {
     URL site      = new URL(location);
-    Reader reader = new InputStreamReader(site.openStream());
-    load(reader);
+    load(site.openStream());
   }
   
   public static IFeatureVersionMap getLatestVersions() throws IOException {
