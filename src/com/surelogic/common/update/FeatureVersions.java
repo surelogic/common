@@ -27,6 +27,16 @@ public class FeatureVersions extends Properties implements IFeatureVersionMap {
     try {
       IFeatureVersionMap versions = new FeatureVersions("file:///work/workspace/common/latest.properties");
       System.out.println("common = "+versions.get("common"));
+
+      String[] tmp = new String[] { "0.7", "1.0.0", "1.0.0.1", "2.0", "2.0_2008" };
+      String last  = null; 
+      for(String v : tmp) {
+        if (last != null) {
+          System.out.println(last+" <= "+v+" : "+(last.compareTo(v) <= 0));
+        }
+        last = v;
+      }
+      
     } catch (IOException e) {
       e.printStackTrace();
     }
