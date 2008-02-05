@@ -8,4 +8,5 @@ Export-Package: com.surelogic.common,
  com.surelogic.common.i18n,
  com.surelogic.common.jdbc,
  com.surelogic.common.logging,
+ com.surelogic.common.update,
  com.surelogic.common.xml
