@@ -7,7 +7,7 @@ import java.sql.SQLException;
 
 public abstract class AbstractSchemaUtility implements ISchemaUtility {
 	public void checkAndUpdate(final Connection c, final boolean serverDB)
-			throws SQLException, IOException {
+			throws SQLException, IOException, FutureDatabaseException {
 		final int arrayLength = getSchemaVersion() + 1;
 		final IDBType db = getDBType(c);
 		final URL[] scripts = new URL[arrayLength];

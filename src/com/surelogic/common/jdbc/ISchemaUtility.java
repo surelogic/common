@@ -9,5 +9,5 @@ public interface ISchemaUtility {
 	static final String SEPARATOR = "_";
 
 	void checkAndUpdate(final Connection c, boolean isServer)
-			throws IOException, SQLException;
+			throws IOException, SQLException, FutureDatabaseException;
 }

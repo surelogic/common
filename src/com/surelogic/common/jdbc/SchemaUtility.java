@@ -68,9 +68,13 @@ public final class SchemaUtility {
 	 *             occurs.
 	 * @throws IOException
 	 *             if a problem occurs reading an SQL script.
+	 * @throws FutureDatabaseException
+	 *             if the database version is higher (newer) than what this code
+	 *             expects.
 	 */
 	public static void checkAndUpdate(final Connection c, URL[] sqlScripts,
-			final SchemaAction[] actions) throws SQLException, IOException {
+			final SchemaAction[] actions) throws SQLException, IOException,
+			FutureDatabaseException {
 		/*
 		 * Check preconditions
 		 */
@@ -95,6 +99,14 @@ public final class SchemaUtility {
 		try {
 
 			final int dbSchemaVersion = getVersion(st);
+
+			/*
+			 * Check if the database is too new for this code
+			 */
+			if (programSchemaVersion < dbSchemaVersion || true) {
+				throw new FutureDatabaseException(programSchemaVersion,
+						dbSchemaVersion);
+			}
 
 			if (dbSchemaVersion < programSchemaVersion) {
 
