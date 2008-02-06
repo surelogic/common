@@ -83,7 +83,7 @@ public abstract class ExportTableDataSource implements Iterable<String[]> {
 
 			public String[] next() {
 				if (f_initialized) {
-					return next();
+					return nextRow();
 				} else {
 					f_initialized = true;
 					return init();
