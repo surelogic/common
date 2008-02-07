@@ -10,13 +10,14 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
-import java.util.logging.Level;
+import java.util.logging.*;
 
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.logging.SLLogger;
 
 public final class SchemaUtility {
-
+  private static final Logger LOG = SLLogger.getLogger();
+  
 	private SchemaUtility() {
 		// no instances
 	}
@@ -91,7 +92,7 @@ public final class SchemaUtility {
 		  // Check if there is either a script or an action for every version
 		  for(int i=0; i<sqlScripts.length; i++) {
 		    if (sqlScripts[i] == null && actions[i] == null) {
-		       throw new IllegalArgumentException("There must be a script or action for version "+(i+1));
+		      throw new IllegalArgumentException("There must be a script or action for version "+i);
 		    }
 		  }		  
 		} else { // no actions, so there must be a script for every version
@@ -150,11 +151,11 @@ public final class SchemaUtility {
 				if (programSchemaVersion != 0)
 					setVersion(programSchemaVersion, st);
 
-				SLLogger.getLogger().info(
+				LOG.info(
 						I18N.msg("db.updatedVersion", programSchemaVersion, c));
 			} else {
-				if (SLLogger.getLogger().isLoggable(Level.FINE))
-					SLLogger.getLogger().fine(
+				if (LOG.isLoggable(Level.FINE))
+					LOG.fine(
 							I18N.msg("db.atVersion", programSchemaVersion, c));
 			}
 		} finally {
