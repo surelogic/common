@@ -134,7 +134,7 @@ public class JDBCUtils {
 	 * Escape a string to be used as input in a JDBC query.
 	 * 
 	 * @param string
-	 * @return
+	 * @return the string with all ' changed into ''.
 	 */
 	public static String escapeString(final String string) {
 		return string.replaceAll("'", "''");
