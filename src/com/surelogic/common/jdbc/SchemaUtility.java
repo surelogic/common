@@ -9,9 +9,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 
 import com.surelogic.common.i18n.I18N;
@@ -84,15 +82,26 @@ public final class SchemaUtility {
 		if (sqlScripts.length < 1)
 			throw new IllegalArgumentException(
 					"SQL script array cannot be empty");
-		for (URL f : sqlScripts)
-			if (f == null)
-				throw new IllegalArgumentException(
-						"elements of SQL script array cannot be null: "
-								+ Arrays.toString(sqlScripts));
-		if (actions != null && sqlScripts.length != actions.length)
-			throw new IllegalArgumentException(
-					"sqlScripts.length == actions.length when actions != null");
 
+		if (actions != null) {
+		  if (sqlScripts.length != actions.length) {
+		    throw new IllegalArgumentException(
+		    "sqlScripts.length == actions.length when actions != null");
+		  }
+		  // Check if there is either a script or an action for every version
+		  for(int i=0; i<sqlScripts.length; i++) {
+		    if (sqlScripts[i] == null && actions[i] == null) {
+		       throw new IllegalArgumentException("There must be a script or action for version "+(i+1));
+		    }
+		  }		  
+		} else { // no actions, so there must be a script for every version
+	    for (URL f : sqlScripts)
+	      if (f == null)
+	        throw new IllegalArgumentException(
+	            "elements of SQL script array cannot be null: "
+	                + Arrays.toString(sqlScripts));
+		}
+		
 		final int programSchemaVersion = sqlScripts.length - 1;
 
 		final Statement st = c.createStatement();
@@ -121,7 +130,9 @@ public final class SchemaUtility {
 						/*
 						 * Update the schema in the database.
 						 */
-						runScript(sqlScripts[i], st);
+	          if (sqlScripts[i] != null) {
+	            runScript(sqlScripts[i], st);
+	          }
 						/*
 						 * Run the action on the database (optional).
 						 */
