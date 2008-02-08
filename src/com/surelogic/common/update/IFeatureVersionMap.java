@@ -1,19 +1,19 @@
 package com.surelogic.common.update;
 
 /**
- * Provides access to released versions of SureLogic software products.
+ * Provides access to information about SureLogic software products.
  */
 public interface IFeatureVersionMap {
 	/**
-	 * Gets the version number for the newest release of a product from
-	 * SureLogic.
+	 * Looks up the value for the given key. Typically this gets the version
+	 * number for the newest release of a product from SureLogic.
 	 * 
-	 * @param productName
-	 *            the product identifier.
-	 * @return the version number of the newest release from SureLogic, or
-	 *         <tt>null</tt> if the product identifier is unknown.
+	 * @param key
+	 *            the identifier (typically a product identifier).
+	 * @return the value (typically the version number of the newest release
+	 *         from SureLogic), or <tt>null</tt> if no value is defined.
 	 */
-	String get(String productName);
+	String get(String key);
 
 	/**
 	 * Checks if an upgrade is available for a given version of a product.
