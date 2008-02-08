@@ -4,7 +4,7 @@ import java.io.*;
 import java.net.*;
 import java.util.Properties;
 
-public class FeatureVersions extends Properties implements IFeatureVersionMap {
+public final class FeatureVersions extends Properties implements IFeatureVersionMap {
   private static final long serialVersionUID = 1L;
   
   private static String LATEST = "http://www.surelogic.com/latest.properties";

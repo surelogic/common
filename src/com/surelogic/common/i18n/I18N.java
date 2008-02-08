@@ -12,7 +12,7 @@ import java.util.ResourceBundle;
  * 
  * @author Tim Halloran
  */
-public class I18N {
+public final class I18N {
 
 	private static final ResourceBundle BUNDLE = ResourceBundle
 			.getBundle(I18N.class.getPackage().getName() + ".SureLogic");
