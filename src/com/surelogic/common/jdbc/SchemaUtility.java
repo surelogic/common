@@ -320,7 +320,7 @@ public final class SchemaUtility {
 			String buffer;
 			while ((buffer = br.readLine()) != null) {
 				buffer = buffer.trim();
-				if (buffer.startsWith("--") || buffer.equals("")) {
+				if (buffer.startsWith("--") || "".equals(buffer)) {
 					// comment or blank line -- ignore this line
 				} else if (buffer.endsWith("<<>>")) {
 					// end of an SQL statement -- add to our resulting list
