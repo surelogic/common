@@ -11,8 +11,8 @@ final class CSVTableExporter extends TextFileTableExporer {
 
 	@Override
 	protected void export(PrintWriter to) throws Exception {
+    final StringBuilder b = new StringBuilder();
 		for (String[] row : getSource()) {
-			StringBuilder b = new StringBuilder();
 			boolean first = true;
 			for (String item : row) {
 				if (first) {
@@ -27,6 +27,7 @@ final class CSVTableExporter extends TextFileTableExporer {
 				b.append('"').append(doubleQuote(item)).append('"');
 			}
 			to.println(b.toString());
+			b.setLength(0);
 		}
 	}
 
