@@ -11,13 +11,13 @@ package com.surelogic.common.jdbc;
  */
 public final class FutureDatabaseException extends Exception {
 
-	private int f_codeVersion;
+	private final int f_codeVersion;
 
 	public int getCodeVersion() {
 		return f_codeVersion;
 	}
 
-	private int f_schemaVersion;
+	private final int f_schemaVersion;
 
 	public int getSchemaVersion() {
 		return f_schemaVersion;
