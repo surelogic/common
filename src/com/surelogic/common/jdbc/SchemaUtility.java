@@ -200,9 +200,13 @@ public final class SchemaUtility {
 		int result = -1;
 		try {
 			final ResultSet ver = st.executeQuery(Q_SELECT);
-			while (ver.next()) {
-				result = ver.getInt(1);
-			}
+      try {
+        while (ver.next()) {
+          result = ver.getInt(1);
+        }
+      } finally {
+        ver.close();
+      }
 		} catch (SQLException e) {
 			/*
 			 * Ignore, this exception occurred because the schema was not found
