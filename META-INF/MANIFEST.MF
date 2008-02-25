@@ -5,6 +5,7 @@ Bundle-SymbolicName: com.surelogic.common
 Bundle-Version: 2.0.0.qualifier
 Bundle-Vendor: SureLogic, Inc.
 Export-Package: com.surelogic.common,
+ com.surelogic.common.base64,
  com.surelogic.common.export,
  com.surelogic.common.i18n,
  com.surelogic.common.jdbc,
