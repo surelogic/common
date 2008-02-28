@@ -1386,6 +1386,7 @@ public class Base64 {
 		private int lineLength;
 		private boolean breakLines; // Break lines at less than 80 characters
 		private int options; // Record options used to create the stream.
+		@SuppressWarnings("unused")
 		private byte[] alphabet; // Local copies to avoid extra method calls
 		private byte[] decodabet; // Local copies to avoid extra method calls
 
@@ -1607,6 +1608,7 @@ public class Base64 {
 		private byte[] b4; // Scratch used in a few places
 		private boolean suspendEncoding;
 		private int options; // Record for later
+		@SuppressWarnings("unused")
 		private byte[] alphabet; // Local copies to avoid extra method calls
 		private byte[] decodabet; // Local copies to avoid extra method calls
 
