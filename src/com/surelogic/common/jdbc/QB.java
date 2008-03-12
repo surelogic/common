@@ -71,21 +71,23 @@ public final class QB {
 		f_databaseQualifier.set(value);
 	}
 
-	public static void main(String[] args) {
-		System.out.println(QB.get("portal.contributions.select") + "= (1)");
-		System.out.println(QB.get("portal.contributions.update") + "= (4)");
-		setDatabaseType(DatabaseType.oracle);
-		System.out.println(QB.get("portal.contributions.update") + "= (2)");
-		setDatabaseQualifier("11");
-		System.out.println(QB.get("portal.contributions.update") + "= (3)");
-
-		long start = System.nanoTime();
-		for (int i = 0; i < 100000; i++) {
-			QB.get("portal.contributions.select");
-		}
-		long duration = System.nanoTime() - start;
-		System.out.println(duration + " ns duration");
-	}
+	// public static void main(String[] args) {
+	// System.out.println(QB.get("portal.contributions.select") + "= (1)");
+	// System.out.println(QB.get("portal.contributions.update") + "= (4)");
+	// setDatabaseType(DatabaseType.oracle);
+	// System.out.println(QB.get("portal.contributions.update") + "= (2)");
+	// setDatabaseQualifier("11");
+	// System.out.println(QB.get("portal.contributions.update") + "= (3)");
+	//
+	// long start = System.nanoTime();
+	// for (int i = 0; i < 1000000; i++) {
+	// QB.get("portal.contributions.select");
+	// }
+	// long duration = System.nanoTime() - start;
+	// double dur = duration / 1000000000.0;
+	// System.out.println(duration + " ns duration");
+	// System.out.println(dur + " s duration");
+	//	}
 
 	/**
 	 * Gets the query defined in the query bank for the given key.
@@ -148,6 +150,10 @@ public final class QB {
 	/**
 	 * Looks up a key in the bundle, but returns {@code null} rather than
 	 * throwing an exception if the key doesn't exist.
+	 * <p>
+	 * <i>Implementation Note:</i> This method tries, via reflection, to use
+	 * the Java 6 containsKey method on the {@link ResourceBundle} class, if it
+	 * can't find it it defaults to a try-catch block strategy.
 	 * 
 	 * @param key
 	 *            the key.
@@ -159,10 +165,8 @@ public final class QB {
 				final Method containsKey = BUNDLE.getClass().getMethod(
 						"containsKey", String.class);
 				f_containsKey.set(containsKey);
-				System.out.println("found containsKey");
 			} catch (Exception e) {
 				// no luck, have to use the exception approach
-				System.out.println("didn't find containsKey");
 			}
 		}
 		final Method containsKey = f_containsKey.get();
@@ -186,7 +190,7 @@ public final class QB {
 			}
 		}
 		/*
-		 * Fall back on using a try catch block.
+		 * Fall back on using a try-catch block.
 		 */
 		try {
 			return BUNDLE.getString(key);
