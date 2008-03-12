@@ -1,10 +1,14 @@
 package com.surelogic.common.jdbc;
 
+import java.lang.reflect.Method;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.logging.Level;
 
 import com.surelogic.common.i18n.I18N;
+import com.surelogic.common.logging.SLLogger;
 
 /**
  * This utility implements a bank of queries that are localized to a particular
@@ -66,7 +70,23 @@ public final class QB {
 	public static void setDatabaseQualifier(final String value) {
 		f_databaseQualifier.set(value);
 	}
-	
+
+	public static void main(String[] args) {
+		System.out.println(QB.get("portal.contributions.select") + "= (1)");
+		System.out.println(QB.get("portal.contributions.update") + "= (4)");
+		setDatabaseType(DatabaseType.oracle);
+		System.out.println(QB.get("portal.contributions.update") + "= (2)");
+		setDatabaseQualifier("11");
+		System.out.println(QB.get("portal.contributions.update") + "= (3)");
+
+		long start = System.nanoTime();
+		for (int i = 0; i < 100000; i++) {
+			QB.get("portal.contributions.select");
+		}
+		long duration = System.nanoTime() - start;
+		System.out.println(duration + " ns duration");
+	}
+
 	/**
 	 * Gets the query defined in the query bank for the given key.
 	 * <p>
@@ -108,16 +128,71 @@ public final class QB {
 		final String keyDotType = key + "." + type;
 		if (qualifier != null) {
 			final String keyDotTypeDotQualifier = keyDotType + "." + qualifier;
+			final String result = getStringOrNull(keyDotTypeDotQualifier);
+			if (result != null)
+				return result;
+		}
+		final String result = getStringOrNull(keyDotType);
+		if (result != null)
+			return result;
+		else
+			return BUNDLE.getString(key);
+	}
+
+	private static final AtomicBoolean f_firstGetStringOrNullCall = new AtomicBoolean(
+			true);
+
+	private static final AtomicReference<Method> f_containsKey = new AtomicReference<Method>(
+			null);
+
+	/**
+	 * Looks up a key in the bundle, but returns {@code null} rather than
+	 * throwing an exception if the key doesn't exist.
+	 * 
+	 * @param key
+	 *            the key.
+	 * @return the string for the given key.
+	 */
+	private static String getStringOrNull(final String key) {
+		if (f_firstGetStringOrNullCall.getAndSet(false)) {
 			try {
-				return BUNDLE.getString(keyDotTypeDotQualifier);
-			} catch (MissingResourceException e) {
+				final Method containsKey = BUNDLE.getClass().getMethod(
+						"containsKey", String.class);
+				f_containsKey.set(containsKey);
+				System.out.println("found containsKey");
+			} catch (Exception e) {
+				// no luck, have to use the exception approach
+				System.out.println("didn't find containsKey");
 			}
 		}
+		final Method containsKey = f_containsKey.get();
+		if (containsKey != null) {
+			/*
+			 * We can use the containsKey method added in Java 6.
+			 */
+			try {
+				final Object result = containsKey.invoke(BUNDLE, key);
+				if (result instanceof Boolean) {
+					final Boolean booleanResult = (Boolean) result;
+					if (booleanResult.booleanValue()) {
+						return BUNDLE.getString(key);
+					} else {
+						return null;
+					}
+				}
+			} catch (Exception e) {
+				// Should not happen
+				SLLogger.getLogger().log(Level.SEVERE, I18N.err(90));
+			}
+		}
+		/*
+		 * Fall back on using a try catch block.
+		 */
 		try {
-			return BUNDLE.getString(keyDotType);
+			return BUNDLE.getString(key);
 		} catch (MissingResourceException e) {
 		}
-		return BUNDLE.getString(key);
+		return null;
 	}
 
 	/**
