@@ -1,5 +1,6 @@
 package com.surelogic.common.jdbc;
 
+import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -65,7 +66,7 @@ public final class QB {
 	public static void setDatabaseQualifier(final String value) {
 		f_databaseQualifier.set(value);
 	}
-
+	
 	/**
 	 * Gets the query defined in the query bank for the given key.
 	 * <p>
@@ -107,12 +108,14 @@ public final class QB {
 		final String keyDotType = key + "." + type;
 		if (qualifier != null) {
 			final String keyDotTypeDotQualifier = keyDotType + "." + qualifier;
-			if (BUNDLE.containsKey(keyDotTypeDotQualifier)) {
+			try {
 				return BUNDLE.getString(keyDotTypeDotQualifier);
+			} catch (MissingResourceException e) {
 			}
 		}
-		if (BUNDLE.containsKey(keyDotType)) {
+		try {
 			return BUNDLE.getString(keyDotType);
+		} catch (MissingResourceException e) {
 		}
 		return BUNDLE.getString(key);
 	}
