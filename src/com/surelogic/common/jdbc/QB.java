@@ -6,6 +6,7 @@ import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.logging.SLLogger;
@@ -71,24 +72,6 @@ public final class QB {
 		f_databaseQualifier.set(value);
 	}
 
-	// public static void main(String[] args) {
-	// System.out.println(QB.get("portal.contributions.select") + "= (1)");
-	// System.out.println(QB.get("portal.contributions.update") + "= (4)");
-	// setDatabaseType(DatabaseType.oracle);
-	// System.out.println(QB.get("portal.contributions.update") + "= (2)");
-	// setDatabaseQualifier("11");
-	// System.out.println(QB.get("portal.contributions.update") + "= (3)");
-	//
-	// long start = System.nanoTime();
-	// for (int i = 0; i < 1000000; i++) {
-	// QB.get("portal.contributions.select");
-	// }
-	// long duration = System.nanoTime() - start;
-	// double dur = duration / 1000000000.0;
-	// System.out.println(duration + " ns duration");
-	// System.out.println(dur + " s duration");
-	//	}
-
 	/**
 	 * Gets the query defined in the query bank for the given key.
 	 * <p>
@@ -120,7 +103,22 @@ public final class QB {
 	 *            the key for the desired query.
 	 * @return the query.
 	 */
-	public static final String get(final String key) {
+	public static String get(final String key) {
+		final String result = getQueryString(key);
+		final Logger log = SLLogger.getLogger();
+		if (log.isLoggable(Level.FINE)) {
+			SLLogger.log(Level.FINE, I18N.msg("db.QB.get", key, result));
+		}
+		return result;
+	}
+
+	/**
+	 * This method basically implements {@link #get(String)}. It doesn't,
+	 * however, log its result.
+	 * 
+	 * @see #get(String)
+	 */
+	private static String getQueryString(final String key) {
 		if (key == null)
 			throw new IllegalArgumentException(I18N.err(44, "key"));
 
@@ -144,6 +142,11 @@ public final class QB {
 	private static final AtomicBoolean f_firstGetStringOrNullCall = new AtomicBoolean(
 			true);
 
+	/**
+	 * A handle to the containsKey method in the {@link ResourceBundle} class.
+	 * This method was added in Java 6 and may or may not exist depending upon
+	 * the VM we are running on.
+	 */
 	private static final AtomicReference<Method> f_containsKey = new AtomicReference<Method>(
 			null);
 
@@ -186,7 +189,7 @@ public final class QB {
 				}
 			} catch (Exception e) {
 				// Should not happen
-				SLLogger.getLogger().log(Level.SEVERE, I18N.err(90));
+				SLLogger.log(Level.SEVERE, I18N.err(90));
 			}
 		}
 		/*
@@ -228,8 +231,13 @@ public final class QB {
 	 * @return the formatted string for the query.
 	 * @see String#format(String, Object...)
 	 */
-	public static final String get(final String key, Object... args) {
-		return String.format(I18N.msg(key), args);
+	public static String get(final String key, Object... args) {
+		final String result = String.format(getQueryString(key), args);
+		final Logger log = SLLogger.getLogger();
+		if (log.isLoggable(Level.FINE)) {
+			SLLogger.log(Level.FINE, I18N.msg("db.QB.get", key, result));
+		}
+		return result;
 	}
 
 	/**
@@ -255,9 +263,19 @@ public final class QB {
 	 *            the query number.
 	 * @return the query.
 	 */
-	public static final String get(final int number) {
-		final String key = String.format("query.%05d", number);
-		return get(key);
+	public static String get(final int number) {
+		final String key = numberToKey(number);
+		final String result = getQueryString(key);
+		final Logger log = SLLogger.getLogger();
+		if (log.isLoggable(Level.FINE)) {
+			SLLogger.log(Level.FINE, I18N
+					.msg("db.QB.getNumber", number, result));
+		}
+		return result;
+	}
+
+	private static String numberToKey(final int number) {
+		return String.format("query.%05d", number);
 	}
 
 	/**
@@ -288,8 +306,15 @@ public final class QB {
 	 * @return the formatted string for the query.
 	 * @see String#format(String, Object...)
 	 */
-	public static final String get(final int number, Object... args) {
-		return String.format(I18N.err(number), args);
+	public static String get(final int number, Object... args) {
+		final String key = numberToKey(number);
+		final String result = String.format(getQueryString(key), args);
+		final Logger log = SLLogger.getLogger();
+		if (log.isLoggable(Level.FINE)) {
+			SLLogger.log(Level.FINE, I18N
+					.msg("db.QB.getNumber", number, result));
+		}
+		return result;
 	}
 
 	private QB() {

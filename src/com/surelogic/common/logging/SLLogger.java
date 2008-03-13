@@ -182,8 +182,8 @@ public class SLLogger {
 	}
 
 	/**
-	 * Convenience method to get the <code>com.surelogic</code> logger.
-	 * Invoking this method is equivalent to invoking:
+	 * Convenience method to get the {@code com.surelogic} logger. Invoking this
+	 * method is equivalent to invoking:
 	 * 
 	 * <pre>
 	 * getLogger(&quot;&quot;)
@@ -194,6 +194,35 @@ public class SLLogger {
 	 */
 	public static synchronized Logger getLogger() {
 		return getLogger("");
+	}
+
+	/**
+	 * Logs a message to the {@code com.surelogic} logger. Calling this method
+	 * is equivalent to calling {@code SLLogger.getLogger().log(level, msg)}.
+	 * 
+	 * @param level
+	 *            One of the message level identifiers, e.g. SEVERE
+	 * @param msg
+	 *            The string message (or a key in the message catalog)
+	 */
+	public static void log(Level level, String msg) {
+		getLogger().log(level, msg);
+	}
+
+	/**
+	 * Logs a message to the {@code com.surelogic} logger. Calling this method
+	 * is equivalent to calling
+	 * {@code SLLogger.getLogger().log(level, msg, thrown)}.
+	 * 
+	 * @param level
+	 *            One of the message level identifiers, e.g. SEVERE
+	 * @param msg
+	 *            The string message (or a key in the message catalog)
+	 * @param thrown
+	 *            Throwable associated with log message.
+	 */
+	public static void log(Level level, String msg, Throwable thrown) {
+		getLogger().log(level, msg, thrown);
 	}
 
 	/**
