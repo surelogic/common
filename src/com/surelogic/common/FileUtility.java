@@ -75,7 +75,7 @@ public final class FileUtility {
 	 * <tt>~/.sierra-data</tt> is used. Finally, if that directory is invalid
 	 * then the value of <tt>java.io.tmpdir</tt> is used.
 	 * 
-	 * @return the path to the Sierra data directory. No training <tt>/</tt>
+	 * @return the path to the Sierra data directory. No trailing <tt>/</tt>
 	 *         is included.
 	 */
 	static public String getSierraDataDirectory() {
