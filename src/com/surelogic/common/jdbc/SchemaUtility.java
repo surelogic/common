@@ -16,17 +16,11 @@ import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.logging.SLLogger;
 
 public final class SchemaUtility {
-  private static final Logger LOG = SLLogger.getLogger();
-  
+	private static final Logger LOG = SLLogger.getLogger();
+
 	private SchemaUtility() {
 		// no instances
 	}
-
-	private static final String Q_CREATE = "create table VERSION (N INT NOT NULL)";
-	private static final String Q_DELETE = "drop table VERSION";
-	private static final String Q_SELECT = "select N from VERSION";
-	private static final String Q_INSERT = "insert into VERSION values (0)";
-	private static final String Q_UPDATE = "update VERSION set N=";
 
 	/**
 	 * Checks the passed database connection is at the correct version. Versions
@@ -85,24 +79,25 @@ public final class SchemaUtility {
 					"SQL script array cannot be empty");
 
 		if (actions != null) {
-		  if (sqlScripts.length != actions.length) {
-		    throw new IllegalArgumentException(
-		    "sqlScripts.length == actions.length when actions != null");
-		  }
-		  // Check if there is either a script or an action for every version
-		  for(int i=0; i<sqlScripts.length; i++) {
-		    if (sqlScripts[i] == null && actions[i] == null) {
-		      throw new IllegalArgumentException("There must be a script or action for version "+i);
-		    }
-		  }		  
+			if (sqlScripts.length != actions.length) {
+				throw new IllegalArgumentException(
+						"sqlScripts.length == actions.length when actions != null");
+			}
+			// Check if there is either a script or an action for every version
+			for (int i = 0; i < sqlScripts.length; i++) {
+				if (sqlScripts[i] == null && actions[i] == null) {
+					throw new IllegalArgumentException(
+							"There must be a script or action for version " + i);
+				}
+			}
 		} else { // no actions, so there must be a script for every version
-	    for (URL f : sqlScripts)
-	      if (f == null)
-	        throw new IllegalArgumentException(
-	            "elements of SQL script array cannot be null: "
-	                + Arrays.toString(sqlScripts));
+			for (URL f : sqlScripts)
+				if (f == null)
+					throw new IllegalArgumentException(
+							"elements of SQL script array cannot be null: "
+									+ Arrays.toString(sqlScripts));
 		}
-		
+
 		final int programSchemaVersion = sqlScripts.length - 1;
 
 		final Statement st = c.createStatement();
@@ -131,9 +126,9 @@ public final class SchemaUtility {
 						/*
 						 * Update the schema in the database.
 						 */
-	          if (sqlScripts[i] != null) {
-	            runScript(sqlScripts[i], st);
-	          }
+						if (sqlScripts[i] != null) {
+							runScript(sqlScripts[i], st);
+						}
 						/*
 						 * Run the action on the database (optional).
 						 */
@@ -151,12 +146,12 @@ public final class SchemaUtility {
 				if (programSchemaVersion != 0)
 					setVersion(programSchemaVersion, st);
 
-				LOG.info(
-						I18N.msg("db.updatedVersion", programSchemaVersion, c));
+				LOG
+						.info(I18N.msg("db.updatedVersion",
+								programSchemaVersion, c));
 			} else {
 				if (LOG.isLoggable(Level.FINE))
-					LOG.fine(
-							I18N.msg("db.atVersion", programSchemaVersion, c));
+					LOG.fine(I18N.msg("db.atVersion", programSchemaVersion, c));
 			}
 		} finally {
 			st.close();
@@ -178,12 +173,12 @@ public final class SchemaUtility {
 		assert st != null;
 
 		try {
-			st.execute(Q_DELETE);
+			st.execute(QB.get(8));
 		} catch (SQLException e) {
 			// will fail if the database is completely empty
 		}
-		st.execute(Q_CREATE);
-		st.execute(Q_INSERT);
+		st.execute(QB.get(7));
+		st.execute(QB.get(10));
 	}
 
 	/**
@@ -199,14 +194,14 @@ public final class SchemaUtility {
 
 		int result = -1;
 		try {
-			final ResultSet ver = st.executeQuery(Q_SELECT);
-      try {
-        while (ver.next()) {
-          result = ver.getInt(1);
-        }
-      } finally {
-        ver.close();
-      }
+			final ResultSet ver = st.executeQuery(QB.get(9));
+			try {
+				while (ver.next()) {
+					result = ver.getInt(1);
+				}
+			} finally {
+				ver.close();
+			}
 		} catch (SQLException e) {
 			/*
 			 * Ignore, this exception occurred because the schema was not found
@@ -229,7 +224,7 @@ public final class SchemaUtility {
 	 */
 	private static void setVersion(final int version, final Statement st)
 			throws SQLException {
-		st.execute(Q_UPDATE + version);
+		st.execute(QB.get(11, version));
 	}
 
 	/**
