@@ -17,7 +17,7 @@ public final class FileUtility {
 	 * 
 	 * @param path
 	 *            the desired directory.
-	 * @returns <tt>true</tt> if the directory exited or was created, along
+	 * @returns <tt>true</tt> if the directory existed or was created, along
 	 *          with all necessary parent directories; <tt>false</tt>
 	 *          otherwise.
 	 * 
@@ -92,6 +92,21 @@ public final class FileUtility {
 		if (createDirectory(dir))
 			return dir;
 		SLLogger.getLogger().severe(I18N.err(32, dir));
+		return System.getProperty("java.io.tmpdir");
+	}
+
+	/**
+	 * This method gets the path to the Sierra local team server data directory.
+	 * It ensures the directory exists.
+	 * 
+	 * @return the path to the Sierra data directory. No trailing <tt>/</tt>
+	 *         is included.
+	 */
+	static public String getSierraLocalTeamServerDirectory() {
+		final String dir = getSierraDataDirectory() + File.separator + "server";
+		if (createDirectory(dir))
+			return dir;
+		SLLogger.getLogger().severe(I18N.err(92, dir));
 		return System.getProperty("java.io.tmpdir");
 	}
 }
