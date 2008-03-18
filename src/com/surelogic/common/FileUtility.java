@@ -109,4 +109,20 @@ public final class FileUtility {
 		SLLogger.getLogger().severe(I18N.err(92, dir));
 		return System.getProperty("java.io.tmpdir");
 	}
+
+	/**
+	 * This method gets the path to the Sierra team server cache directory. It
+	 * ensures the directory exists.
+	 * 
+	 * @return the path to the Sierra team server cache directory. No trailing
+	 *         <tt>/</tt> is included.
+	 */
+	static public String getSierraTeamServerCacheDirectory() {
+		final String tmpdir = System.getProperty("java.io.tmpdir");
+		final String dir = tmpdir + File.separator + "sierra-cache";
+		if (createDirectory(dir))
+			return dir;
+		SLLogger.getLogger().severe(I18N.err(95, dir));
+		return tmpdir;
+	}
 }
