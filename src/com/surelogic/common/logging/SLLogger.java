@@ -15,6 +15,8 @@ import java.util.logging.Logger;
  */
 public class SLLogger {
 
+	public static final String SL_LOGGING_PROPERTY = "SLLoggingLevel";
+
 	/**
 	 * Setting this system property allows easy configuration of the logging
 	 * level. For example <code>-DSLLoggingLevel=FINE</code> will now show
@@ -23,7 +25,8 @@ public class SLLogger {
 	 * The default is to show all logged messages at INFO and above.
 	 */
 	public static final AtomicReference<Level> LEVEL = new AtomicReference<Level>(
-			Level.parse(System.getProperty("SLLoggingLevel", "INFO")));
+			Level.parse(System.getProperty(SL_LOGGING_PROPERTY, Level.INFO
+					.toString())));
 
 	/**
 	 * Changes the logging level of the console and file handlers managed by
