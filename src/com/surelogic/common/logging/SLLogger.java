@@ -229,6 +229,19 @@ public class SLLogger {
 	}
 
 	/**
+	 * Check if a message of the given level would actually be logged by
+	 * {@code com.surelogic} logger.
+	 * 
+	 * @param level
+	 *            a message logging level.
+	 * @return {@code true} if the given message level is currently being
+	 *         logged, {@code false} otherwise.
+	 */
+	public static boolean isLoggable(Level level) {
+		return getLogger().isLoggable(level);
+	}
+
+	/**
 	 * Find or create a logger for a class using the class name as the named
 	 * subsystem for the logger.
 	 * 
