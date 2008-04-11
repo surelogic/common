@@ -7,7 +7,11 @@ public class LogStatus {
 		delegate = d;
 	}	
 	
-	public static synchronized void createErrorStatus(int code, String message) {
-		delegate.createErrorStatus(code, message);
+	public static synchronized Object createErrorStatus(int code, String message) {
+		return delegate.createErrorStatus(code, message);
+	}
+
+	public static synchronized Object createErrorStatus(int code, String message, Exception e) {
+		return delegate.createErrorStatus(code, message, e);
 	}   
 }
