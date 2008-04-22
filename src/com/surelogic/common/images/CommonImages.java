@@ -72,6 +72,30 @@ public final class CommonImages {
 	public static final String IMG_TRAFFIC_LIGHT_YELLOW = "traffic_light_yellow.png";
 	public static final String IMG_UP = "up.gif";
 	
+        public static final String IMG_ASSUME_DECR = "assume_decr.gif";
+        public static final String IMG_CHOICE_ITEM = "choice_item.gif";
+        public static final String IMG_CHOICE = "choice.gif";
+        public static final String IMG_CLASS = "class.gif";
+        public static final String IMG_CONSISTENT_DECR = "consistent_decr.gif";
+        public static final String IMG_FOLDER = "folder.gif";
+        public static final String IMG_INCONSISTENT_DECR = "inconsistent_decr.gif";
+        public static final String IMG_INFO_DECR = "info_decr.gif";
+        public static final String IMG_INFO = "info.gif";
+        public static final String IMG_INTERFACE = "interface.gif";
+        public static final String IMG_COMP_UNIT = "jcu.gif";
+        public static final String IMG_LINK = "link.gif";
+        public static final String IMG_PACKAGE = "package.gif";
+        public static final String IMG_PLUS = "plus.gif";
+        public static final String IMG_PROMISE = "promise.gif";
+        public static final String IMG_REDDOT_DECR = "reddot_decr.gif";
+        public static final String IMG_REDX = "redx.gif";
+        public static final String IMG_TALLYHO = "tallyho.gif";
+        public static final String IMG_TRUSTED_DECR = "trusted_decr.gif";
+        public static final String IMG_UNKNOWN = "unknown.gif";
+        public static final String IMG_VIRTUAL_DECR = "virtual_decr.gif";
+        public static final String IMG_WARNING_DECR = "warning_decr.gif";
+        public static final String IMG_WARNING = "warning.gif";
+                
 	public static URL getImageURL(String symbolicName) { 
 		final String pluginPath = PATH + symbolicName;
 		URL url = CommonImages.class.getResource(pluginPath);
