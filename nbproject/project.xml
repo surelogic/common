@@ -11,6 +11,7 @@
                 <package>com.surelogic.common.base64</package>
                 <package>com.surelogic.common.export</package>
                 <package>com.surelogic.common.i18n</package>
+                <package>com.surelogic.common.images</package>
                 <package>com.surelogic.common.jdbc</package>
                 <package>com.surelogic.common.logging</package>
                 <package>com.surelogic.common.registration</package>
