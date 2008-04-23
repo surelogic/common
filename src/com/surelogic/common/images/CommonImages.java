@@ -1,8 +1,12 @@
 package com.surelogic.common.images;
 
+import java.awt.Image;
 import java.net.URL;
 
 import com.surelogic.common.logging.SLLogger;
+import java.awt.Toolkit;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 
 public final class CommonImages {
 	public static final String PATH = "/com/surelogic/common/images/";
@@ -105,4 +109,22 @@ public final class CommonImages {
 		}
 		return url;
 	}
+        
+        public static Icon getIcon(String symbolicName) {
+            URL imgURL = getImageURL(symbolicName);
+            if (imgURL != null) {
+                return new ImageIcon(imgURL, symbolicName);
+            }
+            // nothing found
+            return null;
+        }
+
+        public static Image getJavaImage(String symbolicName) {
+            URL imgURL = getImageURL(symbolicName);
+            if (imgURL != null) {
+                return Toolkit.getDefaultToolkit().createImage(imgURL);
+            }
+            // nothing found
+            return null;
+        }
 }
