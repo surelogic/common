@@ -93,6 +93,24 @@ public class JDBCUtils {
 	}
 
 	/**
+	 * Set a parameter to the String value "Y" or "N", or to null if none is
+	 * supplied.
+	 * 
+	 * @param idx
+	 * @param st
+	 * @param string
+	 * @throws SQLException
+	 */
+	public static void setNullableBoolean(int idx, PreparedStatement st,
+			Boolean bool) throws SQLException {
+		if (bool == null) {
+			st.setNull(idx, Types.VARCHAR);
+		} else {
+			st.setString(idx, bool ? "Y" : "N");
+		}
+	}
+
+	/**
 	 * Set a paramter to the specified Long, or to null if none is supplied.
 	 * 
 	 * @param idx
