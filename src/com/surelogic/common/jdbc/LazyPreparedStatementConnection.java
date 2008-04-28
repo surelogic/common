@@ -14,10 +14,8 @@ import java.util.concurrent.Callable;
  * LazyPreparedStatementConnection proxies Connection and supplies slightly
  * different (but still valid) behavior than a normal Connection. Essentially, a
  * PreparedStatement is not actually created until someone attempts to invoke a
- * method on it. In addition, all PreparedStatement objects are closed when a
- * Connection is closed.
- * 
- * (copied in its entirety)
+ * method on it. In addition, all PreparedStatement objects that have not
+ * already been closed are closed when a Connection is closed.
  * 
  * @author nathan
  * 
@@ -29,29 +27,29 @@ public class LazyPreparedStatementConnection implements InvocationHandler {
 
 	public LazyPreparedStatementConnection(Connection conn) {
 		this.conn = conn;
-		this.statements = new HashSet<PreparedStatement>();
+		statements = new HashSet<PreparedStatement>();
 	}
 
-	public static Connection wrap(final Connection conn) {
+	public static Connection wrap(Connection conn) {
 		return (Connection) Proxy.newProxyInstance(Connection.class
 				.getClassLoader(), new Class[] { Connection.class },
 				new LazyPreparedStatementConnection(conn));
 	}
 
-	public Object invoke(Object proxy, Method method, final Object[] args)
+	public Object invoke(Object proxy, Method method, Object[] args)
 			throws Throwable {
 		if ("prepareStatement".equals(method.getName())) {
 			return Proxy.newProxyInstance(PreparedStatement.class
 					.getClassLoader(), new Class[] { PreparedStatement.class },
 					new LazyPreparedStatement(method, args));
 		} else if ("close".equals(method.getName())) {
-			for (PreparedStatement st : statements) {
+			for (final PreparedStatement st : statements) {
 				st.close();
 			}
 		}
 		try {
 			return method.invoke(conn, args);
-		} catch (InvocationTargetException e) {
+		} catch (final InvocationTargetException e) {
 			final Throwable target = e.getTargetException();
 			if (target instanceof Exception) {
 				throw (Exception) target;
@@ -75,8 +73,8 @@ public class LazyPreparedStatementConnection implements InvocationHandler {
 								.invoke(conn, args);
 						statements.add(st);
 						return st;
-					} catch (InvocationTargetException e) {
-						Throwable target = e.getTargetException();
+					} catch (final InvocationTargetException e) {
+						final Throwable target = e.getTargetException();
 						if (target instanceof Exception) {
 							throw (Exception) target;
 						} else {
@@ -94,16 +92,16 @@ public class LazyPreparedStatementConnection implements InvocationHandler {
 			}
 		}
 
-		public Object invoke(Object proxy, Method method, final Object[] args)
+		public Object invoke(Object proxy, Method method, Object[] args)
 				throws Throwable {
 			check();
 			try {
-				Object val = method.invoke(st, args);
+				final Object val = method.invoke(st, args);
 				if ("close".equals(method.getName())) {
 					statements.remove(st);
 				}
 				return val;
-			} catch (InvocationTargetException e) {
+			} catch (final InvocationTargetException e) {
 				final Throwable target = e.getTargetException();
 				if (target instanceof Exception) {
 					throw (Exception) target;
@@ -112,5 +110,6 @@ public class LazyPreparedStatementConnection implements InvocationHandler {
 				}
 			}
 		}
+
 	}
 }
