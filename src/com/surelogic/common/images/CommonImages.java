@@ -10,7 +10,7 @@ import javax.swing.ImageIcon;
 
 public final class CommonImages {
 	public static final String PATH = "/com/surelogic/common/images/";
-	
+
 	/*
 	 * Shared image keys:
 	 */
@@ -33,6 +33,7 @@ public final class CommonImages {
 	public static final String IMG_FILTER = "filter.gif";
 	public static final String IMG_FINDBUGS_FINDING = "findbugs_finding.gif";
 	public static final String IMG_FL_APP = "fl_app.gif";
+	public static final String IMG_FL_LOGO = "fl_logo.gif";
 	public static final String IMG_FL_PREP_DATA = "fl_prep_data.gif";
 	public static final String IMG_FL_PREP = "fl_prep.gif";
 	public static final String IMG_FL_READ_LOG = "fl_read_log.gif";
@@ -75,56 +76,58 @@ public final class CommonImages {
 	public static final String IMG_TRAFFIC_LIGHT_RED = "traffic_light_red.png";
 	public static final String IMG_TRAFFIC_LIGHT_YELLOW = "traffic_light_yellow.png";
 	public static final String IMG_UP = "up.gif";
-	
-        public static final String IMG_ASSUME_DECR = "assume_decr.gif";
-        public static final String IMG_CHOICE_ITEM = "choice_item.gif";
-        public static final String IMG_CHOICE = "choice.gif";
-        public static final String IMG_CLASS = "class.gif";
-        public static final String IMG_CONSISTENT_DECR = "consistent_decr.gif";
-        public static final String IMG_FOLDER = "folder.gif";
-        public static final String IMG_INCONSISTENT_DECR = "inconsistent_decr.gif";
-        public static final String IMG_INFO_DECR = "info_decr.gif";
-        public static final String IMG_INFO = "info.gif";
-        public static final String IMG_INTERFACE = "interface.gif";
-        public static final String IMG_COMP_UNIT = "jcu.gif";
-        public static final String IMG_LINK = "link.gif";
-        public static final String IMG_PACKAGE = "package.gif";
-        public static final String IMG_PLUS = "plus.gif";
-        public static final String IMG_PROMISE = "promise.gif";
-        public static final String IMG_REDDOT_DECR = "reddot_decr.gif";
-        public static final String IMG_REDX = "redx.gif";
-        public static final String IMG_TALLYHO = "tallyho.gif";
-        public static final String IMG_TRUSTED_DECR = "trusted_decr.gif";
-        public static final String IMG_UNKNOWN = "unknown.gif";
-        public static final String IMG_VIRTUAL_DECR = "virtual_decr.gif";
-        public static final String IMG_WARNING_DECR = "warning_decr.gif";
-        public static final String IMG_WARNING = "warning.gif";
-                
-	public static URL getImageURL(String symbolicName) { 
+
+	public static final String IMG_ASSUME_DECR = "assume_decr.gif";
+	public static final String IMG_CHOICE_ITEM = "choice_item.gif";
+	public static final String IMG_CHOICE = "choice.gif";
+	public static final String IMG_CLASS = "class.gif";
+	public static final String IMG_CONSISTENT_DECR = "consistent_decr.gif";
+	public static final String IMG_FOLDER = "folder.gif";
+	public static final String IMG_INCONSISTENT_DECR = "inconsistent_decr.gif";
+	public static final String IMG_INFO_DECR = "info_decr.gif";
+	public static final String IMG_INFO = "info.gif";
+	public static final String IMG_INTERFACE = "interface.gif";
+	public static final String IMG_COMP_UNIT = "jcu.gif";
+	public static final String IMG_LINK = "link.gif";
+	public static final String IMG_PACKAGE = "package.gif";
+	public static final String IMG_PLUS = "plus.gif";
+	public static final String IMG_PROMISE = "promise.gif";
+	public static final String IMG_REDDOT_DECR = "reddot_decr.gif";
+	public static final String IMG_REDX = "redx.gif";
+	public static final String IMG_TALLYHO = "tallyho.gif";
+	public static final String IMG_TRUSTED_DECR = "trusted_decr.gif";
+	public static final String IMG_UNKNOWN = "unknown.gif";
+	public static final String IMG_VIRTUAL_DECR = "virtual_decr.gif";
+	public static final String IMG_WARNING_DECR = "warning_decr.gif";
+	public static final String IMG_WARNING = "warning.gif";
+
+	public static URL getImageURL(String symbolicName) {
 		final String pluginPath = PATH + symbolicName;
 		URL url = CommonImages.class.getResource(pluginPath);
 		if (url == null) {
 			SLLogger.getLogger()
-			  .severe("unable to create a URL for the plug-in path " + pluginPath);
+					.severe(
+							"unable to create a URL for the plug-in path "
+									+ pluginPath);
 		}
 		return url;
 	}
-        
-        public static Icon getIcon(String symbolicName) {
-            URL imgURL = getImageURL(symbolicName);
-            if (imgURL != null) {
-                return new ImageIcon(imgURL, symbolicName);
-            }
-            // nothing found
-            return null;
-        }
 
-        public static Image getJavaImage(String symbolicName) {
-            URL imgURL = getImageURL(symbolicName);
-            if (imgURL != null) {
-                return Toolkit.getDefaultToolkit().createImage(imgURL);
-            }
-            // nothing found
-            return null;
-        }
+	public static Icon getIcon(String symbolicName) {
+		URL imgURL = getImageURL(symbolicName);
+		if (imgURL != null) {
+			return new ImageIcon(imgURL, symbolicName);
+		}
+		// nothing found
+		return null;
+	}
+
+	public static Image getJavaImage(String symbolicName) {
+		URL imgURL = getImageURL(symbolicName);
+		if (imgURL != null) {
+			return Toolkit.getDefaultToolkit().createImage(imgURL);
+		}
+		// nothing found
+		return null;
+	}
 }
