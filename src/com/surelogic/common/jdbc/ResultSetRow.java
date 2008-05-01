@@ -2,8 +2,8 @@ package com.surelogic.common.jdbc;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.Date;
-
 
 public class ResultSetRow implements Row {
 
@@ -78,6 +78,14 @@ public class ResultSetRow implements Row {
 	public Boolean nullableBoolean() {
 		try {
 			return JDBCUtils.getNullableBoolean(idx++, set);
+		} catch (final SQLException e) {
+			throw new ResultSetException(e);
+		}
+	}
+
+	public Timestamp nextTimestamp() {
+		try {
+			return set.getTimestamp(idx++);
 		} catch (final SQLException e) {
 			throw new ResultSetException(e);
 		}

@@ -1,5 +1,6 @@
 package com.surelogic.common.jdbc;
 
+import java.sql.Timestamp;
 import java.util.Date;
 
 public interface Row {
@@ -15,6 +16,8 @@ public interface Row {
 	String nextString();
 
 	Date nextDate();
+
+	Timestamp nextTimestamp();
 
 	boolean nextBoolean();
 
