@@ -41,6 +41,7 @@ public final class CommonImages {
 	public static final String IMG_FL_RUN = "fl_run.gif";
 	public static final String IMG_GRAY_X_DOT = "gray_x_dot.gif";
 	public static final String IMG_GRAY_X = "gray_x.gif";
+	public static final String IMG_GRAY_X_DOUBLE = "grey_x_double.gif";
 	public static final String IMG_IMPORT = "import.gif";
 	public static final String IMG_JETTY_LOG = "jetty_log.gif";
 	public static final String IMG_PMD_FINDING = "pmd_finding.gif";
