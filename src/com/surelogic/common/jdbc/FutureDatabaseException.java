@@ -28,5 +28,11 @@ public final class FutureDatabaseException extends Exception {
 		f_schemaVersion = schemaVersion;
 	}
 
+	@Override
+	public String getMessage() {
+		return "Code version: " + f_codeVersion + ", Schema version: "
+				+ f_schemaVersion;
+	}
+
 	private static final long serialVersionUID = 6446502447505736644L;
 }
