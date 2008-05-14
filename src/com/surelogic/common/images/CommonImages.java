@@ -23,6 +23,7 @@ public final class CommonImages {
 	public static final String IMG_ASTERISK_ORANGE_50 = "asterisk_orange_50.gif";
 	public static final String IMG_ASTERISK_ORANGE_75 = "asterisk_orange_75.gif";
 	public static final String IMG_ASTERISK_ORANGE_100 = "asterisk_orange_100.gif";
+	public static final String IMG_BUGLINK_DECR = "buglink_decr.gif";
 	public static final String IMG_CATEGORY = "category.gif";
 	public static final String IMG_COLUMNS = "columns.gif";
 	public static final String IMG_COMMENT = "comment.gif";
@@ -73,6 +74,7 @@ public final class CommonImages {
 	public static final String IMG_SIERRA_SYNC = "sierra_sync.gif";
 	public static final String IMG_SORT_UP = "sort_up.gif";
 	public static final String IMG_SORT_DOWN = "sort_down.gif";
+	public static final String IMG_TEAM_SERVER_DECR = "team_server_decr.gif";
 	public static final String IMG_TRAFFIC_LIGHT_GREEN = "traffic_light_green.png";
 	public static final String IMG_TRAFFIC_LIGHT_RED = "traffic_light_red.png";
 	public static final String IMG_TRAFFIC_LIGHT_YELLOW = "traffic_light_yellow.png";
