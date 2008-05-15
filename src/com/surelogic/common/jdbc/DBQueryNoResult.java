@@ -2,17 +2,13 @@ package com.surelogic.common.jdbc;
 
 /**
  * A helper implementation of {@link DBQuery} that returns no result.
- * 
- * @author nathan
- * 
  */
-public abstract class DBQueryEmpty implements DBQuery<Void> {
+public abstract class DBQueryNoResult implements DBQuery<Void> {
 
-	public Void perform(Query q) {
+	public final Void perform(Query q) {
 		doPerform(q);
 		return null;
 	}
 
 	abstract public void doPerform(Query q);
-
 }
