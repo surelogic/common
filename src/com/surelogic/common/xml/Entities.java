@@ -16,6 +16,10 @@ public final class Entities {
 		E.defineStandardXML();
 	}
 
+	public static void start(final String name, final StringBuilder b) {
+		b.append("<").append(name);
+	}
+	
 	/**
 	 * Helper to avoid having to escape non-string values.
 	 */
