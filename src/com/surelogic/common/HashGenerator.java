@@ -1,4 +1,4 @@
-package com.surelogic.sierra.tool.analyzer;
+package com.surelogic.common;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
