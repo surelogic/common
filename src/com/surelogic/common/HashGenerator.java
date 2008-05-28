@@ -22,6 +22,7 @@ import com.surelogic.common.logging.SLLogger;
  * 
  */
 public class HashGenerator {
+	public static final Long UNKNOWN = -1L;
 
 	private static final Logger log = SLLogger.getLogger("sierra");
 
