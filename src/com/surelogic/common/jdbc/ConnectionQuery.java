@@ -3,6 +3,7 @@ package com.surelogic.common.jdbc;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +46,11 @@ public class ConnectionQuery implements Query {
 
 	public <T> Queryable<T> prepared(String key, ResultHandler<T> rh) {
 		return new QueryablePreparedStatement<T>(findOrCreate(key), rh);
+	}
+
+	public <T> Queryable<T> prepared(String key, KeyHandler<T> kh) {
+		return new QueryableKeyedStatement<T>(findOrCreateKeyed(key, kh
+				.keyNames()), kh);
 	}
 
 	public Queryable<Void> statement(String key) {
@@ -116,4 +122,23 @@ public class ConnectionQuery implements Query {
 		}
 		return st;
 	}
+
+	private PreparedStatement findOrCreateKeyed(String key, String[] keys) {
+		PreparedStatement st = map.get(key);
+		if (st == null) {
+			try {
+				if (JDBCUtils.getDb(conn) == DBType.ORACLE) {
+					st = conn.prepareStatement(QB.get(key), keys);
+				} else {
+					st = conn.prepareStatement(QB.get(key),
+							Statement.RETURN_GENERATED_KEYS);
+				}
+				map.put(key, st);
+			} catch (final SQLException e) {
+				throw new StatementException(e);
+			}
+		}
+		return st;
+	}
+
 }

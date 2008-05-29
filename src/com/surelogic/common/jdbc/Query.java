@@ -34,6 +34,18 @@ public interface Query {
 	/**
 	 * Return a Queryable object representing the prepared statement stored at
 	 * the provided key that will return the result of evaluating the provided
+	 * {@link KeyHandler} when called.
+	 * 
+	 * @param <T>
+	 * @param key
+	 * @param rh
+	 * @return
+	 */
+	<T> Queryable<T> prepared(String key, KeyHandler<T> kh);
+
+	/**
+	 * Return a Queryable object representing the prepared statement stored at
+	 * the provided key that will return the result of evaluating the provided
 	 * {@link ResultHandler} against the full result set when called.
 	 * 
 	 * @param <T>
