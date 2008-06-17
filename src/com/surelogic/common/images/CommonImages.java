@@ -43,6 +43,7 @@ public final class CommonImages {
 	public static final String IMG_GRAY_X_DOT = "gray_x_dot.gif";
 	public static final String IMG_GRAY_X = "gray_x.gif";
 	public static final String IMG_GRAY_X_DOUBLE = "grey_x_double.gif";
+	public static final String IMG_GRAY_X_LIGHT = "gray_x_light.gif";
 	public static final String IMG_IMPORT = "import.gif";
 	public static final String IMG_JETTY_LOG = "jetty_log.gif";
 	public static final String IMG_PMD_FINDING = "pmd_finding.gif";
@@ -96,7 +97,7 @@ public final class CommonImages {
 	public static final String IMG_PLUS = "plus.gif";
 	public static final String IMG_PROMISE = "promise.gif";
 	public static final String IMG_REDDOT_DECR = "reddot_decr.gif";
-	public static final String IMG_RED_X = "redx.gif";
+	public static final String IMG_RED_X = "red_x.gif";
 	public static final String IMG_TALLYHO = "tallyho.gif";
 	public static final String IMG_TRUSTED_DECR = "trusted_decr.gif";
 	public static final String IMG_UNKNOWN = "unknown.gif";
