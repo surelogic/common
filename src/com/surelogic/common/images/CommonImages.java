@@ -96,7 +96,7 @@ public final class CommonImages {
 	public static final String IMG_PLUS = "plus.gif";
 	public static final String IMG_PROMISE = "promise.gif";
 	public static final String IMG_REDDOT_DECR = "reddot_decr.gif";
-	public static final String IMG_REDX = "redx.gif";
+	public static final String IMG_RED_X = "redx.gif";
 	public static final String IMG_TALLYHO = "tallyho.gif";
 	public static final String IMG_TRUSTED_DECR = "trusted_decr.gif";
 	public static final String IMG_UNKNOWN = "unknown.gif";
