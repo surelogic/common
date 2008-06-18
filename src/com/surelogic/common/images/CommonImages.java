@@ -29,6 +29,7 @@ public final class CommonImages {
 	public static final String IMG_COMMENT = "comment.gif";
 	public static final String IMG_CONSOLE = "console.gif";
 	public static final String IMG_DOWN = "down.gif";
+	public static final String IMG_EMPTY = "empty.gif";
 	public static final String IMG_EXPORT_WEB = "export_ws_wiz.png";
 	public static final String IMG_EXPORT = "export.gif";
 	public static final String IMG_FILTER = "filter.gif";
