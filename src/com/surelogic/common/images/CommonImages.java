@@ -50,6 +50,8 @@ public final class CommonImages {
 	public static final String IMG_JSURE_LOGO = "jsure_logo.gif";
 	public static final String IMG_PMD_FINDING = "pmd_finding.gif";
 	public static final String IMG_PRIORITY = "priority.gif";
+	public static final String IMG_PROMISE_CONSISTENT = "promise_consistent.gif";
+	public static final String IMG_PROMISE_INCONSISTENT = "promise_consistent.gif";
 	public static final String IMG_QUERY = "query.gif";
 	public static final String IMG_REFRESH = "refresh.gif";
 	public static final String IMG_RIGHT_ARROW_SMALL = "right_arrow_small.gif";
