@@ -48,6 +48,8 @@ public final class CommonImages {
 	public static final String IMG_IMPORT = "import.gif";
 	public static final String IMG_JETTY_LOG = "jetty_log.gif";
 	public static final String IMG_JSURE_LOGO = "jsure_logo.gif";
+	public static final String IMG_JSURE_NO_VERIFY = "jsure_no_verify.gif";
+	public static final String IMG_JSURE_VERIFY = "jsure_verify.gif";
 	public static final String IMG_PMD_FINDING = "pmd_finding.gif";
 	public static final String IMG_PRIORITY = "priority.gif";
 	public static final String IMG_PROMISE_CONSISTENT = "promise_consistent.gif";
