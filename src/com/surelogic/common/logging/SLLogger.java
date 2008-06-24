@@ -200,48 +200,6 @@ public class SLLogger {
 	}
 
 	/**
-	 * Logs a message to the {@code com.surelogic} logger. Calling this method
-	 * is equivalent to calling {@code SLLogger.getLogger().log(level, msg)}.
-	 * 
-	 * @param level
-	 *            One of the message level identifiers, e.g. SEVERE
-	 * @param msg
-	 *            The string message (or a key in the message catalog)
-	 */
-	public static void log(Level level, String msg) {
-		getLogger().log(level, msg);
-	}
-
-	/**
-	 * Logs a message to the {@code com.surelogic} logger. Calling this method
-	 * is equivalent to calling
-	 * {@code SLLogger.getLogger().log(level, msg, thrown)}.
-	 * 
-	 * @param level
-	 *            One of the message level identifiers, e.g. SEVERE
-	 * @param msg
-	 *            The string message (or a key in the message catalog)
-	 * @param thrown
-	 *            Throwable associated with log message.
-	 */
-	public static void log(Level level, String msg, Throwable thrown) {
-		getLogger().log(level, msg, thrown);
-	}
-
-	/**
-	 * Check if a message of the given level would actually be logged by
-	 * {@code com.surelogic} logger.
-	 * 
-	 * @param level
-	 *            a message logging level.
-	 * @return {@code true} if the given message level is currently being
-	 *         logged, {@code false} otherwise.
-	 */
-	public static boolean isLoggable(Level level) {
-		return getLogger().isLoggable(level);
-	}
-
-	/**
 	 * Find or create a logger for a class using the class name as the named
 	 * subsystem for the logger.
 	 * 

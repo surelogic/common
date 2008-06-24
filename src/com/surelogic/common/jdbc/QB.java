@@ -107,7 +107,7 @@ public final class QB {
 		final String result = getQueryString(key);
 		final Logger log = SLLogger.getLogger();
 		if (log.isLoggable(Level.FINE)) {
-			SLLogger.log(Level.FINE, I18N.msg("db.QB.get", key, result));
+			log.log(Level.FINE, I18N.msg("db.QB.get", key, result));
 		}
 		return result;
 	}
@@ -189,7 +189,7 @@ public final class QB {
 				}
 			} catch (Exception e) {
 				// Should not happen
-				SLLogger.log(Level.SEVERE, I18N.err(90));
+				SLLogger.getLogger().log(Level.SEVERE, I18N.err(90));
 			}
 		}
 		/*
@@ -235,7 +235,7 @@ public final class QB {
 		final String result = String.format(getQueryString(key), args);
 		final Logger log = SLLogger.getLogger();
 		if (log.isLoggable(Level.FINE)) {
-			SLLogger.log(Level.FINE, I18N.msg("db.QB.get", key, result));
+			log.log(Level.FINE, I18N.msg("db.QB.get", key, result));
 		}
 		return result;
 	}
@@ -268,8 +268,7 @@ public final class QB {
 		final String result = getQueryString(key);
 		final Logger log = SLLogger.getLogger();
 		if (log.isLoggable(Level.FINE)) {
-			SLLogger.log(Level.FINE, I18N
-					.msg("db.QB.getNumber", number, result));
+			log.log(Level.FINE, I18N.msg("db.QB.getNumber", number, result));
 		}
 		return result;
 	}
@@ -311,8 +310,7 @@ public final class QB {
 		final String result = String.format(getQueryString(key), args);
 		final Logger log = SLLogger.getLogger();
 		if (log.isLoggable(Level.FINE)) {
-			SLLogger.log(Level.FINE, I18N
-					.msg("db.QB.getNumber", number, result));
+			log.log(Level.FINE, I18N.msg("db.QB.getNumber", number, result));
 		}
 		return result;
 	}
