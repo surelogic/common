@@ -19,9 +19,9 @@ public class JDBCUtils {
 	/**
 	 * Fill the parameters of a {@link PreparedStatement} with the values in
 	 * args. Supported types include {@link Integer}, {@link Long},
-	 * {@link Boolean}, {@link String}, and {@link Date}. Due to constraints
-	 * in JDBC, null values for these types may not be represented as
-	 * {@code null}. Instead, use one of the values of {@link Nulls}.
+	 * {@link Boolean}, {@link String}, and {@link Date}. Due to constraints in
+	 * JDBC, null values for these types may not be represented as {@code null}.
+	 * Instead, use one of the values of {@link Nulls}.
 	 * 
 	 * Example:
 	 * 
@@ -36,10 +36,14 @@ public class JDBCUtils {
 	 *            the arguments given to the prepared statement
 	 * @throws SQLException
 	 */
-	public static void fill(PreparedStatement st, Object[] args)
+	public static void fill(final PreparedStatement st, final Object[] args)
 			throws SQLException {
 		int idx = 1;
 		for (final Object o : args) {
+			if (o == null) {
+				throw new IllegalArgumentException(
+						"Parameter may nut be null.  Use one of the com.surelogic.common.jdbc.Nulls enumerable objects instead.");
+			}
 			if (o instanceof Nulls) {
 				switch ((Nulls) o) {
 				case INT:
@@ -83,8 +87,9 @@ public class JDBCUtils {
 	 * @param string
 	 * @throws SQLException
 	 */
-	public static void setNullableString(int idx, PreparedStatement st,
-			String string) throws SQLException {
+	public static void setNullableString(final int idx,
+			final PreparedStatement st, final String string)
+			throws SQLException {
 		if (string == null) {
 			st.setNull(idx, Types.VARCHAR);
 		} else {
@@ -101,8 +106,8 @@ public class JDBCUtils {
 	 * @param string
 	 * @throws SQLException
 	 */
-	public static void setNullableBoolean(int idx, PreparedStatement st,
-			Boolean bool) throws SQLException {
+	public static void setNullableBoolean(final int idx,
+			final PreparedStatement st, final Boolean bool) throws SQLException {
 		if (bool == null) {
 			st.setNull(idx, Types.VARCHAR);
 		} else {
@@ -118,8 +123,9 @@ public class JDBCUtils {
 	 * @param longValue
 	 * @throws SQLException
 	 */
-	public static void setNullableLong(int idx, PreparedStatement st,
-			Long longValue) throws SQLException {
+	public static void setNullableLong(final int idx,
+			final PreparedStatement st, final Long longValue)
+			throws SQLException {
 		if (longValue == null) {
 			st.setNull(idx, Types.BIGINT);
 		} else {
@@ -135,8 +141,9 @@ public class JDBCUtils {
 	 * @param intValue
 	 * @throws SQLException
 	 */
-	public static void setNullableInt(int idx, PreparedStatement st,
-			Integer intValue) throws SQLException {
+	public static void setNullableInt(final int idx,
+			final PreparedStatement st, final Integer intValue)
+			throws SQLException {
 		if (intValue == null) {
 			st.setNull(idx, Types.INTEGER);
 		} else {
@@ -152,8 +159,9 @@ public class JDBCUtils {
 	 * @param dateValue
 	 * @throws SQLException
 	 */
-	public static void setNullableTimestamp(int idx, PreparedStatement st,
-			Date dateValue) throws SQLException {
+	public static void setNullableTimestamp(final int idx,
+			final PreparedStatement st, final Date dateValue)
+			throws SQLException {
 		if (dateValue == null) {
 			st.setNull(idx, Types.TIMESTAMP);
 		} else {
@@ -170,7 +178,7 @@ public class JDBCUtils {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static Long getNullableLong(int idx, ResultSet set)
+	public static Long getNullableLong(final int idx, final ResultSet set)
 			throws SQLException {
 		final long l = set.getLong(idx);
 		if (set.wasNull()) {
@@ -189,7 +197,7 @@ public class JDBCUtils {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static Integer getNullableInteger(int idx, ResultSet set)
+	public static Integer getNullableInteger(final int idx, final ResultSet set)
 			throws SQLException {
 		final int i = set.getInt(idx);
 		if (set.wasNull()) {
@@ -214,7 +222,7 @@ public class JDBCUtils {
 	 * @param string
 	 * @return
 	 */
-	public static String escapeString(String string) {
+	public static String escapeString(final String string) {
 		return string.replaceAll("'", "''");
 	}
 
@@ -225,7 +233,7 @@ public class JDBCUtils {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static DBType getDb(Connection conn) throws SQLException {
+	public static DBType getDb(final Connection conn) throws SQLException {
 		return "Oracle".equals(conn.getMetaData().getDatabaseProductName()) ? DBType.ORACLE
 				: DBType.DERBY;
 	}
@@ -238,7 +246,7 @@ public class JDBCUtils {
 	 * @return
 	 * @throws SQLException
 	 */
-	public static boolean isServer(Connection conn) throws SQLException {
+	public static boolean isServer(final Connection conn) throws SQLException {
 		try {
 			final Statement st = conn.createStatement();
 			try {
@@ -252,11 +260,12 @@ public class JDBCUtils {
 		}
 	}
 
-	public static boolean getBoolean(int i, ResultSet set) throws SQLException {
+	public static boolean getBoolean(final int i, final ResultSet set)
+			throws SQLException {
 		return set.getString(i).equals("Y");
 	}
 
-	public static Boolean getNullableBoolean(int i, ResultSet set)
+	public static Boolean getNullableBoolean(final int i, final ResultSet set)
 			throws SQLException {
 		final String c = set.getString(i);
 		return c == null ? null : c.equals("Y");
