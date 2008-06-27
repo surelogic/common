@@ -215,6 +215,9 @@ public class HashGenerator {
 	private static final int BUF_SIZE = 16384;
 	
 	public int getLineForOffset(String fileName, int offset) {
+		if (offset < 0 || offset == Integer.MAX_VALUE) {
+			return -1;
+		}
 		if (lastOffset == offset && lastOffsetFile.equals(fileName)) {
 			return lastOffsetLine;
 		}
