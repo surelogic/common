@@ -218,7 +218,8 @@ public class HashGenerator {
 		if (offset < 0 || offset == Integer.MAX_VALUE) {
 			return -1;
 		}
-		if (lastOffset == offset && lastOffsetFile.equals(fileName)) {
+		if (lastOffset == offset && lastOffsetFile != null &&
+			lastOffsetFile.equals(fileName)) {
 			return lastOffsetLine;
 		}
 		try {
