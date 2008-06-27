@@ -1,14 +1,7 @@
 package com.surelogic.common;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.io.*;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -79,13 +72,8 @@ public class HashGenerator {
 			if (lineNumber > 0) {
 				lineNumber--;
 			}
-			if (cachedFileLines == null) {
-			  cachedFileName = null; 
-			}
-			if (cachedFileName == null || !cachedFileName.equals(fileName)) {
-				cachedFileName = fileName;
-				cachedFileLines = buildCachedLines(fileName);
-			} else if (lastHashLine == lineNumber) {
+			boolean updated = updateCache(fileName);
+			if (!updated && lastHashLine == lineNumber) {
 				return lastHashValue;
 			}
 	     
@@ -116,6 +104,21 @@ public class HashGenerator {
 		}
 	}
 
+	/**
+	 * @return true if updated
+	 */
+	private boolean updateCache(String fileName) throws IOException {
+		if (cachedFileLines == null) {
+			  cachedFileName = null; 
+		}
+		if (cachedFileName == null || !cachedFileName.equals(fileName)) {
+			cachedFileName = fileName;
+			cachedFileLines = buildCachedLines(fileName);
+			return false;
+		} 
+		return true;
+	}
+	
 	public void generateHash(Map<String, Map<Integer, Long>> hashHolder) {
 		for(Map.Entry<String, Map<Integer, Long>> entry : hashHolder.entrySet()) {
 			String fileName = entry.getKey();
@@ -209,4 +212,45 @@ public class HashGenerator {
 		return chunkBuf.toString();
 	}
 
+	private static final int BUF_SIZE = 16384;
+	
+	public int getLineForOffset(String fileName, int offset) {
+		if (lastOffset == offset && lastOffsetFile.equals(fileName)) {
+			return lastOffsetLine;
+		}
+		try {
+			// Read the file up to f_offset
+			int numLeft     = offset+1;
+			FileReader fr   = new FileReader(fileName);
+			StringBuffer sb = new StringBuffer(numLeft);
+			char[] cbuf     = new char[BUF_SIZE];			
+			int num;			
+			while (numLeft > 0  && (num = fr.read(cbuf, 0, numLeft < BUF_SIZE ? numLeft : BUF_SIZE)) >= 0) {
+				sb.append(cbuf, 0, num);				
+				numLeft -= num;
+			};			
+			
+			int line = 0;
+			BufferedReader in = new BufferedReader(new StringReader(sb.toString()));			
+			while (in.readLine() != null) {
+				line++;
+			}			
+			lastOffsetFile = fileName;
+			lastOffset     = offset;
+			lastOffsetLine = line;
+			return line;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return -1;
+	}
+
+	private String lastOffsetFile;
+	private int lastOffset;
+	private int lastOffsetLine;
+	
+	public Long getHashForOffset(String fileName, int offset) {
+		int line = getLineForOffset(fileName, offset);
+		return getHash(fileName, line);
+	}
 }
