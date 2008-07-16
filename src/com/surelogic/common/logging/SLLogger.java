@@ -10,6 +10,8 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.surelogic.common.i18n.I18N;
+
 /**
  * A utility for obtaining SureLogic loggers. This class is thread-safe.
  */
@@ -19,14 +21,32 @@ public class SLLogger {
 
 	/**
 	 * Setting this system property allows easy configuration of the logging
-	 * level. For example <code>-DSLLoggingLevel=FINE</code> will now show
-	 * fine logging messages and above to the console and the file.
+	 * level. For example <code>-DSLLoggingLevel=FINE</code> will now show fine
+	 * logging messages and above to the console and the file.
 	 * <p>
 	 * The default is to show all logged messages at INFO and above.
 	 */
-	public static final AtomicReference<Level> LEVEL = new AtomicReference<Level>(
-			Level.parse(System.getProperty(SL_LOGGING_PROPERTY, Level.INFO
-					.toString())));
+	public static final AtomicReference<Level> LEVEL;
+
+	static {
+		final String property = System.getProperty(SL_LOGGING_PROPERTY);
+		if (property != null) {
+			Level value = Level.INFO;
+			try {
+				value = Level.parse(property);
+			} catch (IllegalArgumentException e) {
+				/*
+				 * 
+				 * We can't log this problem normally as we are setting up
+				 * logging.
+				 */
+				System.err.println(I18N.err(99, SL_LOGGING_PROPERTY, property));
+			}
+			LEVEL = new AtomicReference<Level>(value);
+		} else {
+			LEVEL = new AtomicReference<Level>(Level.INFO);
+		}
+	}
 
 	/**
 	 * Changes the logging level of the console and file handlers managed by
@@ -153,11 +173,11 @@ public class SLLogger {
 
 	/**
 	 * Find or create a logger for a named subsystem. All names passed to this
-	 * method become prefixed by <code>com.surelogic</code>. For example if
-	 * the code is <code>SLLogger.getLogger("flashlight")</code> the name of
-	 * the returned logger is <code>com.surelogic.flashlight</code>. If a
-	 * logger has already been created with the given name it is returned.
-	 * Otherwise a new logger is created.
+	 * method become prefixed by <code>com.surelogic</code>. For example if the
+	 * code is <code>SLLogger.getLogger("flashlight")</code> the name of the
+	 * returned logger is <code>com.surelogic.flashlight</code>. If a logger has
+	 * already been created with the given name it is returned. Otherwise a new
+	 * logger is created.
 	 * <p>
 	 * If a new logger is created its log level will be configured to use a
 	 * concise output format to the console (defined by {@link SLFormatter}) as
@@ -167,8 +187,8 @@ public class SLLogger {
 	 * the LogManager global name space.
 	 * 
 	 * @param name
-	 *            name for the logger, may not be <code>null</code>. All
-	 *            names passed to this method become prefixed by
+	 *            name for the logger, may not be <code>null</code>. All names
+	 *            passed to this method become prefixed by
 	 *            <code>com.surelogic</code>.
 	 * @return a suitable Logger.
 	 * @throws NullPointerException
