@@ -9,8 +9,11 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.*;
-import java.util.logging.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.logging.SLLogger;
@@ -26,11 +29,11 @@ public final class SchemaUtility {
 	 * Checks the passed database connection is at the correct version. Versions
 	 * start at 0 and go up as sequential integers. The current version of the
 	 * database is held within a table named <code>VERSION</code> as its only
-	 * row. The appropriate SQL script to go from version <i>n</i> - 1 to <i>n</i>
-	 * is referenced by <code>sqlScripts[n]</code>. These scripts are always
-	 * run <b>in sequence</b> from lowest to highest. Optionally, code may be
-	 * passed for each version that is executed <b>after</b> the SQL script for
-	 * that version.
+	 * row. The appropriate SQL script to go from version <i>n</i> - 1 to
+	 * <i>n</i> is referenced by <code>sqlScripts[n]</code>. These scripts are
+	 * always run <b>in sequence</b> from lowest to highest. Optionally, code
+	 * may be passed for each version that is executed <b>after</b> the SQL
+	 * script for that version.
 	 * <p>
 	 * The <code>VERSION</code> is defined as follows:
 	 * 
@@ -65,18 +68,20 @@ public final class SchemaUtility {
 	 *             if the database version is higher (newer) than what this code
 	 *             expects.
 	 */
-	public static void checkAndUpdate(final Connection c, URL[] sqlScripts,
-			final SchemaAction[] actions) throws SQLException, IOException,
-			FutureDatabaseException {
+	public static void checkAndUpdate(final Connection c,
+			final URL[] sqlScripts, final SchemaAction[] actions)
+			throws SQLException, IOException, FutureDatabaseException {
 		/*
 		 * Check preconditions
 		 */
-		if (sqlScripts == null)
+		if (sqlScripts == null) {
 			throw new IllegalArgumentException(
 					"SQL script array cannot be null");
-		if (sqlScripts.length < 1)
+		}
+		if (sqlScripts.length < 1) {
 			throw new IllegalArgumentException(
 					"SQL script array cannot be empty");
+		}
 
 		if (actions != null) {
 			if (sqlScripts.length != actions.length) {
@@ -85,17 +90,19 @@ public final class SchemaUtility {
 			}
 			// Check if there is either a script or an action for every version
 			for (int i = 0; i < sqlScripts.length; i++) {
-				if (sqlScripts[i] == null && actions[i] == null) {
+				if ((sqlScripts[i] == null) && (actions[i] == null)) {
 					throw new IllegalArgumentException(
 							"There must be a script or action for version " + i);
 				}
 			}
 		} else { // no actions, so there must be a script for every version
-			for (URL f : sqlScripts)
-				if (f == null)
+			for (final URL f : sqlScripts) {
+				if (f == null) {
 					throw new IllegalArgumentException(
 							"elements of SQL script array cannot be null: "
 									+ Arrays.toString(sqlScripts));
+				}
+			}
 		}
 
 		final int programSchemaVersion = sqlScripts.length - 1;
@@ -118,8 +125,9 @@ public final class SchemaUtility {
 				/*
 				 * If the database is empty create the VERSION table.
 				 */
-				if (dbSchemaVersion == -1)
+				if (dbSchemaVersion == -1) {
 					createVersionTable(st);
+				}
 
 				for (int i = 0; i < sqlScripts.length; i++) {
 					if (i > dbSchemaVersion) {
@@ -132,9 +140,11 @@ public final class SchemaUtility {
 						/*
 						 * Run the action on the database (optional).
 						 */
-						if (actions != null)
-							if (actions[i] != null)
+						if (actions != null) {
+							if (actions[i] != null) {
 								runAction(actions[i], c);
+							}
+						}
 					}
 				}
 
@@ -143,15 +153,17 @@ public final class SchemaUtility {
 				 * the database call if the version is 0 since the
 				 * createVersionTable(st) call sets the version to 0.)
 				 */
-				if (programSchemaVersion != 0)
+				if (programSchemaVersion != 0) {
 					setVersion(programSchemaVersion, st);
+				}
 
 				LOG
 						.info(I18N.msg("db.updatedVersion",
 								programSchemaVersion, c));
 			} else {
-				if (LOG.isLoggable(Level.FINE))
+				if (LOG.isLoggable(Level.FINE)) {
 					LOG.fine(I18N.msg("db.atVersion", programSchemaVersion, c));
+				}
 			}
 		} finally {
 			st.close();
@@ -174,7 +186,7 @@ public final class SchemaUtility {
 
 		try {
 			st.execute(QB.get(8));
-		} catch (SQLException e) {
+		} catch (final SQLException e) {
 			// will fail if the database is completely empty
 		}
 		st.execute(QB.get(7));
@@ -202,7 +214,7 @@ public final class SchemaUtility {
 			} finally {
 				ver.close();
 			}
-		} catch (SQLException e) {
+		} catch (final SQLException e) {
 			/*
 			 * Ignore, this exception occurred because the schema was not found
 			 * within the database.
@@ -248,19 +260,20 @@ public final class SchemaUtility {
 		assert st != null;
 
 		final List<StringBuilder> stmts = getSQLStatements(script);
-		for (StringBuilder b : stmts) {
+		for (final StringBuilder b : stmts) {
 			try {
 				st.execute(b.toString());
-			} catch (SQLException e) {
+			} catch (final SQLException e) {
 				throw new IllegalStateException(I18N.err(12, b.toString(),
 						script), e);
 			}
 		}
 
-		if (SLLogger.getLogger().isLoggable(Level.FINE))
+		if (SLLogger.getLogger().isLoggable(Level.FINE)) {
 			SLLogger.getLogger().fine(
 					I18N.msg("db.ranSQLScript", script.getPath(), st
 							.getConnection()));
+		}
 	}
 
 	/**
@@ -281,11 +294,12 @@ public final class SchemaUtility {
 			throws SQLException {
 		action.run(c);
 
-		if (SLLogger.getLogger().isLoggable(Level.FINE))
+		if (SLLogger.getLogger().isLoggable(Level.FINE)) {
 			SLLogger.getLogger()
 					.fine(
 							I18N.msg("db.ranSQLAction", action.getClass()
 									.getName(), c));
+		}
 	}
 
 	/**
@@ -305,8 +319,9 @@ public final class SchemaUtility {
 	 */
 	public static List<StringBuilder> getSQLStatements(final URL sqlScript)
 			throws IOException {
-		if (sqlScript == null)
+		if (sqlScript == null) {
 			throw new IllegalArgumentException("sqlFile must be non-null");
+		}
 
 		final List<StringBuilder> result = new ArrayList<StringBuilder>();
 
@@ -323,16 +338,18 @@ public final class SchemaUtility {
 					// comment or blank line -- ignore this line
 				} else if (buffer.endsWith("<<>>")) {
 					// end of an SQL statement -- add to our resulting list
-					if (b.length() > 0)
+					if (b.length() > 0) {
 						b.append("\n");
+					}
 					b.append(buffer);
 					b.delete(b.length() - 4, b.length());
 					result.add(b);
 					b = new StringBuilder();
 				} else {
 					// add this line (with a newline after the first line)
-					if (b.length() > 0)
+					if (b.length() > 0) {
 						b.append("\n");
+					}
 					b.append(buffer);
 				}
 			}
@@ -346,10 +363,9 @@ public final class SchemaUtility {
 	/**
 	 * Pads the given positive integer with 0s and returns a string of at least
 	 * 4 characters. For example: <code>getZeroPadded(0)</code> results in the
-	 * string <code>"0000"</code>; <code>getZeroPadded(436)</code> results
-	 * in the string <code>"0456"</code>; <code>getZeroPadded(56900)</code>
-	 * results in the string <code>"56900"</code>. (FIX copied from
-	 * SierraSchemaUtility)
+	 * string <code>"0000"</code>; <code>getZeroPadded(436)</code> results in
+	 * the string <code>"0456"</code>; <code>getZeroPadded(56900)</code> results
+	 * in the string <code>"56900"</code>.
 	 * 
 	 * @param n
 	 *            a non-negative integer (i.e., n >=0).
@@ -365,29 +381,117 @@ public final class SchemaUtility {
 		return result;
 	}
 
-	/**
-	 * Returns null if the class is not found
-	 * 
-	 * FIX copied from SierraSchemaUtility
-	 */
-	public static SchemaAction getSchemaAction(
-			final String fullyQualifiedClassName) {
-		SchemaAction result = null;
+	public static final String SQL_SCRIPT_SUFFIX = ".sql";
+	public static final String SERVER_PREFIX = "server";
+	public static final String ACTION_COMMON = "Schema_";
+	public static final String ACTION_SERVER = "Server_";
+	public static final String SEPARATOR = "_";
+
+	public static void checkAndUpdate(final Connection c,
+			final SchemaData schemaLoader, final boolean serverDB)
+			throws SQLException, FutureDatabaseException {
 		try {
-			result = (SchemaAction) Class.forName(fullyQualifiedClassName)
-					.newInstance();
-		} catch (InstantiationException e) {
-			throw new IllegalStateException(e);
-		} catch (IllegalAccessException e) {
-			throw new IllegalStateException(e);
-		} catch (ClassNotFoundException e) {
-			// It is okay to not have any jobs for this version, do
-			// nothing.
-		} catch (IllegalArgumentException e) {
-			throw new IllegalStateException(e);
-		} catch (SecurityException e) {
+			final int arrayLength = schemaLoader.getVersion() + 1;
+			final DBType db = JDBCUtils.getDb(c);
+			final URL[] scripts = new URL[arrayLength];
+			final SchemaAction[] schemaActions = new SchemaAction[arrayLength];
+			for (int i = 0; i < scripts.length; i++) {
+				final String num = getZeroPadded(i);
+				final Schema common = new Schema(schemaLoader, db, num, false);
+				scripts[i] = common.script;
+
+				schemaActions[i] = common.action;
+				if (serverDB) {
+					final Schema server = new Schema(schemaLoader, db, num,
+							true);
+					final boolean serverScriptOrAction = (server.script != null)
+							|| (server.action != null);
+					if (serverScriptOrAction) {
+						final SchemaAction commonAction = common.action;
+						final URL serverScript = server.script;
+						final SchemaAction serverAction = server.action;
+						schemaActions[i] = new SchemaAction() {
+							public void run(final Connection c)
+									throws SQLException {
+								/*
+								 * This approach is very generic, the server may
+								 * or may not define schema scripts and/or
+								 * actions at each schema level. We only run
+								 * them if they exist.
+								 */
+								if (commonAction != null) {
+									SchemaUtility.runAction(commonAction, c);
+								}
+
+								if (serverScript != null) {
+									final Statement st = c.createStatement();
+									try {
+										SchemaUtility.runScript(serverScript,
+												st);
+									} catch (final IOException e) {
+										throw new SQLException(
+												"IOException reading server script file "
+														+ serverScript
+																.getFile()
+														+ " : " + e.toString());
+									} finally {
+										st.close();
+									}
+								}
+
+								if (serverAction != null) {
+									SchemaUtility.runAction(serverAction, c);
+								}
+							}
+						};
+					}
+				} else if ((common.script == null) && (common.action == null)) {
+					// not server, and there's no common script/action
+					// Make sure that there's a server script/action
+					final Schema server = new Schema(schemaLoader, db, num,
+							true);
+					final boolean serverScriptOrAction = (server.script != null)
+							|| (server.action != null);
+					if (serverScriptOrAction) {
+						// Dummy action to satisfy constraint in
+						// SchemaUtility.checkAndUpdate()
+						// that there be an action or script for each version
+						schemaActions[i] = new SchemaAction() {
+							public void run(final Connection c)
+									throws SQLException {
+								SLLogger.getLogger().fine(
+										"Nothing to do in client; only server-side changes for version "
+												+ num + ".");
+							}
+						};
+					} else {
+						throw new IllegalArgumentException(
+								"No scripts/actions for version " + num);
+					}
+				}
+			}
+			SchemaUtility.checkAndUpdate(c, scripts, schemaActions);
+		} catch (final IOException e) {
 			throw new IllegalStateException(e);
 		}
-		return result;
 	}
+
+	private static class Schema {
+
+		final URL script;
+		final SchemaAction action;
+
+		Schema(final SchemaData schemaLoader, final DBType db,
+				final String num, final boolean server) {
+			final String name = db.getPrefix()
+					+ (server ? SEPARATOR + SERVER_PREFIX : "") + SEPARATOR
+					+ num + ".sql";
+			script = schemaLoader.getSchemaResource(name);
+
+			action = schemaLoader.getSchemaAction((server ? ACTION_SERVER
+					: ACTION_COMMON)
+					+ num);
+		}
+	}
+
 }
