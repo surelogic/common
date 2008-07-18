@@ -18,8 +18,7 @@ public final class FileUtility {
 	 * @param path
 	 *            the desired directory.
 	 * @returns <tt>true</tt> if the directory existed or was created, along
-	 *          with all necessary parent directories; <tt>false</tt>
-	 *          otherwise.
+	 *          with all necessary parent directories; <tt>false</tt> otherwise.
 	 * 
 	 */
 	static public boolean createDirectory(final String path) {
@@ -75,8 +74,8 @@ public final class FileUtility {
 	 * <tt>~/.sierra-data</tt> is used. Finally, if that directory is invalid
 	 * then the value of <tt>java.io.tmpdir</tt> is used.
 	 * 
-	 * @return the path to the Sierra data directory. No trailing <tt>/</tt>
-	 *         is included.
+	 * @return the path to the Sierra data directory. No trailing <tt>/</tt> is
+	 *         included.
 	 */
 	static public String getSierraDataDirectory() {
 		String dir = System.getProperty("SLSierraDataDirectory");
@@ -99,8 +98,8 @@ public final class FileUtility {
 	 * This method gets the path to the Sierra local team server data directory.
 	 * It ensures the directory exists.
 	 * 
-	 * @return the path to the Sierra data directory. No trailing <tt>/</tt>
-	 *         is included.
+	 * @return the path to the Sierra data directory. No trailing <tt>/</tt> is
+	 *         included.
 	 */
 	static public String getSierraLocalTeamServerDirectory() {
 		final String dir = getSierraDataDirectory() + File.separator + "server";
@@ -124,5 +123,35 @@ public final class FileUtility {
 			return dir;
 		SLLogger.getLogger().severe(I18N.err(95, dir));
 		return tmpdir;
+	}
+
+	/**
+	 * This method gets the path to the Flashlight data directory. It ensures
+	 * the directory exists.
+	 * <p>
+	 * It first tries to use the value of the <tt>SLFlashlightDataDirectory</tt>
+	 * property. If that property is not defined (or it is not valid) then
+	 * <tt>~/.flashlight-data</tt> is used. Finally, if that directory is
+	 * invalid then the value of <tt>java.io.tmpdir</tt> is used.
+	 * 
+	 * @return the path to the Flashlight data directory. No trailing <tt>/</tt>
+	 *         is included.
+	 */
+	static public String getFlashlightDataDirectory() {
+		String dir = System.getProperty("SLFlashlightDataDirectory");
+		/*
+		 * The property was set so see if it makes sense.
+		 */
+		if (dir != null) {
+			if (createDirectory(dir))
+				return dir;
+			SLLogger.getLogger().warning(I18N.err(31, dir));
+		}
+		dir = System.getProperty("user.home") + File.separator
+				+ ".flashlight-data";
+		if (createDirectory(dir))
+			return dir;
+		SLLogger.getLogger().severe(I18N.err(32, dir));
+		return System.getProperty("java.io.tmpdir");
 	}
 }
