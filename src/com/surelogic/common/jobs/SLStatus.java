@@ -1,4 +1,4 @@
-package com.surelogic.common.logging;
+package com.surelogic.common.jobs;
 
 import com.surelogic.common.i18n.I18N;
 

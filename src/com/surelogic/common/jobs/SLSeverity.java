@@ -1,4 +1,4 @@
-package com.surelogic.common.logging;
+package com.surelogic.common.jobs;
 
 public enum SLSeverity {
 	OK, ERROR, INFO, WARNING, CANCEL;
