@@ -13,6 +13,7 @@
                 <package>com.surelogic.common.i18n</package>
                 <package>com.surelogic.common.images</package>
                 <package>com.surelogic.common.jdbc</package>
+                <package>com.surelogic.common.jobs</package>
                 <package>com.surelogic.common.logging</package>
                 <package>com.surelogic.common.registration</package>
                 <package>com.surelogic.common.update</package>
