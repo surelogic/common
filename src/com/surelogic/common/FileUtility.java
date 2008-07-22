@@ -1,6 +1,14 @@
 package com.surelogic.common;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.logging.Level;
 
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.logging.SLLogger;
@@ -40,7 +48,7 @@ public final class FileUtility {
 	 * @param path
 	 *            the directory to delete
 	 * @return <tt>true</tt> if and only if the directory is successfully
-	 *         deleted; <tt>false</tt> otherwise.
+	 *         deleted, <tt>false</tt> otherwise.
 	 * 
 	 */
 	static public boolean deleteDirectoryAndContents(final File path) {
@@ -63,6 +71,63 @@ public final class FileUtility {
 			SLLogger.getLogger().warning(I18N.err(11, path.getAbsolutePath()));
 		}
 		return success;
+	}
+
+	/**
+	 * Copies the contents of a {@link URL} to a file.
+	 * 
+	 * @param source
+	 *            the stream to copy.
+	 * @param to
+	 *            the target file.
+	 * @return <tt>true</tt> if and only if the copy is successful,
+	 *         <tt>false</tt> otherwise.
+	 */
+	static public boolean copy(URL source, File to) {
+		boolean success = true;
+		try {
+			InputStream is = null;
+			try {
+				is = source.openStream();
+				is = new BufferedInputStream(is, 8192);
+				final OutputStream os = new FileOutputStream(to);
+
+				final byte[] buf = new byte[8192];
+				int num;
+				while ((num = is.read(buf)) >= 0) {
+					os.write(buf, 0, num);
+				}
+			} finally {
+				if (is != null)
+					is.close();
+			}
+		} catch (IOException e) {
+			SLLogger.getLogger().log(Level.SEVERE,
+					I18N.err(112, source.toString(), to.getAbsolutePath()), e);
+			success = false;
+		}
+		return success;
+	}
+
+	/**
+	 * Copies the contents of one file to another file.
+	 * 
+	 * @param from
+	 *            the source file to copy.
+	 * @param to
+	 *            the target file.
+	 * @return <tt>true</tt> if and only if the copy is successful,
+	 *         <tt>false</tt> otherwise.
+	 */
+	static public boolean copy(File from, File to) {
+		try {
+			URL source = from.toURI().toURL();
+			return copy(source, to);
+		} catch (MalformedURLException e) {
+			SLLogger.getLogger().log(Level.SEVERE,
+					I18N.err(113, from.getAbsolutePath()), e);
+		}
+		return false;
 	}
 
 	/**
