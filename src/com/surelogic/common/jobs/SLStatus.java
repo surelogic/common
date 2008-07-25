@@ -1,7 +1,13 @@
 package com.surelogic.common.jobs;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.surelogic.common.i18n.I18N;
 
+/**
+ * An IDE independent status object.
+ */
 public final class SLStatus {
 
 	/**
@@ -63,6 +69,32 @@ public final class SLStatus {
 	 */
 	public Throwable getException() {
 		return f_exception;
+	}
+
+	/**
+	 * Child status objects.
+	 */
+	private static final List<SLStatus> f_children = new ArrayList<SLStatus>();
+
+	/**
+	 * Adds a child status object to this status. Children of this status are
+	 * placed in the order in which they are added.
+	 * 
+	 * @param status
+	 *            the child status object to attach to this status.
+	 */
+	public void addChild(final SLStatus status) {
+		f_children.add(status);
+	}
+
+	/**
+	 * Gets the list of child status objects attached to this.
+	 * 
+	 * @return the list of child status objects attached to this. This list is a
+	 *         copy and can be mutated by the caller.
+	 */
+	public List<SLStatus> getChildren() {
+		return new ArrayList<SLStatus>(f_children);
 	}
 
 	/**
