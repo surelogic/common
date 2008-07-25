@@ -1,6 +1,5 @@
 package com.surelogic.common.jobs;
 
-import com.surelogic.common.SLProgressMonitor;
 
 /**
  * Interface implemented by IDE independent jobs. Work such as database queries

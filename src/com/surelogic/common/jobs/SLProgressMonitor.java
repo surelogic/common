@@ -1,4 +1,4 @@
-package com.surelogic.common;
+package com.surelogic.common.jobs;
 
 /**
  * 

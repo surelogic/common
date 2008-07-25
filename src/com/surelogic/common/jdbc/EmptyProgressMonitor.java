@@ -1,6 +1,6 @@
 package com.surelogic.common.jdbc;
 
-import com.surelogic.common.SLProgressMonitor;
+import com.surelogic.common.jobs.SLProgressMonitor;
 
 public class EmptyProgressMonitor implements SLProgressMonitor {
 

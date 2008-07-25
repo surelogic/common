@@ -1,6 +1,5 @@
-package com.surelogic.common;
+package com.surelogic.common.jobs;
 
-import com.surelogic.common.SLProgressMonitor;
 
 public class NullProgressMonitor implements SLProgressMonitor {
 
