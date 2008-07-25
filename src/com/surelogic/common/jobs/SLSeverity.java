@@ -1,5 +1,5 @@
 package com.surelogic.common.jobs;
 
 public enum SLSeverity {
-	OK, ERROR, INFO, WARNING, CANCEL;
+	OK, INFO, CANCEL, WARNING, ERROR;
 }
