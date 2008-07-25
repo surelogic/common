@@ -7,13 +7,14 @@ import java.net.URL;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
+import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.logging.SLLogger;
 
 public final class CommonImages {
 	public static final String PATH = "/com/surelogic/common/images/";
 
 	/*
-	 * Shared image keys:
+	 * Symbolic image names
 	 */
 	public static final String IMG_ANNOTATION = "annotation.gif";
 	public static final String IMG_ASSUME_DECR = "assume_decr.gif";
@@ -113,29 +114,49 @@ public final class CommonImages {
 	public static final String IMG_WARNING = "warning.gif";
 	public static final String IMG_WARNING_DECR = "warning_decr.gif";
 
-	public static URL getImageURL(String symbolicName) {
-		final String pluginPath = PATH + symbolicName;
-		URL url = CommonImages.class.getResource(pluginPath);
+	/**
+	 * Gets the ULR to the passed name within this package.
+	 * 
+	 * @param imageSymbolicName
+	 *            the image's symbolic name.
+	 * @return a URL or {@code null} if no resource was found.
+	 */
+	public static URL getImageURL(String imageSymbolicName) {
+		final String path = PATH + imageSymbolicName;
+		final URL url = CommonImages.class.getResource(path);
 		if (url == null) {
-			SLLogger.getLogger()
-					.severe(
-							"unable to create a URL for the plug-in path "
-									+ pluginPath);
+			SLLogger.getLogger().severe(I18N.err(41, path));
 		}
 		return url;
 	}
 
-	public static Icon getIcon(String symbolicName) {
-		URL imgURL = getImageURL(symbolicName);
+	/**
+	 * Creates a Swing {@link Icon} from the image file in this package
+	 * associated with the passed image symbolic name.
+	 * 
+	 * @param imageSymbolicName
+	 *            the image's symbolic name.
+	 * @return an icon or {@code null} if the image file could not be found.
+	 */
+	public static Icon getIcon(String imageSymbolicName) {
+		final URL imgURL = getImageURL(imageSymbolicName);
 		if (imgURL != null) {
-			return new ImageIcon(imgURL, symbolicName);
+			return new ImageIcon(imgURL, imageSymbolicName);
 		}
 		// nothing found
 		return null;
 	}
 
-	public static Image getJavaImage(String symbolicName) {
-		URL imgURL = getImageURL(symbolicName);
+	/**
+	 * Creates a Swing {@link Image} from the image file in this package
+	 * associated with the passed image symbolic name.
+	 * 
+	 * @param imageSymbolicName
+	 *            the image's symbolic name.
+	 * @return an image or {@code null} if the image file could not be found.
+	 */
+	public static Image getJavaImage(String imageSymbolicName) {
+		final URL imgURL = getImageURL(imageSymbolicName);
 		if (imgURL != null) {
 			return Toolkit.getDefaultToolkit().createImage(imgURL);
 		}
