@@ -74,7 +74,7 @@ public final class SLStatus {
 	/**
 	 * Child status objects.
 	 */
-	private static final List<SLStatus> f_children = new ArrayList<SLStatus>();
+	private final List<SLStatus> f_children = new ArrayList<SLStatus>();
 
 	/**
 	 * Adds a child status object to this status. Children of this status are
@@ -240,6 +240,45 @@ public final class SLStatus {
 	/**
 	 * Used to indicate that something completed successfully.
 	 */
-	public static final SLStatus OK_STATUS = new SLStatus(SLSeverity.OK, OK,
-			"OK", null);
+	public static final SLStatus OK_STATUS = createOkStatus();
+	
+	public static SLStatus createOkStatus() {
+		return new SLStatus(SLSeverity.OK, OK, "OK", null);
+	}
+	
+	public static class Builder {
+		private final List<SLStatus> f_children = new ArrayList<SLStatus>();
+		
+		public void add(SLStatus s) {
+			if (s != null) {
+				f_children.add(s);
+			}
+		}
+		
+		public SLStatus build() {
+			int num = f_children.size();
+			if (num == 0) {
+				return OK_STATUS;
+			} 
+			else if (num == 1) {
+				return f_children.get(0);
+			}
+			SLSeverity sev = SLSeverity.OK; 
+			int code       = OK;
+			Throwable t    = null;
+			for(SLStatus c : f_children) {
+				if (c.getSeverity().ordinal() > sev.ordinal()) {
+					sev  = c.getSeverity();
+					code = c.getCode(); 
+					t    = c.getException();
+				}
+			}
+			SLStatus s = new SLStatus(sev, code, "Top-level status", t);
+			for(SLStatus c : f_children) {
+				s.addChild(c);
+			}
+			f_children.clear();
+			return s;
+		}
+	}
 }
