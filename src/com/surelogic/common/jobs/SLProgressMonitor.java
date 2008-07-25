@@ -13,21 +13,21 @@ package com.surelogic.common.jobs;
  * <p>
  * All activity is broken down into a linear sequence of tasks against which
  * progress is reported. When a task begins, a <code>beginTask(String, int)
- * </code>
- * notification is reported, followed by any number and mixture of progress
- * reports (<code>worked()</code>) and subtask notifications (<code>subTask(String)</code>).
- * When the task is eventually completed, a <code>done()</code> notification
- * is reported. After the <code>done()</code> notification, the progress
- * monitor cannot be reused; i.e., <code>
- * beginTask(String, int)</code> cannot
- * be called again after the call to <code>done()</code>.
+ * </code> notification is reported,
+ * followed by any number and mixture of progress reports (<code>worked()</code>
+ * ) and subtask notifications (<code>subTask(String)</code>). When the task is
+ * eventually completed, a <code>done()</code> notification is reported. After
+ * the <code>done()</code> notification, the progress monitor cannot be reused;
+ * i.e., <code>
+ * beginTask(String, int)</code> cannot be called again after the call to
+ * <code>done()</code>.
  * </p>
  * <p>
  * A request to cancel an operation can be signaled using the
  * <code>setCanceled</code> method. Operations taking a progress monitor are
- * expected to poll the monitor (using <code>isCanceled</code>) periodically
- * and abort at their earliest convenience. Operation can however choose to
- * ignore cancellation requests.
+ * expected to poll the monitor (using <code>isCanceled</code>) periodically and
+ * abort at their earliest convenience. Operation can however choose to ignore
+ * cancellation requests.
  * </p>
  * <p>
  * Since notification is synchronous with the activity itself, the listener
@@ -69,15 +69,6 @@ public interface SLProgressMonitor {
 	public void done();
 
 	/**
-	 * Internal method to handle scaling correctly. This method must not be
-	 * called by a client. Clients should always use the method </code>worked(int)</code>.
-	 * 
-	 * @param work
-	 *            the amount of work done
-	 */
-	public void internalWorked(double work);
-
-	/**
 	 * Returns whether cancellation of current operation has been requested.
 	 * Long-running operations should poll to see if cancellation has been
 	 * requested.
@@ -100,17 +91,6 @@ public interface SLProgressMonitor {
 	public void setCanceled(boolean value);
 
 	/**
-	 * Sets the task name to the given value. This method is used to restore the
-	 * task label after a nested operation was executed. Normally there is no
-	 * need for clients to call this method.
-	 * 
-	 * @param name
-	 *            the name (or description) of the main task
-	 * @see #beginTask(java.lang.String, int)
-	 */
-	public void setTaskName(String name);
-
-	/**
 	 * Notifies that a subtask of the main task is beginning. Subtasks are
 	 * optional; the main task might not have subtasks.
 	 * 
@@ -128,29 +108,4 @@ public interface SLProgressMonitor {
 	 *            a non-negative number of work units just completed
 	 */
 	public void worked(int work);
-	
-  /**
-   * Notifies that the task encountered a non-fatal error
-   */
-  public void error(String msg);
-  
-  /**
-   * Notifies that the task encountered a non-fatal error
-   */
-  public void error(String msg, Throwable t);
-	
-	 /**
-   * Notifies that the task failed with the given message
-   */
-	public void failed(String msg);
-	
-	/**
-	 * Notifies that the task failed with the given Throwable
-	 */
-	public void failed(String msg, Throwable t);
-	
-	/**
-	 * @return non-null if there was a failure
-	 */
-	public Throwable getFailureTrace();
 }
