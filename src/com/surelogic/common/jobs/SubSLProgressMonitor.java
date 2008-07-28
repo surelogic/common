@@ -69,6 +69,7 @@ public final class SubSLProgressMonitor implements SLProgressMonitor {
 		if (parentWorkRemaining > 0) {
 			f_parent.worked(parentWorkRemaining);
 		}
+		f_parent.subTask("");
 	}
 
 	public boolean isCanceled() {

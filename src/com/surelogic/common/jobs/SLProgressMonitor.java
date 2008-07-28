@@ -1,7 +1,6 @@
 package com.surelogic.common.jobs;
 
 /**
- * 
  * From the Eclipse <code>IProgressMonitor</code> interface. This interface
  * exists so that code that is shared between Eclipse client code and J2EE code
  * can both reference to progress monitors without needing the Eclipse
