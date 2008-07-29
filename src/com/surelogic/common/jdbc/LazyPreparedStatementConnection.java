@@ -20,12 +20,12 @@ import java.util.concurrent.Callable;
  * @author nathan
  * 
  */
-public class LazyPreparedStatementConnection implements InvocationHandler {
+public final class LazyPreparedStatementConnection implements InvocationHandler {
 
 	private final Connection conn;
 	private final Set<PreparedStatement> statements;
 
-	public LazyPreparedStatementConnection(Connection conn) {
+	public LazyPreparedStatementConnection(Connection conn) { 
 		this.conn = conn;
 		statements = new HashSet<PreparedStatement>();
 	}
