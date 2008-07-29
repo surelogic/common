@@ -7,7 +7,7 @@ package com.surelogic.common.jdbc;
  * @author nathan
  * 
  */
-public class TransactionException extends RuntimeException {
+public class TransactionException extends JDBCException {
 
 	/**
 	 * 
