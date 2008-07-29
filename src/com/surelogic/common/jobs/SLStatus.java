@@ -1,5 +1,7 @@
 package com.surelogic.common.jobs;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -355,5 +357,25 @@ public final class SLStatus {
 			f_children.clear();
 			return s;
 		}
+	}
+
+	/**
+	 * Gets the stack trace from an exception and returns it as a string.
+	 * 
+	 * @param t
+	 *            the exception.
+	 * @return the stack trace.
+	 * @throws IllegalArgumentException
+	 *             if the passed exception is {code null}.
+	 */
+	public static String getStackTrace(Throwable t) {
+		if (t == null)
+			throw new IllegalArgumentException(I18N.err(44, "t"));
+		final StringWriter sw = new StringWriter();
+		final PrintWriter pw = new PrintWriter(sw, true);
+		t.printStackTrace(pw);
+		pw.flush();
+		sw.flush();
+		return sw.toString();
 	}
 }
