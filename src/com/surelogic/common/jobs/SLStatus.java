@@ -161,8 +161,16 @@ public final class SLStatus {
 
 	/**
 	 * Creates a new <code>WARNING</code> status object.
-	 * <p>
-	 * The new object is associated with the SureLogic plug-in.
+	 * 
+	 * @param message
+	 *            a human-readable message, localized to the current locale.
+	 */
+	public static SLStatus createWarningStatus(final String message) {
+		return new SLStatus(SLSeverity.WARNING, OK, message, null);
+	}
+
+	/**
+	 * Creates a new <code>WARNING</code> status object.
 	 * 
 	 * @param code
 	 *            the plug-in or module-specific status code, or {@link #OK}.
@@ -172,6 +180,19 @@ public final class SLStatus {
 	public static SLStatus createWarningStatus(final int code,
 			final String message) {
 		return new SLStatus(SLSeverity.WARNING, code, message, null);
+	}
+
+	/**
+	 * Creates a new <code>WARNING</code> status object.
+	 * 
+	 * @param message
+	 *            a human-readable message, localized to the current locale.
+	 * @param exception
+	 *            a low-level exception, or {@code null} if not applicable.
+	 */
+	public static SLStatus createWarningStatus(final String message,
+			final Throwable exception) {
+		return new SLStatus(SLSeverity.WARNING, OK, message, exception);
 	}
 
 	/**
@@ -192,6 +213,16 @@ public final class SLStatus {
 	/**
 	 * Creates a new <code>ERROR</code> status object.
 	 * 
+	 * @param message
+	 *            a human-readable message, localized to the current locale.
+	 */
+	public static SLStatus createErrorStatus(final String message) {
+		return new SLStatus(SLSeverity.ERROR, OK, message, null);
+	}
+
+	/**
+	 * Creates a new <code>ERROR</code> status object.
+	 * 
 	 * @param code
 	 *            the plug-in or module-specific status code, or {@link #OK}.
 	 * @param message
@@ -200,6 +231,16 @@ public final class SLStatus {
 	public static SLStatus createErrorStatus(final int code,
 			final String message) {
 		return new SLStatus(SLSeverity.ERROR, code, message, null);
+	}
+
+	/**
+	 * Creates a new <code>ERROR</code> status object.
+	 * 
+	 ** @param exception
+	 *            a low-level exception, or {@code null} if not applicable.
+	 */
+	public static SLStatus createErrorStatus(final Throwable exception) {
+		return new SLStatus(SLSeverity.ERROR, OK, "unexpected error", exception);
 	}
 
 	/**
@@ -214,6 +255,19 @@ public final class SLStatus {
 			final Throwable exception) {
 		return new SLStatus(SLSeverity.ERROR, code, "unexpected error",
 				exception);
+	}
+
+	/**
+	 * Creates a new <code>ERROR</code> status object.
+	 * 
+	 * @param message
+	 *            a human-readable message, localized to the current locale.
+	 * @param exception
+	 *            a low-level exception, or {@code null} if not applicable.
+	 */
+	public static SLStatus createErrorStatus(final String message,
+			final Throwable exception) {
+		return new SLStatus(SLSeverity.ERROR, OK, message, exception);
 	}
 
 	/**
@@ -241,40 +295,42 @@ public final class SLStatus {
 	 * Used to indicate that something completed successfully.
 	 */
 	public static final SLStatus OK_STATUS = createOkStatus();
-	
+
 	public static SLStatus createOkStatus() {
 		return new SLStatus(SLSeverity.OK, OK, "OK", null);
 	}
-	
+
+	/**
+	 * A builder class to help construct multi-status objects.
+	 */
 	public static class Builder {
 		private final List<SLStatus> f_children = new ArrayList<SLStatus>();
-		
+
 		public void add(SLStatus s) {
 			if (s != null) {
 				f_children.add(s);
 			}
 		}
-		
+
 		public SLStatus build() {
 			int num = f_children.size();
 			if (num == 0) {
 				return OK_STATUS;
-			} 
-			else if (num == 1) {
+			} else if (num == 1) {
 				return f_children.get(0);
 			}
-			SLSeverity sev = SLSeverity.OK; 
-			int code       = OK;
-			Throwable t    = null;
-			for(SLStatus c : f_children) {
+			SLSeverity sev = SLSeverity.OK;
+			int code = OK;
+			Throwable t = null;
+			for (SLStatus c : f_children) {
 				if (c.getSeverity().ordinal() > sev.ordinal()) {
-					sev  = c.getSeverity();
-					code = c.getCode(); 
-					t    = c.getException();
+					sev = c.getSeverity();
+					code = c.getCode();
+					t = c.getException();
 				}
 			}
 			SLStatus s = new SLStatus(sev, code, "Top-level status", t);
-			for(SLStatus c : f_children) {
+			for (SLStatus c : f_children) {
 				s.addChild(c);
 			}
 			f_children.clear();
