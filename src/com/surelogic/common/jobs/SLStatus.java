@@ -306,12 +306,31 @@ public final class SLStatus {
 	public static class Builder {
 		private final List<SLStatus> f_children = new ArrayList<SLStatus>();
 
-		public void add(SLStatus s) {
-			if (s != null) {
-				f_children.add(s);
-			}
+		/**
+		 * Adds a status object to this builder. It will become a child of the
+		 * status object when {@link #build()} is called.
+		 * 
+		 * @param status
+		 *            a status object.
+		 */
+		public void addChild(SLStatus status) {
+			if (status == null)
+				throw new IllegalArgumentException(I18N.err(44, "status"));
+			f_children.add(status);
 		}
 
+		/**
+		 * Constructs a status object with a severity that matches the highest
+		 * severity of one of its child status objects.
+		 * <p>
+		 * If no children have been added to this builder then
+		 * {@link SLStatus#OK_STATUS} is returned.
+		 * <p>
+		 * If only one status object has been added to this builder than that
+		 * object is returned (i.e., no multi-status object is constructed).
+		 * 
+		 * @return a status object.
+		 */
 		public SLStatus build() {
 			int num = f_children.size();
 			if (num == 0) {
