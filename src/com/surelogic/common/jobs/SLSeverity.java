@@ -14,11 +14,21 @@ public enum SLSeverity {
 		public Level toLevel() {
 			return Level.FINEST;
 		}
+
+		@Override
+		public boolean isProblem() {
+			return false;
+		}
 	},
 	INFO {
 		@Override
 		public Level toLevel() {
 			return Level.INFO;
+		}
+
+		@Override
+		public boolean isProblem() {
+			return false;
 		}
 	},
 	CANCEL {
@@ -26,17 +36,32 @@ public enum SLSeverity {
 		public Level toLevel() {
 			return Level.FINEST;
 		}
+
+		@Override
+		public boolean isProblem() {
+			return false;
+		}
 	},
 	WARNING {
 		@Override
 		public Level toLevel() {
 			return Level.WARNING;
 		}
+
+		@Override
+		public boolean isProblem() {
+			return true;
+		}
 	},
 	ERROR {
 		@Override
 		public Level toLevel() {
 			return Level.SEVERE;
+		}
+
+		@Override
+		public boolean isProblem() {
+			return true;
 		}
 	};
 
@@ -47,4 +72,12 @@ public enum SLSeverity {
 	 * @return a logging level.
 	 */
 	public abstract Level toLevel();
+
+	/**
+	 * Indicates that this severity indicates some kind of problem.
+	 * 
+	 * @return {@code true} if the severity indicates a problem, {@code false}
+	 *         otherwise.
+	 */
+	public abstract boolean isProblem();
 }
