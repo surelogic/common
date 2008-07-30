@@ -10,7 +10,7 @@ class ResultSetResult implements Result {
 	private final ResultSet set;
 	private final ResultSetRow row;
 
-	ResultSetResult(ResultSet set) {
+	ResultSetResult(final ResultSet set) {
 		this.set = set;
 		this.row = new ResultSetRow(set);
 	}
@@ -58,6 +58,8 @@ class ResultSetResult implements Result {
 	}
 
 	void close() throws SQLException {
-		set.close();
+		if (set != null) {
+			set.close();
+		}
 	}
 }
