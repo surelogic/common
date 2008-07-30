@@ -20,7 +20,7 @@ final class QueryableStatement<T> implements Queryable<T> {
 	private final String query;
 	private final ResultHandler<T> handler;
 
-	QueryableStatement(Connection conn, String key, ResultHandler<T> handler) {
+	QueryableStatement(final Connection conn, final String key, final ResultHandler<T> handler) {
 		try {
 			this.st = conn.createStatement();
 		} catch (final SQLException e) {
@@ -30,10 +30,13 @@ final class QueryableStatement<T> implements Queryable<T> {
 		this.handler = handler;
 	}
 
-	public T call(Object... args) {
+	public T call(final Object... args) {
 		try {
 			st.execute(String.format(query, args));
-			return handler.handle(new ResultSetResult(st.getResultSet()));
+			ResultSetResult rs = new ResultSetResult(st.getResultSet());
+			try {return handler.handle(rs); } finally {
+				rs.close();
+			}
 		} catch (final SQLException e) {
 			throw new StatementException(e);
 		}

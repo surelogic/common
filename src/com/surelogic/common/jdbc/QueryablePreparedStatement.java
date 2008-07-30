@@ -19,13 +19,13 @@ public class QueryablePreparedStatement<T> implements Queryable<T> {
 	private final PreparedStatement st;
 	private final ResultHandler<T> rh;
 
-	public QueryablePreparedStatement(PreparedStatement st, ResultHandler<T> rh) {
+	public QueryablePreparedStatement(final PreparedStatement st, final ResultHandler<T> rh) {
 		this.st = st;
 		this.rh = rh;
 	}
 
-	public QueryablePreparedStatement(Connection conn, String key,
-			ResultHandler<T> rh) {
+	public QueryablePreparedStatement(final Connection conn, final String key,
+			final ResultHandler<T> rh) {
 		try {
 			st = conn.prepareStatement(QB.get(key));
 		} catch (final SQLException e) {
@@ -34,11 +34,16 @@ public class QueryablePreparedStatement<T> implements Queryable<T> {
 		this.rh = rh;
 	}
 
-	public T call(Object... args) {
+	public T call(final Object... args) {
 		try {
 			JDBCUtils.fill(st, args);
 			st.execute();
-			return rh.handle(new ResultSetResult(st.getResultSet()));
+			final ResultSetResult rs =new ResultSetResult(st.getResultSet());
+			try {
+				return rh.handle(rs);
+			} finally {
+				rs.close();
+			}
 		} catch (final SQLException e) {
 			throw new StatementException(e);
 		}
