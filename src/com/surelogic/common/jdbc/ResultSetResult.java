@@ -16,6 +16,10 @@ class ResultSetResult implements Result {
 	}
 
 	public Iterator<Row> iterator() {
+		if (set == null) {
+			throw new IllegalArgumentException(
+					"Cannot iterate over an empty result set.  Please make sure that your query is a SELECT statement.");
+		}
 		return new Iterator<Row>() {
 
 			private boolean hasNexted = false;
