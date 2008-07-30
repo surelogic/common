@@ -1,8 +1,10 @@
 package com.surelogic.common;
 
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -128,6 +130,32 @@ public final class FileUtility {
 					I18N.err(113, from.getAbsolutePath()), e);
 		}
 		return false;
+	}
+
+	/**
+	 * Gets the contents of a text file and returns it as a string.
+	 * 
+	 * @param textFile
+	 *            a text file.
+	 * @return the file's contents.
+	 */
+	static public String getFileContents(final File textFile) {
+		StringBuilder b = new StringBuilder();
+		try {
+			BufferedReader r = new BufferedReader(new FileReader(textFile));
+			while (true) {
+				String s = r.readLine();
+				if (s == null)
+					break;
+				b.append(s);
+				b.append("\n");
+			}
+			r.close();
+		} catch (IOException e) {
+			SLLogger.getLogger().log(Level.SEVERE,
+					I18N.err(117, textFile.getAbsolutePath()), e);
+		}
+		return b.toString();
 	}
 
 	/**
