@@ -31,18 +31,20 @@ public abstract class AbstractSLJob implements SLJob {
 	 * 
 	 * <pre>
 	 * public SLStatus run(SLProgressMonitor monitor) {
-	 * 	monitor.begin(100);
-	 * 	monitor.worked(50);
-	 * 	SLJob job = new PrepSLJob();
-	 * 	// run the subtask
-	 * 	final SLStatus status = invoke(job, monitor, 50);
-	 * 	if (status.getSeverity() != SLSeverity.OK)
-	 * 		return status;
-	 * 	if (monitor.isCanceled())
-	 * 		return SLStatus.CANCEL_STATUS;
-	 * 
-	 * 	return SLStatus.OK_STATUS;
-	 * }
+	 *   monitor.begin(100);
+	 *   try {
+	 *     monitor.worked(50);
+	 *     SLJob job = new PrepSLJob();
+	 *     // run the subtask
+	 *     final SLStatus status = invoke(job, monitor, 50);
+	 *     if (status.getSeverity() != SLSeverity.OK)
+	 *       return status;
+	 *     if (monitor.isCanceled())
+	 *       return SLStatus.CANCEL_STATUS;
+	 *   } finally {
+	 *     monitor.done();
+	 *   }
+	 *   return SLStatus.OK_STATUS;
 	 * </pre>
 	 * 
 	 * @param job
