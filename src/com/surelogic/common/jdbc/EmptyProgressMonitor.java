@@ -6,19 +6,20 @@ public class EmptyProgressMonitor implements SLProgressMonitor {
 
 	private static final EmptyProgressMonitor singleton = new EmptyProgressMonitor();
 
-	public void beginTask(String name, int totalWork) {
+	public void begin() {
 		// Do nothing
+	}
 
+	public void begin(int totalWork) {
+		// Do nothing
 	}
 
 	public void done() {
 		// Do nothing
-
 	}
 
 	public void internalWorked(double work) {
 		// Do nothing
-
 	}
 
 	public boolean isCanceled() {
@@ -28,17 +29,14 @@ public class EmptyProgressMonitor implements SLProgressMonitor {
 
 	public void setCanceled(boolean value) {
 		// Do nothing
-
 	}
 
 	public void setTaskName(String name) {
 		// Do nothing
-
 	}
 
 	public void subTask(String name) {
 		// Do nothing
-
 	}
 
 	public void worked(int work) {
@@ -49,27 +47,27 @@ public class EmptyProgressMonitor implements SLProgressMonitor {
 		return singleton;
 	}
 
-  public void failed(String msg) {
-    // Do nothing
-  }
-	
-  public void failed(Throwable t) {
-    // Do nothing
-  }
+	public void failed(String msg) {
+		// Do nothing
+	}
 
-  public Throwable getFailureTrace() {
-    return null;
-  }
+	public void failed(Throwable t) {
+		// Do nothing
+	}
 
-  public void error(String msg) {
-    // Do nothing
-  }
+	public Throwable getFailureTrace() {
+		return null;
+	}
 
-  public void error(String msg, Throwable t) {
-    // Do nothing
-  }
+	public void error(String msg) {
+		// Do nothing
+	}
 
-  public void failed(String msg, Throwable t) {
-    // Do nothing
-  }
+	public void error(String msg, Throwable t) {
+		// Do nothing
+	}
+
+	public void failed(String msg, Throwable t) {
+		// Do nothing
+	}
 }

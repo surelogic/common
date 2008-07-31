@@ -1,64 +1,48 @@
 package com.surelogic.common.jobs;
 
 /**
- * From the Eclipse <code>IProgressMonitor</code> interface. This interface
- * exists so that code that is shared between Eclipse client code and J2EE code
- * can both reference to progress monitors without needing the Eclipse
- * libraries.
+ * An IDE independent interface for job progress monitoring. Similar to the
+ * Eclipse {@code IProgressMonitor} interface.
  * 
- * The <code>SLProgressMonitor</code> interface is implemented by objects that
+ * The {@link SLProgressMonitor} interface is implemented by objects that
  * monitor the progress of an activity; the methods in this interface are
  * invoked by code that performs the activity.
  * <p>
  * All activity is broken down into a linear sequence of tasks against which
- * progress is reported. When a task begins, a <code>beginTask(String, int)
- * </code> notification is reported,
- * followed by any number and mixture of progress reports (<code>worked()</code>
- * ) and subtask notifications (<code>subTask(String)</code>). When the task is
- * eventually completed, a <code>done()</code> notification is reported. After
- * the <code>done()</code> notification, the progress monitor cannot be reused;
- * i.e., <code>
- * beginTask(String, int)</code> cannot be called again after the call to
- * <code>done()</code>.
- * </p>
+ * progress is reported. When a task begins, a {@link #begin(int)} notification
+ * is reported (or a {@link #begin()} if the task is indeterminate), followed by
+ * any number and mixture of progress reports via {@link #worked(int)} and
+ * subtask notifications via {@link SLProgressMonitor#subTask(String)}. When the
+ * task is eventually completed, a {@link #done()} notification is reported.
+ * After the {@link #done()} notification, the progress monitor cannot be
+ * reused; i.e., {@link #begin(int)} cannot be called again after the call to
+ * {@link #done()}.
  * <p>
  * A request to cancel an operation can be signaled using the
- * <code>setCanceled</code> method. Operations taking a progress monitor are
- * expected to poll the monitor (using <code>isCanceled</code>) periodically and
- * abort at their earliest convenience. Operation can however choose to ignore
- * cancellation requests.
- * </p>
- * <p>
- * Since notification is synchronous with the activity itself, the listener
- * should provide a fast and robust implementation. If the handling of
- * notifications would involve blocking operations, or operations which might
- * throw uncaught exceptions, the notifications should be queued, and the actual
- * processing deferred (or perhaps delegated to a separate thread).
- * </p>
+ * {@link #setCanceled(boolean)} method. Operations taking a progress monitor
+ * are expected to poll the monitor (using {@link #isCanceled()}) periodically
+ * and abort at their earliest convenience. Operation can however choose to
+ * ignore cancellation requests.
  * <p>
  * Clients may implement this interface.
- * </p>
  */
 public interface SLProgressMonitor {
 
 	/**
-	 * Constant indicating an unknown amount of work.
+	 * Start the progress indication for an indeterminate task. This must only
+	 * be called once on a given progress monitor instance.
 	 */
-	public final static int UNKNOWN = -1;
+	public void begin();
 
 	/**
-	 * Notifies that the main task is beginning. This must only be called once
-	 * on a given progress monitor instance.
+	 * Start the progress indication for a task with known number of steps. This
+	 * must only be called once on a given progress monitor instance.
 	 * 
-	 * @param name
-	 *            the name (or description) of the main task
 	 * @param totalWork
-	 *            the total number of work units into which the main task is
-	 *            been subdivided. If the value is <code>UNKNOWN</code> the
-	 *            implementation is free to indicate progress in a way which
-	 *            doesn't require the total number of work units in advance.
+	 *            the total number of work units into which this task is
+	 *            subdivided.
 	 */
-	public void beginTask(String name, int totalWork);
+	public void begin(int totalWork);
 
 	/**
 	 * Notifies that the work is done; that is, either the main task is

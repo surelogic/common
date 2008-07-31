@@ -6,7 +6,11 @@ public final class NullSLProgressMonitor implements SLProgressMonitor {
 
 	private final AtomicBoolean f_canceled = new AtomicBoolean(false);
 
-	public void beginTask(String name, int totalWork) {
+	public void begin() {
+		// Do nothing
+	}
+
+	public void begin(int totalWork) {
 		// Do nothing
 	}
 
@@ -25,7 +29,6 @@ public final class NullSLProgressMonitor implements SLProgressMonitor {
 
 	public void subTask(String name) {
 		// Do nothing
-
 	}
 
 	public void worked(int work) {

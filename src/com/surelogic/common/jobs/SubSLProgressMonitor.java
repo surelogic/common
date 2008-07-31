@@ -8,18 +8,18 @@ import com.surelogic.common.i18n.I18N;
  * 
  * <pre>
  * try {
- * 	pm.beginTask(&quot;Main Task&quot;, 100);
- * 	doSomeWork(pm, 30);
- * 	SubSLProgressMonitor subMonitor = new SubSLProgressMonitor(pm, 40);
- * 	try {
- * 		subMonitor.beginTask(&quot;&quot;, 300);
- * 		doSomeWork(subMonitor, 300);
- * 	} finally {
- * 		subMonitor.done();
- * 	}
- * 	doSomeWork(pm, 30);
+ *   pm.begin(100);
+ *   pm.worked(30);
+ *   SubSLProgressMonitor subMonitor = new SubSLProgressMonitor(pm, &quot;sub 1&quot;, 40);
+ *   try {
+ *     subMonitor.begin(300);
+ *     subMonitor.worked(100);
+ *   } finally {
+ *     subMonitor.done();
+ *   }
+ *   pm.worked(30)
  * } finally {
- * 	pm.done();
+ *   pm.done();
  * }
  * </pre>
  * 
@@ -27,7 +27,11 @@ import com.surelogic.common.i18n.I18N;
  * {@link #done()} to ensure that the correct amount of work is done on the
  * parent progress monitor.
  * <p>
- * Calls to {@link #subTask(String)} are ignored.
+ * It is allowed to nest subtasks, but this is typically bad practice and may
+ * not be well displayed in the UI. Hence, it is best to have one main task with
+ * subtasks (i.e., not have subtasks of a subtask). This is allowed so that a
+ * task that is normally invoked as a main task could be used as a subtask of
+ * some higher task.
  */
 public final class SubSLProgressMonitor implements SLProgressMonitor {
 
@@ -37,17 +41,24 @@ public final class SubSLProgressMonitor implements SLProgressMonitor {
 	 * 
 	 * @param parent
 	 *            the parent progress monitor.
+	 * @param name
+	 *            the name of this subtask, or {@code null} if the subtask has
+	 *            no name.
 	 * @param work
 	 *            the amount of work that will be done on the parent progress
 	 *            monitor.
 	 */
-	public SubSLProgressMonitor(SLProgressMonitor parent, int work) {
+	public SubSLProgressMonitor(SLProgressMonitor parent, String name, int work) {
 		if (parent == null)
 			throw new IllegalArgumentException(I18N.err(44, "parent"));
 		f_parent = parent;
+		if (name == null)
+			throw new IllegalArgumentException(I18N.err(44, "name"));
+		f_name = name;
 		f_parentWorkedGoal = work;
 	}
 
+	private final String f_name;
 	private final SLProgressMonitor f_parent;
 
 	private final int f_parentWorkedGoal;
@@ -56,8 +67,16 @@ public final class SubSLProgressMonitor implements SLProgressMonitor {
 	private int f_workedGoal;
 	private int f_worked;
 
-	public void beginTask(String name, int totalWork) {
-		f_parent.subTask(name);
+	public void begin() {
+		/*
+		 * We handle indeterminate subtasks by making them one unit of work.
+		 * This unit will be ticked off when done is called.
+		 */
+		begin(1);
+	}
+
+	public void begin(int totalWork) {
+		f_parent.subTask(f_name);
 		if (totalWork <= 0)
 			throw new IllegalStateException(I18N.err(115, "totalWork"));
 		f_workedGoal = totalWork;
@@ -81,7 +100,11 @@ public final class SubSLProgressMonitor implements SLProgressMonitor {
 	}
 
 	public void subTask(String name) {
-		// ignore
+		if (name == null || "".equals(name)) {
+			f_parent.subTask(f_name);
+		} else {
+			f_parent.subTask(name);
+		}
 	}
 
 	public void worked(int work) {
