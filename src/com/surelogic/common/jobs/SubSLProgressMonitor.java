@@ -40,10 +40,9 @@ public final class SubSLProgressMonitor implements SLProgressMonitor {
 	 * work on the parent monitor.
 	 * 
 	 * @param parent
-	 *            the parent progress monitor.
+	 *            the non-null parent progress monitor.
 	 * @param name
-	 *            the name of this subtask, or {@code null} if the subtask has
-	 *            no name.
+	 *            the non-null name of this subtask.
 	 * @param work
 	 *            the amount of work that will be done on the parent progress
 	 *            monitor.
