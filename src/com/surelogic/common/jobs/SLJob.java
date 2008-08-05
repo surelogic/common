@@ -21,15 +21,7 @@ public interface SLJob {
 	 * 
 	 * @param monitor
 	 *            the monitor to be used for reporting progress and responding
-	 *            to cancellation. It is recommended (as a defensive coding
-	 *            practice) that the implementation check if the monitor is null
-	 *            and construct a {@link NullSLProgressMonitor} in that case.
-	 *            For example:
-	 * 
-	 *            <pre>
-	 * if (monitor == null)
-	 * 	monitor = new NullSLProgressMonitor();
-	 * </pre>
+	 *            to cancellation. This parameter should never be {@code null}.
 	 * 
 	 * @return resulting status of the run. The result must not be {@code null}.
 	 * 
