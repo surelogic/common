@@ -7,9 +7,6 @@ import java.net.URL;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
-import com.surelogic.common.i18n.I18N;
-import com.surelogic.common.logging.SLLogger;
-
 public final class CommonImages {
 	public static final String PATH = "/com/surelogic/common/images/";
 
@@ -123,9 +120,6 @@ public final class CommonImages {
 	public static URL getImageURL(String imageSymbolicName) {
 		final String path = PATH + imageSymbolicName;
 		final URL url = CommonImages.class.getResource(path);
-		if (url == null) {
-			SLLogger.getLogger().severe(I18N.err(41, path));
-		}
 		return url;
 	}
 
