@@ -33,6 +33,7 @@ public final class CommonImages {
 	public static final String IMG_CONSISTENT_DECR = "consistent_decr.gif";
 	public static final String IMG_CONSOLE = "console.gif";
 	public static final String IMG_DOWN = "down.gif";
+	public static final String IMG_EDIT_ADD = "edit_add.gif";
 	public static final String IMG_EDIT_COPY = "edit_copy.gif";
 	public static final String IMG_EDIT_CUT = "edit_cut.gif";
 	public static final String IMG_EDIT_DELETE = "edit_delete.gif";
@@ -48,7 +49,7 @@ public final class CommonImages {
 	public static final String IMG_FL_APP = "fl_app.gif";
 	public static final String IMG_FL_LOGO = "fl_logo.gif";
 	public static final String IMG_FL_PREP_DATA = "fl_prep_data.gif";
-	public static final String IMG_FL_PREP = "fl_prep.gif";
+	public static final String IMG_DRUM = "drum.gif";
 	public static final String IMG_FL_RUN = "fl_run.gif";
 	public static final String IMG_FL_RUN_OBJ = "fl_run_obj.gif";
 	public static final String IMG_FL_RUN_VIEW = "fl_run_view.gif";
@@ -57,6 +58,7 @@ public final class CommonImages {
 	public static final String IMG_GRAY_X = "gray_x.gif";
 	public static final String IMG_GRAY_X_DOUBLE = "gray_x_double.gif";
 	public static final String IMG_GRAY_X_LIGHT = "gray_x_light.gif";
+	public static final String IMG_HIERARCHICAL = "hierarchical.gif";
 	public static final String IMG_IMPORT = "import.gif";
 	public static final String IMG_INCONSISTENT_DECR = "inconsistent_decr.gif";
 	public static final String IMG_INFO = "info.gif";
@@ -81,6 +83,8 @@ public final class CommonImages {
 	public static final String IMG_RED_X = "red_x.gif";
 	public static final String IMG_REFRESH = "refresh.gif";
 	public static final String IMG_RIGHT_ARROW_SMALL = "right_arrow_small.gif";
+	public static final String IMG_RUN = "run.gif";
+	public static final String IMG_RUN_DRUM = "run_drum.gif";
 	public static final String IMG_SAVE_EDIT = "save_edit.gif";
 	public static final String IMG_SAVEALL_EDIT = "saveall_edit.gif";
 	public static final String IMG_SAVEAS_EDIT = "saveas_edit.gif";
