@@ -30,10 +30,15 @@ public final class CommonImages {
 	public static final String IMG_CLASS = "class.gif";
 	public static final String IMG_COLUMNS = "columns.gif";
 	public static final String IMG_COMMENT = "comment.gif";
-	public static final String IMG_COMP_UNIT = "jcu.gif";
 	public static final String IMG_CONSISTENT_DECR = "consistent_decr.gif";
 	public static final String IMG_CONSOLE = "console.gif";
 	public static final String IMG_DOWN = "down.gif";
+	public static final String IMG_EDIT_COPY = "edit_copy.gif";
+	public static final String IMG_EDIT_CUT = "edit_cut.gif";
+	public static final String IMG_EDIT_DELETE = "edit_delete.gif";
+	public static final String IMG_EDIT_NEW = "edit_new.gif";
+	public static final String IMG_EDIT_PASTE = "edit_paste.gif";
+	public static final String IMG_EDIT_PRINT = "edit_print.gif";
 	public static final String IMG_EMPTY = "empty.gif";
 	public static final String IMG_EXPORT_WEB = "export_ws_wiz.png";
 	public static final String IMG_EXPORT = "export.gif";
@@ -57,6 +62,7 @@ public final class CommonImages {
 	public static final String IMG_INFO = "info.gif";
 	public static final String IMG_INFO_DECR = "info_decr.gif";
 	public static final String IMG_INTERFACE = "interface.gif";
+	public static final String IMG_JAVA_COMP_UNIT = "java_comp_unit.gif";
 	public static final String IMG_JETTY_LOG = "jetty_log.gif";
 	public static final String IMG_JSURE_LOGO = "jsure_logo.gif";
 	public static final String IMG_JSURE_NO_VERIFY = "jsure_no_verify.gif";
@@ -66,9 +72,10 @@ public final class CommonImages {
 	public static final String IMG_PLUS = "plus.gif";
 	public static final String IMG_PMD_FINDING = "pmd_finding.gif";
 	public static final String IMG_PRIORITY = "priority.gif";
+	public static final String IMG_PROJECT = "project.gif";
 	public static final String IMG_PROMISE = "promise.gif";
 	public static final String IMG_PROMISE_CONSISTENT = "promise_consistent.gif";
-	public static final String IMG_PROMISE_INCONSISTENT = "promise_consistent.gif";
+	public static final String IMG_PROMISE_INCONSISTENT = "promise_inconsistent.gif";
 	public static final String IMG_QUERY = "query.gif";
 	public static final String IMG_REDDOT_DECR = "reddot_decr.gif";
 	public static final String IMG_RED_X = "red_x.gif";
