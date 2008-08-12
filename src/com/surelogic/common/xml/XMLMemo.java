@@ -34,6 +34,7 @@ public final class XMLMemo implements ILifecycle {
 
 	static final String KEY = "key";
 	static final String MEMO = "memo";
+	static final String MEMO_BOOLEAN = "memo-boolean";
 	static final String MEMO_INT = "memo-int";
 	static final String MEMO_STRING = "memo-string";
 	static final String VALUE = "value";
@@ -64,6 +65,27 @@ public final class XMLMemo implements ILifecycle {
 					I18N.err(125, f_file.getAbsolutePath()), e);
 		}
 
+	}
+
+	private static final Map<String, Boolean> f_keyToBoolean = new HashMap<String, Boolean>();
+
+	public boolean getBoolean(final String key, final boolean defaultValue) {
+		if (key == null)
+			throw new IllegalArgumentException(I18N.err(44, "key"));
+		Boolean resultObject = f_keyToBoolean.get(key);
+		final boolean result;
+		if (resultObject == null) {
+			result = defaultValue;
+		} else {
+			result = resultObject;
+		}
+		return result;
+	}
+
+	public void setBoolean(final String key, final boolean value) {
+		if (key == null)
+			throw new IllegalArgumentException(I18N.err(44, "key"));
+		f_keyToBoolean.put(key, value);
 	}
 
 	private static final Map<String, Integer> f_keyToInteger = new HashMap<String, Integer>();
@@ -116,17 +138,25 @@ public final class XMLMemo implements ILifecycle {
 		Entities.addAttribute(VERSION, VERSION_1_0, b);
 		b.append(">"); // don't end this element
 		pw.println(b.toString());
-		for (Map.Entry<String, String> entry : f_keyToString.entrySet()) {
+		for (Map.Entry<String, Boolean> entry : f_keyToBoolean.entrySet()) {
 			b = new StringBuilder();
-			b.append("  <").append(MEMO_STRING);
+			b.append("  <").append(MEMO_BOOLEAN);
 			Entities.addAttribute(KEY, entry.getKey(), b);
-			Entities.addAttribute(VALUE, entry.getValue(), b);
+			Entities.addAttribute(VALUE, entry.getValue().toString(), b);
 			b.append("/>");
 			pw.println(b.toString());
 		}
 		for (Map.Entry<String, Integer> entry : f_keyToInteger.entrySet()) {
 			b = new StringBuilder();
 			b.append("  <").append(MEMO_INT);
+			Entities.addAttribute(KEY, entry.getKey(), b);
+			Entities.addAttribute(VALUE, entry.getValue(), b);
+			b.append("/>");
+			pw.println(b.toString());
+		}
+		for (Map.Entry<String, String> entry : f_keyToString.entrySet()) {
+			b = new StringBuilder();
+			b.append("  <").append(MEMO_STRING);
 			Entities.addAttribute(KEY, entry.getKey(), b);
 			Entities.addAttribute(VALUE, entry.getValue(), b);
 			b.append("/>");
@@ -166,14 +196,15 @@ public final class XMLMemo implements ILifecycle {
 				Attributes attributes) throws SAXException {
 			if (name.equals(MEMO)) {
 				// nothing to do until there is more than one file version
-			} else if (name.equals(MEMO_STRING)) {
+			} else if (name.equals(MEMO_BOOLEAN)) {
 				final String key = attributes.getValue(KEY);
 				final String value = attributes.getValue(VALUE);
 				if (key == null)
 					throw new SAXException(I18N.err(44, KEY));
 				if (value == null)
 					throw new SAXException(I18N.err(44, VALUE));
-				f_keyToString.put(key, value);
+				final boolean booleanValue = Boolean.parseBoolean(value);
+				f_keyToBoolean.put(key, booleanValue);
 			} else if (name.equals(MEMO_INT)) {
 				final String key = attributes.getValue(KEY);
 				final String value = attributes.getValue(VALUE);
@@ -183,6 +214,14 @@ public final class XMLMemo implements ILifecycle {
 					throw new SAXException(I18N.err(44, VALUE));
 				final int intValue = Integer.parseInt(value);
 				f_keyToInteger.put(key, intValue);
+			} else if (name.equals(MEMO_STRING)) {
+				final String key = attributes.getValue(KEY);
+				final String value = attributes.getValue(VALUE);
+				if (key == null)
+					throw new SAXException(I18N.err(44, KEY));
+				if (value == null)
+					throw new SAXException(I18N.err(44, VALUE));
+				f_keyToString.put(key, value);
 			}
 		}
 	}
