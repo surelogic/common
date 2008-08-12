@@ -66,6 +66,10 @@ public final class SubSLProgressMonitor implements SLProgressMonitor {
 	private int f_workedGoal;
 	private int f_worked;
 
+	public String getName() {
+		return f_name;
+	}
+	
 	public void begin() {
 		/*
 		 * We handle indeterminate subtasks by making them one unit of work.

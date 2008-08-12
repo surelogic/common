@@ -55,7 +55,7 @@ public abstract class AbstractSLJob implements SLJob {
 	 *            the amount of work to be accomplished on the parent monitor.
 	 * @return the resulting status of the subtask.
 	 */
-	public SLStatus invoke(SLJob job, SLProgressMonitor monitor, int work) {
+	public static SLStatus invoke(SLJob job, SLProgressMonitor monitor, int work) {
 		final SLProgressMonitor sub = new SubSLProgressMonitor(monitor, job
 				.getName(), work);
 		try {
