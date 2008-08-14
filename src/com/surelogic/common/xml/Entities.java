@@ -19,7 +19,7 @@ public final class Entities {
 	public static void start(final String name, final StringBuilder b) {
 		b.append("<").append(name);
 	}
-	
+
 	/**
 	 * Helper to avoid having to escape non-string values.
 	 */
@@ -33,6 +33,11 @@ public final class Entities {
 	public static void addAttribute(final String name, final String value,
 			final StringBuilder b) {
 		add(name, E.escape(value), b);
+	}
+
+	public static void addAttribute(final String name, final boolean value,
+			final StringBuilder b) {
+		add(name, Boolean.toString(value), b);
 	}
 
 	public static void addAttribute(final String name, final int value,
@@ -133,7 +138,8 @@ public final class Entities {
 	}
 
 	/**
-	 * Defines the five standard XML predefined character entities: &, ', >, <, ".
+	 * Defines the five standard XML predefined character entities: &, ', >, <,
+	 * ".
 	 */
 	public void defineStandardXML() {
 		define("amp", "&");
