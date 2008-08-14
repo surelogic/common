@@ -41,6 +41,7 @@ public final class CommonImages {
 	public static final String IMG_EDIT_PASTE = "edit_paste.gif";
 	public static final String IMG_EDIT_PRINT = "edit_print.gif";
 	public static final String IMG_EMPTY = "empty.gif";
+	public static final String IMG_ERROR = "error.gif";
 	public static final String IMG_EXPORT_WEB = "export_ws_wiz.png";
 	public static final String IMG_EXPORT = "export.gif";
 	public static final String IMG_FILE = "file.gif";
