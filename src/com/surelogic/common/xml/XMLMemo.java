@@ -24,9 +24,11 @@ import com.surelogic.common.logging.SLLogger;
 
 /**
  * A simple class that memorizes values and helps persist them across sessions.
- * This class is not intended as a crutch to avoid creating a data model, but
- * rather a class to remember view state that is not part of a data model. For
- * example, where a sash pane was located or which tab was visible.
+ * This class is not intended as a crutch to avoid creating a principled data
+ * model, but rather a class to help with the mechanics of persisting data. This
+ * is a good class to use to persist view state that is not part of the view's
+ * data model. For example, where a sash pane was located or which tab was
+ * visible.
  */
 public final class XMLMemo implements ILifecycle {
 
