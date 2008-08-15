@@ -69,7 +69,7 @@ public final class XMLMemo implements ILifecycle {
 
 	}
 
-	private static final Map<String, Boolean> f_keyToBoolean = new HashMap<String, Boolean>();
+	private final Map<String, Boolean> f_keyToBoolean = new HashMap<String, Boolean>();
 
 	public boolean getBoolean(final String key, final boolean defaultValue) {
 		if (key == null)
@@ -90,7 +90,7 @@ public final class XMLMemo implements ILifecycle {
 		f_keyToBoolean.put(key, value);
 	}
 
-	private static final Map<String, Integer> f_keyToInteger = new HashMap<String, Integer>();
+	private final Map<String, Integer> f_keyToInteger = new HashMap<String, Integer>();
 
 	public int getInt(final String key, final int defaultValue) {
 		if (key == null)
@@ -111,7 +111,7 @@ public final class XMLMemo implements ILifecycle {
 		f_keyToInteger.put(key, value);
 	}
 
-	private static final Map<String, String> f_keyToString = new HashMap<String, String>();
+	private final Map<String, String> f_keyToString = new HashMap<String, String>();
 
 	public String getString(final String key, final String defaultValue) {
 		if (key == null)
