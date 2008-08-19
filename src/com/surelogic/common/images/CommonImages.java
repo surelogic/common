@@ -33,6 +33,8 @@ public final class CommonImages {
 	public static final String IMG_CONSISTENT_DECR = "consistent_decr.gif";
 	public static final String IMG_CONSOLE = "console.gif";
 	public static final String IMG_DOWN = "down.gif";
+	public static final String IMG_DRUM = "drum.gif";
+	public static final String IMG_DRUM_GRAY = "drum_gray.gif";
 	public static final String IMG_EDIT_ADD = "edit_add.gif";
 	public static final String IMG_EDIT_COPY = "edit_copy.gif";
 	public static final String IMG_EDIT_CUT = "edit_cut.gif";
@@ -50,7 +52,6 @@ public final class CommonImages {
 	public static final String IMG_FL_APP = "fl_app.gif";
 	public static final String IMG_FL_LOGO = "fl_logo.gif";
 	public static final String IMG_FL_PREP_DATA = "fl_prep_data.gif";
-	public static final String IMG_DRUM = "drum.gif";
 	public static final String IMG_FL_RUN = "fl_run.gif";
 	public static final String IMG_FL_RUN_OBJ = "fl_run_obj.gif";
 	public static final String IMG_FL_RUN_VIEW = "fl_run_view.gif";
