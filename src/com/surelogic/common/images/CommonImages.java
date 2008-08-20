@@ -35,6 +35,7 @@ public final class CommonImages {
 	public static final String IMG_DOWN = "down.gif";
 	public static final String IMG_DRUM = "drum.gif";
 	public static final String IMG_DRUM_GRAY = "drum_gray.gif";
+	public static final String IMG_DRUM_U = "drum_u.gif";
 	public static final String IMG_EDIT_ADD = "edit_add.gif";
 	public static final String IMG_EDIT_COPY = "edit_copy.gif";
 	public static final String IMG_EDIT_CUT = "edit_cut.gif";
