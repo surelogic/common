@@ -82,6 +82,7 @@ public final class CommonImages {
 	public static final String IMG_PROMISE_CONSISTENT = "promise_consistent.gif";
 	public static final String IMG_PROMISE_INCONSISTENT = "promise_inconsistent.gif";
 	public static final String IMG_QUERY = "query.gif";
+	public static final String IMG_QUERY_GRAY = "query_gray.gif";
 	public static final String IMG_QUERY_OBJ = "query_obj.gif";
 	public static final String IMG_QUERY_OBJ_HIDDEN = "query_obj_hidden.gif";
 	public static final String IMG_QUERY_OBJ_ROOT = "query_obj_root.gif";
