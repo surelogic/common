@@ -6,6 +6,7 @@ Bundle-Version: 2.3.0.qualifier
 Bundle-Vendor: SureLogic, Inc.
 Export-Package: com.surelogic.common,
  com.surelogic.common.base64,
+ com.surelogic.common.concurrent,
  com.surelogic.common.export,
  com.surelogic.common.i18n,
  com.surelogic.common.images,
