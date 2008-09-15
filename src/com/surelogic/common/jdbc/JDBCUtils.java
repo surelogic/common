@@ -74,6 +74,9 @@ public class JDBCUtils {
 				st.setTimestamp(idx, new Timestamp(((Date) o).getTime()));
 			} else if (o instanceof Boolean) {
 				st.setString(idx, ((Boolean) o) ? "Y" : "N");
+			} else {
+				throw new IllegalArgumentException(o.getClass()
+						+ " can not be interpreted as an SQL parameter.");
 			}
 			idx++;
 		}
