@@ -12,11 +12,42 @@ package com.surelogic.common.jobs;
  * progress is reported. When a task begins, a {@link #begin(int)} notification
  * is reported (or a {@link #begin()} if the task is indeterminate), followed by
  * any number and mixture of progress reports via {@link #worked(int)} and
- * subtask notifications via {@link SLProgressMonitor#subTask(String)}. When the
+ * subtask notifications that are bracketed by calls to {@link SLProgressMonitor#subTask(String)}
+ * and {@link #subTaskDone()}. When the
  * task is eventually completed, a {@link #done()} notification is reported.
  * After the {@link #done()} notification, the progress monitor cannot be
  * reused; i.e., {@link #begin(int)} cannot be called again after the call to
  * {@link #done()}.
+ * <p>
+ * Subtasks may be nested.  For instance, the code
+ * <pre>
+ *   final SLProgressMonitor monitor = ...;
+ *   monitor.begin();
+ *   monitor.worked(3);
+ *   monitor.subTask("Sub task");
+ *   monitor.worked(5);
+ *   monitor.subTask("Sub sub task");
+ *   monitor.worked(5);
+ *   monitor.subTaskDone();
+ *   monitor.worked(3);
+ *   monitor.subTaskDone();
+ *   monitor.worked(2);
+ *   monitor.done();
+ * </pre>
+ * creates a new progress monitor, and begins the reporting.  It reports 3 units
+ * of work for the outer most task, and then starts a new subtask "Sub task." 
+ * After reporting 5 units of work, the sub task "Sub task" starts a subtask of
+ * its own "Sub sub task."  After reporting 5 units of work, the inner most subtask
+ * completes.  Task "Sub task" performs 3 more units of work before completed.
+ * Finally the outer most task reports 2 units of work, and then completes.
+ * <p>
+ * Ideally all there will be a one-to-one correspondence between calls to
+ * {@code subTask} and {@code subTaskDone}, all neatly bracket between a call
+ * to {@code begin} and a call to {@code done}.  Exceptions and other deeply
+ * nested error handling may make this impractical.  For this reason, the
+ * {@code done} method is closes all nested subtasks.  <em>This can be relied
+ * upon by users of the progress monitor.  It is an implementation obligation
+ * for implementors of progress monitors.</em>.
  * <p>
  * A request to cancel an operation can be signaled using the
  * {@link #setCanceled(boolean)} method. Operations taking a progress monitor
@@ -47,7 +78,10 @@ public interface SLProgressMonitor {
 	/**
 	 * Notifies that the work is done; that is, either the main task is
 	 * completed or the user canceled it. This method may be called more than
-	 * once (implementations should be prepared to handle this case).
+	 * once (implementations should be prepared to handle this case).  Also closes
+	 * any subtasks that are still "open."  That is, the progress monitor should
+	 * behave as if {@link #subTaskDone()} has been called for any subtasks that 
+	 * are still unfinished. 
 	 */
 	public void done();
 
@@ -75,12 +109,18 @@ public interface SLProgressMonitor {
 
 	/**
 	 * Notifies that a subtask of the main task is beginning. Subtasks are
-	 * optional; the main task might not have subtasks.
+	 * optional; the main task might not have subtasks.  When the subtask
+	 * is complete it must call {@link #subTaskDone()}.
 	 * 
 	 * @param name
 	 *            the name (or description) of the subtask
 	 */
 	public void subTask(String name);
+	
+	/**
+	 * Notifies that a subtask has completed.
+	 */
+	public void subTaskDone();
 
 	/**
 	 * Notifies that a given number of work unit of the main task has been

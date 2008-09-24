@@ -91,7 +91,8 @@ public final class SubSLProgressMonitor implements SLProgressMonitor {
 		if (parentWorkRemaining > 0) {
 			f_parent.worked(parentWorkRemaining);
 		}
-		f_parent.subTask("");
+		f_parent.subTaskDone();
+//		f_parent.subTask("");
 	}
 
 	public boolean isCanceled() {
@@ -103,14 +104,20 @@ public final class SubSLProgressMonitor implements SLProgressMonitor {
 	}
 
 	public void subTask(String name) {
-		if (name == null || "".equals(name)) {
-			f_parent.subTask(f_name);
-		} else {
-			f_parent.subTask(name);
-		}
+	  f_parent.subTask(name);
+//		if (name == null || "".equals(name)) {
+//			f_parent.subTask(f_name);
+//		} else {
+//			f_parent.subTask(name);
+//		}
 	}
 
-	public void worked(int work) {
+	public void subTaskDone() {
+	  f_parent.subTaskDone();
+	}
+	
+	@SuppressWarnings("cast")
+  public void worked(int work) {
 		if (f_worked < f_workedGoal) {
 			f_worked = Math.min(f_worked + work, f_workedGoal);
 

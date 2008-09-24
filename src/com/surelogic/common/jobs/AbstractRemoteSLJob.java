@@ -195,6 +195,10 @@ public abstract class AbstractRemoteSLJob {
 		public void subTask(final String name) {
 			out.println("##" + Remote.SUBTASK + ", " + name);
 		}
+		
+		public void subTaskDone() {
+		  // Do nothing
+		}
 
 		public void worked(final int work) {
 			out.println("##" + Remote.WORK + ", " + work);
