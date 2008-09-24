@@ -66,7 +66,6 @@ public final class XMLMemo implements ILifecycle {
 			SLLogger.getLogger().log(Level.SEVERE,
 					I18N.err(125, f_file.getAbsolutePath()), e);
 		}
-
 	}
 
 	private final Map<String, Boolean> f_keyToBoolean = new HashMap<String, Boolean>();
