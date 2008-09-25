@@ -21,6 +21,17 @@ public final class UsageMeter {
 	private final File f_usageFile = new File(System.getProperty("user.home")
 			+ File.separator + ".surelogic");
 
+	/**
+	 * Gets the file being used to persist this usage meter. If this file needs
+	 * to be read than it is important to call {@link #persist()} before reading
+	 * its contents.
+	 * 
+	 * @return the file being used to persist this usage meter.
+	 */
+	public File getFile() {
+		return f_usageFile;
+	}
+
 	private XMLMemo f_memo = new XMLMemo(f_usageFile);
 
 	/**
