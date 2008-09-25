@@ -21,7 +21,33 @@ public final class UsageMeter {
 	private final File f_usageFile = new File(System.getProperty("user.home")
 			+ File.separator + ".surelogic");
 
-	private XMLMemo f_memo;
+	private XMLMemo f_memo = new XMLMemo(f_usageFile);
+
+	/**
+	 * Gets the memo underlying this usage meter. The {@link #tickUse(String)}
+	 * method should be used to note the use of a feature rather than direct
+	 * interaction with the memo. For registration and copy protection data,
+	 * however, direct use of the memo is required.
+	 * <p>
+	 * To be safe it is recommended that all actions performed on the memo
+	 * object be within a block synchronized on this usage meter.
+	 * 
+	 * <pre>
+	 * final UsageMeter m = UsageMeter.getInstance();
+	 * synchronized (m) {
+	 * 	final XMLMemo memo = m.getMemo();
+	 * 	// do stuff with memo
+	 * }
+	 * </pre>
+	 * 
+	 * Always use {@link #persist()} rather than calling
+	 * {@link XMLMemo#dispose()} on the memo directly.
+	 * 
+	 * @return the memo underlying this usage meter.
+	 */
+	public synchronized XMLMemo getMemo() {
+		return f_memo;
+	}
 
 	/**
 	 * Indicates that some named feature was used again. This "ticks" up the
@@ -46,19 +72,8 @@ public final class UsageMeter {
 		f_memo.dispose();
 	}
 
-	/**
-	 * Clears all usage counters. This likely indicates that the usage data was
-	 * sent to SureLogic.
-	 */
-	public synchronized void reset() {
-		f_usageFile.delete();
-		f_memo = new XMLMemo(f_usageFile);
-		f_memo.init();
-	}
-
 	private UsageMeter() {
 		// singleton
-		f_memo = new XMLMemo(f_usageFile);
 		f_memo.init();
 	}
 }
