@@ -2,6 +2,7 @@ package com.surelogic.common.serviceability;
 
 import java.io.File;
 
+import com.surelogic.common.FileUtility;
 import com.surelogic.common.xml.XMLMemo;
 
 /**
@@ -81,6 +82,19 @@ public final class UsageMeter {
 	 */
 	public synchronized void persist() {
 		f_memo.dispose();
+	}
+
+	/**
+	 * Gets the contents of the file used to persist this usage meter. This
+	 * meter is persisted before its contents are read.
+	 * <p>
+	 * The resulting data is in XML and is ready to be sent to SureLogic.
+	 * 
+	 * @return the contents of the file used to persist this usage meter.
+	 */
+	public synchronized String getFileContents() {
+		persist();
+		return FileUtility.getFileContents(f_usageFile);
 	}
 
 	private UsageMeter() {

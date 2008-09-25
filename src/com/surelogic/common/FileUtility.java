@@ -140,7 +140,8 @@ public final class FileUtility {
 	 * @return the file's contents.
 	 */
 	static public String getFileContents(final File textFile) {
-		StringBuilder b = new StringBuilder();
+		final String lf = System.getProperty("line.separator");
+		final StringBuilder b = new StringBuilder();
 		try {
 			BufferedReader r = new BufferedReader(new FileReader(textFile));
 			while (true) {
@@ -148,7 +149,7 @@ public final class FileUtility {
 				if (s == null)
 					break;
 				b.append(s);
-				b.append("\n");
+				b.append(lf);
 			}
 			r.close();
 		} catch (IOException e) {
