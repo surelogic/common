@@ -3,6 +3,8 @@ package com.surelogic.common.xml;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.surelogic.common.CharBuffer;
+
 /**
  * Manages a table of entities for XML. This class can be used to help escape
  * strings that are output in XML format.
@@ -54,6 +56,11 @@ public final class Entities {
     b.append(E.escape(value));
   }
 
+  public static CharBuffer addEscaped(final String value, final CharBuffer b) {
+    b.append(E.escape(value));
+    return b;
+  }
+  
   public static String trimInternal(final String value) {
     return value.replaceAll("\\s+", " ");
   }
