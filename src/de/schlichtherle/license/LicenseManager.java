@@ -711,7 +711,7 @@ public class LicenseManager implements LicenseCreator, LicenseVerifier {
      *     time must match their restrictions.
      * <li>'consumerType' must be provided and 'consumerAmount' must be
      *     positive. If a user preference node is provided in the license
-     *     parameters, 'consumerType' must also match “User” (whereby case
+     *     parameters, 'consumerType' must also match "User" (whereby case
      *     is ignored) and 'consumerAmount' must equal 1.
      * </ul>
      * <p>
