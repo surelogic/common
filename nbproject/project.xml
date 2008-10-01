@@ -20,6 +20,15 @@
                 <package>com.surelogic.common.serviceability</package>
                 <package>com.surelogic.common.update</package>
                 <package>com.surelogic.common.xml</package>
+                <package>de.schlichtherle.license</package>
+                <package>de.schlichtherle.license.ftp</package>
+                <package>de.schlichtherle.util</package>
+                <package>de.schlichtherle.xml</package>
+                <package>org.apache.commons.codec</package>
+                <package>org.apache.commons.codec.binary</package>
+                <package>org.apache.commons.codec.digest</package>
+                <package>org.apache.commons.codec.language</package>
+                <package>org.apache.commons.codec.net</package>
             </public-packages>
         </data>
     </configuration>
