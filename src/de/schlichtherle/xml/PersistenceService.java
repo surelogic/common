@@ -34,16 +34,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Iterator;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipOutputStream;
 
 /**
  * Provides a collection of static methods to support comfortable loading and
@@ -92,7 +88,7 @@ public class PersistenceService implements XMLConstants {
      * <code>PersistenceDelegate</code> instances. Its elements are installed
      * in the <code>XMLEncoder</code> prior to encoding an object.
      */
-    private static final HashMap allPDs = new HashMap();
+    private static final HashMap<Class<?>, PersistenceDelegate> allPDs = new HashMap<Class<?>, PersistenceDelegate>();
     
     /**
      * The buffer size for I/O used in the store and load methods.
@@ -161,7 +157,7 @@ public class PersistenceService implements XMLConstants {
      * @see java.beans.DefaultPersistenceDelegate
      */
     public static synchronized final void setPersistenceDelegate(
-            Class clazz,
+            Class<?> clazz,
             PersistenceDelegate persistenceDelegate) {
         allPDs.put(clazz, persistenceDelegate);
     }
@@ -175,15 +171,15 @@ public class PersistenceService implements XMLConstants {
      *
      * @throws RuntimeException if <code>encoder</code> is <code>null</code>.
      */
-    protected static synchronized void installPersistenceDelegates(final Encoder encoder) {
-        Iterator i = allPDs.entrySet().iterator();
-        while (i.hasNext()) {
-            Map.Entry entry = (Map.Entry) i.next();
-            encoder.setPersistenceDelegate(
-                    (Class) entry.getKey(),
-                    (PersistenceDelegate) entry.getValue());
-        }
-    }
+    protected static synchronized void installPersistenceDelegates(
+			final Encoder encoder) {
+		Iterator<Map.Entry<Class<?>, PersistenceDelegate>> i = allPDs
+				.entrySet().iterator();
+		while (i.hasNext()) {
+			Map.Entry<Class<?>, PersistenceDelegate> entry = i.next();
+			encoder.setPersistenceDelegate(entry.getKey(), entry.getValue());
+		}
+	}
     
     /**
      * Stores the object <code>root</code>, which may form the root of an entire

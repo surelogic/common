@@ -30,7 +30,10 @@ import java.beans.*;
  * @author Christian Schlichtherle
  */
 public class GenericCertificateIsLockedException extends PropertyVetoException {
-    public GenericCertificateIsLockedException(PropertyChangeEvent evt) {
+	
+	private static final long serialVersionUID = 3337801567168639557L;
+
+	public GenericCertificateIsLockedException(PropertyChangeEvent evt) {
         super(evt.getPropertyName(), evt);
     }
 }

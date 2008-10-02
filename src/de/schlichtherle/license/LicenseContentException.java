@@ -28,7 +28,9 @@ package de.schlichtherle.license;
  */
 public class LicenseContentException extends java.lang.Exception {
     
-    /**
+	private static final long serialVersionUID = 191738513519740631L;
+
+	/**
      * Constructs an instance of <tt>LicenseContentException</tt>
      * with the given <tt>resourceKey</tt> to lookup the localized detail
      * message with.

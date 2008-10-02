@@ -45,7 +45,7 @@ public class DefaultKeyStoreParam extends AbstractKeyStoreParam {
      *        to be returned by {@link #getStorePwd()}.
      */
     public DefaultKeyStoreParam(
-            Class clazz,
+            Class<?> clazz,
             String resource,
             String alias,
             String storePwd,

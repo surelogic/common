@@ -29,4 +29,6 @@ package de.schlichtherle.xml;
  */
 public class GenericCertificateIntegrityException
         extends java.security.GeneralSecurityException {
+
+	private static final long serialVersionUID = 1900447684056031638L;
 }

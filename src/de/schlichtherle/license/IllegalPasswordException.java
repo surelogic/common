@@ -28,7 +28,10 @@ import de.schlichtherle.util.ObfuscatedString;
  * @author Christian Schlichtherle
  */
 public class IllegalPasswordException extends IllegalArgumentException {
-    public String getLocalizedMessage() {
+	
+	private static final long serialVersionUID = -949689548401215314L;
+
+	public String getLocalizedMessage() {
         return Resources.getString(new ObfuscatedString(new long[] {
             0xAB863F4C6B6EB259L, 0x40C8776423443909L, 0xF1BA739EBF91FAF8L,
             0xE8AFA8114E385C8CL

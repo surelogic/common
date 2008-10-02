@@ -24,16 +24,10 @@ package de.schlichtherle.license;
 import de.schlichtherle.util.ObfuscatedString;
 import de.schlichtherle.xml.*;
 
-import java.beans.*;
 import java.io.*;
-import java.security.*;
-import java.security.cert.*;
-import java.security.spec.*;
 import java.util.*;
 import java.util.prefs.*;
 
-import javax.crypto.*;
-import javax.crypto.spec.*;
 import javax.security.auth.x500.X500Principal;
 import javax.swing.filechooser.FileFilter;
 

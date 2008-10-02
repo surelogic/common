@@ -28,11 +28,8 @@ import de.schlichtherle.license.LicenseNotary;
 import de.schlichtherle.license.NoLicenseInstalledException;
 import de.schlichtherle.util.ObfuscatedString;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.Calendar;
-import java.security.KeyStoreException;
-import java.security.cert.CertificateException;
 import javax.security.auth.x500.X500Principal;
 
 /**

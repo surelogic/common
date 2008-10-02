@@ -36,7 +36,9 @@ package de.schlichtherle.xml;
  */
 public class PersistenceServiceException extends Exception {
 
-    /**
+	private static final long serialVersionUID = 1829371436965067178L;
+
+	/**
      * Constructs an instance of <code>PersistenceServiceException</code>
      * with the specified <tt>cause</tt>.
      *

@@ -31,7 +31,9 @@ import de.schlichtherle.util.ObfuscatedString;
  */
 public class NoLicenseInstalledException extends java.lang.Exception {
 
-    private static final String EXC_NO_LICENSE_INSTALLED = new ObfuscatedString(new long[] {
+	private static final long serialVersionUID = 74799480211832556L;
+	
+	private static final String EXC_NO_LICENSE_INSTALLED = new ObfuscatedString(new long[] {
         0x4E3A1D690A6899DEL, 0xF4EB1546CB69D2C6L, 0x2A6262DBA2AC86DBL,
         0xC3C9B45280715D5L}).toString(); /* => "exc.noLicenseInstalled" */
 

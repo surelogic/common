@@ -30,4 +30,6 @@ package de.schlichtherle.xml;
  */
 public class GenericCertificateNotLockedException
         extends IllegalStateException {
+
+	private static final long serialVersionUID = -851599817191095666L;
 }

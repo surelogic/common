@@ -23,10 +23,7 @@ package de.schlichtherle.xml;
 
 import java.beans.*;
 import java.io.*;
-import java.lang.reflect.*;
 import java.security.*;
-import java.security.cert.*;
-import java.util.*;
 
 import org.apache.commons.codec.binary.Base64;
 
@@ -182,7 +179,9 @@ import org.apache.commons.codec.binary.Base64;
  */
 public final class GenericCertificate implements Serializable, XMLConstants {
 
-    private static final String BASE64_CHARSET = "US-ASCII"; // NOI18N
+	private static final long serialVersionUID = -8916991504387279196L;
+	
+	private static final String BASE64_CHARSET = "US-ASCII"; // NOI18N
     private static final String SIGNATURE_ENCODING = "US-ASCII/Base64"; // NOI18N
     
     /**

@@ -24,12 +24,10 @@ package de.schlichtherle.license;
 import de.schlichtherle.util.ObfuscatedString;
 import de.schlichtherle.xml.*;
 
-import java.beans.*;
 import java.io.*;
 import java.security.*;
 import java.security.cert.*;
 import java.security.cert.Certificate;
-import java.util.*;
 
 /**
  * This notary knows how to sign and verify a {@link GenericCertificate}.

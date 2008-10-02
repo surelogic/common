@@ -32,7 +32,9 @@ package de.schlichtherle.license;
 public class LicenseNotaryException
         extends java.security.GeneralSecurityException {
 
-    /** The alias of the entry in the key store. */
+	private static final long serialVersionUID = 1240698656911479916L;
+	
+	/** The alias of the entry in the key store. */
     private String alias;
     
     /**

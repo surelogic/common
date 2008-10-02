@@ -25,8 +25,6 @@ import de.schlichtherle.xml.PersistenceService;
 
 import java.beans.*;
 import java.io.*;
-import java.lang.reflect.*;
-import java.text.DateFormat;
 import java.util.*;
 import javax.security.auth.x500.X500Principal;
 
@@ -59,7 +57,9 @@ import javax.security.auth.x500.X500Principal;
  */
 public class LicenseContent implements Serializable, Cloneable {
 
-    static {
+	private static final long serialVersionUID = 8656127167248916810L;
+
+	static {
         // With a little help of a persistence delegate we can even make
         // X.500 Principals persistent.
         PersistenceService.setPersistenceDelegate(

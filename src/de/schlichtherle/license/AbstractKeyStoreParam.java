@@ -33,7 +33,7 @@ import java.io.IOException;
  */
 public abstract class AbstractKeyStoreParam implements KeyStoreParam {
     
-    private final Class clazz;
+    private final Class<?> clazz;
     private final String resource;
     
     /**
@@ -41,7 +41,7 @@ public abstract class AbstractKeyStoreParam implements KeyStoreParam {
      * the given resource using the classloader of the given class when
      * calling {@link #getStream()}.
      */
-    protected AbstractKeyStoreParam(Class clazz, String resource) {
+    protected AbstractKeyStoreParam(Class<?> clazz, String resource) {
         this.clazz = clazz;
         this.resource = resource;
     }
