@@ -25,6 +25,7 @@ package org.apache.commons.codec;
  * @author Apache Software Foundation
  * @version $Id: EncoderException.java,v 1.10 2004/02/29 04:08:31 tobrien Exp $
  */
+@SuppressWarnings("serial")
 public class EncoderException extends Exception {
 
     /**

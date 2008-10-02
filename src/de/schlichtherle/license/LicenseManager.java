@@ -185,8 +185,8 @@ public class LicenseManager implements LicenseCreator, LicenseVerifier {
     /** A suitable file filter for the subject of this license manager. */
     private FileFilter fileFilter; // lazy initialized
 
-    /** The preferences node used to store the license key. */
-    private Preferences preferences; // lazy initialized
+//    /** The preferences node used to store the license key. */
+//    private Preferences preferences; // lazy initialized
 
     /**
      * Creates a new License Manager.
@@ -261,7 +261,7 @@ public class LicenseManager implements LicenseCreator, LicenseVerifier {
         certificate = null;
         certificateTime = 0;
         fileFilter = null;
-        preferences = null;
+//        preferences = null;
     }
 
     //
@@ -396,13 +396,6 @@ public class LicenseManager implements LicenseCreator, LicenseVerifier {
      *
      * @see #initialize(LicenseContent)
      * @see #validate(LicenseContent)
-     *
-     * @deprecated <b>Experimental:</b> Methods marked with this note have
-     *             been tested to be functional but may change or disappear
-     *             at will in one of the next releases because they are still
-     *             a topic for research on extended functionality.
-     *             Most likely the methods will prevail however and this note
-     *             will just vanish, so you may use them with a certain risk.
      */
     protected synchronized byte[] create(
             final LicenseContent content,
@@ -496,13 +489,6 @@ public class LicenseManager implements LicenseCreator, LicenseVerifier {
      *         localized) meaningful detail message.
      *
      * @see #validate(LicenseContent)
-     *
-     * @deprecated <b>Experimental:</b> Methods marked with this note have
-     *             been tested to be functional but may change or disappear
-     *             at will in one of the next releases because they are still
-     *             a topic for research on extended functionality.
-     *             Most likely the methods will prevail however and this note
-     *             will just vanish, so you may use them with a certain risk.
      */
     protected synchronized LicenseContent install(
             final byte[] key,
@@ -557,13 +543,6 @@ public class LicenseManager implements LicenseCreator, LicenseVerifier {
      *         localized) meaningful detail message.
      *
      * @see #validate(LicenseContent)
-     *
-     * @deprecated <b>Experimental:</b> Methods marked with this note have
-     *             been tested to be functional but may change or disappear
-     *             at will in one of the next releases because they are still
-     *             a topic for research on extended functionality.
-     *             Most likely the methods will prevail however and this note
-     *             will just vanish, so you may use them with a certain risk.
      */
     protected synchronized LicenseContent verify(final LicenseNotary notary)
     throws Exception {
@@ -764,14 +743,7 @@ public class LicenseManager implements LicenseCreator, LicenseVerifier {
      * Returns the license certificate cached from the
      * last installation/verification of a license key
      * or <tt>null</tt> if there wasn't an installation/verification
-     * or a timeout has occured.
-     *
-     * @deprecated <b>Experimental:</b> Methods marked with this note have
-     *             been tested to be functional but may change or disappear
-     *             at will in one of the next releases because they are still
-     *             a topic for research on extended functionality.
-     *             Most likely the methods will prevail however and this note
-     *             will just vanish, so you may use them with a certain risk.
+     * or a timeout has occurred.
      */
     protected /*synchronized*/ GenericCertificate getCertificate() {
         if (certificate != null
@@ -807,13 +779,6 @@ public class LicenseManager implements LicenseCreator, LicenseVerifier {
 
     /**
      * Returns the current license key.
-     *
-     * @deprecated <b>Experimental:</b> Methods marked with this note have
-     *             been tested to be functional but may change or disappear
-     *             at will in one of the next releases because they are still
-     *             a topic for research on extended functionality.
-     *             Most likely the methods will prevail however and this note
-     *             will just vanish, so you may use them with a certain risk.
      */
     protected /*synchronized*/ byte[] getLicenseKey() {
         return getLicenseParam().getPreferences().getByteArray(PREFERENCES_KEY, null);

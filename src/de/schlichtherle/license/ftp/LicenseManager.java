@@ -52,9 +52,9 @@ public class LicenseManager extends de.schlichtherle.license.LicenseManager {
         0x3AAAFA7C2F900E82L, 0xE7676924E761DBA6L
     }).toString(); /* => "Equal key store parameters for regular and FTP licenses!" */
 
-    private static final String FTP_DAYS = new ObfuscatedString(new long[] {
-        0x73F69B7ABA25F620L, 0x40BA225C709D724EL
-    }).toString(); /* => "ftpDays" */
+//    private static final String FTP_DAYS = new ObfuscatedString(new long[] {
+//        0x73F69B7ABA25F620L, 0x40BA225C709D724EL
+//    }).toString(); /* => "ftpDays" */
 
     private LicenseNotary ftpNotary;
 

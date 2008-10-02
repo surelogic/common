@@ -30,6 +30,7 @@ import java.util.Comparator;
  * @author Apache Software Foundation
  * @version $Id: StringEncoderComparator.java,v 1.14 2004/06/21 23:24:17 ggregory Exp $
  */
+@SuppressWarnings("unchecked")
 public class StringEncoderComparator implements Comparator {
 
     /**
