@@ -55,4 +55,11 @@ public interface DBConnection {
 	 */
 	public <T> T withTransaction(final DBTransaction<T> action);
 
+	/**
+	 * Returns an object that allows access to the schema and version
+	 * information for this database.
+	 * 
+	 * @return
+	 */
+	SchemaData getSchemaLoader();
 }
