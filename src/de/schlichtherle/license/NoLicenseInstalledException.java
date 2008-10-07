@@ -1,9 +1,4 @@
 /*
- * NoLicenseInstalled.java
- *
- * Created on 18. März 2005, 18:40
- */
-/*
  * Copyright 2005 Schlichtherle IT Services
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
