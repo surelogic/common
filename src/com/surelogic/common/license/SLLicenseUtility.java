@@ -7,6 +7,9 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import javax.security.auth.x500.X500Principal;
 
 import com.surelogic.common.i18n.I18N;
+import com.surelogic.common.jobs.SLJob;
+import com.surelogic.common.jobs.SLProgressMonitor;
+import com.surelogic.common.jobs.SLStatus;
 
 import de.schlichtherle.license.LicenseContent;
 import de.schlichtherle.license.LicenseManager;
@@ -213,6 +216,41 @@ public final class SLLicenseUtility {
 			for (ILicenseObserver o : f_observers)
 				o.notifyNoLicenseFor(subject);
 		return licensed;
+	}
+
+	/**
+	 * A helper routine to validate a license from within the
+	 * {@link SLJob#run(SLProgressMonitor)} method. A result of {@code null}
+	 * indicates the check succeeded, otherwise the resulting {@link SLStatus}
+	 * object should be returned to cause the job to fail. A typical use would
+	 * be as shown below.
+	 * 
+	 * <pre>
+	 * final SLStatus failed = SLLicenseUtility.validateSLJob(
+	 * 		SLLicenseUtility.FLASHLIGHT_SUBJECT, monitor);
+	 * if (failed != null)
+	 * 	return failed;
+	 * </pre>
+	 * 
+	 * If the check fails then the {@link SLProgressMonitor#done()} method is
+	 * called on <tt>monitor</tt>.
+	 * 
+	 * @param subject
+	 *            the non-null license subject.
+	 * @param monitor
+	 *            a progress monitor.
+	 * @return {@code null} if the license check was successful, an error status
+	 *         otherwise.
+	 */
+	public static SLStatus validateSLJob(final String subject,
+			final SLProgressMonitor monitor) {
+		if (!validate(subject)) {
+			final int code = 143;
+			final String msg = I18N.err(code, subject);
+			monitor.done();
+			return SLStatus.createErrorStatus(code, msg);
+		} else
+			return null;
 	}
 
 	private SLLicenseUtility() {
