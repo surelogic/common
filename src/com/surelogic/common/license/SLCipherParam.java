@@ -21,10 +21,10 @@ final class SLCipherParam extends DefaultCipherParam {
 	 * {@link #getKeyPwd()}.
 	 */
 	private SLCipherParam() {
-		/* => "A.Real.Java.Puzzler" */
+		/* => "A.Real.Java.Puzz1er" */
 		super(
-				new ObfuscatedString(new long[] { 0xF0D8BA0005A49E8EL,
-						0x99BAA9DBC1976481L, 0x9BF65FA74D624214L,
-						0x3FAF3665A81A5A10L }).toString());
+				new ObfuscatedString(new long[] { 0x7191EF595FDF3683L,
+						0x6C3EFC4DC1016796L, 0xF6EB4C62D9AEBBC4L,
+						0xB858B835D85DFAC6L }).toString());
 	}
 }
