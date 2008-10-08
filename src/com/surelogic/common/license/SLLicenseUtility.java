@@ -1,8 +1,6 @@
 package com.surelogic.common.license;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.security.auth.x500.X500Principal;
 
@@ -11,6 +9,9 @@ import com.surelogic.common.i18n.I18N;
 import de.schlichtherle.license.LicenseContent;
 import de.schlichtherle.license.LicenseManager;
 
+/**
+ * A utility to help manage licenses to use SureLogic tools.
+ */
 public final class SLLicenseUtility {
 
 	/*
@@ -26,25 +27,6 @@ public final class SLLicenseUtility {
 			FLASHLIGHT_SUBJECT, JSURE_SUBJECT, SIERRA_SUBJECT };
 
 	/**
-	 * Gets a possibly empty list of the installed licenses.
-	 * 
-	 * @return a possibly empty list of the installed licenses.
-	 */
-	public static List<LicenseContent> getInstalledLicenses() {
-		final List<LicenseContent> result = new ArrayList<LicenseContent>();
-		/*
-		 * Collect up the possibly installed licenses.
-		 */
-		LicenseContent lc;
-		for (String subject : SUBJECTS) {
-			lc = tryToGetInstalledLicense(subject);
-			if (lc != null)
-				result.add(lc);
-		}
-		return result;
-	}
-
-	/**
 	 * Gets the content of an installed license with the passed subject, or
 	 * {@code null} if no such license is installed.
 	 * 
@@ -53,7 +35,8 @@ public final class SLLicenseUtility {
 	 * @return the content of an installed license with the passed subject, or
 	 *         {@code null} if no such license is installed.
 	 */
-	public static LicenseContent tryToGetInstalledLicense(final String subject) {
+	public static synchronized LicenseContent tryToGetInstalledLicense(
+			final String subject) {
 		if (subject == null)
 			throw new IllegalArgumentException(I18N.err(44, "subject"));
 		final LicenseManager lm = new LicenseManager(
@@ -83,7 +66,7 @@ public final class SLLicenseUtility {
 	 *             {@link Throwable#getLocalizedMessage()} to get a (possibly
 	 *             localized) meaningful message.
 	 */
-	public static void tryToInstallLicense(final String subject,
+	public static synchronized void tryToInstallLicense(final String subject,
 			final File keyFile) throws Exception {
 		if (subject == null)
 			throw new IllegalArgumentException(I18N.err(44, "subject"));
@@ -111,7 +94,7 @@ public final class SLLicenseUtility {
 	 *             {@link Throwable#getLocalizedMessage()} to get a (possibly
 	 *             localized) meaningful message.
 	 */
-	public static void tryToUninstallLicense(final String subject)
+	public static synchronized void tryToUninstallLicense(final String subject)
 			throws Exception {
 		if (subject == null)
 			throw new IllegalArgumentException(I18N.err(44, "subject"));
