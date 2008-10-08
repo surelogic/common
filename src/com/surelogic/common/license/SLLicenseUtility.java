@@ -1,6 +1,8 @@
 package com.surelogic.common.license;
 
 import java.io.File;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import javax.security.auth.x500.X500Principal;
 
@@ -160,6 +162,57 @@ public final class SLLicenseUtility {
 				break;
 			b.replace(index, index + 1, "");
 		}
+	}
+
+	private static final Set<ILicenseObserver> f_observers = new CopyOnWriteArraySet<ILicenseObserver>();
+
+	/**
+	 * Adds a license check observer.
+	 * 
+	 * @param observer
+	 *            a license check observer.
+	 */
+	public static void addObserver(ILicenseObserver observer) {
+		if (observer != null)
+			f_observers.add(observer);
+	}
+
+	/**
+	 * Removes a license check observer.
+	 * 
+	 * @param observer
+	 *            a license check observer.
+	 */
+	public static void removeObserver(ILicenseObserver observer) {
+		f_observers.remove(observer);
+	}
+
+	/**
+	 * Checks if the passed license subject is installed or if an all SureLogic
+	 * tools license is installed.
+	 * <p>
+	 * If a license does not exists then all registered {@link ILicenseObserver}
+	 * instances are notified that the license check failed.
+	 * 
+	 * @param subject
+	 *            the non-null license subject.
+	 * @return {@code true} if a license exists, {@code false} otherwise.
+	 */
+	public static boolean validate(final String subject) {
+		boolean licensed;
+		synchronized (SLLicenseUtility.class) {
+			licensed = tryToGetInstalledLicense(subject) != null;
+			if (!licensed) {
+				licensed = tryToGetInstalledLicense(ALL_TOOL_SUBJECT) != null;
+			}
+		}
+		/*
+		 * Don't call the observers holding a lock.
+		 */
+		if (!licensed)
+			for (ILicenseObserver o : f_observers)
+				o.notifyNoLicenseFor(subject);
+		return licensed;
 	}
 
 	private SLLicenseUtility() {
