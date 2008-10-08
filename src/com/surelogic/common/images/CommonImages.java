@@ -71,6 +71,7 @@ public final class CommonImages {
 	public static final String IMG_JSURE_LOGO = "jsure_logo.gif";
 	public static final String IMG_JSURE_NO_VERIFY = "jsure_no_verify.gif";
 	public static final String IMG_JSURE_VERIFY = "jsure_verify.gif";
+	public static final String IMG_LICENSE = "license.gif";
 	public static final String IMG_LINK = "link.gif";
 	public static final String IMG_PACKAGE = "package.gif";
 	public static final String IMG_PLUS = "plus.gif";

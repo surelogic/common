@@ -99,6 +99,28 @@ public final class SLLicenseUtility {
 	}
 
 	/**
+	 * Tries to uninstall a license for the passed subject. This method will
+	 * throw an exception if anything goes wrong during the removal of the
+	 * license.
+	 * 
+	 * @param subject
+	 *            the non-null license subject.
+	 * @throws Exception
+	 *             if the removal of the license fails for various reasons. Note
+	 *             that you should always use
+	 *             {@link Throwable#getLocalizedMessage()} to get a (possibly
+	 *             localized) meaningful message.
+	 */
+	public static void tryToUninstallLicense(final String subject)
+			throws Exception {
+		if (subject == null)
+			throw new IllegalArgumentException(I18N.err(44, "subject"));
+		final LicenseManager lm = new LicenseManager(
+				new SLLicenseParam(subject));
+		lm.uninstall();
+	}
+
+	/**
 	 * Creates an X500 principal for SureLogic.
 	 * 
 	 * @return an X500 principal for SureLogic.
