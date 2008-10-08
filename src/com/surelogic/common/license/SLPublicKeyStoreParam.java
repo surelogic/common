@@ -28,9 +28,9 @@ final class SLPublicKeyStoreParam extends AbstractKeyStoreParam {
 	}
 
 	public String getStorePwd() {
-		/* => "public" */
-		return new ObfuscatedString(new long[] { 0x4BB7D4210BCC59B2L,
-				0xB190D812BA270CBL }).toString();
+		/* => "Public198" */
+		return new ObfuscatedString(new long[] { 0x9FD642F6B952C461L,
+				0x66D0AAF3F882B7AEL, 0x4FDE7044C267542FL }).toString();
 	}
 
 	public String getKeyPwd() {
