@@ -17,10 +17,10 @@ public final class SLLicenseUtility {
 	 * Keep the SUBJECTS array complete and in alphabetical order when new
 	 * license subjects are added below.
 	 */
-	public static final String ALL_TOOL_SUBJECT = "All SureLogic Tools";
-	public static final String FLASHLIGHT_SUBJECT = "SureLogic Flashlight";
-	public static final String JSURE_SUBJECT = "SureLogic JSure";
-	public static final String SIERRA_SUBJECT = "SureLogic Sierra";
+	public static final String ALL_TOOL_SUBJECT = "All Tools";
+	public static final String FLASHLIGHT_SUBJECT = "Flashlight";
+	public static final String JSURE_SUBJECT = "JSure";
+	public static final String SIERRA_SUBJECT = "Sierra";
 
 	public static final String[] SUBJECTS = { ALL_TOOL_SUBJECT,
 			FLASHLIGHT_SUBJECT, JSURE_SUBJECT, SIERRA_SUBJECT };
