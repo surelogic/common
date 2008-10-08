@@ -25,15 +25,26 @@ public final class SLUtility {
 		return (int) result;
 	}
 
-	private final static ThreadLocal<SimpleDateFormat> tl_format = new ThreadLocal<SimpleDateFormat>() {
+	private final static ThreadLocal<SimpleDateFormat> tl_day_format = new ThreadLocal<SimpleDateFormat>() {
+		@Override
+		protected SimpleDateFormat initialValue() {
+			return new SimpleDateFormat("yyyy-MM-dd");
+		}
+	};
+
+	public static synchronized String toStringDay(final Date date) {
+		return tl_day_format.get().format(date);
+	}
+
+	private final static ThreadLocal<SimpleDateFormat> tl_hms_format = new ThreadLocal<SimpleDateFormat>() {
 		@Override
 		protected SimpleDateFormat initialValue() {
 			return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		}
 	};
 
-	public static synchronized String toStringMS(final Date date) {
-		return tl_format.get().format(date);
+	public static synchronized String toStringHMS(final Date date) {
+		return tl_hms_format.get().format(date);
 	}
 
 	public static Timestamp getWall(final Timestamp start, final long startNS,

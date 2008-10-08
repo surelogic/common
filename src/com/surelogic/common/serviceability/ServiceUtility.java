@@ -35,7 +35,7 @@ public final class ServiceUtility {
 		final String lf = System.getProperty("line.separator");
 
 		b.append("   Date: ");
-		b.append(SLUtility.toStringMS(new Date()));
+		b.append(SLUtility.toStringHMS(new Date()));
 		b.append(lf);
 		b.append("Subject: Tip for Improvement");
 		b.append(lf);
@@ -120,7 +120,7 @@ public final class ServiceUtility {
 		final String lf = System.getProperty("line.separator");
 
 		b.append("   Date: ");
-		b.append(SLUtility.toStringMS(new Date()));
+		b.append(SLUtility.toStringHMS(new Date()));
 		b.append(lf);
 		b.append("Subject: Problem Report");
 		b.append(lf);
