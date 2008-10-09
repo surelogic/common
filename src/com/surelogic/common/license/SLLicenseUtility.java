@@ -127,22 +127,30 @@ public final class SLLicenseUtility {
 	 * <p>
 	 * The <tt>OU</tt> field is set to the string representation of a randomly
 	 * generated UUID (generated with the {@link UUID#randomUUID()} method).
+	 * <p>
+	 * The <tt>O</tt> field contains {@code true} or {@code false} indicating if
+	 * a network check should be performed on any license issued to this
+	 * principal.
 	 * 
-	 * @param cn
+	 * @param name
 	 *            the <tt>CN</tt> value for the X500 principal. Should be
 	 *            something like a name or a company name.
+	 * @param performNetCheck
+	 *            the <tt>O</tt> value for the X500 principal. Represents if a
+	 *            network check should be done on the license.
 	 * @return an 500 principal.
 	 * @throws IllegalArgumentException
 	 *             if <tt>CN</tt> is null or the empty string or if after
 	 *             escaping <tt>CN</tt> is not able to be parsed by the
 	 *             constructor {@link X500Principal#X500Principal(String)}.
 	 */
-	public static X500Principal getX500PrincipalFor(final String cn) {
-		if (cn == null)
+	public static X500Principal getX500PrincipalFor(final String name,
+			final boolean performNetCheck) {
+		if (name == null)
 			throw new IllegalArgumentException(I18N.err(44, "cn"));
-		if ("".equals(cn))
+		if ("".equals(name))
 			throw new IllegalArgumentException(I18N.err(139, "cn"));
-		final StringBuilder b = new StringBuilder(cn);
+		final StringBuilder b = new StringBuilder(name);
 		remove("\\", b);
 		escape(",", b);
 		escape(";", b);
@@ -150,6 +158,8 @@ public final class SLLicenseUtility {
 		b.append(", OU=");
 		UUID uuid = UUID.randomUUID();
 		b.append(uuid.toString());
+		b.append(", O=");
+		b.append(performNetCheck);
 		return new X500Principal(b.toString());
 	}
 
@@ -170,10 +180,10 @@ public final class SLLicenseUtility {
 			throw new IllegalArgumentException(I18N.err(44, "p"));
 		final String ou = ",OU=";
 		final StringBuilder b = new StringBuilder(p.getName());
-		final int index = b.indexOf(ou);
-		if (index == -1)
+		final int oIndex = b.indexOf(ou);
+		if (oIndex == -1)
 			return null;
-		b.delete(index, b.length());
+		b.delete(oIndex, b.length());
 		if (b.length() < 3)
 			return null;
 		b.delete(0, 3);
@@ -196,13 +206,32 @@ public final class SLLicenseUtility {
 	public static String getUUIDFrom(X500Principal p) {
 		if (p == null)
 			throw new IllegalArgumentException(I18N.err(44, "p"));
+		final String o = ",O=";
 		final String ou = ",OU=";
 		final StringBuilder b = new StringBuilder(p.getName());
-		final int index = b.indexOf(ou);
-		if (index == -1)
+		final int oIndex = b.indexOf(o);
+		if (oIndex != -1)
+			b.delete(oIndex, b.length());
+		final int ouIndex = b.indexOf(ou);
+		if (ouIndex == -1)
 			return null;
-		b.delete(0, index + ou.length());
+		b.delete(0, ouIndex + ou.length());
 		return b.toString();
+	}
+
+	/**
+	 * Gets if a network check should be performed on any license issued to this
+	 * principal.
+	 * 
+	 * @param p
+	 *            an {@link X500Principal}.
+	 * @return {@code true} if a network check should be performed on any
+	 *         license issued to this principal, {@code false} otherwise.
+	 */
+	public static boolean getPerformNetCheckFrom(X500Principal p) {
+		if (p == null)
+			throw new IllegalArgumentException(I18N.err(44, "p"));
+		return p.getName().endsWith("O=true");
 	}
 
 	private static void escape(final String value, final StringBuilder b) {
