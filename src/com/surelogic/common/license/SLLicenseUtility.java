@@ -205,19 +205,6 @@ public final class SLLicenseUtility {
 		return b.toString();
 	}
 
-	public static void main(String[] args) {
-		X500Principal p = getX500PrincipalFor("FooBar");
-		System.out.println(p);
-		System.out.println(p.getName());
-		System.out.println(getNameFrom(p));
-		System.out.println(getUUIDFrom(p));
-		p = getX500PrincipalFor("SureLogic, Inc.");
-		System.out.println(p);
-		System.out.println(p.getName());
-		System.out.println(getNameFrom(p));
-		System.out.println(getUUIDFrom(p));
-	}
-
 	private static void escape(final String value, final StringBuilder b) {
 		int index = 0;
 		while (true) {
