@@ -215,7 +215,8 @@ public final class ServiceUtility {
 
 			public SLStatus run(SLProgressMonitor monitor) {
 				monitor.begin();
-				// TODO
+				System.out.println("Sending to SureLogic:");
+				System.out.println(msg);
 				monitor.done();
 				return SLStatus.OK_STATUS;
 			}
