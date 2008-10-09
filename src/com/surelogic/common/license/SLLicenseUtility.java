@@ -8,6 +8,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import javax.security.auth.x500.X500Principal;
 
 import com.surelogic.common.i18n.I18N;
+import com.surelogic.common.jobs.NullSLProgressMonitor;
 import com.surelogic.common.jobs.SLJob;
 import com.surelogic.common.jobs.SLProgressMonitor;
 import com.surelogic.common.jobs.SLStatus;
@@ -134,7 +135,8 @@ public final class SLLicenseUtility {
 				 */
 				final String msg = ServiceUtility.composeAInstallationNotice(
 						true, issuedTo, licenseId);
-				ServiceUtility.sendToSureLogic(msg);
+				final SLJob job = ServiceUtility.sendToSureLogic(msg);
+				job.run(new NullSLProgressMonitor());
 			}
 			netCheckOk = true;
 		} finally {
@@ -190,7 +192,8 @@ public final class SLLicenseUtility {
 				 */
 				final String msg = ServiceUtility.composeAInstallationNotice(
 						false, issuedTo, licenseId);
-				ServiceUtility.sendToSureLogic(msg);
+				final SLJob job = ServiceUtility.sendToSureLogic(msg);
+				job.run(new NullSLProgressMonitor());
 			}
 		} finally {
 			/*

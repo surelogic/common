@@ -7,6 +7,9 @@ import java.util.UUID;
 import com.surelogic.common.FileUtility;
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
+import com.surelogic.common.jobs.SLJob;
+import com.surelogic.common.jobs.SLProgressMonitor;
+import com.surelogic.common.jobs.SLStatus;
 
 public final class ServiceUtility {
 
@@ -198,16 +201,25 @@ public final class ServiceUtility {
 	}
 
 	/**
-	 * Sends a message over the internet to SureLogic.
+	 * Constructs a job that sends a message over the Internet to SureLogic.
 	 * 
 	 * @param msg
-	 *            the message.
-	 * @throws Exception
-	 *             if something goes wrong while trying to send the message to
-	 *             SureLogic.
+	 *            the message for SureLogic.
 	 */
-	public static void sendToSureLogic(final String msg) throws Exception {
-		// TODO
+	public static SLJob sendToSureLogic(final String msg) {
+		return new SLJob() {
+
+			public String getName() {
+				return "Sending a servicability message to SureLogic";
+			}
+
+			public SLStatus run(SLProgressMonitor monitor) {
+				monitor.begin();
+				// TODO
+				monitor.done();
+				return SLStatus.OK_STATUS;
+			}
+		};
 	}
 
 	private ServiceUtility() {
