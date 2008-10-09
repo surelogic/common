@@ -2,6 +2,7 @@ package com.surelogic.common.license;
 
 import java.io.File;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import javax.security.auth.x500.X500Principal;
@@ -123,6 +124,9 @@ public final class SLLicenseUtility {
 	 * Creates an X500 principal for the passed <tt>CN</tt> name. The name is
 	 * escaped to try to avoid parsing errors when the {@link X500Principal}
 	 * instance is constructed.
+	 * <p>
+	 * The <tt>OU</tt> field is set to the string representation of a randomly
+	 * generated UUID (generated with the {@link UUID#randomUUID()} method).
 	 * 
 	 * @param cn
 	 *            the <tt>CN</tt> value for the X500 principal. Should be
@@ -143,7 +147,75 @@ public final class SLLicenseUtility {
 		escape(",", b);
 		escape(";", b);
 		b.insert(0, "CN=");
+		b.append(", OU=");
+		UUID uuid = UUID.randomUUID();
+		b.append(uuid.toString());
 		return new X500Principal(b.toString());
+	}
+
+	/**
+	 * This method gets the <tt>CN</tt> portion of an {@link X500Principal}
+	 * created via a call to {@link #getX500PrincipalFor(String)}. The
+	 * <tt>CN</tt> field is used to hold the name (of a person or a company) who
+	 * holds a license. A result of {@code null} indicates that the value could
+	 * not be determined.
+	 * 
+	 * @param p
+	 *            an {@link X500Principal}.
+	 * @return the <tt>CN</tt> portion, or {@code null} if it could not be
+	 *         extracted.
+	 */
+	public static String getNameFrom(X500Principal p) {
+		if (p == null)
+			throw new IllegalArgumentException(I18N.err(44, "p"));
+		final String ou = ",OU=";
+		final StringBuilder b = new StringBuilder(p.getName());
+		final int index = b.indexOf(ou);
+		if (index == -1)
+			return null;
+		b.delete(index, b.length());
+		if (b.length() < 3)
+			return null;
+		b.delete(0, 3);
+		remove("\\", b);
+		return b.toString();
+	}
+
+	/**
+	 * This method gets the <tt>OU</tt> portion of an {@link X500Principal}
+	 * created via a call to {@link #getX500PrincipalFor(String)}. The
+	 * <tt>OU</tt> field is used to hold a {@link UUID} that provides an
+	 * identity for an issued license. A result of {@code null} indicates that
+	 * the value could not be determined.
+	 * 
+	 * @param p
+	 *            an {@link X500Principal}.
+	 * @return the <tt>OU</tt> portion, or {@code null} if it could not be
+	 *         extracted.
+	 */
+	public static String getUUIDFrom(X500Principal p) {
+		if (p == null)
+			throw new IllegalArgumentException(I18N.err(44, "p"));
+		final String ou = ",OU=";
+		final StringBuilder b = new StringBuilder(p.getName());
+		final int index = b.indexOf(ou);
+		if (index == -1)
+			return null;
+		b.delete(0, index + ou.length());
+		return b.toString();
+	}
+
+	public static void main(String[] args) {
+		X500Principal p = getX500PrincipalFor("FooBar");
+		System.out.println(p);
+		System.out.println(p.getName());
+		System.out.println(getNameFrom(p));
+		System.out.println(getUUIDFrom(p));
+		p = getX500PrincipalFor("SureLogic, Inc.");
+		System.out.println(p);
+		System.out.println(p.getName());
+		System.out.println(getNameFrom(p));
+		System.out.println(getUUIDFrom(p));
 	}
 
 	private static void escape(final String value, final StringBuilder b) {
@@ -163,7 +235,7 @@ public final class SLLicenseUtility {
 			index = b.indexOf(value, index);
 			if (index == -1)
 				break;
-			b.replace(index, index + 1, "");
+			b.delete(index, index + 1);
 		}
 	}
 
