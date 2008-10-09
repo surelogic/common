@@ -11,6 +11,7 @@ import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.jobs.SLJob;
 import com.surelogic.common.jobs.SLProgressMonitor;
 import com.surelogic.common.jobs.SLStatus;
+import com.surelogic.common.serviceability.ServiceUtility;
 
 import de.schlichtherle.license.LicenseContent;
 import de.schlichtherle.license.LicenseManager;
@@ -60,6 +61,14 @@ public final class SLLicenseUtility {
 	 * Tries to install a license for the passed subject from the passed file.
 	 * This method will throw an exception if anything goes wrong during the
 	 * installation.
+	 * <p>
+	 * If the license loaded indicates that a network check should be made then
+	 * the blacklist is downloaded. The license is checked to ensure that it is
+	 * not on the blacklist.
+	 * <p>
+	 * If the license is successfully installed, and the license indicated that
+	 * a network check should be performed, then a message is sent notifying
+	 * SureLogic that the license was installed.
 	 * 
 	 * @param subject
 	 *            the non-null license subject.
@@ -85,27 +94,57 @@ public final class SLLicenseUtility {
 		final LicenseManager lm = new LicenseManager(
 				new SLLicenseParam(subject));
 		final LicenseContent lc = lm.install(keyFile);
+		boolean netCheckOk = false;
 		try {
-			if (getPerformNetCheckFrom(lc.getHolder())) {
-				final UUID uuid = UUID.fromString(getUUIDFrom(lc.getHolder()));
-				final LicenseBlacklist b = new LicenseBlacklist();
-				b.updateFromNet();
-				if (!b.fromNet()) {
+			final X500Principal licenseHolder = lc.getHolder();
+			if (getPerformNetCheckFrom(licenseHolder)) {
+				final UUID licenseId = UUID
+						.fromString(getLicenseIdFrom(licenseHolder));
+				if (licenseId == null)
+					throw new IllegalStateException(I18N.err(44,
+							"license identifier (in license)"));
+				final String issuedTo = getIssuedToFrom(licenseHolder);
+				if (issuedTo == null)
+					throw new IllegalStateException(I18N.err(44,
+							"issued to name (in license)"));
+
+				/*
+				 * Check if this license is on the blacklist.
+				 */
+				final LicenseBlacklist bl = new LicenseBlacklist();
+				bl.updateFromNet();
+				if (!bl.fromNet()) {
+					/*
+					 * We were not able to download the blacklist from
+					 * SureLogic.
+					 */
 					throw new IllegalStateException(I18N.err(144, I18N
 							.msg("common.manage.licenses.blacklist.url")));
 				}
-				if (b.getList().contains(uuid)) {
+				if (bl.getList().contains(licenseId)) {
 					/*
-					 * This license is blacklisted
+					 * This license is blacklisted by SureLogic.
 					 */
-					throw new IllegalArgumentException(I18N.err(145, uuid
-							.toString(), getNameFrom(lc.getHolder())));
+					throw new IllegalStateException(I18N.err(145, licenseId
+							.toString(), issuedTo));
 				}
+				/*
+				 * Send notification to SureLogic that this license was
+				 * installed.
+				 */
+				final String msg = ServiceUtility.composeAInstallationNotice(
+						true, issuedTo, licenseId);
+				ServiceUtility.sendToSureLogic(msg);
 			}
-
-		} catch (Exception e) {
-			lm.uninstall();
-			throw new IllegalStateException("Network check failed", e);
+			netCheckOk = true;
+		} finally {
+			/*
+			 * If the network check didn't complete we need to uninstall the
+			 * license. We had to install it to extract information inside of it
+			 * but if the network check failed we need to uninstall it.
+			 */
+			if (!netCheckOk)
+				lm.uninstall();
 		}
 	}
 
@@ -113,6 +152,10 @@ public final class SLLicenseUtility {
 	 * Tries to uninstall a license for the passed subject. This method will
 	 * throw an exception if anything goes wrong during the removal of the
 	 * license.
+	 * <p>
+	 * If the license is successfully uninstalled, and the license indicated
+	 * that a network check should be performed, then a message is sent
+	 * notifying SureLogic that the license was uninstalled.
 	 * 
 	 * @param subject
 	 *            the non-null license subject.
@@ -128,7 +171,34 @@ public final class SLLicenseUtility {
 			throw new IllegalArgumentException(I18N.err(44, "subject"));
 		final LicenseManager lm = new LicenseManager(
 				new SLLicenseParam(subject));
-		lm.uninstall();
+		final LicenseContent lc = lm.verify();
+		try {
+			final X500Principal licenseHolder = lc.getHolder();
+			if (getPerformNetCheckFrom(licenseHolder)) {
+				final UUID licenseId = UUID
+						.fromString(getLicenseIdFrom(licenseHolder));
+				if (licenseId == null)
+					throw new IllegalStateException(I18N.err(44,
+							"license identifier (in license)"));
+				final String issuedTo = getIssuedToFrom(licenseHolder);
+				if (issuedTo == null)
+					throw new IllegalStateException(I18N.err(44,
+							"issued to name (in license)"));
+				/*
+				 * Send notification to SureLogic that this license was
+				 * installed.
+				 */
+				final String msg = ServiceUtility.composeAInstallationNotice(
+						false, issuedTo, licenseId);
+				ServiceUtility.sendToSureLogic(msg);
+			}
+		} finally {
+			/*
+			 * Go ahead and uninstall the license regardless whether or not we
+			 * could notify SureLogic.
+			 */
+			lm.uninstall();
+		}
 	}
 
 	/**
@@ -188,16 +258,16 @@ public final class SLLicenseUtility {
 	/**
 	 * This method gets the <tt>CN</tt> portion of an {@link X500Principal}
 	 * created via a call to {@link #getX500PrincipalFor(String)}. The
-	 * <tt>CN</tt> field is used to hold the name (of a person or a company) who
-	 * holds a license. A result of {@code null} indicates that the value could
-	 * not be determined.
+	 * <tt>CN</tt> field is used to hold the name (of a person or a company) to
+	 * whom the license was issued. A result of {@code null} indicates that the
+	 * value could not be determined.
 	 * 
 	 * @param p
 	 *            an {@link X500Principal}.
 	 * @return the <tt>CN</tt> portion, or {@code null} if it could not be
 	 *         extracted.
 	 */
-	public static String getNameFrom(X500Principal p) {
+	public static String getIssuedToFrom(X500Principal p) {
 		if (p == null)
 			throw new IllegalArgumentException(I18N.err(44, "p"));
 		final String ou = ",OU=";
@@ -225,7 +295,7 @@ public final class SLLicenseUtility {
 	 * @return the <tt>OU</tt> portion, or {@code null} if it could not be
 	 *         extracted.
 	 */
-	public static String getUUIDFrom(X500Principal p) {
+	public static String getLicenseIdFrom(X500Principal p) {
 		if (p == null)
 			throw new IllegalArgumentException(I18N.err(44, "p"));
 		final String o = ",O=";
@@ -253,7 +323,10 @@ public final class SLLicenseUtility {
 	public static boolean getPerformNetCheckFrom(X500Principal p) {
 		if (p == null)
 			throw new IllegalArgumentException(I18N.err(44, "p"));
-		return p.getName().endsWith("O=true");
+		/*
+		 * Err on the side of performing the network check
+		 */
+		return !p.getName().endsWith("O=false");
 	}
 
 	private static void escape(final String value, final StringBuilder b) {

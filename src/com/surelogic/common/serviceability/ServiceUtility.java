@@ -2,6 +2,7 @@ package com.surelogic.common.serviceability;
 
 import java.io.File;
 import java.util.Date;
+import java.util.UUID;
 
 import com.surelogic.common.FileUtility;
 import com.surelogic.common.SLUtility;
@@ -174,6 +175,39 @@ public final class ServiceUtility {
 		}
 
 		return b.toString();
+	}
+
+	/**
+	 * Composes a notice that a license was installed or uninstalled in a format
+	 * to send to SureLogic.
+	 * 
+	 * @param install
+	 *            {@code true} if a license was installed, {@code false} if the
+	 *            license was uninstalled.
+	 * @param issuedTo
+	 *            the name of the person or company to whom the license was
+	 *            issued.
+	 * @param licenseId
+	 *            the license identifier.
+	 * @return a notice that a license was installed or uninstalled in a format
+	 *         to send to SureLogic.
+	 */
+	public static String composeAInstallationNotice(boolean install,
+			String issuedTo, UUID licenseId) {
+		return "";
+	}
+
+	/**
+	 * Sends a message over the internet to SureLogic.
+	 * 
+	 * @param msg
+	 *            the message.
+	 * @throws Exception
+	 *             if something goes wrong while trying to send the message to
+	 *             SureLogic.
+	 */
+	public static void sendToSureLogic(final String msg) throws Exception {
+		// TODO
 	}
 
 	private ServiceUtility() {

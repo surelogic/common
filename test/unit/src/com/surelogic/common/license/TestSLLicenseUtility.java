@@ -19,16 +19,16 @@ public class TestSLLicenseUtility extends TestCase {
 		X500Principal p = SLLicenseUtility.getX500PrincipalFor(name, true);
 		System.out.println(p.toString());
 		assertNotNull(p);
-		assertEquals(SLLicenseUtility.getNameFrom(p), name);
-		UUID uuid = UUID.fromString(SLLicenseUtility.getUUIDFrom(p));
+		assertEquals(SLLicenseUtility.getIssuedToFrom(p), name);
+		UUID uuid = UUID.fromString(SLLicenseUtility.getLicenseIdFrom(p));
 		assertNotNull(uuid);
 		assertTrue(SLLicenseUtility.getPerformNetCheckFrom(p));
 
 		name = ",,::;;Co,,";
 		p = SLLicenseUtility.getX500PrincipalFor(name, false);
 		assertNotNull(p);
-		assertEquals(SLLicenseUtility.getNameFrom(p), name);
-		uuid = UUID.fromString(SLLicenseUtility.getUUIDFrom(p));
+		assertEquals(SLLicenseUtility.getIssuedToFrom(p), name);
+		uuid = UUID.fromString(SLLicenseUtility.getLicenseIdFrom(p));
 		assertNotNull(uuid);
 		assertFalse(SLLicenseUtility.getPerformNetCheckFrom(p));
 	}
