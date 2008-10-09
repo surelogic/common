@@ -187,6 +187,8 @@ public final class ServiceUtility {
 	 * @param install
 	 *            {@code true} if a license was installed, {@code false} if the
 	 *            license was uninstalled.
+	 * @param tool
+	 *            the tool or product that the license is for.
 	 * @param issuedTo
 	 *            the name of the person or company to whom the license was
 	 *            issued.
@@ -196,8 +198,33 @@ public final class ServiceUtility {
 	 *         to send to SureLogic.
 	 */
 	public static String composeAInstallationNotice(boolean install,
-			String issuedTo, UUID licenseId) {
-		return "";
+			String tool, String issuedTo, UUID licenseId) {
+		final StringBuilder b = new StringBuilder();
+		final String lf = System.getProperty("line.separator");
+
+		b.append("   Date: ");
+		b.append(SLUtility.toStringHMS(new Date()));
+		b.append(lf);
+		b.append("Subject: License ");
+		if (install)
+			b.append("Installation");
+		else
+			b.append("Removal");
+		b.append(lf);
+
+		b.append("   Tool: ");
+		b.append(tool);
+		b.append(lf);
+
+		b.append(" Holder: ");
+		b.append(issuedTo);
+		b.append(lf);
+
+		b.append("     Id: ");
+		b.append(licenseId);
+		b.append(lf);
+
+		return b.toString();
 	}
 
 	/**

@@ -134,7 +134,7 @@ public final class SLLicenseUtility {
 				 * installed.
 				 */
 				final String msg = ServiceUtility.composeAInstallationNotice(
-						true, issuedTo, licenseId);
+						true, subject, issuedTo, licenseId);
 				final SLJob job = ServiceUtility.sendToSureLogic(msg);
 				job.run(new NullSLProgressMonitor());
 			}
@@ -191,7 +191,7 @@ public final class SLLicenseUtility {
 				 * installed.
 				 */
 				final String msg = ServiceUtility.composeAInstallationNotice(
-						false, issuedTo, licenseId);
+						false, subject, issuedTo, licenseId);
 				final SLJob job = ServiceUtility.sendToSureLogic(msg);
 				job.run(new NullSLProgressMonitor());
 			}
