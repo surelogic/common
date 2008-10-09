@@ -84,7 +84,29 @@ public final class SLLicenseUtility {
 
 		final LicenseManager lm = new LicenseManager(
 				new SLLicenseParam(subject));
-		lm.install(keyFile);
+		final LicenseContent lc = lm.install(keyFile);
+		try {
+			if (getPerformNetCheckFrom(lc.getHolder())) {
+				final UUID uuid = UUID.fromString(getUUIDFrom(lc.getHolder()));
+				final LicenseBlacklist b = new LicenseBlacklist();
+				b.updateFromNet();
+				if (!b.fromNet()) {
+					throw new IllegalStateException(I18N.err(144, I18N
+							.msg("common.manage.licenses.blacklist.url")));
+				}
+				if (b.getList().contains(uuid)) {
+					/*
+					 * This license is blacklisted
+					 */
+					throw new IllegalArgumentException(I18N.err(145, uuid
+							.toString(), getNameFrom(lc.getHolder())));
+				}
+			}
+
+		} catch (Exception e) {
+			lm.uninstall();
+			throw new IllegalStateException("Network check failed", e);
+		}
 	}
 
 	/**
