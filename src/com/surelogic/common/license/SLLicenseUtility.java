@@ -1,6 +1,8 @@
 package com.surelogic.common.license;
 
 import java.io.File;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -380,27 +382,40 @@ public final class SLLicenseUtility {
 	 * Checks if the passed license subject is installed or if an all SureLogic
 	 * tools license is installed.
 	 * <p>
-	 * If a license does not exists then all registered {@link ILicenseObserver}
+	 * If a license does not exist then all registered {@link ILicenseObserver}
 	 * instances are notified that the license check failed.
+	 * <p>
+	 * If the license is close to its expiration then all registered
+	 * {@link ILicenseObserver} instances are notified.
 	 * 
 	 * @param subject
 	 *            the non-null license subject.
 	 * @return {@code true} if a license exists, {@code false} otherwise.
 	 */
 	public static boolean validate(final String subject) {
-		boolean licensed;
+		LicenseContent lc;
 		synchronized (SLLicenseUtility.class) {
-			licensed = tryToGetInstalledLicense(subject) != null;
-			if (!licensed) {
-				licensed = tryToGetInstalledLicense(ALL_TOOL_SUBJECT) != null;
+			lc = tryToGetInstalledLicense(subject);
+			if (lc == null) {
+				lc = tryToGetInstalledLicense(ALL_TOOL_SUBJECT);
 			}
 		}
+		final boolean licensed = lc != null;
 		/*
 		 * Don't call the observers holding a lock.
 		 */
-		if (!licensed)
+		if (licensed) {
+			final Date expiration = lc.getNotAfter();
+			final Calendar now = Calendar.getInstance();
+			now.add(Calendar.WEEK_OF_YEAR, 1);
+			if (expiration.before(now.getTime())) {
+				for (ILicenseObserver o : f_observers)
+					o.notifyExpiration(subject, expiration);
+			}
+		} else {
 			for (ILicenseObserver o : f_observers)
 				o.notifyNoLicenseFor(subject);
+		}
 		return licensed;
 	}
 
