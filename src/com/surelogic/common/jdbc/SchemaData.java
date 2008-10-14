@@ -5,6 +5,9 @@ import java.net.URL;
 /**
  * Allows access to schema and version information for a particular tool.
  * <p>
+ * This interface also allows access to the license subject used for checking if
+ * the user has a valid license.
+ * <p>
  * <i>Implementation Note:</i> This interface is required because the Eclipse
  * class loader requires that implementors be within the same plug-in as the
  * schema resources. (We put them in the same package as the resources.)
@@ -46,4 +49,12 @@ public interface SchemaData {
 	 *             if an illegal access or an instantiation problem occurs.
 	 */
 	public SchemaAction getSchemaAction(String action);
+
+	/**
+	 * The license subject that the user is required to have a valid license for
+	 * to use this database.
+	 * 
+	 * @return a non-null license subject.
+	 */
+	public String getLicenseSubject();
 }
