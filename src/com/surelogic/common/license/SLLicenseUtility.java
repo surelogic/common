@@ -234,7 +234,7 @@ public final class SLLicenseUtility {
 	 *            something like a name or a company name.
 	 * @param performNetCheck
 	 *            the <tt>O</tt> value for the X500 principal. Represents if a
-	 *            network check should be done on the license.
+	 *            network check should be done when the license is installed.
 	 * @return an 500 principal.
 	 * @throws IllegalArgumentException
 	 *             if <tt>CN</tt> is null or the empty string or if after
@@ -317,13 +317,14 @@ public final class SLLicenseUtility {
 	}
 
 	/**
-	 * Gets if a network check should be performed on any license issued to this
-	 * principal.
+	 * Gets if a network check should be performed when any license issued to
+	 * this principal is installed.
 	 * 
 	 * @param p
 	 *            an {@link X500Principal}.
-	 * @return {@code true} if a network check should be performed on any
-	 *         license issued to this principal, {@code false} otherwise.
+	 * @return {@code true} if a network check should be performed when any
+	 *         license issued to this principal is installed, {@code false}
+	 *         otherwise.
 	 */
 	public static boolean getPerformNetCheckFrom(X500Principal p) {
 		if (p == null)
