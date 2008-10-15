@@ -3,6 +3,7 @@ package com.surelogic.common;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Formatter;
 
 /**
  * A utility with SureLogic common code.
@@ -61,6 +62,16 @@ public final class SLUtility {
 		Timestamp result = new Timestamp(tMS);
 		result.setNanos((int) tDecNS);
 		return result;
+	}
+	
+	public static String toCommaSepString(int i) {
+		return toCommaSepString((long) i);
+	}
+
+	public static String toCommaSepString(long i) {
+		Formatter f = new Formatter();
+		f.format("%,d", i);
+		return f.toString();
 	}
 
 	private SLUtility() {
