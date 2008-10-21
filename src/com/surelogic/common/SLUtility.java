@@ -10,6 +10,8 @@ import java.util.Formatter;
  */
 public final class SLUtility {
 
+	public static final String JAVA_DEFAULT_PACKAGE = "(default package)";
+
 	/**
 	 * Returns an {@code int} value of the passed {@code long} value or
 	 * {@link Integer#MAX_VALUE} if the long is too bit to fit into an {@code
@@ -63,7 +65,7 @@ public final class SLUtility {
 		result.setNanos((int) tDecNS);
 		return result;
 	}
-	
+
 	public static String toCommaSepString(int i) {
 		return toCommaSepString((long) i);
 	}
@@ -72,6 +74,22 @@ public final class SLUtility {
 		Formatter f = new Formatter();
 		f.format("%,d", i);
 		return f.toString();
+	}
+
+	public static long byteToMByte(long value) {
+		return value / 1024L / 1024L;
+	}
+
+	/**
+	 * Gets the current maximum heap memory size in megabytes of this process.
+	 * It uses the result provided by {@link Runtime#maxMemory()} to compute its
+	 * result.
+	 * 
+	 * @return The maximum heap memory size in megabytes.
+	 */
+	public static int getCurrentMaxMemorySizeInMb() {
+		final Runtime rt = Runtime.getRuntime();
+		return SLUtility.safeLongToInt(SLUtility.byteToMByte(rt.maxMemory()));
 	}
 
 	private SLUtility() {
