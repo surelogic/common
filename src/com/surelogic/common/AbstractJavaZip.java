@@ -1,13 +1,7 @@
 package com.surelogic.common;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.LineNumberReader;
-import java.io.PrintWriter;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.TreeMap;
+import java.io.*;
+import java.util.*;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -17,6 +11,8 @@ import com.surelogic.common.xml.XMLUtil;
 
 public abstract class AbstractJavaZip<T> {
 	protected static final Logger LOG = SLLogger.getLogger();
+	public static final String CLASS_MAPPING = "classMapping.txt";
+	public static final String SOURCE_FILES = "sourceFiles.xml";	
 	
 	public void generateSourceZipContents(ZipOutputStream out)    
 	throws IOException {
@@ -28,11 +24,11 @@ public abstract class AbstractJavaZip<T> {
 		Map<String,Map<String,String>> fileMap = new TreeMap<String,Map<String,String>>();
 		addAnnotatedResourcesToZip(out, fileMap, root, includeScript);
 
-		out.putNextEntry(new ZipEntry("sourceFiles.xml"));
+		out.putNextEntry(new ZipEntry(SOURCE_FILES));
 		generateFileList(new PrintWriter(out), fileMap);
 		out.closeEntry();
 		
-		out.putNextEntry(new ZipEntry("classMapping.xml"));
+		out.putNextEntry(new ZipEntry(CLASS_MAPPING));
 		generateClassMappings(new PrintWriter(out), fileMap);
 		out.closeEntry();
 		out.flush(); // unnecessary?			
@@ -171,8 +167,13 @@ public abstract class AbstractJavaZip<T> {
 	public static final String SRCFILES_TAG   = "sourceFiles";
 	public static final String PACKAGE_TAG    = "package";
 	public static final String CLASS_TAG      = "class";
-	public static final String PACKAGE_FORMAT = "\t<"+PACKAGE_TAG+" name=\"%s\">\n";
-	public static final String CLASS_FORMAT   = "\t\t<"+CLASS_TAG+" name=\"%s\" source=\"%s\"/>\n";  
+	private static final String PACKAGE_PREFIX = PACKAGE_TAG+" name=\"";
+	private static final String PACKAGE_SUFFIX = "\">\n";
+	public static final String PACKAGE_FORMAT = "\t<"+PACKAGE_PREFIX+"%s"+PACKAGE_SUFFIX;
+	private static final String CLASS_NAME_PREFIX = PACKAGE_TAG+" name=\"";
+	private static final String CLASS_NAME_SUFFIX = "\" source=\"";
+	private static final String CLASS_SRC_SUFFIX  = "\">\n";
+	public static final String CLASS_FORMAT   = "\t\t<"+CLASS_NAME_PREFIX+"%s"+CLASS_NAME_SUFFIX+"%s"+CLASS_SRC_SUFFIX;  
 
 	private void generateFileList(PrintWriter pw, Map<String, Map<String, String>> fileMap) {
 		pw.println(XMLUtil.openNode(SRCFILES_TAG));
@@ -192,6 +193,51 @@ public abstract class AbstractJavaZip<T> {
 		}
 		pw.println(XMLUtil.closeNode(SRCFILES_TAG));
 		pw.flush();
+	}
+	
+	private static void matchInLine(BufferedReader br, String tag) throws IOException {
+		String line = br.readLine();
+		if (line == null || !line.contains(tag)) {
+			throw new IOException("Couldn't find "+tag);
+		}
+	}
+	
+	private static void readPackage(BufferedReader br, Map<String, Map<String, String>> fileMap, 
+			                        String line) throws IOException {
+		int start = line.indexOf(PACKAGE_PREFIX);
+		if (start < 0) {
+			throw new IOException("Couldn't find "+PACKAGE_PREFIX);
+		}
+		start += PACKAGE_PREFIX.length();
+		int end = line.indexOf(PACKAGE_SUFFIX, start);
+		final String pkg = line.substring(start, end);
+		
+		// Read classes
+		Map<String,String> map = new HashMap<String,String>();
+		while ((line = br.readLine()) != null) {
+			if (line.contains(PACKAGE_TAG)) {
+				break; // Done with the package
+			}
+			start = line.indexOf(CLASS_NAME_PREFIX) + CLASS_NAME_PREFIX.length();
+			end   = line.indexOf(CLASS_NAME_SUFFIX, start);
+			final String name = line.substring(start, end);
+			start = end + CLASS_NAME_SUFFIX.length();
+			end   = line.indexOf(CLASS_SRC_SUFFIX, start);
+			final String path = line.substring(start, end);
+			map.put(name, path);
+		}
+		fileMap.put(pkg, map);
+	}
+	
+	public static void readFileList(BufferedReader br, Map<String, Map<String, String>> fileMap) throws IOException {
+		matchInLine(br, SRCFILES_TAG);
+		String line;
+		while ((line = br.readLine()) != null) {
+			if (line.contains(SRCFILES_TAG)) {
+				return; // Done with the file
+			}			
+			readPackage(br, fileMap, line);
+		}
 	}
 		
 	private void generateClassMappings(PrintWriter pw,
