@@ -169,12 +169,12 @@ public abstract class AbstractJavaZip<T> {
 	public static final String PACKAGE_TAG    = "package";
 	public static final String CLASS_TAG      = "class";
 	private static final String PACKAGE_PREFIX = PACKAGE_TAG+" name=\"";
-	private static final String PACKAGE_SUFFIX = "\">\n";
-	public static final String PACKAGE_FORMAT = "\t<"+PACKAGE_PREFIX+"%s"+PACKAGE_SUFFIX;
-	private static final String CLASS_NAME_PREFIX = PACKAGE_TAG+" name=\"";
+	private static final String PACKAGE_SUFFIX = "\">";
+	public static final String PACKAGE_FORMAT = "\t<"+PACKAGE_PREFIX+"%s"+PACKAGE_SUFFIX+"\n";
+	private static final String CLASS_NAME_PREFIX = CLASS_TAG+" name=\"";
 	private static final String CLASS_NAME_SUFFIX = "\" source=\"";
-	private static final String CLASS_SRC_SUFFIX  = "\">\n";
-	public static final String CLASS_FORMAT   = "\t\t<"+CLASS_NAME_PREFIX+"%s"+CLASS_NAME_SUFFIX+"%s"+CLASS_SRC_SUFFIX;  
+	private static final String CLASS_SRC_SUFFIX  = "\"/>";
+	public static final String CLASS_FORMAT   = "\t\t<"+CLASS_NAME_PREFIX+"%s"+CLASS_NAME_SUFFIX+"%s"+CLASS_SRC_SUFFIX+"\n";  
 
 	private void generateFileList(PrintWriter pw, Map<String, Map<String, String>> fileMap) {
 		pw.println(XMLUtil.openNode(SRCFILES_TAG));
@@ -210,6 +210,7 @@ public abstract class AbstractJavaZip<T> {
 			throw new IOException("Couldn't find "+PACKAGE_PREFIX);
 		}
 		start += PACKAGE_PREFIX.length();
+		String temp = line.substring(start);
 		int end = line.indexOf(PACKAGE_SUFFIX, start);
 		final String pkg = line.substring(start, end);
 		
@@ -219,12 +220,16 @@ public abstract class AbstractJavaZip<T> {
 			if (line.contains(PACKAGE_TAG)) {
 				break; // Done with the package
 			}
-			start = line.indexOf(CLASS_NAME_PREFIX) + CLASS_NAME_PREFIX.length();
+			start = line.indexOf(CLASS_NAME_PREFIX); 
+			start += CLASS_NAME_PREFIX.length();
 			end   = line.indexOf(CLASS_NAME_SUFFIX, start);
 			final String name = line.substring(start, end);
 			start = end + CLASS_NAME_SUFFIX.length();
 			end   = line.indexOf(CLASS_SRC_SUFFIX, start);
-			final String path = line.substring(start, end);
+			String path = line.substring(start, end);
+			if (path.startsWith("/")) {
+				path = path.substring(1);
+			}
 			map.put(name, path);
 		}
 		fileMap.put(pkg, map);
