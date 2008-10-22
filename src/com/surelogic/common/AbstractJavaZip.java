@@ -17,13 +17,13 @@ public abstract class AbstractJavaZip<T> {
 	
 	public void generateSourceZipContents(ZipOutputStream out)    
 	throws IOException {
-		generateSourceZipContents(out, getRoot(), true);
+		generateSourceZipContents(out, getRoot());
 	}
 
-	public void generateSourceZipContents(ZipOutputStream out, T root, boolean includeScript) 
+	public void generateSourceZipContents(ZipOutputStream out, T root) 
 	throws IOException {
 		Map<String,Map<String,String>> fileMap = new TreeMap<String,Map<String,String>>();
-		addAnnotatedResourcesToZip(out, fileMap, root, includeScript);
+		addAnnotatedResourcesToZip(out, fileMap, root);
 
 		out.putNextEntry(new ZipEntry(SOURCE_FILES));
 		generateFileList(new PrintWriter(out), fileMap);
@@ -45,7 +45,7 @@ public abstract class AbstractJavaZip<T> {
 	protected abstract String[] getIncludedTypes(T res);
 	
 	public void addAnnotatedResourcesToZip(ZipOutputStream out, 
-			Map<String,Map<String,String>> fileMap, T resource, boolean includeScript) {
+			Map<String,Map<String,String>> fileMap, T resource) {
 
 		if(!isAccessible(resource)) return;
 		String pathName;
@@ -67,13 +67,7 @@ public abstract class AbstractJavaZip<T> {
 				// Can't use XMLWriter because tag attribute order is not fixed
 				PrintWriter pw = new PrintWriter(out); 
 
-				out.putNextEntry(new ZipEntry(pathName + ".html"));
-				pw.println("<html><head>");
-				pw.println("<style type=\"text/css\">");
-				pw.println("BODY { margin: 0px }");
-				pw.println("SPAN.highlight { position:absolute; width:100%; color:white; background-color:teal; }");
-				pw.println("</style>");
-				pw.println("</head><body><pre>");
+				out.putNextEntry(new ZipEntry(pathName));
 				String line;
 				String packageString = null, className = null;
 				while ((line = reader.readLine()) != null) {
@@ -94,8 +88,8 @@ public abstract class AbstractJavaZip<T> {
 								fileMap.put(packageKey, classNameToSource);
 							}					
 							// Changed to map non-main classes
-							final String srcPath = "/" + pathName + ".html";
-							final String zipPath = pathName + ".html";
+							final String srcPath = "/" + pathName;
+							final String zipPath = pathName;
 							classNameToSource.put(classKey, srcPath);
 							/* FIX
 							final ICompilationUnit icu = JavaCore.createCompilationUnitFrom(file);
@@ -121,25 +115,8 @@ public abstract class AbstractJavaZip<T> {
 							}
 						}
 					}
-					String lineNum = new Integer(reader.getLineNumber()).toString();
-					pw.println("<span id="
-							+ lineNum
-							+ ">"
-							+ "<a name="
-							+ lineNum
-							+ ">"
-							+ "&nbsp;&nbsp;&nbsp;&nbsp;".substring(6 * Math.min(lineNum
-									.length(), 4)) // pad line numbers to 4 digits
-									+ lineNum + "</a> " + XMLUtil.escape(line) + "</span>");
+					pw.println(line);
 				}
-				pw.println("</pre>");
-				if (includeScript) {
-				  pw.println("<script><!--");
-				  pw.println("if(parent.currentLine > 0) window.onload = parent.highlightLine;");
-				  pw.println("parent.setFileHeader(\"" + packageString + "\", \"" + className + "\");");
-				  pw.println("--></script>");
-				}
-				pw.print("</body></html>");
 				pw.flush();
 				out.closeEntry();
 			} catch (IOException e) {
@@ -157,10 +134,18 @@ public abstract class AbstractJavaZip<T> {
 				return;
 			}
 			for(int i=0; i < members.length; i++) {
-			  addAnnotatedResourcesToZip(out, fileMap, members[i], includeScript);
+			  addAnnotatedResourcesToZip(out, fileMap, members[i]);
 			}
 		}
 	}
+
+	// keywords, Strings, comments
+	private String syntaxHighlight(String escape) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
 
 	/*
 	 * Tags for source files
