@@ -4,6 +4,7 @@ import java.io.*;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 import com.surelogic.common.logging.SLLogger;
@@ -229,19 +230,27 @@ public abstract class AbstractJavaZip<T> {
 		fileMap.put(pkg, map);
 	}
 	
-	public static void readFileList(BufferedReader br, Map<String, Map<String, String>> fileMap) throws IOException {
+	private static Map<String, Map<String, String>> readFileList(BufferedReader br) throws IOException {
+		Map<String, Map<String, String>> fileMap = new HashMap<String, Map<String, String>>();
 		matchInLine(br, SRCFILES_TAG);
 		String line;
 		while ((line = br.readLine()) != null) {
 			if (line.contains(SRCFILES_TAG)) {
-				return; // Done with the file
+				return fileMap; // Done with the file
 			}			
 			readPackage(br, fileMap, line);
 		}
+		return fileMap;
 	}
 		
-	private void generateClassMappings(PrintWriter pw,
-			                                  Map<String, Map<String, String>> fileMap) {
+	public static Map<String, Map<String, String>> readSourceFileMappings(ZipFile zf) throws IOException {
+		ZipEntry ze = zf.getEntry(SOURCE_FILES);
+		InputStream in = zf.getInputStream(ze);
+		BufferedReader br = new BufferedReader(new InputStreamReader(in));
+		return readFileList(br);
+	}
+	
+	private void generateClassMappings(PrintWriter pw, Map<String, Map<String, String>> fileMap) {
 		for(Map.Entry<String, Map<String, String>> e : fileMap.entrySet()) {
 			for(Map.Entry<String, String> e2 : e.getValue().entrySet()) {
 				if (!e2.getKey().endsWith(".java")) {
@@ -250,6 +259,25 @@ public abstract class AbstractJavaZip<T> {
 			}
 		}
 		pw.flush();
+	}
+	
+	private static Map<String, String> readClassMappings(BufferedReader br) throws IOException {
+		Map<String, String> map = new HashMap<String, String>();
+		String line;
+		while ((line = br.readLine()) != null) {
+			final int separator = line.indexOf('=');
+			final String key = line.substring(0, separator);
+			final String val = line.substring(separator+1, line.length());
+			map.put(key, val);
+		}
+		return map;
+	}
+	
+	public static Map<String, String> readClassMappings(ZipFile zf) throws IOException {
+		ZipEntry ze = zf.getEntry(CLASS_MAPPING);
+		InputStream in = zf.getInputStream(ze);
+		BufferedReader br = new BufferedReader(new InputStreamReader(in));
+		return readClassMappings(br);
 	}
 	
 	protected abstract T getRoot();
