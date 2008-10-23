@@ -284,8 +284,7 @@ public final class ServiceUtility {
 						}
 					}
 				} catch (final Exception e) {
-					SLLogger.getLogger().log(Level.WARNING,
-							I18N.err(144, f_serviceLocation), e);
+					return SLStatus.createErrorStatus(I18N.err(154, f_serviceLocation), e);
 				}
 
 				monitor.done();
