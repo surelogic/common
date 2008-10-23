@@ -1,8 +1,14 @@
 package com.surelogic.common.serviceability;
 
 import java.io.File;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.Date;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import com.surelogic.common.FileUtility;
 import com.surelogic.common.SLUtility;
@@ -10,8 +16,11 @@ import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.jobs.SLJob;
 import com.surelogic.common.jobs.SLProgressMonitor;
 import com.surelogic.common.jobs.SLStatus;
+import com.surelogic.common.logging.SLLogger;
 
 public final class ServiceUtility {
+	private final static String f_serviceLocation = I18N
+			.msg("common.serviceability.supportrequest.url");
 
 	/**
 	 * Composes a tip in a format to send to SureLogic.
@@ -33,8 +42,9 @@ public final class ServiceUtility {
 	 *            should be included in the generated tip, {@code false} if not.
 	 * @return a tip in a format to send to SureLogic.
 	 */
-	public static String composeATip(String email, String name, String tip,
-			boolean includeVersionInfo, String ideVersion, boolean includeUsage) {
+	public static String composeATip(final String email, final String name,
+			final String tip, final boolean includeVersionInfo,
+			final String ideVersion, final boolean includeUsage) {
 		final StringBuilder b = new StringBuilder();
 		final String lf = System.getProperty("line.separator");
 
@@ -46,10 +56,11 @@ public final class ServiceUtility {
 		b.append("     To: SureLogic, Inc.");
 		b.append(lf);
 		b.append("   From: ");
-		if ("".equals(name))
+		if ("".equals(name)) {
 			b.append("(anonymous)");
-		else
+		} else {
 			b.append(name);
+		}
 		b.append(" ");
 		if (!"".equals(email)) {
 			b.append("<");
@@ -117,9 +128,11 @@ public final class ServiceUtility {
 	 *            {@link I18N#msg(String)}.
 	 * @return a problem report in a format to send to SureLogic.
 	 */
-	public static String composeAProblemReport(String email, String name,
-			String report, boolean includeVersionInfo, String ideVersion,
-			boolean includeUsage, File ideLogFile, String ideLogFileI18nKey) {
+	public static String composeAProblemReport(final String email,
+			final String name, final String report,
+			final boolean includeVersionInfo, final String ideVersion,
+			final boolean includeUsage, final File ideLogFile,
+			final String ideLogFileI18nKey) {
 		final StringBuilder b = new StringBuilder();
 		final String lf = System.getProperty("line.separator");
 
@@ -131,10 +144,11 @@ public final class ServiceUtility {
 		b.append("     To: SureLogic, Inc.");
 		b.append(lf);
 		b.append("   From: ");
-		if ("".equals(name))
+		if ("".equals(name)) {
 			b.append("(anonymous)");
-		else
+		} else {
 			b.append(name);
+		}
 		b.append(" ");
 		if (!"".equals(email)) {
 			b.append("<");
@@ -197,8 +211,8 @@ public final class ServiceUtility {
 	 * @return a notice that a license was installed or uninstalled in a format
 	 *         to send to SureLogic.
 	 */
-	public static String composeAInstallationNotice(boolean install,
-			String tool, String issuedTo, UUID licenseId) {
+	public static String composeAInstallationNotice(final boolean install,
+			final String tool, final String issuedTo, final UUID licenseId) {
 		final StringBuilder b = new StringBuilder();
 		final String lf = System.getProperty("line.separator");
 
@@ -206,10 +220,11 @@ public final class ServiceUtility {
 		b.append(SLUtility.toStringHMS(new Date()));
 		b.append(lf);
 		b.append("Subject: License ");
-		if (install)
+		if (install) {
 			b.append("Installation");
-		else
+		} else {
 			b.append("Removal");
+		}
 		b.append(lf);
 
 		b.append("   Tool: ");
@@ -240,10 +255,39 @@ public final class ServiceUtility {
 				return "Sending a servicability message to SureLogic";
 			}
 
-			public SLStatus run(SLProgressMonitor monitor) {
+			public SLStatus run(final SLProgressMonitor monitor) {
 				monitor.begin();
-				System.out.println("Sending to SureLogic:");
-				System.out.println(msg);
+				try {
+					// Prepare the URL connection
+					final URL url = new URL(f_serviceLocation);
+					final URLConnection conn = url.openConnection();
+					conn.setDoInput(true);
+					conn.setDoOutput(true);
+					conn.setUseCaches(false);
+
+					final OutputStream os = null;
+					OutputStreamWriter wr = null;
+					try {
+						// Send the request
+						wr = new OutputStreamWriter(conn.getOutputStream());
+						wr.write(msg);
+						wr.flush();
+
+						// Check the response
+						final InputStream is = conn.getInputStream();
+						is.close();
+					} finally {
+						if (wr != null) {
+							wr.close();
+						} else if (os != null) {
+							os.close();
+						}
+					}
+				} catch (final Exception e) {
+					SLLogger.getLogger().log(Level.WARNING,
+							I18N.err(144, f_serviceLocation), e);
+				}
+
 				monitor.done();
 				return SLStatus.OK_STATUS;
 			}
