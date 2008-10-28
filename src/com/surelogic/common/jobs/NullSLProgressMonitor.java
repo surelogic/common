@@ -26,7 +26,6 @@ public final class NullSLProgressMonitor implements SLProgressMonitor {
 
 	public void done() {
 		// Do nothing
-
 	}
 
 	public boolean isCanceled() {
