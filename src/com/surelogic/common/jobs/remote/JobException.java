@@ -1,4 +1,4 @@
-package com.surelogic.common.jobs;
+package com.surelogic.common.jobs.remote;
 
 import com.surelogic.common.i18n.I18N;
 

@@ -1,4 +1,4 @@
-package com.surelogic.common.jobs;
+package com.surelogic.common.jobs.remote;
 
 public enum TestCode {
 	NONE, LOW_MEMORY, HIGH_MEMORY, MAD_MEMORY, MISSING_CODE, BAD_AUX_PATH, BAD_CONFIG, 

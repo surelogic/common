@@ -3,14 +3,17 @@ package com.surelogic.common.jobs;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public final class NullSLProgressMonitor implements SLProgressMonitor {
-  public static final SLProgressMonitorFactory FACTORY = new SLProgressMonitorFactory() {
-    public SLProgressMonitor createSLProgressMonitor(final String taskName) {
-      return new NullSLProgressMonitor();
-    }
-  };
 
+	private static final SLProgressMonitorFactory FACTORY = new SLProgressMonitorFactory() {
+		public SLProgressMonitor createSLProgressMonitor(final String taskName) {
+			return new NullSLProgressMonitor();
+		}
+	};
 
-  
+	public static SLProgressMonitorFactory getFactory() {
+		return FACTORY;
+	}
+
 	private final AtomicBoolean f_canceled = new AtomicBoolean(false);
 
 	public void begin() {
@@ -37,9 +40,9 @@ public final class NullSLProgressMonitor implements SLProgressMonitor {
 	public void subTask(String name) {
 		// Do nothing
 	}
-	
+
 	public void subTaskDone() {
-	  // Do nothing
+		// Do nothing
 	}
 
 	public void worked(int work) {

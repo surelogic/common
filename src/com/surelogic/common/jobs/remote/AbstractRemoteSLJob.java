@@ -1,13 +1,17 @@
 /*
  * Created on Jan 11, 2008
  */
-package com.surelogic.common.jobs;
+package com.surelogic.common.jobs.remote;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 
+import com.surelogic.common.jobs.SLJob;
+import com.surelogic.common.jobs.SLProgressMonitor;
+import com.surelogic.common.jobs.SLSeverity;
+import com.surelogic.common.jobs.SLStatus;
 import com.surelogic.common.logging.SLLogger;
 
 public abstract class AbstractRemoteSLJob {

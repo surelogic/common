@@ -1,4 +1,4 @@
-package com.surelogic.common.jobs;
+package com.surelogic.common.jobs.remote;
 
 public final class SLJobConstants {
 	/**
