@@ -25,13 +25,13 @@ import com.surelogic.common.i18n.I18N;
  * 
  * Cancellation is passed up to the parent. It is important to always call
  * {@link #done()} to ensure that the correct amount of work is done on the
- * parent progress monitor. It is find to call {@link #done()} more than once
+ * parent progress monitor. It is fine to call {@link #done()} more than once
  * (subsequent calls will be ignored).
  * <p>
- * It is allowed to nest subtasks, but this is typically bad practice and may
- * not be well displayed in the UI. Hence, it is best to have one main task with
- * subtasks (i.e., not have subtasks of a subtask). This is allowed so that a
- * task that is normally invoked as a main task could be used as a subtask of
+ * It is allowed to nest subtasks, but this is typically bad practice and may or
+ * may not be well displayed in the UI. Hence, it is best to have one main task
+ * with subtasks (i.e., not have subtasks of a subtask). This is allowed so that
+ * a task that is normally invoked as a main task could be used as a subtask of
  * some higher task.
  */
 public final class SubSLProgressMonitor implements SLProgressMonitor {

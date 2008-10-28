@@ -61,6 +61,9 @@ public abstract class AbstractSLJob implements SLJob {
 		try {
 			return job.run(sub);
 		} finally {
+			/*
+			 * It is OK to call done again, just in case.
+			 */
 			sub.done();
 		}
 	}
