@@ -1,6 +1,6 @@
 package com.surelogic.common.jobs.remote;
 
-public final class SLJobConstants {
+public final class RemoteSLJobConstants {
 	/**
 	 * Java property for the test code (if any)
 	 */

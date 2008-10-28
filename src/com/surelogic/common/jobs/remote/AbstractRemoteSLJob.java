@@ -25,9 +25,9 @@ public abstract class AbstractRemoteSLJob {
 	@SuppressWarnings("incomplete-switch")
 	protected final void run() {
 		final TestCode testCode = TestCode.getTestCode(System
-				.getProperty(SLJobConstants.TEST_CODE_PROPERTY));
+				.getProperty(RemoteSLJobConstants.TEST_CODE_PROPERTY));
 		if (TestCode.NO_TOOL_OUTPUT.equals(testCode)) {
-			System.exit(-SLJobConstants.ERROR_NO_OUTPUT_FROM_JOB);
+			System.exit(-RemoteSLJobConstants.ERROR_NO_OUTPUT_FROM_JOB);
 		}
 		System.out.println("JVM started");
 		System.out.println("Log level: " + SLLogger.LEVEL.get());
@@ -66,7 +66,7 @@ public abstract class AbstractRemoteSLJob {
 						new Throwable());
 				break;
 			case ABNORMAL_EXIT:
-				System.exit(-SLJobConstants.ERROR_PROCESS_FAILED);
+				System.exit(-RemoteSLJobConstants.ERROR_PROCESS_FAILED);
 				break;
 			case EXCEPTION:
 				throw new Exception("Testing scan exception");
@@ -77,7 +77,7 @@ public abstract class AbstractRemoteSLJob {
 			checkInput(br, mon, "Done scanning: " + (end - start) + " ms");
 		} catch (final Throwable e) {
 			outputFailure(System.out, null, e);
-			System.exit(-SLJobConstants.ERROR_JOB_FAILED);
+			System.exit(-RemoteSLJobConstants.ERROR_JOB_FAILED);
 		}
 	}
 
