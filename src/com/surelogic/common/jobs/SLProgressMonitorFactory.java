@@ -4,7 +4,9 @@ package com.surelogic.common.jobs;
  * Factory interface for creating progress monitor objects.
  * <p>
  * This interface may be use by specific implementations of {@link SLJob} that
- * desire an indirect way to construct new progress monitors.
+ * desire an indirect way to construct new progress monitors. The
+ * {@link NullSLProgressMonitor} class implements a static method to provide a
+ * factory for itself {@link NullSLProgressMonitor#getFactory()};
  */
 public interface SLProgressMonitorFactory {
 

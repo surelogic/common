@@ -1,17 +1,18 @@
 package com.surelogic.common.jobs.console;
 
 import java.io.PrintWriter;
-import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.surelogic.common.jobs.CancellableSLProgressMonitor;
 import com.surelogic.common.jobs.SLProgressMonitor;
 import com.surelogic.common.jobs.SLProgressMonitorFactory;
 
 /**
  * A progress monitor that prints status reports to a {@link PrintWriter}.
  */
-public final class PrintWriterSLProgressMonitor implements SLProgressMonitor {
+public final class PrintWriterSLProgressMonitor extends
+		CancellableSLProgressMonitor {
 
-	public static final class Factory implements SLProgressMonitorFactory {
+	private static final class Factory implements SLProgressMonitorFactory {
 		private final PrintWriter printWriter;
 
 		public Factory(final PrintWriter pw) {
@@ -23,85 +24,101 @@ public final class PrintWriterSLProgressMonitor implements SLProgressMonitor {
 		}
 	}
 
+	public static SLProgressMonitorFactory getFactory(PrintWriter out) {
+		return new Factory(out);
+	}
+
 	private static final String INDENT = "\t";
 	private static final String BEGIN = " [.";
 	private static final String WORK = ".";
 	private static final String DONE = "]";
 
-	private final PrintWriter printWriter;
-	private final String taskName;
-	private int indentLevel = 0;
-	private boolean atNewLine = true;
-	private final AtomicBoolean isCanceled = new AtomicBoolean(false);
+	private final PrintWriter f_out;
+	private final String f_name;
+	private int f_indentLevel = 0;
+	private boolean f_atNewLine = true;
 
+	/**
+	 * Constructs a new console progress monitor instance.
+	 * 
+	 * @param pw
+	 *            a character stream to output progress to.
+	 * @param name
+	 *            the name of the job we are monitoring the progress of.
+	 */
 	public PrintWriterSLProgressMonitor(final PrintWriter pw, final String name) {
-		printWriter = pw;
-		taskName = name;
+		f_out = pw;
+		f_name = name;
+	}
+
+	/**
+	 * Constructs a new console progress monitor that sends its output to
+	 * {@link System#out}.
+	 * 
+	 * @param name
+	 *            the name of the job we are monitoring the progress of.
+	 */
+	public PrintWriterSLProgressMonitor(final String name) {
+		this(new PrintWriter(System.out), name);
 	}
 
 	private synchronized void indent() {
-		for (int i = 0; i < indentLevel; i++) {
-			printWriter.print(INDENT);
+		for (int i = 0; i < f_indentLevel; i++) {
+			f_out.print(INDENT);
 		}
 	}
 
 	public synchronized void begin() {
 		indent();
-		printWriter.print(taskName);
-		printWriter.print(BEGIN);
-		printWriter.flush();
-		atNewLine = false;
+		f_out.print(f_name);
+		f_out.print(BEGIN);
+		f_out.flush();
+		f_atNewLine = false;
 	}
 
 	public synchronized void begin(int totalWork) {
 		indent();
-		printWriter.print(taskName);
-		printWriter.print(BEGIN);
-		printWriter.flush();
-		atNewLine = false;
+		f_out.print(f_name);
+		f_out.print(BEGIN);
+		f_out.flush();
+		f_atNewLine = false;
 	}
 
 	public synchronized void done() {
 		// First close any open subtasks
-		while (indentLevel > 0) {
+		while (f_indentLevel > 0) {
 			subTaskDone();
 		}
-		printWriter.println(DONE);
-		printWriter.flush();
-		atNewLine = true;
-	}
-
-	public synchronized boolean isCanceled() {
-		return isCanceled.get();
-	}
-
-	public synchronized void setCanceled(final boolean value) {
-		isCanceled.set(value);
+		f_out.println(DONE);
+		f_out.flush();
+		f_atNewLine = true;
 	}
 
 	public synchronized void subTask(final String name) {
-		if (!atNewLine)
-			printWriter.println();
-		indentLevel += 1;
+		if (!f_atNewLine)
+			f_out.println();
+		f_indentLevel += 1;
 		indent();
-		printWriter.print(name);
-		printWriter.print(BEGIN);
-		printWriter.flush();
-		atNewLine = false;
+		f_out.print(name);
+		f_out.print(BEGIN);
+		f_out.flush();
+		f_atNewLine = false;
 	}
 
 	public synchronized void subTaskDone() {
-		if (atNewLine)
+		if (f_atNewLine)
 			indent();
-		printWriter.println(DONE);
-		printWriter.flush();
-		indentLevel -= 1;
-		atNewLine = true;
+		f_out.println(DONE);
+		f_out.flush();
+		f_indentLevel -= 1;
+		f_atNewLine = true;
 	}
 
 	public synchronized void worked(final int work) {
-		printWriter.print(WORK);
-		printWriter.flush();
-		atNewLine = false;
+		if (f_atNewLine)
+			indent();
+		f_out.print(WORK);
+		f_out.flush();
+		f_atNewLine = false;
 	}
 }

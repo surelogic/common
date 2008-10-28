@@ -1,15 +1,18 @@
 package com.surelogic.common.jobs.console;
 
+import java.io.PrintWriter;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import com.surelogic.common.jobs.AbstractSLJob;
 import com.surelogic.common.jobs.SLJob;
 import com.surelogic.common.jobs.SLProgressMonitor;
 import com.surelogic.common.jobs.SLProgressMonitorFactory;
 import com.surelogic.common.jobs.SLStatus;
+import com.surelogic.common.jobs.SubSLProgressMonitor;
 
 /**
  * Class for submitting jobs to a "console." The jobs are not meant to be
@@ -66,5 +69,68 @@ public final class ConsoleJob {
 		} catch (ExecutionException e) {
 			return SLStatus.createErrorStatus(e);
 		}
+	}
+
+	/**
+	 * A simple test top(sub(fifty-fifty)
+	 */
+	public static void main(String[] args) {
+		final PrintWriter out = new PrintWriter(System.out);
+		final ConsoleJob cj = new ConsoleJob(PrintWriterSLProgressMonitor
+				.getFactory(out));
+		final SLJob fifty = new SLJob() {
+
+			public String getName() {
+				return "fifty";
+			}
+
+			public SLStatus run(SLProgressMonitor monitor) {
+				monitor.begin(50);
+				for (int i = 0; i < 50; i++)
+					monitor.worked(1);
+				monitor.done();
+				return SLStatus.OK_STATUS;
+			}
+		};
+		final SLJob sub = new SLJob() {
+
+			public String getName() {
+				return "sub";
+			}
+
+			public SLStatus run(SLProgressMonitor monitor) {
+				monitor.begin(120);
+				AbstractSLJob.invoke(fifty, monitor, 10);
+				AbstractSLJob.invoke(fifty, monitor, 100);
+				// skip 10 as the done should do this
+				monitor.done();
+				return SLStatus.OK_STATUS;
+			}
+		};
+		final SLJob top = new SLJob() {
+
+			public String getName() {
+				return "top";
+			}
+
+			public SLStatus run(SLProgressMonitor monitor) {
+				monitor.begin(100);
+				AbstractSLJob.invoke(sub, monitor, 50);
+
+				SLProgressMonitor sub = new SubSLProgressMonitor(monitor,
+						"local-sub-ind", 25);
+				sub.begin();
+				sub.done();
+
+				sub = new SubSLProgressMonitor(monitor, "local-sub-10", 25);
+				sub.begin(10);
+				sub.worked(10);
+				sub.done();
+
+				monitor.done();
+				return SLStatus.OK_STATUS;
+			}
+		};
+		cj.submitJob(top);
 	}
 }

@@ -25,7 +25,8 @@ import com.surelogic.common.i18n.I18N;
  * 
  * Cancellation is passed up to the parent. It is important to always call
  * {@link #done()} to ensure that the correct amount of work is done on the
- * parent progress monitor.
+ * parent progress monitor. It is find to call {@link #done()} more than once
+ * (subsequent calls will be ignored).
  * <p>
  * It is allowed to nest subtasks, but this is typically bad practice and may
  * not be well displayed in the UI. Hence, it is best to have one main task with
@@ -66,6 +67,8 @@ public final class SubSLProgressMonitor implements SLProgressMonitor {
 	private int f_workedGoal;
 	private int f_worked;
 
+	private boolean f_done = false;
+
 	public String getName() {
 		return f_name;
 	}
@@ -87,11 +90,18 @@ public final class SubSLProgressMonitor implements SLProgressMonitor {
 	}
 
 	public void done() {
-		final int parentWorkRemaining = f_parentWorkedGoal - f_parentWorked;
-		if (parentWorkRemaining > 0) {
-			f_parent.worked(parentWorkRemaining);
+		/*
+		 * This method can be called more than once, but we only want to do the
+		 * below logic once.
+		 */
+		if (!f_done) {
+			f_done = true;
+			final int parentWorkRemaining = f_parentWorkedGoal - f_parentWorked;
+			if (parentWorkRemaining > 0) {
+				f_parent.worked(parentWorkRemaining);
+			}
+			f_parent.subTaskDone();
 		}
-		f_parent.subTaskDone();
 	}
 
 	public boolean isCanceled() {
