@@ -8,7 +8,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.Date;
 import java.util.UUID;
-import java.util.logging.Level;
 
 import com.surelogic.common.FileUtility;
 import com.surelogic.common.SLUtility;
@@ -16,7 +15,6 @@ import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.jobs.SLJob;
 import com.surelogic.common.jobs.SLProgressMonitor;
 import com.surelogic.common.jobs.SLStatus;
-import com.surelogic.common.logging.SLLogger;
 
 public final class ServiceUtility {
 	private final static String f_serviceLocation = I18N
@@ -284,7 +282,8 @@ public final class ServiceUtility {
 						}
 					}
 				} catch (final Exception e) {
-					return SLStatus.createErrorStatus(I18N.err(154, f_serviceLocation), e);
+					return SLStatus.createErrorStatus(I18N.err(154,
+							f_serviceLocation), e);
 				}
 
 				monitor.done();

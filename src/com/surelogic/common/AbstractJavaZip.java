@@ -147,6 +147,7 @@ public abstract class AbstractJavaZip<T> {
 	}
 
 	// keywords, Strings, comments
+	@SuppressWarnings("unused")
 	private String syntaxHighlight(String escape) {
 		// TODO Auto-generated method stub
 		return null;
@@ -209,7 +210,7 @@ public abstract class AbstractJavaZip<T> {
 			throw new IOException("Couldn't find " + PACKAGE_PREFIX);
 		}
 		start += PACKAGE_PREFIX.length();
-		String temp = line.substring(start);
+		//String temp = line.substring(start);
 		int end = line.indexOf(PACKAGE_SUFFIX, start);
 		final String pkg = line.substring(start, end);
 
