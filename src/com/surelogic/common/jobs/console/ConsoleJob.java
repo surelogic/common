@@ -28,6 +28,7 @@ import com.surelogic.common.jobs.SubSLProgressMonitor;
  * @see PrintWriterSLProgressMonitor
  */
 public final class ConsoleJob {
+
 	private final SLProgressMonitorFactory pmFactory;
 	private final ExecutorService executor = Executors
 			.newSingleThreadExecutor();
@@ -58,6 +59,11 @@ public final class ConsoleJob {
 	 * @return The status of the job.
 	 */
 	public SLStatus submitJob(final SLJob slJob) {
+		if (executor.isShutdown())
+			throw new IllegalStateException(
+					ConsoleJob.class.getName()
+							+ " is already shutdown and cannot accept further jobs to run");
+
 		final SLProgressMonitor monitor = pmFactory
 				.createSLProgressMonitor(slJob.getName());
 		final Future<SLStatus> future = executor.submit(new ConsoleCallable(
@@ -69,6 +75,13 @@ public final class ConsoleJob {
 		} catch (ExecutionException e) {
 			return SLStatus.createErrorStatus(e);
 		}
+	}
+
+	/**
+	 * Indicates that no more jobs will be submitted to this instance.
+	 */
+	public void shutdown() {
+		executor.shutdown();
 	}
 
 	/**
@@ -132,5 +145,6 @@ public final class ConsoleJob {
 			}
 		};
 		cj.submitJob(top);
+		cj.shutdown();
 	}
 }
