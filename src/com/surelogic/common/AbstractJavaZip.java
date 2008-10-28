@@ -284,6 +284,9 @@ public abstract class AbstractJavaZip<T> {
 	public static Map<String, String> readClassMappings(ZipFile zf)
 			throws IOException {
 		ZipEntry ze = zf.getEntry(CLASS_MAPPING);
+		if (ze == null) {
+			return Collections.emptyMap();
+		}
 		InputStream in = zf.getInputStream(ze);
 		BufferedReader br = new BufferedReader(new InputStreamReader(in));
 		return readClassMappings(br);
