@@ -15,6 +15,8 @@
                 <package>com.surelogic.common.images</package>
                 <package>com.surelogic.common.jdbc</package>
                 <package>com.surelogic.common.jobs</package>
+                <package>com.surelogic.common.jobs.console</package>
+                <package>com.surelogic.common.jobs.remote</package>
                 <package>com.surelogic.common.license</package>
                 <package>com.surelogic.common.logging</package>
                 <package>com.surelogic.common.registration</package>
