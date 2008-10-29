@@ -23,13 +23,16 @@ import com.surelogic.common.jobs.SubSLProgressMonitor;
  * new progress monitor for each submitted job. For example, the class
  * {@link PrintWriterSLProgressMonitor} is meant to be used with this class.
  * <p>
- * Jobs are executed serially.
+ * Jobs are executed serially. Clients <i>must</i> invoke {@link #shutdown()}
+ * when they are done submitting jobs to this instance (because an executor used
+ * in the implementation of this class must be shutdown).
  * 
  * @see PrintWriterSLProgressMonitor
  */
 public final class ConsoleJob {
 
 	private final SLProgressMonitorFactory pmFactory;
+
 	private final ExecutorService executor = Executors
 			.newSingleThreadExecutor();
 
