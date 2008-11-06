@@ -67,4 +67,31 @@ public interface DBConnection {
 	 * Unload and delete the database.
 	 */
 	void destroy();
+
+	/**
+	 * Boots and checks the embedded database but logs any problems rather than
+	 * throwing an exception.
+	 * <p>
+	 * Multiple calls to this method are benign, only the first call boots and
+	 * checks the embedded database.
+	 * 
+	 * @see #bootAndCheckSchema()
+	 */
+	public void loggedBootAndCheckSchema();
+
+	/**
+	 * Boots and checks the embedded database. This method is suitable to call
+	 * within an Eclipse {@code Activator} because if it fails it will stop the
+	 * plug-in from loading. Within NetBeans it is better to call
+	 * {@link #loggedBootAndCheckSchema()} from the {@code getInstance()} method
+	 * of the {@code Data} class.
+	 * <p>
+	 * Multiple calls to this method are benign, only the first call boots and
+	 * checks the embedded database.
+	 * 
+	 * @throws Exception
+	 *             if a failure occurs.
+	 * @see #loggedBootAndCheckSchema()
+	 */
+	public void bootAndCheckSchema() throws Exception;
 }
