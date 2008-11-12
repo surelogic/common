@@ -15,6 +15,9 @@ import java.util.logging.Level;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.logging.SLLogger;
 
+/**
+ * A utility to help with file operations.
+ */
 public final class FileUtility {
 
 	private FileUtility() {
@@ -179,16 +182,35 @@ public final class FileUtility {
 	}
 
 	/**
+	 * This method returns the anchor for the Sierra data directory. Clients
+	 * typically will not use this method to get the Sierra data directory,
+	 * instead they would use the method {@link #getSierraDataDirectory()}.
+	 * 
+	 * @return the non-null anchor for the Flashlight data directory.
+	 * @see #getDataDirectory(File)
+	 * @see #getSierraDataDirectory()
+	 */
+	static public File getSierraDataDirectoryAnchor() {
+		return new File(System.getProperty("user.home") + File.separator
+				+ ".sierra-data");
+	}
+
+	/**
 	 * This method gets the Sierra data directory. It ensures the directory
 	 * exists.
+	 * <p>
+	 * This method is the same as calling
+	 * 
+	 * <pre>
+	 * getDataDirectory(getSierraDataDirectoryAnchor())
+	 * </pre>
 	 * 
 	 * @return the Sierra data directory.
-	 * @see FileUtility#getDataDirectory(File)
+	 * @see #getDataDirectory(File)
+	 * @see #getSierraDataDirectoryAnchor()
 	 */
 	static public File getSierraDataDirectory() {
-		final File data = new File(System.getProperty("user.home")
-				+ File.separator + ".sierra-data");
-		return getDataDirectory(data);
+		return getDataDirectory(getSierraDataDirectoryAnchor());
 	}
 
 	/**
@@ -196,7 +218,7 @@ public final class FileUtility {
 	 * the directory exists.
 	 * 
 	 * @return the Sierra local team server data directory.
-	 * @see FileUtility#getDataDirectory(File)
+	 * @see #getDataDirectory(File)
 	 */
 	static public File getSierraLocalTeamServerDirectory() {
 		final File data = new File(getSierraDataDirectory(), "server");
@@ -208,10 +230,10 @@ public final class FileUtility {
 	 * directory exists.
 	 * <p>
 	 * Note that this method is <i>not</i> just used for a local Sierra team
-	 * server.
+	 * server. It is used by all Sierra team server instances.
 	 * 
 	 * @return the Sierra team server cache directory.
-	 * @see FileUtility#getDataDirectory(File)
+	 * @see #getDataDirectory(File)
 	 */
 	static public File getSierraTeamServerCacheDirectory() {
 		final File data = new File(System.getProperty("java.io.tmpdir")
@@ -220,21 +242,10 @@ public final class FileUtility {
 	}
 
 	/**
-	 * This method gets the Flashlight data directory. It ensures the directory
-	 * exists.
-	 * 
-	 * @return the Flashlight data directory.
-	 * @see FileUtility#getDataDirectory(File)
-	 */
-	static public File getFlashlightDataDirectory() {
-		final File data = new File(System.getProperty("user.home")
-				+ File.separator + ".flashlight-data");
-		return getDataDirectory(data);
-	}
-
-	/**
 	 * This method determines a directory where data is stored based upon a
-	 * passed path. It ensures the directory exists.
+	 * passed anchor path. This anchor path is passed in <tt>data</tt> and is
+	 * either a directory or file that references a directory. It ensures the
+	 * directory exists.
 	 * <ul>
 	 * <li>If <tt>data</tt> does not exist. Then a directory is created using
 	 * <tt>data</tt> and returned. If the creation fails for any reason then
