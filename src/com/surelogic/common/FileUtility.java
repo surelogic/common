@@ -32,13 +32,32 @@ public final class FileUtility {
 	 * 
 	 */
 	static public boolean createDirectory(final String path) {
-		File p = new File(path);
-		if (p.exists()) {
+		if (path == null)
+			throw new IllegalArgumentException(I18N.err(44, "path"));
+		final File p = new File(path);
+		return createDirectory(p);
+	}
+
+	/**
+	 * Tries to create the specified directory in the file system unless it
+	 * already exists.
+	 * 
+	 * @param path
+	 *            the desired directory.
+	 * @returns <tt>true</tt> if the directory existed or was created, along
+	 *          with all necessary parent directories; <tt>false</tt> otherwise.
+	 * 
+	 */
+	static public boolean createDirectory(final File path) {
+		if (path == null)
+			throw new IllegalArgumentException(I18N.err(44, "path"));
+		if (path.exists()) {
 			return true;
 		} else {
-			boolean success = p.mkdirs();
+			boolean success = path.mkdirs();
 			if (!success) {
-				SLLogger.getLogger().warning(I18N.err(30, path));
+				SLLogger.getLogger().warning(
+						I18N.err(30, path.getAbsolutePath()));
 			}
 			return success;
 		}
@@ -160,92 +179,110 @@ public final class FileUtility {
 	}
 
 	/**
-	 * This method gets the path to the Sierra data directory. It ensures the
+	 * This method gets the Sierra data directory. It ensures the directory
+	 * exists.
+	 * 
+	 * @return the Sierra data directory.
+	 * @see FileUtility#getDataDirectory(File)
+	 */
+	static public File getSierraDataDirectory() {
+		final File data = new File(System.getProperty("user.home")
+				+ File.separator + ".sierra-data");
+		return getDataDirectory(data);
+	}
+
+	/**
+	 * This method gets the Sierra local team server data directory. It ensures
+	 * the directory exists.
+	 * 
+	 * @return the Sierra local team server data directory.
+	 * @see FileUtility#getDataDirectory(File)
+	 */
+	static public File getSierraLocalTeamServerDirectory() {
+		final File data = new File(getSierraDataDirectory(), "server");
+		return getDataDirectory(data);
+	}
+
+	/**
+	 * This method gets the Sierra team server cache directory. It ensures the
 	 * directory exists.
 	 * <p>
-	 * It first tries to use the value of the <tt>SLSierraDataDirectory</tt>
-	 * property. If that property is not defined (or it is not valid) then
-	 * <tt>~/.sierra-data</tt> is used. Finally, if that directory is invalid
-	 * then the value of <tt>java.io.tmpdir</tt> is used.
+	 * Note that this method is <i>not</i> just used for a local Sierra team
+	 * server.
 	 * 
-	 * @return the path to the Sierra data directory. No trailing <tt>/</tt> is
-	 *         included.
+	 * @return the Sierra team server cache directory.
+	 * @see FileUtility#getDataDirectory(File)
 	 */
-	static public String getSierraDataDirectory() {
-		String dir = System.getProperty("SLSierraDataDirectory");
-		/*
-		 * The property was set so see if it makes sense.
-		 */
-		if (dir != null) {
-			if (createDirectory(dir))
-				return dir;
-			SLLogger.getLogger().warning(I18N.err(31, dir));
+	static public File getSierraTeamServerCacheDirectory() {
+		final File data = new File(System.getProperty("java.io.tmpdir")
+				+ File.separator + "sierra-cache");
+		return getDataDirectory(data);
+	}
+
+	/**
+	 * This method gets the Flashlight data directory. It ensures the directory
+	 * exists.
+	 * 
+	 * @return the Flashlight data directory.
+	 * @see FileUtility#getDataDirectory(File)
+	 */
+	static public File getFlashlightDataDirectory() {
+		final File data = new File(System.getProperty("user.home")
+				+ File.separator + ".flashlight-data");
+		return getDataDirectory(data);
+	}
+
+	/**
+	 * This method determines a directory where data is stored based upon a
+	 * passed path. It ensures the directory exists.
+	 * <ul>
+	 * <li>If <tt>data</tt> does not exist. Then a directory is created using
+	 * <tt>data</tt> and returned. If the creation fails for any reason then
+	 * <tt>System.getProperty("java.io.tmpdir")</tt> is returned (and an error
+	 * is logged).</li>
+	 * <li>If <tt>data</tt> exists and is a directory, then that directory is
+	 * returned.</li>
+	 * <li>If <tt>data</tt> exists and is a file, then the contents of that file
+	 * are read. The resulting string is assumed to be a path to the data
+	 * directory. The resulting string is converted to a {@link File} object and
+	 * a recursive call to this method is made.</li>
+	 * </ul>
+	 * 
+	 * @return the path to the data directory.
+	 * @throws IllegalArgumentException
+	 *             if <tt>data</tt> is {@code null}.
+	 */
+	static public File getDataDirectory(final File data) {
+		if (data == null)
+			throw new IllegalArgumentException(I18N.err(44, "data"));
+		if (data.exists()) {
+			if (data.isFile()) {
+				/*
+				 * The contents of the file contain the path to the data
+				 * directory.
+				 */
+				final String referencedPath = getFileContents(data).trim();
+				final File dataPath = new File(referencedPath);
+				return getDataDirectory(dataPath);
+			} else {
+				/*
+				 * Return the data directory.
+				 */
+				return data;
+			}
+		} else {
+			/*
+			 * The data directory needs to be created.
+			 */
+			if (createDirectory(data)) {
+				return data;
+			} else {
+				final File tmp = new File(System.getProperty("java.io.tmpdir"));
+				SLLogger.getLogger().severe(
+						I18N.err(32, data.getAbsolutePath(), tmp
+								.getAbsolutePath()));
+				return tmp;
+			}
 		}
-		dir = System.getProperty("user.home") + File.separator + ".sierra-data";
-		if (createDirectory(dir))
-			return dir;
-		SLLogger.getLogger().severe(I18N.err(32, dir));
-		return System.getProperty("java.io.tmpdir");
-	}
-
-	/**
-	 * This method gets the path to the Sierra local team server data directory.
-	 * It ensures the directory exists.
-	 * 
-	 * @return the path to the Sierra data directory. No trailing <tt>/</tt> is
-	 *         included.
-	 */
-	static public String getSierraLocalTeamServerDirectory() {
-		final String dir = getSierraDataDirectory() + File.separator + "server";
-		if (createDirectory(dir))
-			return dir;
-		SLLogger.getLogger().severe(I18N.err(92, dir));
-		return System.getProperty("java.io.tmpdir");
-	}
-
-	/**
-	 * This method gets the path to the Sierra team server cache directory. It
-	 * ensures the directory exists.
-	 * 
-	 * @return the path to the Sierra team server cache directory. No trailing
-	 *         <tt>/</tt> is included.
-	 */
-	static public String getSierraTeamServerCacheDirectory() {
-		final String tmpdir = System.getProperty("java.io.tmpdir");
-		final String dir = tmpdir + File.separator + "sierra-cache";
-		if (createDirectory(dir))
-			return dir;
-		SLLogger.getLogger().severe(I18N.err(95, dir));
-		return tmpdir;
-	}
-
-	/**
-	 * This method gets the path to the Flashlight data directory. It ensures
-	 * the directory exists.
-	 * <p>
-	 * It first tries to use the value of the <tt>SLFlashlightDataDirectory</tt>
-	 * property. If that property is not defined (or it is not valid) then
-	 * <tt>~/.flashlight-data</tt> is used. Finally, if that directory is
-	 * invalid then the value of <tt>java.io.tmpdir</tt> is used.
-	 * 
-	 * @return the path to the Flashlight data directory. No trailing <tt>/</tt>
-	 *         is included.
-	 */
-	static public String getFlashlightDataDirectory() {
-		String dir = System.getProperty("SLFlashlightDataDirectory");
-		/*
-		 * The property was set so see if it makes sense.
-		 */
-		if (dir != null) {
-			if (createDirectory(dir))
-				return dir;
-			SLLogger.getLogger().warning(I18N.err(31, dir));
-		}
-		dir = System.getProperty("user.home") + File.separator
-				+ ".flashlight-data";
-		if (createDirectory(dir))
-			return dir;
-		SLLogger.getLogger().severe(I18N.err(32, dir));
-		return System.getProperty("java.io.tmpdir");
 	}
 }
