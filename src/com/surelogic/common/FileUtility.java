@@ -18,6 +18,7 @@ import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.jobs.AbstractSLJob;
 import com.surelogic.common.jobs.SLJob;
 import com.surelogic.common.jobs.SLProgressMonitor;
+import com.surelogic.common.jobs.SLSeverity;
 import com.surelogic.common.jobs.SLStatus;
 import com.surelogic.common.logging.SLLogger;
 
@@ -362,10 +363,19 @@ public final class FileUtility {
 	 *            the old data directory, {@link false} otherwise. The contents
 	 *            will only be deleted if there is some existing data to move or
 	 *            if <tt>destination</tt> is not a directory.
+	 * @param optionalStartUp
+	 *            a job run before the data directory is moved, {@code null}
+	 *            indicates no job is needed. This job is typically used to
+	 *            release resources in the data directory.
+	 * @param optionalFinishUp
+	 *            a job run after the data directory is moved, {@code null}
+	 *            indicates no job is needed. This job is typically used to
+	 *            re-attach to resources in the data directory.
 	 * @return an {@link SLJob} to move the data directory.
 	 */
 	public static SLJob moveDataDirectory(final File anchor,
-			final File destination, final boolean moveOldToNew) {
+			final File destination, final boolean moveOldToNew,
+			final SLJob optionalStartUp, final SLJob optionalFinishUp) {
 		final File existing = getDataDirectory(anchor);
 		final SLJob job = new AbstractSLJob(I18N.msg(
 				"common.jobs.name.moveDataDirectory", existing
@@ -375,6 +385,20 @@ public final class FileUtility {
 				monitor.begin();
 				boolean success;
 				try {
+					/*
+					 * Optionally run a start-up job to setup for this move.
+					 * Resources in the data directory might need to be
+					 * released.
+					 */
+					if (optionalStartUp != null) {
+						final SLStatus startResult = AbstractSLJob.invoke(
+								optionalStartUp, monitor, 1);
+						if (startResult.getSeverity() != SLSeverity.OK)
+							return startResult;
+						if (monitor.isCanceled())
+							return SLStatus.CANCEL_STATUS;
+					}
+
 					if (destination.exists()
 							&& (moveOldToNew && existing.exists() || !destination
 									.isDirectory())) {
@@ -438,6 +462,18 @@ public final class FileUtility {
 						FileUtility.putFileContents(anchor, destination
 								.getAbsolutePath());
 					}
+
+					/*
+					 * Optionally run a finish-up job to setup for this move.
+					 * Resources in the data directory might need to be attached
+					 * to.
+					 */
+					if (optionalFinishUp != null) {
+						final SLStatus startResult = AbstractSLJob.invoke(
+								optionalFinishUp, monitor, 1);
+						if (startResult.getSeverity() != SLSeverity.OK)
+							return startResult;
+					}
 				} finally {
 					monitor.done();
 				}
@@ -445,5 +481,20 @@ public final class FileUtility {
 			}
 		};
 		return job;
+	}
+
+	/**
+	 * Convenience method to move a data directory when no start or finish jobs
+	 * are needed. This method has the same effect as calling:
+	 * 
+	 * <pre>
+	 * moveDataDirectory(anchor, destination, moveOldToNew, null, null)
+	 * </pre>
+	 * 
+	 * @see #moveDataDirectory(File, File, boolean, SLJob, SLJob)
+	 */
+	public static SLJob moveDataDirectory(final File anchor,
+			final File destination, final boolean moveOldToNew) {
+		return moveDataDirectory(anchor, destination, moveOldToNew, null, null);
 	}
 }
