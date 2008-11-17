@@ -42,8 +42,9 @@ public final class FileUtility {
 	 * 
 	 */
 	public static boolean createDirectory(final String path) {
-		if (path == null)
+		if (path == null) {
 			throw new IllegalArgumentException(I18N.err(44, "path"));
+		}
 		final File p = new File(path);
 		return createDirectory(p);
 	}
@@ -59,12 +60,13 @@ public final class FileUtility {
 	 * 
 	 */
 	public static boolean createDirectory(final File path) {
-		if (path == null)
+		if (path == null) {
 			throw new IllegalArgumentException(I18N.err(44, "path"));
+		}
 		if (path.exists()) {
 			return true;
 		} else {
-			boolean success = path.mkdirs();
+			final boolean success = path.mkdirs();
 			if (!success) {
 				SLLogger.getLogger().warning(
 						I18N.err(30, path.getAbsolutePath()));
@@ -87,7 +89,7 @@ public final class FileUtility {
 	public static boolean recursiveDelete(final File path) {
 		boolean success;
 		if (path.isDirectory()) {
-			for (File file : path.listFiles()) {
+			for (final File file : path.listFiles()) {
 				success = recursiveDelete(file);
 				if (!success) {
 					SLLogger.getLogger().warning(
@@ -112,7 +114,7 @@ public final class FileUtility {
 	 * @return {@code true} if and only if the copy is successful, {@code false}
 	 *         otherwise.
 	 */
-	public static boolean copy(URL source, File to) {
+	public static boolean copy(final URL source, final File to) {
 		boolean success = true;
 		try {
 			InputStream is = null;
@@ -128,12 +130,14 @@ public final class FileUtility {
 					os.write(buf, 0, num);
 				}
 			} finally {
-				if (is != null)
+				if (is != null) {
 					is.close();
-				if (os != null)
+				}
+				if (os != null) {
 					os.close();
+				}
 			}
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			SLLogger.getLogger().log(Level.SEVERE,
 					I18N.err(112, source.toString(), to.getAbsolutePath()), e);
 			success = false;
@@ -151,11 +155,11 @@ public final class FileUtility {
 	 * @return {@code true} if and only if the copy is successful, {@code false}
 	 *         otherwise.
 	 */
-	public static boolean copy(File from, File to) {
+	public static boolean copy(final File from, final File to) {
 		try {
 			final URL source = from.toURI().toURL();
 			return copy(source, to);
-		} catch (MalformedURLException e) {
+		} catch (final MalformedURLException e) {
 			SLLogger.getLogger().log(Level.SEVERE,
 					I18N.err(113, from.getAbsolutePath()), e);
 		}
@@ -175,12 +179,14 @@ public final class FileUtility {
 		final String lf = System.getProperty("line.separator");
 		final StringBuilder b = new StringBuilder();
 		try {
-			BufferedReader r = new BufferedReader(new FileReader(textFile));
+			final BufferedReader r = new BufferedReader(
+					new FileReader(textFile));
 			boolean first = true;
 			while (true) {
-				String s = r.readLine();
-				if (s == null)
+				final String s = r.readLine();
+				if (s == null) {
 					break;
+				}
 				if (first) {
 					first = false;
 				} else {
@@ -189,7 +195,7 @@ public final class FileUtility {
 				b.append(s);
 			}
 			r.close();
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			final String msg = I18N.err(117, textFile.getAbsolutePath());
 			SLLogger.getLogger().log(Level.SEVERE, msg, e);
 			throw new IllegalStateException(msg, e);
@@ -210,10 +216,11 @@ public final class FileUtility {
 	 */
 	public static void putFileContents(final File textFile, final String text) {
 		try {
-			BufferedWriter r = new BufferedWriter(new FileWriter(textFile));
+			final BufferedWriter r = new BufferedWriter(
+					new FileWriter(textFile));
 			r.write(text);
 			r.close();
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			final String msg = I18N.err(31, textFile.getAbsolutePath());
 			SLLogger.getLogger().log(Level.SEVERE, msg, e);
 			throw new IllegalStateException(msg, e);
@@ -305,8 +312,9 @@ public final class FileUtility {
 	 *             if <tt>anchor</tt> is {@code null}.
 	 */
 	public static File getDataDirectory(final File anchor) {
-		if (anchor == null)
+		if (anchor == null) {
 			throw new IllegalArgumentException(I18N.err(44, "anchor"));
+		}
 		final File tmp = new File(System.getProperty("java.io.tmpdir"));
 		if (anchor.exists()) {
 			if (anchor.isFile()) {
@@ -381,7 +389,7 @@ public final class FileUtility {
 				"common.jobs.name.moveDataDirectory", existing
 						.getAbsolutePath(), destination.getAbsolutePath())) {
 
-			public SLStatus run(SLProgressMonitor monitor) {
+			public SLStatus run(final SLProgressMonitor monitor) {
 				monitor.begin();
 				boolean success;
 				try {
@@ -393,10 +401,12 @@ public final class FileUtility {
 					if (optionalStartUp != null) {
 						final SLStatus startResult = AbstractSLJob.invoke(
 								optionalStartUp, monitor, 1);
-						if (startResult.getSeverity() != SLSeverity.OK)
+						if (startResult.getSeverity() != SLSeverity.OK) {
 							return startResult;
-						if (monitor.isCanceled())
+						}
+						if (monitor.isCanceled()) {
 							return SLStatus.CANCEL_STATUS;
+						}
 					}
 
 					if (destination.exists()
@@ -458,7 +468,8 @@ public final class FileUtility {
 					 * Point the anchor to the destination data directory unless
 					 * the anchor is the destination data directory.
 					 */
-					if (!anchor.equals(destination)) {
+					if (!anchor.getAbsolutePath().equals(
+							destination.getAbsolutePath())) {
 						FileUtility.putFileContents(anchor, destination
 								.getAbsolutePath());
 					}
@@ -471,8 +482,9 @@ public final class FileUtility {
 					if (optionalFinishUp != null) {
 						final SLStatus startResult = AbstractSLJob.invoke(
 								optionalFinishUp, monitor, 1);
-						if (startResult.getSeverity() != SLSeverity.OK)
+						if (startResult.getSeverity() != SLSeverity.OK) {
 							return startResult;
+						}
 					}
 				} finally {
 					monitor.done();
