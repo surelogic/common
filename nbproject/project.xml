@@ -19,7 +19,6 @@
                 <package>com.surelogic.common.jobs.remote</package>
                 <package>com.surelogic.common.license</package>
                 <package>com.surelogic.common.logging</package>
-                <package>com.surelogic.common.registration</package>
                 <package>com.surelogic.common.serviceability</package>
                 <package>com.surelogic.common.update</package>
                 <package>com.surelogic.common.xml</package>
