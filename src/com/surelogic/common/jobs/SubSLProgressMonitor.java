@@ -66,6 +66,7 @@ public final class SubSLProgressMonitor implements SLProgressMonitor {
 
 	private int f_workedGoal;
 	private int f_worked;
+	private float f_scaleFactor;
 
 	private boolean f_done = false;
 
@@ -87,6 +88,7 @@ public final class SubSLProgressMonitor implements SLProgressMonitor {
 			throw new IllegalStateException(I18N.err(115, "totalWork"));
 		f_workedGoal = totalWork;
 		f_worked = 0;
+		f_scaleFactor = (float) f_parentWorkedGoal / (float) f_workedGoal;
 	}
 
 	public void done() {
@@ -124,8 +126,7 @@ public final class SubSLProgressMonitor implements SLProgressMonitor {
 		if (f_worked < f_workedGoal) {
 			f_worked = Math.min(f_worked + work, f_workedGoal);
 
-			int goal = Math.round((float) f_worked * (float) f_parentWorkedGoal
-					/ (float) f_workedGoal);
+			int goal = Math.round(f_worked * f_scaleFactor);
 			if (f_parentWorked < goal) {
 				int ticks = Math.min(goal - f_parentWorked, f_parentWorkedGoal
 						- f_parentWorked);
