@@ -110,7 +110,7 @@ public final class SLLicenseUtility {
 				if (issuedTo == null)
 					throw new IllegalStateException(I18N.err(44,
 							"issued to name (in license)"));
-
+				final Date expireDate = lc.getNotAfter();
 				/*
 				 * Check if this license is on the blacklist.
 				 */
@@ -136,7 +136,7 @@ public final class SLLicenseUtility {
 				 * installed.
 				 */
 				final String msg = ServiceUtility.composeAInstallationNotice(
-						true, subject, issuedTo, licenseId);
+						true, subject, issuedTo, licenseId, expireDate);
 				final SLJob job = ServiceUtility.sendToSureLogic(msg);
 				job.run(new NullSLProgressMonitor());
 			}
@@ -188,12 +188,14 @@ public final class SLLicenseUtility {
 				if (issuedTo == null)
 					throw new IllegalStateException(I18N.err(44,
 							"issued to name (in license)"));
+				Date expireDate = lc.getNotAfter();
+				
 				/*
 				 * Send notification to SureLogic that this license was
 				 * installed.
 				 */
 				final String msg = ServiceUtility.composeAInstallationNotice(
-						false, subject, issuedTo, licenseId);
+						false, subject, issuedTo, licenseId, expireDate);
 				final SLJob job = ServiceUtility.sendToSureLogic(msg);
 				job.run(new NullSLProgressMonitor());
 			}

@@ -210,7 +210,7 @@ public final class ServiceUtility {
 	 *         to send to SureLogic.
 	 */
 	public static String composeAInstallationNotice(final boolean install,
-			final String tool, final String issuedTo, final UUID licenseId) {
+			final String tool, final String issuedTo, final UUID licenseId, final Date expiration) {
 		final StringBuilder b = new StringBuilder();
 		final String lf = System.getProperty("line.separator");
 
@@ -237,6 +237,9 @@ public final class ServiceUtility {
 		b.append(licenseId);
 		b.append(lf);
 
+		b.append("Expires: ");
+		b.append(SLUtility.toStringDay(expiration));
+		b.append(lf);
 		return b.toString();
 	}
 
