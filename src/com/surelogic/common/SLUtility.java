@@ -1,6 +1,7 @@
 package com.surelogic.common;
 
 import java.sql.Timestamp;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Formatter;
@@ -23,8 +24,8 @@ public final class SLUtility {
 	 *         {@link Integer#MAX_VALUE} if the long is too bit to fit into an
 	 *         {@code int}.
 	 */
-	public static int safeLongToInt(long value) {
-		long result = Math.min(value, Integer.MAX_VALUE);
+	public static int safeLongToInt(final long value) {
+		final long result = Math.min(value, Integer.MAX_VALUE);
 		return (int) result;
 	}
 
@@ -35,8 +36,13 @@ public final class SLUtility {
 		}
 	};
 
-	public static synchronized String toStringDay(final Date date) {
+	public static String toStringDay(final Date date) {
 		return tl_day_format.get().format(date);
+	}
+
+	public static Date fromStringDay(final String dateStr)
+			throws ParseException {
+		return tl_day_format.get().parse(dateStr);
 	}
 
 	private final static ThreadLocal<SimpleDateFormat> tl_hms_format = new ThreadLocal<SimpleDateFormat>() {
@@ -46,37 +52,43 @@ public final class SLUtility {
 		}
 	};
 
-	public static synchronized String toStringHMS(final Date date) {
+	public static String toStringHMS(final Date date) {
 		return tl_hms_format.get().format(date);
+	}
+
+	public static Date fromStringHMS(final String dateStr)
+			throws ParseException {
+		return tl_hms_format.get().parse(dateStr);
 	}
 
 	public static Timestamp getWall(final Timestamp start, final long startNS,
 			final long timeNS) {
 		long tMS = start.getTime();
 		final long deltaNS = timeNS - startNS;
-		if (deltaNS < 0)
+		if (deltaNS < 0) {
 			throw new IllegalStateException("timeNS=" + timeNS
 					+ " cannot be less than startedNS=" + startNS);
+		}
 		final long deltaMS = deltaNS / 1000000;
 		tMS = tMS + deltaMS;
 		long tDecNS = (tMS % 1000) * 1000000;
 		tDecNS = tDecNS + (deltaNS % 1000000);
-		Timestamp result = new Timestamp(tMS);
+		final Timestamp result = new Timestamp(tMS);
 		result.setNanos((int) tDecNS);
 		return result;
 	}
 
-	public static String toCommaSepString(int i) {
+	public static String toCommaSepString(final int i) {
 		return toCommaSepString((long) i);
 	}
 
-	public static String toCommaSepString(long i) {
-		Formatter f = new Formatter();
+	public static String toCommaSepString(final long i) {
+		final Formatter f = new Formatter();
 		f.format("%,d", i);
 		return f.toString();
 	}
 
-	public static long byteToMByte(long value) {
+	public static long byteToMByte(final long value) {
 		return value / 1024L / 1024L;
 	}
 
