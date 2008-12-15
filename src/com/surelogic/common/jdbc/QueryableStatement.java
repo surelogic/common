@@ -32,12 +32,6 @@ final class QueryableStatement<T> implements Queryable<T> {
 
 	public T call(final Object... args) {
 		try {
-			final Object[] in = args;
-			for (int i = 0; i < in.length; i++) {
-				if (in[i] instanceof String) {
-					in[i] = JDBCUtils.escapeString((String) in[i]);
-				}
-			}
 			st.execute(String.format(query, args));
 			final ResultSetResult rs = new ResultSetResult(st.getResultSet());
 			try {
