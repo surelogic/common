@@ -23,6 +23,8 @@ public final class ServiceUtility {
 	/**
 	 * Composes a tip in a format to send to SureLogic.
 	 * 
+	 * @param tool
+	 *            the SureLogic tool that this tip is about.
 	 * @param email
 	 *            email address of the tip author, may be {@code null}.
 	 * @param name
@@ -40,16 +42,22 @@ public final class ServiceUtility {
 	 *            should be included in the generated tip, {@code false} if not.
 	 * @return a tip in a format to send to SureLogic.
 	 */
-	public static String composeATip(final String email, final String name,
-			final String tip, final boolean includeVersionInfo,
-			final String ideVersion, final boolean includeUsage) {
+	public static String composeATip(final String tool, final String email,
+			final String name, final String tip,
+			final boolean includeVersionInfo, final String ideVersion,
+			final boolean includeUsage) {
 		final StringBuilder b = new StringBuilder();
 		final String lf = System.getProperty("line.separator");
 
 		b.append("   Date: ");
 		b.append(SLUtility.toStringHMS(new Date()));
 		b.append(lf);
-		b.append("Subject: Tip for Improvement");
+		b.append("Subject: ");
+		if (!"".equals(tool)) {
+			b.append(tool);
+			b.append(" ");
+		}
+		b.append("Tip for Improvement");
 		b.append(lf);
 		b.append("     To: SureLogic, Inc.");
 		b.append(lf);
@@ -100,6 +108,8 @@ public final class ServiceUtility {
 	/**
 	 * Composes a problem report in a format to send to SureLogic.
 	 * 
+	 * @param tool
+	 *            the SureLogic tool that this problem report is about.
 	 * @param email
 	 *            email address of the tip author, may be {@code null}.
 	 * @param name
@@ -126,8 +136,8 @@ public final class ServiceUtility {
 	 *            {@link I18N#msg(String)}.
 	 * @return a problem report in a format to send to SureLogic.
 	 */
-	public static String composeAProblemReport(final String email,
-			final String name, final String report,
+	public static String composeAProblemReport(final String tool,
+			final String email, final String name, final String report,
 			final boolean includeVersionInfo, final String ideVersion,
 			final boolean includeUsage, final File ideLogFile,
 			final String ideLogFileI18nKey) {
@@ -137,7 +147,12 @@ public final class ServiceUtility {
 		b.append("   Date: ");
 		b.append(SLUtility.toStringHMS(new Date()));
 		b.append(lf);
-		b.append("Subject: Problem Report");
+		b.append("Subject: ");
+		if (!"".equals(tool)) {
+			b.append(tool);
+			b.append(" ");
+		}
+		b.append("Problem Report");
 		b.append(lf);
 		b.append("     To: SureLogic, Inc.");
 		b.append(lf);
@@ -210,7 +225,8 @@ public final class ServiceUtility {
 	 *         to send to SureLogic.
 	 */
 	public static String composeAInstallationNotice(final boolean install,
-			final String tool, final String issuedTo, final UUID licenseId, final Date expiration) {
+			final String tool, final String issuedTo, final UUID licenseId,
+			final Date expiration) {
 		final StringBuilder b = new StringBuilder();
 		final String lf = System.getProperty("line.separator");
 
