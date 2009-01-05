@@ -115,6 +115,7 @@ public final class CommonImages {
 	public static final String IMG_SIERRA_SCAN = "sierra_scan.gif";
 	public static final String IMG_SIERRA_SERVER_LOCAL = "sierra_server_local.gif";
 	public static final String IMG_SIERRA_SERVER = "sierra_server.gif";
+	public static final String IMG_SIERRA_SERVER_GRAY = "sierra_server_gray.gif";
 	public static final String IMG_SIERRA_STAMP_SMALL = "sierra_stamp_small.gif";
 	public static final String IMG_SIERRA_STAMP = "sierra_stamp.png";
 	public static final String IMG_SIERRA_SYNC = "sierra_sync.gif";
