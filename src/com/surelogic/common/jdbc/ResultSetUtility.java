@@ -8,7 +8,23 @@ import java.util.ArrayList;
 import com.surelogic.common.i18n.I18N;
 
 public final class ResultSetUtility {
-
+	public static final class Result {
+		public final String[] columnLabels;
+		public final String[][] rows;
+		public final int rowsSkipped;
+		
+		Result(int numSkipped, String[] labels, String[][] rows) {
+			rowsSkipped = numSkipped;
+			columnLabels = labels;
+			this.rows = rows;
+		}
+	}
+	
+	public static Result getResult(final ResultSet rs, final int maxRows) throws SQLException {
+		String[] labels = getColumnLabels(rs);
+		return getRows(rs, maxRows, labels);
+	}
+	
 	/**
 	 * Obtains the column labels from a result set.
 	 * <p>
@@ -23,7 +39,7 @@ public final class ResultSetUtility {
 	 * @throws IllegalArgumentException
 	 *             if the result set is null.
 	 */
-	public static String[] getColumnLabels(final ResultSet rs)
+	private static String[] getColumnLabels(final ResultSet rs)
 			throws SQLException {
 		if (rs == null)
 			throw new IllegalArgumentException(I18N.err(44, "rs"));
@@ -57,28 +73,35 @@ public final class ResultSetUtility {
 	 * @throws IllegalArgumentException
 	 *             if the result set is null.
 	 */
-	public static String[][] getRows(final ResultSet rs, final int maxRows)
+	public static Result getRows(final ResultSet rs, final int maxRows, final String[] labels)
 			throws SQLException {
 		if (rs == null)
 			throw new IllegalArgumentException(I18N.err(44, "rs"));
 
 		final boolean rowLimit = maxRows > 0;
 
-		final ResultSetMetaData meta = rs.getMetaData();
+		final ResultSetMetaData meta = rs.getMetaData();		
 		final int columnCount = meta.getColumnCount();
-		ArrayList<String[]> rowList = new ArrayList<String[]>();
+		ArrayList<String[]> rowList = new ArrayList<String[]>();		
+		boolean limited = false;
+		int numSkipped = 0;
 		while (rs.next()) {
-			final String[] rowContent = new String[columnCount];
-			for (int i = 1; i <= columnCount; i++) {
-				rowContent[i - 1] = rs.getString(i);
+			if (!limited) {
+				final String[] rowContent = new String[columnCount];
+				for (int i = 1; i <= columnCount; i++) {
+					rowContent[i - 1] = rs.getString(i);
+				}
+				rowList.add(rowContent);
+				
+				if (rowLimit)
+					if (rowList.size() >= maxRows) {
+						limited = true;						
+					}
+			} else {
+				numSkipped++;
 			}
-			rowList.add(rowContent);
-
-			if (rowLimit)
-				if (rowList.size() >= maxRows)
-					break;
 		}
-		return rowList.toArray(new String[rowList.size()][]);
+		return new Result(numSkipped, labels, rowList.toArray(new String[rowList.size()][]));
 	}
 
 	private ResultSetUtility() {
