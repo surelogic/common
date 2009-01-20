@@ -68,6 +68,12 @@ public final class FileUtility {
 		} else {
 			final boolean success = path.mkdirs();
 			if (!success) {
+				/*
+				 * Check if the reason we could not create the directory is
+				 * because it already exists.
+				 */
+				if (path.isDirectory())
+					return true;
 				SLLogger.getLogger().warning(
 						I18N.err(30, path.getAbsolutePath()));
 			}
