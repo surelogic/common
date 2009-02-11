@@ -40,6 +40,6 @@ Export-Package: com.surelogic.common,
  org.apache.commons.lang.mutable,
  org.apache.commons.lang.text,
  org.apache.commons.lang.time
-Bundle-ClassPath: lib/runtime/commons-lang-2.3.jar,
- lib/runtime/antlr-runtime-3.1-sl.jar,
- .
+Bundle-ClassPath: lib/runtime/antlr-runtime-3.1-sl.jar,
+ .,
+ lib/runtime/commons-lang-2.4.jar
