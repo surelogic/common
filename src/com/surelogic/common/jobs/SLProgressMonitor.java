@@ -3,7 +3,7 @@ package com.surelogic.common.jobs;
 /**
  * An IDE independent interface for job progress monitoring. Similar to the
  * Eclipse {@code IProgressMonitor} interface.
- * 
+ * <p>
  * The {@link SLProgressMonitor} interface is implemented by objects that
  * monitor the progress of an activity; the methods in this interface are
  * invoked by code that performs the activity.
@@ -24,16 +24,19 @@ package com.surelogic.common.jobs;
  * <pre>
  *   final SLProgressMonitor monitor = ...;
  *   monitor.begin();
- *   monitor.worked(3);
- *   monitor.subTask(&quot;Sub task&quot;);
- *   monitor.worked(5);
- *   monitor.subTask(&quot;Sub sub task&quot;);
- *   monitor.worked(5);
- *   monitor.subTaskDone();
- *   monitor.worked(3);
- *   monitor.subTaskDone();
- *   monitor.worked(2);
- *   monitor.done();
+ *   try {
+ *     monitor.worked(3);
+ *     monitor.subTask(&quot;Sub task&quot;);
+ *     monitor.worked(5);
+ *     monitor.subTask(&quot;Sub sub task&quot;);
+ *     monitor.worked(5);
+ *     monitor.subTaskDone();
+ *     monitor.worked(3);
+ *     monitor.subTaskDone();
+ *     monitor.worked(2);
+ *   } finally {
+ *     monitor.done();
+ *   }
  * </pre>
  * 
  * creates a new progress monitor, and begins the reporting. It reports 3 units
