@@ -1,4 +1,4 @@
-package com.surelogic.common.images;
+package com.surelogic.common;
 
 import java.awt.Image;
 import java.awt.Toolkit;
@@ -8,6 +8,7 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
 public final class CommonImages {
+
 	public static final String PATH = "/com/surelogic/common/images/";
 
 	/*
