@@ -4,7 +4,7 @@ package com.surelogic.common.jobs;
  * A progress monitor that tracks if the job was canceled but does not log
  * progress information.
  */
-public final class NullSLProgressMonitor extends CancellableSLProgressMonitor {
+public class NullSLProgressMonitor extends CancellableSLProgressMonitor {
 
 	/**
 	 * A single factory instance for {@link NullSLProgressMonitor} instances.
