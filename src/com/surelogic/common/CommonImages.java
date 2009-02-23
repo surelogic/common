@@ -30,6 +30,7 @@ public final class CommonImages {
 	public static final String IMG_CHOICE = "choice.gif";
 	public static final String IMG_CLASS = "class.gif";
 	public static final String IMG_COLUMNS = "columns.gif";
+	public static final String IMG_COLLAPSE_ALL = "collapse_all.gif";
 	public static final String IMG_COMMENT = "comment.gif";
 	public static final String IMG_CONSISTENT_DECR = "consistent_decr.gif";
 	public static final String IMG_CONSOLE = "console.gif";
