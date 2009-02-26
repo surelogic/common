@@ -233,6 +233,7 @@ public class HashGenerator {
 				sb.append(cbuf, 0, num);				
 				numLeft -= num;
 			};			
+			fr.close();
 			
 			int line = 0;
 			BufferedReader in = new BufferedReader(new StringReader(sb.toString()));			
