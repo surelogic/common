@@ -239,6 +239,7 @@ public class HashGenerator {
 			while (in.readLine() != null) {
 				line++;
 			}			
+			in.close();
 			lastOffsetFile = fileName;
 			lastOffset     = offset;
 			lastOffsetLine = line;
