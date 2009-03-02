@@ -60,7 +60,7 @@ function outlineInitItem(item)
 		}
 	}
 	if (hasKids) {
-		item.style.cursor = "pointer";
+	    // item.style.cursor = "pointer";
 		var len = outlineItems.length;
 		outlineItems[len] = item;
 		// We can't just modify item.innerHTML, because that would
