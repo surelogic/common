@@ -3,6 +3,7 @@ package com.surelogic.common;
 import java.io.*;
 
 public abstract class AbstractJavaFileZip extends AbstractJavaZip<File> {
+
 	@Override
 	protected InputStream getFileContents(File res) throws IOException {
 		return new FileInputStream(res);
