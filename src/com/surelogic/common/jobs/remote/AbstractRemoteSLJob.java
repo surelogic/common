@@ -74,7 +74,7 @@ public abstract class AbstractRemoteSLJob {
 			final SLStatus status = job.run(mon);
 			final long end = System.currentTimeMillis();
 			processStatus(mon, status);
-			checkInput(br, mon, "Done scanning: " + (end - start) + " ms");
+			checkInput(br, mon, "Scanning complete (" + (end - start) + " ms)");
 		} catch (final Throwable e) {
 			outputFailure(System.out, null, e);
 			System.exit(-RemoteSLJobConstants.ERROR_JOB_FAILED);
