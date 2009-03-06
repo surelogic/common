@@ -106,6 +106,7 @@ public final class FileUtility {
 		success = path.delete();
 		if (!success) {
 			SLLogger.getLogger().warning(I18N.err(11, path.getAbsolutePath()));
+			path.deleteOnExit();
 		}
 		return success;
 	}
