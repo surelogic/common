@@ -35,6 +35,7 @@ public final class CommonImages {
 	public static final String IMG_CONSISTENT_DECR = "consistent_decr.gif";
 	public static final String IMG_CONSOLE = "console.gif";
 	public static final String IMG_DOWN = "down.gif";
+	public static final String IMG_DRUM_EXPLORER = "drum_explorer.gif";
 	public static final String IMG_DRUM_GRAY = "drum_gray.gif";
 	public static final String IMG_DRUM_U = "drum_u.gif";
 	public static final String IMG_DRUM = "drum.gif";
