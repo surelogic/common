@@ -127,6 +127,7 @@ public abstract class AbstractJavaZip<T> {
 				}
 				pw.flush();
 				out.closeEntry();
+				is.close();
 			} catch (IOException e) {
 				LOG.severe("Error adding " + pathName + " to ZIP.");
 				e.printStackTrace();
