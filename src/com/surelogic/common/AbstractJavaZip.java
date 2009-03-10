@@ -53,7 +53,6 @@ public abstract class AbstractJavaZip<T> {
 
 	public void addAnnotatedResourcesToZip(ZipOutputStream out,
 			Map<String, Map<String, String>> fileMap, T resource) {
-
 		if (!isAccessible(resource))
 			return;
 		String pathName;
@@ -71,63 +70,59 @@ public abstract class AbstractJavaZip<T> {
 				return;
 			}
 			try {
-				InputStream is = getFileContents(resource);
-				LineNumberReader reader = new LineNumberReader(
-						new InputStreamReader(is));
-				// Can't use XMLWriter because tag attribute order is not fixed
-				PrintWriter pw = new PrintWriter(out);
+				final LineNumberReader reader = new LineNumberReader(
+						new InputStreamReader(getFileContents(resource)));
+				try {
+					/*
+					 * Can't use XMLWriter because tag attribute order is not
+					 * fixed.
+					 */
+					final PrintWriter pw = new PrintWriter(out);
 
-				out.putNextEntry(new ZipEntry(pathName));
-				String line;
-				String packageString = null, className = null;
-				while ((line = reader.readLine()) != null) {
-					if (packageString == null) {
-						String trimmed = line.trim();
-						if (trimmed.startsWith("package")) {
-							packageString = trimmed.substring(7,
-									trimmed.indexOf(';')).trim();
-							String packageKey = packageString;
-							className = getName(resource);
-							String classKey = className;
-							// remove ".java"
-							className = className.substring(0, className
-									.length() - 5);
-							Map<String, String> classNameToSource;
-							if (fileMap.containsKey(packageString)) {
-								classNameToSource = fileMap.get(packageKey);
-							} else {
-								classNameToSource = new TreeMap<String, String>();
-								fileMap.put(packageKey, classNameToSource);
-							}
-							// Changed to map non-main classes
-							final String srcPath = "/" + pathName;
-							final String zipPath = pathName;
-							classNameToSource.put(classKey, srcPath);
-							/*
-							 * FIX final ICompilationUnit icu =
-							 * JavaCore.createCompilationUnitFrom(file); if (icu
-							 * == null) { classNameToSource.put(classKey,
-							 * zipPath); } else { try { for(IType t :
-							 * icu.getAllTypes()) {
-							 * classNameToSource.put(t.getFullyQualifiedName
-							 * ('$'), zipPath); } } catch (JavaModelException e)
-							 * { e.printStackTrace(); } }
-							 */
-							String[] types = getIncludedTypes(resource);
-							if (types == null) {
-								classNameToSource.put(classKey, zipPath);
-							} else {
-								for (String t : types) {
-									classNameToSource.put(t, zipPath);
+					out.putNextEntry(new ZipEntry(pathName));
+					String line;
+					String packageString = null, className = null;
+					while ((line = reader.readLine()) != null) {
+						if (packageString == null) {
+							String trimmed = line.trim();
+							if (trimmed.startsWith("package")) {
+								packageString = trimmed.substring(7,
+										trimmed.indexOf(';')).trim();
+								String packageKey = packageString;
+								className = getName(resource);
+								String classKey = className;
+								// remove ".java"
+								className = className.substring(0, className
+										.length() - 5);
+								Map<String, String> classNameToSource;
+								if (fileMap.containsKey(packageString)) {
+									classNameToSource = fileMap.get(packageKey);
+								} else {
+									classNameToSource = new TreeMap<String, String>();
+									fileMap.put(packageKey, classNameToSource);
+								}
+								// Changed to map non-main classes
+								final String srcPath = "/" + pathName;
+								final String zipPath = pathName;
+								classNameToSource.put(classKey, srcPath);
+								String[] types = getIncludedTypes(resource);
+								if (types == null) {
+									classNameToSource.put(classKey, zipPath);
+								} else {
+									for (String t : types) {
+										classNameToSource.put(t, zipPath);
+									}
 								}
 							}
 						}
+						pw.println(line);
 					}
-					pw.println(line);
+					pw.flush();
+					out.closeEntry();
+				} finally {
+					if (reader != null)
+						reader.close();
 				}
-				pw.flush();
-				out.closeEntry();
-				is.close();
 			} catch (IOException e) {
 				LOG.severe("Error adding " + pathName + " to ZIP.");
 				e.printStackTrace();
@@ -211,7 +206,7 @@ public abstract class AbstractJavaZip<T> {
 			throw new IOException("Couldn't find " + PACKAGE_PREFIX);
 		}
 		start += PACKAGE_PREFIX.length();
-		//String temp = line.substring(start);
+		// String temp = line.substring(start);
 		int end = line.indexOf(PACKAGE_SUFFIX, start);
 		final String pkg = line.substring(start, end);
 
