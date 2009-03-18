@@ -19,9 +19,18 @@ public final class Entities {
   }
 
   public static void start(final String name, final StringBuilder b) {
-    b.append("<").append(name);
+    b.append('<').append(name);
   }
 
+  /**
+   * Helper to create <name\>enclosedText</name>
+   */
+  public static void createTag(String name, String enclosedText, StringBuilder b) {
+	b.append('<').append(name).append('>');
+	addEscaped(enclosedText, b);
+	b.append("</").append(name).append(">\n");
+  }
+  
   /**
    * Helper to avoid having to escape non-string values.
    */
