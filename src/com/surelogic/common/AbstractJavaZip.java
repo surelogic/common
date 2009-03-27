@@ -1,7 +1,16 @@
 package com.surelogic.common;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.LineNumberReader;
+import java.io.PrintWriter;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -15,14 +24,14 @@ public abstract class AbstractJavaZip<T> {
 	public static final String CLASS_MAPPING = "classMapping.txt";
 	public static final String SOURCE_FILES = "sourceFiles.xml";
 
-	public void generateSourceZipContents(ZipOutputStream out)
+	public void generateSourceZipContents(final ZipOutputStream out)
 			throws IOException {
 		generateSourceZipContents(out, getRoot());
 	}
 
-	public void generateSourceZipContents(ZipOutputStream out, T root)
-			throws IOException {
-		Map<String, Map<String, String>> fileMap = new TreeMap<String, Map<String, String>>();
+	public void generateSourceZipContents(final ZipOutputStream out,
+			final T root) throws IOException {
+		final Map<String, Map<String, String>> fileMap = new TreeMap<String, Map<String, String>>();
 		addAnnotatedResourcesToZip(out, fileMap, root);
 
 		out.putNextEntry(new ZipEntry(SOURCE_FILES));
@@ -51,20 +60,22 @@ public abstract class AbstractJavaZip<T> {
 
 	protected abstract String[] getIncludedTypes(T res);
 
-	public void addAnnotatedResourcesToZip(ZipOutputStream out,
-			Map<String, Map<String, String>> fileMap, T resource) {
-		if (!isAccessible(resource))
+	public void addAnnotatedResourcesToZip(final ZipOutputStream out,
+			final Map<String, Map<String, String>> fileMap, final T resource) {
+		if (!isAccessible(resource)) {
 			return;
+		}
 		String pathName;
 		try {
 			pathName = getFullPath(resource);
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			LOG.severe("Error adding " + getName(resource) + " to ZIP.");
 			e.printStackTrace();
 			return;
 		}
-		if (pathName.startsWith("/"))
+		if (pathName.startsWith("/")) {
 			pathName = pathName.substring(1);
+		}
 		if (isFile(resource)) {
 			if (!isJavaSourceFile(resource)) {
 				return;
@@ -83,47 +94,48 @@ public abstract class AbstractJavaZip<T> {
 					String line;
 					String packageString = null, className = null;
 					while ((line = reader.readLine()) != null) {
-						if (packageString == null) {
-							String trimmed = line.trim();
-							if (trimmed.startsWith("package")) {
-								packageString = trimmed.substring(7,
-										trimmed.indexOf(';')).trim();
-								String packageKey = packageString;
-								className = getName(resource);
-								String classKey = className;
-								// remove ".java"
-								className = className.substring(0, className
-										.length() - 5);
-								Map<String, String> classNameToSource;
-								if (fileMap.containsKey(packageString)) {
-									classNameToSource = fileMap.get(packageKey);
-								} else {
-									classNameToSource = new TreeMap<String, String>();
-									fileMap.put(packageKey, classNameToSource);
-								}
-								// Changed to map non-main classes
-								final String srcPath = "/" + pathName;
-								final String zipPath = pathName;
-								classNameToSource.put(classKey, srcPath);
-								String[] types = getIncludedTypes(resource);
-								if (types == null) {
-									classNameToSource.put(classKey, zipPath);
-								} else {
-									for (String t : types) {
-										classNameToSource.put(t, zipPath);
-									}
-								}
-							}
+						final String trimmed = line.trim();
+						if (trimmed.startsWith("package")) {
+							packageString = trimmed.substring(7,
+									trimmed.indexOf(';')).trim();
+							break;
 						}
 						pw.println(line);
 					}
 					pw.flush();
+					if (packageString == null) {
+						packageString = "(default)";
+					}
+					className = getName(resource);
+					final String classKey = className;
+					// remove ".java"
+					className = className.substring(0, className.length() - 5);
+					Map<String, String> classNameToSource;
+					if (fileMap.containsKey(packageString)) {
+						classNameToSource = fileMap.get(packageString);
+					} else {
+						classNameToSource = new TreeMap<String, String>();
+						fileMap.put(packageString, classNameToSource);
+					}
+					// Changed to map non-main classes
+					final String srcPath = "/" + pathName;
+					final String zipPath = pathName;
+					classNameToSource.put(classKey, srcPath);
+					final String[] types = getIncludedTypes(resource);
+					if (types == null) {
+						classNameToSource.put(classKey, zipPath);
+					} else {
+						for (final String t : types) {
+							classNameToSource.put(t, zipPath);
+						}
+					}
 					out.closeEntry();
 				} finally {
-					if (reader != null)
+					if (reader != null) {
 						reader.close();
+					}
 				}
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				LOG.severe("Error adding " + pathName + " to ZIP.");
 				e.printStackTrace();
 			}
@@ -131,20 +143,20 @@ public abstract class AbstractJavaZip<T> {
 			T[] members;
 			try {
 				members = getMembers(resource);
-			} catch (IOException e) {
+			} catch (final IOException e) {
 				LOG.severe("Error accessing child resources");
 				e.printStackTrace();
 				return;
 			}
-			for (int i = 0; i < members.length; i++) {
-				addAnnotatedResourcesToZip(out, fileMap, members[i]);
+			for (final T member : members) {
+				addAnnotatedResourcesToZip(out, fileMap, member);
 			}
 		}
 	}
 
 	// keywords, Strings, comments
 	@SuppressWarnings("unused")
-	private String syntaxHighlight(String escape) {
+	private String syntaxHighlight(final String escape) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -165,20 +177,20 @@ public abstract class AbstractJavaZip<T> {
 	public static final String CLASS_FORMAT = "\t\t<" + CLASS_NAME_PREFIX
 			+ "%s" + CLASS_NAME_SUFFIX + "%s" + CLASS_SRC_SUFFIX + "\n";
 
-	private void generateFileList(PrintWriter pw,
-			Map<String, Map<String, String>> fileMap) {
+	private void generateFileList(final PrintWriter pw,
+			final Map<String, Map<String, String>> fileMap) {
 		pw.println(XMLUtil.openNode(SRCFILES_TAG));
-		Iterator<Map.Entry<String, Map<String, String>>> packageIter = fileMap
+		final Iterator<Map.Entry<String, Map<String, String>>> packageIter = fileMap
 				.entrySet().iterator();
 		while (packageIter.hasNext()) {
-			Map.Entry<String, Map<String, String>> packageEntry = packageIter
+			final Map.Entry<String, Map<String, String>> packageEntry = packageIter
 					.next();
 			pw.format(PACKAGE_FORMAT, packageEntry.getKey());
-			Map<String, String> classMap = packageEntry.getValue();
-			Iterator<Map.Entry<String, String>> classIter = classMap.entrySet()
-					.iterator();
+			final Map<String, String> classMap = packageEntry.getValue();
+			final Iterator<Map.Entry<String, String>> classIter = classMap
+					.entrySet().iterator();
 			while (classIter.hasNext()) {
-				Map.Entry<String, String> classEntry = classIter.next();
+				final Map.Entry<String, String> classEntry = classIter.next();
 				if (classEntry.getKey().endsWith(".java")) {
 					pw.format(CLASS_FORMAT, classEntry.getKey(), classEntry
 							.getValue());
@@ -190,16 +202,16 @@ public abstract class AbstractJavaZip<T> {
 		pw.flush();
 	}
 
-	private static void matchInLine(BufferedReader br, String tag)
+	private static void matchInLine(final BufferedReader br, final String tag)
 			throws IOException {
-		String line = br.readLine();
+		final String line = br.readLine();
 		if (line == null || !line.contains(tag)) {
 			throw new IOException("Couldn't find " + tag);
 		}
 	}
 
-	private static void readPackage(BufferedReader br,
-			Map<String, Map<String, String>> fileMap, String line)
+	private static void readPackage(final BufferedReader br,
+			final Map<String, Map<String, String>> fileMap, String line)
 			throws IOException {
 		int start = line.indexOf(PACKAGE_PREFIX);
 		if (start < 0) {
@@ -211,7 +223,7 @@ public abstract class AbstractJavaZip<T> {
 		final String pkg = line.substring(start, end);
 
 		// Read classes
-		Map<String, String> map = new HashMap<String, String>();
+		final Map<String, String> map = new HashMap<String, String>();
 		while ((line = br.readLine()) != null) {
 			if (line.contains(PACKAGE_TAG)) {
 				break; // Done with the package
@@ -232,8 +244,8 @@ public abstract class AbstractJavaZip<T> {
 	}
 
 	private static Map<String, Map<String, String>> readFileList(
-			BufferedReader br) throws IOException {
-		Map<String, Map<String, String>> fileMap = new HashMap<String, Map<String, String>>();
+			final BufferedReader br) throws IOException {
+		final Map<String, Map<String, String>> fileMap = new HashMap<String, Map<String, String>>();
 		matchInLine(br, SRCFILES_TAG);
 		String line;
 		while ((line = br.readLine()) != null) {
@@ -246,17 +258,18 @@ public abstract class AbstractJavaZip<T> {
 	}
 
 	public static Map<String, Map<String, String>> readSourceFileMappings(
-			ZipFile zf) throws IOException {
-		ZipEntry ze = zf.getEntry(SOURCE_FILES);
-		InputStream in = zf.getInputStream(ze);
-		BufferedReader br = new BufferedReader(new InputStreamReader(in));
+			final ZipFile zf) throws IOException {
+		final ZipEntry ze = zf.getEntry(SOURCE_FILES);
+		final InputStream in = zf.getInputStream(ze);
+		final BufferedReader br = new BufferedReader(new InputStreamReader(in));
 		return readFileList(br);
 	}
 
-	private void generateClassMappings(PrintWriter pw,
-			Map<String, Map<String, String>> fileMap) {
-		for (Map.Entry<String, Map<String, String>> e : fileMap.entrySet()) {
-			for (Map.Entry<String, String> e2 : e.getValue().entrySet()) {
+	private void generateClassMappings(final PrintWriter pw,
+			final Map<String, Map<String, String>> fileMap) {
+		for (final Map.Entry<String, Map<String, String>> e : fileMap
+				.entrySet()) {
+			for (final Map.Entry<String, String> e2 : e.getValue().entrySet()) {
 				if (!e2.getKey().endsWith(".java")) {
 					pw.println(e2.getKey() + "=" + e2.getValue());
 				}
@@ -265,9 +278,9 @@ public abstract class AbstractJavaZip<T> {
 		pw.flush();
 	}
 
-	private static Map<String, String> readClassMappings(BufferedReader br)
+	private static Map<String, String> readClassMappings(final BufferedReader br)
 			throws IOException {
-		Map<String, String> map = new HashMap<String, String>();
+		final Map<String, String> map = new HashMap<String, String>();
 		String line;
 		while ((line = br.readLine()) != null) {
 			final int separator = line.indexOf('=');
@@ -278,14 +291,14 @@ public abstract class AbstractJavaZip<T> {
 		return map;
 	}
 
-	public static Map<String, String> readClassMappings(ZipFile zf)
+	public static Map<String, String> readClassMappings(final ZipFile zf)
 			throws IOException {
-		ZipEntry ze = zf.getEntry(CLASS_MAPPING);
+		final ZipEntry ze = zf.getEntry(CLASS_MAPPING);
 		if (ze == null) {
 			return Collections.emptyMap();
 		}
-		InputStream in = zf.getInputStream(ze);
-		BufferedReader br = new BufferedReader(new InputStreamReader(in));
+		final InputStream in = zf.getInputStream(ze);
+		final BufferedReader br = new BufferedReader(new InputStreamReader(in));
 		return readClassMappings(br);
 	}
 
