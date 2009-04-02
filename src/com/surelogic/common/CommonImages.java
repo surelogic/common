@@ -78,6 +78,7 @@ public final class CommonImages {
 	public static final String IMG_JSURE_NO_VERIFY = "jsure_no_verify.gif";
 	public static final String IMG_JSURE_VERIFY_GRAY = "jsure_verify_gray.gif";
 	public static final String IMG_JSURE_VERIFY = "jsure_verify.gif";
+	public static final String IMG_LEFT = "left.gif";
 	public static final String IMG_LEFT_ARROW_SMALL = "left_arrow_small.gif";
 	public static final String IMG_LICENSE = "license.gif";
 	public static final String IMG_LINK = "link.gif";
@@ -99,6 +100,7 @@ public final class CommonImages {
 	public static final String IMG_RED_X = "red_x.gif";
 	public static final String IMG_REDDOT_DECR = "reddot_decr.gif";
 	public static final String IMG_REFRESH = "refresh.gif";
+	public static final String IMG_RIGHT = "right.gif";
 	public static final String IMG_RIGHT_ARROW_SMALL = "right_arrow_small.gif";
 	public static final String IMG_RUN_DRUM = "run_drum.gif";
 	public static final String IMG_RUN = "run.gif";
