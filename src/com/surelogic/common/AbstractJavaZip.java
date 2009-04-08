@@ -95,10 +95,9 @@ public abstract class AbstractJavaZip<T> {
 					String packageString = null, className = null;
 					while ((line = reader.readLine()) != null) {
 						final String trimmed = line.trim();
-						if (trimmed.startsWith("package")) {
+						if (trimmed.startsWith("package ")) {
 							packageString = trimmed.substring(7,
 									trimmed.indexOf(';')).trim();
-							break;
 						}
 						pw.println(line);
 					}
