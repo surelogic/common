@@ -96,8 +96,13 @@ public abstract class AbstractJavaZip<T> {
 					while ((line = reader.readLine()) != null) {
 						final String trimmed = line.trim();
 						if (trimmed.startsWith("package ")) {
-							packageString = trimmed.substring(7,
-									trimmed.indexOf(';')).trim();
+							try {
+								packageString = trimmed.substring(7,
+										trimmed.indexOf(';')).trim();
+							} catch (final StringIndexOutOfBoundsException e) {
+								// FIXME We need to only look for package
+								// declarations outside of comment blocks.
+							}
 						}
 						pw.println(line);
 					}
