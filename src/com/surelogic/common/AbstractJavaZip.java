@@ -50,9 +50,28 @@ public abstract class AbstractJavaZip<T> {
 
 	protected abstract String getFullPath(T res) throws IOException;
 
+	/**
+	 * Checks if this resource is a file.
+	 * 
+	 * @param res
+	 *            the resource.
+	 * @return {@code true} if the resource is a file, {@code false} otherwise.
+	 */
 	protected abstract boolean isFile(T res);
 
-	protected abstract boolean isJavaSourceFile(T res);
+	/**
+	 * Checks if this resource is a Java source file and if it is returns the
+	 * package it is declared within or {@code null} if the resource is not a
+	 * Java compilation unit.
+	 * 
+	 * @param res
+	 *            the resource.
+	 * @return he package name the source file is declared within using
+	 *         <tt>(default)</tt> for the default package or {@code null} if the
+	 *         resource is not a Java compilation unit..
+	 */
+
+	protected abstract String getJavaPackageNameOrNull(T res);
 
 	protected abstract InputStream getFileContents(T res) throws IOException;
 
@@ -77,7 +96,8 @@ public abstract class AbstractJavaZip<T> {
 			pathName = pathName.substring(1);
 		}
 		if (isFile(resource)) {
-			if (!isJavaSourceFile(resource)) {
+			final String packageName = getJavaPackageNameOrNull(resource);
+			if (packageName == null) {
 				return;
 			}
 			try {
@@ -92,34 +112,21 @@ public abstract class AbstractJavaZip<T> {
 
 					out.putNextEntry(new ZipEntry(pathName));
 					String line;
-					String packageString = null, className = null;
+					String className = null;
 					while ((line = reader.readLine()) != null) {
-						final String trimmed = line.trim();
-						if (trimmed.startsWith("package ")) {
-							try {
-								packageString = trimmed.substring(7,
-										trimmed.indexOf(';')).trim();
-							} catch (final StringIndexOutOfBoundsException e) {
-								// FIXME We need to only look for package
-								// declarations outside of comment blocks.
-							}
-						}
 						pw.println(line);
 					}
 					pw.flush();
-					if (packageString == null) {
-						packageString = "(default)";
-					}
 					className = getName(resource);
 					final String classKey = className;
 					// remove ".java"
 					className = className.substring(0, className.length() - 5);
 					Map<String, String> classNameToSource;
-					if (fileMap.containsKey(packageString)) {
-						classNameToSource = fileMap.get(packageString);
+					if (fileMap.containsKey(packageName)) {
+						classNameToSource = fileMap.get(packageName);
 					} else {
 						classNameToSource = new TreeMap<String, String>();
-						fileMap.put(packageString, classNameToSource);
+						fileMap.put(packageName, classNameToSource);
 					}
 					// Changed to map non-main classes
 					final String srcPath = "/" + pathName;

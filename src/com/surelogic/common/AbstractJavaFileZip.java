@@ -38,7 +38,7 @@ public abstract class AbstractJavaFileZip extends AbstractJavaZip<File> {
 	}
 
 	@Override
-	protected boolean isJavaSourceFile(File res) {
-		return res != null && res.getName().endsWith(".java");
+	protected String getJavaPackageNameOrNull(File res) {
+		throw new UnsupportedOperationException("not implemented yet");
 	}
 }
