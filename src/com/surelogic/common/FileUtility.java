@@ -98,11 +98,14 @@ public final class FileUtility {
 	public static boolean recursiveDelete(final File path) {
 		boolean success;
 		if (path.isDirectory()) {
-			for (final File file : path.listFiles()) {
-				success = recursiveDelete(file);
-				if (!success) {
-					SLLogger.getLogger().warning(
-							I18N.err(11, file.getAbsolutePath()));
+			final File[] files = path.listFiles();
+			if (files != null) {
+				for (final File file : files) {
+					success = recursiveDelete(file);
+					if (!success) {
+						SLLogger.getLogger().warning(
+								I18N.err(11, file.getAbsolutePath()));
+					}
 				}
 			}
 		}
@@ -112,6 +115,55 @@ public final class FileUtility {
 			path.deleteOnExit();
 		}
 		return success;
+	}
+
+	/**
+	 * This method performs a rough calculation of the space being used by the
+	 * passed file or directory. The calculation is recursive and includes
+	 * sub-directories.
+	 * 
+	 * @param path
+	 *            the file or directory to compute the size of.
+	 * @return the size in bytes of the passed file or directory.
+	 */
+	public static long recursiveSizeInBytes(final File path) {
+		long result = 0L;
+		if (path.isDirectory()) {
+			final File[] files = path.listFiles();
+			if (files != null) {
+				for (final File file : files) {
+					result += recursiveSizeInBytes(file);
+				}
+			}
+		} else {
+			result = path.length();
+		}
+		return result;
+	}
+
+	/**
+	 * This method produces a human readable size such as <tt>50 Bytes</tt> or
+	 * <tt>45.2 MB</tt> or <tt>5.1 GB</tt> from a given size in bytes value.
+	 * 
+	 * @param bytes
+	 *            a size in bytes.
+	 * @return the human readable string.
+	 */
+	public static String bytesToHumanReadableString(final long bytes) {
+		final String[] labels = { "Bytes", "KB", "MB", "GB" };
+		int labelIndex = 0;
+		long size = bytes;
+		int digit = 0;
+		while (size > 1024 && labelIndex < 3) {
+			final long oldSize = size;
+			size = oldSize / 1024L;
+			digit = (int) (((oldSize % 1024L) / (double) 1024.0) * (double) 10.0);
+			labelIndex++;
+		}
+		if (labelIndex == 0 || digit == 0)
+			return size + " " + labels[labelIndex];
+		else
+			return size + "." + digit + " " + labels[labelIndex];
 	}
 
 	/**
@@ -526,42 +578,42 @@ public final class FileUtility {
 		zipDir(tempDir, tempDir, zos);
 		zos.close();
 	}
-	
-	public static void zipDir(File baseDir, File zipDir, ZipOutputStream zos) throws IOException { 
-		// get a listing of the directory content 
-		File[] dirList = zipDir.listFiles(); 
-		byte[] readBuffer = new byte[4096]; 
-		int bytesIn = 0; 
-		// loop through dirList, and zip the files 
-		for(File f : dirList) { 
-			if (f.isDirectory()) { 				
-				// if the File object is a directory, call this 
-				// function again to add its content recursively 
-				zipDir(baseDir, f, zos); 
-				// loop again 
-				continue; 
-			} 
-			// if we reached here, the File object f was not a directory 
-			// create a FileInputStream on top of f 
-			FileInputStream fis = new FileInputStream(f); 
-			// create a new zip entry 
+
+	public static void zipDir(File baseDir, File zipDir, ZipOutputStream zos)
+			throws IOException {
+		// get a listing of the directory content
+		File[] dirList = zipDir.listFiles();
+		byte[] readBuffer = new byte[4096];
+		int bytesIn = 0;
+		// loop through dirList, and zip the files
+		for (File f : dirList) {
+			if (f.isDirectory()) {
+				// if the File object is a directory, call this
+				// function again to add its content recursively
+				zipDir(baseDir, f, zos);
+				// loop again
+				continue;
+			}
+			// if we reached here, the File object f was not a directory
+			// create a FileInputStream on top of f
+			FileInputStream fis = new FileInputStream(f);
+			// create a new zip entry
 			String path = f.getAbsolutePath();
 			String name;
 			if (path.startsWith(baseDir.getAbsolutePath())) {
-				name = path.substring(baseDir.getAbsolutePath().length()+1);
+				name = path.substring(baseDir.getAbsolutePath().length() + 1);
 			} else {
 				name = path;
 			}
-			ZipEntry anEntry = new ZipEntry(name); 
-			// place the zip entry in the ZipOutputStream object 
-			zos.putNextEntry(anEntry); 
-			// now write the content of the file to the ZipOutputStream 
-			while ((bytesIn = fis.read(readBuffer)) != -1) 
-			{ 
-				zos.write(readBuffer, 0, bytesIn); 
-			} 
-			//close the Stream 
-			fis.close(); 
-		} 
+			ZipEntry anEntry = new ZipEntry(name);
+			// place the zip entry in the ZipOutputStream object
+			zos.putNextEntry(anEntry);
+			// now write the content of the file to the ZipOutputStream
+			while ((bytesIn = fis.read(readBuffer)) != -1) {
+				zos.write(readBuffer, 0, bytesIn);
+			}
+			// close the Stream
+			fis.close();
+		}
 	}
 }

@@ -171,4 +171,23 @@ public class TestFileUtility extends TestCase {
 		assertTrue(FileUtility.recursiveDelete(anchor));
 		assertFalse(anchor.exists());
 	}
+
+	public void testBytesToHumanReadableString() {
+		assertEquals("0 Bytes", FileUtility.bytesToHumanReadableString(0L));
+		assertEquals("10 Bytes", FileUtility.bytesToHumanReadableString(10L));
+		assertEquals("1023 Bytes", FileUtility
+				.bytesToHumanReadableString(1023L));
+		assertEquals("1024 Bytes", FileUtility
+				.bytesToHumanReadableString(1024L));
+		assertEquals("1 KB", FileUtility.bytesToHumanReadableString(1025L));
+		assertEquals("1.9 KB", FileUtility.bytesToHumanReadableString(2025L));
+		assertEquals("2 KB", FileUtility.bytesToHumanReadableString(2048L));
+		assertEquals("2 MB", FileUtility
+				.bytesToHumanReadableString(1024L * 1024L * 2L));
+		assertEquals("1.2 MB", FileUtility.bytesToHumanReadableString(1269764L));
+		assertEquals("1.9 GB", FileUtility
+				.bytesToHumanReadableString(2043253448L));
+		assertEquals("1903.9 GB", FileUtility
+				.bytesToHumanReadableString(2044325355448L));
+	}
 }
