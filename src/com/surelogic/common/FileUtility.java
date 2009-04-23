@@ -289,6 +289,17 @@ public final class FileUtility {
 		}
 	}
 
+	private static File dataAnchor = 
+		new File(System.getProperty("user.home")+File.separator+".sierra-data");
+	
+	public static void setSierraDataDirectoryAnchor(File dir) {
+		if (dir != null && dir.exists() && dir.isDirectory()) {
+			dataAnchor = dir;
+		} else {
+			throw new IllegalArgumentException("Bad directory: "+dir);
+		}
+	}
+	
 	/**
 	 * This method returns the anchor for the Sierra data directory. Clients
 	 * typically will not use this method to get the Sierra data directory,
@@ -301,8 +312,7 @@ public final class FileUtility {
 	 * @see #getSierraDataDirectory()
 	 */
 	public static File getSierraDataDirectoryAnchor() {
-		return new File(System.getProperty("user.home") + File.separator
-				+ ".sierra-data");
+		return dataAnchor;
 	}
 
 	/**
