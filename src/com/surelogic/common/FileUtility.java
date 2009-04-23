@@ -361,6 +361,8 @@ public final class FileUtility {
 		return getDataDirectory(data);
 	}
 
+	private static boolean DISALLOW_FILE_ANCHOR = true;
+	
 	/**
 	 * This method determines a directory where data is stored based upon a
 	 * passed anchor path. This anchor path is passed in <tt>anchor</tt> and is
@@ -390,6 +392,9 @@ public final class FileUtility {
 		final File tmp = new File(System.getProperty("java.io.tmpdir"));
 		if (anchor.exists()) {
 			if (anchor.isFile()) {
+				if (DISALLOW_FILE_ANCHOR) {
+					throw new IllegalArgumentException("Disallowing file anchor "+anchor);
+				}
 				/*
 				 * The contents of the file contain the path to the data
 				 * directory.
@@ -540,8 +545,8 @@ public final class FileUtility {
 					 * Point the anchor to the destination data directory unless
 					 * the anchor is the destination data directory.
 					 */
-					if (!anchor.getAbsolutePath().equals(
-							destination.getAbsolutePath())) {
+					if (!DISALLOW_FILE_ANCHOR && 
+						!anchor.getAbsolutePath().equals(destination.getAbsolutePath())) {
 						FileUtility.putFileContents(anchor, destination
 								.getAbsolutePath());
 					}
