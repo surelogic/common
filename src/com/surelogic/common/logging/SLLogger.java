@@ -1,9 +1,6 @@
 package com.surelogic.common.logging;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
@@ -127,6 +124,21 @@ public class SLLogger {
 		}
 	}
 
+	public static synchronized void removeHandler(Handler h) {
+		if (h == null) {
+			throw new NullPointerException("handler to match must be non-null");
+		}
+		boolean removed = f_handlers.remove(h);
+		if (removed) {
+			/*
+			 * Remove this handler from all the existing loggers.
+			 */
+			for (Logger logger : f_nameToLogger.values()) {
+				logger.removeHandler(h);
+			}
+		}
+	}
+	
 	static {
 		/*
 		 * We use a property scheme to try to avoid duplicate logging on the EJB
