@@ -64,6 +64,11 @@ public interface DBConnection {
 	SchemaData getSchemaLoader();
 
 	/**
+	 * Disconnect the database
+	 */
+	void shutdown();
+	
+	/**
 	 * Unload and delete the database.
 	 */
 	void destroy();
