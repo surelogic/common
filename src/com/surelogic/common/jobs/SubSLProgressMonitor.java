@@ -1,6 +1,10 @@
 package com.surelogic.common.jobs;
 
+import java.util.NoSuchElementException;
+import java.util.logging.Level;
+
 import com.surelogic.common.i18n.I18N;
+import com.surelogic.common.logging.SLLogger;
 
 /**
  * A IDE independent sub-task of any {@link SLProgressMonitor}. It can be used
@@ -102,7 +106,11 @@ public final class SubSLProgressMonitor implements SLProgressMonitor {
 			if (parentWorkRemaining > 0) {
 				f_parent.worked(parentWorkRemaining);
 			}
-			f_parent.subTaskDone();
+			try {
+				f_parent.subTaskDone();
+			} catch (NoSuchElementException e) {
+				SLLogger.getLogger().log(Level.WARNING, "Probably missing call to begin()", e);
+			}
 		}
 	}
 
