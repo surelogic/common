@@ -1,7 +1,15 @@
 package com.surelogic.common;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -22,10 +30,10 @@ public class HashGenerator {
 	private static final String FIRST = "FIRST";
 
 	private static final String LAST = "LAST";
-	
+
 	private static final String TOO_FAR = "TOOFAR";
 
-	//private int countFileAccess = 0;
+	// private int countFileAccess = 0;
 
 	private String cachedFileName;
 
@@ -52,52 +60,54 @@ public class HashGenerator {
 	 * 
 	 * @param args
 	 */
-	public static void main(String args[]) {
+	public static void main(final String args[]) {
 
-		HashGenerator hashGenerator = HashGenerator.getInstance();
-		System.out
-				.println("\t" + hashGenerator.getHash("C:/fibonacci.java", 1));
-		System.out
-				.println("\t" + hashGenerator.getHash("C:/fibonacci.java", 5));
-		System.out
-				.println("\t" + hashGenerator.getHash("C:/fibonacci.java", 5));
-		System.out.println("\t"
-				+ hashGenerator.getHash("C:/fibonacci.java", 18));
+		final HashGenerator hashGenerator = HashGenerator.getInstance();
+		if (args.length % 2 == 0) {
+			for (int i = 0; i < args.length; i += 2) {
+				System.out.println(""
+						+ hashGenerator.getHash(args[i], Integer
+								.valueOf(args[i + 1])));
+			}
+		}
 
 	}
 
-	public Long getHash(String fileName, int lineNumber) {
+	public Long getHash(final String fileName, int lineNumber) {
 		try {
 			// adjust line number to be zero indexed
 			if (lineNumber > 0) {
 				lineNumber--;
 			}
-			boolean updated = updateCache(fileName);
+			final boolean updated = updateCache(fileName);
 			if (!updated && lastHashLine == lineNumber) {
 				return lastHashValue;
 			}
-	     
+
 			if (lineNumber >= cachedFileLines.size()) {
-			  log.severe("line# too big: "+lineNumber+" >= "+cachedFileLines.size());
-			  cachedFileLines = buildCachedLines(fileName);
-			}			
+				log.severe("line# too big: " + lineNumber + " >= "
+						+ cachedFileLines.size());
+				cachedFileLines = buildCachedLines(fileName);
+			}
 			lastHashLine = lineNumber;
 
-			String valueUp = getChunkBefore(cachedFileLines, lineNumber, 30);
-			String valueDown = getChunkAfter(cachedFileLines, lineNumber, 30);
+			final String valueUp = getChunkBefore(cachedFileLines, lineNumber,
+					30);
+			final String valueDown = getChunkAfter(cachedFileLines, lineNumber,
+					30);
 
-			int hashUp = valueUp.hashCode();
-			int hashDown = valueDown.hashCode();
+			final int hashUp = valueUp.hashCode();
+			final int hashDown = valueDown.hashCode();
 
 			lastHashValue = (((long) hashDown) << 32) + hashUp;
 			return lastHashValue;
-		} catch (FileNotFoundException e) {
+		} catch (final FileNotFoundException e) {
 			log
 					.log(Level.SEVERE, "The file " + fileName
 							+ " was not found.", e);
 			throw new RuntimeException("While generating hash :"
 					+ e.getMessage());
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			log.log(Level.SEVERE, "I/O exception while hash generation.", e);
 			throw new RuntimeException("While generating hash :"
 					+ e.getMessage());
@@ -107,32 +117,33 @@ public class HashGenerator {
 	/**
 	 * @return true if updated
 	 */
-	private boolean updateCache(String fileName) throws IOException {
+	private boolean updateCache(final String fileName) throws IOException {
 		if (cachedFileLines == null) {
-			  cachedFileName = null; 
+			cachedFileName = null;
 		}
 		if (cachedFileName == null || !cachedFileName.equals(fileName)) {
 			cachedFileName = fileName;
 			cachedFileLines = buildCachedLines(fileName);
 			return false;
-		} 
+		}
 		return true;
 	}
-	
-	public void generateHash(Map<String, Map<Integer, Long>> hashHolder) {
-		for(Map.Entry<String, Map<Integer, Long>> entry : hashHolder.entrySet()) {
-			String fileName = entry.getKey();
-			Map<Integer, Long> lineHashMap = entry.getValue();
-			Set<Integer> lineNumbers = lineHashMap.keySet();
-			Iterator<Integer> lineNumberIterator = lineNumbers.iterator();
+
+	public void generateHash(final Map<String, Map<Integer, Long>> hashHolder) {
+		for (final Map.Entry<String, Map<Integer, Long>> entry : hashHolder
+				.entrySet()) {
+			final String fileName = entry.getKey();
+			final Map<Integer, Long> lineHashMap = entry.getValue();
+			final Set<Integer> lineNumbers = lineHashMap.keySet();
+			final Iterator<Integer> lineNumberIterator = lineNumbers.iterator();
 
 			while (lineNumberIterator.hasNext()) {
-				int lineNumber = lineNumberIterator.next();
-				Long hashValue = getHash(fileName, lineNumber);
+				final int lineNumber = lineNumberIterator.next();
+				final Long hashValue = getHash(fileName, lineNumber);
 				lineHashMap.put(lineNumber, hashValue);
 			}
 
-			//countFileAccess++;
+			// countFileAccess++;
 
 		}
 
@@ -141,20 +152,21 @@ public class HashGenerator {
 
 	}
 
-	private List<String> buildCachedLines(String fileName) throws IOException {
-	  if (fileName == null) {
-	    throw new IllegalArgumentException("Null filename");
-	  }
-		List<String> cachedLines = new ArrayList<String>();
-		BufferedReader in = new BufferedReader(new FileReader(fileName));
+	private List<String> buildCachedLines(final String fileName)
+			throws IOException {
+		if (fileName == null) {
+			throw new IllegalArgumentException("Null filename");
+		}
+		final List<String> cachedLines = new ArrayList<String>();
+		final BufferedReader in = new BufferedReader(new FileReader(fileName));
 		try {
-		  final StringBuilder cachedLine = new StringBuilder();
+			final StringBuilder cachedLine = new StringBuilder();
 			String inLine = in.readLine();
 			while (inLine != null) {
-				String[] lineElements = inLine.split("\\s+");
+				final String[] lineElements = inLine.split("\\s+");
 				// TODO replace split with replaceAll?
-				
-				for (String element : lineElements) {
+
+				for (final String element : lineElements) {
 					cachedLine.append(element);
 				}
 				cachedLines.add(cachedLine.toString());
@@ -169,37 +181,38 @@ public class HashGenerator {
 		return cachedLines;
 	}
 
-	private String getChunkBefore(List<String> cachedLines, int lineNumber,
-			int maxChunkSize) {
+	private String getChunkBefore(final List<String> cachedLines,
+			final int lineNumber, final int maxChunkSize) {
 		int chunkLine = lineNumber;
 		if (chunkLine < 0) {
 			return FIRST;
 		}
-    if (chunkLine >= cachedLines.size()) {
-      log.severe("line# too big: "+chunkLine+" >= "+cachedLines.size());
-      return TOO_FAR;
-    }
-		StringBuilder chunkBuf = new StringBuilder();
+		if (chunkLine >= cachedLines.size()) {
+			log.severe("line# too big: " + chunkLine + " >= "
+					+ cachedLines.size());
+			return TOO_FAR;
+		}
+		final StringBuilder chunkBuf = new StringBuilder();
 		while (chunkLine >= 0 && chunkBuf.length() < maxChunkSize) {
 			chunkBuf.insert(0, cachedLines.get(chunkLine));
 			chunkLine--;
 		}
 
 		if (chunkBuf.length() > maxChunkSize) {
-			int len = chunkBuf.length();
+			final int len = chunkBuf.length();
 			return chunkBuf.substring(len - maxChunkSize, len);
 		}
 		return chunkBuf.toString();
 	}
 
-	private String getChunkAfter(List<String> cachedLines, int lineNumber,
-			int maxChunkSize) {
+	private String getChunkAfter(final List<String> cachedLines,
+			final int lineNumber, final int maxChunkSize) {
 		int chunkLine = lineNumber + 1;
 		if (chunkLine >= cachedLines.size()) {
 			return LAST;
 		}
 
-		StringBuilder chunkBuf = new StringBuilder();
+		final StringBuilder chunkBuf = new StringBuilder();
 		while (chunkLine < cachedLines.size()
 				&& chunkBuf.length() < maxChunkSize) {
 			chunkBuf.append(cachedLines.get(chunkLine));
@@ -213,39 +226,43 @@ public class HashGenerator {
 	}
 
 	private static final int BUF_SIZE = 16384;
-	
-	public int getLineForOffset(String fileName, int offset) {
+
+	public int getLineForOffset(final String fileName, final int offset) {
 		if (offset < 0 || offset == Integer.MAX_VALUE) {
 			return -1;
 		}
-		if (lastOffset == offset && lastOffsetFile != null &&
-			lastOffsetFile.equals(fileName)) {
+		if (lastOffset == offset && lastOffsetFile != null
+				&& lastOffsetFile.equals(fileName)) {
 			return lastOffsetLine;
 		}
 		try {
 			// Read the file up to f_offset
-			int numLeft     = offset+1;
-			FileReader fr   = new FileReader(fileName);
-			StringBuffer sb = new StringBuffer(numLeft);
-			char[] cbuf     = new char[BUF_SIZE];			
-			int num;			
-			while (numLeft > 0  && (num = fr.read(cbuf, 0, numLeft < BUF_SIZE ? numLeft : BUF_SIZE)) >= 0) {
-				sb.append(cbuf, 0, num);				
+			int numLeft = offset + 1;
+			final FileReader fr = new FileReader(fileName);
+			final StringBuffer sb = new StringBuffer(numLeft);
+			final char[] cbuf = new char[BUF_SIZE];
+			int num;
+			while (numLeft > 0
+					&& (num = fr.read(cbuf, 0, numLeft < BUF_SIZE ? numLeft
+							: BUF_SIZE)) >= 0) {
+				sb.append(cbuf, 0, num);
 				numLeft -= num;
-			};			
+			}
+			;
 			fr.close();
-			
+
 			int line = 0;
-			BufferedReader in = new BufferedReader(new StringReader(sb.toString()));			
+			final BufferedReader in = new BufferedReader(new StringReader(sb
+					.toString()));
 			while (in.readLine() != null) {
 				line++;
-			}			
+			}
 			in.close();
 			lastOffsetFile = fileName;
-			lastOffset     = offset;
+			lastOffset = offset;
 			lastOffsetLine = line;
 			return line;
-		} catch (IOException e) {
+		} catch (final IOException e) {
 			e.printStackTrace();
 		}
 		return -1;
@@ -254,9 +271,9 @@ public class HashGenerator {
 	private String lastOffsetFile;
 	private int lastOffset;
 	private int lastOffsetLine;
-	
-	public Long getHashForOffset(String fileName, int offset) {
-		int line = getLineForOffset(fileName, offset);
+
+	public Long getHashForOffset(final String fileName, final int offset) {
+		final int line = getLineForOffset(fileName, offset);
 		return getHash(fileName, line);
 	}
 }
