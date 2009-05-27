@@ -1,5 +1,6 @@
 package com.surelogic.common.jobs;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.surelogic.common.i18n.I18N;
@@ -12,6 +13,10 @@ import com.surelogic.common.i18n.I18N;
 public final class AggregateSLJob extends AbstractSLJob {
 
 	private final List<SLJob> f_jobs;
+
+	public List<SLJob> getAggregatedJobs() {
+		return new ArrayList<SLJob>(f_jobs);
+	}
 
 	public AggregateSLJob(String name, List<SLJob> jobs) {
 		super(name);
