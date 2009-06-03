@@ -2,10 +2,6 @@ package com.surelogic.common;
 
 import java.io.File;
 
-import com.surelogic.common.jobs.NullSLProgressMonitor;
-import com.surelogic.common.jobs.SLJob;
-import com.surelogic.common.jobs.SLStatus;
-
 import junit.framework.TestCase;
 
 public class TestFileUtility extends TestCase {
@@ -86,90 +82,6 @@ public class TestFileUtility extends TestCase {
 		assertFalse(f.exists());
 		assertTrue(FileUtility.recursiveDelete(d));
 		assertFalse(d.exists());
-	}
-
-	public void testDataDirectory() {
-		final File anchor = new File(f_tmpDir, "anchor");
-		final File data = new File(f_tmpDir, "data-directory");
-		if (anchor.exists())
-			FileUtility.recursiveDelete(anchor);
-		if (data.exists())
-			FileUtility.recursiveDelete(data);
-
-		File result = FileUtility.getDataDirectory(anchor);
-
-		assertEquals(anchor, result);
-		assertTrue(FileUtility.recursiveDelete(anchor));
-
-		FileUtility.putFileContents(anchor, data.getAbsolutePath());
-
-		result = FileUtility.getDataDirectory(anchor);
-
-		assertEquals(data, result);
-
-		assertTrue(data.exists());
-		assertTrue(data.isDirectory());
-
-		assertTrue(FileUtility.recursiveDelete(anchor));
-		assertFalse(anchor.exists());
-		assertTrue(FileUtility.recursiveDelete(data));
-		assertFalse(data.exists());
-	}
-
-	public void testDataDirectoryMove() {
-		final File anchor = new File(f_tmpDir, "anchor");
-		final File data = new File(f_tmpDir, "data-directory");
-		if (anchor.exists())
-			FileUtility.recursiveDelete(anchor);
-		if (data.exists())
-			FileUtility.recursiveDelete(data);
-
-		final String someFile = "dataFile.txt";
-		final String someText = "some data text";
-
-		File result = FileUtility.getDataDirectory(anchor);
-		assertEquals(anchor, result);
-		assertTrue(anchor.exists());
-		assertTrue(anchor.isDirectory());
-
-		File some = new File(result, someFile);
-		FileUtility.putFileContents(some, someText);
-		assertTrue(some.exists());
-
-		SLJob job = FileUtility.moveDataDirectory(anchor, data, true);
-		SLStatus status = job.run(new NullSLProgressMonitor());
-		assertEquals(status.getMessage(), SLStatus.OK_STATUS, status);
-		assertTrue(anchor.exists());
-		assertTrue(anchor.isFile());
-		assertTrue(data.exists());
-		assertTrue(data.isDirectory());
-
-		result = FileUtility.getDataDirectory(anchor);
-		assertTrue(result.exists());
-		assertTrue(result.isDirectory());
-		assertEquals(data, result);
-
-		assertFalse(some.exists());
-		some = new File(result, someFile);
-		assertTrue(some.exists());
-		assertTrue(some.isFile());
-		assertEquals(someText, FileUtility.getFileContents(some));
-
-		job = FileUtility.moveDataDirectory(anchor, anchor, true);
-		status = job.run(new NullSLProgressMonitor());
-		assertEquals(status.getMessage(), SLStatus.OK_STATUS, status);
-
-		result = FileUtility.getDataDirectory(anchor);
-		assertEquals(anchor, result);
-
-		assertFalse(some.exists());
-		some = new File(result, someFile);
-		assertTrue(some.exists());
-		assertTrue(some.isFile());
-		assertEquals(someText, FileUtility.getFileContents(some));
-
-		assertTrue(FileUtility.recursiveDelete(anchor));
-		assertFalse(anchor.exists());
 	}
 
 	public void testBytesToHumanReadableString() {
