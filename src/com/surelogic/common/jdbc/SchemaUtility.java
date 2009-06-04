@@ -381,11 +381,10 @@ public final class SchemaUtility {
 		return result;
 	}
 
-	public static final String SQL_SCRIPT_SUFFIX = ".sql";
-	public static final String SERVER_PREFIX = "server";
-	public static final String ACTION_COMMON = "Schema_";
-	public static final String ACTION_SERVER = "Server_";
-	public static final String SEPARATOR = "_";
+	private static final String SERVER_PREFIX = "server";
+	private static final String ACTION_COMMON = "Schema_";
+	private static final String ACTION_SERVER = "Server_";
+	private static final String SEPARATOR = "_";
 
 	public static void checkAndUpdate(final Connection c,
 			final SchemaData schemaLoader, final boolean serverDB)

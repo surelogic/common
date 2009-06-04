@@ -50,6 +50,16 @@ public final class FileUtility {
 	public static final String DB_PATH_FRAGMENT = "db";
 
 	/**
+	 * Name of the local team server directory under the Sierra data directory.
+	 */
+	public static final String LOCAL_TEAM_SERVER_PATH_FRAGMENT = "server";
+
+	/**
+	 * Name of the tool extension directory under the Sierra data directory.
+	 */
+	public static final String TOOLS_PATH_FRAGMENT = "tools";
+
+	/**
 	 * Tries to create the specified directory in the file system unless it
 	 * already exists.
 	 * 
