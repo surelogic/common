@@ -215,6 +215,10 @@ public class LicenseNotary {
      *     Call the copy constructor of {@link GenericCertificate} if you
      *     need an unlocked copy of the certificate.</li>
      * </ul>
+     * <p>
+     * This method exists for testing purposes only and
+     *             you should not normally need it.
+     *             Use {@link #sign(Object)} instead.
      *
      * @param certificate The generic certificate used to hold the encoded
      *        content and its digital signature.
@@ -225,10 +229,6 @@ public class LicenseNotary {
      *
      * @throws Exception A subclass of this class may be thrown for various
      *         reasons.
-     *
-     * @deprecated This method exists for testing purposes only and
-     *             you should not normally need it.
-     *             Use {@link #sign(Object)} instead.
      */
     public /*synchronized*/ void sign(GenericCertificate certificate, Object content)
     throws Exception {
@@ -270,7 +270,14 @@ public class LicenseNotary {
 
     /**
      * Returns the private key from the keyStore.
-     * 
+     * <p>
+     * <b>Experimental:</b> Methods marked with this note have
+     *             been tested to be functional but may change or disappear
+     *             at will in one of the next releases because they are still
+     *             a topic for research on extended functionality.
+     *             Most likely the methods will prevail however and this note
+     *             will just vanish, so you may use them with a certain risk.
+     *
      * @throws LicenseNotaryException If the parameters used to access the
      *         corresponding key store are insufficient or incorrect.
      *         Note that you should always use
@@ -284,13 +291,6 @@ public class LicenseNotary {
      *         the integrity of the keyStore cannot be found.
      * @throws UnrecoverableKeyException If the key cannot get recovered
      *         (e.g. the given password is wrong).
-     *
-     * @deprecated <b>Experimental:</b> Methods marked with this note have
-     *             been tested to be functional but may change or disappear
-     *             at will in one of the next releases because they are still
-     *             a topic for research on extended functionality.
-     *             Most likely the methods will prevail however and this note
-     *             will just vanish, so you may use them with a certain risk.
      */
     protected /*synchronized*/ PrivateKey getPrivateKey()
     throws  LicenseNotaryException,
@@ -320,7 +320,14 @@ public class LicenseNotary {
     }
 
     /**
-     * Returns the public key from the keyStore
+     * Returns the public key from the keyStore.
+     * <p>
+     * <b>Experimental:</b> Methods marked with this note have
+     *             been tested to be functional but may change or disappear
+     *             at will in one of the next releases because they are still
+     *             a topic for research on extended functionality.
+     *             Most likely the methods will prevail however and this note
+     *             will just vanish, so you may use them with a certain risk.
      * 
      * @throws LicenseNotaryException If the parameters used to access the
      *         corresponding key store are insufficient or incorrect.
@@ -333,13 +340,6 @@ public class LicenseNotary {
      *         keyStore could not be loaded.
      * @throws NoSuchAlgorithmException If the algorithm used to check
      *         the integrity of the keyStore cannot be found.
-     *
-     * @deprecated <b>Experimental:</b> Methods marked with this note have
-     *             been tested to be functional but may change or disappear
-     *             at will in one of the next releases because they are still
-     *             a topic for research on extended functionality.
-     *             Most likely the methods will prevail however and this note
-     *             will just vanish, so you may use them with a certain risk.
      */
     protected /*synchronized*/ PublicKey getPublicKey()
     throws  LicenseNotaryException,
@@ -371,8 +371,8 @@ public class LicenseNotary {
     /**
      * Returns a valid signature engine to be used for signing and verifying
      * a {@link GenericCertificate} - <tt>null</tt> is never returned.
-     *
-     * @deprecated <b>Experimental:</b> Methods marked with this note have
+     * <p>
+     * <b>Experimental:</b> Methods marked with this note have
      *             been tested to be functional but may change or disappear
      *             at will in one of the next releases because they are still
      *             a topic for research on extended functionality.
@@ -390,6 +390,13 @@ public class LicenseNotary {
 
     /**
      * Returns a loaded/initialized keyStore.
+     * <p>
+     * <b>Experimental:</b> Methods marked with this note have
+     *             been tested to be functional but may change or disappear
+     *             at will in one of the next releases because they are still
+     *             a topic for research on extended functionality.
+     *             Most likely the methods will prevail however and this note
+     *             will just vanish, so you may use them with a certain risk.
      * 
      * @throws IOException If there is an I/O or format problem with the
      *         keyStore data.
@@ -397,13 +404,6 @@ public class LicenseNotary {
      *         keyStore could not be loaded.
      * @throws NoSuchAlgorithmException If the algorithm used to check
      *         the integrity of the keyStore cannot be found.
-     *
-     * @deprecated <b>Experimental:</b> Methods marked with this note have
-     *             been tested to be functional but may change or disappear
-     *             at will in one of the next releases because they are still
-     *             a topic for research on extended functionality.
-     *             Most likely the methods will prevail however and this note
-     *             will just vanish, so you may use them with a certain risk.
      */
     protected /*synchronized*/ KeyStore getKeyStore()
     throws  IOException,

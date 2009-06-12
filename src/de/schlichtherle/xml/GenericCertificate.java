@@ -588,6 +588,10 @@ public final class GenericCertificate implements Serializable, XMLConstants {
     
     /**
      * Setter for the bound property <tt>signatureEncoding</tt>.
+     * <p>
+     * Currently ignored by {@link #verify}.
+     * Only provided to cause {@link XMLEncoder} to encode this
+     * property for upwards compatibility.
      *
      * @param signatureEncoding The string identifying the signature encoding
      *        - may be <tt>null</tt>.
@@ -596,10 +600,6 @@ public final class GenericCertificate implements Serializable, XMLConstants {
      *         already locked by signing or verifying it before.
      *         Note that this is actually a subclass of
      *         {@link PropertyVetoException}.
-     *
-     * @deprecated Currently ignored by {@link #verify}.
-     *             Only provided to cause {@link XMLEncoder} to encode this
-     *             property for upwards compatibility.
      */
     public synchronized void setSignatureEncoding(String signatureEncoding)
     throws GenericCertificateIsLockedException {

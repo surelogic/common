@@ -185,8 +185,8 @@ public class PrivacyGuard {
     /**
      * Returns a cipher object which is initialised for encryption
      * - <tt>null</tt> is never returned.
-     *
-     * @deprecated <b>Experimental:</b> Methods marked with this note have
+     * <p>
+     * <b>Experimental:</b> Methods marked with this note have
      *             been tested to be functional but may change or disappear
      *             at will in one of the next releases because they are still
      *             a topic for research on extended functionality.
@@ -211,8 +211,8 @@ public class PrivacyGuard {
     /**
      * Returns a cipher object which is initialised for decryption
      * - <tt>null</tt> is never returned.
-     *
-     * @deprecated <b>Experimental:</b> Methods marked with this note have
+     * <p>
+     * <b>Experimental:</b> Methods marked with this note have
      *             been tested to be functional but may change or disappear
      *             at will in one of the next releases because they are still
      *             a topic for research on extended functionality.
@@ -238,8 +238,8 @@ public class PrivacyGuard {
      * Returns a cipher object which needs to be configured for encryption or
      * decryption
      * - <tt>null</tt> is never returned.
-     *
-     * @deprecated <b>Experimental:</b> Methods marked with this note have
+     * <p>
+     * <b>Experimental:</b> Methods marked with this note have
      *             been tested to be functional but may change or disappear
      *             at will in one of the next releases because they are still
      *             a topic for research on extended functionality.

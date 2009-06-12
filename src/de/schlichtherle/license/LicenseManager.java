@@ -307,6 +307,13 @@ public class LicenseManager implements LicenseCreator, LicenseVerifier {
      * As a side effect, the given license <tt>content</tt> is initialized
      * with some reasonable defaults unless the respective properties have
      * already been set.
+     * <p>
+     * <b>Experimental:</b> Methods marked with this note have
+     *             been tested to be functional but may change or disappear
+     *             at will in one of the next releases because they are still
+     *             a topic for research on extended functionality.
+     *             Most likely the methods will prevail however and this note
+     *             will just vanish, so you may use them with a certain risk.
      *
      * @param content The license content
      *        - may <em>not</em> be <tt>null</tt>.
@@ -324,13 +331,6 @@ public class LicenseManager implements LicenseCreator, LicenseVerifier {
      *
      * @see #initialize(LicenseContent)
      * @see #validate(LicenseContent)
-     *
-     * @deprecated <b>Experimental:</b> Methods marked with this note have
-     *             been tested to be functional but may change or disappear
-     *             at will in one of the next releases because they are still
-     *             a topic for research on extended functionality.
-     *             Most likely the methods will prevail however and this note
-     *             will just vanish, so you may use them with a certain risk.
      */
     protected synchronized void store(
             final LicenseContent content,
@@ -438,7 +438,14 @@ public class LicenseManager implements LicenseCreator, LicenseVerifier {
      * Loads, decrypts, decompresses, decodes and verifies the license key in
      * <tt>keyFile</tt>, validates its license content and installs it
      * as the current license key.
-     *
+     * <p>
+     * <b>Experimental:</b> Methods marked with this note have
+     *             been tested to be functional but may change or disappear
+     *             at will in one of the next releases because they are still
+     *             a topic for research on extended functionality.
+     *             Most likely the methods will prevail however and this note
+     *             will just vanish, so you may use them with a certain risk.
+     * 
      * @param keyFile The file to load the license key from
      *        - may <em>not</em> be <tt>null</tt>.
      * @param notary The license notary used to verify the license key
@@ -454,13 +461,6 @@ public class LicenseManager implements LicenseCreator, LicenseVerifier {
      *         localized) meaningful detail message.
      *
      * @see #validate(LicenseContent)
-     *
-     * @deprecated <b>Experimental:</b> Methods marked with this note have
-     *             been tested to be functional but may change or disappear
-     *             at will in one of the next releases because they are still
-     *             a topic for research on extended functionality.
-     *             Most likely the methods will prevail however and this note
-     *             will just vanish, so you may use them with a certain risk.
      */
     protected synchronized LicenseContent install(
             final File keyFile,
@@ -589,6 +589,13 @@ public class LicenseManager implements LicenseCreator, LicenseVerifier {
     /**
      * Decrypts, decompresses, decodes and verifies the given license key,
      * validates its license content and returns it.
+     * <p>
+     * <b>Experimental:</b> Methods marked with this note have
+     *             been tested to be functional but may change or disappear
+     *             at will in one of the next releases because they are still
+     *             a topic for research on extended functionality.
+     *             Most likely the methods will prevail however and this note
+     *             will just vanish, so you may use them with a certain risk.
      *
      * @param key The license key
      *        - may <em>not</em> be <tt>null</tt>.
@@ -605,13 +612,6 @@ public class LicenseManager implements LicenseCreator, LicenseVerifier {
      *         localized) meaningful detail message.
      *
      * @see #validate(LicenseContent)
-     *
-     * @deprecated <b>Experimental:</b> Methods marked with this note have
-     *             been tested to be functional but may change or disappear
-     *             at will in one of the next releases because they are still
-     *             a topic for research on extended functionality.
-     *             Most likely the methods will prevail however and this note
-     *             will just vanish, so you may use them with a certain risk.
      */
     protected synchronized LicenseContent verify(
             final byte[] key,
@@ -755,16 +755,16 @@ public class LicenseManager implements LicenseCreator, LicenseVerifier {
 
     /**
      * Sets the given license certificate as installed or verified.
-     *
-     * @param certificate The license certificate
-     *        - may be <tt>null</tt> to clear.
-     *
-     * @deprecated <b>Experimental:</b> Methods marked with this note have
+     * <p>
+     * <b>Experimental:</b> Methods marked with this note have
      *             been tested to be functional but may change or disappear
      *             at will in one of the next releases because they are still
      *             a topic for research on extended functionality.
      *             Most likely the methods will prevail however and this note
      *             will just vanish, so you may use them with a certain risk.
+     *
+     * @param certificate The license certificate
+     *        - may be <tt>null</tt> to clear.
      */
     protected synchronized void setCertificate(GenericCertificate certificate) {
         this.certificate = certificate;
@@ -788,8 +788,8 @@ public class LicenseManager implements LicenseCreator, LicenseVerifier {
      * Installs the given license key as the current license key.
      * If <tt>key</tt> is <tt>null</tt>, the current license key gets
      * uninstalled (but the cached license certificate is not cleared).
-     *
-     * @deprecated <b>Experimental:</b> Methods marked with this note have
+     * <p>
+     * <b>Experimental:</b> Methods marked with this note have
      *             been tested to be functional but may change or disappear
      *             at will in one of the next releases because they are still
      *             a topic for research on extended functionality.
