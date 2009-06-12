@@ -182,7 +182,7 @@ public final class FileUtility {
 		while (size > 1024 && labelIndex < 3) {
 			final long oldSize = size;
 			size = oldSize / 1024L;
-			digit = (int) (((oldSize % 1024L) / (double) 1024.0) * (double) 10.0);
+			digit = (int) (((oldSize % 1024L) / 1024.0) * 10.0);
 			labelIndex++;
 		}
 		if (labelIndex == 0 || digit == 0)
