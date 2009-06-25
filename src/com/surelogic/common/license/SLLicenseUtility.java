@@ -397,10 +397,12 @@ public final class SLLicenseUtility {
 	 */
 	public static boolean validate(final String subject) {
 		LicenseContent lc;
+		boolean usingAllToolsLicense = false;
 		synchronized (SLLicenseUtility.class) {
 			lc = tryToGetInstalledLicense(subject);
 			if (lc == null) {
 				lc = tryToGetInstalledLicense(ALL_TOOL_SUBJECT);
+				usingAllToolsLicense = true;
 			}
 		}
 		final boolean licensed = lc != null;
@@ -413,7 +415,8 @@ public final class SLLicenseUtility {
 			now.add(Calendar.WEEK_OF_YEAR, 1);
 			if (expiration.before(now.getTime())) {
 				for (ILicenseObserver o : f_observers)
-					o.notifyExpiration(subject, expiration);
+					o.notifyExpiration(usingAllToolsLicense ? ALL_TOOL_SUBJECT : subject, 
+							           expiration);
 			}
 		} else {
 			for (ILicenseObserver o : f_observers)
