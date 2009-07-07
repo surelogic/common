@@ -42,7 +42,7 @@ public class JDBCUtils {
 		for (final Object o : args) {
 			if (o == null) {
 				throw new IllegalArgumentException(
-						"Parameter may nut be null.  Use one of the com.surelogic.common.jdbc.Nulls enumerable objects instead.");
+						"Parameter may not be null.  Use one of the com.surelogic.common.jdbc.Nulls enumerable objects instead.");
 			}
 			if (o instanceof Nulls) {
 				switch ((Nulls) o) {
@@ -73,7 +73,7 @@ public class JDBCUtils {
 			} else if (o instanceof Date) {
 				st.setTimestamp(idx, new Timestamp(((Date) o).getTime()));
 			} else if (o instanceof Boolean) {
-				st.setString(idx, ((Boolean) o) ? "Y" : "N");
+				st.setString(idx, (Boolean) o ? "Y" : "N");
 			} else {
 				throw new IllegalArgumentException(o.getClass()
 						+ " can not be interpreted as an SQL parameter.");
