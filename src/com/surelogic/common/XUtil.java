@@ -12,6 +12,18 @@ package com.surelogic.common;
  * on the Java command line or as a VM argument within Eclipse.
  */
 public final class XUtil {
+	private static final boolean f_useDeveloperMode = 
+		System.getProperty("SureLogicDev") != null;
+
+	/**
+	 * Indicates if developer functionality is enabled.
+	 * 
+	 * @return <code>true</code> if developer functionality is enabled,
+	 *         <code>false</code> otherwise.
+	 */
+	public static boolean useDeveloperMode() {
+		return f_useDeveloperMode;
+	}
 
 	private static final boolean f_useExperimental = System
 			.getProperty("SureLogicX") != null;
