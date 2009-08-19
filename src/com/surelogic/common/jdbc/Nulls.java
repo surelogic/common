@@ -1,5 +1,6 @@
 package com.surelogic.common.jdbc;
 
+import java.io.File;
 import java.util.Date;
 
 /**
@@ -9,7 +10,7 @@ import java.util.Date;
  * 
  */
 public enum Nulls {
-	INT, LONG, STRING, DATE, BOOLEAN;
+	INT, LONG, STRING, DATE, BOOLEAN, FILE;
 
 	/**
 	 * Return a Nulls value of the appropriate type if null.
@@ -59,5 +60,15 @@ public enum Nulls {
 	 */
 	public static Object coerce(final Boolean i) {
 		return i == null ? BOOLEAN : i;
+	}
+
+	/**
+	 * Return a Nulls value of the appropriate type if null.
+	 * 
+	 * @param i
+	 * @return
+	 */
+	public static Object coerce(final File f) {
+		return f == null ? FILE : f;
 	}
 }

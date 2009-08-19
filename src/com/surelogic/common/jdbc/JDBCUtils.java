@@ -1,5 +1,9 @@
 package com.surelogic.common.jdbc;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -19,7 +23,8 @@ public class JDBCUtils {
 	/**
 	 * Fill the parameters of a {@link PreparedStatement} with the values in
 	 * args. Supported types include {@link Integer}, {@link Long},
-	 * {@link Boolean}, {@link String}, and {@link Date}. Due to constraints in
+	 * {@link Boolean}, {@link String}, {@link Date}, and {@link File}.
+	 * {@link File} objects are reperented as a BLOB. Due to constraints in
 	 * JDBC, null values for these types may not be represented as {@code null}.
 	 * Instead, use one of the values of {@link Nulls}.
 	 * 
@@ -59,6 +64,8 @@ public class JDBCUtils {
 				case DATE:
 					setNullableTimestamp(idx, st, null);
 					break;
+				case FILE:
+					st.setClob(idx, (Clob) null);
 				default:
 					break;
 				}
@@ -74,6 +81,15 @@ public class JDBCUtils {
 				st.setTimestamp(idx, new Timestamp(((Date) o).getTime()));
 			} else if (o instanceof Boolean) {
 				st.setString(idx, (Boolean) o ? "Y" : "N");
+			} else if (o instanceof File) {
+				final File f = (File) o;
+				FileInputStream fin;
+				try {
+					fin = new FileInputStream(f);
+				} catch (final FileNotFoundException e) {
+					throw new StatementException(e);
+				}
+				st.setBinaryStream(idx, fin, f.length());
 			} else {
 				throw new IllegalArgumentException(o.getClass()
 						+ " can not be interpreted as an SQL parameter.");
