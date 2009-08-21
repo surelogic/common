@@ -24,7 +24,7 @@ public class JDBCUtils {
 	 * Fill the parameters of a {@link PreparedStatement} with the values in
 	 * args. Supported types include {@link Integer}, {@link Long},
 	 * {@link Boolean}, {@link String}, {@link Date}, and {@link File}.
-	 * {@link File} objects are reperented as a BLOB. Due to constraints in
+	 * {@link File} objects are represented as a BLOB. Due to constraints in
 	 * JDBC, null values for these types may not be represented as {@code null}.
 	 * Instead, use one of the values of {@link Nulls}.
 	 * 
