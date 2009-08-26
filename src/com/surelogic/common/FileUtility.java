@@ -33,16 +33,18 @@ public final class FileUtility {
 	private FileUtility() {
 		// no instances
 	}
-
+	
+	public static final String GZIP_SUFFIX = ".gz";
+	
 	/**
 	 * The string name of the Sierra data directory.
 	 */
-	public static String SIERRA_DATA_PATH_FRAGMENT = ".sierra-data";
+	public static final String SIERRA_DATA_PATH_FRAGMENT = ".sierra-data";
 
 	/**
 	 * The string name of the Flashlight data directory.
 	 */
-	public static String FLASHLIGHT_DATA_PATH_FRAGMENT = ".flashlight-data";
+	public static final String FLASHLIGHT_DATA_PATH_FRAGMENT = ".flashlight-data";
 
 	/**
 	 * Recommended name of the directory to place the database in.
