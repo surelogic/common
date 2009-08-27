@@ -89,7 +89,10 @@ public class JDBCUtils {
 				} catch (final FileNotFoundException e) {
 					throw new StatementException(e);
 				}
-				st.setBinaryStream(idx, fin, f.length());
+				if (f.length() > Integer.MAX_VALUE) {
+					throw new IllegalArgumentException("File argument too big: "+f);
+				}
+				st.setBinaryStream(idx, fin, (int) f.length());
 			} else {
 				throw new IllegalArgumentException(o.getClass()
 						+ " can not be interpreted as an SQL parameter.");
