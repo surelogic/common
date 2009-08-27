@@ -1,18 +1,10 @@
 package com.surelogic.common;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.*;
+import java.nio.channels.*;
 import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -507,4 +499,74 @@ public final class FileUtility {
 			fis.close();
 		}
 	}
+
+	public static OutputStream getOutputStream(File file) throws IOException {
+		// Create a writeable file channel
+		FileChannel channel = new RandomAccessFile(file, "rw").getChannel();
+
+		// Create an output stream on the channel
+		OutputStream os = Channels.newOutputStream(channel);		
+		return os;
+	}
+	
+	public static InputStream getInputStream(File file) throws IOException {
+		// Create a readable file channel
+		FileChannel channel = new RandomAccessFile(file, "r").getChannel();
+
+		// Create an inputstream on the channel
+		InputStream is = Channels.newInputStream(channel);
+		return is;
+	}
+	
+	public static OutputStream getMappedOutputStream(File file) throws IOException {
+		/*
+		// Create a read-only memory-mapped file
+		FileChannel roChannel = new RandomAccessFile(file, "r").getChannel();
+		ByteBuffer roBuf = roChannel.map(FileChannel.MapMode.READ_ONLY, 0, (int)roChannel.size());
+        */
+		// Create a read-write memory-mapped file
+		FileChannel rwChannel = new RandomAccessFile(file, "rw").getChannel();
+		ByteBuffer wrBuf = rwChannel.map(FileChannel.MapMode.READ_WRITE, 0, (int)rwChannel.size());
+		/*
+		// Create a private (copy-on-write) memory-mapped file.
+		// Any write to this channel results in a private copy of the data.
+		FileChannel pvChannel = new RandomAccessFile(file, "rw").getChannel();
+		ByteBuffer pvBuf = roChannel.map(FileChannel.MapMode.READ_WRITE, 0, (int)rwChannel.size());		
+		*/
+		return newOutputStream(wrBuf);
+	}
+	
+	 // Returns an output stream for a ByteBuffer.
+    // The write() methods use the relative ByteBuffer put() methods.
+    public static OutputStream newOutputStream(final ByteBuffer buf) {
+        return new OutputStream() {
+            public synchronized void write(int b) throws IOException {
+                buf.put((byte)b);               
+            }
+    
+            public synchronized void write(byte[] bytes, int off, int len) throws IOException {
+                buf.put(bytes, off, len);
+            }
+        };
+    }
+    
+    // Returns an input stream for a ByteBuffer.
+    // The read() methods use the relative ByteBuffer get() methods.
+    public static InputStream newInputStream(final ByteBuffer buf) {
+        return new InputStream() {
+            public synchronized int read() throws IOException {
+                if (!buf.hasRemaining()) {
+                    return -1;
+                }
+                return buf.get();
+            }
+    
+            public synchronized int read(byte[] bytes, int off, int len) throws IOException {
+                // Read only what's left
+                len = Math.min(len, buf.remaining());
+                buf.get(bytes, off, len);
+                return len;
+            }
+        };
+    }
 }
