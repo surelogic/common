@@ -397,11 +397,13 @@ public final class SLLicenseUtility {
 	 */
 	public static boolean validate(final String subject) {
 		LicenseContent lc;
+		LicenseContent allLicense;
 		boolean usingAllToolsLicense = false;
 		synchronized (SLLicenseUtility.class) {
 			lc = tryToGetInstalledLicense(subject);
+			allLicense = tryToGetInstalledLicense(ALL_TOOL_SUBJECT);
 			if (lc == null) {
-				lc = tryToGetInstalledLicense(ALL_TOOL_SUBJECT);
+				lc = allLicense;
 				usingAllToolsLicense = true;
 			}
 		}
@@ -411,12 +413,18 @@ public final class SLLicenseUtility {
 		 */
 		if (licensed) {
 			final Date expiration = lc.getNotAfter();
-			final Calendar now = Calendar.getInstance();
-			now.add(Calendar.WEEK_OF_YEAR, 1);
-			if (expiration.before(now.getTime())) {
-				for (ILicenseObserver o : f_observers)
-					o.notifyExpiration(usingAllToolsLicense ? ALL_TOOL_SUBJECT : subject, 
-							           expiration);
+			final Calendar nextWeek = Calendar.getInstance();
+			nextWeek.add(Calendar.WEEK_OF_YEAR, 1);			
+			if (expiration.before(nextWeek.getTime())) {
+				// lc is about to expire, and ...
+				final Date allExpiration = allLicense.getNotAfter();
+				if (allLicense == null || lc == allLicense || // can't use ALL instead
+					allExpiration.before(nextWeek.getTime())) // or ALL's also about to expire
+				{
+					for (ILicenseObserver o : f_observers)
+						o.notifyExpiration(usingAllToolsLicense ? ALL_TOOL_SUBJECT : subject, 
+								           expiration);
+				} 
 			}
 		} else {
 			for (ILicenseObserver o : f_observers)
