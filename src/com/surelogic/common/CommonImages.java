@@ -15,6 +15,7 @@ public final class CommonImages {
 	 * Symbolic image names
 	 */
 	public static final String IMG_ANNOTATION = "annotation.gif";
+	public static final String IMG_ANNOTATION_ERROR = "annotation_error.gif";
 	public static final String IMG_ASSUME_DECR = "assume_decr.gif";
 	public static final String IMG_ASTERISK_DIAMOND_GRAY = "asterisk_diamond_gray.gif";
 	public static final String IMG_ASTERISK_DIAMOND_ORANGE = "asterisk_diamond_orange.gif";
@@ -75,6 +76,7 @@ public final class CommonImages {
 	public static final String IMG_JAVA_COMP_UNIT = "java_comp_unit.gif";
 	public static final String IMG_JETTY_LOG = "jetty_log.gif";
 	public static final String IMG_JSURE_LOGO = "jsure_logo.gif";
+	public static final String IMG_JSURE_MODEL_PROBLEMS = "jsure_model_problems.gif";
 	public static final String IMG_JSURE_NO_VERIFY_GRAY = "jsure_no_verify_gray.gif";
 	public static final String IMG_JSURE_NO_VERIFY = "jsure_no_verify.gif";
 	public static final String IMG_JSURE_VERIFY_GRAY = "jsure_verify_gray.gif";
