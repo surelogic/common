@@ -48,10 +48,13 @@ public final class CommonImages {
 	public static final String IMG_EDIT_PASTE = "edit_paste.gif";
 	public static final String IMG_EDIT_PRINT = "edit_print.gif";
 	public static final String IMG_EMPTY = "empty.gif";
+	public static final String IMG_EMPTY_DOT = "empty_dot.gif";
 	public static final String IMG_ENUM = "enum.gif";
 	public static final String IMG_ERROR = "error.gif";
-	public static final String IMG_EXPORT_WEB = "export_ws_wiz.png";
+	public static final String IMG_EXPAND_ALL = "expand_all.gif";
 	public static final String IMG_EXPORT = "export.gif";
+	public static final String IMG_EXPORT_WEB = "export_ws_wiz.png";
+	public static final String IMG_EXPORT_WITH_SOURCE = "export_with_source.gif";
 	public static final String IMG_FILE = "file.gif";
 	public static final String IMG_FILTER = "filter.gif";
 	public static final String IMG_FINDBUGS_FINDING = "findbugs_finding.gif";
@@ -66,6 +69,7 @@ public final class CommonImages {
 	public static final String IMG_GRAY_X_DOUBLE = "gray_x_double.gif";
 	public static final String IMG_GRAY_X_LIGHT = "gray_x_light.gif";
 	public static final String IMG_GRAY_X = "gray_x.gif";
+	public static final String IMG_GREEN_DOT = "green_dot.gif";
 	public static final String IMG_HIERARCHICAL = "hierarchical.gif";
 	public static final String IMG_IMPORT = "import.gif";
 	public static final String IMG_INCONSISTENT_DECR = "inconsistent_decr.gif";
@@ -75,6 +79,7 @@ public final class CommonImages {
 	public static final String IMG_JAR = "jar.gif";
 	public static final String IMG_JAVA_COMP_UNIT = "java_comp_unit.gif";
 	public static final String IMG_JETTY_LOG = "jetty_log.gif";
+	public static final String IMG_JSURE_DECR = "jsure_decr.gif";
 	public static final String IMG_JSURE_LOGO = "jsure_logo.gif";
 	public static final String IMG_JSURE_MODEL_PROBLEMS = "jsure_model_problems.gif";
 	public static final String IMG_JSURE_NO_VERIFY_GRAY = "jsure_no_verify_gray.gif";
@@ -90,6 +95,8 @@ public final class CommonImages {
 	public static final String IMG_PAGE_ORANGE = "page_orange.gif";
 	public static final String IMG_PLUS = "plus.gif";
 	public static final String IMG_PMD_FINDING = "pmd_finding.gif";
+	public static final String IMG_PREREQUISITE = "prerequisite.gif";
+	public static final String IMG_PREREQUISITE_GRAY = "prerequisite_gray.gif";
 	public static final String IMG_PRIORITY = "priority.gif";
 	public static final String IMG_PROJECT = "project.gif";
 	public static final String IMG_PROMISE_CONSISTENT = "promise_consistent.gif";
