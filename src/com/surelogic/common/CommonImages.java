@@ -137,6 +137,7 @@ public final class CommonImages {
 	public static final String IMG_SIERRA_SYNC = "sierra_sync.gif";
 	public static final String IMG_SORT_DOWN = "sort_down.gif";
 	public static final String IMG_SORT_UP = "sort_up.gif";
+	public static final String IMG_SUGGESTIONS_WARNINGS = "suggestions_warnings.gif";
 	public static final String IMG_TALLYHO = "tallyho.gif";
 	public static final String IMG_TEAM_SERVER_DECR = "team_server_decr.gif";
 	public static final String IMG_TRAFFIC_LIGHT_GREEN = "traffic_light_green.png";
