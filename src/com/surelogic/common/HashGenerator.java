@@ -263,7 +263,7 @@ public class HashGenerator {
 			lastOffsetLine = line;
 			return line;
 		} catch (final IOException e) {
-			e.printStackTrace();
+			SLLogger.getLogger().log(Level.SEVERE, "Unable to read "+fileName, e);
 		}
 		return -1;
 	}

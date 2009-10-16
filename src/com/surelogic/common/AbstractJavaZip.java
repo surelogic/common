@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -88,8 +89,7 @@ public abstract class AbstractJavaZip<T> {
 		try {
 			pathName = getFullPath(resource);
 		} catch (final IOException e) {
-			LOG.severe("Error adding " + getName(resource) + " to ZIP.");
-			e.printStackTrace();
+			LOG.log(Level.SEVERE, "Error adding " + getName(resource) + " to ZIP.", e);
 			return;
 		}
 		if (pathName.startsWith("/")) {
@@ -147,16 +147,15 @@ public abstract class AbstractJavaZip<T> {
 					}
 				}
 			} catch (final IOException e) {
-				LOG.severe("Error adding " + pathName + " to ZIP.");
-				e.printStackTrace();
+				LOG.log(Level.SEVERE, "Error adding " + pathName + " to ZIP.", e);
+				return;
 			}
 		} else { // Resource is an container
 			T[] members;
 			try {
 				members = getMembers(resource);
 			} catch (final IOException e) {
-				LOG.severe("Error accessing child resources");
-				e.printStackTrace();
+				LOG.log(Level.SEVERE, "Error accessing child resources", e);
 				return;
 			}
 			for (final T member : members) {
