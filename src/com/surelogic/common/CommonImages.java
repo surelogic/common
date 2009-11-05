@@ -16,6 +16,8 @@ public final class CommonImages {
 	 */
 	public static final String IMG_ANNOTATION = "annotation.gif";
 	public static final String IMG_ANNOTATION_ERROR = "annotation_error.gif";
+	public static final String IMG_ARROW_DOWN = "arrow_down.gif";
+	public static final String IMG_ARROW_RIGHT = "arrow_right.gif";
 	public static final String IMG_ASSUME_DECR = "assume_decr.gif";
 	public static final String IMG_ASTERISK_DIAMOND_GRAY = "asterisk_diamond_gray.gif";
 	public static final String IMG_ASTERISK_DIAMOND_ORANGE = "asterisk_diamond_orange.gif";
@@ -94,6 +96,7 @@ public final class CommonImages {
 	public static final String IMG_PAGE_BLUE = "page_blue.gif";
 	public static final String IMG_PAGE_ORANGE = "page_orange.gif";
 	public static final String IMG_PLUS = "plus.gif";
+	public static final String IMG_PLUS_VOUCH = "plus_vouch.gif";
 	public static final String IMG_PMD_FINDING = "pmd_finding.gif";
 	public static final String IMG_PREREQUISITE = "prerequisite.gif";
 	public static final String IMG_PREREQUISITE_GRAY = "prerequisite_gray.gif";

@@ -11,7 +11,7 @@
 //
 //
 //This file requires two images to be present in the folder 'image_files':
-//arrow-right.gif and arrow-down.gif
+//arrow_right.gif and arrow_down.gif
 //
 //
 //
