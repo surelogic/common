@@ -14,12 +14,14 @@ public abstract class AbstractJavaFileZip extends AbstractJavaZip<File> {
 		return res.getCanonicalPath();
 	}
 
+	private static final File[] noFiles = new File[0];
+	
 	@Override
 	protected File[] getMembers(File res) throws IOException {
 		if (res.isDirectory()) {
 			return res.listFiles();
 		}
-		return null;
+		return noFiles;
 	}
 
 	@Override
