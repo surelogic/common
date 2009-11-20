@@ -74,7 +74,7 @@ function outlineInitItem(item)
 			"onClick='outlineItemClickByOffset(" + len + 
 			"); return false' " +
 			"class='olink'>" +
-		    "<img class='oimg' alt='Open' style=\"border: none\" src='image_files/arrow-right.gif'></a>";
+		    "<img class='oimg' alt='Open' style=\"border: none\" src='image_files/arrow_right.gif'></a>";
 		item.insertBefore(span, kids[0]);
 		item.onclick = outlineItemClick;
 	}
@@ -136,10 +136,10 @@ function outlineItemClickBody(target)
 	var img = outlineGetImg(target);
 	if (closed) {
 		// We've just opened it, show close button
-		img.src = "image_files/arrow-down.gif";
+		img.src = "image_files/arrow_down.gif";
 		img.alt = "Close";
 	} else {
-		img.src = "image_files/arrow-right.gif";
+		img.src = "image_files/arrow_right.gif";
 		img.alt = "Open";
 	}
 }
