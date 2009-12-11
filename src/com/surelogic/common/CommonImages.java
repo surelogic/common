@@ -154,7 +154,7 @@ public final class CommonImages {
 	public static final String IMG_WARNING = "warning.gif";
 
 	/**
-	 * Gets the ULR to the passed name within this package.
+	 * Gets the URL to the passed name within this package.
 	 * 
 	 * @param imageSymbolicName
 	 *            the image's symbolic name.
@@ -162,7 +162,8 @@ public final class CommonImages {
 	 */
 	public static URL getImageURL(String imageSymbolicName) {
 		final String path = PATH + imageSymbolicName;
-		final URL url = CommonImages.class.getResource(path);
+		final URL url = Thread.currentThread().getContextClassLoader()
+				.getResource(path);
 		return url;
 	}
 
