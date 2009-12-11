@@ -266,6 +266,10 @@ public final class ServiceUtility {
 	 *            the message for SureLogic.
 	 */
 	public static SLJob sendToSureLogic(final String msg) {
+		return sendToSureLogic(msg, null);
+	}
+	
+	public static SLJob sendToSureLogic(final String msg, final Runnable after) {
 		return new SLJob() {
 
 			public String getName() {
@@ -293,6 +297,10 @@ public final class ServiceUtility {
 						// Check the response
 						final InputStream is = conn.getInputStream();
 						is.close();
+						
+						if (after != null) {
+							after.run();
+						}
 					} finally {
 						if (wr != null) {
 							wr.close();
