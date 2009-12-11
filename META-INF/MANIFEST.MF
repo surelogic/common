@@ -24,6 +24,10 @@ Export-Package: com.surelogic.common,
  de.schlichtherle.license.ftp,
  de.schlichtherle.util,
  de.schlichtherle.xml,
+ jsr166x,
+ jsr166y,
+ jsr166y.forkjoin,
+ jsr166y.locks,
  org.antlr.runtime,
  org.antlr.runtime.debug,
  org.antlr.runtime.misc,
@@ -43,4 +47,5 @@ Export-Package: com.surelogic.common,
  org.apache.commons.lang.time
 Bundle-ClassPath: lib/runtime/antlr-runtime-3.1-sl.jar,
  .,
- lib/runtime/commons-lang-2.4.jar
+ lib/runtime/commons-lang-2.4.jar,
+ lib/runtime/jsr166xy_java5.jar
