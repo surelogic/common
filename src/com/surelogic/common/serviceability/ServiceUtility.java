@@ -103,7 +103,7 @@ public final class ServiceUtility {
 
     if (includeUsage) {
       b.append(lf).append(lf);
-      b.append(I18N.msg("common.serviceability.usageLog.title"));
+      b.append(ServiceabilityConstants.USAGE_LOG_TITLE);
       b.append(lf).append(lf);
       b.append(UsageMeter.getInstance().getFileContents());
     }
@@ -146,7 +146,7 @@ public final class ServiceUtility {
       final String email, final String name, final String summary,
       final String report, final boolean includeVersionInfo,
       final String ideVersion, final boolean includeUsage,
-      final File ideLogFile, final String ideLogFileI18nKey) {
+      final File ideLogFile) {
     final StringBuilder b = new StringBuilder();
     final String lf = System.getProperty("line.separator");
 
@@ -202,14 +202,14 @@ public final class ServiceUtility {
 
     if (includeUsage) {
       b.append(lf).append(lf);
-      b.append(I18N.msg("common.serviceability.usageLog.title"));
+      b.append(ServiceabilityConstants.USAGE_LOG_TITLE);
       b.append(lf).append(lf);
       b.append(UsageMeter.getInstance().getFileContents());
     }
 
     if (ideLogFile != null) {
       b.append(lf).append(lf);
-      b.append(I18N.msg(ideLogFileI18nKey));
+      b.append(ServiceabilityConstants.ECLIPSE_LOG_TITLE);
       b.append(lf).append(lf);
       b.append(FileUtility.getFileContents(ideLogFile));
     }
