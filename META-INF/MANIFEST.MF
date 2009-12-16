@@ -4,7 +4,8 @@ Bundle-Name: SureLogic Common Code
 Bundle-SymbolicName: com.surelogic.common
 Bundle-Version: 3.1.0.qualifier
 Bundle-Vendor: SureLogic, Inc.
-Export-Package: com.surelogic.common,
+Export-Package: com.surelogic,
+ com.surelogic.common,
  com.surelogic.common.base64,
  com.surelogic.common.concurrent,
  com.surelogic.common.export,
@@ -48,4 +49,5 @@ Export-Package: com.surelogic.common,
 Bundle-ClassPath: lib/runtime/antlr-runtime-3.1-sl.jar,
  .,
  lib/runtime/commons-lang-2.4.jar,
- lib/runtime/jsr166xy_java5.jar
+ lib/runtime/jsr166xy_java5.jar,
+ lib/runtime/promises-3.1.0.jar
