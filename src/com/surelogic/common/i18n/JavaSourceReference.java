@@ -41,6 +41,11 @@ public final class JavaSourceReference {
 		f_lineNumber = lineNumber;
 	}
 
+	public JavaSourceReference(String projectName, String packageName,
+			String typeName) {
+		this(projectName, packageName, typeName, 0);
+	}
+
 	public JavaSourceReference(String packageName, String typeName,
 			int lineNumber) {
 		this(null, packageName, typeName, lineNumber);
@@ -119,7 +124,7 @@ public final class JavaSourceReference {
 	 * If the project name is {@code null} it is not included. If the line
 	 * number is 0 (meaning unknown) it is not included.
 	 * 
-	 * @return
+	 * @return an <i>n</i>-tuple containing the contents of this object.
 	 */
 	public String toStringCanonical() {
 		final StringBuilder b = new StringBuilder();
@@ -133,6 +138,28 @@ public final class JavaSourceReference {
 		if (lineNumber > 0)
 			b.append(',').append(getLineNumber());
 		b.append(')');
+		return b.toString();
+	}
+
+	/**
+	 * Returns a human readable message about the contents of this object. For
+	 * example, the string <tt>"at line 50 in com.surelogic.Foo (common)"</tt>
+	 * would result if this references line 50 of the class {@code Foo} in
+	 * package {@code com.surelogic} in the project {@code common}.
+	 * 
+	 * @return a human readable message about the contents of this object.
+	 */
+	public String toStringMessage() {
+		final StringBuilder b = new StringBuilder();
+		final int lineNumber = getLineNumber();
+		if (lineNumber > 0) {
+			b.append("at line ").append(lineNumber).append(' ');
+		}
+		b.append("in ");
+		b.append(getPackageName()).append('.').append(getTypeName());
+		final String projectName = getProjectName();
+		if (projectName != null)
+			b.append(" (").append(projectName).append(')');
 		return b.toString();
 	}
 
