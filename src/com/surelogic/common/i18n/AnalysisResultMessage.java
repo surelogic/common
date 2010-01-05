@@ -55,6 +55,11 @@ public final class AnalysisResultMessage {
 				f_args);
 	}
 
+	public String getResultStringCanonical() {
+		return f_args.length == 0 ? I18N.resc(f_number) : I18N.resc(f_number,
+				f_args);
+	}
+
 	public JavaSourceReference getSrcRef() {
 		return f_srcRef;
 	}
@@ -70,8 +75,7 @@ public final class AnalysisResultMessage {
 
 	public String toStringCanonical() {
 		final StringBuilder b = new StringBuilder();
-		b.append(f_args.length == 0 ? I18N.resc(f_number) : I18N.resc(f_number,
-				f_args));
+		b.append(getResultStringCanonical());
 		b.append('@');
 		b.append(f_srcRef.toStringCanonical());
 		return b.toString();
