@@ -22,6 +22,9 @@ public final class I18N {
 
   private static final String ERROR_FORMAT = "(SureLogic #%d) %s";
 
+  private static final ResourceBundle RESULTS = ResourceBundle
+      .getBundle(I18N.class.getPackage().getName() + ".SureLogicResults");
+
   /**
    * Gets the string defined for the given key from the i18n resource bundle.
    * For example, <tt>I18N.msg("ad-hoc-query.cheer")</tt> would result in the
@@ -84,8 +87,8 @@ public final class I18N {
    * error.00023=A singular problem.
    * </pre>
    * 
-   * is contained in the SureLogic properties file. If the key is not defined in
-   * the SureLogic properties file an exception is thrown.
+   * is contained in the SureLogicErrors properties file. If the key is not
+   * defined in the SureLogicErrors properties file an exception is thrown.
    * 
    * @param number
    *          the error message number.
@@ -114,8 +117,8 @@ public final class I18N {
    * error.00024=A %s problem.
    * </pre>
    * 
-   * is contained in the SureLogic properties file. If the key is not defined in
-   * the SureLogic properties file an exception is thrown.
+   * is contained in the SureLogicErrors properties file. If the key is not
+   * defined in the SureLogicErrors properties file an exception is thrown.
    * 
    * @param number
    *          the error message number.
@@ -126,6 +129,106 @@ public final class I18N {
    */
   public static final String err(final int number, Object... args) {
     return String.format(I18N.err(number), args);
+  }
+
+  /**
+   * Gets the string defined for the given result number from the i18 resource
+   * bundle. The key for the result message in the SureLogic properties file is
+   * <i>nnnnn</i>. For example, <tt>I18N.res(2001)</tt> would result in the
+   * string <tt>"A singular result."</tt> if the definition
+   * 
+   * <pre>
+   * 02001=A singular problem.
+   * </pre>
+   * 
+   * is contained in the SureLogicResults properties file. If the key is not
+   * defined in the SureLogicResults properties file an exception is thrown.
+   * 
+   * @param number
+   *          the result message number.
+   * @return the result message for the given number.
+   * 
+   * @see #resc(int)
+   */
+  public static final String res(final int number) {
+    final String key = String.format("%05d", number);
+    final String result = RESULTS.getString(key);
+    return result;
+  }
+
+  /**
+   * Gets and formats the string defined for the given result number from the
+   * i18 resource bundle. Calling this method is equivalent to calling
+   * 
+   * <pre>
+   * String.format(I18N.err(number), args).
+   * </pre>
+   * 
+   * The key for the result message in the SureLogic properties file is
+   * <i>nnnnn</i>. For example, <tt>I18N.res(456, "inconsistent")</tt> would
+   * result in the string <tt>"A inconsistent result."</tt> if the definition
+   * 
+   * <pre>
+   * 00456=A %s result.
+   * </pre>
+   * 
+   * is contained in the SureLogicResults properties file. If the key is not
+   * defined in the SureLogic SureLogicResults file an exception is thrown.
+   * 
+   * @param number
+   *          the result message number.
+   * @param args
+   *          the variable arguments to format the resulting result message
+   *          with.
+   * @return the formatted result message for the given number.
+   * @see String#format(String, Object...)
+   * @see #resc(int, Object...)
+   */
+  public static final String res(final int number, Object... args) {
+    return String.format(I18N.res(number), args);
+  }
+
+  /**
+   * Returns a canonical version of the analysis result. For example, {@code
+   * I18N.resc(2001)} will return <tt>"(2001)"</tt>.
+   * <p>
+   * Throws an exception if a call to {@code I18N.res} is not legal for the
+   * passed result message number.
+   * 
+   * @param number
+   *          the result message number.
+   * @return a canonical version of the analysis result.
+   * @see #res(int)
+   */
+  public static final String resc(final int number) {
+    res(number); // toss result, but ensure the call works
+    return "(" + number + ")";
+  }
+
+  /**
+   * Returns a canonical version of the analysis result. For example, {@code
+   * I18N.resc(2001, "foo", 5)} will return <tt>"(2001,foo,5)"</tt>. *
+   * <p>
+   * Throws an exception if a call to {@code I18N.res} is not legal for the
+   * passed result message number.
+   * 
+   * @param number
+   *          the result message number.
+   * @param args
+   *          the variable arguments to format the resulting result message
+   *          with.
+   * @return a canonical version of the analysis result.
+   * @see #res(int, Object...)
+   */
+  public static final String resc(final int number, Object... args) {
+    res(number, args); // toss result, but ensure the call works
+    final StringBuilder b = new StringBuilder();
+    b.append('(').append(number);
+    for (Object o : args) {
+      b.append(',').append(o);
+    }
+    b.append(')');
+    return b.toString();
   }
 
   private I18N() {
