@@ -7,11 +7,18 @@ import java.util.Date;
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 
+import com.surelogic.RegionEffects;
+import com.surelogic.Unique;
+
 /**
  * A concise format for SureLogic loggers.
  */
 public final class SLFormatter extends Formatter {
-
+	@Unique("return")
+	public SLFormatter() {
+		// Only to be annotated
+	}
+	
 	private final static ThreadLocal<SimpleDateFormat> tl_format = new ThreadLocal<SimpleDateFormat>() {
 		@Override
 		protected SimpleDateFormat initialValue() {

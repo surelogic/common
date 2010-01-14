@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 
+import com.surelogic.*;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.jobs.NullSLProgressMonitor;
 import com.surelogic.common.jobs.SLJob;
@@ -15,8 +16,11 @@ import com.surelogic.common.jobs.SLProgressMonitor;
 import com.surelogic.common.jobs.SLStatus;
 import com.surelogic.common.logging.SLLogger;
 
+@RegionLock("Lock is this protects Instance")
+@Promise("@Unique(return) for new()")
 public final class LicenseBlacklist {
-
+	@Unique
+	@Aggregate
 	private final List<UUID> f_blacklist = new ArrayList<UUID>();
 
 	public synchronized List<UUID> getList() {

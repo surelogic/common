@@ -7,11 +7,14 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.surelogic.*;
 import com.surelogic.common.i18n.I18N;
 
 /**
  * A utility for obtaining SureLogic loggers. This class is thread-safe.
  */
+@Region("static LoggerState")
+@RegionLock("Lock is class protects LoggerState")
 public class SLLogger {
 
 	public static final String SL_LOGGING_PROPERTY = "SLLoggingLevel";
@@ -23,6 +26,8 @@ public class SLLogger {
 	 * <p>
 	 * The default is to show all logged messages at INFO and above.
 	 */
+	@Unique
+	@AggregateInRegion("LoggerState")
 	public static final AtomicReference<Level> LEVEL;
 
 	static {
@@ -71,17 +76,23 @@ public class SLLogger {
 	 * Everyone can reuse the same instance of this formatter because the
 	 * format() method uses no instance state.
 	 */
+	@Unique
+	@AggregateInRegion("LoggerState")
 	private static final AtomicReference<SLFormatter> f_formatter = new AtomicReference<SLFormatter>(
 			new SLFormatter());
 
 	/**
 	 * A simple cache of loggers we have already configured.
 	 */
+	@Unique
+	@AggregateInRegion("LoggerState")
 	private static final Map<String, Logger> f_nameToLogger = new HashMap<String, Logger>();
 
 	/**
 	 * A list of the handlers we manage for logging.
 	 */
+	@Unique
+	@AggregateInRegion("LoggerState")
 	private static final List<Handler> f_handlers = new ArrayList<Handler>();
 
 	/**
@@ -93,6 +104,7 @@ public class SLLogger {
 	 * @param logger
 	 *            the logger to add handlers to.
 	 */
+	@RequiresLock("Lock")
 	private static void addAllHandlersTo(final Logger logger) {
 		for (Handler handler : f_handlers) {
 			logger.addHandler(handler);
@@ -165,6 +177,7 @@ public class SLLogger {
 	 *            the logger name.
 	 * @return a suitable Logger.
 	 */
+	@RequiresLock("Lock")
 	private static Logger getLoggerInternal(final String name) {
 		assert name != null;
 

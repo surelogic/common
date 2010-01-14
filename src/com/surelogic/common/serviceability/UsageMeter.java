@@ -2,6 +2,7 @@ package com.surelogic.common.serviceability;
 
 import java.io.File;
 
+import com.surelogic.*;
 import com.surelogic.common.FileUtility;
 import com.surelogic.common.xml.XMLMemo;
 
@@ -11,6 +12,7 @@ import com.surelogic.common.xml.XMLMemo;
  * <p>
  * This class is thread-safe.
  */
+@RegionLock("Lock is this protects Instance")
 public final class UsageMeter {
 
 	private static UsageMeter INSTANCE = new UsageMeter();
@@ -33,6 +35,8 @@ public final class UsageMeter {
 		return f_usageFile;
 	}
 
+	@Unique
+	@Aggregate
 	private XMLMemo f_memo = new XMLMemo(f_usageFile);
 
 	/**
@@ -97,6 +101,7 @@ public final class UsageMeter {
 		return FileUtility.getFileContents(f_usageFile);
 	}
 
+	@Unique("return")
 	private UsageMeter() {
 		// singleton
 		f_memo.init();

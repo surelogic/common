@@ -2,6 +2,7 @@ package com.surelogic.common.jobs.console;
 
 import java.io.PrintWriter;
 
+import com.surelogic.*;
 import com.surelogic.common.jobs.CancellableSLProgressMonitor;
 import com.surelogic.common.jobs.SLProgressMonitor;
 import com.surelogic.common.jobs.SLProgressMonitorFactory;
@@ -9,6 +10,9 @@ import com.surelogic.common.jobs.SLProgressMonitorFactory;
 /**
  * A progress monitor that prints status reports to a {@link PrintWriter}.
  */
+@Region("MonitorState")
+@RegionLock("Lock is this protects MonitorState")
+@InRegion("f_indentLevel, f_atNewLine into MonitorState")
 public final class PrintWriterSLProgressMonitor extends
 		CancellableSLProgressMonitor {
 
@@ -38,6 +42,7 @@ public final class PrintWriterSLProgressMonitor extends
 	private int f_indentLevel = 0;
 	private boolean f_atNewLine = true;
 
+	
 	/**
 	 * Constructs a new console progress monitor instance.
 	 * 
@@ -46,6 +51,7 @@ public final class PrintWriterSLProgressMonitor extends
 	 * @param name
 	 *            the name of the job we are monitoring the progress of.
 	 */
+	@Unique("return")
 	public PrintWriterSLProgressMonitor(final PrintWriter pw, final String name) {
 		f_out = pw;
 		f_name = name;
@@ -58,6 +64,7 @@ public final class PrintWriterSLProgressMonitor extends
 	 * @param name
 	 *            the name of the job we are monitoring the progress of.
 	 */
+	@Unique("return")
 	public PrintWriterSLProgressMonitor(final String name) {
 		this(new PrintWriter(System.out), name);
 	}

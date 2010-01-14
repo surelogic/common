@@ -9,6 +9,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 import javax.security.auth.x500.X500Principal;
 
+import com.surelogic.*;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.jobs.NullSLProgressMonitor;
 import com.surelogic.common.jobs.SLJob;
@@ -22,6 +23,7 @@ import de.schlichtherle.license.LicenseManager;
 /**
  * A utility to help manage licenses to use SureLogic tools.
  */
+@PolicyLock("Lock is class")
 public final class SLLicenseUtility {
 
 	/*

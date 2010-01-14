@@ -30,7 +30,9 @@ public abstract class AbstractRemoteSLJob {
 			System.exit(-RemoteSLJobConstants.ERROR_NO_OUTPUT_FROM_JOB);
 		}
 		System.out.println("JVM started");
-		System.out.println("Log level: " + SLLogger.LEVEL.get());
+		synchronized (SLLogger.class) {
+			System.out.println("Log level: " + SLLogger.LEVEL.get());
+		}
 		/*
 		 * System.out.println("java.system.class.loader = "+System.getProperty("java.system.class.loader"
 		 * ));System.out.println("System classloader = "+ClassLoader.

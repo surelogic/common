@@ -18,6 +18,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import com.surelogic.*;
 import com.surelogic.common.ILifecycle;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.logging.SLLogger;
@@ -44,12 +45,14 @@ public final class XMLMemo implements ILifecycle {
 
 	private final File f_file;
 
+	@Unique("return")
 	public XMLMemo(final File file) {
 		if (file == null)
 			throw new IllegalArgumentException(I18N.err(44, "file"));
 		f_file = file;
 	}
 
+	@Borrowed("this")
 	public void init() {
 		try {
 			load();
@@ -166,7 +169,8 @@ public final class XMLMemo implements ILifecycle {
 		pw.println("</" + MEMO + ">");
 		pw.close();
 	}
-
+	
+	@Borrowed("this")
 	private void load() throws Exception {
 		final InputStream stream;
 		try {

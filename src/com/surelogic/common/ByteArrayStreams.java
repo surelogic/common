@@ -5,6 +5,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import com.surelogic.*;
+
 /**
  * Class that uses a common buffer between and {@link OutputStream} and an
  * {@link InputStream}. The idea is that first the data is written, and then
@@ -34,6 +36,7 @@ import java.io.OutputStream;
  * the copying of the data that would occur if the standard Java classes were
  * used.
  */
+@RegionLock("Lock is this protects Instance")
 public final class ByteArrayStreams {
   private enum State { READY, WRITING, WRITE_CLOSED, READING, READ_CLOSED }
   
@@ -64,6 +67,7 @@ public final class ByteArrayStreams {
    * Creates a new byte array output stream. The buffer capacity is 
    * initially 32 bytes, though its size increases if necessary. 
    */
+  @Unique("return")
   public ByteArrayStreams() {
     this(32);
   }
@@ -75,6 +79,7 @@ public final class ByteArrayStreams {
    * @param   size   the initial size.
    * @exception  IllegalArgumentException if size is negative.
    */
+  @Unique("return")
   public ByteArrayStreams(final int size) {
     if (size < 0) {
       throw new IllegalArgumentException("Negative initial size: " + size);
@@ -83,7 +88,7 @@ public final class ByteArrayStreams {
     state = State.READY;
   }
   
-  public SafeCloseOutputStream getOutputStream() {
+  public synchronized SafeCloseOutputStream getOutputStream() {
     if (state != State.READY) {
       throw new IllegalStateException("Streams not in the new/reset state.");
     }
@@ -92,7 +97,7 @@ public final class ByteArrayStreams {
     return outStream;
   }
 
-  public SafeCloseInputStream getInputStream() {
+  public synchronized SafeCloseInputStream getInputStream() {
     if (state != State.WRITE_CLOSED) {
       throw new IllegalStateException("Streams not in the write closed state.");
     }
@@ -105,7 +110,7 @@ public final class ByteArrayStreams {
    * Can always be called.  Returns the streams to the ready state.  Closes
    * any streams that may be open, and resets the byte count to zero.
    */
-  public void reset() {
+  public synchronized void reset() {
     count = 0;
     state = State.READY;
     if (outStream != null) {
@@ -130,16 +135,18 @@ public final class ByteArrayStreams {
      *          the byte to be written.
      */
     @Override
-    public synchronized void write(final int b) {
-      checkStatus();
-      int newcount = count + 1;
-      if (newcount > buf.length) {
-        byte newbuf[] = new byte[Math.max(buf.length << 1, newcount)];
-        System.arraycopy(buf, 0, newbuf, 0, count);
-        buf = newbuf;
-      }
-      buf[count] = (byte) b;
-      count = newcount;
+    public void write(final int b) {
+    	synchronized (ByteArrayStreams.this) {
+    		checkStatus();
+    		int newcount = count + 1;
+    		if (newcount > buf.length) {
+    			byte newbuf[] = new byte[Math.max(buf.length << 1, newcount)];
+    			System.arraycopy(buf, 0, newbuf, 0, count);
+    			buf = newbuf;
+    		}
+    		buf[count] = (byte) b;
+    		count = newcount;
+    	}
     }
 
     /**
@@ -151,30 +158,34 @@ public final class ByteArrayStreams {
      * @param   len   the number of bytes to write.
      */
     @Override
-    public synchronized void write(final byte b[], final int off, final int len) {
-      checkStatus();
-      if ((off < 0) || (off > b.length) || (len < 0)
-          || ((off + len) > b.length) || ((off + len) < 0)) {
-        throw new IndexOutOfBoundsException();
-      } else if (len == 0) {
-        return;
-      }
-      int newcount = count + len;
-      if (newcount > buf.length) {
-        byte newbuf[] = new byte[Math.max(buf.length << 1, newcount)];
-        System.arraycopy(buf, 0, newbuf, 0, count);
-        buf = newbuf;
-      }
-      System.arraycopy(b, off, buf, count, len);
-      count = newcount;
+    public void write(final byte b[], final int off, final int len) {
+     	synchronized (ByteArrayStreams.this) {
+     		checkStatus();
+     		if ((off < 0) || (off > b.length) || (len < 0)
+     				|| ((off + len) > b.length) || ((off + len) < 0)) {
+     			throw new IndexOutOfBoundsException();
+     		} else if (len == 0) {
+     			return;
+     		}
+     		int newcount = count + len;
+     		if (newcount > buf.length) {
+     			byte newbuf[] = new byte[Math.max(buf.length << 1, newcount)];
+     			System.arraycopy(buf, 0, newbuf, 0, count);
+     			buf = newbuf;
+     		}
+     		System.arraycopy(b, off, buf, count, len);
+     		count = newcount;
+     	}
     }
     
     @Override
     public void close() {
-      checkStatus();
-      alive = false;
-      ByteArrayStreams.this.outStream = null;
-      state = State.WRITE_CLOSED;
+    	synchronized (ByteArrayStreams.this) {
+    		checkStatus();
+    		alive = false;
+    		ByteArrayStreams.this.outStream = null;
+    		state = State.WRITE_CLOSED;
+    	}
     }
 
     private void checkStatus() {
@@ -224,9 +235,11 @@ public final class ByteArrayStreams {
      *         stream has been reached.
      */
     @Override
-    public synchronized int read() {
-      checkState();
-      return (pos < count) ? (buf[pos++] & 0xff) : -1;
+    public int read() {
+    	synchronized (ByteArrayStreams.this) {
+    		checkState();
+    		return (pos < count) ? (buf[pos++] & 0xff) : -1;
+    	}
     }
 
     /**
@@ -254,26 +267,28 @@ public final class ByteArrayStreams {
      *         stream has been reached.
      */
     @Override
-    public synchronized int read(final byte b[], final int off, int len) {
-      checkState();
-      if (b == null) {
-        throw new NullPointerException();
-      } else if ((off < 0) || (off > b.length) || (len < 0)
-          || ((off + len) > b.length) || ((off + len) < 0)) {
-        throw new IndexOutOfBoundsException();
-      }
-      if (pos >= count) {
-        return -1;
-      }
-      if (pos + len > count) {
-        len = count - pos;
-      }
-      if (len <= 0) {
-        return 0;
-      }
-      System.arraycopy(buf, pos, b, off, len);
-      pos += len;
-      return len;
+    public int read(final byte b[], final int off, int len) {
+    	synchronized (ByteArrayStreams.this) {
+    		checkState();
+    		if (b == null) {
+    			throw new NullPointerException();
+    		} else if ((off < 0) || (off > b.length) || (len < 0)
+    				|| ((off + len) > b.length) || ((off + len) < 0)) {
+    			throw new IndexOutOfBoundsException();
+    		}
+    		if (pos >= count) {
+    			return -1;
+    		}
+    		if (pos + len > count) {
+    			len = count - pos;
+    		}
+    		if (len <= 0) {
+    			return 0;
+    		}
+    		System.arraycopy(buf, pos, b, off, len);
+    		pos += len;
+    		return len;
+    	}
     }
 
     /**
@@ -288,16 +303,18 @@ public final class ByteArrayStreams {
      * @return the actual number of bytes skipped.
      */
     @Override
-    public synchronized long skip(long n) {
-      checkState();
-      if (pos + n > count) {
-        n = count - pos;
-      }
-      if (n < 0) {
-        return 0;
-      }
-      pos += n;
-      return n;
+    public long skip(long n) {
+    	synchronized (ByteArrayStreams.this) {
+    		checkState();
+    		if (pos + n > count) {
+    			n = count - pos;
+    		}
+    		if (n < 0) {
+    			return 0;
+    		}
+    		pos += n;
+    		return n;
+    	}
     }
 
     /**
@@ -309,9 +326,11 @@ public final class ByteArrayStreams {
      *         without blocking.
      */
     @Override
-    public synchronized int available() {
-      checkState();
-      return count - pos;
+    public int available() {
+    	synchronized (ByteArrayStreams.this) {
+    		checkState();
+    		return count - pos;
+    	}
     }
 
     /**
@@ -352,9 +371,11 @@ public final class ByteArrayStreams {
      * constructor.
      */
     @Override
-    public synchronized void reset() {
-      checkState();
-      pos = mark;
+    public void reset() {
+    	synchronized (ByteArrayStreams.this) {
+    		checkState();
+    		pos = mark;
+    	}
     }
 
     /**
@@ -365,10 +386,12 @@ public final class ByteArrayStreams {
      */
     @Override
     public void close() {
-      checkState();
-      alive = false;
-      ByteArrayStreams.this.inStream = null;
-      state = State.READ_CLOSED;
+    	synchronized (ByteArrayStreams.this) {
+    		checkState();
+    		alive = false;
+    		ByteArrayStreams.this.inStream = null;      
+    		state = State.READ_CLOSED;
+    	}
     }
 
     private void checkState() {
