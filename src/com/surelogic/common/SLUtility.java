@@ -6,11 +6,13 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Formatter;
 
+import org.apache.commons.lang.SystemUtils;
+
 /**
  * A utility with SureLogic common code.
  */
 public final class SLUtility {
-
+	public static final boolean is64bit = (SystemUtils.OS_ARCH.indexOf("64") >= 0);	
 	public static final String JAVA_DEFAULT_PACKAGE = "(default package)";
 
 	/**
