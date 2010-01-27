@@ -12,7 +12,8 @@ package com.surelogic.common.i18n;
  * @see JavaSourceReference
  */
 public final class AnalysisResultMessage {
-
+	public static final Object[] noArgs = new Object[0];
+	
 	/**
 	 * This number must exist in the <tt>SureLogicResults.properties</tt> file
 	 * defined in this package.
@@ -32,7 +33,7 @@ public final class AnalysisResultMessage {
 	private AnalysisResultMessage(JavaSourceReference srcRef, int number,
 			Object... args) {
 		f_number = number;
-		f_args = args;
+		f_args = (args.length > 0) ? args : noArgs;
 		if (srcRef == null)
 			throw new IllegalArgumentException(I18N.err(44, "srcRef"));
 		f_srcRef = srcRef;
@@ -40,12 +41,14 @@ public final class AnalysisResultMessage {
 
 	public static AnalysisResultMessage getInstance(JavaSourceReference srcRef,
 			int number) {
+		// TODO cache the formatted message?
 		I18N.res(number); // toss result, but ensure the call works
-		return new AnalysisResultMessage(srcRef, number);
+		return new AnalysisResultMessage(srcRef, number, noArgs);
 	}
 
 	public static AnalysisResultMessage getInstance(JavaSourceReference srcRef,
 			int number, Object... args) {
+		// TODO cache the formatted message?
 		I18N.res(number, args); // toss result, but ensure the call works
 		return new AnalysisResultMessage(srcRef, number, args);
 	}
