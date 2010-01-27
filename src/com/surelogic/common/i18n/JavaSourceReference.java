@@ -26,9 +26,14 @@ public final class JavaSourceReference {
 	 * Must be non-negative. 0 indicates that the line number is not known.
 	 */
 	private final int f_lineNumber;
+	
+	/**
+	 * -1 indicates that the offset is not known
+	 */
+	private final int f_offset;
 
 	public JavaSourceReference(String projectName, String packageName,
-			String typeName, int lineNumber) {
+			String typeName, int lineNumber, int offset) {
 		f_projectName = projectName;
 		if (packageName == null)
 			throw new IllegalArgumentException(I18N.err(44, "packageName"));
@@ -39,20 +44,25 @@ public final class JavaSourceReference {
 		if (lineNumber < 0)
 			lineNumber = 0;
 		f_lineNumber = lineNumber;
+		
+		if (offset < -1) {
+			offset = -1;
+		}
+		f_offset = offset;
 	}
 
 	public JavaSourceReference(String projectName, String packageName,
 			String typeName) {
-		this(projectName, packageName, typeName, 0);
+		this(projectName, packageName, typeName, 0, -1);
 	}
 
 	public JavaSourceReference(String packageName, String typeName,
-			int lineNumber) {
-		this(null, packageName, typeName, lineNumber);
+			int lineNumber, int offset) {
+		this(null, packageName, typeName, lineNumber, offset);
 	}
 
 	public JavaSourceReference(String packageName, String typeName) {
-		this(packageName, typeName, 0);
+		this(packageName, typeName, 0, -1);
 	}
 
 	public String getProjectName() {
@@ -71,10 +81,15 @@ public final class JavaSourceReference {
 		return f_lineNumber;
 	}
 
+	public int getOffset() {
+		return f_offset;
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime + f_offset;
 		result = prime * result + f_lineNumber;
 		result = prime * result
 				+ ((f_packageName == null) ? 0 : f_packageName.hashCode());
@@ -96,6 +111,9 @@ public final class JavaSourceReference {
 		JavaSourceReference other = (JavaSourceReference) obj;
 		if (f_lineNumber != other.f_lineNumber)
 			return false;
+		if (f_offset != other.f_offset) {
+			return false;
+		}
 		if (f_packageName == null) {
 			if (other.f_packageName != null)
 				return false;
@@ -136,7 +154,10 @@ public final class JavaSourceReference {
 		b.append(getTypeName());
 		final int lineNumber = getLineNumber();
 		if (lineNumber > 0)
-			b.append(',').append(getLineNumber());
+			b.append(',').append(lineNumber);
+		final int offset = getOffset();
+		if (offset >= 0)
+			b.append(',').append(offset);
 		b.append(')');
 		return b.toString();
 	}
@@ -155,6 +176,7 @@ public final class JavaSourceReference {
 		if (lineNumber > 0) {
 			b.append("at line ").append(lineNumber).append(' ');
 		}
+		// TODO include the offset?
 		b.append("in ");
 		b.append(getPackageName()).append('.').append(getTypeName());
 		final String projectName = getProjectName();
