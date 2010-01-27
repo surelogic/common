@@ -196,12 +196,33 @@ public final class FileUtility {
 	 *         otherwise.
 	 */
 	public static boolean copy(final URL source, final File to) {
+		final String label = source.toString();
+		try {
+			return copy(label, source.openStream(), to);
+		} catch (final IOException e) {
+			SLLogger.getLogger().log(Level.SEVERE,
+					I18N.err(112, label, to.getAbsolutePath()), e);
+			return false;
+		}
+	}
+		
+	/**
+	 * Copies the contents of a {@link InputStream} to a file.
+	 * 
+	 * @param source
+	 *            a label identifying the source of the stream
+	 * @param is
+	 * 		      the stream to copy from
+	 * @param to
+	 *            the target file.
+	 * @return {@code true} if and only if the copy is successful, {@code false}
+	 *         otherwise.
+	 */
+	public static boolean copy(String source, InputStream is, final File to) {
 		boolean success = true;
 		try {
-			InputStream is = null;
 			OutputStream os = null;
 			try {
-				is = source.openStream();
 				is = new BufferedInputStream(is, 8192);
 				os = new FileOutputStream(to);
 
@@ -218,9 +239,9 @@ public final class FileUtility {
 					os.close();
 				}
 			}
-		} catch (final IOException e) {
+		} catch (final IOException e) {			
 			SLLogger.getLogger().log(Level.SEVERE,
-					I18N.err(112, source.toString(), to.getAbsolutePath()), e);
+					I18N.err(112, source, to.getAbsolutePath()), e);
 			success = false;
 		}
 		return success;
