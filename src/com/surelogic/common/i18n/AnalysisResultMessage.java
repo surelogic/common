@@ -83,4 +83,26 @@ public final class AnalysisResultMessage {
 		b.append(f_srcRef.toStringCanonical());
 		return b.toString();
 	}
+
+	public boolean sameAs(int num, Object[] args) {
+		if (num == f_number) {
+			if (args == null) {
+				return f_args == null;
+			}
+			if (args.length != f_args.length) {
+				return false;
+			}
+			for(int i=0; i<args.length; i++) {
+				if (args[i] != null) {
+					if (!args[i].equals(f_args[i])) {
+						return false;
+					}
+				} else if (f_args[i] != null){
+					return false; // args[i] is null, so different
+				}
+			}
+			return true;
+		}
+		return false;
+	}
 }
