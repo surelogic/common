@@ -66,6 +66,7 @@ public class JDBCUtils {
 					break;
 				case FILE:
 					st.setClob(idx, (Clob) null);
+					break;
 				default:
 					break;
 				}
@@ -90,7 +91,8 @@ public class JDBCUtils {
 					throw new StatementException(e);
 				}
 				if (f.length() > Integer.MAX_VALUE) {
-					throw new IllegalArgumentException("File argument too big: "+f);
+					throw new IllegalArgumentException(
+							"File argument too big: " + f);
 				}
 				st.setBinaryStream(idx, fin, (int) f.length());
 			} else {
