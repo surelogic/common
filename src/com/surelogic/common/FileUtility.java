@@ -59,6 +59,11 @@ public final class FileUtility {
 	public static final String TOOLS_PATH_FRAGMENT = "tools";
 
 	/**
+	 * Name of the IR persistence directory under the JSure data directory
+	 */
+	public static final String IR_PATH_FRAGMENT = "ir";
+	
+	/**
 	 * Tries to create the specified directory in the file system unless it
 	 * already exists.
 	 * 
