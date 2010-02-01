@@ -34,8 +34,10 @@ public final class AnalysisResultMessage {
 			Object... args) {
 		f_number = number;
 		f_args = (args.length > 0) ? args : noArgs;
+		/*
 		if (srcRef == null)
 			throw new IllegalArgumentException(I18N.err(44, "srcRef"));
+			*/
 		f_srcRef = srcRef;
 	}
 
@@ -69,18 +71,22 @@ public final class AnalysisResultMessage {
 
 	@Override
 	public String toString() {
-		final StringBuilder b = new StringBuilder();
+		final StringBuilder b = new StringBuilder();		
 		b.append(getResultString());
-		b.append(' ');
-		b.append(f_srcRef.toStringMessage());
+		if (f_srcRef != null) {
+			b.append(' ');
+			b.append(f_srcRef.toStringMessage());
+		}
 		return b.toString();
 	}
 
 	public String toStringCanonical() {
 		final StringBuilder b = new StringBuilder();
 		b.append(getResultStringCanonical());
-		b.append('@');
-		b.append(f_srcRef.toStringCanonical());
+		if (f_srcRef != null) {
+			b.append('@');
+			b.append(f_srcRef.toStringCanonical());
+		}
 		return b.toString();
 	}
 
