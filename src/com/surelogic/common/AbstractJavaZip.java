@@ -133,8 +133,12 @@ public abstract class AbstractJavaZip<T> {
 					final String zipPath = pathName;
 					classNameToSource.put(classKey, srcPath);
 					final String[] types = getIncludedTypes(resource);
-					if (types == null) {
-						classNameToSource.put(classKey, zipPath);
+					if (types == null || types.length == 0) {
+						if (className.equals("package-info")) {
+							classNameToSource.put(packageName+'.'+className, zipPath);
+						} else {
+							classNameToSource.put(classKey, zipPath);
+						}
 					} else {
 						for (final String t : types) {
 							classNameToSource.put(t, zipPath);
