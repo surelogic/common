@@ -85,8 +85,8 @@ public class HashGenerator {
 			}
 
 			if (lineNumber >= cachedFileLines.size()) {
-				log.severe("line# too big: " + lineNumber + " >= "
-						+ cachedFileLines.size());
+				log.log(Level.SEVERE, "line# too big: " + lineNumber + " >= "
+						+ cachedFileLines.size(), new Throwable("for stack trace"));
 				cachedFileLines = buildCachedLines(fileName);
 			}
 			lastHashLine = lineNumber;
@@ -188,8 +188,8 @@ public class HashGenerator {
 			return FIRST;
 		}
 		if (chunkLine >= cachedLines.size()) {
-			log.severe("line# too big: " + chunkLine + " >= "
-					+ cachedLines.size());
+			log.log(Level.SEVERE, "line# too big: " + chunkLine + " >= "
+					+ cachedLines.size(), new Throwable("for stack trace"));
 			return TOO_FAR;
 		}
 		final StringBuilder chunkBuf = new StringBuilder();
