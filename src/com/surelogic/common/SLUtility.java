@@ -8,11 +8,13 @@ import java.util.Formatter;
 
 import org.apache.commons.lang.SystemUtils;
 
+import com.surelogic.common.i18n.I18N;
+
 /**
  * A utility with SureLogic common code.
  */
 public final class SLUtility {
-	public static final boolean is64bit = (SystemUtils.OS_ARCH.indexOf("64") >= 0);	
+	public static final boolean is64bit = (SystemUtils.OS_ARCH.indexOf("64") >= 0);
 	public static final String JAVA_DEFAULT_PACKAGE = "(default package)";
 
 	/**
@@ -106,6 +108,38 @@ public final class SLUtility {
 		return SLUtility.safeLongToInt(SLUtility.byteToMByte(rt.maxMemory()));
 	}
 
+	/**
+	 * Escapes a Java string so that it can be output as a quoted string literal
+	 * and be legal Java code.
+	 * <p>
+	 * For example, The string <code>This "doggie" \ "kitty" is nice</code>
+	 * would generate the string <code>This \"doggie\" \\ \"kitty\" is nice</code>.
+	 * 
+	 * @param s
+	 *            the string to escape.
+	 * @return the resulting string literal (not surrounded by double
+	 *         quotations).
+	 */
+	public static String escapeJavaStringForQuoting(String s) {
+		if (s == null)
+			throw new IllegalArgumentException(I18N.err(44, "s"));
+		final StringBuilder b = new StringBuilder(s);
+
+		int index = 0;
+		while (true) {
+			final int length = b.length();
+			if (index >= length)
+				break;
+			char c = b.charAt(index);
+			if (c == '\\' || c == '\"') {
+				b.insert(index, '\\');
+				index++;
+			}
+			index++;
+		}
+		return b.toString();
+	}
+	
 	private SLUtility() {
 		// no instances
 	}
