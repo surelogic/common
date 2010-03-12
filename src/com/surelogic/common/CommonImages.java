@@ -16,6 +16,7 @@ public final class CommonImages {
    */
   public static final String IMG_ANNOTATION = "annotation.gif";
   public static final String IMG_ANNOTATION_ERROR = "annotation_error.gif";
+  public static final String IMG_ANNOTATION_PROPOSED = "annotation_proposed.gif";
   public static final String IMG_ARROW_DOWN = "arrow_down.gif";
   public static final String IMG_ARROW_RIGHT = "arrow_right.gif";
   public static final String IMG_ASSUME_DECR = "assume_decr.gif";
