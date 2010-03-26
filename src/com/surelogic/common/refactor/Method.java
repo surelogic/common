@@ -57,6 +57,9 @@ public class Method implements IJavaDeclaration {
 
 	public String forSyntax() {
 		final StringBuilder b = new StringBuilder();
+		if (method.equals(type.getName())) {
+			b.append("new ");
+		}
 		b.append(method);
 		b.append('(');
 		for (final String s : params) {
