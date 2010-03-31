@@ -35,8 +35,9 @@ public final class JavaSourceReference {
 	public JavaSourceReference(String projectName, String packageName,
 			String typeName, int lineNumber, int offset) {
 		f_projectName = projectName;
-		if (packageName == null)
-			throw new IllegalArgumentException(I18N.err(44, "packageName"));
+		if (packageName == null) {
+			packageName = "(default)";
+		}
 		f_packageName = packageName;
 		if (typeName == null)
 			throw new IllegalArgumentException(I18N.err(44, "typeName"));
