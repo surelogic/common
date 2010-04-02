@@ -519,6 +519,8 @@ public final class FileUtility {
 			} else {
 				name = path;
 			}
+			name = name.replace('\\', '/');
+			
 			ZipEntry anEntry = new ZipEntry(name);
 			// place the zip entry in the ZipOutputStream object
 			zos.putNextEntry(anEntry);
