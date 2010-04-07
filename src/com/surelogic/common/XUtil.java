@@ -12,6 +12,8 @@ package com.surelogic.common;
  * on the Java command line or as a VM argument within Eclipse.
  */
 public final class XUtil {
+	public static final boolean testing = System.getProperty("dc.testing","false").equals("true");
+	
 	private static final boolean f_useDeveloperMode = 
 		System.getProperty("SureLogicDev") != null;
 
