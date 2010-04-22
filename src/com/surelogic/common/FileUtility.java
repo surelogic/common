@@ -125,13 +125,17 @@ public final class FileUtility {
 	 * 
 	 */
 	public static boolean recursiveDelete(final File path) {
+		return recursiveDelete(path, true);
+	}
+	
+	public static boolean recursiveDelete(final File path, boolean printWarning) {
 		boolean success;
 		if (path.isDirectory()) {
 			final File[] files = path.listFiles();
 			if (files != null) {
 				for (final File file : files) {
-					success = recursiveDelete(file);
-					if (!success) {
+					success = recursiveDelete(file, printWarning);
+					if (!success && printWarning) {
 						SLLogger.getLogger().warning(
 								I18N.err(11, file.getAbsolutePath()));
 					}
