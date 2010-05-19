@@ -13,6 +13,7 @@ package com.surelogic.common;
  */
 public final class XUtil {
 	public static final boolean testing = System.getProperty("dc.testing","false").equals("true");
+	public static final boolean testingWorkspace = System.getProperty("jsure.test.workspace","false").equals("true");
 	
 	private static final boolean f_useDeveloperMode = 
 		System.getProperty("SureLogicDev") != null;
