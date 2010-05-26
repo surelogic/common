@@ -7,8 +7,7 @@ import java.util.Date;
 import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 
-import com.surelogic.RegionEffects;
-import com.surelogic.Unique;
+import com.surelogic.*;
 
 /**
  * A concise format for SureLogic loggers.
