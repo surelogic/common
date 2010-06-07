@@ -21,7 +21,6 @@
 
 package de.schlichtherle.license;
 
-import de.schlichtherle.util.ObfuscatedString;
 import de.schlichtherle.xml.*;
 
 import java.io.*;
@@ -30,6 +29,8 @@ import java.util.prefs.*;
 
 import javax.security.auth.x500.X500Principal;
 import javax.swing.filechooser.FileFilter;
+
+import com.surelogic.common.ObfuscatedString;
 
 /**
  * This is the top level class which manages all licensing aspects like for

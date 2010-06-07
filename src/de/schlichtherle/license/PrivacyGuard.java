@@ -21,7 +21,6 @@
 
 package de.schlichtherle.license;
 
-import de.schlichtherle.util.ObfuscatedString;
 import de.schlichtherle.xml.*;
 
 import java.io.*;
@@ -31,6 +30,8 @@ import java.util.zip.*;
 
 import javax.crypto.*;
 import javax.crypto.spec.*;
+
+import com.surelogic.common.ObfuscatedString;
 
 /**
  * This class provides encoding and encryption services to provide long time

@@ -21,7 +21,7 @@
 
 package de.schlichtherle.license;
 
-import de.schlichtherle.util.ObfuscatedString;
+import com.surelogic.common.ObfuscatedString;
 
 /**
  *

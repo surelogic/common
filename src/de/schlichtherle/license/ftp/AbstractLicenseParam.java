@@ -25,9 +25,10 @@ import de.schlichtherle.license.CipherParam;
 import de.schlichtherle.license.DefaultLicenseParam;
 import de.schlichtherle.license.KeyStoreParam;
 import de.schlichtherle.license.LicenseContent;
-import de.schlichtherle.util.ObfuscatedString;
 
 import java.util.prefs.Preferences;
+
+import com.surelogic.common.ObfuscatedString;
 
 /**
  * This is a convenience class implementing some methods of the

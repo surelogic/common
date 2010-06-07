@@ -1,8 +1,9 @@
 package com.surelogic.common.license;
 
+import com.surelogic.common.ObfuscatedString;
+
 import de.schlichtherle.license.CipherParam;
 import de.schlichtherle.license.DefaultCipherParam;
-import de.schlichtherle.util.ObfuscatedString;
 
 /**
  * The SureLogic implementation of the {@link CipherParam} interface. This

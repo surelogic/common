@@ -1,8 +1,9 @@
 package com.surelogic.common.license;
 
+import com.surelogic.common.ObfuscatedString;
+
 import de.schlichtherle.license.AbstractKeyStoreParam;
 import de.schlichtherle.license.KeyStoreParam;
-import de.schlichtherle.util.ObfuscatedString;
 
 /**
  * The SureLogic implementation of {@link KeyStoreParam} accessing the

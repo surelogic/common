@@ -26,11 +26,12 @@ import de.schlichtherle.license.KeyStoreParam;
 import de.schlichtherle.license.LicenseContent;
 import de.schlichtherle.license.LicenseNotary;
 import de.schlichtherle.license.NoLicenseInstalledException;
-import de.schlichtherle.util.ObfuscatedString;
 
 import java.util.Date;
 import java.util.Calendar;
 import javax.security.auth.x500.X500Principal;
+
+import com.surelogic.common.ObfuscatedString;
 
 /**
  * Extends {@link de.schlichtherle.license.LicenseManager} in order to provide

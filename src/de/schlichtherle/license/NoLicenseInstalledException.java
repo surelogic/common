@@ -16,7 +16,7 @@
 
 package de.schlichtherle.license;
 
-import de.schlichtherle.util.ObfuscatedString;
+import com.surelogic.common.ObfuscatedString;
 
 /**
  * Thrown if and only if a license is to be verified using

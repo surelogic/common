@@ -21,9 +21,10 @@
 
 package de.schlichtherle.license.ftp;
 
-import de.schlichtherle.util.ObfuscatedString;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
+
+import com.surelogic.common.ObfuscatedString;
 
 /**
  * Looks up the resources for this package in a Resource Bundle.
