@@ -21,20 +21,15 @@
 
 package de.schlichtherle.license;
 
-import com.surelogic.common.OString;
+import com.surelogic.common.SLUtility;
 
-/**
- *
- * @author Christian Schlichtherle
- */
 public class IllegalPasswordException extends IllegalArgumentException {
-	
+
 	private static final long serialVersionUID = -949689548401215314L;
 
 	public String getLocalizedMessage() {
-        return Resources.getString(new OString(new long[] {
-            0xAB863F4C6B6EB259L, 0x40C8776423443909L, 0xF1BA739EBF91FAF8L,
-            0xE8AFA8114E385C8CL
-        }).toString()); /* => "exc.policy.IllegalPwd" */
-    }
+		return Resources.getString(SLUtility.toString(new long[] {
+				0xAB863F4C6B6EB259L, 0x40C8776423443909L, 0xF1BA739EBF91FAF8L,
+				0xE8AFA8114E385C8CL })); /* => "exc.policy.IllegalPwd" */
+	}
 }
