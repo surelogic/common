@@ -31,7 +31,7 @@ import java.util.zip.*;
 import javax.crypto.*;
 import javax.crypto.spec.*;
 
-import com.surelogic.common.ObfuscatedString;
+import com.surelogic.common.OString;
 
 /**
  * This class provides encoding and encryption services to provide long time
@@ -44,7 +44,7 @@ import com.surelogic.common.ObfuscatedString;
  */
 public class PrivacyGuard {
 
-    private static final String PBE_WITH_MD5_AND_DES = new ObfuscatedString(new long[] {
+    private static final String PBE_WITH_MD5_AND_DES = new OString(new long[] {
         0x27B2E8783E47F1ABL, 0x45CF8AD4390DC9D8L, 0xAB320350966BC9BFL
     }).toString(); /* => "PBEWithMD5AndDES" */
 

@@ -1,6 +1,6 @@
 package com.surelogic.common.license;
 
-import com.surelogic.common.ObfuscatedString;
+import com.surelogic.common.OString;
 
 import de.schlichtherle.license.CipherParam;
 import de.schlichtherle.license.DefaultCipherParam;
@@ -24,7 +24,7 @@ final class SLCipherParam extends DefaultCipherParam {
 	private SLCipherParam() {
 		/* => "A.Real.Java.Puzz1er" */
 		super(
-				new ObfuscatedString(new long[] { 0x7191EF595FDF3683L,
+				new OString(new long[] { 0x7191EF595FDF3683L,
 						0x6C3EFC4DC1016796L, 0xF6EB4C62D9AEBBC4L,
 						0xB858B835D85DFAC6L }).toString());
 	}

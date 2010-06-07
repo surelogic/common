@@ -40,22 +40,21 @@ import com.surelogic.common.i18n.I18N;
  * 
  * <pre>
  * public static void main(String[] args) {
- * 	System.out.println(ObfuscatedString.obfuscate(&quot;cool.passwd.&quot;));
+ * 	System.out.println(OString.obfuscate(&quot;cool.passwd.&quot;));
  * }
  * </pre>
  * 
  * which will output
  * 
  * <pre>
- * new ObfuscatedString(new long[] {0x811F49CE856AF34BL, 0x5CE192315A4C6E23L, 0x80EC93C84116E17EL}).toString() / => "cool.passwd." /
+ * new OString(new long[] {0x811F49CE856AF34BL, 0x5CE192315A4C6E23L, 0x80EC93C84116E17EL}).toString() / => "cool.passwd." /
  * </pre>
  * 
  * which can be placed in your code, for example, as
  * 
  * <pre>
- * private static final String p = new ObfuscatedString(new long[] {
- * 		0x811F49CE856AF34BL, 0x5CE192315A4C6E23L, 0x80EC93C84116E17EL })
- * 		.toString();
+ * private static final String p = new OString(new long[] { 0x811F49CE856AF34BL,
+ * 		0x5CE192315A4C6E23L, 0x80EC93C84116E17EL }).toString();
  * </pre>
  * 
  * to result in a constant <tt>p</tt> that contains the constant
@@ -78,7 +77,7 @@ import com.surelogic.common.i18n.I18N;
  * This class is designed to be thread safe.
  */
 @ThreadSafe
-public final class ObfuscatedString {
+public final class OString {
 
 	private static final String UTF8 = new String(new char[] { '\u0055',
 			'\u0054', '\u0046', '\u0038' }); // => "UTF8"
@@ -146,7 +145,7 @@ public final class ObfuscatedString {
 	 * as a seed) only!
 	 * <p>
 	 * As an example, calling this method with <code>"Hello world!"</code> as
-	 * its parameter may produce the result <code>"new ObfuscatedString(new long[] {
+	 * its parameter may produce the result <code>"new OString(new long[] {
 	 *     0x3676CB307FBD35FEL, 0xECFB991E2033C169L, 0xD8C3D3E365645589L
 	 * }).toString()"</code>. If this code is compiled and executed later, it will produce the
 	 * string <code>"Hello world!"</code> again.
@@ -237,7 +236,7 @@ public final class ObfuscatedString {
 	 * @throws ArrayIndexOutOfBoundsException
 	 *             If the provided array does not contain at least one element.
 	 */
-	public ObfuscatedString(final long[] obfuscated) {
+	public OString(final long[] obfuscated) {
 		final int length = obfuscated.length;
 
 		// The original UTF8 encoded string was probably not a multiple

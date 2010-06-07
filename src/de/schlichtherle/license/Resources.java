@@ -25,7 +25,7 @@ package de.schlichtherle.license;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
 
-import com.surelogic.common.ObfuscatedString;
+import com.surelogic.common.OString;
 
 /**
  * Looks up the resources for this package in a Resource Bundle.
@@ -35,7 +35,7 @@ import com.surelogic.common.ObfuscatedString;
  */
 class Resources {
 
-    private static final String CLASS_NAME = new ObfuscatedString(new long[] {
+    private static final String CLASS_NAME = new OString(new long[] {
         0x54087D071FCE4840L, 0x50F993D8A5287E71L, 0x3B4F078A163B6812L,
         0xE97B3E32094E2DB9L, 0x5C18E921228781ECL, 0xDF350057733EC2A7L
     }).toString(); /* => "de.schlichtherle.license.Resources" */

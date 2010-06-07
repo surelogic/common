@@ -28,7 +28,7 @@ import java.security.*;
 import java.security.cert.*;
 import java.security.cert.Certificate;
 
-import com.surelogic.common.ObfuscatedString;
+import com.surelogic.common.OString;
 
 /**
  * This notary knows how to sign and verify a {@link GenericCertificate}.
@@ -42,37 +42,37 @@ public class LicenseNotary {
     /** The buffer size for I/O. */
     private static final int BUFSIZE = 5 * 1024;
 
-    static final String PARAM = new ObfuscatedString(new long[] {
+    static final String PARAM = new OString(new long[] {
         0x9462FFDE0183752L, 0xE2A34A222A24DB14L
     }).toString(); /* => "param" */
 
-    private static final String ALIAS = new ObfuscatedString(new long[] {
+    private static final String ALIAS = new OString(new long[] {
         0xF7122BB1103EE24L, 0x5D073BF77D50CE8AL
     }).toString(); /* => "alias" */
 
-    private static final String EXC_NO_KEY_PWD = new ObfuscatedString(new long[] {
+    private static final String EXC_NO_KEY_PWD = new OString(new long[] {
         0x9BEEC1A930D89BC1L, 0x314F8BFE96B1D7BL, 0x7D41D459E6191D0AL
     }).toString(); /* => "exc.noKeyPwd" */
 
-    private static final String EXC_NO_KEY_ENTRY = new ObfuscatedString(new long[] {
+    private static final String EXC_NO_KEY_ENTRY = new OString(new long[] {
         0xECC3EE809CC45994L, 0x395EC0314F8227A1L, 0x90B1DBA3D701F0FBL
     }).toString(); /* => "exc.noKeyEntry" */
 
-    private static final String EXC_PRIVATE_KEY_OR_PWD_IS_NOT_ALLOWED = new ObfuscatedString(new long[] {
+    private static final String EXC_PRIVATE_KEY_OR_PWD_IS_NOT_ALLOWED = new OString(new long[] {
         0xD6E9FE0BD39F8075L, 0x351D278C14FABB1AL, 0xD64A9C9BD412AB10L,
         0x1AEB0F657DB66448L, 0x41EE587D2CD73A1AL
     }).toString(); /* => "exc.privateKeyOrPwdIsNotAllowed" */
 
-    private static final String EXC_NO_CERTIFICATE_ENTRY = new ObfuscatedString(new long[] {
+    private static final String EXC_NO_CERTIFICATE_ENTRY = new OString(new long[] {
         0xCA437064C1D0C41EL, 0xDDBBA0FF1F17FC35L, 0x5D2CD0D970444C3DL,
         0xF94EAAC3F634D04CL
     }).toString(); /* => "exc.noCertificateEntry" */
 
-    private static final String SHA1_WITH_DSA = new ObfuscatedString(new long[] {
+    private static final String SHA1_WITH_DSA = new OString(new long[] {
         0xEB0CFFD676FD2839L, 0x176DF514D5A0ED59L, 0xBFE1DE24AEF8E9B0L
     }).toString(); /* => "SHA1withDSA" */
 
-    private static final String JKS = new ObfuscatedString(new long[] {
+    private static final String JKS = new OString(new long[] {
         0xA97AF8FB6356CB08L, 0x20E47C2995D2FE7AL
     }).toString(); /* => "JKS" */
 

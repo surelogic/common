@@ -24,7 +24,7 @@ package de.schlichtherle.license.ftp;
 import java.text.MessageFormat;
 import java.util.ResourceBundle;
 
-import com.surelogic.common.ObfuscatedString;
+import com.surelogic.common.OString;
 
 /**
  * Looks up the resources for this package in a Resource Bundle.
@@ -34,7 +34,7 @@ import com.surelogic.common.ObfuscatedString;
  */
 class Resources {
 
-    private static final String CLASS_NAME = new ObfuscatedString(new long[] {
+    private static final String CLASS_NAME = new OString(new long[] {
         0xED417927B5A22343L, 0xFCFE487B94539114L, 0xEB7159A762B47D70L,
         0xDDCF2474803823EAL, 0xAC1F276714EE71F1L, 0xE08BE958E3A83F4DL
     }).toString(); /* => "de.schlichtherle.license.ftp.Resources" */

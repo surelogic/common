@@ -31,7 +31,7 @@ import java.util.Date;
 import java.util.Calendar;
 import javax.security.auth.x500.X500Principal;
 
-import com.surelogic.common.ObfuscatedString;
+import com.surelogic.common.OString;
 
 /**
  * Extends {@link de.schlichtherle.license.LicenseManager} in order to provide
@@ -43,24 +43,24 @@ import com.surelogic.common.ObfuscatedString;
  */
 public class LicenseManager extends de.schlichtherle.license.LicenseManager {
 
-    private static final String FTP_KEYSTORE_PARAM = new ObfuscatedString(new long[] {
+    private static final String FTP_KEYSTORE_PARAM = new OString(new long[] {
         0x5AC618555EC967B9L, 0xABE6B36EE9502E44L, 0x58814EE1E5E3CF8FL
     }).toString(); /* => "ftpKeyStoreParam" */
 
-    private static final String EQUAL_KEY_STORE_PARAMS = new ObfuscatedString(new long[] {
+    private static final String EQUAL_KEY_STORE_PARAMS = new OString(new long[] {
         0x4C72769A851F67C3L, 0x40A67DFB8206B61BL, 0x412E3FE142BA378EL,
         0x68B2E25FA4BE7607L, 0x7A6AB29D2E2E5FDDL, 0x0432DC122188C63FL,
         0x3AAAFA7C2F900E82L, 0xE7676924E761DBA6L
     }).toString(); /* => "Equal key store parameters for regular and FTP licenses!" */
 
-//    private static final String FTP_DAYS = new ObfuscatedString(new long[] {
+//    private static final String FTP_DAYS = new OString(new long[] {
 //        0x73F69B7ABA25F620L, 0x40BA225C709D724EL
 //    }).toString(); /* => "ftpDays" */
 
     private LicenseNotary ftpNotary;
 
     private static final String CN_FTP_USER = CN + Resources.getString(
-            new ObfuscatedString(new long[] {
+            new OString(new long[] {
         0xA54F04397F20F4A8L, 0xC56F605BF6AF0408L
     }).toString()); /* => "user" */
     
@@ -121,7 +121,7 @@ public class LicenseManager extends de.schlichtherle.license.LicenseManager {
             throw new IllegalArgumentException(EQUAL_KEY_STORE_PARAMS);
         final int ftpDays = licenseParam.getFTPDays();
         if (0 >= ftpDays || ftpDays > 365) // unreasonable
-            throw new IllegalArgumentException(new ObfuscatedString(new long[] {
+            throw new IllegalArgumentException(new OString(new long[] {
                 0x8AC2FF8435527B06L, 0x3702F35A60398FC4L
             }).toString()); /* => "ftpDays" */
         

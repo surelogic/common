@@ -28,7 +28,7 @@ import de.schlichtherle.license.LicenseContent;
 
 import java.util.prefs.Preferences;
 
-import com.surelogic.common.ObfuscatedString;
+import com.surelogic.common.OString;
 
 /**
  * This is a convenience class implementing some methods of the
@@ -41,7 +41,7 @@ public abstract class AbstractLicenseParam
         implements LicenseParam {
 
     private static final String LICENSE_CONTENT_INFO
-            = Resources.getString(new ObfuscatedString(new long[] {
+            = Resources.getString(new OString(new long[] {
         0x30D3DC32CB325528L, 0x49530D107781940AL, 0xAD7049DAEA85009EL,
         0x4AF2194E755E89CDL
     }).toString()); /* => "licenseContent.info" */

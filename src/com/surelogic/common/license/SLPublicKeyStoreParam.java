@@ -1,6 +1,6 @@
 package com.surelogic.common.license;
 
-import com.surelogic.common.ObfuscatedString;
+import com.surelogic.common.OString;
 
 import de.schlichtherle.license.AbstractKeyStoreParam;
 import de.schlichtherle.license.KeyStoreParam;
@@ -24,13 +24,13 @@ final class SLPublicKeyStoreParam extends AbstractKeyStoreParam {
 
 	public String getAlias() {
 		/* => "surelogic-public" */
-		return new ObfuscatedString(new long[] { 0xA124AAE729161A7CL,
+		return new OString(new long[] { 0xA124AAE729161A7CL,
 				0xB2DC5D6C3CF0E724L, 0x3F955B0AB54B6586L }).toString();
 	}
 
 	public String getStorePwd() {
 		/* => "Public198" */
-		return new ObfuscatedString(new long[] { 0x9FD642F6B952C461L,
+		return new OString(new long[] { 0x9FD642F6B952C461L,
 				0x66D0AAF3F882B7AEL, 0x4FDE7044C267542FL }).toString();
 	}
 
