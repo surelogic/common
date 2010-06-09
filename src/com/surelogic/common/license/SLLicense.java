@@ -17,7 +17,7 @@ public final class SLLicense {
 	/**
 	 * The identify of this license. May not be <tt>null</tt>.
 	 */
-	public final UUID f_uuid;
+	private final UUID f_uuid;
 
 	/**
 	 * Gets the {@link UUID} that identifies this license.
@@ -31,7 +31,7 @@ public final class SLLicense {
 	/**
 	 * The name of the license holder. May not be <tt>null</tt>.
 	 */
-	public final String f_holder;
+	private final String f_holder;
 
 	/**
 	 * Gets the name of the license holder.
@@ -45,7 +45,7 @@ public final class SLLicense {
 	/**
 	 * The name of the product being licensed. May not be <tt>null</tt>.
 	 */
-	public final String f_product;
+	private final String f_product;
 
 	/**
 	 * Gets the name of the product being licensed.

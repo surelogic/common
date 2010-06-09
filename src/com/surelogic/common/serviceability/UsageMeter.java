@@ -98,7 +98,7 @@ public final class UsageMeter {
 	 */
 	public synchronized String getFileContents() {
 		persist();
-		return FileUtility.getFileContents(f_usageFile);
+		return FileUtility.getFileContentsAsString(f_usageFile);
 	}
 
 	@Unique("return")

@@ -291,7 +291,7 @@ public final class FileUtility {
 	 * @throws IllegalStateException
 	 *             if something goes wrong.
 	 */
-	public static String getFileContents(final File textFile) {
+	public static String getFileContentsAsString(final File textFile) {
 		final String lf = System.getProperty("line.separator");
 		final StringBuilder b = new StringBuilder();
 		try {
@@ -330,7 +330,7 @@ public final class FileUtility {
 	 * @throws IllegalStateException
 	 *             if something goes wrong.
 	 */
-	public static void putFileContents(final File textFile, final String text) {
+	public static void putStringIntoAFile(final File textFile, final String text) {
 		try {
 			final BufferedWriter r = new BufferedWriter(
 					new FileWriter(textFile));

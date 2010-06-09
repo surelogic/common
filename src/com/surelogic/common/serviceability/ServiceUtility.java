@@ -211,7 +211,7 @@ public final class ServiceUtility {
       b.append(lf).append(lf);
       b.append(ServiceabilityConstants.ECLIPSE_LOG_TITLE);
       b.append(lf).append(lf);
-      b.append(FileUtility.getFileContents(ideLogFile));
+      b.append(FileUtility.getFileContentsAsString(ideLogFile));
     }
 
     return b.toString();

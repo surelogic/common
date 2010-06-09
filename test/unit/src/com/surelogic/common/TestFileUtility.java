@@ -16,8 +16,8 @@ public class TestFileUtility extends TestCase {
 		assertFalse(f.exists());
 
 		String text = f.getAbsolutePath();
-		FileUtility.putFileContents(f, text);
-		String actual = FileUtility.getFileContents(f);
+		FileUtility.putStringIntoAFile(f, text);
+		String actual = FileUtility.getFileContentsAsString(f);
 		assertEquals(text, actual);
 		assertTrue(f.exists());
 
@@ -28,8 +28,8 @@ public class TestFileUtility extends TestCase {
 		 * Also, it doesn't remember extra line feeds at the end.
 		 */
 		text = "foo" + f_lf + f_lf + "\tbar\\";
-		FileUtility.putFileContents(f, text);
-		actual = FileUtility.getFileContents(f);
+		FileUtility.putStringIntoAFile(f, text);
+		actual = FileUtility.getFileContentsAsString(f);
 		assertEquals(text, actual);
 		assertTrue(f.exists());
 
@@ -46,7 +46,7 @@ public class TestFileUtility extends TestCase {
 
 		for (int i = 0; i < 10; i++) {
 			final File c = new File(f, "ooo" + i);
-			FileUtility.putFileContents(c, c.getAbsolutePath());
+			FileUtility.putStringIntoAFile(c, c.getAbsolutePath());
 			assertTrue(c.exists());
 			final File sd = new File(f, "subdir.dir");
 			assertTrue(FileUtility.createDirectory(sd));
@@ -54,7 +54,7 @@ public class TestFileUtility extends TestCase {
 			assertTrue(sd.isDirectory());
 			for (int j = 0; j < 10; j++) {
 				final File sdc = new File(sd, "ooo" + i);
-				FileUtility.putFileContents(sdc, sdc.getAbsolutePath());
+				FileUtility.putStringIntoAFile(sdc, sdc.getAbsolutePath());
 				assertTrue(sdc.exists());
 			}
 		}
@@ -66,7 +66,7 @@ public class TestFileUtility extends TestCase {
 	public void testCopy() {
 		final File f = new File(f_tmpDir, "test01.txt");
 		final String text = f.getAbsolutePath();
-		FileUtility.putFileContents(f, text);
+		FileUtility.putStringIntoAFile(f, text);
 		assertTrue(f.exists());
 
 		final File d = new File(f_tmpDir, "test02.txt");
@@ -74,9 +74,9 @@ public class TestFileUtility extends TestCase {
 		assertTrue(f.exists());
 		assertTrue(d.exists());
 
-		assertEquals(text, FileUtility.getFileContents(d));
-		assertEquals(FileUtility.getFileContents(f), FileUtility
-				.getFileContents(d));
+		assertEquals(text, FileUtility.getFileContentsAsString(d));
+		assertEquals(FileUtility.getFileContentsAsString(f), FileUtility
+				.getFileContentsAsString(d));
 
 		assertTrue(FileUtility.recursiveDelete(f));
 		assertFalse(f.exists());

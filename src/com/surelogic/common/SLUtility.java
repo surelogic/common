@@ -1,6 +1,9 @@
 package com.surelogic.common;
 
 import java.io.UnsupportedEncodingException;
+import java.security.KeyFactory;
+import java.security.PublicKey;
+import java.security.spec.X509EncodedKeySpec;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -18,8 +21,7 @@ import com.surelogic.common.i18n.I18N;
 public final class SLUtility {
 	public static final boolean is64bit = (SystemUtils.OS_ARCH.indexOf("64") >= 0);
 	public static final String JAVA_DEFAULT_PACKAGE = "(default package)";
-	private static final String UTF8 = new String(new char[] { '\u0055',
-			'\u0054', '\u0046', '\u0038' }); // => "UTF8"
+	public static final String UTF8 = "UTF8";
 
 	/**
 	 * Returns an {@code int} value of the passed {@code long} value or
@@ -204,7 +206,7 @@ public final class SLUtility {
 		 * represented in hexadecimal in order to keep the string representation
 		 * as short as possible.
 		 */
-		final StringBuffer code = new StringBuffer(I18N.msg("common.os.1"));
+		final StringBuilder code = new StringBuilder(I18N.msg("common.os.1"));
 		appendHexLiteral(code, seed);
 
 		final int length = encoded.length;
@@ -225,6 +227,55 @@ public final class SLUtility {
 		code.append(I18N.msg("common.os.3"));
 
 		return code.toString();
+	}
+
+	/**
+	 * Converts a byte array into a Java declaration that can be cut and pasted
+	 * into code as a constant.
+	 * <p>
+	 * For example the code
+	 * 
+	 * <pre>
+	 * byte[] b = new byte[] { (byte) 0xFF, (byte) 0x01, (byte) 0xAB };
+	 * String s = toByteArrayJavaConstant(b);
+	 * </pre>
+	 * 
+	 * would result in <tt>s</tt> referencing the string
+	 * <tt>"new byte[] {(byte) 0xFF, (byte) 0x01, (byte) 0xAB}"</tt>
+	 * 
+	 * @param bytes
+	 *            the array of bytes.
+	 * @return a Java string that can be cut and pasted into Java code.
+	 */
+	public static String toByteArrayJavaConstant(byte[] bytes) {
+		final StringBuilder code = new StringBuilder(I18N.msg("common.ob.1"));
+
+		boolean first = true;
+		for (byte b : bytes) {
+			if (first) {
+				first = false;
+			} else {
+				code.append(", ");
+			}
+			code.append("(byte) 0x").append(getHex(b));
+		}
+		code.append("}");
+
+		return code.toString();
+	}
+
+	/**
+	 * Returns a hex string corresponding to the passed byte.
+	 * 
+	 * @param b
+	 *            a byte
+	 * @return a hex string two characters long.
+	 */
+	public static String getHex(byte b) {
+		final String hs = "0123456789ABCDEF";
+		final StringBuilder hex = new StringBuilder();
+		hex.append(hs.charAt((b & 0xF0) >> 4)).append(hs.charAt((b & 0x0F)));
+		return hex.toString();
 	}
 
 	/**
@@ -277,7 +328,7 @@ public final class SLUtility {
 		return result;
 	}
 
-	private static final void appendHexLiteral(final StringBuffer sb,
+	private static final void appendHexLiteral(final StringBuilder sb,
 			final long l) {
 		sb.append("0x");
 		sb.append(Long.toHexString(l).toUpperCase());
@@ -325,12 +376,106 @@ public final class SLUtility {
 	 * @param off
 	 *            The offset of the bytes in the array.
 	 */
-	private static final void toBytes(long l, byte[] bytes, int off) {
+	private static void toBytes(long l, byte[] bytes, int off) {
 		final int end = Math.min(bytes.length, off + 8);
 		for (int i = off; i < end; i++) {
 			bytes[i] = (byte) l;
 			l >>= 8;
 		}
+	}
+
+	/**
+	 * This method returns the SureLogic RSA public key.
+	 * 
+	 * @return SureLogic RSA public key.
+	 */
+	public static PublicKey getPublicKey() {
+		final byte[] slPublicKeyBytes = new byte[] { (byte) 0x30, (byte) 0x82,
+				(byte) 0x01, (byte) 0x22, (byte) 0x30, (byte) 0x0D,
+				(byte) 0x06, (byte) 0x09, (byte) 0x2A, (byte) 0x86,
+				(byte) 0x48, (byte) 0x86, (byte) 0xF7, (byte) 0x0D,
+				(byte) 0x01, (byte) 0x01, (byte) 0x01, (byte) 0x05,
+				(byte) 0x00, (byte) 0x03, (byte) 0x82, (byte) 0x01,
+				(byte) 0x0F, (byte) 0x00, (byte) 0x30, (byte) 0x82,
+				(byte) 0x01, (byte) 0x0A, (byte) 0x02, (byte) 0x82,
+				(byte) 0x01, (byte) 0x01, (byte) 0x00, (byte) 0xEA,
+				(byte) 0xE5, (byte) 0x3C, (byte) 0xD2, (byte) 0xDD,
+				(byte) 0x24, (byte) 0x75, (byte) 0x96, (byte) 0x84,
+				(byte) 0x7E, (byte) 0xDD, (byte) 0x39, (byte) 0x15,
+				(byte) 0x3B, (byte) 0x8D, (byte) 0x0F, (byte) 0xB4,
+				(byte) 0xFA, (byte) 0xA4, (byte) 0xA2, (byte) 0x91,
+				(byte) 0x77, (byte) 0xF6, (byte) 0xA5, (byte) 0xD1,
+				(byte) 0x58, (byte) 0xB3, (byte) 0x1C, (byte) 0x7B,
+				(byte) 0xD4, (byte) 0xA5, (byte) 0x54, (byte) 0x46,
+				(byte) 0x61, (byte) 0x1C, (byte) 0x62, (byte) 0x6C,
+				(byte) 0x07, (byte) 0xE3, (byte) 0x8D, (byte) 0xBE,
+				(byte) 0xAC, (byte) 0xB5, (byte) 0xD6, (byte) 0x5E,
+				(byte) 0xA7, (byte) 0xAD, (byte) 0x9A, (byte) 0x05,
+				(byte) 0x57, (byte) 0xB9, (byte) 0x2F, (byte) 0x9E,
+				(byte) 0xCB, (byte) 0xBB, (byte) 0xC4, (byte) 0xE0,
+				(byte) 0xCC, (byte) 0x41, (byte) 0x68, (byte) 0x73,
+				(byte) 0x6B, (byte) 0x52, (byte) 0x4D, (byte) 0x05,
+				(byte) 0x0B, (byte) 0x68, (byte) 0x1E, (byte) 0xDE,
+				(byte) 0xC1, (byte) 0x77, (byte) 0xB5, (byte) 0xF4,
+				(byte) 0x28, (byte) 0x2B, (byte) 0x1B, (byte) 0x53,
+				(byte) 0xCE, (byte) 0x44, (byte) 0x3B, (byte) 0x72,
+				(byte) 0x19, (byte) 0x19, (byte) 0x2B, (byte) 0x6C,
+				(byte) 0x34, (byte) 0x4F, (byte) 0x34, (byte) 0xF8,
+				(byte) 0x2A, (byte) 0x7E, (byte) 0xF5, (byte) 0x2C,
+				(byte) 0xB5, (byte) 0x28, (byte) 0xA0, (byte) 0xBA,
+				(byte) 0x2A, (byte) 0xB7, (byte) 0x71, (byte) 0xE3,
+				(byte) 0x70, (byte) 0x7A, (byte) 0x93, (byte) 0x0A,
+				(byte) 0x21, (byte) 0xDB, (byte) 0xA3, (byte) 0x16,
+				(byte) 0x6F, (byte) 0x81, (byte) 0xC0, (byte) 0xD3,
+				(byte) 0x18, (byte) 0xC1, (byte) 0xEE, (byte) 0x34,
+				(byte) 0x73, (byte) 0x28, (byte) 0x12, (byte) 0xA6,
+				(byte) 0x67, (byte) 0xFC, (byte) 0x4C, (byte) 0xBD,
+				(byte) 0x90, (byte) 0x0D, (byte) 0xC6, (byte) 0xB0,
+				(byte) 0xA5, (byte) 0x65, (byte) 0x26, (byte) 0xC9,
+				(byte) 0x04, (byte) 0xD1, (byte) 0xD1, (byte) 0x3D,
+				(byte) 0xA7, (byte) 0x88, (byte) 0xC5, (byte) 0x86,
+				(byte) 0x89, (byte) 0xF0, (byte) 0x07, (byte) 0xDC,
+				(byte) 0x40, (byte) 0x64, (byte) 0x99, (byte) 0x01,
+				(byte) 0xF4, (byte) 0x40, (byte) 0xF1, (byte) 0x23,
+				(byte) 0xE4, (byte) 0x76, (byte) 0xC7, (byte) 0x76,
+				(byte) 0xF5, (byte) 0x70, (byte) 0x95, (byte) 0xC1,
+				(byte) 0x9E, (byte) 0xD1, (byte) 0x40, (byte) 0xB2,
+				(byte) 0x9C, (byte) 0xD2, (byte) 0x77, (byte) 0x8E,
+				(byte) 0x75, (byte) 0x73, (byte) 0xEC, (byte) 0x46,
+				(byte) 0x6B, (byte) 0xCF, (byte) 0xB9, (byte) 0x5A,
+				(byte) 0x2F, (byte) 0xB8, (byte) 0xEA, (byte) 0x89,
+				(byte) 0x8A, (byte) 0xE4, (byte) 0x85, (byte) 0x76,
+				(byte) 0xFA, (byte) 0x5A, (byte) 0xBA, (byte) 0x73,
+				(byte) 0xFF, (byte) 0x97, (byte) 0xD5, (byte) 0x37,
+				(byte) 0xE4, (byte) 0x38, (byte) 0x18, (byte) 0x20,
+				(byte) 0xF5, (byte) 0xB3, (byte) 0xEB, (byte) 0x95,
+				(byte) 0x45, (byte) 0xE4, (byte) 0x54, (byte) 0x7F,
+				(byte) 0x7C, (byte) 0xA3, (byte) 0x80, (byte) 0xBE,
+				(byte) 0x21, (byte) 0xFB, (byte) 0x70, (byte) 0x2A,
+				(byte) 0x46, (byte) 0xDC, (byte) 0x35, (byte) 0x3B,
+				(byte) 0xC8, (byte) 0x1F, (byte) 0x05, (byte) 0xF1,
+				(byte) 0x7B, (byte) 0xEA, (byte) 0xB6, (byte) 0xAC,
+				(byte) 0xF9, (byte) 0x31, (byte) 0x28, (byte) 0xD3,
+				(byte) 0xE5, (byte) 0xC5, (byte) 0xA2, (byte) 0x92,
+				(byte) 0x1F, (byte) 0xB7, (byte) 0x81, (byte) 0x1F,
+				(byte) 0x4A, (byte) 0x26, (byte) 0x9B, (byte) 0x52,
+				(byte) 0x80, (byte) 0x9E, (byte) 0x9A, (byte) 0xF0,
+				(byte) 0x3F, (byte) 0xB7, (byte) 0x7F, (byte) 0x4E,
+				(byte) 0xEA, (byte) 0x13, (byte) 0xCC, (byte) 0xC6,
+				(byte) 0x10, (byte) 0xA2, (byte) 0x81, (byte) 0x02,
+				(byte) 0x03, (byte) 0x01, (byte) 0x00, (byte) 0x01 };
+		final PublicKey result;
+		try {
+			// create public key
+			final X509EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(
+					slPublicKeyBytes);
+			final KeyFactory kf = KeyFactory.getInstance("RSA");
+			result = kf.generatePublic(publicKeySpec);
+		} catch (Exception e) {
+			/* Lots could go wrong, anything at all would indicate a bug */
+			throw new IllegalStateException(I18N.err(178), e);
+		}
+		return result;
 	}
 
 	private SLUtility() {
