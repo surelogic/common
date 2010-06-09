@@ -2,7 +2,9 @@ package com.surelogic.common;
 
 import java.io.UnsupportedEncodingException;
 import java.security.KeyFactory;
+import java.security.PrivateKey;
 import java.security.PublicKey;
+import java.security.Signature;
 import java.security.spec.X509EncodedKeySpec;
 import java.sql.Timestamp;
 import java.text.ParseException;
@@ -257,7 +259,7 @@ public final class SLUtility {
 			} else {
 				code.append(", ");
 			}
-			code.append("(byte) 0x").append(getHex(b));
+			code.append("(byte) 0x").append(toHexString(b));
 		}
 		code.append("}");
 
@@ -268,14 +270,58 @@ public final class SLUtility {
 	 * Returns a hex string corresponding to the passed byte.
 	 * 
 	 * @param b
-	 *            a byte
+	 *            a byte.
 	 * @return a hex string two characters long.
 	 */
-	public static String getHex(byte b) {
-		final String hs = "0123456789ABCDEF";
+	public static String toHexString(byte b) {
+		final String hs = "0123456789abcdef";
 		final StringBuilder hex = new StringBuilder();
 		hex.append(hs.charAt((b & 0xF0) >> 4)).append(hs.charAt((b & 0x0F)));
 		return hex.toString();
+	}
+
+	/**
+	 * Returns a hex string corresponding to the passed byte array.
+	 * 
+	 * @param ba
+	 *            the byte array.
+	 * @return a hex string <tt>ba.length * 2</tt> characters long.
+	 */
+	public static String toHexString(byte[] ba) {
+		final StringBuilder hex = new StringBuilder();
+		for (byte b : ba) {
+			hex.append(toHexString(b));
+		}
+		return hex.toString();
+	}
+
+	/**
+	 * Parses the passed hex string into a corresponding byte array. Strings
+	 * must look like <tt>01FFAB</tt> and <tt>s.length()</tt> must be even.
+	 * 
+	 * @param s
+	 *            the hex string to pares.
+	 * @return a byte array of length <tt>s.length() / 2</tt>.
+	 * @throws IllegalArgumentException
+	 *             if <tt>s</tt> is <tt>null</tt> or <tt>s.length()</tt> is not
+	 *             even.
+	 * @throws NumberFormatException
+	 *             if the string cannot be parsed.
+	 */
+	public static byte[] parseHexString(String s) {
+		if (s == null)
+			throw new IllegalArgumentException(I18N.err(44, "s"));
+		if (s.length() % 2 != 0)
+			throw new IllegalArgumentException(
+					"Hex string must contain an even number of characters");
+		byte[] result = new byte[s.length() / 2];
+
+		for (int i = 0; i < result.length; i++) {
+			final int sIndex = i * 2;
+			result[i] = (byte) Integer.parseInt(
+					s.substring(sIndex, sIndex + 2), 16);
+		}
+		return result;
 	}
 
 	/**
@@ -388,6 +434,8 @@ public final class SLUtility {
 	 * This method returns the SureLogic RSA public key.
 	 * 
 	 * @return SureLogic RSA public key.
+	 * @throws IllegalStateException
+	 *             if something goes wrong creating the key.
 	 */
 	public static PublicKey getPublicKey() {
 		final byte[] slPublicKeyBytes = new byte[] { (byte) 0x30, (byte) 0x82,
@@ -476,6 +524,117 @@ public final class SLUtility {
 			throw new IllegalStateException(I18N.err(178), e);
 		}
 		return result;
+	}
+
+	/**
+	 * Generates and returns a signature for the passed data using the passed
+	 * RSA private key.
+	 * 
+	 * @param data
+	 *            the data to generate a signature for.
+	 * @param key
+	 *            the RSA private key to use.
+	 * @return the signature.
+	 * @throws IllegalArgumentException
+	 *             if one of the parameters is <tt>null</tt>.
+	 * @throws IllegalStateException
+	 *             if something goes wrong during the signature generation.
+	 */
+	public static byte[] getSignature(byte[] data, PrivateKey key) {
+		if (data == null)
+			throw new IllegalArgumentException(I18N.err(44, "data"));
+		if (key == null)
+			throw new IllegalArgumentException(I18N.err(44, "key"));
+
+		final byte[] signature;
+		try {
+			final Signature rsaSig = Signature.getInstance("SHA1withRSA");
+			rsaSig.initSign(key);
+			rsaSig.update(data);
+			signature = rsaSig.sign();
+		} catch (Exception e) {
+			/* Lots could go wrong, anything at all would indicate a bug */
+			throw new IllegalStateException(I18N.err(180), e);
+		}
+		return signature;
+	}
+
+	/**
+	 * Checks a signature using the passed public key.
+	 * 
+	 * @param data
+	 *            the data the signature is about.
+	 * @param signature
+	 *            the signature.
+	 * @param key
+	 *            the RSA public key to use.
+	 * @return {@code true} if the signature is valid, {@code false} otherwise.
+	 */
+	public static boolean checkSignature(byte[] data, byte[] signature,
+			PublicKey key) {
+		if (data == null)
+			throw new IllegalArgumentException(I18N.err(44, "data"));
+		if (signature == null)
+			throw new IllegalArgumentException(I18N.err(44, "signature"));
+
+		try {
+			final Signature rsaSig = Signature.getInstance("SHA1withRSA");
+			rsaSig.initVerify(key);
+			rsaSig.update(data);
+			final boolean verifies = rsaSig.verify(signature);
+			return verifies;
+		} catch (Exception e) {
+			// fall through and return false
+		}
+		/* if we get here the signature is bad or broken */
+		return false;
+	}
+
+	/**
+	 * Checks a signature using the SureLogic RSA public key.
+	 * 
+	 * @param data
+	 *            the data the signature is about.
+	 * @param signature
+	 *            the signature.
+	 * @return {@code true} if the signature is valid, {@code false} otherwise.
+	 * @see #getPublicKey()
+	 */
+	public static boolean checkSignature(byte[] data, byte[] signature) {
+		return checkSignature(data, signature, getPublicKey());
+	}
+
+	/**
+	 * Line wraps the passed string at the specified width by inserting
+	 * newlines. The last line may not be the specified length.
+	 * 
+	 * @param b
+	 *            the string to wrap.
+	 * @param linewidth
+	 *            the desired line width.
+	 */
+	public static void wrap(StringBuilder b, int linewidth) {
+		int workIndex = linewidth;
+		while (b.length() > workIndex) {
+			b.insert(workIndex, '\n');
+			workIndex = workIndex + linewidth + 1;
+		}
+	}
+
+	/**
+	 * Line wraps the passed string at the specified width by inserting
+	 * newlines. The last line may not be the specified length.
+	 * 
+	 * @param s
+	 *            the string to wrap.
+	 * @param linewidth
+	 *            the desired line width.
+	 * @return the wrapped string.
+	 */
+	public static String wrap(String s, int linewidth) {
+		StringBuilder b = new StringBuilder(s);
+		wrap(b, linewidth);
+		return b.toString();
 	}
 
 	private SLUtility() {
