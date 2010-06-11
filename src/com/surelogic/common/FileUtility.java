@@ -5,8 +5,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.*;
 import java.nio.channels.*;
+import java.util.Enumeration;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 import com.surelogic.common.i18n.I18N;
@@ -537,6 +540,30 @@ public final class FileUtility {
 		}
 	}
 
+	public static void unzipFile(File zipFile, File targetDir) throws IOException {
+		unzipFile(new ZipFile(zipFile), targetDir, null);
+	}
+	
+	public static void unzipFile(ZipFile zipFile, File targetDir, UnzipCallback cb) throws IOException {
+		Enumeration<? extends ZipEntry> e = zipFile.entries();
+        while (e.hasMoreElements()) {
+            ZipEntry ze = e.nextElement();
+            File f = new File(targetDir, ze.getName());
+            if (!f.exists()) {
+                f.getParentFile().mkdirs();
+                FileUtility.copy(ze.getName(), zipFile.getInputStream(ze), f);
+            }
+            if (cb != null) {
+            	cb.unzipped(ze, f);
+            }
+        }
+        zipFile.close();
+	}
+	
+	public interface UnzipCallback {
+		void unzipped(ZipEntry ze, File f);		
+	}
+	
 	public static OutputStream getOutputStream(File file) throws IOException {
 		// Create a writeable file channel
 		FileChannel channel = new RandomAccessFile(file, "rw").getChannel();
