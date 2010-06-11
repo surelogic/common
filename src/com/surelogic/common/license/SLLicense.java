@@ -170,4 +170,9 @@ public final class SLLicense {
 			throw new IllegalArgumentException(I18N.err(177));
 		f_performNetCheck = performNetCheck;
 	}
+
+	@Override
+	public String toString() {
+		return SLLicensePersistence.toString(this);
+	}
 }
