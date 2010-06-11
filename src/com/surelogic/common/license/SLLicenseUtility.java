@@ -4,7 +4,6 @@ import java.text.SimpleDateFormat;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-import com.surelogic.PolicyLock;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.jobs.SLJob;
 import com.surelogic.common.jobs.SLProgressMonitor;
@@ -13,7 +12,6 @@ import com.surelogic.common.jobs.SLStatus;
 /**
  * A utility to help manage licenses to use SureLogic tools.
  */
-@PolicyLock("Lock is class")
 public final class SLLicenseUtility {
 
 	private final static ThreadLocal<SimpleDateFormat> tl_format = new ThreadLocal<SimpleDateFormat>() {
@@ -25,7 +23,9 @@ public final class SLLicenseUtility {
 
 	/**
 	 * Gets a simple date format which produces dates of the form
-	 * <tt>yyyy-MM-dd</tt> such as <tt>2010-01-21</tt>.
+	 * <tt>yyyy-MM-dd</tt> such as <tt>2010-01-21</tt>. This is used to persist
+	 * and load the expiration date or renewal deadline for {@link SLLicense}
+	 * objects.
 	 * 
 	 * @return an instance that can be safely used.
 	 */

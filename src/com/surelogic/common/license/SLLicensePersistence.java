@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.UUID;
 import java.util.logging.Level;
 
+import com.surelogic.NotThreadSafe;
 import com.surelogic.common.FileUtility;
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
@@ -86,6 +87,7 @@ import com.surelogic.common.logging.SLLogger;
  * @see SLLicense
  * @see SLLicenseUtility
  */
+@NotThreadSafe
 public final class SLLicensePersistence {
 
 	private static final String DATE_LABEL = "date=";
