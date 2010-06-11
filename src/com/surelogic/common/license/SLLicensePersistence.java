@@ -530,8 +530,8 @@ public final class SLLicensePersistence {
 	 * @param key
 	 *            a RSA private key used to digitally sign the data.
 	 */
-	public static void outputToSignedFile(final SLLicense license, File out,
-			PrivateKey key) {
+	public static void outputLicenseToSignedFile(final SLLicense license,
+			File out, PrivateKey key) {
 		FileUtility.putStringIntoAFile(out, toSignedHexString(license, key,
 				true));
 	}
@@ -547,8 +547,8 @@ public final class SLLicensePersistence {
 	 * @param key
 	 *            a RSA private key used to digitally sign the data.
 	 */
-	public static void outputToSignedFile(final SLLicenseNetCheck nc, File out,
-			PrivateKey key) {
+	public static void outputLicenseNetCheckToSignedFile(
+			final SLLicenseNetCheck nc, File out, PrivateKey key) {
 		FileUtility.putStringIntoAFile(out, toSignedHexString(nc, key, true));
 	}
 
