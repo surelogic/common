@@ -16,7 +16,9 @@ import com.surelogic.common.logging.SLLogger;
 
 /**
  * A utility that handles encoding and decoding to and from strings and files of
- * {@link SLLicense} objects.
+ * {@link SLLicense} objects and {@link SLLicenseNetCheck} objects.
+ * <p>
+ * <b>SLLicense persistence formats</b>
  * <p>
  * The (unencoded) string representation of a license instance, referenced by
  * <tt>license</tt>, is as follows:
@@ -30,9 +32,8 @@ import com.surelogic.common.logging.SLLogger;
  * <li>The string constant {@link #PRODUCT_LABEL} followed by
  * <tt>license.getProduct()</tt>.
  * <li>The character {@link #SEP}.
- * <li>The string constant {@link #DATE_LABEL} followed by
- * <tt>license.getDate()</tt> converted to a string using
- * {@link SLLicenseUtility#getThreadSafeDateFormat()}.
+ * <li>The string constant {@link #DURATION_LABEL} followed by
+ * <tt>Integer.toString(license.getDurationInDays())</tt>.
  * <li>The character {@link #SEP}.
  * <li>The string constant {@link #TYPE_LABEL} followed by
  * <tt>license.getType().toString()</tt>.
@@ -50,7 +51,7 @@ import com.surelogic.common.logging.SLLogger;
  * id=58eab27c-e416-4b76-9225-49783707056f
  * holder=Tim
  * product=Flashlight
- * date=2010-06-11
+ * durationInDays=365
  * type=P
  * maxActive=2
  * performNetCheck=true
@@ -59,48 +60,105 @@ import com.surelogic.common.logging.SLLogger;
  * The encoded digitally signed license format is a stream of continuous
  * characters as follows:
  * <ul>
- * <li>The string constant {@link #BEGIN}</li>
+ * <li>The string constant {@link #BEGIN_LICENSE}</li>
  * <li>A hex string representation of the digital signature bytes</li>
  * <li>The string constant {@link #MIDDLE}</li>
  * <li>A hex string representation of the license data bytes (produced from
  * <tt>toString(license).getBytes()</tt>)</li>
- * <li>The string constant {@link #END}</li>
+ * <li>The string constant {@link #END_LICENSE}</li>
  * </ul>
  * The stream is wrapped at {@link #LINEWRAP} characters. An example of this
  * format is:
  * 
  * <pre>
- * [sl-#v1.0#(7dac0784358bd7605c1780ab11ef3b903e144cf298c66e3dd6898d35a
- * 05b116084b5882ccb4bc532e63ab0952b5696c894b267b98b0e72a239eda9698d4be
- * 9c62bd8966e57ec912f5efd2eda3c420961908bcc27546abfc81984b31d7a22edd4f
- * 501c17c35485cec2ffa1358bda629a5120695dee30d27d7a546363a3caf3808368f3
- * 48e4a7e1edb3293f65561f8a631b2e7cd2e6c8425f31b1a69d9e3b84384a9e58454d
- * 961d3429c422459189c078eed1a2791292838b3635ad678430affa959b18219861d8
- * 7602a73dc2fb047f905a09c8726cdb14bf9966192988c63cc114e7bc7699fe6b0d63
- * 5c3c913bf3c3696cd25e7cddd41fd273cf3f66f1a41d9ad8fbO69643d36336235366
- * 538612d623636622d346133382d613539662d3437333164343864323065330a686f6
- * c6465723d54696d0a70726f647563743d466c6173686c696768740a646174653d323
- * 031302d30362d31310a747970653d500a6d61784163746976653d320a706572666f7
- * 26d4e6574436865636b3d747275650a7e1da)]
+ * [sl-#v1.0#(7da088c4b6c9c88097221636d32f5a3ea892b69a757bb4d358fdcd8b4
+ * a0190d65b9b4926409affae8c3fb3b5ddc748fbc2e4dd93b7c7c68fb1f1600b30cf0
+ * 290d852d696b0aaf082ec78b54ebc1441863ca5b0f0916054b6b22ed6d9675db5490
+ * 77e91e35dd869c531031b24b4190d472700cea7629debc788624be16efade18a84da
+ * 53cac8ba322bd8666d88569bece949ee4e75ca8afe95fe5ac79b4f325b01b13482e1
+ * fd9d01451bf3017d8c5acc9c011ad0b962fa8ce52e922ea04c7bfb825350ffa20f74
+ * cc5d12b2cc119754f4c0e34a207d5d80e5b0e22373ea94658dfa75c47cd918c2b035
+ * 9c1bac04012bc962eeadf133201b5acaded33692f1e78ef66cO69643d63333836636
+ * 236612d393931652d346132622d623133612d3732306636623533383163360a686f6
+ * c6465723d54696d0a70726f647563743d466c6173686c696768740a6475726174696
+ * f6e496e446179733d3336350a747970653d500a6d61784163746976653d330a70657
+ * 2666f726d4e6574436865636b3d747275650a7e1da)]
+ * </pre>
+ * 
+ * <b>SLLicenseNetCheck persistence formats</b>
+ * <p>
+ * The format of license net check instances is similar to the format used by
+ * license instances.
+ * <p>
+ * The (unencoded) string representation of a license net check instance,
+ * referenced by <tt>nc</tt>, is as follows:
+ * <ul>
+ * <li>The string constant {@link #UUID_LABEL} followed by
+ * <tt>nc.getUuid().toString()</tt>.
+ * <li>The character {@link #SEP}.
+ * <li>The string constant {@link #DATE_LABEL} followed by <tt>nc.getDate()</tt>
+ * converted to a string using
+ * {@link SLLicenseUtility#getThreadSafeDateFormat()}.
+ * <li>The character {@link #SEP}.
+ * </ul>
+ * An example of this format is:
+ * 
+ * <pre>
+ * id=58eab27c-e416-4b76-9225-49783707056f
+ * date=2010-06-11
+ * </pre>
+ * 
+ * The encoded digitally signed license net check format is a stream of
+ * continuous characters as follows:
+ * <ul>
+ * <li>The string constant {@link #BEGIN_NET_CHECK}</li>
+ * <li>A hex string representation of the digital signature bytes</li>
+ * <li>The string constant {@link #MIDDLE}</li>
+ * <li>A hex string representation of the license data bytes (produced from
+ * <tt>toString(nc).getBytes()</tt>)</li>
+ * <li>The string constant {@link #END_NET_CHECK}</li>
+ * </ul>
+ * The stream is wrapped at {@link #LINEWRAP} characters. An example of this
+ * format is:
+ * 
+ * <pre>
+ * [sl-nc-#v1.0#(5f0940e201bce17b785ea73588755f55794dadac635ef6e0735bbd
+ * aa1edf323b22db461a32a296cac956951d12929cad837af43745c3ffe8e3bb260e5c
+ * f7e1bf3e500b0fd6b5019433b6d9c0b2cef6001a81ca1f3a535c22f09055c305a957
+ * d08d5454fcbfc62859c6d4ccbbddd96b001bffc0388860f514a9e224dd0819190065
+ * 11e81b1d8ec98e83f44c2c903e56f70d80e61ac0e89420e3c45606f86ad856cb62bd
+ * e90696e71c05a8d4a25dae9f918cd235b4dea05806b55b627a067b6a9a80ece6e758
+ * 51ba7e29b4326900d835000db3d983b5faf6c1b1bd37963f24d0574696b9a5afcaf5
+ * 84d759341b91659e81c63aa670aa14b14efde3e445c3891f5f6f7O69643d31323534
+ * 323266612d656163332d343330612d396637382d3238656339393332383839390a64
+ * 6174653d323031302d30362d31310a6ae)]
  * </pre>
  * 
  * @see SLLicense
+ * @see SLLicenseNetCheck
  * @see SLLicenseUtility
  */
 @NotThreadSafe
 public final class SLLicensePersistence {
 
 	private static final String DATE_LABEL = "date=";
+	private static final String DURATION_LABEL = "durationInDays=";
 	private static final String HOLDER_LABEL = "holder=";
 	private static final String MAXACTIVE_LABEL = "maxActive=";
 	private static final String PERFORMNETCHECK_LABEL = "performNetCheck=";
 	private static final String PRODUCT_LABEL = "product=";
 	private static final String TYPE_LABEL = "type=";
 	private static final String UUID_LABEL = "id=";
-	private static final String BEGIN = "[sl-#v1.0#(7da";
+
+	private static final String BEGIN_LICENSE = "[sl-#v1.0#(7da";
+	private static final String END_LICENSE = "7e1da)]";
+
+	private static final String BEGIN_NET_CHECK = "[sl-nc-#v1.0#(5f0";
+	private static final String END_NET_CHECK = "6ae)]";
+
 	private static final String MIDDLE = "O";
-	private static final String END = "7e1da)]";
 	private static final char SEP = '\n';
+
 	private static final int LINEWRAP = 68;
 
 	/**
@@ -108,18 +166,18 @@ public final class SLLicensePersistence {
 	 * {@link #toLicense(String)} method reverses this conversion.
 	 * 
 	 * @param license
-	 *            the license
+	 *            a license
 	 * @return the string representation of the license.
 	 */
 	public static String toString(final SLLicense license) {
 		if (license == null)
 			throw new IllegalArgumentException(I18N.err(44, "license"));
 		final StringBuilder b = new StringBuilder();
-		SimpleDateFormat sdf = SLLicenseUtility.getThreadSafeDateFormat();
 		b.append(UUID_LABEL).append(license.getUuid().toString()).append(SEP);
 		b.append(HOLDER_LABEL).append(license.getHolder()).append(SEP);
 		b.append(PRODUCT_LABEL).append(license.getProduct()).append(SEP);
-		b.append(DATE_LABEL).append(sdf.format(license.getDate())).append(SEP);
+		b.append(DURATION_LABEL).append(
+				Integer.toString(license.getDurationInDays())).append(SEP);
 		b.append(TYPE_LABEL).append(license.getType().toString()).append(SEP);
 		b.append(MAXACTIVE_LABEL).append(
 				Integer.toString(license.getMaxActive())).append(SEP);
@@ -129,10 +187,27 @@ public final class SLLicensePersistence {
 	}
 
 	/**
+	 * Converts a license net check to a string representation.
+	 * 
+	 * @param nc
+	 *            a license net check.
+	 * @return the string representation of the license net check.
+	 */
+	public static String toString(final SLLicenseNetCheck nc) {
+		if (nc == null)
+			throw new IllegalArgumentException(I18N.err(44, "nc"));
+		final StringBuilder b = new StringBuilder();
+		final SimpleDateFormat sdf = SLLicenseUtility.getThreadSafeDateFormat();
+		b.append(UUID_LABEL).append(nc.getUuid().toString()).append(SEP);
+		b.append(DATE_LABEL).append(sdf.format(nc.getDate())).append(SEP);
+		return b.toString();
+	}
+
+	/**
 	 * Converts a string representation to a license. The string representation
-	 * should have been created by a call to {@link #toLicense(String)}. If the
-	 * string is not well-formed a {@code null} is returned and a message about
-	 * what is wrong with the string is logged.
+	 * should have been created by a call to {@link #toString(SLLicense)}. If
+	 * the string is not well-formed a {@code null} is returned and a message
+	 * about what is wrong with the string is logged.
 	 * 
 	 * @param value
 	 *            the string representation of the license.
@@ -178,21 +253,21 @@ public final class SLLicensePersistence {
 		}
 
 		/*
-		 * Parse license expiration date or renewal deadline.
+		 * Parse license license duration in days from installation until
+		 * expiration or renewal.
 		 */
-		final String dateS = getValue(value, DATE_LABEL);
-		if (dateS == null) {
+		final String durationInDaysS = getValue(value, DURATION_LABEL);
+		if (durationInDaysS == null) {
 			SLLogger.getLogger().log(Level.WARNING,
-					I18N.err(187, DATE_LABEL, value));
+					I18N.err(187, DURATION_LABEL, value));
 			return null;
 		}
-		final Date date;
+		final int durationInDays;
 		try {
-			SimpleDateFormat sdf = SLLicenseUtility.getThreadSafeDateFormat();
-			date = sdf.parse(dateS);
+			durationInDays = Integer.parseInt(durationInDaysS);
 		} catch (Exception e) {
 			SLLogger.getLogger().log(Level.WARNING,
-					I18N.err(189, dateS, value), e);
+					I18N.err(191, durationInDaysS, value), e);
 			return null;
 		}
 
@@ -254,10 +329,74 @@ public final class SLLicensePersistence {
 		 */
 		final SLLicense result;
 		try {
-			result = new SLLicense(uuid, holder, product, date, type,
+			result = new SLLicense(uuid, holder, product, durationInDays, type,
 					maxActive, performNetCheck);
 		} catch (Exception e) {
 			SLLogger.getLogger().log(Level.WARNING, I18N.err(193, value), e);
+			return null;
+		}
+		return result;
+	}
+
+	/**
+	 * Converts a string representation to a license net check. The string
+	 * representation should have been created by a call to
+	 * {@link #toString(SLLicenseNetCheck)}. If the string is not well-formed a
+	 * {@code null} is returned and a message about what is wrong with the
+	 * string is logged.
+	 * 
+	 * @param value
+	 *            the string representation of the license net check.
+	 * @return the license net check, or {@code null} if the string is not
+	 *         well-formed.
+	 */
+	public static SLLicenseNetCheck toLicenseNetCheck(final String value) {
+		/*
+		 * Parse the the {@link UUID} that identifies the license this net check
+		 * refers to.
+		 */
+		final String uuidS = getValue(value, UUID_LABEL);
+		if (uuidS == null) {
+			SLLogger.getLogger().log(Level.WARNING,
+					I18N.err(187, UUID_LABEL, value));
+			return null;
+		}
+		final UUID uuid;
+		try {
+			uuid = UUID.fromString(uuidS);
+		} catch (Exception e) {
+			SLLogger.getLogger().log(Level.WARNING,
+					I18N.err(188, uuidS, value), e);
+			return null;
+		}
+
+		/*
+		 * Parse license expiration date or renewal deadline.
+		 */
+		final String dateS = getValue(value, DATE_LABEL);
+		if (dateS == null) {
+			SLLogger.getLogger().log(Level.WARNING,
+					I18N.err(187, DATE_LABEL, value));
+			return null;
+		}
+		final Date date;
+		try {
+			SimpleDateFormat sdf = SLLicenseUtility.getThreadSafeDateFormat();
+			date = sdf.parse(dateS);
+		} catch (Exception e) {
+			SLLogger.getLogger().log(Level.WARNING,
+					I18N.err(189, dateS, value), e);
+			return null;
+		}
+
+		/*
+		 * Try to construct the license net check object.
+		 */
+		final SLLicenseNetCheck result;
+		try {
+			result = new SLLicenseNetCheck(uuid, date);
+		} catch (Exception e) {
+			SLLogger.getLogger().log(Level.WARNING, I18N.err(197, value), e);
 			return null;
 		}
 		return result;
@@ -301,31 +440,83 @@ public final class SLLicensePersistence {
 	}
 
 	/**
-	 * Converts a license to a digitally signed encoded string.
+	 * Converts an array of data to a digitally signed encoded hex string.
 	 * 
-	 * @param license
-	 *            the license.
+	 * @param data
+	 *            the data
 	 * @param key
 	 *            a RSA private key used to digitally sign the data.
-	 * @return the digitally signed encoded string representation of
-	 *         <tt>license</tt>.
+	 * @param beginMark
+	 *            a known string to mark the beginning of the encoded digital
+	 *            signature.
+	 * @param middleMark
+	 *            a known string to separate the digital signature from the
+	 *            data.
+	 * @param endMark
+	 *            a known string to mark the end of the data.
+	 * @param linewrap
+	 *            a width (in characters) to line wrap the returned string, a
+	 *            value less than 1 indicates no wrapping is to be performed.
+	 * @return a digitally signed encoded hex string representation (perhaps
+	 *         line wrapped) of <tt>data</tt>
 	 */
-	public static String toSignedString(final SLLicense license,
-			final PrivateKey key) {
+	public static String toSignedHexString(final byte[] data,
+			final PrivateKey key, final String beginMark,
+			final String middleMark, final String endMark, final int linewrap) {
 		StringBuilder b = new StringBuilder();
 
-		final byte[] data = toString(license).getBytes();
 		final byte[] signature = SLUtility.getSignature(data, key);
 
-		b.append(BEGIN);
+		b.append(beginMark);
 		b.append(SLUtility.toHexString(signature));
-		b.append(MIDDLE);
+		b.append(middleMark);
 		b.append(SLUtility.toHexString(data));
-		b.append(END);
+		b.append(endMark);
 
-		SLUtility.wrap(b, LINEWRAP);
+		if (linewrap > 0)
+			SLUtility.wrap(b, linewrap);
 
 		return b.toString();
+	}
+
+	/**
+	 * Converts a license to a digitally signed encoded hex string.
+	 * 
+	 * @param license
+	 *            a license.
+	 * @param key
+	 *            a RSA private key used to digitally sign the data.
+	 * @param linewrap
+	 *            {@code true} if the returned string should be line wrapped,
+	 *            {@code false} for no line wrapping.
+	 * @return the digitally signed encoded hex string representation of
+	 *         <tt>license</tt>.
+	 */
+	public static String toSignedHexString(final SLLicense license,
+			final PrivateKey key, final boolean linewrap) {
+		final byte[] data = toString(license).getBytes();
+		return toSignedHexString(data, key, BEGIN_LICENSE, MIDDLE, END_LICENSE,
+				linewrap ? LINEWRAP : 0);
+	}
+
+	/**
+	 * Converts a license net check to a digitally signed encoded hex string.
+	 * 
+	 * @param nc
+	 *            a license net check.
+	 * @param key
+	 *            a RSA private key used to digitally sign the data.
+	 * @param linewrap
+	 *            {@code true} if the returned string should be line wrapped,
+	 *            {@code false} for no line wrapping.
+	 * @return the digitally signed encoded hex string representation of
+	 *         <tt>nc</tt>.
+	 */
+	public static String toSignedHexString(final SLLicenseNetCheck nc,
+			final PrivateKey key, final boolean linewrap) {
+		final byte[] data = toString(nc).getBytes();
+		return toSignedHexString(data, key, BEGIN_NET_CHECK, MIDDLE,
+				END_NET_CHECK, linewrap ? LINEWRAP : 0);
 	}
 
 	/**
@@ -333,7 +524,7 @@ public final class SLLicensePersistence {
 	 * string.
 	 * 
 	 * @param license
-	 *            the license.
+	 *            a license.
 	 * @param out
 	 *            the file to create or overwrite.
 	 * @param key
@@ -341,25 +532,52 @@ public final class SLLicensePersistence {
 	 */
 	public static void outputToSignedFile(final SLLicense license, File out,
 			PrivateKey key) {
-		FileUtility.putStringIntoAFile(out, toSignedString(license, key));
+		FileUtility.putStringIntoAFile(out, toSignedHexString(license, key,
+				true));
 	}
 
 	/**
-	 * Converts the encoded digitally signed license string to a usable license
-	 * object, or {@code null} if the string is not well-formed, improperly
-	 * signed, or missing required license data.
+	 * Writes out a file that contains a license net check as a digitally signed
+	 * encoded string.
+	 * 
+	 * @param nc
+	 *            a license net check.
+	 * @param out
+	 *            the file to create or overwrite.
+	 * @param key
+	 *            a RSA private key used to digitally sign the data.
+	 */
+	public static void outputToSignedFile(final SLLicenseNetCheck nc, File out,
+			PrivateKey key) {
+		FileUtility.putStringIntoAFile(out, toSignedHexString(nc, key, true));
+	}
+
+	/**
+	 * Extract the data from an encoded digitally signed hex string. A {@code
+	 * null} results if the string is not well-formed or its is improperly
+	 * signed.
 	 * <p>
 	 * If the conversion fails (and {@code null} is returned) then diagnostic
 	 * information is written to the log about what went wrong.
 	 * 
 	 * @param s
-	 *            the encoded digitally signed license string.
+	 *            an encoded digitally signed hex string.
 	 * @param key
 	 *            a RSA public key used to check the digital signature.
-	 * @return a license object or {@code null} if <tt>s</tt> is not
-	 *         well-formed, improperly signed, or missing required license data.
+	 * @param beginMark
+	 *            a known string to mark the beginning of the encoded digital
+	 *            signature.
+	 * @param middleMark
+	 *            a known string to separate the digital signature from the
+	 *            data.
+	 * @param endMark
+	 *            a known string to mark the end of the data.
+	 * @return the data, or {@code null} if <tt>s</tt> is not well-formed or it
+	 *         is improperly signed.
 	 */
-	public static SLLicense toLicense(final String s, final PublicKey key) {
+	public static byte[] getData(final String s, final PublicKey key,
+			final String beginMark, final String middleMark,
+			final String endMark) {
 		/*
 		 * Trim off any extra spaces or tabs and use a mutable string.
 		 */
@@ -379,19 +597,19 @@ public final class SLLicensePersistence {
 		 * Trim off any extra characters before or after the signed license
 		 * data.
 		 */
-		final int startIndex = b.indexOf(BEGIN);
+		final int startIndex = b.indexOf(beginMark);
 		if (startIndex == -1) {
-			SLLogger.getLogger().warning(I18N.err(181, s));
+			SLLogger.getLogger().warning(I18N.err(181, beginMark, s));
 			return null;
 		}
-		if (b.length() <= startIndex + BEGIN.length()) {
-			SLLogger.getLogger().warning(I18N.err(182, s));
+		if (b.length() <= startIndex + beginMark.length()) {
+			SLLogger.getLogger().warning(I18N.err(182, beginMark, s));
 			return null;
 		}
-		b.delete(0, startIndex + BEGIN.length());
-		final int endIndex = b.indexOf(END);
+		b.delete(0, startIndex + beginMark.length());
+		final int endIndex = b.indexOf(endMark);
 		if (endIndex == -1) {
-			SLLogger.getLogger().warning(I18N.err(183, s));
+			SLLogger.getLogger().warning(I18N.err(183, endMark, s));
 			return null;
 		}
 		b.delete(endIndex, b.length());
@@ -399,8 +617,8 @@ public final class SLLicensePersistence {
 		/*
 		 * Separate the data from the digital signature.
 		 */
-		final int sigEndIndex = b.indexOf(MIDDLE);
-		final int dataStartIndex = sigEndIndex + MIDDLE.length();
+		final int sigEndIndex = b.indexOf(middleMark);
+		final int dataStartIndex = sigEndIndex + middleMark.length();
 		if (sigEndIndex == -1) {
 			SLLogger.getLogger().warning(I18N.err(184, s));
 			return null;
@@ -428,11 +646,64 @@ public final class SLLicensePersistence {
 		final boolean valid = SLUtility.checkSignature(data, signature, key);
 
 		if (valid) {
-			String licenseInfo = new String(data);
-			return toLicense(licenseInfo);
+			return data;
 		} else {
 			SLLogger.getLogger().warning(I18N.err(195, s));
 			return null;
+		}
+	}
+
+	/**
+	 * Converts the encoded digitally signed license hex string to a usable
+	 * license object, or {@code null} if the string is not well-formed,
+	 * improperly signed, or missing required license data.
+	 * <p>
+	 * If the conversion fails (and {@code null} is returned) then diagnostic
+	 * information is written to the log about what went wrong.
+	 * 
+	 * @param s
+	 *            the encoded digitally signed license string.
+	 * @param key
+	 *            a RSA public key used to check the digital signature.
+	 * @return a license object or {@code null} if <tt>s</tt> is not
+	 *         well-formed, improperly signed, or missing required license data.
+	 */
+	public static SLLicense toLicense(final String s, final PublicKey key) {
+		final byte[] data = getData(s, key, BEGIN_LICENSE, MIDDLE, END_LICENSE);
+		if (data == null) {
+			return null;
+		} else {
+			final String licenseInfo = new String(data);
+			return toLicense(licenseInfo);
+		}
+	}
+
+	/**
+	 * Converts the encoded digitally signed license net check hex string to a
+	 * usable license net check object, or {@code null} if the string is not
+	 * well-formed, improperly signed, or missing required license net check
+	 * data.
+	 * <p>
+	 * If the conversion fails (and {@code null} is returned) then diagnostic
+	 * information is written to the log about what went wrong.
+	 * 
+	 * @param s
+	 *            the encoded digitally signed license net check string.
+	 * @param key
+	 *            a RSA public key used to check the digital signature.
+	 * @return a license object or {@code null} if <tt>s</tt> is not
+	 *         well-formed, improperly signed, or missing required license net
+	 *         check data.
+	 */
+	public static SLLicenseNetCheck toLicenseNetCheck(final String s,
+			final PublicKey key) {
+		final byte[] data = getData(s, key, BEGIN_NET_CHECK, MIDDLE,
+				END_NET_CHECK);
+		if (data == null) {
+			return null;
+		} else {
+			final String licenseNetCheckInfo = new String(data);
+			return toLicenseNetCheck(licenseNetCheckInfo);
 		}
 	}
 
@@ -448,9 +719,28 @@ public final class SLLicensePersistence {
 	 *         not well-formed, are improperly signed, or are missing required
 	 *         license data.
 	 */
-	public static SLLicense inputFromSignedFile(File in, PublicKey key) {
+	public static SLLicense inputLicenseFromSignedFile(File in, PublicKey key) {
 		final String fileContents = FileUtility.getFileContentsAsString(in);
 		SLLicense result = toLicense(fileContents, key);
+		return result;
+	}
+
+	/**
+	 * Reads a file that contains a license net check as a digitally signed
+	 * encoded string and converts the string to a license net check.
+	 * 
+	 * @param in
+	 *            the file to read.
+	 * @param key
+	 *            a RSA public key used to check the digital signature.
+	 * @return a license net check object or {@code null} if the contents of the
+	 *         file are not well-formed, are improperly signed, or are missing
+	 *         required license net check data.
+	 */
+	public static SLLicenseNetCheck inputLicenseNetCheckFromSignedFile(File in,
+			PublicKey key) {
+		final String fileContents = FileUtility.getFileContentsAsString(in);
+		SLLicenseNetCheck result = toLicenseNetCheck(fileContents, key);
 		return result;
 	}
 

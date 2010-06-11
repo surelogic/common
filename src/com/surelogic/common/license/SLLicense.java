@@ -1,6 +1,5 @@
 package com.surelogic.common.license;
 
-import java.util.Date;
 import java.util.UUID;
 
 import com.surelogic.Immutable;
@@ -57,18 +56,20 @@ public final class SLLicense {
 	}
 
 	/**
-	 * The license expiration date or renewal deadline.
+	 * The license duration in days from installation until expiration or
+	 * renewal. This value must be greater than one.
 	 */
-	private final Date f_date;
+	private final int f_durationInDays;
 
 	/**
-	 * Gets the license expiration date or renewal deadline.
+	 * Gets the license duration in days from installation until expiration or
+	 * renewal. This value must be greater than one.
 	 * 
-	 * @return the non-<tt>null</tt> license expiration date or renewal
-	 *         deadline.
+	 * @return the license duration in days from installation until expiration
+	 *         or renewal.
 	 */
-	public Date getDate() {
-		return f_date;
+	public int getDurationInDays() {
+		return f_durationInDays;
 	}
 
 	/**
@@ -125,14 +126,14 @@ public final class SLLicense {
 	 * Constructs a new SureLogic license.
 	 * 
 	 * @param uuid
-	 *            a non-<tt>null</tt> {@link UUID} for the license
+	 *            a non-<tt>null</tt> {@link UUID} for the license.
 	 * @param holder
 	 *            a non-<tt>null</tt> name of the license holder.
 	 * @param product
 	 *            a non-<tt>null</tt> name of the product licensed.
-	 * @param date
-	 *            a non-<tt>null</tt> license expiration date or renewal
-	 *            deadline.
+	 * @param durationInDays
+	 *            the license duration in days from installation until
+	 *            expiration or renewal. This value must be greater than one.
 	 * @param type
 	 *            a non-<tt>null</tt> type for the license.
 	 * @param maxActive
@@ -143,8 +144,9 @@ public final class SLLicense {
 	 *            {@code false} otherwise.
 	 */
 	public SLLicense(final UUID uuid, final String holder,
-			final String product, final Date date, final SLLicenseType type,
-			final int maxActive, final boolean performNetCheck) {
+			final String product, final int durationInDays,
+			final SLLicenseType type, final int maxActive,
+			final boolean performNetCheck) {
 		if (uuid == null)
 			throw new IllegalArgumentException(I18N.err(44, "uuid"));
 		f_uuid = uuid;
@@ -154,9 +156,9 @@ public final class SLLicense {
 		if (product == null)
 			throw new IllegalArgumentException(I18N.err(44, "product"));
 		f_product = product;
-		if (date == null)
-			throw new IllegalArgumentException(I18N.err(44, "date"));
-		f_date = date;
+		if (durationInDays <= 1)
+			throw new IllegalArgumentException(I18N.err(196, durationInDays));
+		f_durationInDays = durationInDays;
 		if (type == null)
 			throw new IllegalArgumentException(I18N.err(44, "type"));
 		f_type = type;
