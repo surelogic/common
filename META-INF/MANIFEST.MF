@@ -48,4 +48,4 @@ Bundle-ClassPath: lib/runtime/antlr-runtime-3.1-sl.jar,
  .,
  lib/runtime/commons-lang-2.4.jar,
  lib/runtime/jsr166xy_java5.jar,
- lib/runtime/promises-3.1.0.jar
+ lib/runtime/promises-3.2.1.jar
