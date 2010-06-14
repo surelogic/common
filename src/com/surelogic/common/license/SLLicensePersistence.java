@@ -35,6 +35,10 @@ import com.surelogic.common.logging.SLLogger;
  * <li>The string constant {@link #DURATION_LABEL} followed by
  * <tt>Integer.toString(license.getDurationInDays())</tt>.
  * <li>The character {@link #SEP}.
+ * <li>(Optional) The string constant {@link #INSTALLATION_DEADLINE_LABEL}
+ * followed by <tt>nc.getDate()</tt> converted to a string using
+ * {@link SLLicenseUtility#getThreadSafeDateFormat()}.
+ * <li>(Optional) The character {@link #SEP}.
  * <li>The string constant {@link #TYPE_LABEL} followed by
  * <tt>license.getType().toString()</tt>.
  * <li>The character {@link #SEP}.
@@ -45,7 +49,7 @@ import com.surelogic.common.logging.SLLogger;
  * <tt>Boolean.toString(license.performNetCheck())</tt>.
  * <li>The character {@link #SEP}.
  * </ul>
- * An example of this format is:
+ * An example of this format that specifies a duration is:
  * 
  * <pre>
  * id=58eab27c-e416-4b76-9225-49783707056f
@@ -57,6 +61,20 @@ import com.surelogic.common.logging.SLLogger;
  * performNetCheck=true
  * </pre>
  * 
+ * An example of this format that specifies an installation deadline is:
+ * 
+ * <pre>
+ * id=58eab27c-e416-4b76-9225-497837070544
+ * holder=Tim
+ * product=JSure
+ * durationInDays=60
+ * installationDeadline=2012-06-11
+ * type=S
+ * maxActive=2
+ * performNetCheck=true
+ * </pre>
+ * 
+ * <p>
  * The encoded digitally signed license format is a stream of continuous
  * characters as follows:
  * <ul>
@@ -144,6 +162,7 @@ public final class SLLicensePersistence {
 	private static final String DATE_LABEL = "date=";
 	private static final String DURATION_LABEL = "durationInDays=";
 	private static final String HOLDER_LABEL = "holder=";
+	private static final String INSTALLATION_DEADLINE_LABEL = "installationDeadline=";
 	private static final String MAXACTIVE_LABEL = "maxActive=";
 	private static final String PERFORMNETCHECK_LABEL = "performNetCheck=";
 	private static final String PRODUCT_LABEL = "product=";
@@ -178,6 +197,13 @@ public final class SLLicensePersistence {
 		b.append(PRODUCT_LABEL).append(license.getProduct()).append(SEP);
 		b.append(DURATION_LABEL).append(
 				Integer.toString(license.getDurationInDays())).append(SEP);
+		final Date installBeforeDate = license.getInstallBeforeDate();
+		if (installBeforeDate != null) {
+			final SimpleDateFormat sdf = SLLicenseUtility
+					.getThreadSafeDateFormat();
+			b.append(INSTALLATION_DEADLINE_LABEL).append(
+					sdf.format(installBeforeDate)).append(SEP);
+		}
 		b.append(TYPE_LABEL).append(license.getType().toString()).append(SEP);
 		b.append(MAXACTIVE_LABEL).append(
 				Integer.toString(license.getMaxActive())).append(SEP);
@@ -272,6 +298,26 @@ public final class SLLicensePersistence {
 		}
 
 		/*
+		 * Parse license installation deadline. This value is optional so it may
+		 * not exist.
+		 */
+		final String dateS = getValue(value, INSTALLATION_DEADLINE_LABEL);
+		final Date installBeforeDate;
+		if (dateS == null) {
+			installBeforeDate = null;
+		} else {
+			try {
+				SimpleDateFormat sdf = SLLicenseUtility
+						.getThreadSafeDateFormat();
+				installBeforeDate = sdf.parse(dateS);
+			} catch (Exception e) {
+				SLLogger.getLogger().log(Level.WARNING,
+						I18N.err(189, dateS, value), e);
+				return null;
+			}
+		}
+
+		/*
 		 * Parse the type of the license.
 		 */
 		final String typeS = getValue(value, TYPE_LABEL);
@@ -329,8 +375,8 @@ public final class SLLicensePersistence {
 		 */
 		final SLLicense result;
 		try {
-			result = new SLLicense(uuid, holder, product, durationInDays, type,
-					maxActive, performNetCheck);
+			result = new SLLicense(uuid, holder, product, durationInDays,
+					installBeforeDate, type, maxActive, performNetCheck);
 		} catch (Exception e) {
 			SLLogger.getLogger().log(Level.WARNING, I18N.err(193, value), e);
 			return null;

@@ -1,5 +1,6 @@
 package com.surelogic.common.license;
 
+import java.util.Date;
 import java.util.UUID;
 
 import com.surelogic.Immutable;
@@ -73,6 +74,25 @@ public final class SLLicense {
 	}
 
 	/**
+	 * An optional install before date. Installations after this date will fail.
+	 * A value of {@code null} indicates that there is not install before date
+	 * for this license.
+	 */
+	private final Date f_installBeforeDate;
+
+	/**
+	 * Gets installation deadline, or install before date, for this license.
+	 * Installations after this date will fail. A value of {@code null}
+	 * indicates that there is not an installation deadline for this license.
+	 * 
+	 * @return the installation deadline for this license, or {@code null} if no
+	 *         deadline.
+	 */
+	public Date getInstallBeforeDate() {
+		return f_installBeforeDate;
+	}
+
+	/**
 	 * The type of this license. May not be <tt>null</tt>.
 	 */
 	private final SLLicenseType f_type;
@@ -134,6 +154,9 @@ public final class SLLicense {
 	 * @param durationInDays
 	 *            the license duration in days from installation until
 	 *            expiration or renewal. This value must be greater than one.
+	 * @param installBeforeDate
+	 *            the installation deadline for this license, or {@code null} if
+	 *            no deadline.
 	 * @param type
 	 *            a non-<tt>null</tt> type for the license.
 	 * @param maxActive
@@ -145,8 +168,8 @@ public final class SLLicense {
 	 */
 	public SLLicense(final UUID uuid, final String holder,
 			final String product, final int durationInDays,
-			final SLLicenseType type, final int maxActive,
-			final boolean performNetCheck) {
+			final Date installBeforeDate, final SLLicenseType type,
+			final int maxActive, final boolean performNetCheck) {
 		if (uuid == null)
 			throw new IllegalArgumentException(I18N.err(44, "uuid"));
 		f_uuid = uuid;
@@ -159,6 +182,7 @@ public final class SLLicense {
 		if (durationInDays <= 1)
 			throw new IllegalArgumentException(I18N.err(196, durationInDays));
 		f_durationInDays = durationInDays;
+		f_installBeforeDate = installBeforeDate;
 		if (type == null)
 			throw new IllegalArgumentException(I18N.err(44, "type"));
 		f_type = type;
