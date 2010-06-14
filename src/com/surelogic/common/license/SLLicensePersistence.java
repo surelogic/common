@@ -215,17 +215,19 @@ public final class SLLicensePersistence {
 	/**
 	 * Converts a license net check to a string representation.
 	 * 
-	 * @param nc
+	 * @param licenseNetCheck
 	 *            a license net check.
 	 * @return the string representation of the license net check.
 	 */
-	public static String toString(final SLLicenseNetCheck nc) {
-		if (nc == null)
-			throw new IllegalArgumentException(I18N.err(44, "nc"));
+	public static String toString(final SLLicenseNetCheck licenseNetCheck) {
+		if (licenseNetCheck == null)
+			throw new IllegalArgumentException(I18N.err(44, "licenseNetCheck"));
 		final StringBuilder b = new StringBuilder();
 		final SimpleDateFormat sdf = SLLicenseUtility.getThreadSafeDateFormat();
-		b.append(UUID_LABEL).append(nc.getUuid().toString()).append(SEP);
-		b.append(DATE_LABEL).append(sdf.format(nc.getDate())).append(SEP);
+		b.append(UUID_LABEL).append(licenseNetCheck.getUuid().toString())
+				.append(SEP);
+		b.append(DATE_LABEL).append(sdf.format(licenseNetCheck.getDate()))
+				.append(SEP);
 		return b.toString();
 	}
 
@@ -548,7 +550,7 @@ public final class SLLicensePersistence {
 	/**
 	 * Converts a license net check to a digitally signed encoded hex string.
 	 * 
-	 * @param nc
+	 * @param licenseNetCheck
 	 *            a license net check.
 	 * @param key
 	 *            a RSA private key used to digitally sign the data.
@@ -556,11 +558,12 @@ public final class SLLicensePersistence {
 	 *            {@code true} if the returned string should be line wrapped,
 	 *            {@code false} for no line wrapping.
 	 * @return the digitally signed encoded hex string representation of
-	 *         <tt>nc</tt>.
+	 *         <tt>licenseNetCheck</tt>.
 	 */
-	public static String toSignedHexString(final SLLicenseNetCheck nc,
-			final PrivateKey key, final boolean linewrap) {
-		final byte[] data = toString(nc).getBytes();
+	public static String toSignedHexString(
+			final SLLicenseNetCheck licenseNetCheck, final PrivateKey key,
+			final boolean linewrap) {
+		final byte[] data = toString(licenseNetCheck).getBytes();
 		return toSignedHexString(data, key, BEGIN_NET_CHECK, MIDDLE,
 				END_NET_CHECK, linewrap ? LINEWRAP : 0);
 	}
@@ -586,7 +589,7 @@ public final class SLLicensePersistence {
 	 * Writes out a file that contains a license net check as a digitally signed
 	 * encoded string.
 	 * 
-	 * @param nc
+	 * @param licenseNetCheck
 	 *            a license net check.
 	 * @param out
 	 *            the file to create or overwrite.
@@ -594,8 +597,9 @@ public final class SLLicensePersistence {
 	 *            a RSA private key used to digitally sign the data.
 	 */
 	public static void outputLicenseNetCheckToSignedFile(
-			final SLLicenseNetCheck nc, File out, PrivateKey key) {
-		FileUtility.putStringIntoAFile(out, toSignedHexString(nc, key, true));
+			final SLLicenseNetCheck licenseNetCheck, File out, PrivateKey key) {
+		FileUtility.putStringIntoAFile(out, toSignedHexString(licenseNetCheck,
+				key, true));
 	}
 
 	/**
