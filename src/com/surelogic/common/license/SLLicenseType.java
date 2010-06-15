@@ -61,7 +61,7 @@ public enum SLLicenseType {
 	 * Returns the license type from a one letter code.
 	 * 
 	 * @param value
-	 *            one of <tt>"U"</tt>, <tt>"S"</tt>, of <tt>"P"</tt>,
+	 *            one of <tt>"U"</tt>, <tt>"S"</tt>, or <tt>"P"</tt>.
 	 * @return the license type, or {@code null} if the passed value is not
 	 *         recognized.
 	 */

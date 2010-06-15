@@ -2,6 +2,8 @@ package com.surelogic.common.jdbc;
 
 import java.net.URL;
 
+import com.surelogic.common.license.SLLicenseProduct;
+
 /**
  * Allows access to schema and version information for a particular tool.
  * <p>
@@ -51,10 +53,10 @@ public interface SchemaData {
 	public SchemaAction getSchemaAction(String action);
 
 	/**
-	 * The license subject that the user is required to have a valid license for
-	 * to use this database.
+	 * The product that the user is required to have a valid license for to use
+	 * this database.
 	 * 
-	 * @return a non-null license subject.
+	 * @return a non-<tt>null</tt> product.
 	 */
-	public String getLicenseSubject();
+	public SLLicenseProduct getProduct();
 }

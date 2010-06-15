@@ -4,7 +4,9 @@ import java.io.File;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 
@@ -30,7 +32,7 @@ import com.surelogic.common.logging.SLLogger;
  * <tt>license.getHolder()</tt>.
  * <li>The character {@link #SEP}.
  * <li>The string constant {@link #PRODUCT_LABEL} followed by
- * <tt>license.getProduct()</tt>.
+ * <tt>license.getProduct().toString()</tt>.
  * <li>The character {@link #SEP}.
  * <li>The string constant {@link #DURATION_LABEL} followed by
  * <tt>Integer.toString(license.getDurationInDays())</tt>.
@@ -194,7 +196,8 @@ public final class SLLicensePersistence {
 		final StringBuilder b = new StringBuilder();
 		b.append(UUID_LABEL).append(license.getUuid().toString()).append(SEP);
 		b.append(HOLDER_LABEL).append(license.getHolder()).append(SEP);
-		b.append(PRODUCT_LABEL).append(license.getProduct()).append(SEP);
+		b.append(PRODUCT_LABEL).append(license.getProduct().toString()).append(
+				SEP);
 		b.append(DURATION_LABEL).append(
 				Integer.toString(license.getDurationInDays())).append(SEP);
 		final Date installBeforeDate = license.getInstallBeforeDate();
@@ -273,10 +276,16 @@ public final class SLLicensePersistence {
 		/*
 		 * Parse name of the product being licensed.
 		 */
-		final String product = getValue(value, PRODUCT_LABEL);
-		if (product == null) {
+		final String productS = getValue(value, PRODUCT_LABEL);
+		if (productS == null) {
 			SLLogger.getLogger().log(Level.WARNING,
 					I18N.err(187, PRODUCT_LABEL, value));
+			return null;
+		}
+		final SLLicenseProduct product = SLLicenseProduct.fromString(productS);
+		if (product == null) {
+			SLLogger.getLogger().log(Level.WARNING,
+					I18N.err(199, productS, value));
 			return null;
 		}
 
@@ -569,37 +578,88 @@ public final class SLLicensePersistence {
 	}
 
 	/**
-	 * Writes out a file that contains a license as a digitally signed encoded
-	 * string.
+	 * Converts a list of {@link PossiblyInstalledSLLicense} objects to a string
+	 * that contains a set of licenses and license net checks as digitally
+	 * signed encoded hex strings and outputs the string to a file.
 	 * 
-	 * @param license
-	 *            a license.
-	 * @param out
-	 *            the file to create or overwrite.
-	 * @param key
-	 *            a RSA private key used to digitally sign the data.
+	 * @param newFile
+	 *            a text file. If this file exists its contents will be
+	 *            replaced, if not it will be created.
+	 * @param licenses
+	 *            the list of {@link PossiblyInstalledSLLicense} objects to
+	 *            convert.
+	 * 
+	 * @see SLLicensePersistence#toSignedHexString(List)
 	 */
-	public static void outputLicenseToSignedFile(final SLLicense license,
-			File out, PrivateKey key) {
-		FileUtility.putStringIntoAFile(out, toSignedHexString(license, key,
-				true));
+	public static void writeLicensesToFile(File newFile,
+			final List<PossiblyInstalledSLLicense> licenses) {
+		if (newFile == null)
+			throw new IllegalArgumentException(I18N.err(44, "newFile"));
+		if (licenses == null)
+			throw new IllegalArgumentException(I18N.err(44, "licenses"));
+
+		final String output = toSignedHexString(licenses, true);
+		FileUtility.putStringIntoAFile(newFile, output);
 	}
 
 	/**
-	 * Writes out a file that contains a license net check as a digitally signed
-	 * encoded string.
+	 * Converts a single {@link PossiblyInstalledSLLicense} object to a string
+	 * that contains a licenses and, optionally, a license net check as
+	 * digitally signed encoded hex strings and outputs the string to a file.
 	 * 
-	 * @param licenseNetCheck
-	 *            a license net check.
-	 * @param out
-	 *            the file to create or overwrite.
-	 * @param key
-	 *            a RSA private key used to digitally sign the data.
+	 * @param newFile
+	 *            a text file. If this file exists its contents will be
+	 *            replaced, if not it will be created.
+	 * @param license
+	 *            AN {@link PossiblyInstalledSLLicense} object to convert.
+	 * 
+	 * @see #writeLicensesToFile(File, List)
 	 */
-	public static void outputLicenseNetCheckToSignedFile(
-			final SLLicenseNetCheck licenseNetCheck, File out, PrivateKey key) {
-		FileUtility.putStringIntoAFile(out, toSignedHexString(licenseNetCheck,
-				key, true));
+	public static void writeLicenseToFile(File newFile,
+			PossiblyInstalledSLLicense license) {
+		if (newFile == null)
+			throw new IllegalArgumentException(I18N.err(44, "newFile"));
+		if (license == null)
+			throw new IllegalArgumentException(I18N.err(44, "license"));
+
+		final List<PossiblyInstalledSLLicense> licenses = new ArrayList<PossiblyInstalledSLLicense>();
+		licenses.add(license);
+		writeLicensesToFile(newFile, licenses);
+	}
+
+	/**
+	 * Converts a list of {@link PossiblyInstalledSLLicense} objects to a string
+	 * that contains a set of licenses and license net checks as digitally
+	 * signed encoded hex strings.
+	 * 
+	 * @param licenses
+	 *            the list of {@link PossiblyInstalledSLLicense} objects to
+	 *            convert.
+	 * @param linewrap
+	 *            {@code true} if the returned string should be line wrapped,
+	 *            {@code false} for no line wrapping.
+	 * @return a string that contains a set of licenses and license net checks
+	 *         as digitally signed encoded hex strings.
+	 */
+	public static String toSignedHexString(
+			final List<PossiblyInstalledSLLicense> licenses,
+			final boolean linewrap) {
+		if (licenses == null)
+			throw new IllegalArgumentException(I18N.err(44, "licenses"));
+
+		StringBuilder b = new StringBuilder();
+		for (PossiblyInstalledSLLicense license : licenses) {
+			b.append(license.getSignedSLLicense().getSignedHexString());
+			SignedSLLicenseNetCheck nc = license.getSignedSLLicenseNetCheck();
+			if (nc != null) {
+				b.append(nc.getSignedHexString());
+			}
+		}
+
+		if (linewrap) {
+			SLUtility.wrap(b, LINEWRAP);
+		}
+		return b.toString();
 	}
 
 	/**
@@ -631,7 +691,7 @@ public final class SLLicensePersistence {
 		/*
 		 * Trim off any extra spaces or tabs and use a mutable string.
 		 */
-		StringBuffer b = new StringBuffer(s.trim());
+		StringBuilder b = new StringBuilder(s.trim());
 
 		/*
 		 * Remove any newlines from the string (it was line-wrapped).
@@ -758,21 +818,119 @@ public final class SLLicensePersistence {
 	}
 
 	/**
-	 * Reads a file that contains a license as a digitally signed encoded string
-	 * and converts the string to a license.
+	 * Reads a file that contains a set licenses and license net checks as
+	 * digitally signed encoded strings and returns a list of
+	 * {@link PossiblyInstalledSLLicense} objects.
 	 * 
-	 * @param in
+	 * @param textFile
 	 *            the file to read.
-	 * @param key
-	 *            a RSA public key used to check the digital signature.
-	 * @return a license object or {@code null} if the contents of the file are
-	 *         not well-formed, are improperly signed, or are missing required
-	 *         license data.
+	 * @return the (possibly empty) list of {@link PossiblyInstalledSLLicense}
+	 *         objects.
 	 */
-	public static SLLicense inputLicenseFromSignedFile(File in, PublicKey key) {
-		final String fileContents = FileUtility.getFileContentsAsString(in);
-		SLLicense result = toLicense(fileContents, key);
+	public static List<PossiblyInstalledSLLicense> readLicensesFromFile(
+			final File textFile) {
+		if (textFile == null)
+			throw new IllegalArgumentException(I18N.err(44, "textFile"));
+		final String fileContents = FileUtility
+				.getFileContentsAsString(textFile);
+		return readLicensesFromString(fileContents);
+	}
+
+	/**
+	 * Reads a string that contains a set of licenses and license net checks as
+	 * digitally signed encoded hex strings and returns a list of
+	 * {@link PossiblyInstalledSLLicense} objects.
+	 * 
+	 * @param s
+	 *            the string.
+	 * @return the (possibly empty) list of {@link PossiblyInstalledSLLicense}
+	 *         objects.
+	 */
+	public static List<PossiblyInstalledSLLicense> readLicensesFromString(
+			final String s) {
+		if (s == null)
+			throw new IllegalArgumentException(I18N.err(44, "s"));
+
+		final StringBuilder b = SLUtility.trimInternal(s);
+
+		/*
+		 * Extract the set of signed license from the file contents.
+		 */
+		final List<SignedSLLicense> licenses = new ArrayList<SignedSLLicense>();
+		int fromIndex = 0;
+		while (true) {
+			final int index = b.indexOf(BEGIN_LICENSE, fromIndex);
+			if (index == -1)
+				break;
+			final SignedSLLicense license = SignedSLLicense.getInstance(b
+					.substring(index));
+			licenses.add(license);
+			fromIndex = index + 1;
+		}
+
+		/*
+		 * Extract the set of net checks from the file contents and build the
+		 * resulting list.
+		 */
+		final List<PossiblyInstalledSLLicense> result = new ArrayList<PossiblyInstalledSLLicense>();
+		fromIndex = 0;
+		while (true) {
+			final int index = b.indexOf(BEGIN_NET_CHECK, fromIndex);
+			if (index == -1)
+				break;
+			final SignedSLLicenseNetCheck licenseNetCheck = SignedSLLicenseNetCheck
+					.getInstance(b.substring(index));
+			final SignedSLLicense associatedLicense = lookupLicense(licenses,
+					licenseNetCheck.getLicenseNetCheck().getUuid());
+			if (associatedLicense == null) {
+				SLLogger.getLogger().log(
+						Level.WARNING,
+						I18N.err(200, licenseNetCheck.getLicenseNetCheck()
+								.getUuid(), s));
+			} else {
+				/*
+				 * Create the paired license and license net check and add it to
+				 * our result.
+				 */
+				result.add(new PossiblyInstalledSLLicense(associatedLicense,
+						licenseNetCheck));
+				/*
+				 * Ensure that we remove the associated license from the
+				 * remaining unmatched licenses.
+				 */
+				licenses.remove(associatedLicense);
+			}
+			fromIndex = index + 1;
+		}
+
+		/*
+		 * Add the license with no license net check to the result.
+		 */
+		for (SignedSLLicense license : licenses) {
+			result.add(new PossiblyInstalledSLLicense(license, null));
+		}
+
 		return result;
+	}
+
+	/**
+	 * Helper method to find a {@link SignedSLLicense} in a list with a
+	 * particular {@link UUID}.
+	 * 
+	 * @param licenses
+	 *            the list of {@link SignedSLLicense} objects.
+	 * @param id
+	 *            the {@link UUID} to search for.
+	 * @return the {@link SignedSLLicense} object with <tt>id</tt> for its
+	 *         {@link UUID}.
+	 */
+	private static SignedSLLicense lookupLicense(
+			List<SignedSLLicense> licenses, UUID id) {
+		for (SignedSLLicense license : licenses) {
+			if (license.getLicense().getUuid().equals(id))
+				return license;
+		}
+		return null;
 	}
 
 	/**

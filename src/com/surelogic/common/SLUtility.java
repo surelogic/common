@@ -637,6 +637,33 @@ public final class SLUtility {
 		return b.toString();
 	}
 
+	/**
+	 * Trims out newlines, spaces, tabs, formfeeds, and backspaces from the
+	 * passed string.
+	 * 
+	 * @param s
+	 *            the string to trim the above out of.
+	 * @return the string with the above removed.
+	 */
+	public static StringBuilder trimInternal(String s) {
+		/*
+		 * Trim off any extra spaces or tabs and use a mutable string.
+		 */
+		StringBuilder b = new StringBuilder(s.trim());
+
+		String[] stripout = new String[] { "\n", "\r", "\f", " ", "\t", "\b" };
+
+		for (String c : stripout) {
+			while (true) {
+				int newlineIndex = b.indexOf(c);
+				if (newlineIndex == -1)
+					break;
+				b.delete(newlineIndex, newlineIndex + 1);
+			}
+		}
+		return b;
+	}
+
 	private SLUtility() {
 		// no instances
 	}

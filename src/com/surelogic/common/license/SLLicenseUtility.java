@@ -33,18 +33,6 @@ public final class SLLicenseUtility {
 		return tl_format.get();
 	}
 
-	/*
-	 * Keep the SUBJECTS array complete and in alphabetical order when new
-	 * license subjects are added below.
-	 */
-	public static final String ALL_TOOL_SUBJECT = "All Tools";
-	public static final String FLASHLIGHT_SUBJECT = "Flashlight";
-	public static final String JSURE_SUBJECT = "JSure";
-	public static final String SIERRA_SUBJECT = "Sierra";
-
-	public static final String[] SUBJECTS = { ALL_TOOL_SUBJECT,
-			FLASHLIGHT_SUBJECT, JSURE_SUBJECT, SIERRA_SUBJECT };
-
 	private static final Set<ILicenseObserver> f_observers = new CopyOnWriteArraySet<ILicenseObserver>();
 
 	/**
@@ -69,20 +57,23 @@ public final class SLLicenseUtility {
 	}
 
 	/**
-	 * Checks if the passed license subject is installed or if an all SureLogic
-	 * tools license is installed.
+	 * Checks if a license that allows use of the passed product is installed.
 	 * <p>
-	 * If a license does not exist then all registered {@link ILicenseObserver}
-	 * instances are notified that the license check failed.
+	 * If an appropriate license is not installed then all registered
+	 * {@link ILicenseObserver} instances are notified that the license check
+	 * failed.
 	 * <p>
 	 * If the license is close to its expiration then all registered
 	 * {@link ILicenseObserver} instances are notified.
 	 * 
-	 * @param subject
-	 *            the non-null license subject.
-	 * @return {@code true} if a license exists, {@code false} otherwise.
+	 * @param product
+	 *            the non-<tt>null</tt> product.
+	 * @return {@code true} if a license exists that allows use of
+	 *         <tt>product</tt>, {@code false} otherwise.
 	 */
-	public static boolean validate(final String subject) {
+	public static boolean validate(final SLLicenseProduct product) {
+		if (product == null)
+			throw new IllegalArgumentException(I18N.err(44, "product"));
 		return true;
 	}
 
@@ -95,7 +86,7 @@ public final class SLLicenseUtility {
 	 * 
 	 * <pre>
 	 * final SLStatus failed = SLLicenseUtility.validateSLJob(
-	 * 		SLLicenseUtility.FLASHLIGHT_SUBJECT, monitor);
+	 * 		SLLicenseProduct.FLASHLIGHT, monitor);
 	 * if (failed != null)
 	 * 	return failed;
 	 * </pre>
@@ -103,18 +94,18 @@ public final class SLLicenseUtility {
 	 * If the check fails then the {@link SLProgressMonitor#done()} method is
 	 * called on <tt>monitor</tt>.
 	 * 
-	 * @param subject
-	 *            the non-null license subject.
+	 * @param product
+	 *            the non-<tt>null</tt> product.
 	 * @param monitor
 	 *            a progress monitor.
-	 * @return {@code null} if the license check was successful, an error status
-	 *         otherwise.
+	 * @return {@code null} if the license check was successful and use of the
+	 *         product is licensed, an error status otherwise.
 	 */
-	public static SLStatus validateSLJob(final String subject,
+	public static SLStatus validateSLJob(final SLLicenseProduct product,
 			final SLProgressMonitor monitor) {
-		if (!validate(subject)) {
+		if (!validate(product)) {
 			final int code = 143;
-			final String msg = I18N.err(code, subject);
+			final String msg = I18N.err(code, product.toString());
 			monitor.done();
 			return SLStatus.createErrorStatus(code, msg);
 		} else

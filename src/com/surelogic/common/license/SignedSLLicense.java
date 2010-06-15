@@ -12,16 +12,27 @@ import com.surelogic.common.i18n.I18N;
  */
 public final class SignedSLLicense {
 
-	final SLLicense f_license;
+	private final SLLicense f_license;
 
 	public SLLicense getLicense() {
 		return f_license;
 	}
 
-	final String f_signedHexString;
+	private final String f_signedHexString;
 
 	public String getSignedHexString() {
 		return f_signedHexString;
+	}
+
+	@Override
+	public String toString() {
+		final StringBuilder b = new StringBuilder();
+		b.append(this.getClass().toString());
+		b.append(" : (signed hex string) ");
+		b.append(getSignedHexString());
+		b.append('\n');
+		b.append(getLicense().toString());
+		return b.toString();
 	}
 
 	private SignedSLLicense(final SLLicense license,
@@ -30,11 +41,12 @@ public final class SignedSLLicense {
 		f_signedHexString = signedHexString;
 	}
 
-	public SignedSLLicense getInstance(String signedHexString) {
+	public static SignedSLLicense getInstance(String signedHexString) {
 		return getInstance(signedHexString, SLUtility.getPublicKey());
 	}
 
-	public SignedSLLicense getInstance(String signedHexString, PublicKey key) {
+	public static SignedSLLicense getInstance(String signedHexString,
+			PublicKey key) {
 		if (signedHexString == null)
 			throw new IllegalArgumentException(I18N.err(44, "signedHexString"));
 		if (key == null)
@@ -44,7 +56,7 @@ public final class SignedSLLicense {
 		return new SignedSLLicense(license, signedHexString);
 	}
 
-	public SignedSLLicense getInstance(SLLicense license, PrivateKey key) {
+	public static SignedSLLicense getInstance(SLLicense license, PrivateKey key) {
 		if (license == null)
 			throw new IllegalArgumentException(I18N.err(44, "license"));
 		if (key == null)

@@ -8,17 +8,17 @@ import com.surelogic.common.i18n.I18N;
 
 /**
  * Encapsulates a license net check and the signed hex string that demonstrates
- * that the license was created by SureLogic.
+ * that the license net check was created by SureLogic.
  */
 public final class SignedSLLicenseNetCheck {
 
-	final SLLicenseNetCheck f_licenseNetCheck;
+	private final SLLicenseNetCheck f_licenseNetCheck;
 
 	public SLLicenseNetCheck getLicenseNetCheck() {
 		return f_licenseNetCheck;
 	}
 
-	final String f_signedHexString;
+	private final String f_signedHexString;
 
 	public String getSignedHexString() {
 		return f_signedHexString;
@@ -30,11 +30,22 @@ public final class SignedSLLicenseNetCheck {
 		f_signedHexString = signedHexString;
 	}
 
-	public SignedSLLicenseNetCheck getInstance(String signedHexString) {
+	@Override
+	public String toString() {
+		final StringBuilder b = new StringBuilder();
+		b.append(this.getClass().toString());
+		b.append(" : (signed hex string) ");
+		b.append(getSignedHexString());
+		b.append('\n');
+		b.append(getLicenseNetCheck().toString());
+		return b.toString();
+	}
+
+	public static SignedSLLicenseNetCheck getInstance(String signedHexString) {
 		return getInstance(signedHexString, SLUtility.getPublicKey());
 	}
 
-	public SignedSLLicenseNetCheck getInstance(String signedHexString,
+	public static SignedSLLicenseNetCheck getInstance(String signedHexString,
 			PublicKey key) {
 		if (signedHexString == null)
 			throw new IllegalArgumentException(I18N.err(44, "signedHexString"));
@@ -45,7 +56,7 @@ public final class SignedSLLicenseNetCheck {
 		return new SignedSLLicenseNetCheck(nc, signedHexString);
 	}
 
-	public SignedSLLicenseNetCheck getInstance(
+	public static SignedSLLicenseNetCheck getInstance(
 			SLLicenseNetCheck licenseNetCheck, PrivateKey key) {
 		if (licenseNetCheck == null)
 			throw new IllegalArgumentException(I18N.err(44, "licenseNetCheck"));

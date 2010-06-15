@@ -45,14 +45,14 @@ public final class SLLicense {
 	/**
 	 * The name of the product being licensed. May not be <tt>null</tt>.
 	 */
-	private final String f_product;
+	private final SLLicenseProduct f_product;
 
 	/**
-	 * Gets the name of the product being licensed.
+	 * Gets the product being licensed.
 	 * 
-	 * @return the non-<tt>null</tt> name of the product being licensed.
+	 * @return the non-<tt>null</tt> product being licensed.
 	 */
-	public String getProduct() {
+	public SLLicenseProduct getProduct() {
 		return f_product;
 	}
 
@@ -167,7 +167,7 @@ public final class SLLicense {
 	 *            {@code false} otherwise.
 	 */
 	public SLLicense(final UUID uuid, final String holder,
-			final String product, final int durationInDays,
+			final SLLicenseProduct product, final int durationInDays,
 			final Date installBeforeDate, final SLLicenseType type,
 			final int maxActive, final boolean performNetCheck) {
 		if (uuid == null)
