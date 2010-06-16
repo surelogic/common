@@ -100,6 +100,11 @@ public abstract class AbstractJavaZip<T> {
 			if (packageName == null) {
 				return;
 			}
+			/*
+            if (resource.toString().contains("pphtml")) {
+				System.out.println("Looking at: "+resource);
+			}
+			*/
 			try {
 				final LineNumberReader reader = new LineNumberReader(
 						new InputStreamReader(getFileContents(resource)));
@@ -281,14 +286,17 @@ public abstract class AbstractJavaZip<T> {
 
 	private void generateClassMappings(final PrintWriter pw,
 			final Map<String, Map<String, String>> fileMap) {
+		//int count = 0;
 		for (final Map.Entry<String, Map<String, String>> e : fileMap
 				.entrySet()) {
 			for (final Map.Entry<String, String> e2 : e.getValue().entrySet()) {
 				if (!e2.getKey().endsWith(".java")) {
 					pw.println(e2.getKey() + "=" + e2.getValue());
+					//count++;
 				}
 			}
 		}
+		//System.out.println("Class mapping#: "+count);
 		pw.flush();
 	}
 
