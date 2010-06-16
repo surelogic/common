@@ -1,5 +1,6 @@
 package com.surelogic.common.license;
 
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -90,6 +91,14 @@ public final class SLLicenseUtility {
 			return SLStatus.createErrorStatus(code, msg);
 		} else
 			return null;
+	}
+
+	public static void tryToInstallLicense(String value) throws Exception {
+		final List<PossiblyInstalledSLLicense> licenses = SLLicensePersistence
+				.readLicensesFromString(value);
+		if (licenses.isEmpty())
+			throw new Exception(I18N.err(200));
+		SLLicenseManager.getInstance().install(licenses);
 	}
 
 	private SLLicenseUtility() {
