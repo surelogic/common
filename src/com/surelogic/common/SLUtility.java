@@ -24,6 +24,8 @@ public final class SLUtility {
 	public static final boolean is64bit = (SystemUtils.OS_ARCH.indexOf("64") >= 0);
 	public static final String JAVA_DEFAULT_PACKAGE = "(default package)";
 	public static final String UTF8 = "UTF8";
+	public static final String YES = "Yes";
+	public static final String NO = "No";
 
 	/**
 	 * Returns an {@code int} value of the passed {@code long} value or
@@ -55,6 +57,22 @@ public final class SLUtility {
 	public static Date fromStringDay(final String dateStr)
 			throws ParseException {
 		return tl_day_format.get().parse(dateStr);
+	}
+	
+	private final static ThreadLocal<SimpleDateFormat> tl_human_day_format = new ThreadLocal<SimpleDateFormat>() {
+		@Override
+		protected SimpleDateFormat initialValue() {
+			return new SimpleDateFormat("dd-MMM-yyyy");
+		}
+	};
+
+	public static String toStringHumanDay(final Date date) {
+		return tl_human_day_format.get().format(date);
+	}
+
+	public static Date fromStringHumanDay(final String dateStr)
+			throws ParseException {
+		return tl_human_day_format.get().parse(dateStr);
 	}
 
 	private final static ThreadLocal<SimpleDateFormat> tl_hms_format = new ThreadLocal<SimpleDateFormat>() {

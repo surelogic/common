@@ -1,6 +1,5 @@
 package com.surelogic.common.license;
 
-import java.text.SimpleDateFormat;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -13,25 +12,6 @@ import com.surelogic.common.jobs.SLStatus;
  * A utility to help manage licenses to use SureLogic tools.
  */
 public final class SLLicenseUtility {
-
-	private final static ThreadLocal<SimpleDateFormat> tl_format = new ThreadLocal<SimpleDateFormat>() {
-		@Override
-		protected SimpleDateFormat initialValue() {
-			return new SimpleDateFormat("yyyy-MM-dd");
-		}
-	};
-
-	/**
-	 * Gets a simple date format which produces dates of the form
-	 * <tt>yyyy-MM-dd</tt> such as <tt>2010-01-21</tt>. This is used to persist
-	 * and load the expiration date or renewal deadline for {@link SLLicense}
-	 * objects.
-	 * 
-	 * @return an instance that can be safely used.
-	 */
-	public static SimpleDateFormat getThreadSafeDateFormat() {
-		return tl_format.get();
-	}
 
 	private static final Set<ILicenseObserver> f_observers = new CopyOnWriteArraySet<ILicenseObserver>();
 

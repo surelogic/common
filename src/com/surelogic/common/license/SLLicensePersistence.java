@@ -3,7 +3,6 @@ package com.surelogic.common.license;
 import java.io.File;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -38,11 +37,10 @@ import com.surelogic.common.logging.SLLogger;
  * <tt>Integer.toString(license.getDurationInDays())</tt>.
  * <li>The character {@link #SEP}.
  * <li>(Optional) The string constant {@link #INSTALLATION_DEADLINE_LABEL}
- * followed by <tt>nc.getDate()</tt> converted to a string using
- * {@link SLLicenseUtility#getThreadSafeDateFormat()}.
+ * followed by <tt>SLUtility.toStringDay(license.getInstallBeforeDate())</tt>.
  * <li>(Optional) The character {@link #SEP}.
  * <li>The string constant {@link #TYPE_LABEL} followed by
- * <tt>license.getType().toString()</tt>.
+ * <tt>license.getType().toSymbol()</tt>.
  * <li>The character {@link #SEP}.
  * <li>The string constant {@link #MAXACTIVE_LABEL} followed by
  * <tt>Integer.toString(license.getMaxActive())</tt>.
@@ -116,9 +114,8 @@ import com.surelogic.common.logging.SLLogger;
  * <li>The string constant {@link #UUID_LABEL} followed by
  * <tt>nc.getUuid().toString()</tt>.
  * <li>The character {@link #SEP}.
- * <li>The string constant {@link #DATE_LABEL} followed by <tt>nc.getDate()</tt>
- * converted to a string using
- * {@link SLLicenseUtility#getThreadSafeDateFormat()}.
+ * <li>The string constant {@link #DATE_LABEL} followed by
+ * <tt>SLUtility.toStringDay(licenseNetCheck.getDate())</tt>.
  * <li>The character {@link #SEP}.
  * </ul>
  * An example of this format is:
@@ -200,14 +197,10 @@ public final class SLLicensePersistence {
 				SEP);
 		b.append(DURATION_LABEL).append(
 				Integer.toString(license.getDurationInDays())).append(SEP);
-		final Date installBeforeDate = license.getInstallBeforeDate();
-		if (installBeforeDate != null) {
-			final SimpleDateFormat sdf = SLLicenseUtility
-					.getThreadSafeDateFormat();
-			b.append(INSTALLATION_DEADLINE_LABEL).append(
-					sdf.format(installBeforeDate)).append(SEP);
-		}
-		b.append(TYPE_LABEL).append(license.getType().toString()).append(SEP);
+		b.append(INSTALLATION_DEADLINE_LABEL).append(
+				SLUtility.toStringDay(license.getInstallBeforeDate())).append(
+				SEP);
+		b.append(TYPE_LABEL).append(license.getType().toSymbol()).append(SEP);
 		b.append(MAXACTIVE_LABEL).append(
 				Integer.toString(license.getMaxActive())).append(SEP);
 		b.append(PERFORMNETCHECK_LABEL).append(
@@ -226,11 +219,10 @@ public final class SLLicensePersistence {
 		if (licenseNetCheck == null)
 			throw new IllegalArgumentException(I18N.err(44, "licenseNetCheck"));
 		final StringBuilder b = new StringBuilder();
-		final SimpleDateFormat sdf = SLLicenseUtility.getThreadSafeDateFormat();
 		b.append(UUID_LABEL).append(licenseNetCheck.getUuid().toString())
 				.append(SEP);
-		b.append(DATE_LABEL).append(sdf.format(licenseNetCheck.getDate()))
-				.append(SEP);
+		b.append(DATE_LABEL).append(
+				SLUtility.toStringDay(licenseNetCheck.getDate())).append(SEP);
 		return b.toString();
 	}
 
@@ -318,9 +310,7 @@ public final class SLLicensePersistence {
 			installBeforeDate = null;
 		} else {
 			try {
-				SimpleDateFormat sdf = SLLicenseUtility
-						.getThreadSafeDateFormat();
-				installBeforeDate = sdf.parse(dateS);
+				installBeforeDate = SLUtility.fromStringDay(dateS);
 			} catch (Exception e) {
 				SLLogger.getLogger().log(Level.WARNING,
 						I18N.err(189, dateS, value), e);
@@ -337,7 +327,7 @@ public final class SLLicensePersistence {
 					I18N.err(187, TYPE_LABEL, value));
 			return null;
 		}
-		final SLLicenseType type = SLLicenseType.fromString(typeS);
+		final SLLicenseType type = SLLicenseType.fromSymbol(typeS);
 		if (type == null) {
 			SLLogger.getLogger()
 					.log(Level.WARNING, I18N.err(190, typeS, value));
@@ -438,8 +428,7 @@ public final class SLLicensePersistence {
 		}
 		final Date date;
 		try {
-			SimpleDateFormat sdf = SLLicenseUtility.getThreadSafeDateFormat();
-			date = sdf.parse(dateS);
+			date = SLUtility.fromStringDay(dateS);
 		} catch (Exception e) {
 			SLLogger.getLogger().log(Level.WARNING,
 					I18N.err(189, dateS, value), e);

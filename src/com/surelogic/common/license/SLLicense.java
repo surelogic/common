@@ -74,19 +74,16 @@ public final class SLLicense {
 	}
 
 	/**
-	 * An optional install before date. Installations after this date will fail.
-	 * A value of {@code null} indicates that there is not install before date
-	 * for this license.
+	 * An install before date. Installations after this date will fail. May not
+	 * be <tt>null</tt>.
 	 */
 	private final Date f_installBeforeDate;
 
 	/**
 	 * Gets installation deadline, or install before date, for this license.
-	 * Installations after this date will fail. A value of {@code null}
-	 * indicates that there is not an installation deadline for this license.
+	 * Installations after this date will fail.
 	 * 
-	 * @return the installation deadline for this license, or {@code null} if no
-	 *         deadline.
+	 * @return the non-<tt>null</tt> installation deadline for this license.
 	 */
 	public Date getInstallBeforeDate() {
 		return f_installBeforeDate;
@@ -155,8 +152,7 @@ public final class SLLicense {
 	 *            the license duration in days from installation until
 	 *            expiration or renewal. This value must be greater than one.
 	 * @param installBeforeDate
-	 *            the installation deadline for this license, or {@code null} if
-	 *            no deadline.
+	 *            the non-<tt>null</tt> installation deadline for this license.
 	 * @param type
 	 *            a non-<tt>null</tt> type for the license.
 	 * @param maxActive
@@ -182,6 +178,9 @@ public final class SLLicense {
 		if (durationInDays <= 1)
 			throw new IllegalArgumentException(I18N.err(196, durationInDays));
 		f_durationInDays = durationInDays;
+		if (installBeforeDate == null)
+			throw new IllegalArgumentException(I18N
+					.err(44, "installBeforeDate"));
 		f_installBeforeDate = installBeforeDate;
 		if (type == null)
 			throw new IllegalArgumentException(I18N.err(44, "type"));

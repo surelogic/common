@@ -40,9 +40,19 @@ public enum SLLicenseType {
 		f_symbol = symbol;
 	}
 
+	public String toSymbol() {
+		return f_symbol;
+	}
+
 	@Override
 	public String toString() {
-		return f_symbol;
+		return name().toLowerCase();
+	}
+
+	public String toHumanString() {
+		StringBuilder b = new StringBuilder(name().toLowerCase());
+		b.replace(0, 1, b.substring(0, 1).toUpperCase());
+		return b.toString();
 	}
 
 	/*
@@ -53,7 +63,7 @@ public enum SLLicenseType {
 	private static final Map<String, SLLicenseType> stringToEnum = new HashMap<String, SLLicenseType>();
 	static {
 		for (SLLicenseType type : values()) {
-			stringToEnum.put(type.toString(), type);
+			stringToEnum.put(type.toSymbol(), type);
 		}
 	}
 
@@ -65,7 +75,7 @@ public enum SLLicenseType {
 	 * @return the license type, or {@code null} if the passed value is not
 	 *         recognized.
 	 */
-	public static SLLicenseType fromString(String value) {
+	public static SLLicenseType fromSymbol(String value) {
 		return stringToEnum.get(value);
 	}
 }

@@ -1,7 +1,9 @@
 package com.surelogic.common.license;
 
+import java.util.Date;
 import java.util.UUID;
 
+import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
 
 /**
@@ -50,13 +52,79 @@ public final class PossiblyInstalledSLLicense {
 	}
 
 	/**
-	 * Flags if this license is installed.
+	 * Flags if this license is activated. Activation is indicated by the
+	 * existence of a {@link SignedSLLicenseNetCheck} object.
 	 * 
-	 * @return {@code true} if this license has been installed properly, {@code
-	 *         false} otherwise.
+	 * @return {@code true} if this license has been activated, {@code false}
+	 *         otherwise.
 	 */
-	public boolean isInstalled() {
+	public boolean isActivated() {
 		return f_licenseNetCheck != null;
+	}
+
+	/**
+	 * A textual explanation of the activation status of this license. The
+	 * result is intended for use in the user interface.
+	 * 
+	 * @return a textual explanation of the activation status of this license.
+	 */
+	public String getActivatedExplanation() {
+		final StringBuilder b = new StringBuilder();
+		if (isActivated()) {
+			b.append(SLUtility.YES);
+		} else {
+			final String date = SLUtility.toStringHumanDay(getSignedSLLicense()
+					.getLicense().getInstallBeforeDate());
+			b.append(SLUtility.NO).append(" [activate before ").append(date)
+					.append("]");
+		}
+		return b.toString();
+	}
+
+	/**
+	 * Flags if this license is expired. The type of the license is not taken
+	 * into consideration just the date in the license net check. This method
+	 * returns {@code false} if the license has not been installed.
+	 * 
+	 * @return {@code true} if this license has expired, {@code false}
+	 *         otherwise.
+	 */
+	public boolean isExpired() {
+		if (isActivated()) {
+			final Date now = new Date();
+			final Date deadline = f_licenseNetCheck.getLicenseNetCheck()
+					.getDate();
+			final boolean expired = now.after(deadline);
+			return expired;
+		} else
+			return false;
+	}
+
+	/**
+	 * A textual explanation of the expiration status of this license. The
+	 * result is intended for use in the user interface.
+	 * 
+	 * @return a textual explanation of the expiration status of this license.
+	 */
+	public String getExpirationExplanation() {
+		final StringBuilder b = new StringBuilder();
+		final SLLicenseType type = getSignedSLLicense().getLicense().getType();
+
+		if (isActivated()) {
+			final String date = SLUtility
+					.toStringHumanDay(getSignedSLLicenseNetCheck()
+							.getLicenseNetCheck().getDate());
+			if (isExpired()) {
+				b.append(SLUtility.YES);
+				if (type == SLLicenseType.PERPETUAL) {
+					b.append(" [renew now]");
+				}
+			} else {
+				b.append(SLUtility.NO).append(" [valid until ").append(date)
+						.append("]");
+			}
+		}
+		return b.toString();
 	}
 
 	/**
@@ -95,7 +163,7 @@ public final class PossiblyInstalledSLLicense {
 	public String toString() {
 		final StringBuilder b = new StringBuilder();
 		b.append(this.getClass().toString());
-		if (isInstalled()) {
+		if (isActivated()) {
 			b.append(" : installed\n");
 			b.append(getSignedSLLicense().toString());
 			b.append(getSignedSLLicenseNetCheck().toString());
