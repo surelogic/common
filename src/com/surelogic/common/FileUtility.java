@@ -39,14 +39,14 @@ public final class FileUtility {
 	private FileUtility() {
 		// no instances
 	}
-	
+
 	public static final String GZIP_SUFFIX = ".gz";
-	
+
 	/**
 	 * The string name of the JSure data directory.
 	 */
 	public static final String JSURE_DATA_PATH_FRAGMENT = ".jsure-data";
-	
+
 	/**
 	 * The string name of the Sierra data directory.
 	 */
@@ -76,7 +76,7 @@ public final class FileUtility {
 	 * Name of the IR persistence directory under the JSure data directory
 	 */
 	public static final String IR_PATH_FRAGMENT = "ir";
-	
+
 	/**
 	 * Tries to create the specified directory in the file system unless it
 	 * already exists.
@@ -118,8 +118,9 @@ public final class FileUtility {
 				 * Check if the reason we could not create the directory is
 				 * because it already exists.
 				 */
-				if (path.isDirectory())
+				if (path.isDirectory()) {
 					return true;
+				}
 				SLLogger.getLogger().warning(
 						I18N.err(30, path.getAbsolutePath()));
 			}
@@ -141,8 +142,9 @@ public final class FileUtility {
 	public static boolean recursiveDelete(final File path) {
 		return recursiveDelete(path, true);
 	}
-	
-	public static boolean recursiveDelete(final File path, boolean printWarning) {
+
+	public static boolean recursiveDelete(final File path,
+			final boolean printWarning) {
 		boolean success;
 		if (path.isDirectory()) {
 			final File[] files = path.listFiles();
@@ -204,13 +206,14 @@ public final class FileUtility {
 		while (size > 1024 && labelIndex < 3) {
 			final long oldSize = size;
 			size = oldSize / 1024L;
-			digit = (int) (((oldSize % 1024L) / 1024.0) * 10.0);
+			digit = (int) (oldSize % 1024L / 1024.0 * 10.0);
 			labelIndex++;
 		}
-		if (labelIndex == 0 || digit == 0)
+		if (labelIndex == 0 || digit == 0) {
 			return size + " " + labels[labelIndex];
-		else
+		} else {
 			return size + "." + digit + " " + labels[labelIndex];
+		}
 	}
 
 	/**
@@ -233,20 +236,21 @@ public final class FileUtility {
 			return false;
 		}
 	}
-		
+
 	/**
 	 * Copies the contents of a {@link InputStream} to a file.
 	 * 
 	 * @param source
 	 *            a label identifying the source of the stream
 	 * @param is
-	 * 		      the stream to copy from
+	 *            the stream to copy from
 	 * @param to
 	 *            the target file.
 	 * @return {@code true} if and only if the copy is successful, {@code false}
 	 *         otherwise.
 	 */
-	public static boolean copy(String source, InputStream is, final File to) {
+	public static boolean copy(final String source, InputStream is,
+			final File to) {
 		boolean success = true;
 		try {
 			OutputStream os = null;
@@ -267,7 +271,7 @@ public final class FileUtility {
 					os.close();
 				}
 			}
-		} catch (final IOException e) {			
+		} catch (final IOException e) {
 			SLLogger.getLogger().log(Level.SEVERE,
 					I18N.err(112, source, to.getAbsolutePath()), e);
 			success = false;
@@ -504,21 +508,22 @@ public final class FileUtility {
 				null);
 	}
 
-	public static void zipDir(File tempDir, File zipFile) throws IOException {
-		FileOutputStream fos = new FileOutputStream(zipFile);
-		ZipOutputStream zos = new ZipOutputStream(fos);
+	public static void zipDir(final File tempDir, final File zipFile)
+			throws IOException {
+		final FileOutputStream fos = new FileOutputStream(zipFile);
+		final ZipOutputStream zos = new ZipOutputStream(fos);
 		zipDir(tempDir, tempDir, zos);
 		zos.close();
 	}
 
-	public static void zipDir(File baseDir, File zipDir, ZipOutputStream zos)
-			throws IOException {
+	public static void zipDir(final File baseDir, final File zipDir,
+			final ZipOutputStream zos) throws IOException {
 		// get a listing of the directory content
-		File[] dirList = zipDir.listFiles();
-		byte[] readBuffer = new byte[4096];
+		final File[] dirList = zipDir.listFiles();
+		final byte[] readBuffer = new byte[4096];
 		int bytesIn = 0;
 		// loop through dirList, and zip the files
-		for (File f : dirList) {
+		for (final File f : dirList) {
 			if (f.isDirectory()) {
 				// if the File object is a directory, call this
 				// function again to add its content recursively
@@ -528,9 +533,9 @@ public final class FileUtility {
 			}
 			// if we reached here, the File object f was not a directory
 			// create a FileInputStream on top of f
-			FileInputStream fis = new FileInputStream(f);
+			final FileInputStream fis = new FileInputStream(f);
 			// create a new zip entry
-			String path = f.getAbsolutePath();
+			final String path = f.getAbsolutePath();
 			String name;
 			if (path.startsWith(baseDir.getAbsolutePath())) {
 				name = path.substring(baseDir.getAbsolutePath().length() + 1);
@@ -538,8 +543,8 @@ public final class FileUtility {
 				name = path;
 			}
 			name = name.replace('\\', '/');
-			
-			ZipEntry anEntry = new ZipEntry(name);
+
+			final ZipEntry anEntry = new ZipEntry(name);
 			// place the zip entry in the ZipOutputStream object
 			zos.putNextEntry(anEntry);
 			// now write the content of the file to the ZipOutputStream
@@ -551,97 +556,119 @@ public final class FileUtility {
 		}
 	}
 
-	public static void unzipFile(File zipFile, File targetDir) throws IOException {
+	public static void unzipFile(final File zipFile, final File targetDir)
+			throws IOException {
 		unzipFile(new ZipFile(zipFile), targetDir, null);
 	}
-	
-	public static void unzipFile(ZipFile zipFile, File targetDir, UnzipCallback cb) throws IOException {
-		Enumeration<? extends ZipEntry> e = zipFile.entries();
-        while (e.hasMoreElements()) {
-            ZipEntry ze = e.nextElement();
-            File f = new File(targetDir, ze.getName());
-            if (!f.exists()) {
-                f.getParentFile().mkdirs();
-                FileUtility.copy(ze.getName(), zipFile.getInputStream(ze), f);
-            }
-            if (cb != null) {
-            	cb.unzipped(ze, f);
-            }
-        }
-        zipFile.close();
+
+	public static void unzipFile(final ZipFile zipFile, final File targetDir,
+			final UnzipCallback cb) throws IOException {
+		final Enumeration<? extends ZipEntry> e = zipFile.entries();
+		while (e.hasMoreElements()) {
+			final ZipEntry ze = e.nextElement();
+			final File f = new File(targetDir, ze.getName());
+			if (!f.exists()) {
+				if (ze.isDirectory()) {
+					f.mkdirs();
+				} else {
+					f.getParentFile().mkdirs();
+					FileUtility.copy(ze.getName(), zipFile.getInputStream(ze),
+							f);
+				}
+			}
+			if (cb != null) {
+				cb.unzipped(ze, f);
+			}
+		}
+		zipFile.close();
 	}
-	
+
 	public interface UnzipCallback {
-		void unzipped(ZipEntry ze, File f);		
+		void unzipped(ZipEntry ze, File f);
 	}
-	
-	public static OutputStream getOutputStream(File file) throws IOException {
+
+	public static OutputStream getOutputStream(final File file)
+			throws IOException {
 		// Create a writeable file channel
-		FileChannel channel = new RandomAccessFile(file, "rw").getChannel();
+		final FileChannel channel = new RandomAccessFile(file, "rw")
+				.getChannel();
 
 		// Create an output stream on the channel
-		OutputStream os = Channels.newOutputStream(channel);		
+		final OutputStream os = Channels.newOutputStream(channel);
 		return os;
 	}
-	
-	public static InputStream getInputStream(File file) throws IOException {
+
+	public static InputStream getInputStream(final File file)
+			throws IOException {
 		// Create a readable file channel
-		FileChannel channel = new RandomAccessFile(file, "r").getChannel();
+		final FileChannel channel = new RandomAccessFile(file, "r")
+				.getChannel();
 
 		// Create an inputstream on the channel
-		InputStream is = Channels.newInputStream(channel);
+		final InputStream is = Channels.newInputStream(channel);
 		return is;
 	}
-	
-	public static OutputStream getMappedOutputStream(File file) throws IOException {
+
+	public static OutputStream getMappedOutputStream(final File file)
+			throws IOException {
 		/*
-		// Create a read-only memory-mapped file
-		FileChannel roChannel = new RandomAccessFile(file, "r").getChannel();
-		ByteBuffer roBuf = roChannel.map(FileChannel.MapMode.READ_ONLY, 0, (int)roChannel.size());
-        */
+		 * // Create a read-only memory-mapped file FileChannel roChannel = new
+		 * RandomAccessFile(file, "r").getChannel(); ByteBuffer roBuf =
+		 * roChannel.map(FileChannel.MapMode.READ_ONLY, 0,
+		 * (int)roChannel.size());
+		 */
 		// Create a read-write memory-mapped file
-		FileChannel rwChannel = new RandomAccessFile(file, "rw").getChannel();
-		ByteBuffer wrBuf = rwChannel.map(FileChannel.MapMode.READ_WRITE, 0, (int)rwChannel.size());
+		final FileChannel rwChannel = new RandomAccessFile(file, "rw")
+				.getChannel();
+		final ByteBuffer wrBuf = rwChannel.map(FileChannel.MapMode.READ_WRITE,
+				0, (int) rwChannel.size());
 		/*
-		// Create a private (copy-on-write) memory-mapped file.
-		// Any write to this channel results in a private copy of the data.
-		FileChannel pvChannel = new RandomAccessFile(file, "rw").getChannel();
-		ByteBuffer pvBuf = roChannel.map(FileChannel.MapMode.READ_WRITE, 0, (int)rwChannel.size());		
-		*/
+		 * // Create a private (copy-on-write) memory-mapped file. // Any write
+		 * to this channel results in a private copy of the data. FileChannel
+		 * pvChannel = new RandomAccessFile(file, "rw").getChannel(); ByteBuffer
+		 * pvBuf = roChannel.map(FileChannel.MapMode.READ_WRITE, 0,
+		 * (int)rwChannel.size());
+		 */
 		return newOutputStream(wrBuf);
 	}
-	
-	 // Returns an output stream for a ByteBuffer.
-    // The write() methods use the relative ByteBuffer put() methods.
-    public static OutputStream newOutputStream(final ByteBuffer buf) {
-        return new OutputStream() {
-            public synchronized void write(int b) throws IOException {
-                buf.put((byte)b);               
-            }
-    
-            public synchronized void write(byte[] bytes, int off, int len) throws IOException {
-                buf.put(bytes, off, len);
-            }
-        };
-    }
-    
-    // Returns an input stream for a ByteBuffer.
-    // The read() methods use the relative ByteBuffer get() methods.
-    public static InputStream newInputStream(final ByteBuffer buf) {
-        return new InputStream() {
-            public synchronized int read() throws IOException {
-                if (!buf.hasRemaining()) {
-                    return -1;
-                }
-                return buf.get();
-            }
-    
-            public synchronized int read(byte[] bytes, int off, int len) throws IOException {
-                // Read only what's left
-                len = Math.min(len, buf.remaining());
-                buf.get(bytes, off, len);
-                return len;
-            }
-        };
-    }
+
+	// Returns an output stream for a ByteBuffer.
+	// The write() methods use the relative ByteBuffer put() methods.
+	public static OutputStream newOutputStream(final ByteBuffer buf) {
+		return new OutputStream() {
+			@Override
+			public synchronized void write(final int b) throws IOException {
+				buf.put((byte) b);
+			}
+
+			@Override
+			public synchronized void write(final byte[] bytes, final int off,
+					final int len) throws IOException {
+				buf.put(bytes, off, len);
+			}
+		};
+	}
+
+	// Returns an input stream for a ByteBuffer.
+	// The read() methods use the relative ByteBuffer get() methods.
+	public static InputStream newInputStream(final ByteBuffer buf) {
+		return new InputStream() {
+			@Override
+			public synchronized int read() throws IOException {
+				if (!buf.hasRemaining()) {
+					return -1;
+				}
+				return buf.get();
+			}
+
+			@Override
+			public synchronized int read(final byte[] bytes, final int off,
+					int len) throws IOException {
+				// Read only what's left
+				len = Math.min(len, buf.remaining());
+				buf.get(bytes, off, len);
+				return len;
+			}
+		};
+	}
 }
