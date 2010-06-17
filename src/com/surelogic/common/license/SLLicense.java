@@ -74,14 +74,14 @@ public final class SLLicense {
 	}
 
 	/**
-	 * An install before date. Installations after this date will fail. May not
-	 * be <tt>null</tt>.
+	 * An install before date. Installations and activations after this date
+	 * will fail. May not be <tt>null</tt>.
 	 */
 	private final Date f_installBeforeDate;
 
 	/**
 	 * Gets installation deadline, or install before date, for this license.
-	 * Installations after this date will fail.
+	 * Installations and activations after this date will fail.
 	 * 
 	 * @return the non-<tt>null</tt> installation deadline for this license.
 	 */
