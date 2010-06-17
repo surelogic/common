@@ -1,5 +1,6 @@
 package com.surelogic.common.license;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -93,12 +94,75 @@ public final class SLLicenseUtility {
 			return null;
 	}
 
+	/**
+	 * Takes the passed encoded string, assumes that it is an encoded signed
+	 * license, and installs it.
+	 * 
+	 * @param value
+	 *            the string to decode into a license.
+	 * @throws Exception
+	 *             should anything go wrong.
+	 */
 	public static void tryToInstallLicense(String value) throws Exception {
 		final List<PossiblyInstalledSLLicense> licenses = SLLicensePersistence
 				.readLicensesFromString(value);
 		if (licenses.isEmpty())
 			throw new Exception(I18N.err(200));
 		SLLicenseManager.getInstance().install(licenses);
+	}
+
+	/**
+	 * Contacts the SureLogic server and tries to activate/renew a set of
+	 * licenses. The server responds with a set of license net checks that then
+	 * need to be installed locally.
+	 * 
+	 * @param licenses
+	 *            the licenses to activate.
+	 * @throws Exception
+	 *             should anything go wrong.
+	 */
+	public static void tryToActivateRenewLicenses(
+			List<PossiblyInstalledSLLicense> licenses) throws Exception {
+		if (licenses.isEmpty())
+			return;
+	}
+
+	/**
+	 * Uninstalls a set of license from the client and notifies the SureLogic
+	 * server that they have been uninstalled.
+	 * 
+	 * @param licenses
+	 *            the licenses to uninstall.
+	 * @throws Exception
+	 *             should anything go wrong.
+	 */
+	public static void tryToUninstallLicenses(
+			List<PossiblyInstalledSLLicense> licenses) throws Exception {
+		if (licenses.isEmpty())
+			return;
+
+		/*
+		 * Local removal
+		 */
+		SLLicenseManager.getInstance().remove(licenses);
+		/*
+		 * For each license removed that performs net checks we should notify
+		 * the server that the license has been removed.
+		 * 
+		 * This is a best effort attempt so we should not get bother the user if
+		 * for any reason the notification fails.
+		 */
+		List<PossiblyInstalledSLLicense> notifyList = new ArrayList<PossiblyInstalledSLLicense>();
+		for (PossiblyInstalledSLLicense license : licenses) {
+			if (license.getSignedSLLicense().getLicense().performNetCheck())
+				notifyList.add(license);
+		}
+		if (!notifyList.isEmpty()) {
+			/*
+			 * Perform notification message to the server.
+			 */
+			// TODO
+		}
 	}
 
 	private SLLicenseUtility() {
