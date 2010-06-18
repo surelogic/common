@@ -1,10 +1,12 @@
 package com.surelogic.common.license;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
+import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.jobs.SLJob;
 import com.surelogic.common.jobs.SLProgressMonitor;
@@ -107,7 +109,27 @@ public final class SLLicenseUtility {
 		final List<PossiblyInstalledSLLicense> licenses = SLLicensePersistence
 				.readLicensesFromString(value);
 		if (licenses.isEmpty())
-			throw new Exception(I18N.err(200));
+			throw new Exception(I18N.err(201));
+		/*
+		 * Iterate through the licenses that we are trying to install ensure
+		 * that we are not installing this license past the install/activation
+		 * deadline.
+		 */
+		final Date now = new Date();
+		for (PossiblyInstalledSLLicense iLicense : licenses) {
+			SLLicense license = iLicense.getSignedSLLicense().getLicense();
+			/*
+			 * The installation deadline only applies to non-perpetual licenses.
+			 */
+			if (license.getType() != SLLicenseType.PERPETUAL) {
+				final Date deadline = license.getInstallBeforeDate();
+				final boolean pastDeadline = now.after(deadline);
+				if (pastDeadline)
+					throw new Exception(I18N.err(202, license.getType()
+							.toHumanString(), license.getProduct().toString(),
+							SLUtility.toStringHumanDay(deadline)));
+			}
+		}
 		SLLicenseManager.getInstance().install(licenses);
 	}
 
@@ -125,6 +147,28 @@ public final class SLLicenseUtility {
 			List<PossiblyInstalledSLLicense> licenses) throws Exception {
 		if (licenses.isEmpty())
 			return;
+		/*
+		 * Check that either (1) each license is not activated or (2) that it is
+		 * a perpetual license.
+		 */
+		for (PossiblyInstalledSLLicense iLicense : licenses) {
+			SLLicense license = iLicense.getSignedSLLicense().getLicense();
+			if (license.getType() != SLLicenseType.PERPETUAL) {
+				if (iLicense.isActivated())
+					throw new Exception(I18N.err(203, license.getType()
+							.toHumanString(), license.getProduct().toString(),
+							SLUtility.toStringHumanDay(iLicense
+									.getSignedSLLicenseNetCheck()
+									.getLicenseNetCheck().getDate())));
+			}
+		}
+
+		/*
+		 * Build the message to send to www.surelogic.com.
+		 */
+		final String msg = SLLicensePersistence.toSignedHexString(licenses,
+				true);
+
 	}
 
 	/**
