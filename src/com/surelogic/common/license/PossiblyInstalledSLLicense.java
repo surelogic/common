@@ -73,10 +73,13 @@ public final class PossiblyInstalledSLLicense {
 		if (isActivated()) {
 			b.append(SLUtility.YES);
 		} else {
-			final String date = SLUtility.toStringHumanDay(getSignedSLLicense()
-					.getLicense().getInstallBeforeDate());
-			b.append(SLUtility.NO).append(" [activate before ").append(date)
-					.append("]");
+			b.append(SLUtility.NO);
+			final SLLicense license = getSignedSLLicense().getLicense();
+			if (license.getType() != SLLicenseType.PERPETUAL) {
+				final String date = SLUtility.toStringHumanDay(license
+						.getInstallBeforeDate());
+				b.append(" [activate before ").append(date).append("]");
+			}
 		}
 		return b.toString();
 	}
