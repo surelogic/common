@@ -4,6 +4,7 @@ import java.io.File;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -810,19 +811,30 @@ public final class SLLicensePersistence {
 	 * Reads a file that contains a set licenses and license net checks as
 	 * digitally signed encoded strings and returns a list of
 	 * {@link PossiblyActivatedSLLicense} objects.
+	 * <p>
+	 * This is a robust call, in that it will report problems but not throw an
+	 * exception unless the passed file is {@code null}.
 	 * 
 	 * @param textFile
 	 *            the file to read.
 	 * @return the (possibly empty) list of {@link PossiblyActivatedSLLicense}
 	 *         objects.
+	 * @throws IllegalArgumentException
+	 *             if <tt>textFile</tt> is {@code null}.
 	 */
 	public static List<PossiblyActivatedSLLicense> readLicensesFromFile(
 			final File textFile) {
 		if (textFile == null)
 			throw new IllegalArgumentException(I18N.err(44, "textFile"));
-		final String fileContents = FileUtility
-				.getFileContentsAsString(textFile);
-		return readPossiblyActivatedLicensesFromString(fileContents);
+		try {
+			final String fileContents = FileUtility
+					.getFileContentsAsString(textFile);
+			return readPossiblyActivatedLicensesFromString(fileContents);
+		} catch (Exception trouble) {
+			SLLogger.getLogger().log(Level.WARNING,
+					I18N.err(206, textFile.getAbsolutePath()), trouble);
+		}
+		return Collections.emptyList();
 	}
 
 	/**

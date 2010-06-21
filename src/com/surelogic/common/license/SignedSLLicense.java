@@ -41,10 +41,35 @@ public final class SignedSLLicense {
 		f_signedHexString = signedHexString;
 	}
 
+	/**
+	 * Creates a signed license object from a passed hex encoded string using
+	 * the public key obtained from {@link SLUtility#getPublicKey()} to check
+	 * that the strings digital signature.
+	 * 
+	 * @param signedHexString
+	 *            a signed hex string that demonstrates that the license was
+	 *            created by SureLogic.
+	 * @return a signed license object.
+	 * @throws IllegalArgumentException
+	 *             if something goes wrong.
+	 */
 	public static SignedSLLicense getInstance(String signedHexString) {
 		return getInstance(signedHexString, SLUtility.getPublicKey());
 	}
 
+	/**
+	 * Creates a signed license object from a passed hex encoded string using a
+	 * public key to check that the strings digital signature.
+	 * 
+	 * @param signedHexString
+	 *            a signed hex string that demonstrates that the license was
+	 *            created by the private key corresponding to <tt>key</tt>.
+	 * @param key
+	 *            a public key.
+	 * @return a signed license object.
+	 * @throws IllegalArgumentException
+	 *             if something goes wrong.
+	 */
 	public static SignedSLLicense getInstance(String signedHexString,
 			PublicKey key) {
 		if (signedHexString == null)
@@ -53,9 +78,23 @@ public final class SignedSLLicense {
 			throw new IllegalArgumentException(I18N.err(44, "key"));
 		SLLicense license = SLLicensePersistence
 				.toLicense(signedHexString, key);
+		if (license == null)
+			throw new IllegalArgumentException(I18N.err(204, signedHexString));
 		return new SignedSLLicense(license, signedHexString);
 	}
 
+	/**
+	 * Creates a signed license object from the passed license object using a
+	 * private key digitally sign the data.
+	 * 
+	 * @param license
+	 *            a license object.
+	 * @param key
+	 *            a private key to sign the license contents with.
+	 * @return a signed license object.
+	 * @throws IllegalArgumentException
+	 *             if any parameter to this method is {@code null}.
+	 */
 	public static SignedSLLicense getInstance(SLLicense license, PrivateKey key) {
 		if (license == null)
 			throw new IllegalArgumentException(I18N.err(44, "license"));
