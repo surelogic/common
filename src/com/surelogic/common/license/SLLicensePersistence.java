@@ -840,35 +840,19 @@ public final class SLLicensePersistence {
 		if (s == null)
 			throw new IllegalArgumentException(I18N.err(44, "s"));
 
-		final StringBuilder b = SLUtility.trimInternal(s);
-
 		/*
 		 * Extract the set of signed license from the file contents.
 		 */
-		final List<SignedSLLicense> licenses = new ArrayList<SignedSLLicense>();
-		int fromIndex = 0;
-		while (true) {
-			final int index = b.indexOf(BEGIN_LICENSE, fromIndex);
-			if (index == -1)
-				break;
-			final SignedSLLicense license = SignedSLLicense.getInstance(b
-					.substring(index));
-			licenses.add(license);
-			fromIndex = index + 1;
-		}
+		final List<SignedSLLicense> licenses = readLicensesFromString(s);
 
 		/*
-		 * Extract the set of net checks from the file contents and build the
-		 * resulting list.
+		 * Extract the set of net checks from the file contents..
 		 */
+		final List<SignedSLLicenseNetCheck> licenseNetChecks = readLicenseNetChecksFromString(s);
+
 		final List<PossiblyActivatedSLLicense> result = new ArrayList<PossiblyActivatedSLLicense>();
-		fromIndex = 0;
-		while (true) {
-			final int index = b.indexOf(BEGIN_NET_CHECK, fromIndex);
-			if (index == -1)
-				break;
-			final SignedSLLicenseNetCheck licenseNetCheck = SignedSLLicenseNetCheck
-					.getInstance(b.substring(index));
+
+		for (SignedSLLicenseNetCheck licenseNetCheck : licenseNetChecks) {
 			final SignedSLLicense associatedLicense = lookupLicense(licenses,
 					licenseNetCheck.getLicenseNetCheck().getUuid());
 			if (associatedLicense == null) {
@@ -889,7 +873,6 @@ public final class SLLicensePersistence {
 				 */
 				licenses.remove(associatedLicense);
 			}
-			fromIndex = index + 1;
 		}
 
 		/*
@@ -902,6 +885,15 @@ public final class SLLicensePersistence {
 		return result;
 	}
 
+	/**
+	 * Reads a string that contains a set of licenses as digitally signed
+	 * encoded hex strings and returns a list of {@link SignedSLLicense}
+	 * objects.
+	 * 
+	 * @param s
+	 *            the string.
+	 * @return the (possibly empty) list of {@link SignedSLLicense} objects.
+	 */
 	public static List<SignedSLLicense> readLicensesFromString(final String s) {
 		if (s == null)
 			throw new IllegalArgumentException(I18N.err(44, "s"));
@@ -920,6 +912,41 @@ public final class SLLicensePersistence {
 			final SignedSLLicense license = SignedSLLicense.getInstance(b
 					.substring(index));
 			result.add(license);
+			fromIndex = index + 1;
+		}
+		return result;
+	}
+
+	/**
+	 * Reads a string that contains a set of license net checks as digitally
+	 * signed encoded hex strings and returns a list of
+	 * {@link SignedSLLicenseNetCheck} objects.
+	 * 
+	 * @param s
+	 *            the string.
+	 * @return the (possibly empty) list of {@link SignedSLLicenseNetCheck}
+	 *         objects.
+	 */
+	public static List<SignedSLLicenseNetCheck> readLicenseNetChecksFromString(
+			final String s) {
+		if (s == null)
+			throw new IllegalArgumentException(I18N.err(44, "s"));
+
+		final StringBuilder b = SLUtility.trimInternal(s);
+
+		/*
+		 * Extract the set of signed license from the file contents.
+		 */
+		final List<SignedSLLicenseNetCheck> result = new ArrayList<SignedSLLicenseNetCheck>();
+		int fromIndex = 0;
+		while (true) {
+			final int index = b.indexOf(BEGIN_NET_CHECK, fromIndex);
+			if (index == -1)
+				break;
+			final SignedSLLicenseNetCheck licenseNetCheck = SignedSLLicenseNetCheck
+					.getInstance(b.substring(index));
+
+			result.add(licenseNetCheck);
 			fromIndex = index + 1;
 		}
 		return result;
