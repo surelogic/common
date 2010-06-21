@@ -106,8 +106,8 @@ public final class SLLicenseUtility {
 	 *             should anything go wrong.
 	 */
 	public static void tryToInstallLicense(String value) throws Exception {
-		final List<PossiblyInstalledSLLicense> licenses = SLLicensePersistence
-				.readLicensesFromString(value);
+		final List<PossiblyActivatedSLLicense> licenses = SLLicensePersistence
+				.readPossiblyActivatedLicensesFromString(value);
 		if (licenses.isEmpty())
 			throw new Exception(I18N.err(201));
 		/*
@@ -116,7 +116,7 @@ public final class SLLicenseUtility {
 		 * deadline.
 		 */
 		final Date now = new Date();
-		for (PossiblyInstalledSLLicense iLicense : licenses) {
+		for (PossiblyActivatedSLLicense iLicense : licenses) {
 			SLLicense license = iLicense.getSignedSLLicense().getLicense();
 			/*
 			 * The installation deadline only applies to non-perpetual licenses.
@@ -144,14 +144,14 @@ public final class SLLicenseUtility {
 	 *             should anything go wrong.
 	 */
 	public static void tryToActivateRenewLicenses(
-			List<PossiblyInstalledSLLicense> licenses) throws Exception {
+			List<PossiblyActivatedSLLicense> licenses) throws Exception {
 		if (licenses.isEmpty())
 			return;
 		/*
 		 * Check that either (1) each license is not activated or (2) that it is
 		 * a perpetual license.
 		 */
-		for (PossiblyInstalledSLLicense iLicense : licenses) {
+		for (PossiblyActivatedSLLicense iLicense : licenses) {
 			SLLicense license = iLicense.getSignedSLLicense().getLicense();
 			if (license.getType() != SLLicenseType.PERPETUAL) {
 				if (iLicense.isActivated())
@@ -181,7 +181,7 @@ public final class SLLicenseUtility {
 	 *             should anything go wrong.
 	 */
 	public static void tryToUninstallLicenses(
-			List<PossiblyInstalledSLLicense> licenses) throws Exception {
+			List<PossiblyActivatedSLLicense> licenses) throws Exception {
 		if (licenses.isEmpty())
 			return;
 
@@ -196,8 +196,8 @@ public final class SLLicenseUtility {
 		 * This is a best effort attempt so we should not get bother the user if
 		 * for any reason the notification fails.
 		 */
-		List<PossiblyInstalledSLLicense> notifyList = new ArrayList<PossiblyInstalledSLLicense>();
-		for (PossiblyInstalledSLLicense license : licenses) {
+		List<PossiblyActivatedSLLicense> notifyList = new ArrayList<PossiblyActivatedSLLicense>();
+		for (PossiblyActivatedSLLicense license : licenses) {
 			if (license.getSignedSLLicense().getLicense().performNetCheck())
 				notifyList.add(license);
 		}

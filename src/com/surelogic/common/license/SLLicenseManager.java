@@ -9,7 +9,7 @@ import com.surelogic.common.i18n.I18N;
 
 /**
  * Manages the contents of the <tt>~/.surelogic-licenses</tt> file. This class
- * manages the persistence of a list of {@link PossiblyInstalledSLLicense}
+ * manages the persistence of a list of {@link PossiblyActivatedSLLicense}
  * objects. This is focused around persistence and does not include
  * functionality such as performing net checks.
  */
@@ -30,16 +30,16 @@ public final class SLLicenseManager {
 	private final File f_licenseFile = new File(System.getProperty("user.home")
 			+ File.separator + ".surelogic-licenses");
 
-	private final List<PossiblyInstalledSLLicense> f_licenses = new ArrayList<PossiblyInstalledSLLicense>();
+	private final List<PossiblyActivatedSLLicense> f_licenses = new ArrayList<PossiblyActivatedSLLicense>();
 
 	/**
 	 * Gets a copy of the list of possibly installed licenses.
 	 * 
 	 * @return a copy of the list of possibly installed licenses.
 	 */
-	public List<PossiblyInstalledSLLicense> getLicenses() {
+	public List<PossiblyActivatedSLLicense> getLicenses() {
 		synchronized (SLLicenseManager.class) {
-			return new ArrayList<PossiblyInstalledSLLicense>(f_licenses);
+			return new ArrayList<PossiblyActivatedSLLicense>(f_licenses);
 		}
 	}
 
@@ -52,11 +52,11 @@ public final class SLLicenseManager {
 	 * @param licenses
 	 *            a list of licenses to add to the set managed by this class.
 	 */
-	public void install(List<PossiblyInstalledSLLicense> licenses) {
+	public void install(List<PossiblyActivatedSLLicense> licenses) {
 		if (licenses == null)
 			throw new IllegalArgumentException(I18N.err(44, "licenses"));
 		synchronized (SLLicenseManager.class) {
-			for (PossiblyInstalledSLLicense license : licenses) {
+			for (PossiblyActivatedSLLicense license : licenses) {
 				/*
 				 * Remove any existing licenses with the same id.
 				 */
@@ -83,8 +83,8 @@ public final class SLLicenseManager {
 	 * @param license
 	 *            a license to add to the set managed by this class.
 	 */
-	public void install(PossiblyInstalledSLLicense license) {
-		List<PossiblyInstalledSLLicense> licenses = new ArrayList<PossiblyInstalledSLLicense>();
+	public void install(PossiblyActivatedSLLicense license) {
+		List<PossiblyActivatedSLLicense> licenses = new ArrayList<PossiblyActivatedSLLicense>();
 		licenses.add(license);
 		install(licenses);
 	}
@@ -99,11 +99,11 @@ public final class SLLicenseManager {
 	 *            a list of licenses to remove from the set managed by this
 	 *            class.
 	 */
-	public void remove(List<PossiblyInstalledSLLicense> licenses) {
+	public void remove(List<PossiblyActivatedSLLicense> licenses) {
 		if (licenses == null)
 			throw new IllegalArgumentException(I18N.err(44, "licenses"));
 		synchronized (SLLicenseManager.class) {
-			for (PossiblyInstalledSLLicense license : licenses) {
+			for (PossiblyActivatedSLLicense license : licenses) {
 				/*
 				 * Remove any existing licenses with the same id.
 				 */
@@ -126,8 +126,8 @@ public final class SLLicenseManager {
 	 * @param license
 	 *            a license to remove from the set managed by this class.
 	 */
-	public void remove(PossiblyInstalledSLLicense license) {
-		List<PossiblyInstalledSLLicense> licenses = new ArrayList<PossiblyInstalledSLLicense>();
+	public void remove(PossiblyActivatedSLLicense license) {
+		List<PossiblyActivatedSLLicense> licenses = new ArrayList<PossiblyActivatedSLLicense>();
 		licenses.add(license);
 		install(licenses);
 	}
@@ -146,7 +146,7 @@ public final class SLLicenseManager {
 	 *            a license id.
 	 */
 	private void removeHelper(UUID id) {
-		for (PossiblyInstalledSLLicense license : getLicenses()) {
+		for (PossiblyActivatedSLLicense license : getLicenses()) {
 			if (license.getSignedSLLicense().getLicense().getUuid().equals(id)) {
 				f_licenses.remove(license);
 			}

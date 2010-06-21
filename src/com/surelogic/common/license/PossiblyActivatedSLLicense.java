@@ -16,7 +16,7 @@ import com.surelogic.common.i18n.I18N;
  * Note that being installed is a necessary but not sufficient condition for a
  * license to be considered valid.
  */
-public final class PossiblyInstalledSLLicense {
+public final class PossiblyActivatedSLLicense {
 
 	/**
 	 * A license and the signed hex string that demonstrates that the license
@@ -140,7 +140,7 @@ public final class PossiblyInstalledSLLicense {
 	 *            a signed license net check, or {@code null} if there is no net
 	 *            check.
 	 */
-	public PossiblyInstalledSLLicense(final SignedSLLicense license,
+	public PossiblyActivatedSLLicense(final SignedSLLicense license,
 			final SignedSLLicenseNetCheck licenseNetCheck) {
 		if (license == null)
 			throw new IllegalArgumentException(I18N.err(44, "license"));

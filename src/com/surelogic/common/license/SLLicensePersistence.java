@@ -567,7 +567,7 @@ public final class SLLicensePersistence {
 	}
 
 	/**
-	 * Converts a list of {@link PossiblyInstalledSLLicense} objects to a string
+	 * Converts a list of {@link PossiblyActivatedSLLicense} objects to a string
 	 * that contains a set of licenses and license net checks as digitally
 	 * signed encoded hex strings and outputs the string to a file.
 	 * 
@@ -575,13 +575,13 @@ public final class SLLicensePersistence {
 	 *            a text file. If this file exists its contents will be
 	 *            replaced, if not it will be created.
 	 * @param licenses
-	 *            the list of {@link PossiblyInstalledSLLicense} objects to
+	 *            the list of {@link PossiblyActivatedSLLicense} objects to
 	 *            convert.
 	 * 
 	 * @see SLLicensePersistence#toSignedHexString(List)
 	 */
 	public static void writeLicensesToFile(File newFile,
-			final List<PossiblyInstalledSLLicense> licenses) {
+			final List<PossiblyActivatedSLLicense> licenses) {
 		if (newFile == null)
 			throw new IllegalArgumentException(I18N.err(44, "newFile"));
 		if (licenses == null)
@@ -592,7 +592,7 @@ public final class SLLicensePersistence {
 	}
 
 	/**
-	 * Converts a single {@link PossiblyInstalledSLLicense} object to a string
+	 * Converts a single {@link PossiblyActivatedSLLicense} object to a string
 	 * that contains a licenses and, optionally, a license net check as
 	 * digitally signed encoded hex strings and outputs the string to a file.
 	 * 
@@ -600,29 +600,29 @@ public final class SLLicensePersistence {
 	 *            a text file. If this file exists its contents will be
 	 *            replaced, if not it will be created.
 	 * @param license
-	 *            AN {@link PossiblyInstalledSLLicense} object to convert.
+	 *            AN {@link PossiblyActivatedSLLicense} object to convert.
 	 * 
 	 * @see #writeLicensesToFile(File, List)
 	 */
 	public static void writeLicenseToFile(File newFile,
-			PossiblyInstalledSLLicense license) {
+			PossiblyActivatedSLLicense license) {
 		if (newFile == null)
 			throw new IllegalArgumentException(I18N.err(44, "newFile"));
 		if (license == null)
 			throw new IllegalArgumentException(I18N.err(44, "license"));
 
-		final List<PossiblyInstalledSLLicense> licenses = new ArrayList<PossiblyInstalledSLLicense>();
+		final List<PossiblyActivatedSLLicense> licenses = new ArrayList<PossiblyActivatedSLLicense>();
 		licenses.add(license);
 		writeLicensesToFile(newFile, licenses);
 	}
 
 	/**
-	 * Converts a list of {@link PossiblyInstalledSLLicense} objects to a string
+	 * Converts a list of {@link PossiblyActivatedSLLicense} objects to a string
 	 * that contains a set of licenses and license net checks as digitally
 	 * signed encoded hex strings.
 	 * 
 	 * @param licenses
-	 *            the list of {@link PossiblyInstalledSLLicense} objects to
+	 *            the list of {@link PossiblyActivatedSLLicense} objects to
 	 *            convert.
 	 * @param linewrap
 	 *            {@code true} if the returned string should be line wrapped,
@@ -631,13 +631,13 @@ public final class SLLicensePersistence {
 	 *         as digitally signed encoded hex strings.
 	 */
 	public static String toSignedHexString(
-			final List<PossiblyInstalledSLLicense> licenses,
+			final List<PossiblyActivatedSLLicense> licenses,
 			final boolean linewrap) {
 		if (licenses == null)
 			throw new IllegalArgumentException(I18N.err(44, "licenses"));
 
 		StringBuilder b = new StringBuilder();
-		for (PossiblyInstalledSLLicense license : licenses) {
+		for (PossiblyActivatedSLLicense license : licenses) {
 			b.append(license.getSignedSLLicense().getSignedHexString());
 			SignedSLLicenseNetCheck nc = license.getSignedSLLicenseNetCheck();
 			if (nc != null) {
@@ -809,33 +809,33 @@ public final class SLLicensePersistence {
 	/**
 	 * Reads a file that contains a set licenses and license net checks as
 	 * digitally signed encoded strings and returns a list of
-	 * {@link PossiblyInstalledSLLicense} objects.
+	 * {@link PossiblyActivatedSLLicense} objects.
 	 * 
 	 * @param textFile
 	 *            the file to read.
-	 * @return the (possibly empty) list of {@link PossiblyInstalledSLLicense}
+	 * @return the (possibly empty) list of {@link PossiblyActivatedSLLicense}
 	 *         objects.
 	 */
-	public static List<PossiblyInstalledSLLicense> readLicensesFromFile(
+	public static List<PossiblyActivatedSLLicense> readLicensesFromFile(
 			final File textFile) {
 		if (textFile == null)
 			throw new IllegalArgumentException(I18N.err(44, "textFile"));
 		final String fileContents = FileUtility
 				.getFileContentsAsString(textFile);
-		return readLicensesFromString(fileContents);
+		return readPossiblyActivatedLicensesFromString(fileContents);
 	}
 
 	/**
 	 * Reads a string that contains a set of licenses and license net checks as
 	 * digitally signed encoded hex strings and returns a list of
-	 * {@link PossiblyInstalledSLLicense} objects.
+	 * {@link PossiblyActivatedSLLicense} objects.
 	 * 
 	 * @param s
 	 *            the string.
-	 * @return the (possibly empty) list of {@link PossiblyInstalledSLLicense}
+	 * @return the (possibly empty) list of {@link PossiblyActivatedSLLicense}
 	 *         objects.
 	 */
-	public static List<PossiblyInstalledSLLicense> readLicensesFromString(
+	public static List<PossiblyActivatedSLLicense> readPossiblyActivatedLicensesFromString(
 			final String s) {
 		if (s == null)
 			throw new IllegalArgumentException(I18N.err(44, "s"));
@@ -861,7 +861,7 @@ public final class SLLicensePersistence {
 		 * Extract the set of net checks from the file contents and build the
 		 * resulting list.
 		 */
-		final List<PossiblyInstalledSLLicense> result = new ArrayList<PossiblyInstalledSLLicense>();
+		final List<PossiblyActivatedSLLicense> result = new ArrayList<PossiblyActivatedSLLicense>();
 		fromIndex = 0;
 		while (true) {
 			final int index = b.indexOf(BEGIN_NET_CHECK, fromIndex);
@@ -881,7 +881,7 @@ public final class SLLicensePersistence {
 				 * Create the paired license and license net check and add it to
 				 * our result.
 				 */
-				result.add(new PossiblyInstalledSLLicense(associatedLicense,
+				result.add(new PossiblyActivatedSLLicense(associatedLicense,
 						licenseNetCheck));
 				/*
 				 * Ensure that we remove the associated license from the
@@ -896,9 +896,32 @@ public final class SLLicensePersistence {
 		 * Add the license with no license net check to the result.
 		 */
 		for (SignedSLLicense license : licenses) {
-			result.add(new PossiblyInstalledSLLicense(license, null));
+			result.add(new PossiblyActivatedSLLicense(license, null));
 		}
 
+		return result;
+	}
+
+	public static List<SignedSLLicense> readLicensesFromString(final String s) {
+		if (s == null)
+			throw new IllegalArgumentException(I18N.err(44, "s"));
+
+		final StringBuilder b = SLUtility.trimInternal(s);
+
+		/*
+		 * Extract the set of signed license from the file contents.
+		 */
+		final List<SignedSLLicense> result = new ArrayList<SignedSLLicense>();
+		int fromIndex = 0;
+		while (true) {
+			final int index = b.indexOf(BEGIN_LICENSE, fromIndex);
+			if (index == -1)
+				break;
+			final SignedSLLicense license = SignedSLLicense.getInstance(b
+					.substring(index));
+			result.add(license);
+			fromIndex = index + 1;
+		}
 		return result;
 	}
 
