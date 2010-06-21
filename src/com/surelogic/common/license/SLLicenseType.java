@@ -1,8 +1,5 @@
 package com.surelogic.common.license;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * The types of licenses supported by SureLogic.
  */
@@ -13,7 +10,7 @@ public enum SLLicenseType {
 	 * To continue use of the tools after the expiration date a new license must
 	 * be installed.
 	 */
-	USE("U"),
+	USE,
 
 	/**
 	 * This type of license stops use of new tool releases after a given
@@ -21,7 +18,7 @@ public enum SLLicenseType {
 	 * date remain usable. To use versions of the tools released after the
 	 * expiration date a new license must be installed.
 	 */
-	SUPPORT("S"),
+	SUPPORT,
 
 	/**
 	 * This type of license doesn't expire unless it is blacklisted. However, it
@@ -32,50 +29,29 @@ public enum SLLicenseType {
 	 * stops use of new tool releases (similar to an expired support license)
 	 * until a renewal is successfully performed.
 	 */
-	PERPETUAL("P");
-
-	private final String f_symbol;
-
-	SLLicenseType(String symbol) {
-		f_symbol = symbol;
-	}
-
-	public String toSymbol() {
-		return f_symbol;
-	}
+	PERPETUAL;
 
 	@Override
 	public String toString() {
-		return name().toLowerCase();
-	}
-
-	public String toHumanString() {
 		StringBuilder b = new StringBuilder(name().toLowerCase());
 		b.replace(0, 1, b.substring(0, 1).toUpperCase());
 		return b.toString();
 	}
 
-	/*
-	 * See page 154 of Bloch's <i>Effective Java</i> (second edition) for a
-	 * further description of supporting a fromString operation.
-	 */
-
-	private static final Map<String, SLLicenseType> stringToEnum = new HashMap<String, SLLicenseType>();
-	static {
-		for (SLLicenseType type : values()) {
-			stringToEnum.put(type.toSymbol(), type);
-		}
-	}
-
 	/**
-	 * Returns the license type from a one letter code.
+	 * Returns the license type from a string.
 	 * 
 	 * @param value
-	 *            one of <tt>"U"</tt>, <tt>"S"</tt>, or <tt>"P"</tt>.
+	 *            a case insensitive string.
 	 * @return the license type, or {@code null} if the passed value is not
 	 *         recognized.
 	 */
-	public static SLLicenseType fromSymbol(String value) {
-		return stringToEnum.get(value);
+	public static SLLicenseType fromString(String value) {
+		try {
+			return valueOf(value.toUpperCase());
+		} catch (Exception noValue) {
+			// ignore, return null below
+		}
+		return null;
 	}
 }

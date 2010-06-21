@@ -126,7 +126,7 @@ public final class SLLicenseUtility {
 				final boolean pastDeadline = now.after(deadline);
 				if (pastDeadline)
 					throw new Exception(I18N.err(202, license.getType()
-							.toHumanString(), license.getProduct().toString(),
+							.toString(), license.getProduct().toString(),
 							SLUtility.toStringHumanDay(deadline)));
 			}
 		}
@@ -156,7 +156,7 @@ public final class SLLicenseUtility {
 			if (license.getType() != SLLicenseType.PERPETUAL) {
 				if (iLicense.isActivated())
 					throw new Exception(I18N.err(203, license.getType()
-							.toHumanString(), license.getProduct().toString(),
+							.toString(), license.getProduct().toString(),
 							SLUtility.toStringHumanDay(iLicense
 									.getSignedSLLicenseNetCheck()
 									.getLicenseNetCheck().getDate())));

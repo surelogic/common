@@ -21,7 +21,7 @@ import com.surelogic.common.logging.SLLogger;
  * <p>
  * <b>SLLicense persistence formats</b>
  * <p>
- * The (unencoded) string representation of a license instance, referenced by
+ * The hex encoded string representation of a license instance, referenced by
  * <tt>license</tt>, is as follows:
  * <ul>
  * <li>The string constant {@link #UUID_LABEL} followed by
@@ -40,7 +40,7 @@ import com.surelogic.common.logging.SLLogger;
  * followed by <tt>SLUtility.toStringDay(license.getInstallBeforeDate())</tt>.
  * <li>(Optional) The character {@link #SEP}.
  * <li>The string constant {@link #TYPE_LABEL} followed by
- * <tt>license.getType().toSymbol()</tt>.
+ * <tt>license.getType().toString()</tt>.
  * <li>The character {@link #SEP}.
  * <li>The string constant {@link #MAXACTIVE_LABEL} followed by
  * <tt>Integer.toString(license.getMaxActive())</tt>.
@@ -56,7 +56,7 @@ import com.surelogic.common.logging.SLLogger;
  * holder=Tim
  * product=Flashlight
  * durationInDays=365
- * type=P
+ * type=Perpetual
  * maxActive=2
  * performNetCheck=true
  * </pre>
@@ -69,7 +69,7 @@ import com.surelogic.common.logging.SLLogger;
  * product=JSure
  * durationInDays=60
  * installationDeadline=2012-06-11
- * type=S
+ * type=Support
  * maxActive=2
  * performNetCheck=true
  * </pre>
@@ -108,7 +108,7 @@ import com.surelogic.common.logging.SLLogger;
  * The format of license net check instances is similar to the format used by
  * license instances.
  * <p>
- * The (unencoded) string representation of a license net check instance,
+ * The hex encoded string representation of a license net check instance,
  * referenced by <tt>nc</tt>, is as follows:
  * <ul>
  * <li>The string constant {@link #UUID_LABEL} followed by
@@ -200,7 +200,7 @@ public final class SLLicensePersistence {
 		b.append(INSTALLATION_DEADLINE_LABEL).append(
 				SLUtility.toStringDay(license.getInstallBeforeDate())).append(
 				SEP);
-		b.append(TYPE_LABEL).append(license.getType().toSymbol()).append(SEP);
+		b.append(TYPE_LABEL).append(license.getType().toString()).append(SEP);
 		b.append(MAXACTIVE_LABEL).append(
 				Integer.toString(license.getMaxActive())).append(SEP);
 		b.append(PERFORMNETCHECK_LABEL).append(
@@ -327,7 +327,7 @@ public final class SLLicensePersistence {
 					I18N.err(187, TYPE_LABEL, value));
 			return null;
 		}
-		final SLLicenseType type = SLLicenseType.fromSymbol(typeS);
+		final SLLicenseType type = SLLicenseType.fromString(typeS);
 		if (type == null) {
 			SLLogger.getLogger()
 					.log(Level.WARNING, I18N.err(190, typeS, value));
