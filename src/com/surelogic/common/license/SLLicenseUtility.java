@@ -185,8 +185,17 @@ public final class SLLicenseUtility {
 				.msg("common.serviceability.licenserequest.url"));
 		final String response = SLUtility.sendPostToUrl(url, param);
 
+		if (response
+				.startsWith(I18N
+						.msg("common.serviceability.licenserequest.resp.failure.prefix"))) {
+			throw new Exception(I18N.err(208, response));
+		}
+
 		final List<SignedSLLicenseNetCheck> licenseNetChecks = SLLicensePersistence
 				.readLicenseNetChecksFromString(response);
+		if (licenseNetChecks.isEmpty()) {
+			throw new Exception(I18N.err(209, licenses));
+		}
 		SLLicenseManager.getInstance().activateOrRenew(licenseNetChecks);
 	}
 
