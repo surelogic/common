@@ -182,7 +182,7 @@ public final class SLLicenseUtility {
 				.msg("common.serviceability.licenserequest.req.actrew"));
 		param.put(I18N.msg("common.serviceability.licenserequest.url"), l);
 		final URL url = new URL(I18N
-				.msg("common.serviceability.licenserequest.license"));
+				.msg("common.serviceability.licenserequest.url"));
 		final String response = SLUtility.sendPostToUrl(url, param);
 
 		final List<SignedSLLicenseNetCheck> licenseNetChecks = SLLicensePersistence
