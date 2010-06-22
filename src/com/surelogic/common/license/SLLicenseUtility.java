@@ -1,5 +1,12 @@
 package com.surelogic.common.license;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -18,7 +25,7 @@ import com.surelogic.common.jobs.SLStatus;
 public final class SLLicenseUtility {
 
 	private static final Set<ILicenseObserver> f_observers = new CopyOnWriteArraySet<ILicenseObserver>();
-
+	private static final String f_licenseLocation = I18N.msg("common.serviceability.licenserequest.url");
 	/**
 	 * Adds a license check observer.
 	 * 
@@ -168,7 +175,41 @@ public final class SLLicenseUtility {
 		 */
 		final String msg = SLLicensePersistence.toSignedHexString(licenses,
 				true);
+		sendInstallMessage(msg);
+	}
 
+	/**
+	 * Send a message to the client to install the given licenses.
+	 * 
+	 * @param possiblyInstalledLicenseString
+	 * @throws IOException
+	 */
+	private static void sendInstallMessage(
+			final String possiblyInstalledLicenseString) throws IOException {
+		// Prepare the URL connection
+		final URL url = new URL(f_licenseLocation);
+		final URLConnection conn = url.openConnection();
+		conn.setDoInput(true);
+		conn.setDoOutput(true);
+		conn.setUseCaches(false);
+		final OutputStream os = null;
+		PrintWriter wr = null;
+		try {
+			// Send the request
+			wr = new PrintWriter(new OutputStreamWriter(conn.getOutputStream()));
+			wr.print("req=INSTALL&");
+			wr.print( "license=" + possiblyInstalledLicenseString);
+			wr.flush();
+			// Check the response
+			final InputStream is = conn.getInputStream();
+			is.close();
+		} finally {
+			if (wr != null) {
+				wr.close();
+			} else if (os != null) {
+				os.close();
+			}
+		}
 	}
 
 	/**
