@@ -245,26 +245,23 @@ public final class SLLicenseUtility {
 				notifyList.add(license);
 			}
 		}
-		if (!notifyList.isEmpty()) {
-			/*
-			 * Perform notification message to the server.
-			 */
-			final String l = SLLicensePersistence.toSignedHexString(notifyList,
-					true);
-			final Map<String, String> param = new HashMap<String, String>();
-			param
-					.put(
-							I18N
-									.msg("common.serviceability.licenserequest.req"),
-							I18N
-									.msg("common.serviceability.licenserequest.req.remove"));
-			param.put(I18N.msg("common.serviceability.licenserequest.license"),
-					l);
-			final URL url = new URL(I18N
-					.msg("common.serviceability.licenserequest.url"));
-			final String response = SLUtility.sendPostToUrl(url, param);
-			// TODO check response
-		}
+
+		if (notifyList.isEmpty())
+			return; // nothing to do (local enough)
+
+		/*
+		 * Perform notification message to the server.
+		 */
+		final String l = SLLicensePersistence.toSignedHexString(notifyList,
+				true);
+		final Map<String, String> param = new HashMap<String, String>();
+		param.put(I18N.msg("common.serviceability.licenserequest.req"), I18N
+				.msg("common.serviceability.licenserequest.req.remove"));
+		param.put(I18N.msg("common.serviceability.licenserequest.license"), l);
+		final URL url = new URL(I18N
+				.msg("common.serviceability.licenserequest.url"));
+		final String response = SLUtility.sendPostToUrl(url, param);
+		// TODO check response
 	}
 
 	private SLLicenseUtility() {
