@@ -260,8 +260,7 @@ public final class SLLicenseUtility {
 		param.put(I18N.msg("common.serviceability.licenserequest.license"), l);
 		final URL url = new URL(I18N
 				.msg("common.serviceability.licenserequest.url"));
-		final String response = SLUtility.sendPostToUrl(url, param);
-		// TODO check response
+		SLUtility.sendPostToUrl(url, param);
 	}
 
 	private SLLicenseUtility() {
