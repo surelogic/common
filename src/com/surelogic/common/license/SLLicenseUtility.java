@@ -1,7 +1,8 @@
 package com.surelogic.common.license;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -25,16 +26,19 @@ import com.surelogic.common.jobs.SLStatus;
 public final class SLLicenseUtility {
 
 	private static final Set<ILicenseObserver> f_observers = new CopyOnWriteArraySet<ILicenseObserver>();
-	private static final String f_licenseLocation = I18N.msg("common.serviceability.licenserequest.url");
+	private static final String f_licenseLocation = I18N
+			.msg("common.serviceability.licenserequest.url");
+
 	/**
 	 * Adds a license check observer.
 	 * 
 	 * @param observer
 	 *            a license check observer.
 	 */
-	public static void addObserver(ILicenseObserver observer) {
-		if (observer != null)
+	public static void addObserver(final ILicenseObserver observer) {
+		if (observer != null) {
 			f_observers.add(observer);
+		}
 	}
 
 	/**
@@ -43,7 +47,7 @@ public final class SLLicenseUtility {
 	 * @param observer
 	 *            a license check observer.
 	 */
-	public static void removeObserver(ILicenseObserver observer) {
+	public static void removeObserver(final ILicenseObserver observer) {
 		f_observers.remove(observer);
 	}
 
@@ -63,8 +67,9 @@ public final class SLLicenseUtility {
 	 *         <tt>product</tt>, {@code false} otherwise.
 	 */
 	public static boolean validate(final SLLicenseProduct product) {
-		if (product == null)
+		if (product == null) {
 			throw new IllegalArgumentException(I18N.err(44, "product"));
+		}
 		return true;
 	}
 
@@ -99,8 +104,9 @@ public final class SLLicenseUtility {
 			final String msg = I18N.err(code, product.toString());
 			monitor.done();
 			return SLStatus.createErrorStatus(code, msg);
-		} else
+		} else {
 			return null;
+		}
 	}
 
 	/**
@@ -112,11 +118,12 @@ public final class SLLicenseUtility {
 	 * @throws Exception
 	 *             should anything go wrong.
 	 */
-	public static void tryToInstallLicense(String value) throws Exception {
+	public static void tryToInstallLicense(final String value) throws Exception {
 		final List<PossiblyActivatedSLLicense> licenses = SLLicensePersistence
 				.readPossiblyActivatedLicensesFromString(value);
-		if (licenses.isEmpty())
+		if (licenses.isEmpty()) {
 			throw new Exception(I18N.err(201));
+		}
 		/*
 		 * Iterate through the licenses that we are trying to install ensure
 		 * that we are not installing this license past the install/activation
@@ -131,10 +138,11 @@ public final class SLLicenseUtility {
 			if (license.getType() != SLLicenseType.PERPETUAL) {
 				final Date deadline = license.getInstallBeforeDate();
 				final boolean pastDeadline = now.after(deadline);
-				if (pastDeadline)
+				if (pastDeadline) {
 					throw new Exception(I18N.err(202, license.getType()
 							.toString(), license.getProduct().toString(),
 							SLUtility.toStringHumanDay(deadline)));
+				}
 			}
 		}
 		SLLicenseManager.getInstance().install(licenses);
@@ -151,9 +159,10 @@ public final class SLLicenseUtility {
 	 *             should anything go wrong.
 	 */
 	public static void tryToActivateRenewLicenses(
-			List<PossiblyActivatedSLLicense> licenses) throws Exception {
-		if (licenses.isEmpty())
+			final List<PossiblyActivatedSLLicense> licenses) throws Exception {
+		if (licenses.isEmpty()) {
 			return;
+		}
 		/*
 		 * Check that either (1) each license is not activated or (2) that it is
 		 * a perpetual license.
@@ -161,12 +170,13 @@ public final class SLLicenseUtility {
 		for (PossiblyActivatedSLLicense iLicense : licenses) {
 			SLLicense license = iLicense.getSignedSLLicense().getLicense();
 			if (license.getType() != SLLicenseType.PERPETUAL) {
-				if (iLicense.isActivated())
+				if (iLicense.isActivated()) {
 					throw new Exception(I18N.err(203, license.getType()
 							.toString(), license.getProduct().toString(),
 							SLUtility.toStringHumanDay(iLicense
 									.getSignedSLLicenseNetCheck()
 									.getLicenseNetCheck().getDate())));
+				}
 			}
 		}
 
@@ -184,7 +194,7 @@ public final class SLLicenseUtility {
 	 * @param possiblyInstalledLicenseString
 	 * @throws IOException
 	 */
-	private static void sendInstallMessage(
+	private static String sendInstallMessage(
 			final String possiblyInstalledLicenseString) throws IOException {
 		// Prepare the URL connection
 		final URL url = new URL(f_licenseLocation);
@@ -198,11 +208,22 @@ public final class SLLicenseUtility {
 			// Send the request
 			wr = new PrintWriter(new OutputStreamWriter(conn.getOutputStream()));
 			wr.print("req=INSTALL&");
-			wr.print( "license=" + possiblyInstalledLicenseString);
+			wr.print("license=" + possiblyInstalledLicenseString);
 			wr.flush();
 			// Check the response
-			final InputStream is = conn.getInputStream();
-			is.close();
+			BufferedReader reader = new BufferedReader(new InputStreamReader(
+					conn.getInputStream()));
+			try {
+				StringBuilder response = new StringBuilder();
+				char[] buf = new char[512];
+				for (int len = reader.read(buf); len != -1; len = reader
+						.read(buf)) {
+					response.append(buf, 0, len);
+				}
+				return response.toString();
+			} finally {
+				reader.close();
+			}
 		} finally {
 			if (wr != null) {
 				wr.close();
@@ -222,9 +243,10 @@ public final class SLLicenseUtility {
 	 *             should anything go wrong.
 	 */
 	public static void tryToUninstallLicenses(
-			List<PossiblyActivatedSLLicense> licenses) throws Exception {
-		if (licenses.isEmpty())
+			final List<PossiblyActivatedSLLicense> licenses) throws Exception {
+		if (licenses.isEmpty()) {
 			return;
+		}
 
 		/*
 		 * Local removal
@@ -239,8 +261,9 @@ public final class SLLicenseUtility {
 		 */
 		List<PossiblyActivatedSLLicense> notifyList = new ArrayList<PossiblyActivatedSLLicense>();
 		for (PossiblyActivatedSLLicense license : licenses) {
-			if (license.getSignedSLLicense().getLicense().performNetCheck())
+			if (license.getSignedSLLicense().getLicense().performNetCheck()) {
 				notifyList.add(license);
+			}
 		}
 		if (!notifyList.isEmpty()) {
 			/*
