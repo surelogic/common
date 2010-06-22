@@ -1,6 +1,13 @@
 package com.surelogic.common;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -11,6 +18,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Formatter;
+import java.util.Map;
 import java.util.Random;
 
 import org.apache.commons.lang.SystemUtils;
@@ -58,7 +66,7 @@ public final class SLUtility {
 			throws ParseException {
 		return tl_day_format.get().parse(dateStr);
 	}
-	
+
 	private final static ThreadLocal<SimpleDateFormat> tl_human_day_format = new ThreadLocal<SimpleDateFormat>() {
 		@Override
 		protected SimpleDateFormat initialValue() {
@@ -680,6 +688,66 @@ public final class SLUtility {
 			}
 		}
 		return b;
+	}
+
+	/**
+	 * Sends a string to a URL and returns the response. If anything goes wrong
+	 * an exception is thrown.
+	 * 
+	 * @param url
+	 *            a URL to communicate with.
+	 * @param param
+	 *            a map of parameters to send.
+	 * @return the result.
+	 * @throws IOException
+	 *             if anything goes wrong.
+	 */
+	public static String sendMessageToUrl(final URL url,
+			final Map<String, String> param) throws IOException {
+		if (url == null)
+			throw new IllegalArgumentException(I18N.err(44, "url"));
+		if (param == null)
+			throw new IllegalArgumentException(I18N.err(44, "param"));
+
+		/*
+		 * Prepare the connection.
+		 */
+		final URLConnection conn = url.openConnection();
+		conn.setDoInput(true);
+		conn.setDoOutput(true);
+		conn.setUseCaches(false);
+		PrintWriter wr = null;
+		try {
+			/*
+			 * Send the request.
+			 */
+			wr = new PrintWriter(new OutputStreamWriter(conn.getOutputStream()));
+			for (Map.Entry<String, String> entry : param.entrySet()) {
+				// TODO
+				//wr.print(msg);
+			}
+			wr.flush();
+			/*
+			 * Get the response.
+			 */
+			final BufferedReader reader = new BufferedReader(
+					new InputStreamReader(conn.getInputStream()));
+			try {
+				StringBuilder response = new StringBuilder();
+				char[] buf = new char[512];
+				for (int len = reader.read(buf); len != -1; len = reader
+						.read(buf)) {
+					response.append(buf, 0, len);
+				}
+				return response.toString();
+			} finally {
+				reader.close();
+			}
+		} finally {
+			if (wr != null) {
+				wr.close();
+			}
+		}
 	}
 
 	private SLUtility() {
