@@ -8,6 +8,7 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLEncoder;
 import java.security.KeyFactory;
 import java.security.PrivateKey;
 import java.security.PublicKey;
@@ -18,6 +19,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Formatter;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Random;
 
@@ -29,7 +31,7 @@ import com.surelogic.common.i18n.I18N;
  * A utility with SureLogic common code.
  */
 public final class SLUtility {
-	public static final boolean is64bit = (SystemUtils.OS_ARCH.indexOf("64") >= 0);
+	public static final boolean is64bit = SystemUtils.OS_ARCH.indexOf("64") >= 0;
 	public static final String JAVA_DEFAULT_PACKAGE = "(default package)";
 	public static final String UTF8 = "UTF8";
 	public static final String YES = "Yes";
@@ -109,8 +111,8 @@ public final class SLUtility {
 		}
 		final long deltaMS = deltaNS / 1000000;
 		tMS = tMS + deltaMS;
-		long tDecNS = (tMS % 1000) * 1000000;
-		tDecNS = tDecNS + (deltaNS % 1000000);
+		long tDecNS = tMS % 1000 * 1000000;
+		tDecNS = tDecNS + deltaNS % 1000000;
 		final Timestamp result = new Timestamp(tMS);
 		result.setNanos((int) tDecNS);
 		return result;
@@ -154,16 +156,18 @@ public final class SLUtility {
 	 * @return the resulting string literal (not surrounded by double
 	 *         quotations).
 	 */
-	public static String escapeJavaStringForQuoting(String s) {
-		if (s == null)
+	public static String escapeJavaStringForQuoting(final String s) {
+		if (s == null) {
 			throw new IllegalArgumentException(I18N.err(44, "s"));
+		}
 		final StringBuilder b = new StringBuilder(s);
 
 		int index = 0;
 		while (true) {
 			final int length = b.length();
-			if (index >= length)
+			if (index >= length) {
 				break;
+			}
 			char c = b.charAt(index);
 			if (c == '\\' || c == '\"') {
 				b.insert(index, '\\');
@@ -203,8 +207,9 @@ public final class SLUtility {
 	 */
 	public static String obfuscate(final String s) {
 		// Check that the string is free of null characters.
-		if (s.indexOf(0) != -1)
+		if (s.indexOf(0) != -1) {
 			throw new IllegalArgumentException(I18N.err(175));
+		}
 
 		// Obtain the string as a sequence of UTF-8 encoded bytes.
 		final byte[] encoded;
@@ -275,7 +280,7 @@ public final class SLUtility {
 	 *            the array of bytes.
 	 * @return a Java string that can be cut and pasted into Java code.
 	 */
-	public static String toByteArrayJavaConstant(byte[] bytes) {
+	public static String toByteArrayJavaConstant(final byte[] bytes) {
 		final StringBuilder code = new StringBuilder(I18N.msg("common.ob.1"));
 
 		boolean first = true;
@@ -299,7 +304,7 @@ public final class SLUtility {
 	 *            a byte.
 	 * @return a hex string two characters long.
 	 */
-	public static String toHexString(byte b) {
+	public static String toHexString(final byte b) {
 		final String hs = "0123456789abcdef";
 		final StringBuilder hex = new StringBuilder();
 		hex.append(hs.charAt((b & 0xF0) >> 4)).append(hs.charAt((b & 0x0F)));
@@ -313,7 +318,7 @@ public final class SLUtility {
 	 *            the byte array.
 	 * @return a hex string <tt>ba.length * 2</tt> characters long.
 	 */
-	public static String toHexString(byte[] ba) {
+	public static String toHexString(final byte[] ba) {
 		final StringBuilder hex = new StringBuilder();
 		for (byte b : ba) {
 			hex.append(toHexString(b));
@@ -334,12 +339,14 @@ public final class SLUtility {
 	 * @throws NumberFormatException
 	 *             if the string cannot be parsed.
 	 */
-	public static byte[] parseHexString(String s) {
-		if (s == null)
+	public static byte[] parseHexString(final String s) {
+		if (s == null) {
 			throw new IllegalArgumentException(I18N.err(44, "s"));
-		if (s.length() % 2 != 0)
+		}
+		if (s.length() % 2 != 0) {
 			throw new IllegalArgumentException(
 					"Hex string must contain an even number of characters");
+		}
 		byte[] result = new byte[s.length() / 2];
 
 		for (int i = 0; i < result.length; i++) {
@@ -363,8 +370,9 @@ public final class SLUtility {
 	 *             If the provided array does not contain at least one element.
 	 */
 	public static String toString(final long[] obfuscated) {
-		if (obfuscated == null)
+		if (obfuscated == null) {
 			throw new IllegalArgumentException(I18N.err(44, "obfuscated"));
+		}
 
 		final int length = obfuscated.length;
 
@@ -422,7 +430,7 @@ public final class SLUtility {
 	 * 
 	 * @return The decoded long value.
 	 */
-	private static final long toLong(final byte[] bytes, int off) {
+	private static final long toLong(final byte[] bytes, final int off) {
 		long l = 0;
 
 		final int end = Math.min(bytes.length, off + 8);
@@ -448,7 +456,7 @@ public final class SLUtility {
 	 * @param off
 	 *            The offset of the bytes in the array.
 	 */
-	private static void toBytes(long l, byte[] bytes, int off) {
+	private static void toBytes(long l, final byte[] bytes, final int off) {
 		final int end = Math.min(bytes.length, off + 8);
 		for (int i = off; i < end; i++) {
 			bytes[i] = (byte) l;
@@ -566,11 +574,13 @@ public final class SLUtility {
 	 * @throws IllegalStateException
 	 *             if something goes wrong during the signature generation.
 	 */
-	public static byte[] getSignature(byte[] data, PrivateKey key) {
-		if (data == null)
+	public static byte[] getSignature(final byte[] data, final PrivateKey key) {
+		if (data == null) {
 			throw new IllegalArgumentException(I18N.err(44, "data"));
-		if (key == null)
+		}
+		if (key == null) {
 			throw new IllegalArgumentException(I18N.err(44, "key"));
+		}
 
 		final byte[] signature;
 		try {
@@ -596,12 +606,14 @@ public final class SLUtility {
 	 *            the RSA public key to use.
 	 * @return {@code true} if the signature is valid, {@code false} otherwise.
 	 */
-	public static boolean checkSignature(byte[] data, byte[] signature,
-			PublicKey key) {
-		if (data == null)
+	public static boolean checkSignature(final byte[] data,
+			final byte[] signature, final PublicKey key) {
+		if (data == null) {
 			throw new IllegalArgumentException(I18N.err(44, "data"));
-		if (signature == null)
+		}
+		if (signature == null) {
 			throw new IllegalArgumentException(I18N.err(44, "signature"));
+		}
 
 		try {
 			final Signature rsaSig = Signature.getInstance("SHA1withRSA");
@@ -626,7 +638,8 @@ public final class SLUtility {
 	 * @return {@code true} if the signature is valid, {@code false} otherwise.
 	 * @see #getPublicKey()
 	 */
-	public static boolean checkSignature(byte[] data, byte[] signature) {
+	public static boolean checkSignature(final byte[] data,
+			final byte[] signature) {
 		return checkSignature(data, signature, getPublicKey());
 	}
 
@@ -639,7 +652,7 @@ public final class SLUtility {
 	 * @param linewidth
 	 *            the desired line width.
 	 */
-	public static void wrap(StringBuilder b, int linewidth) {
+	public static void wrap(final StringBuilder b, final int linewidth) {
 		int workIndex = linewidth;
 		while (b.length() > workIndex) {
 			b.insert(workIndex, '\n');
@@ -657,7 +670,7 @@ public final class SLUtility {
 	 *            the desired line width.
 	 * @return the wrapped string.
 	 */
-	public static String wrap(String s, int linewidth) {
+	public static String wrap(final String s, final int linewidth) {
 		StringBuilder b = new StringBuilder(s);
 		wrap(b, linewidth);
 		return b.toString();
@@ -671,7 +684,7 @@ public final class SLUtility {
 	 *            the string to trim the above out of.
 	 * @return the string with the above removed.
 	 */
-	public static StringBuilder trimInternal(String s) {
+	public static StringBuilder trimInternal(final String s) {
 		/*
 		 * Trim off any extra spaces or tabs and use a mutable string.
 		 */
@@ -682,8 +695,9 @@ public final class SLUtility {
 		for (String c : stripout) {
 			while (true) {
 				int newlineIndex = b.indexOf(c);
-				if (newlineIndex == -1)
+				if (newlineIndex == -1) {
 					break;
+				}
 				b.delete(newlineIndex, newlineIndex + 1);
 			}
 		}
@@ -702,12 +716,14 @@ public final class SLUtility {
 	 * @throws IOException
 	 *             if anything goes wrong.
 	 */
-	public static String sendMessageToUrl(final URL url,
+	public static String sendPostToUrl(final URL url,
 			final Map<String, String> param) throws IOException {
-		if (url == null)
+		if (url == null) {
 			throw new IllegalArgumentException(I18N.err(44, "url"));
-		if (param == null)
+		}
+		if (param == null) {
 			throw new IllegalArgumentException(I18N.err(44, "param"));
+		}
 
 		/*
 		 * Prepare the connection.
@@ -716,15 +732,24 @@ public final class SLUtility {
 		conn.setDoInput(true);
 		conn.setDoOutput(true);
 		conn.setUseCaches(false);
-		PrintWriter wr = null;
+		PrintWriter wr = new PrintWriter(new OutputStreamWriter(conn
+				.getOutputStream()));
 		try {
 			/*
 			 * Send the request.
 			 */
-			wr = new PrintWriter(new OutputStreamWriter(conn.getOutputStream()));
-			for (Map.Entry<String, String> entry : param.entrySet()) {
-				// TODO
-				//wr.print(msg);
+			if (!param.isEmpty()) {
+				Iterator<Map.Entry<String, String>> iter = param.entrySet()
+						.iterator();
+				for (Map.Entry<String, String> entry = iter.next(); iter
+						.hasNext(); entry = iter.next()) {
+					wr.print(URLEncoder.encode(entry.getKey(), UTF8));
+					wr.print('=');
+					wr.print(URLEncoder.encode(entry.getValue(), UTF8));
+					if (iter.hasNext()) {
+						wr.print('&');
+					}
+				}
 			}
 			wr.flush();
 			/*
@@ -744,9 +769,7 @@ public final class SLUtility {
 				reader.close();
 			}
 		} finally {
-			if (wr != null) {
-				wr.close();
-			}
+			wr.close();
 		}
 	}
 
