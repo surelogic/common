@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -17,9 +18,11 @@ import java.security.spec.X509EncodedKeySpec;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Formatter;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -677,8 +680,42 @@ public final class SLUtility {
 	}
 
 	/**
+	 * Separates a string containing multiple lines into an array containing
+	 * each line.
+	 * <p>
+	 * If the string passed is {@code null} then an empty array is returned.
+	 * <p>
+	 * <i>Implementation Note:</i> The implementation uses a
+	 * {@link StringReader} wrapped by a {@link BufferedReader} to break apart
+	 * the string.
+	 * 
+	 * @param s
+	 *            the string to separate lines from.
+	 * @return a possibly empty array containing the lines within <tt>s</tt>.
+	 */
+	public static String[] separateLines(final String s) {
+		if (s == null)
+			return new String[0];
+		List<String> result = new ArrayList<String>();
+
+		final BufferedReader r = new BufferedReader(new StringReader(s));
+		while (true) {
+			try {
+				final String line = r.readLine();
+				if (line == null)
+					break;
+				result.add(line);
+			} catch (IOException ignore) {
+				break;
+			}
+
+		}
+		return result.toArray(new String[result.size()]);
+	}
+
+	/**
 	 * Trims out newlines, spaces, tabs, formfeeds, and backspaces from the
-	 * passed string.
+	 * entire passed string.
 	 * 
 	 * @param s
 	 *            the string to trim the above out of.

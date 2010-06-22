@@ -184,8 +184,13 @@ public final class SLLicenseUtility {
 		final URL url = new URL(I18N
 				.msg("common.serviceability.licenserequest.url"));
 		final String response = SLUtility.sendPostToUrl(url, param);
-
+		final String[] rLines = SLUtility.separateLines(response);
+		
 		System.out.println("SERVER RESPONSE: " + response);
+		
+		for (final String line : rLines) {
+			System.out.println(" o " + line);
+		}
 
 		if (response
 				.startsWith(I18N

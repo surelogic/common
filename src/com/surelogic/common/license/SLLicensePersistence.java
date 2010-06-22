@@ -637,7 +637,7 @@ public final class SLLicensePersistence {
 		if (licenses == null)
 			throw new IllegalArgumentException(I18N.err(44, "licenses"));
 
-		StringBuilder b = new StringBuilder();
+		final StringBuilder b = new StringBuilder();
 		for (PossiblyActivatedSLLicense license : licenses) {
 			b.append(license.getSignedSLLicense().getSignedHexString());
 			SignedSLLicenseNetCheck nc = license.getSignedSLLicenseNetCheck();
@@ -921,10 +921,15 @@ public final class SLLicensePersistence {
 			final int index = b.indexOf(BEGIN_LICENSE, fromIndex);
 			if (index == -1)
 				break;
+			int endIndex = b.indexOf(END_LICENSE, index);
+			if (endIndex == -1) {
+				break;
+			}
+			endIndex += END_LICENSE.length();
 			final SignedSLLicense license = SignedSLLicense.getInstance(b
-					.substring(index));
+					.substring(index, endIndex));
 			result.add(license);
-			fromIndex = index + 1;
+			fromIndex = endIndex;
 		}
 		return result;
 	}
@@ -955,11 +960,16 @@ public final class SLLicensePersistence {
 			final int index = b.indexOf(BEGIN_NET_CHECK, fromIndex);
 			if (index == -1)
 				break;
+			int endIndex = b.indexOf(END_NET_CHECK, index);
+			if (endIndex == -1) {
+				break;
+			}
+			endIndex += END_NET_CHECK.length();
 			final SignedSLLicenseNetCheck licenseNetCheck = SignedSLLicenseNetCheck
-					.getInstance(b.substring(index));
+					.getInstance(b.substring(index, endIndex));
 
 			result.add(licenseNetCheck);
-			fromIndex = index + 1;
+			fromIndex = endIndex;
 		}
 		return result;
 	}
