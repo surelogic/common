@@ -129,6 +129,35 @@ public final class FileUtility {
 	}
 
 	/**
+	 * Tries to recursively copy the entire contents of the file or folder
+	 * located at src to dest.
+	 * 
+	 * @param src
+	 *            The file or folder structure to copy from
+	 * @param dest
+	 *            The file or folder to copy to
+	 * @return {@code true} if and only if the entire file or folder structure
+	 *         is successfully copied.
+	 */
+	public static boolean recursiveCopy(final File src, final File dest) {
+		if (src.isDirectory()) {
+			if (dest.mkdir()) {
+				for (final String name : src.list()) {
+					if (!recursiveCopy(new File(src, name),
+							new File(dest, name))) {
+						return false;
+					}
+				}
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			return copy(src, dest);
+		}
+	}
+
+	/**
 	 * Tries to perform a recursive deletion on the passed path. If the path is
 	 * a file it is deleted, if the path is a directory then the directory and
 	 * all its contents are deleted.
