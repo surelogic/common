@@ -185,6 +185,8 @@ public final class SLLicenseUtility {
 				.msg("common.serviceability.licenserequest.url"));
 		final String response = SLUtility.sendPostToUrl(url, param);
 
+		System.out.println("SERVER RESPONSE: " + response);
+
 		if (response
 				.startsWith(I18N
 						.msg("common.serviceability.licenserequest.resp.failure.prefix"))) {
