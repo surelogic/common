@@ -1,16 +1,11 @@
 package com.surelogic.common.license;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -183,54 +178,18 @@ public final class SLLicenseUtility {
 		/*
 		 * Build the message to send to www.surelogic.com.
 		 */
-		final String msg = SLLicensePersistence.toSignedHexString(licenses,
-				true);
-		sendInstallMessage(msg);
-	}
+		final String l = SLLicensePersistence.toSignedHexString(licenses, true);
+		final Map<String, String> param = new HashMap<String, String>();
+		param.put(I18N.msg("common.serviceability.licenserequest.req"), I18N
+				.msg("common.serviceability.licenserequest.req.actrew"));
+		param.put(I18N.msg("common.serviceability.licenserequest.url"), l);
+		final URL url = new URL(I18N
+				.msg("common.serviceability.licenserequest.license"));
+		final String response = SLUtility.sendPostToUrl(url, param);
 
-	/**
-	 * Send a message to the client to install the given licenses.
-	 * 
-	 * @param possiblyInstalledLicenseString
-	 * @throws IOException
-	 */
-	private static String sendInstallMessage(
-			final String possiblyInstalledLicenseString) throws IOException {
-		// Prepare the URL connection
-		final URL url = new URL(f_licenseLocation);
-		final URLConnection conn = url.openConnection();
-		conn.setDoInput(true);
-		conn.setDoOutput(true);
-		conn.setUseCaches(false);
-		final OutputStream os = null;
-		PrintWriter wr = null;
-		try {
-			// Send the request
-			wr = new PrintWriter(new OutputStreamWriter(conn.getOutputStream()));
-			wr.print("req=INSTALL&");
-			wr.print("license=" + possiblyInstalledLicenseString);
-			wr.flush();
-			// Check the response
-			BufferedReader reader = new BufferedReader(new InputStreamReader(
-					conn.getInputStream()));
-			try {
-				StringBuilder response = new StringBuilder();
-				char[] buf = new char[512];
-				for (int len = reader.read(buf); len != -1; len = reader
-						.read(buf)) {
-					response.append(buf, 0, len);
-				}
-				return response.toString();
-			} finally {
-				reader.close();
-			}
-		} finally {
-			if (wr != null) {
-				wr.close();
-			} else if (os != null) {
-				os.close();
-			}
-		}
+		final List<SignedSLLicenseNetCheck> ncs = SLLicensePersistence
+				.readLicenseNetChecksFromString(response);
+		// TODO add to manager.
 	}
 
 	/**
