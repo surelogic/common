@@ -715,6 +715,8 @@ public final class SLUtility {
 	 * @return the result.
 	 * @throws IOException
 	 *             if anything goes wrong.
+	 * @throws IllegalArgumentException
+	 *             if either of the parameters is {@code null}.
 	 */
 	public static String sendPostToUrl(final URL url,
 			final Map<String, String> param) throws IOException {
