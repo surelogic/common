@@ -184,25 +184,32 @@ public final class SLLicenseUtility {
 		final URL url = new URL(I18N
 				.msg("common.serviceability.licenserequest.url"));
 		final String response = SLUtility.sendPostToUrl(url, param);
-		final String[] rLines = SLUtility.separateLines(response);
-		
-		System.out.println("SERVER RESPONSE: " + response);
-		
-		for (final String line : rLines) {
-			System.out.println(" o " + line);
-		}
-
-		if (response
-				.startsWith(I18N
-						.msg("common.serviceability.licenserequest.resp.failure.prefix"))) {
-			throw new Exception(I18N.err(208, response));
-		}
-
 		final List<SignedSLLicenseNetCheck> licenseNetChecks = SLLicensePersistence
 				.readLicenseNetChecksFromString(response);
-		if (licenseNetChecks.isEmpty()) {
+		final String[] rLines = SLUtility.separateLines(response);
+
+		SLLicenseManager.getInstance().activateOrRenew(licenseNetChecks);
+
+		boolean problemReportedByServer = false;
+		final StringBuilder b = new StringBuilder();
+		for (final String line : rLines) {
+			if (line
+					.startsWith(I18N
+							.msg("common.serviceability.licenserequest.resp.failure.prefix"))) {
+				if (problemReportedByServer) {
+					b.append('\n').append(line);
+				} else {
+					problemReportedByServer = true;
+					b.append(I18N.err(208)).append('\n').append(line);
+				}
+			}
+		}
+		if (problemReportedByServer) {
+			throw new Exception(b.toString());
+		} else if (licenseNetChecks.isEmpty()) {
 			throw new Exception(I18N.err(209, licenses));
 		}
+
 		SLLicenseManager.getInstance().activateOrRenew(licenseNetChecks);
 	}
 
@@ -242,7 +249,21 @@ public final class SLLicenseUtility {
 			/*
 			 * Perform notification message to the server.
 			 */
-			// TODO
+			final String l = SLLicensePersistence.toSignedHexString(notifyList,
+					true);
+			final Map<String, String> param = new HashMap<String, String>();
+			param
+					.put(
+							I18N
+									.msg("common.serviceability.licenserequest.req"),
+							I18N
+									.msg("common.serviceability.licenserequest.req.remove"));
+			param.put(I18N.msg("common.serviceability.licenserequest.license"),
+					l);
+			final URL url = new URL(I18N
+					.msg("common.serviceability.licenserequest.url"));
+			final String response = SLUtility.sendPostToUrl(url, param);
+			// TODO check response
 		}
 	}
 
