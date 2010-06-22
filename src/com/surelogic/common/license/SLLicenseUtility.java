@@ -21,8 +21,6 @@ import com.surelogic.common.jobs.SLStatus;
 public final class SLLicenseUtility {
 
 	private static final Set<ILicenseObserver> f_observers = new CopyOnWriteArraySet<ILicenseObserver>();
-	private static final String f_licenseLocation = I18N
-			.msg("common.serviceability.licenserequest.url");
 
 	/**
 	 * Adds a license check observer.
@@ -187,9 +185,9 @@ public final class SLLicenseUtility {
 				.msg("common.serviceability.licenserequest.license"));
 		final String response = SLUtility.sendPostToUrl(url, param);
 
-		final List<SignedSLLicenseNetCheck> ncs = SLLicensePersistence
+		final List<SignedSLLicenseNetCheck> licenseNetChecks = SLLicensePersistence
 				.readLicenseNetChecksFromString(response);
-		// TODO add to manager.
+		SLLicenseManager.getInstance().activateOrRenew(licenseNetChecks);
 	}
 
 	/**

@@ -90,6 +90,39 @@ public final class SLLicenseManager {
 	}
 
 	/**
+	 * Updates the license net checks for a set of managed licenses. This
+	 * activates or renews the licenses. It must be the case that for each
+	 * license net check passed to this method that a corresponding license is
+	 * already managed by this class.
+	 * <p>
+	 * The result is immediately persisted to the <tt>~/.surelogic-licenses</tt>
+	 * file.
+	 * 
+	 * @param licenseNetChecks
+	 *            the set of license net checks to install.
+	 * @throws IllegalStateException
+	 *             if a net check in <tt>licenseNetChecks</tt> does not activate
+	 *             or renew a managed license.
+	 */
+	public void activateOrRenew(List<SignedSLLicenseNetCheck> licenseNetChecks) {
+		final List<PossiblyActivatedSLLicense> licensesToAddOrUpdate = new ArrayList<PossiblyActivatedSLLicense>();
+		for (SignedSLLicenseNetCheck nc : licenseNetChecks) {
+			final PossiblyActivatedSLLicense license = getLicense(nc
+					.getLicenseNetCheck().getUuid());
+			if (license == null) {
+				throw new IllegalStateException(I18N.err(207, nc.toString()));
+			}
+			licensesToAddOrUpdate.add(new PossiblyActivatedSLLicense(license
+					.getSignedSLLicense(), nc));
+		}
+		/*
+		 * The install method does the right thing in this case it overwrites,
+		 * so we can call it to do the rest of the work.
+		 */
+		install(licensesToAddOrUpdate);
+	}
+
+	/**
 	 * Removes a list of licenses from the set managed by this class. Removal is
 	 * performed by matching license identifiers (not by reference equality).
 	 * The result is immediately persisted to the <tt>~/.surelogic-licenses</tt>
@@ -130,6 +163,24 @@ public final class SLLicenseManager {
 		List<PossiblyActivatedSLLicense> licenses = new ArrayList<PossiblyActivatedSLLicense>();
 		licenses.add(license);
 		install(licenses);
+	}
+
+	/**
+	 * Gets a {@link PossiblyActivatedSLLicense} object with a particular
+	 * {@link UUID} if it is managed by this class. If no such license exists
+	 * {@code null} is returned.
+	 * 
+	 * @param id
+	 *            the {@link UUID} to search for.
+	 * @return the {@link PossiblyActivatedSLLicense} object with <tt>id</tt>
+	 *         for its {@link UUID}, or {@code null} if no such license exists.
+	 */
+	public PossiblyActivatedSLLicense getLicense(UUID id) {
+		for (PossiblyActivatedSLLicense license : f_licenses) {
+			if (license.getSignedSLLicense().getLicense().getUuid().equals(id))
+				return license;
+		}
+		return null;
 	}
 
 	private SLLicenseManager() {
