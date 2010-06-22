@@ -743,15 +743,15 @@ public final class SLUtility {
 			if (!param.isEmpty()) {
 				Iterator<Map.Entry<String, String>> iter = param.entrySet()
 						.iterator();
-				for (Map.Entry<String, String> entry = iter.next(); iter
-						.hasNext(); entry = iter.next()) {
+				do {
+					Map.Entry<String, String> entry = iter.next();
 					wr.print(URLEncoder.encode(entry.getKey(), UTF8));
 					wr.print('=');
 					wr.print(URLEncoder.encode(entry.getValue(), UTF8));
 					if (iter.hasNext()) {
 						wr.print('&');
 					}
-				}
+				} while (iter.hasNext());
 			}
 			wr.flush();
 			/*
