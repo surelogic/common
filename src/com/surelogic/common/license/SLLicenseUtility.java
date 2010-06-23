@@ -247,7 +247,7 @@ public final class SLLicenseUtility {
 		}
 
 		if (notifyList.isEmpty())
-			return; // nothing to do (local enough)
+			return; // nothing to do (local removal was enough)
 
 		/*
 		 * Perform notification message to the server.
