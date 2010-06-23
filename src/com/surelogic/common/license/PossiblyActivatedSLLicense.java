@@ -78,7 +78,7 @@ public final class PossiblyActivatedSLLicense {
 			if (license.getType() != SLLicenseType.PERPETUAL) {
 				final String date = SLUtility.toStringHumanDay(license
 						.getInstallBeforeDate());
-				b.append(" [activate before ").append(date).append("]");
+				b.append(" (activate before ").append(date).append(")");
 			}
 		}
 		return b.toString();
@@ -120,11 +120,11 @@ public final class PossiblyActivatedSLLicense {
 			if (isExpired()) {
 				b.append(SLUtility.YES);
 				if (type == SLLicenseType.PERPETUAL) {
-					b.append(" [renew now]");
+					b.append(" (renew now)");
 				}
 			} else {
-				b.append(SLUtility.NO).append(" [valid until ").append(date)
-						.append("]");
+				b.append(SLUtility.NO).append(" (expires ").append(date)
+						.append(")");
 			}
 		}
 		return b.toString();
