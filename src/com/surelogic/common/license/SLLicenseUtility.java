@@ -2,7 +2,6 @@ package com.surelogic.common.license;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -122,20 +121,13 @@ public final class SLLicenseUtility {
 		 * that we are not installing this license past the install/activation
 		 * deadline.
 		 */
-		final Date now = new Date();
 		for (PossiblyActivatedSLLicense iLicense : licenses) {
-			SLLicense license = iLicense.getSignedSLLicense().getLicense();
-			/*
-			 * The installation deadline only applies to non-perpetual licenses.
-			 */
-			if (license.getType() != SLLicenseType.PERPETUAL) {
-				final Date deadline = license.getInstallBeforeDate();
-				final boolean pastDeadline = now.after(deadline);
-				if (pastDeadline) {
-					throw new Exception(I18N.err(202, license.getType()
-							.toString(), license.getProduct().toString(),
-							SLUtility.toStringHumanDay(deadline)));
-				}
+			if (iLicense.isPastInstallBeforeDate()) {
+				SLLicense license = iLicense.getSignedSLLicense().getLicense();
+				throw new Exception(I18N.err(202, license.getType().toString(),
+						license.getProduct().toString(), SLUtility
+								.toStringHumanDay(license
+										.getInstallBeforeDate())));
 			}
 		}
 		SLLicenseManager.getInstance().install(licenses);

@@ -131,6 +131,23 @@ public final class PossiblyActivatedSLLicense {
 	}
 
 	/**
+	 * Flags if this license is past its installation deadline.
+	 * 
+	 * @return {@code true} if this license is past its installation deadline,
+	 *         {@code false} otherwise.
+	 */
+	public boolean isPastInstallBeforeDate() {
+		final Date now = new Date();
+		final SLLicense license = f_license.getLicense();
+		if (license.getType() != SLLicenseType.PERPETUAL) {
+			final Date deadline = license.getInstallBeforeDate();
+			final boolean pastDeadline = now.after(deadline);
+			return pastDeadline;
+		}
+		return false;
+	}
+
+	/**
 	 * Constructs a new instance from the passed signed license and signed
 	 * license net check.
 	 * 
