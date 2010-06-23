@@ -233,7 +233,9 @@ public final class SLLicenseUtility {
 		 */
 		List<PossiblyActivatedSLLicense> notifyList = new ArrayList<PossiblyActivatedSLLicense>();
 		for (PossiblyActivatedSLLicense license : licenses) {
-			if (license.getSignedSLLicense().getLicense().performNetCheck()) {
+			if (license.isActivated()
+					&& license.getSignedSLLicense().getLicense()
+							.performNetCheck()) {
 				notifyList.add(license);
 			}
 		}
