@@ -2,10 +2,12 @@ package com.surelogic.common.license;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import com.surelogic.common.SLUtility;
@@ -43,6 +45,41 @@ public final class SLLicenseUtility {
 		f_observers.remove(observer);
 	}
 
+	private static final Map<SLLicenseProduct, Date> f_knownReleaseDates = new ConcurrentHashMap<SLLicenseProduct, Date>();
+
+	/**
+	 * Sets the release date for the passed product. This method would typically
+	 * be called from the Eclipse activator for that product.
+	 * 
+	 * @param product
+	 *            a product.
+	 * @param value
+	 *            the release date for the running version of <tt>product</tt>.
+	 */
+	public static void setReleaseDateFor(SLLicenseProduct product, Date value) {
+		if (product == null || product == null)
+			return;
+		f_knownReleaseDates.put(product, value);
+	}
+
+	/**
+	 * Gets the release date for the passed product. If the release date is not
+	 * known then today's date is returned.
+	 * 
+	 * @param product
+	 *            a product.
+	 * @return the release date for <tt>product</tt> if it is known, today's
+	 *         date otherwise.
+	 */
+	public static Date getReleaseDateFor(SLLicenseProduct product) {
+		if (product != null) {
+			final Date releaseDate = f_knownReleaseDates.get(product);
+			if (releaseDate != null)
+				return releaseDate;
+		}
+		return new Date();
+	}
+
 	/**
 	 * Checks if a license that allows use of the passed product is installed.
 	 * <p>
@@ -59,8 +96,56 @@ public final class SLLicenseUtility {
 	 *         <tt>product</tt>, {@code false} otherwise.
 	 */
 	public static boolean validate(final SLLicenseProduct product) {
-		if (product == null) {
+		if (product == null)
 			throw new IllegalArgumentException(I18N.err(44, "product"));
+
+		List<PossiblyActivatedSLLicense> licenses = SLLicenseManager
+				.getInstance().getLicenses();
+		PossiblyActivatedSLLicense best = null;
+		for (PossiblyActivatedSLLicense license : licenses) {
+			if (license.licensesUseOf(product)) {
+				if (best == null) {
+					/*
+					 * No license has been found yet, so this one is the best
+					 * one (and only one) so far.
+					 */
+					best = license;
+				} else {
+					/*
+					 * The best license is the one with the latest expiration
+					 * date because we want to avoid bothering the user with
+					 * prompts about expiring licenses.
+					 */
+					final Date expBest = best.getSignedSLLicenseNetCheck()
+							.getLicenseNetCheck().getDate();
+					final Date expLicense = license
+							.getSignedSLLicenseNetCheck().getLicenseNetCheck()
+							.getDate();
+					if (expLicense.after(expBest))
+						best = license;
+				}
+			}
+		}
+
+		/*
+		 * Check if no license was found.
+		 */
+		if (best == null) {
+			for (ILicenseObserver o : f_observers) {
+				o.notifyNoLicenseFor(product.toString());
+			}
+			return false;
+		}
+
+		/*
+		 * Check if the best license is close to expiration.
+		 */
+		if (best.isCloseToBeingExpired()) {
+			for (ILicenseObserver o : f_observers) {
+				o.notifyExpiration(product.toString(), best
+						.getSignedSLLicenseNetCheck().getLicenseNetCheck()
+						.getDate());
+			}
 		}
 		return true;
 	}

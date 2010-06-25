@@ -33,6 +33,8 @@ public enum SLLicenseProduct {
 	public boolean needsLicense() {
 		if (this == WWW_SURELOGIC_COM)
 			return false;
+		if (this == ALL_TOOLS)
+			return false;
 		return true;
 	}
 

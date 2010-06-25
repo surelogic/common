@@ -8,24 +8,22 @@ import java.util.Date;
 public interface ILicenseObserver {
 
 	/**
-	 * Indicates that a license check for a license subject failed. In addition
-	 * to an exact subject match a check to see if an <i>All Tools</i> license
-	 * was tried and failed.
+	 * Indicates that a license check for a product failed.
 	 * 
-	 * @param subject
-	 *            the non-null license subject.
-	 * @see SLLicenseUtility#validate(String)
+	 * @param productName
+	 *            the name of a SureLogic product.
+	 * @see SLLicenseUtility#validate(SLLicenseProduct)
 	 */
-	void notifyNoLicenseFor(String subject);
+	void notifyNoLicenseFor(String productName);
 
 	/**
 	 * Indicates that a license that was checked expires within a week.
 	 * 
-	 * @param subject
-	 *            the non-null license subject.
+	 * @param productName
+	 *            the name of a SureLogic product.
 	 * @param expiration
 	 *            the non-null expiration date.
-	 * @see SLLicenseUtility#validate(String)
+	 * @see SLLicenseUtility#validate(SLLicenseProduct)
 	 */
-	void notifyExpiration(String subject, Date expiration);
+	void notifyExpiration(String productName, Date expiration);
 }

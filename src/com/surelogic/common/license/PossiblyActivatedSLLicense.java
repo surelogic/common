@@ -1,5 +1,6 @@
 package com.surelogic.common.license;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.UUID;
 
@@ -87,20 +88,54 @@ public final class PossiblyActivatedSLLicense {
 	/**
 	 * Flags if this license is expired. The type of the license is not taken
 	 * into consideration just the date in the license net check. This method
-	 * returns {@code false} if the license has not been installed.
+	 * returns {@code false} if the license has not been activated.
 	 * 
 	 * @return {@code true} if this license has expired, {@code false}
 	 *         otherwise.
 	 */
 	public boolean isExpired() {
+		return isExpiredOn(new Date());
+	}
+
+	/**
+	 * Flags if this license is within two weeks of expiration. The type of the
+	 * license is not taken into consideration just the date in the license net
+	 * check. This method returns {@code false} if the license has not been
+	 * activated.
+	 * 
+	 * @return {@code true} if this license is within two weeks of expiration,
+	 *         {@code false} otherwise.
+	 */
+	public boolean isCloseToBeingExpired() {
+		final Calendar cal = Calendar.getInstance();
+		cal.add(Calendar.DAY_OF_MONTH, 14);
+		final Date inTwoWeeks = cal.getTime();
+		return isExpiredOn(inTwoWeeks);
+	}
+
+	/**
+	 * Flags if the this license is expired on the passed date. The type of the
+	 * license is not taken into consideration just the date in the license net
+	 * check. This method returns {@code false} if the license has not been
+	 * activated.
+	 * 
+	 * @param date
+	 *            a date.
+	 * @return {@code true} if this license is expired on the passed date,
+	 *         {@code false} otherwise.
+	 * 
+	 * @throws IllegalArgumentException
+	 *             if <tt>date</tt> is {@code null}.
+	 */
+	public boolean isExpiredOn(Date date) {
 		if (isActivated()) {
-			final Date now = new Date();
 			final Date deadline = f_licenseNetCheck.getLicenseNetCheck()
 					.getDate();
-			final boolean expired = now.after(deadline);
+			final boolean expired = date.after(deadline);
 			return expired;
-		} else
+		} else {
 			return false;
+		}
 	}
 
 	/**
@@ -145,6 +180,56 @@ public final class PossiblyActivatedSLLicense {
 			return pastDeadline;
 		}
 		return false;
+	}
+
+	/**
+	 * Flags if this license allows the use of the passed product.
+	 * 
+	 * @param product
+	 *            a SureLogic product. Cannot be <tt>null</tt>.
+	 * @return {@code true} if this license allows the use of <tt>product</tt>,
+	 *         {@code false} otherwise.
+	 * 
+	 * @throw IllegalArgumentException if <tt>product</tt> is {@code null}.
+	 */
+	public boolean licensesUseOf(final SLLicenseProduct product) {
+		if (product == null)
+			throw new IllegalArgumentException(I18N.err(44, "product"));
+
+		/*
+		 * Some products don't require checks
+		 */
+		if (!product.needsLicense())
+			return true;
+
+		if (!isActivated())
+			return false;
+
+		final SLLicense license = f_license.getLicense();
+		final SLLicenseType type = license.getType();
+
+		/*
+		 * USE licenses expire on the date specified.
+		 */
+		if (isExpired() && type == SLLicenseType.USE) {
+			return false;
+		}
+
+		/*
+		 * SUPPORT and PERPETUAL licenses allow use of versions released before
+		 * their expiration date or renewal deadline, respectively.
+		 */
+		if (type == SLLicenseType.SUPPORT || type == SLLicenseType.PERPETUAL) {
+			final Date releaseDate = SLLicenseUtility
+					.getReleaseDateFor(product);
+			if (isExpiredOn(releaseDate))
+				return false;
+		}
+
+		if (license.getProduct().includes(product))
+			return true;
+		else
+			return false;
 	}
 
 	/**
