@@ -40,4 +40,10 @@ public final class XUtil {
 	public static boolean useExperimental() {
 		return f_useExperimental;
 	}
+	
+	private static final String f_runTest = System.getProperty("SureLogicTest");
+	
+	public static String runTest() {
+		return f_runTest;
+	}
 }
