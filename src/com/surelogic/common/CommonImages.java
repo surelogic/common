@@ -50,6 +50,8 @@ public final class CommonImages {
 	public static final String IMG_EDIT_NEW = "edit_new.gif";
 	public static final String IMG_EDIT_PASTE = "edit_paste.gif";
 	public static final String IMG_EDIT_PRINT = "edit_print.gif";
+	public static final String IMG_EDIT_REDO = "edit_redo.gif";
+	public static final String IMG_EDIT_UNDO = "edit_undo.gif";
 	public static final String IMG_EMPTY = "empty.gif";
 	public static final String IMG_EMPTY_DOT = "empty_dot.gif";
 	public static final String IMG_ENUM = "enum.gif";
