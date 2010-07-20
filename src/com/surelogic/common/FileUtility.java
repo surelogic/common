@@ -330,6 +330,45 @@ public final class FileUtility {
 	}
 
 	/**
+	 * Gets the contents of a text file and returns it as a string. If anything
+	 * goes wrong then the default value passed is returned instead of the
+	 * contents of the file.
+	 * 
+	 * @param textFile
+	 *            a text file.
+	 * @param value
+	 *            a default value.
+	 * @return the contents of <tt>textFile</tt> or, if anything goes wrong
+	 *         reading the file, <tt>value</tt>.
+	 */
+	public static String getFileContentsAsStringOrDefaultValue(File textFile,
+			String value) {
+		final String lf = System.getProperty("line.separator");
+		final StringBuilder b = new StringBuilder();
+		try {
+			final BufferedReader r = new BufferedReader(
+					new FileReader(textFile));
+			boolean first = true;
+			while (true) {
+				final String s = r.readLine();
+				if (s == null) {
+					break;
+				}
+				if (first) {
+					first = false;
+				} else {
+					b.append(lf);
+				}
+				b.append(s);
+			}
+			r.close();
+		} catch (final IOException e) {
+			return value;
+		}
+		return b.toString();
+	}
+
+	/**
 	 * Gets the contents of a text file and returns it as a string.
 	 * 
 	 * @param textFile
