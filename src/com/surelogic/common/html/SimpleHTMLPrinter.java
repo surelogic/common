@@ -17,11 +17,11 @@ public final class SimpleHTMLPrinter {
 	}
 
 	/**
-	 * Extracts parameters of the from <tt>?parameter=value</tt> from a String.
-	 * This is a simple parse that does not handle encodings. The result is a
-	 * map with the parameter as the key to lookup a value. If duplicate
-	 * parameters exist the last value is the resulting value in the returned
-	 * map.
+	 * Extracts parameters of the from <tt>?param1=value&param2=value2</tt> from
+	 * a String. This is a simple parse that does not handle encodings. The
+	 * result is a map with the parameter as the key to lookup a value. If
+	 * duplicate parameters exist the last value is the resulting value in the
+	 * returned map.
 	 * 
 	 * @param value
 	 *            the string to extract parameters from
@@ -31,10 +31,15 @@ public final class SimpleHTMLPrinter {
 			final String value) {
 		final Map<String, String> result = new HashMap<String, String>();
 		int start = 0;
+		int qIdx = value.indexOf('?', start);
+		if (qIdx == -1)
+			qIdx = value.indexOf('&', start);
 		while (true) {
-			int qIdx = value.indexOf('?', start) + 1;
 			int eqIdx = value.indexOf('=', start);
-			if (qIdx == -1 || eqIdx == -1 || qIdx == eqIdx)
+			if (qIdx == -1 || eqIdx == -1)
+				break;
+			qIdx++;
+			if (qIdx == eqIdx)
 				break;
 			/*
 			 * Extract key
@@ -48,7 +53,7 @@ public final class SimpleHTMLPrinter {
 				result.put(key, "");
 				break;
 			} else {
-				qIdx = value.indexOf('?', eqIdx);
+				qIdx = value.indexOf('&', eqIdx);
 				if (qIdx == -1) {
 					result.put(key, value.substring(eqIdx));
 					break;
@@ -59,6 +64,11 @@ public final class SimpleHTMLPrinter {
 			}
 		}
 		return result;
+	}
+
+	public static void main(String[] args) {
+		final Map<String, String> m = extractParametersFromURL("jur?gg=78&f=2&f=3&g=999&h=");
+		System.out.println(m);
 	}
 
 	private static String replace(final String text, final char c,
