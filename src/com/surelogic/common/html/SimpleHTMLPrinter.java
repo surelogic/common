@@ -1,5 +1,8 @@
 package com.surelogic.common.html;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Provides a set of convenience methods for creating HTML pages.
  * <p>
@@ -11,6 +14,51 @@ public final class SimpleHTMLPrinter {
 
 	private SimpleHTMLPrinter() {
 		// utility
+	}
+
+	/**
+	 * Extracts parameters of the from <tt>?parameter=value</tt> from a String.
+	 * This is a simple parse that does not handle encodings. The result is a
+	 * map with the parameter as the key to lookup a value. If duplicate
+	 * parameters exist the last value is the resulting value in the returned
+	 * map.
+	 * 
+	 * @param value
+	 *            the string to extract parameters from
+	 * @return a (possibly empty) map of the parameters.
+	 */
+	public static Map<String, String> extractParametersFromURL(
+			final String value) {
+		final Map<String, String> result = new HashMap<String, String>();
+		int start = 0;
+		while (true) {
+			int qIdx = value.indexOf('?', start) + 1;
+			int eqIdx = value.indexOf('=', start);
+			if (qIdx == -1 || eqIdx == -1 || qIdx == eqIdx)
+				break;
+			/*
+			 * Extract key
+			 */
+			final String key = value.substring(qIdx, eqIdx);
+			/*
+			 * Extract value
+			 */
+			eqIdx++;
+			if (eqIdx == value.length()) {
+				result.put(key, "");
+				break;
+			} else {
+				qIdx = value.indexOf('?', eqIdx);
+				if (qIdx == -1) {
+					result.put(key, value.substring(eqIdx));
+					break;
+				} else {
+					result.put(key, value.substring(eqIdx, qIdx));
+					start = qIdx;
+				}
+			}
+		}
+		return result;
 	}
 
 	private static String replace(final String text, final char c,
