@@ -56,6 +56,26 @@ public interface DBConnection {
 	public <T> T withTransaction(final DBTransaction<T> action);
 
 	/**
+	 * Perform a query with 'default' connection settings. This will not
+	 * explicitly make a connection read-only, or commit a transaction.
+	 * 
+	 * @param <T>
+	 * @param dbQuery
+	 * @return
+	 */
+	public <T> T withDefault(DBQuery<T> dbQuery);
+
+	/**
+	 * Perform a transaction with 'default' connection settings. This will not
+	 * explicitly make a connection read-only, or commit a transaction.
+	 * 
+	 * @param <T>
+	 * @param action
+	 * @return
+	 */
+	public <T> T withDefault(final DBTransaction<T> action);
+
+	/**
 	 * Returns an object that allows access to the schema and version
 	 * information for this database.
 	 * 
@@ -67,7 +87,7 @@ public interface DBConnection {
 	 * Disconnect the database
 	 */
 	void shutdown();
-	
+
 	/**
 	 * Unload and delete the database.
 	 */
@@ -99,4 +119,5 @@ public interface DBConnection {
 	 * @see #loggedBootAndCheckSchema()
 	 */
 	public void bootAndCheckSchema() throws Exception;
+
 }

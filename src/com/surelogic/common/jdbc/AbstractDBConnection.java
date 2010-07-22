@@ -88,18 +88,34 @@ public abstract class AbstractDBConnection implements DBConnection {
 		}
 	}
 
+	public <T> T withDefault(final DBQuery<T> dbQuery) {
+		try {
+			return with(getConnection(), dbQuery, true);
+		} catch (final SQLException e) {
+			throw new TransactionException("Could not establish connection.", e);
+		}
+	}
+
+	public <T> T withDefault(final DBTransaction<T> action) {
+		try {
+			return with(getConnection(), action, true);
+		} catch (final SQLException e) {
+			throw new TransactionException("Could not establish connection.", e);
+		}
+	}
+
 	private <T> T with(final Connection conn, final DBTransaction<T> t,
-			final boolean readOnly) {
+			final boolean readOnlyOrDefault) {
 		Throwable exc = null;
 		T val = null;
 		try {
 			val = t.perform(conn);
-			if (!readOnly) {
+			if (!readOnlyOrDefault) {
 				conn.commit();
 			}
 		} catch (final Throwable exc0) {
 			exc = exc0;
-			if (!readOnly) {
+			if (!readOnlyOrDefault) {
 				try {
 					conn.rollback();
 				} catch (final SQLException e) {
