@@ -4,6 +4,7 @@ import java.io.*;
 
 public class RegressionUtility {
 	public static final String JSURE_SNAPSHOT_SUFFIX = ".sea.xml";
+	public static final String JSURE_SNAPSHOT_DIFF_SUFFIX = ".sea.diffs.xml";
 	
 	public static FilenameFilter oracleFilter = new FilenameFilter() {
 		public boolean accept(File dir, String name) {
