@@ -46,4 +46,10 @@ public final class XUtil {
 	public static String runTest() {
 		return f_runTest;
 	}
+	
+	private static final String f_recordScript = System.getProperty("SureLogicRecordScript");
+	
+	public static String recordScript() {
+		return f_recordScript;
+	}
 }
