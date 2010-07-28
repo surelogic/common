@@ -43,12 +43,18 @@ public final class XUtil {
 	
 	private static final String f_runTest = System.getProperty("SureLogicTest");
 	
+	/**	 
+	 * @return The name of the test to be run, e.g. UAM
+	 */
 	public static String runTest() {
 		return f_runTest;
 	}
 	
 	private static final String f_recordScript = System.getProperty("SureLogicRecordScript");
-	
+
+	/**	 
+	 * @return The directory to which the script (and other resources) should be written
+	 */
 	public static String recordScript() {
 		return f_recordScript;
 	}
