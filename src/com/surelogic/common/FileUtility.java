@@ -8,6 +8,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -195,6 +196,39 @@ public final class FileUtility {
 		return success;
 	}
 
+	public static void deleteTempFiles(TempFileFilter filter) {
+		try {
+			File tmpDir = filter.createTempFile().getParentFile();
+			for (File f : tmpDir.listFiles(filter)) {
+				if (f.isFile()) {
+					f.delete();
+				} else {
+					recursiveDelete(f);
+				}
+			}
+		} catch (IOException e) {
+			// Ignore
+		}
+	}
+	
+	public static class TempFileFilter implements FilenameFilter {
+		final String prefix;
+		final String suffix;
+		
+		public TempFileFilter(String pre, String suf) {
+			prefix = pre;
+			suffix = suf;
+		}
+		
+		public File createTempFile() throws IOException {
+			return File.createTempFile(prefix, suffix);
+		}
+
+		public boolean accept(File dir, String name) {
+			return name.startsWith(prefix) && name.endsWith(suffix);
+		}
+	}
+	
 	/**
 	 * This method performs a rough calculation of the space being used by the
 	 * passed file or directory. The calculation is recursive and includes
