@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
-
 /**
  * A utility class that makes it easy to choose one or more images and write
  * them out to a given folder.
@@ -31,9 +30,9 @@ public class ImageWriter {
 		this(parentDir, IMAGE_FOLDER);
 	}
 
-	public ImageWriter(final File parentDir, final String folderName) {
-		f_imageDir = new File(parentDir, folderName);
-		f_folderName = folderName;
+	public ImageWriter(final File parentDir, final String relativePath) {
+		f_imageDir = new File(parentDir, relativePath);
+		f_folderName = relativePath;
 	}
 
 	/**
@@ -56,14 +55,29 @@ public class ImageWriter {
 		return f_folderName + '/' + image;
 	}
 
+	/**
+	 * Produce an image tag pointing to the given image and alt text. The src
+	 * attribute will be qualified by the relative path of the image writer,
+	 * which is <code>image_files</code> by default.
+	 * 
+	 * @param image
+	 * @param altText
+	 * @return
+	 */
 	public String imageTag(final String image, final String altText) {
 		return "<img src=\"" + imageLocation(image) + "\" alt=\"" + altText
 				+ "\" />";
 	}
 
+	/**
+	 * Copy all images that have been added to this writer to its target
+	 * directory.
+	 * 
+	 * @return whether the copy fully succeeded
+	 */
 	public boolean writeImages() {
 		if (!f_imageDir.exists()) {
-			if (!f_imageDir.mkdir()) {
+			if (!f_imageDir.mkdirs()) {
 				return false;
 			}
 		}
