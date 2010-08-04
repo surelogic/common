@@ -32,15 +32,18 @@ public final class SimpleHTMLPrinter {
 		final Map<String, String> result = new HashMap<String, String>();
 		int start = 0;
 		int qIdx = value.indexOf('?', start);
-		if (qIdx == -1)
+		if (qIdx == -1) {
 			qIdx = value.indexOf('&', start);
+		}
 		while (true) {
 			int eqIdx = value.indexOf('=', start);
-			if (qIdx == -1 || eqIdx == -1)
+			if (qIdx == -1 || eqIdx == -1) {
 				break;
+			}
 			qIdx++;
-			if (qIdx == eqIdx)
+			if (qIdx == eqIdx) {
 				break;
+			}
 			/*
 			 * Extract key
 			 */
@@ -66,7 +69,7 @@ public final class SimpleHTMLPrinter {
 		return result;
 	}
 
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		final Map<String, String> m = extractParametersFromURL("jur?gg=78&f=2&f=3&g=999&h=");
 		System.out.println(m);
 	}
@@ -100,18 +103,50 @@ public final class SimpleHTMLPrinter {
 		return replace(content, '>', "&gt;"); //$NON-NLS-1$
 	}
 
+	/**
+	 * Add the starting html and head sections to the given buffer.
+	 * 
+	 * @param buffer
+	 *            the buffer to write the page prolog to
+	 * @param styleSheet
+	 *            a string containing one or more CSS declarations, or
+	 *            <code>null</code> if none exists
+	 * @param javascript
+	 *            a string containing javascript, or
+	 *            <code>null<code> if none exists
+	 * @param onload
+	 *            the function to call when the page is loaded, or <code>null
+	 *            </code> if none exists
+	 */
 	public static void addPageProlog(final StringBuilder buffer,
-			final String styleSheet) {
+			final String styleSheet, final String javascript,
+			final String onload) {
 
 		final StringBuilder pageProlog = new StringBuilder();
 
 		pageProlog.append("<html>"); //$NON-NLS-1$
-
+		pageProlog.append("<head>");
 		appendStyleSheet(pageProlog, styleSheet);
-
-		pageProlog.append("<body>"); //$NON-NLS-1$
-
+		appendJavaScript(pageProlog, javascript);
+		pageProlog.append("</head>");
+		pageProlog.append("<body"); //$NON-NLS-1$
+		if (onload != null) {
+			pageProlog.append(" onload=\"");
+			pageProlog.append(onload);
+			pageProlog.append('\"');
+		}
+		pageProlog.append(">");
 		buffer.append(pageProlog.toString());
+	}
+
+	private static void appendJavaScript(final StringBuilder buffer,
+			final String javascript) {
+		if (javascript == null) {
+			return;
+		}
+		buffer.append("<script type=\"text/javascript\">");
+		buffer.append(javascript);
+		buffer.append("</script>");
 	}
 
 	private static void appendStyleSheet(final StringBuilder buffer,
@@ -120,7 +155,7 @@ public final class SimpleHTMLPrinter {
 			return;
 		}
 
-		buffer.append("<head><style CHARSET=\"ISO-8859-1\" TYPE=\"text/css\">"); //$NON-NLS-1$
+		buffer.append("<style CHARSET=\"ISO-8859-1\" TYPE=\"text/css\">"); //$NON-NLS-1$
 		buffer.append(styleSheet);
 		buffer.append("</style></head>"); //$NON-NLS-1$
 	}
