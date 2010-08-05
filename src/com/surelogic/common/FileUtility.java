@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -312,14 +313,22 @@ public final class FileUtility {
 	 * @return {@code true} if and only if the copy is successful, {@code false}
 	 *         otherwise.
 	 */
-	public static boolean copy(final String source, InputStream is,
-			final File to) {
+	public static boolean copy(final String source, InputStream is, final File to) {
+		try {
+			return copyToStream(source, is, to.getAbsolutePath(), new FileOutputStream(to), true);
+		} catch (FileNotFoundException e) {
+			SLLogger.getLogger().log(Level.SEVERE,
+					I18N.err(112, source, to.getAbsolutePath()), e);
+			return false;
+		}
+	}
+
+	public static boolean copyToStream(final String source, InputStream is, 
+			                           final String target, OutputStream os, boolean closeOutput) {
 		boolean success = true;
 		try {
-			OutputStream os = null;
 			try {
 				is = new BufferedInputStream(is, 8192);
-				os = new FileOutputStream(to);
 
 				final byte[] buf = new byte[8192];
 				int num;
@@ -331,17 +340,21 @@ public final class FileUtility {
 					is.close();
 				}
 				if (os != null) {
-					os.close();
+					if (closeOutput) {
+						os.close();
+					} else {
+						os.flush();
+					}
 				}
 			}
 		} catch (final IOException e) {
 			SLLogger.getLogger().log(Level.SEVERE,
-					I18N.err(112, source, to.getAbsolutePath()), e);
+					I18N.err(112, source, target), e);
 			success = false;
 		}
 		return success;
 	}
-
+	
 	/**
 	 * Copies the contents of one file to another file.
 	 * 

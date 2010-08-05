@@ -1,21 +1,10 @@
 package com.surelogic.common;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.LineNumberReader;
-import java.io.PrintWriter;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.TreeMap;
+import java.io.*;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipOutputStream;
+import java.util.zip.*;
 
 import com.surelogic.common.logging.SLLogger;
 import com.surelogic.common.xml.XMLUtil;
@@ -106,22 +95,12 @@ public abstract class AbstractJavaZip<T> {
 			}
 			*/
 			try {
-				final LineNumberReader reader = new LineNumberReader(
-						new InputStreamReader(getFileContents(resource)));
+				final InputStream is = getFileContents(resource);
 				try {
-					/*
-					 * Can't use XMLWriter because tag attribute order is not
-					 * fixed.
-					 */
-					final PrintWriter pw = new PrintWriter(out);
-
 					out.putNextEntry(new ZipEntry(pathName));
-					String line;
 					String className = null;
-					while ((line = reader.readLine()) != null) {
-						pw.println(line);
-					}
-					pw.flush();
+					FileUtility.copyToStream(getFullPath(resource), is, pathName, out, false);
+					
 					className = getName(resource);
 					final String classKey = className;
 					// remove ".java"
@@ -151,8 +130,8 @@ public abstract class AbstractJavaZip<T> {
 					}
 					out.closeEntry();
 				} finally {
-					if (reader != null) {
-						reader.close();
+					if (is != null) {
+						is.close();
 					}
 				}
 			} catch (final IOException e) {
