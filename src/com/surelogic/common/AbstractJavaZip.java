@@ -1,10 +1,20 @@
 package com.surelogic.common;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.zip.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipOutputStream;
 
 import com.surelogic.common.logging.SLLogger;
 import com.surelogic.common.xml.XMLUtil;
@@ -78,7 +88,8 @@ public abstract class AbstractJavaZip<T> {
 		try {
 			pathName = getFullPath(resource);
 		} catch (final IOException e) {
-			LOG.log(Level.SEVERE, "Error adding " + getName(resource) + " to ZIP.", e);
+			LOG.log(Level.SEVERE, "Error adding " + getName(resource)
+					+ " to ZIP.", e);
 			return;
 		}
 		if (pathName.startsWith("/")) {
@@ -90,17 +101,17 @@ public abstract class AbstractJavaZip<T> {
 				return;
 			}
 			/*
-            if (resource.toString().contains("pphtml")) {
-				System.out.println("Looking at: "+resource);
-			}
-			*/
+			 * if (resource.toString().contains("pphtml")) {
+			 * System.out.println("Looking at: "+resource); }
+			 */
 			try {
 				final InputStream is = getFileContents(resource);
 				try {
 					out.putNextEntry(new ZipEntry(pathName));
 					String className = null;
-					FileUtility.copyToStream(getFullPath(resource), is, pathName, out, false);
-					
+					FileUtility.copyToStream(getFullPath(resource), is,
+							pathName, out, false);
+
 					className = getName(resource);
 					final String classKey = className;
 					// remove ".java"
@@ -119,7 +130,8 @@ public abstract class AbstractJavaZip<T> {
 					final String[] types = getIncludedTypes(resource);
 					if (types == null || types.length == 0) {
 						if (className.equals("package-info")) {
-							classNameToSource.put(packageName+'.'+className, zipPath);
+							classNameToSource.put(
+									packageName + '.' + className, zipPath);
 						} else {
 							classNameToSource.put(classKey, zipPath);
 						}
@@ -135,7 +147,8 @@ public abstract class AbstractJavaZip<T> {
 					}
 				}
 			} catch (final IOException e) {
-				LOG.log(Level.SEVERE, "Error adding " + pathName + " to ZIP.", e);
+				LOG.log(Level.SEVERE, "Error adding " + pathName + " to ZIP.",
+						e);
 				return;
 			}
 		} else { // Resource is an container
@@ -190,8 +203,8 @@ public abstract class AbstractJavaZip<T> {
 			while (classIter.hasNext()) {
 				final Map.Entry<String, String> classEntry = classIter.next();
 				if (classEntry.getKey().endsWith(".java")) {
-					pw.format(CLASS_FORMAT, classEntry.getKey(), classEntry
-							.getValue());
+					pw.format(CLASS_FORMAT, classEntry.getKey(),
+							classEntry.getValue());
 				}
 			}
 			pw.println("\t" + XMLUtil.closeNode(PACKAGE_TAG));
@@ -265,17 +278,17 @@ public abstract class AbstractJavaZip<T> {
 
 	private void generateClassMappings(final PrintWriter pw,
 			final Map<String, Map<String, String>> fileMap) {
-		//int count = 0;
+		// int count = 0;
 		for (final Map.Entry<String, Map<String, String>> e : fileMap
 				.entrySet()) {
 			for (final Map.Entry<String, String> e2 : e.getValue().entrySet()) {
 				if (!e2.getKey().endsWith(".java")) {
 					pw.println(e2.getKey() + "=" + e2.getValue());
-					//count++;
+					// count++;
 				}
 			}
 		}
-		//System.out.println("Class mapping#: "+count);
+		// System.out.println("Class mapping#: "+count);
 		pw.flush();
 	}
 
