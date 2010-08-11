@@ -128,8 +128,13 @@ public final class SimpleHTMLPrinter {
 		pageProlog.append("<head>");
 		appendStyleSheet(pageProlog, styleSheet);
 		appendJavaScript(pageProlog, javascript);
+		pageProlog.append("<!--[if IE]>");
+		pageProlog
+				.append("\n\t<script type=\"text/javascript\" src=\"svg.js\" data-path=\"\"></script>");
+		pageProlog.append("\n<![endif]-->\n");
 		pageProlog
 				.append("<script type=\"text/javascript\" src=\"protovis-r3.2.js\"></script>");
+
 		pageProlog.append("</head>");
 		pageProlog.append("<body"); //$NON-NLS-1$
 		if (onload != null) {
