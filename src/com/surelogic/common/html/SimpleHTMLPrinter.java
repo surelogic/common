@@ -1,6 +1,7 @@
 package com.surelogic.common.html;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -103,6 +104,21 @@ public final class SimpleHTMLPrinter {
 		return replace(content, '>', "&gt;"); //$NON-NLS-1$
 	}
 
+	public static void beginProlog(final StringBuilder buffer) {
+		buffer.append("<html>"); //$NON-NLS-1$
+		buffer.append("<head>");
+	}
+
+	/**
+	 * Close the head section of the buffer, and start the body.
+	 * 
+	 * @param buffer
+	 */
+	public static void endProlog(final StringBuilder buffer) {
+		buffer.append("</head>");
+		buffer.append("<body>");
+	}
+
 	/**
 	 * Add the starting html and head sections to the given buffer.
 	 * 
@@ -119,15 +135,18 @@ public final class SimpleHTMLPrinter {
 	 *            </code> if none exists
 	 */
 	public static void addPageProlog(final StringBuilder buffer,
-			final String styleSheet, final String javascript,
-			final String onload) {
+			final List<String> styleSheets, final List<String> scripts) {
 
 		final StringBuilder pageProlog = new StringBuilder();
 
 		pageProlog.append("<html>"); //$NON-NLS-1$
 		pageProlog.append("<head>");
-		appendStyleSheet(pageProlog, styleSheet);
-		appendJavaScript(pageProlog, javascript);
+		for (String styleSheet : styleSheets) {
+			appendStyleSheet(pageProlog, styleSheet);
+		}
+		for (String javascript : scripts) {
+			appendJavaScript(pageProlog, javascript);
+		}
 		pageProlog.append("<!--[if IE]>");
 		pageProlog
 				.append("\n\t<script type=\"text/javascript\" src=\"svg.js\" data-path=\"\"></script>");
@@ -135,18 +154,10 @@ public final class SimpleHTMLPrinter {
 		pageProlog
 				.append("<script type=\"text/javascript\" src=\"protovis-r3.2.js\"></script>");
 
-		pageProlog.append("</head>");
-		pageProlog.append("<body"); //$NON-NLS-1$
-		if (onload != null) {
-			pageProlog.append(" onload=\"");
-			pageProlog.append(onload);
-			pageProlog.append('\"');
-		}
-		pageProlog.append(">");
 		buffer.append(pageProlog.toString());
 	}
 
-	private static void appendJavaScript(final StringBuilder buffer,
+	public static void appendJavaScript(final StringBuilder buffer,
 			final String javascript) {
 		if (javascript == null) {
 			return;
@@ -156,7 +167,7 @@ public final class SimpleHTMLPrinter {
 		buffer.append("</script>");
 	}
 
-	private static void appendStyleSheet(final StringBuilder buffer,
+	public static void appendStyleSheet(final StringBuilder buffer,
 			final String styleSheet) {
 		if (styleSheet == null) {
 			return;
