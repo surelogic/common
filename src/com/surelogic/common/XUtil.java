@@ -53,7 +53,9 @@ public final class XUtil {
 	private static final String f_recordScript = System.getProperty("SureLogicRecordScript");
 
 	/**	 
-	 * @return The directory to which the script (and other resources) should be written
+	 * The main project [/ script dir]
+	 * 
+	 * @return The (relative) directory to which the script (and other resources) should be written
 	 */
 	public static String recordScript() {
 		return f_recordScript;
