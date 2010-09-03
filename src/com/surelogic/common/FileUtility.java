@@ -1,19 +1,7 @@
 package com.surelogic.common;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.RandomAccessFile;
+import java.io.*;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.ByteBuffer;
@@ -23,7 +11,6 @@ import java.util.Enumeration;
 import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-import java.util.zip.ZipOutputStream;
 
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.jobs.AbstractSLJob;
@@ -623,54 +610,24 @@ public final class FileUtility {
 				null);
 	}
 
+	/**
+	 * Zip up the given directory into the given zipfile
+	 */
 	public static void zipDir(final File tempDir, final File zipFile)
 			throws IOException {
-		final FileOutputStream fos = new FileOutputStream(zipFile);
-		final ZipOutputStream zos = new ZipOutputStream(fos);
-		zipDir(tempDir, tempDir, zos);
-		zos.close();
+		zipDirAndMore(tempDir, zipFile).close();
 	}
-
-	public static void zipDir(final File baseDir, final File zipDir,
-			final ZipOutputStream zos) throws IOException {
-		// get a listing of the directory content
-		final File[] dirList = zipDir.listFiles();
-		final byte[] readBuffer = new byte[4096];
-		int bytesIn = 0;
-		// loop through dirList, and zip the files
-		for (final File f : dirList) {
-			if (f.isDirectory()) {
-				// if the File object is a directory, call this
-				// function again to add its content recursively
-				zipDir(baseDir, f, zos);
-				// loop again
-				continue;
-			}
-			// if we reached here, the File object f was not a directory
-			// create a FileInputStream on top of f
-			final FileInputStream fis = new FileInputStream(f);
-			// create a new zip entry
-			final String path = f.getAbsolutePath();
-			String name;
-			if (path.startsWith(baseDir.getAbsolutePath())) {
-				name = path.substring(baseDir.getAbsolutePath().length() + 1);
-			} else {
-				name = path;
-			}
-			name = name.replace('\\', '/');
-
-			final ZipEntry anEntry = new ZipEntry(name);
-			// place the zip entry in the ZipOutputStream object
-			zos.putNextEntry(anEntry);
-			// now write the content of the file to the ZipOutputStream
-			while ((bytesIn = fis.read(readBuffer)) != -1) {
-				zos.write(readBuffer, 0, bytesIn);
-			}
-			// close the Stream
-			fis.close();
-		}
+	
+	/**
+	 * Like zipDir, but returns the ZipInfo so you can add more to it
+	 */
+	private static ZipInfo zipDirAndMore(final File tempDir, final File zipFile)
+	throws IOException {
+		final ZipInfo info = new ZipInfo(zipFile);
+		info.zipDir(tempDir, tempDir);
+		return info;
 	}
-
+	
 	public static void unzipFile(final File zipFile, final File targetDir)
 			throws IOException {
 		unzipFile(new ZipFile(zipFile), targetDir, null);
