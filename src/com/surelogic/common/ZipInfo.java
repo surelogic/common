@@ -17,6 +17,9 @@ public class ZipInfo {
 	}
 	
 	public void zipDir(final File baseDir, final File zipDir) throws IOException {
+		if (!zipDir.exists()) {
+			return;
+		}
 		// get a listing of the directory content
 		final File[] dirList = zipDir.listFiles();
 
@@ -36,6 +39,9 @@ public class ZipInfo {
 	}
 
 	public void zipFile(final File baseDir, final File f) throws IOException {
+		if (!f.exists()) {
+			return;
+		}
 		final FileInputStream fis = new FileInputStream(f);
 		// create a new zip entry
 		final String path = f.getAbsolutePath();
