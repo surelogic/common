@@ -621,7 +621,7 @@ public final class FileUtility {
 	/**
 	 * Like zipDir, but returns the ZipInfo so you can add more to it
 	 */
-	private static ZipInfo zipDirAndMore(final File tempDir, final File zipFile)
+	public static ZipInfo zipDirAndMore(final File tempDir, final File zipFile)
 	throws IOException {
 		final ZipInfo info = new ZipInfo(zipFile);
 		info.zipDir(tempDir, tempDir);
