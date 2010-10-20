@@ -743,4 +743,9 @@ public final class FileUtility {
 			}
 		};
 	}
+
+	public static String getPrefix(String name) {
+		int lastDot = name.lastIndexOf('.');
+		return name.substring(0, lastDot);
+	}
 }
