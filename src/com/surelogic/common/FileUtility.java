@@ -745,7 +745,11 @@ public final class FileUtility {
 	}
 
 	public static String getPrefix(String name) {
+		// Find the last segment
+		int lastSlash = name.lastIndexOf('/');
+		int lastBackslash = name.lastIndexOf('\\');		
+		int lastSeparator = lastSlash > lastBackslash ? lastSlash+1 : lastBackslash+1;
 		int lastDot = name.lastIndexOf('.');
-		return name.substring(0, lastDot);
+		return name.substring(lastSeparator, lastDot);
 	}
 }
