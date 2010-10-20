@@ -50,8 +50,28 @@ public final class XUtil {
 		return f_runTest;
 	}
 	
-	private static final String f_recordScript = System.getProperty("SureLogicRecordScript");
+	private static final String f_updateScript = System.getProperty("SureLogicUpdateScript");
+	
+	private static final String f_recordScript = computeRecordScriptValue();
+	
+	private static String computeRecordScriptValue() {
+		if (f_updateScript != null) {
+			if (f_updateScript.endsWith(".zip")) {
+				return f_updateScript.substring(0, f_updateScript.length()-4);
+			} else {
+				throw new IllegalStateException("Not ending with .zip: "+f_updateScript);
+			}					
+		}
+		return System.getProperty("SureLogicRecordScript");
+	}
 
+	/**
+	 * The name of the scripted testcase (zipped) to be updated
+	 */
+	public static String updateScript() {
+		return f_updateScript;
+	}
+	
 	/**	 
 	 * The main project [/ script dir]
 	 * 
