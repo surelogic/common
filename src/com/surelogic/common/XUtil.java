@@ -55,14 +55,19 @@ public final class XUtil {
 	private static final String f_recordScript = computeRecordScriptValue();
 	
 	private static String computeRecordScriptValue() {
+		final String temp = System.getProperty("SureLogicRecordScript");
 		if (f_updateScript != null) {
 			if (f_updateScript.endsWith(".zip")) {
-				return f_updateScript.substring(0, f_updateScript.length()-4);
+				final String prefix = FileUtility.getPrefix(f_updateScript);
+				if (temp != null) {
+					System.out.println("Overriding SureLogicRecordScript: using "+prefix+", instead of "+temp);
+				}
+				return prefix;
 			} else {
 				throw new IllegalStateException("Not ending with .zip: "+f_updateScript);
 			}					
 		}
-		return System.getProperty("SureLogicRecordScript");
+		return temp;
 	}
 
 	/**
