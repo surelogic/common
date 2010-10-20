@@ -1,8 +1,6 @@
 package com.surelogic.common.refactor;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 /**
  * Describes an annotation that should be placed at a given target.
@@ -141,14 +139,20 @@ public class AnnotationDescription implements Comparable<AnnotationDescription> 
 	}
 
 	public static class CU {
+		final String proj;
 		final String cu;
 		final String pakkage;
 
-		public CU(final String pakkage, final String cu) {
+		public CU(final String p, final String pakkage, final String cu) {
+			proj = p;
 			this.cu = cu;
 			this.pakkage = pakkage;
 		}
 
+		public String getProject() {
+			return proj;
+		}
+ 		
 		public String getCu() {
 			return cu;
 		}
@@ -169,6 +173,8 @@ public class AnnotationDescription implements Comparable<AnnotationDescription> 
 			result = prime * result + (cu == null ? 0 : cu.hashCode());
 			result = prime * result
 					+ (pakkage == null ? 0 : pakkage.hashCode());
+			result = prime * result
+			        + (proj == null ? 0 : proj.hashCode());
 			return result;
 		}
 
@@ -196,6 +202,13 @@ public class AnnotationDescription implements Comparable<AnnotationDescription> 
 					return false;
 				}
 			} else if (!pakkage.equals(other.pakkage)) {
+				return false;
+			}
+			if (proj == null) {
+				if (other.proj != null) {
+					return false;
+				}
+			} else if (!proj.equals(other.proj)) {
 				return false;
 			}
 			return true;
