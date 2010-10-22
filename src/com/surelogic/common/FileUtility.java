@@ -176,6 +176,9 @@ public final class FileUtility {
 				}
 			}
 		}
+		if (!path.exists()) {
+			return true; // Same result
+		}
 		success = path.delete();
 		if (!success) {
 			SLLogger.getLogger().warning(I18N.err(11, path.getAbsolutePath()));
@@ -212,6 +215,13 @@ public final class FileUtility {
 			return File.createTempFile(prefix, suffix);
 		}
 
+		public File createTempFolder() throws IOException {
+			File f = createTempFile();
+			f.delete();
+			f.mkdir();
+			return f;
+		}
+		
 		public boolean accept(File dir, String name) {
 			return name.startsWith(prefix) && name.endsWith(suffix);
 		}
