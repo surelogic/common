@@ -1,6 +1,7 @@
 package com.surelogic.common.regression;
 
 import java.io.*;
+import java.util.*;
 
 public class RegressionUtility {
 	public static final String JSURE_SNAPSHOT_SUFFIX = ".sea.xml";
@@ -50,5 +51,15 @@ public class RegressionUtility {
 		}
 		return (file != null) ? file.getAbsolutePath() : projectPath
 				+ File.separator + defaultName;
+	}
+	
+	public static Set<String> readLinesAsSet(File lines) throws IOException {
+		final BufferedReader br = new BufferedReader(new FileReader(lines));
+		final Set<String> cus   = new HashSet<String>();
+		String line;
+		while ((line = br.readLine()) != null) {
+			cus.add(line.trim());
+		}
+		return cus;
 	}
 }
