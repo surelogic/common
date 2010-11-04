@@ -145,7 +145,13 @@ public class AnnotationDescription implements Comparable<AnnotationDescription> 
 
 		public CU(final String p, final String pakkage, final String cu) {
 			proj = p;
-			this.cu = cu;
+			
+			final int lastSeparator = cu.lastIndexOf('/');
+			if (lastSeparator >= 0) {
+				this.cu = cu.substring(lastSeparator+1);
+			} else {
+				this.cu = cu;
+			}
 			this.pakkage = pakkage;
 		}
 
