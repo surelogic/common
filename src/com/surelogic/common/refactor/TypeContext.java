@@ -6,8 +6,7 @@ package com.surelogic.common.refactor;
  * @author nathan
  * 
  */
-public class TypeContext implements IJavaDeclaration {
-
+public class TypeContext extends AbstractJavaDeclaration {	
 	private final TypeContext parent;
 	private final String name;
 	private final Method method;
@@ -106,4 +105,21 @@ public class TypeContext implements IJavaDeclaration {
 		return true;
 	}
 
+	public DeclKind getKind() {
+		return DeclKind.TYPE_CONTEXT;
+	}
+	
+	public JavaDeclInfo snapshot() {
+		final JavaDeclInfo parent;
+		if (this.parent != null) {
+			parent = this.parent.snapshot();
+		} 
+		else if (method != null) {
+			parent = method.snapshot();
+		}
+		else  {
+			parent = null;
+		}
+		return new JavaDeclInfo(this, parent, NAME, name);
+	}
 }

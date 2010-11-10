@@ -8,7 +8,10 @@ import java.util.Arrays;
  * @author nathan
  * 
  */
-public class Method implements IJavaDeclaration {
+public class Method extends AbstractJavaDeclaration {
+	public static final String METHOD = "method";
+	public static final String PARAMS = "params";
+	
 	private final TypeContext type;
 	private final String method;
 	private final String[] params;
@@ -123,4 +126,13 @@ public class Method implements IJavaDeclaration {
 		return true;
 	}
 
+	public DeclKind getKind() {
+		return DeclKind.METHOD;
+	}
+	
+	public JavaDeclInfo snapshot() {
+		final JavaDeclInfo info = new JavaDeclInfo(this, type.snapshot(), METHOD, method);
+		info.addAttribute(PARAMS, addColons(params));
+		return info;
+	}
 }

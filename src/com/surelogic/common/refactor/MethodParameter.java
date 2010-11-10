@@ -6,8 +6,9 @@ package com.surelogic.common.refactor;
  * @author nathan
  * 
  */
-public class MethodParameter implements IJavaDeclaration {
-
+public class MethodParameter extends AbstractJavaDeclaration {
+	public static final String PARAM_NUM = "param-num";
+	
 	private final int param;
 	private final Method method;
 
@@ -76,4 +77,11 @@ public class MethodParameter implements IJavaDeclaration {
 		return true;
 	}
 
+	public DeclKind getKind() {
+		return DeclKind.PARAM;
+	}
+	
+	public JavaDeclInfo snapshot() {
+		return new JavaDeclInfo(this, method.snapshot(), PARAM_NUM, Integer.toString(param));
+	}
 }

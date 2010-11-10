@@ -6,7 +6,9 @@ package com.surelogic.common.refactor;
  * @author nathan
  * 
  */
-public class Field implements IJavaDeclaration {
+public class Field extends AbstractJavaDeclaration {
+	public static final String FIELD = "field";
+	
 	private final TypeContext type;
 	private final String field;
 
@@ -75,4 +77,11 @@ public class Field implements IJavaDeclaration {
 		return true;
 	}
 
+	public DeclKind getKind() {
+		return DeclKind.FIELD;
+	}
+	
+	public JavaDeclInfo snapshot() {
+		return new JavaDeclInfo(this, type.snapshot(), FIELD, field);
+	}
 }

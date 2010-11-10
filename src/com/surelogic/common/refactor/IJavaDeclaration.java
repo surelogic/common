@@ -7,6 +7,10 @@ package com.surelogic.common.refactor;
  * 
  */
 public interface IJavaDeclaration {
+	String TYPE = "type-ref";
+	String METHOD_REF = "method-ref";
+	String NAME = "name";
+	
 	/**
 	 * The type context that the current java declaration is defined in. In the
 	 * case of a type declaration, this is most likely itself.
@@ -23,4 +27,6 @@ public interface IJavaDeclaration {
 	 * @return
 	 */
 	String forSyntax();
+	
+	JavaDeclInfo snapshot();
 }
