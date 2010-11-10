@@ -2,15 +2,18 @@ package com.surelogic.common.refactor;
 
 import java.util.*;
 
-public class JavaDeclInfo {
+import com.surelogic.common.xml.Entity;
+
+public class JavaDeclInfo extends Entity<JavaDeclInfo> {
 	final JavaDeclInfo parent;
 	final DeclKind kind;
-	private final Map<String,String> attributes = new HashMap<String, String>(1);
 	
 	JavaDeclInfo(AbstractJavaDeclaration decl, JavaDeclInfo parent, String key, String value) {
+		super(decl.getKind().toString(), Collections.<String,String>emptyMap());
 		this.parent = parent;
 		this.kind = decl.getKind();
 		attributes.put(key, value);
+		addRef(parent);
 	}
 
 	public void addAttribute(String key, String value) {
