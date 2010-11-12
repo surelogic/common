@@ -2,10 +2,17 @@ package com.surelogic.common.refactor;
 
 import java.util.*;
 
+import org.xml.sax.Attributes;
+
 import com.surelogic.common.xml.Entity;
 
-public class JavaDeclInfo extends Entity<JavaDeclInfo> {
-	final JavaDeclInfo parent;
+public class JavaDeclInfo extends Entity implements IJavaDeclInfoClient {	
+	public static final String INFO_KIND = "info-kind";
+
+	// Indicates what the info is from / used for 
+	public static final String PARENT = "parent";
+	
+	JavaDeclInfo parent;
 	final DeclKind kind;
 	
 	JavaDeclInfo(AbstractJavaDeclaration decl, JavaDeclInfo parent, String key, String value) {
@@ -16,6 +23,20 @@ public class JavaDeclInfo extends Entity<JavaDeclInfo> {
 		addRef(parent);
 	}
 
+	public JavaDeclInfo(String name, Attributes a) {
+		super(name, a);
+		parent = null;
+		kind = DeclKind.valueOf(getValue(a, INFO_KIND));
+	}
+
+	public JavaDeclInfo getParent() {
+		return parent;
+	}
+
+	public DeclKind getKind() {
+		return kind;
+	}
+	
 	public void addAttribute(String key, String value) {
 		attributes.put(key, value);
 	}
@@ -44,5 +65,10 @@ public class JavaDeclInfo extends Entity<JavaDeclInfo> {
 
 	private String[] separateByColons(String s) {
 		return s.split(":");
+	}
+
+	public void addInfo(JavaDeclInfo info) {
+		// TODO check flavor?
+		parent = info;
 	}
 }

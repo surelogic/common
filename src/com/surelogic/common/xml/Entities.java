@@ -44,6 +44,9 @@ public final class Entities {
 
 	public static void addAttribute(final String name, final String value,
 			final StringBuilder b) {
+		if (value == null) {
+			return;
+		}
 		add(name, E.escape(value), b);
 	}
 

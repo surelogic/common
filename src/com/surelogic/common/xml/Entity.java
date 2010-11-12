@@ -4,13 +4,13 @@ import java.util.*;
 
 import org.xml.sax.Attributes;
 
-public class Entity<T extends Entity<T>> {
+public class Entity {
 	final String name;
 	protected final Map<String,String> attributes = new HashMap<String,String>();		
-	//final String id;
-	//final List<Info> infos = new ArrayList<Info>(0);
-	final List<T> refs = new ArrayList<T>(0);
-	//SourceRef source;
+	final String id;
+	final List<MoreInfo> infos = new ArrayList<MoreInfo>(0);
+	final List<Entity> refs = new ArrayList<Entity>(0);
+	SourceRef source;
 	
 	public static String getValue(Attributes a, String name) {
 		for (int i = 0; i < a.getLength(); i++) {
@@ -32,7 +32,7 @@ public class Entity<T extends Entity<T>> {
 				attributes.put(aName, aValue);
 			}
 		}
-		//id = attributes.get(JSureXMLReader.ID_ATTR);
+		id = attributes.get(XMLConstants.ID_ATTR);
 	}
 	
 	public Entity(String name, Map<String,String> a) {
@@ -40,7 +40,7 @@ public class Entity<T extends Entity<T>> {
 		if (attributes != null) {
 			attributes.putAll(a);
 		}
-		//id = attributes.get(JSureXMLReader.ID_ATTR);
+		id = attributes.get(XMLConstants.ID_ATTR);
 	}
 	
 	@Override 
@@ -52,25 +52,23 @@ public class Entity<T extends Entity<T>> {
 		return name;
 	}
 	
-	/*
 	public String getId() {
 		return id;
 	}
-	
-	void setSource(SourceRef r) {
+
+	public void setSource(SourceRef r) {
 		source = r;
 	}
-	
-	void addInfo(Info e) {
+
+	public void addInfo(MoreInfo e) {
 		infos.add(e);
 	}
-	*/
 	
-	public final void addRef(T e) {
+	public void addRef(Entity e) {
 		refs.add(e);
 	}
 	
-	public final Iterable<T> getReferences() {
+	public final Iterable<Entity> getReferences() {
 		return refs;
 	}
 
@@ -81,16 +79,14 @@ public class Entity<T extends Entity<T>> {
 	public final String getAttribute(String a) {
 		return attributes.get(a);
 	}
-	
-	/*
+		
 	public SourceRef getSource() {
 		return source;
 	}
 	
-	public Collection<Info> getInfos() {
+	public Collection<MoreInfo> getInfos() {
 		return infos;
 	}
-	*/
 	
 	private final String DIFF_STATUS = "DiffStatus";
 	private final String OLD = "Old";
