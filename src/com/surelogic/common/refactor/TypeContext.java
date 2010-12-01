@@ -32,6 +32,12 @@ public class TypeContext extends AbstractJavaDeclaration {
 		this.method = m;
 		this.name = id;
 	}
+	
+	public TypeContext(final Field f, final String id) {
+		this.parent = f.getTypeContext();
+		this.method = null; // TODO ignoring field
+		this.name = id;
+	}
 
 	public TypeContext getParent() {
 		return parent;
