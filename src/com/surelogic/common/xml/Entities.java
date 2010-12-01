@@ -19,9 +19,29 @@ public final class Entities {
 	}
 
 	public static void start(final String name, final StringBuilder b) {
+		start(name, b, 0);
+	}
+	
+	public static void start(final String name, final StringBuilder b, int indent) {
+		indent(b, indent);
 		b.append('<').append(name);
 	}
 
+	public static void indent(final StringBuilder b, int indent) {
+		for(int i=0; i<indent; i++) {
+			b.append(XMLConstants.INDENT);
+		}
+	}
+	
+	public static void newLine(final StringBuilder b, int indent) {
+		b.append('\n');
+		indent(b, indent);
+	}
+	
+	public static void closeStart(StringBuilder b, boolean end) {
+		b.append(end ? "/>\n" : ">\n");
+	}
+	
 	/**
 	 * Helper to create <name\>enclosedText</name>
 	 */
@@ -29,9 +49,14 @@ public final class Entities {
 			StringBuilder b) {
 		b.append('<').append(name).append('>');
 		addEscaped(enclosedText, b);
-		b.append("</").append(name).append(">\n");
+		end(name, b, 0);
 	}
 
+	public static void end(String name, StringBuilder b, int indent) {
+		indent(b, indent);
+		b.append("</").append(name).append(">\n");
+	}
+	
 	/**
 	 * Helper to avoid having to escape non-string values.
 	 */
