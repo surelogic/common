@@ -68,6 +68,10 @@ public class Entity {
 		refs.add(e);
 	}
 	
+	public final int numRefs() {
+		return refs.size();
+	}
+	
 	public final Iterable<Entity> getReferences() {
 		return refs;
 	}
