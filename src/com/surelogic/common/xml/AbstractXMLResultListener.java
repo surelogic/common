@@ -2,10 +2,15 @@ package com.surelogic.common.xml;
 
 import java.util.*;
 
-import org.xml.sax.Attributes;
-
 import com.surelogic.common.xml.Entity;
 
+/**
+ * Handles references to entities that haven't been defined yet
+ * Assumes entities have a unique int id, and that refs have an id property 
+ * to specify the entity being referred to
+ * 
+ * @author Edwin
+ */
 public abstract class AbstractXMLResultListener implements IXMLResultListener {	
 	/**
 	 * Holds onto the ref data until the reference is defined
@@ -23,9 +28,17 @@ public abstract class AbstractXMLResultListener implements IXMLResultListener {
 	}
 	private static final List<Ref> DEFINED = Collections.<Ref>emptyList();
 	private static final List<Ref> OMITTED = new ArrayList<Ref>(0); 
-	
+
+	/**
+	 * Pool of unresolved references
+	 */
 	private final Map<String,List<Ref>> references = new HashMap<String,List<Ref>>();
 	
+	/**
+	 * Process any unresolved references to this entity
+	 * 
+	 * @return the id of the Entity
+	 */
 	private int processEntity(Entity e) {
 		final int id = Integer.valueOf(e.getId());
 		final List<Ref> danglingRefs = references.get(e.getId());
@@ -51,20 +64,24 @@ public abstract class AbstractXMLResultListener implements IXMLResultListener {
 	 */
 	protected abstract void handleRef(String from, int fromId, Entity to);
 	
-	private void processRef(String from, int fromId, Entity to) {
-		List<Ref> refs = references.get(to.getId());
+	/**
+	 * Process the references from the given Entity (specified by from)
+	 * to another Entity
+	 */
+	private void processRef(String from, int fromId, Entity toRef) {
+		List<Ref> refs = references.get(toRef.getId());
 		if (refs == null) {
 			refs = new ArrayList<Ref>();
-			references.put(to.getId(), refs);
+			references.put(toRef.getId(), refs);
 		}
 		else if (refs == DEFINED) {
-			handleRef(from, fromId, to);
+			handleRef(from, fromId, toRef);
 			return;
 		}
 		else if (refs == OMITTED) {
 			return;
 		}
-		refs.add(new Ref(from, fromId, to));
+		refs.add(new Ref(from, fromId, toRef));
 	}
 	
 	public void start(String uid, String project) {

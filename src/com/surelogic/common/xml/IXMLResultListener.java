@@ -20,5 +20,9 @@ public interface IXMLResultListener {
 	 */
 	void done();
 	
+	/**
+	 * Factory method for creating different Entity subclasses,
+	 * depending on the name/attributes
+	 */
 	Entity makeEntity(String name, Attributes a);
 }
