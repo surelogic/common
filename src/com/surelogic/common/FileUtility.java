@@ -762,4 +762,11 @@ public final class FileUtility {
 		int lastDot = name.lastIndexOf('.');
 		return name.substring(lastSeparator, lastDot);
 	}
+	
+	public static String normalizePath(String path) {
+		if (path.startsWith("/")) {
+			path = path.substring(1);
+		}
+		return path;
+	}
 }
