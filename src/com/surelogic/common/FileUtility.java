@@ -764,6 +764,9 @@ public final class FileUtility {
 	}
 	
 	public static String normalizePath(String path) {
+		if (path == null) {
+			return null;
+		}
 		if (path.startsWith("/")) {
 			path = path.substring(1);
 		}
