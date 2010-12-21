@@ -3,6 +3,8 @@ package com.surelogic.common.regression;
 import java.io.*;
 import java.util.*;
 
+import com.surelogic.common.FileUtility;
+
 public class RegressionUtility {
 	public static final String JSURE_SNAPSHOT_SUFFIX = ".sea.xml";
 	public static final String JSURE_SNAPSHOT_DIFF_SUFFIX = ".sea.diffs.xml";
@@ -58,7 +60,7 @@ public class RegressionUtility {
 		final Set<String> cus   = new HashSet<String>();
 		String line;
 		while ((line = br.readLine()) != null) {
-			cus.add(line.trim());
+			cus.add(FileUtility.normalizePath(line.trim()));
 		}
 		return cus;
 	}
