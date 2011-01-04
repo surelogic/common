@@ -7,6 +7,7 @@ import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
+import java.security.*;
 import java.util.Enumeration;
 import java.util.logging.Level;
 import java.util.zip.ZipEntry;
@@ -312,7 +313,7 @@ public final class FileUtility {
 	 */
 	public static boolean copy(final String source, InputStream is, final File to) {
 		try {
-			return copyToStream(source, is, to.getAbsolutePath(), new FileOutputStream(to), true);
+			return copyToStream(source, is, to.getAbsolutePath(), new FileOutputStream(to), true) != null;
 		} catch (FileNotFoundException e) {
 			SLLogger.getLogger().log(Level.SEVERE,
 					I18N.err(112, source, to.getAbsolutePath()), e);
@@ -320,18 +321,23 @@ public final class FileUtility {
 		}
 	}
 
-	public static boolean copyToStream(final String source, InputStream is, 
+	/**
+	 * @return the MD5 hash of the copied data
+	 */
+	public static byte[] copyToStream(final String source, InputStream is, 
 			                           final String target, OutputStream os, boolean closeOutput) {
-		boolean success = true;
 		try {
 			try {
+				final MessageDigest md = MessageDigest.getInstance("MD5");
 				is = new BufferedInputStream(is, 8192);
 
 				final byte[] buf = new byte[8192];
 				int num;
 				while ((num = is.read(buf)) >= 0) {
 					os.write(buf, 0, num);
+					md.update(buf, 0, num);
 				}
+				return md.digest();
 			} finally {
 				if (is != null) {
 					is.close();
@@ -344,12 +350,15 @@ public final class FileUtility {
 					}
 				}
 			}
+		} catch (NoSuchAlgorithmException e) {
+			// TODO what error message
+			SLLogger.getLogger().log(Level.SEVERE,
+					I18N.err(112, source, target), e);
 		} catch (final IOException e) {
 			SLLogger.getLogger().log(Level.SEVERE,
 					I18N.err(112, source, target), e);
-			success = false;
 		}
-		return success;
+		return null;
 	}
 	
 	/**

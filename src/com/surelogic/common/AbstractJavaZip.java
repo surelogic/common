@@ -1,20 +1,10 @@
 package com.surelogic.common;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.TreeMap;
+import java.io.*;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
-import java.util.zip.ZipOutputStream;
+import java.util.zip.*;
 
 import com.surelogic.common.logging.SLLogger;
 import com.surelogic.common.xml.XMLUtil;
@@ -23,23 +13,59 @@ public abstract class AbstractJavaZip<T> {
 	protected static final Logger LOG = SLLogger.getLogger();
 	public static final String CLASS_MAPPING = "classMapping.txt";
 	public static final String SOURCE_FILES = "sourceFiles.xml";
+	public static final String FILE_HASHES = "sourceHashes.txt";
+	public static final String FILE_STAMPS = "sourceTimestamps.txt";
 
 	public void generateSourceZipContents(final ZipOutputStream out)
 			throws IOException {
 		generateSourceZipContents(out, getRoot());
 	}
 
+	private static class FileInfo {
+		final long timestamp;
+		final byte[] hash;
+		
+		FileInfo(long time, byte[] h) {
+			timestamp = time;
+			hash = h;
+		}
+	}
+	
+	private static class TempInfo {
+		final Map<String, Map<String, String>> fileMap = new TreeMap<String, Map<String, String>>();
+		final Map<String, FileInfo> fileInfo = new HashMap<String, FileInfo>();
+		
+		void generateFileInfo(ZipOutputStream out) throws IOException {
+			PrintWriter pw;
+			out.putNextEntry(new ZipEntry(FILE_STAMPS));
+			pw = new PrintWriter(out);
+			for(Map.Entry<String,FileInfo> e : fileInfo.entrySet()) {
+				pw.println(e.getKey()+"="+e.getValue().timestamp);
+			}
+			out.closeEntry();
+			
+			out.putNextEntry(new ZipEntry(FILE_HASHES));
+			pw = new PrintWriter(out);
+			for(Map.Entry<String,FileInfo> e : fileInfo.entrySet()) {
+				pw.println(e.getKey()+"="+e.getValue().hash);
+			}
+			out.closeEntry();
+		}
+	}
+	
 	public void generateSourceZipContents(final ZipOutputStream out,
 			final T root) throws IOException {
-		final Map<String, Map<String, String>> fileMap = new TreeMap<String, Map<String, String>>();
-		addAnnotatedResourcesToZip(out, fileMap, root);
+		TempInfo info = new TempInfo();
+		addAnnotatedResourcesToZip(out, info, root);
 
+		info.generateFileInfo(out);
+		
 		out.putNextEntry(new ZipEntry(SOURCE_FILES));
-		generateFileList(new PrintWriter(out), fileMap);
+		generateFileList(new PrintWriter(out), info.fileMap);
 		out.closeEntry();
 
 		out.putNextEntry(new ZipEntry(CLASS_MAPPING));
-		generateClassMappings(new PrintWriter(out), fileMap);
+		generateClassMappings(new PrintWriter(out), info.fileMap);
 		out.closeEntry();
 		out.flush(); // unnecessary?
 	}
@@ -79,8 +105,10 @@ public abstract class AbstractJavaZip<T> {
 
 	protected abstract String[] getIncludedTypes(T res);
 
-	public void addAnnotatedResourcesToZip(final ZipOutputStream out,
-			final Map<String, Map<String, String>> fileMap, final T resource) {
+	protected abstract long getTimestamp(T res);
+	
+	private void addAnnotatedResourcesToZip(final ZipOutputStream out, 
+			TempInfo info, final T resource) {
 		if (!isAccessible(resource)) {
 			return;
 		}
@@ -109,19 +137,24 @@ public abstract class AbstractJavaZip<T> {
 				try {
 					out.putNextEntry(new ZipEntry(pathName));
 					String className = null;
-					FileUtility.copyToStream(getFullPath(resource), is,
+					byte[] hash = FileUtility.copyToStream(getFullPath(resource), is,
 							pathName, out, false);
-
+					if (hash != null) {
+						long time = getTimestamp(resource);
+						info.fileInfo.put(pathName, new FileInfo(time, hash));
+					} else {
+						return;
+					}
 					className = getName(resource);
 					final String classKey = className;
 					// remove ".java"
 					className = className.substring(0, className.length() - 5);
 					Map<String, String> classNameToSource;
-					if (fileMap.containsKey(packageName)) {
-						classNameToSource = fileMap.get(packageName);
+					if (info.fileMap.containsKey(packageName)) {
+						classNameToSource = info.fileMap.get(packageName);
 					} else {
 						classNameToSource = new TreeMap<String, String>();
-						fileMap.put(packageName, classNameToSource);
+						info.fileMap.put(packageName, classNameToSource);
 					}
 					// Changed to map non-main classes
 					final String srcPath = "/" + pathName;
@@ -160,7 +193,7 @@ public abstract class AbstractJavaZip<T> {
 				return;
 			}
 			for (final T member : members) {
-				addAnnotatedResourcesToZip(out, fileMap, member);
+				addAnnotatedResourcesToZip(out, info, member);
 			}
 		}
 	}
@@ -188,7 +221,7 @@ public abstract class AbstractJavaZip<T> {
 	public static final String CLASS_FORMAT = "\t\t<" + CLASS_NAME_PREFIX
 			+ "%s" + CLASS_NAME_SUFFIX + "%s" + CLASS_SRC_SUFFIX + "\n";
 
-	private void generateFileList(final PrintWriter pw,
+	private void generateFileList(final PrintWriter pw, 
 			final Map<String, Map<String, String>> fileMap) {
 		pw.println(XMLUtil.openNode(SRCFILES_TAG));
 		final Iterator<Map.Entry<String, Map<String, String>>> packageIter = fileMap
