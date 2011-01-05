@@ -28,15 +28,15 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 	protected final SLStatus.Builder status   = new SLStatus.Builder();
 	private Stack<SubSLProgressMonitor> tasks = new Stack<SubSLProgressMonitor>();
 	
-	protected AbstractLocalSLJob(String name, int work, TestCode code, int memSize, boolean verbose) {
+	protected AbstractLocalSLJob(String name, int work, ILocalConfig config) {
 		super(name);
 		this.work  = work;
 		if (work <= 0) {
 			throw new IllegalArgumentException("work <= 0");
 		}
-		testCode   = code;
-		memorySize = memSize;
-		this.verbose = verbose;
+		testCode   = TestCode.getTestCode(config.getTestCode());
+		memorySize = config.getMemorySize();
+		this.verbose = config.isVerbose();
 	}
 
 	protected RemoteSLJobException newException(int number, Object... args) {

@@ -9,22 +9,26 @@ import java.util.*;
  * 
  * @author edwin
  */
-public abstract class AbstractPluginUtil {
+public final class ConfigHelper {
+	private final ILocalConfig config;
+	
+	public ConfigHelper(ILocalConfig config) {
+		this.config = config;
+	}
+	
 	protected String getPluginDir(final boolean debug, final String pluginId) {
 		return getPluginDir(debug, pluginId, true);
 	}
 
 	public String getPluginDir(final boolean debug, final String pluginId,
 			boolean required) {
-		final String pluginDir = getPluginDir(pluginId, required);
+		final String pluginDir = config.getPluginDir(pluginId, required);
 		if (debug) {
 			System.out.println(pluginId + " = " + pluginDir);
 		}
 		//usedPlugins.add(pluginId);
 		return pluginDir;
 	}
-
-	protected abstract String getPluginDir(String pluginId, boolean required);
 	
 	/**
 	 * Adds libraries required to use the given Eclipse plugin
