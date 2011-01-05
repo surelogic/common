@@ -83,6 +83,12 @@ public abstract class AbstractRemoteSLJob {
 		}
 	}
 
+	/**
+	 * Do any setup before running the job
+	 * e.g. reading system properties to initialize state
+	 * 
+	 * @return The initialized job to run
+	 */
 	protected abstract SLJob init(BufferedReader br, Monitor mon)
 			throws Throwable;
 

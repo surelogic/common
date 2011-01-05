@@ -9,17 +9,14 @@ import org.apache.tools.ant.Project;
 import org.apache.tools.ant.types.*;
 
 import com.surelogic.common.SLUtility;
-import com.surelogic.common.jobs.AbstractSLJob;
-import com.surelogic.common.jobs.SLProgressMonitor;
-import com.surelogic.common.jobs.SLStatus;
-import com.surelogic.common.jobs.SubSLProgressMonitor;
-import com.surelogic.common.jobs.remote.RemoteSLJobException;
-import com.surelogic.common.jobs.remote.Local;
-import com.surelogic.common.jobs.remote.Remote;
-import com.surelogic.common.jobs.remote.RemoteSLJobConstants;
-import com.surelogic.common.jobs.remote.TestCode;
+import com.surelogic.common.jobs.*;
 import com.surelogic.common.logging.SLLogger;
 
+/**
+ * This is the job that runs in our JVM, managing the remote JVM
+ * 
+ * @author Edwin
+ */
 public abstract class AbstractLocalSLJob extends AbstractSLJob {
     protected static final Logger LOG = SLLogger.getLogger();
 	private static final int FIRST_LINES = 3;
@@ -298,9 +295,11 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 		} else {
 			cmdj.createVmArgument().setValue("-XX:MaxPermSize=128m");
 		}
+		/*
 		if (false) {
 			cmdj.createVmArgument().setValue("-verbose");
 		}
+		*/
 		cmdj.setClassname(getRemoteClass().getCanonicalName());
 		
 		final Project proj = new Project();
@@ -321,10 +320,19 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 		finishSetupJVM(debug, cmdj);
 	}
 	
+	/**
+	 * @return The subclass of AbstractRemoteSLJob to be run on the remote JVM
+	 */
 	protected abstract Class<?> getRemoteClass();
 	
+	/**
+	 * Setup the classpath for the remote JVM
+	 */
 	protected abstract void setupClassPath(boolean debug, Project proj, Path path);
 	
+	/**
+	 * Finish setting JVM arguments
+	 */
 	protected abstract void finishSetupJVM(boolean debug, CommandlineJava cmdj);
 	
 	private void cancel(Process p, final PrintStream pout) {
