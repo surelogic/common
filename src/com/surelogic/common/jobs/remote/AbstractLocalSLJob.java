@@ -1,6 +1,7 @@
 package com.surelogic.common.jobs.remote;
 
 import java.io.*;
+import java.net.*;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,10 +26,15 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 	protected final int work;
 	protected final TestCode testCode;
 	protected final int memorySize;
+	private final int port; // <=0 if just using System.in/out
 	protected final SLStatus.Builder status   = new SLStatus.Builder();
 	private Stack<SubSLProgressMonitor> tasks = new Stack<SubSLProgressMonitor>();
 	
 	protected AbstractLocalSLJob(String name, int work, ILocalConfig config) {
+		this(name, work, config, -1);
+	}
+		
+	protected AbstractLocalSLJob(String name, int work, ILocalConfig config, int port) {
 		super(name);
 		this.work  = work;
 		if (work <= 0) {
@@ -37,6 +43,7 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 		testCode   = TestCode.getTestCode(config.getTestCode());
 		memorySize = config.getMemorySize();
 		this.verbose = config.isVerbose();
+		this.port = port;
 	}
 
 	protected RemoteSLJobException newException(int number, Object... args) {
@@ -118,6 +125,64 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 		return errMsg;
 	}
 	
+	static class Streams {
+		final InputStream in;
+		final OutputStream out;
+		
+		Streams(InputStream in, OutputStream out) {
+			this.in = in;
+			this.out = out;
+		}
+	}
+	
+	private Streams getStreams(Process p) throws Exception {
+		if (port > 0) {
+			// TODO wait until the process has really started up?
+			int retry = 3;
+			do {
+				retry--;
+				try {
+					Thread.sleep(100);
+					Socket s = new Socket("localhost", port);					
+					startOutputProcessingThread(p);
+					return new Streams(s.getInputStream(), s.getOutputStream());
+				} catch(Exception e) {
+					if (retry <= 0) {
+						// Try to read the first part of the stream, because something failed
+						final byte[] buf = new byte[1024];	
+						final int read = p.getInputStream().read(buf);
+						System.out.write(buf, 0, read);
+						System.out.println();
+						System.out.flush();
+						throw e;
+					}
+				}
+			} while (retry > 0);
+		}
+		return new Streams(p.getInputStream(), p.getOutputStream());
+	}
+	
+	/**
+	 * Starts a thread to process the output from p
+	 * (needed to keep it from blocking)
+	 */
+	private void startOutputProcessingThread(final Process p) {			
+		Thread t = new Thread(new Runnable() {
+			public void run() {
+				final byte[] buf = new byte[1024];	
+				int read;
+				try {
+					while ((read = p.getInputStream().read(buf)) > 0) {
+						System.out.write(buf, 0, read);
+					}	
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		t.start();
+	}
+
 	public SLStatus run(final SLProgressMonitor topMonitor) {
 		final boolean debug = verbose && LOG.isLoggable(Level.FINE);
 		CommandlineJava cmdj = new CommandlineJava();
@@ -133,8 +198,8 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 		pb.redirectErrorStream(true);
 		try {
 			Process p = pb.start();
-			BufferedReader br = new BufferedReader(new InputStreamReader(p
-					.getInputStream()));
+			Streams s = getStreams(p);
+			BufferedReader br = new BufferedReader(new InputStreamReader(s.in));
 			String firstLine = br.readLine();
 			if (debug) {
 				while (firstLine != null) {
@@ -162,7 +227,7 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 			firstLines[0] = firstLine;
 
 			// Copy any output
-			final PrintStream pout = new PrintStream(p.getOutputStream());
+			final PrintStream pout = new PrintStream(s.out);
 			if (TestCode.SCAN_CANCELLED.equals(testCode)) {
 				cancel(p, pout);
 			}
@@ -316,7 +381,9 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 			}
 		}		
 		//cmdj.createArgument().setValue("This is a argument.");
-		
+		if (port > 0) {
+			cmdj.createVmArgument().setValue("-D"+RemoteSLJobConstants.REMOTE_PORT_PROP+"="+port);
+		}
 		finishSetupJVM(debug, cmdj);
 	}
 	

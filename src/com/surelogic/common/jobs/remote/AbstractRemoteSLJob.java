@@ -3,20 +3,17 @@
  */
 package com.surelogic.common.jobs.remote;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintStream;
+import java.io.*;
+import java.net.*;
 
-import com.surelogic.common.jobs.SLJob;
-import com.surelogic.common.jobs.SLProgressMonitor;
-import com.surelogic.common.jobs.SLSeverity;
-import com.surelogic.common.jobs.SLStatus;
+import com.surelogic.common.jobs.*;
 import com.surelogic.common.logging.SLLogger;
 
-public abstract class AbstractRemoteSLJob {
+public abstract class AbstractRemoteSLJob {	
 	private static final String CANCEL = "##" + Local.CANCEL;
-
+	private InputStream in;
+	protected PrintStream out;
+	
 	/*
 	 * public static void main(String[] args) { RemoteJob job = new
 	 * RemoteJob(args); job.run(); }
@@ -24,22 +21,45 @@ public abstract class AbstractRemoteSLJob {
 
 	@SuppressWarnings("incomplete-switch")
 	protected final void run() {
+		// Setup streams
+		final String port = System.getProperty(RemoteSLJobConstants.REMOTE_PORT_PROP);
+		/*
+		System.out.println("port = "+port);
+		if (true) {
+			throw new IllegalStateException();
+		}		
+		*/
+		if (port == null) {
+			in  = System.in;
+			out = System.out;
+		} else {		
+			try {
+				ServerSocket serverSocket = new ServerSocket(Integer.parseInt(port));
+				Socket socket = serverSocket.accept();
+				in = socket.getInputStream();
+				out = new PrintStream(socket.getOutputStream());
+			} catch (Exception e) {
+			    e.printStackTrace();
+				System.exit(-RemoteSLJobConstants.ERROR_PROCESS_FAILED);
+			}
+		} 
+		
 		final TestCode testCode = TestCode.getTestCode(System
 				.getProperty(RemoteSLJobConstants.TEST_CODE_PROPERTY));
 		if (TestCode.NO_TOOL_OUTPUT.equals(testCode)) {
 			System.exit(-RemoteSLJobConstants.ERROR_NO_OUTPUT_FROM_JOB);
 		}
-		System.out.println("JVM started");
+		out.println("JVM started: "+System.getProperty("java.version"));
 		synchronized (SLLogger.class) {
-			System.out.println("Log level: " + SLLogger.LEVEL.get());
+			out.println("Log level: " + SLLogger.LEVEL.get());
 		}
 		/*
-		 * System.out.println("java.system.class.loader = "+System.getProperty("java.system.class.loader"
-		 * ));System.out.println("System classloader = "+ClassLoader.
+		 * out.println("java.system.class.loader = "+System.getProperty("java.system.class.loader"
+		 * ));out.println("System classloader = "+ClassLoader.
 		 * getSystemClassLoader()); final String auxPathFile =
 		 * System.getProperty(SierraToolConstants.AUX_PATH_PROPERTY); if
 		 * (auxPathFile != null) {
-		 * System.out.println(SierraToolConstants.AUX_PATH_PROPERTY
+		 * out.println(SierraToolConstants.AUX_PATH_PROPERTY
 		 * +"="+auxPathFile); File auxFile = new File(auxPathFile); if
 		 * (auxFile.exists()) { // No longer needed after creating the system
 		 * ClassLoader auxFile.delete(); } }
@@ -52,11 +72,10 @@ public abstract class AbstractRemoteSLJob {
 		 */
 
 		try {
-			final BufferedReader br = new BufferedReader(new InputStreamReader(
-					System.in));
-			System.out.println("Created reader");
+			final BufferedReader br = new BufferedReader(new InputStreamReader(in));
+			out.println("Created reader");
 
-			final Monitor mon = new Monitor(System.out);
+			final Monitor mon = new Monitor(out);
 			checkInput(br, mon, "Created monitor");
 
 			final SLJob job = init(br, mon);
@@ -64,7 +83,7 @@ public abstract class AbstractRemoteSLJob {
 
 			switch (testCode) {
 			case SCAN_FAILED:
-				outputFailure(System.out, "Testing scan failure",
+				outputFailure(out, "Testing scan failure",
 						new Throwable());
 				break;
 			case ABNORMAL_EXIT:
@@ -78,7 +97,7 @@ public abstract class AbstractRemoteSLJob {
 			processStatus(mon, status);
 			checkInput(br, mon, "Scanning complete (" + (end - start) + " ms)");
 		} catch (final Throwable e) {
-			outputFailure(System.out, null, e);
+			outputFailure(out, null, e);
 			System.exit(-RemoteSLJobConstants.ERROR_JOB_FAILED);
 		}
 	}
@@ -129,17 +148,17 @@ public abstract class AbstractRemoteSLJob {
 		}
 	}
 
-	protected static void checkInput(final BufferedReader br,
+	protected void checkInput(final BufferedReader br,
 			final Monitor mon, final String msg) throws IOException {
-		System.out.println(msg);
+		out.println(msg);
 		if (br.ready()) {
 			final String line = br.readLine();
-			System.out.println("Received: " + line);
+			out.println("Received: " + line);
 			if (CANCEL.equals(line)) {
 				mon.setCanceled(true);
 			}
 		}
-		System.out.flush();
+		out.flush();
 	}
 
 	protected static class Monitor implements SLProgressMonitor {

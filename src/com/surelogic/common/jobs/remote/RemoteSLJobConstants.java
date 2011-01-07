@@ -1,6 +1,8 @@
 package com.surelogic.common.jobs.remote;
 
 public final class RemoteSLJobConstants {
+	public static final String REMOTE_PORT_PROP = "sl.remote.port";
+	
 	/**
 	 * Java property for the test code (if any)
 	 */
