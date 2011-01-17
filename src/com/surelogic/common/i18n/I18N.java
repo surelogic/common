@@ -134,11 +134,11 @@ public final class I18N {
   /**
    * Gets the string defined for the given result number from the i18 resource
    * bundle. The key for the result message in the SureLogic properties file is
-   * <i>nnnnn</i>. For example, <tt>I18N.res(2001)</tt> would result in the
-   * string <tt>"A singular result."</tt> if the definition
+   * <i>result.nnnnn</i>. For example, <tt>I18N.res(2001)</tt> would result in the
+   * string <tt>"A singular problem."</tt> if the definition
    * 
    * <pre>
-   * 02001=A singular problem.
+   * result.02001=A singular problem.
    * </pre>
    * 
    * is contained in the SureLogicResults properties file. If the key is not
@@ -151,11 +151,47 @@ public final class I18N {
    * @see #resc(int)
    */
   public static final String res(final int number) {
-    final String key = String.format("%05d", number);
+    final String key = String.format("result.%05d", number);
     final String result = RESULTS.getString(key);
     return result;
   }
 
+  /**
+   * Gets the string defined for the given category number from the i18 resource
+   * bundle. The key for the result message in the SureLogic properties file is
+   * <i>category.nnnnn</i>. For example, <tt>I18N.category(2001)</tt> would result in the
+   * string <tt>"non-trivial effects"</tt> if the definition
+   * 
+   * <pre>
+   * category.02001=non-trivial effects
+   * </pre>
+   * 
+   * is contained in the SureLogicResults properties file. If the key is not
+   * defined in the SureLogicResults properties file an exception is thrown.
+   * 
+   * @param number
+   *          the result message number.
+   * @return the result message for the given number.
+   * 
+   * @see #resc(int)
+   */
+  public static final String category(final int number) {
+    final String key = String.format("category.%05d", number);
+    final String result = RESULTS.getString(key);
+    return result;
+  }
+
+  /**
+   * @exception MissingResourceException
+   *              If no category using the given formatter and index number is
+   *              found.
+   */
+  public static final String category(final int number, final String formatter) {
+    final String key = String.format("category.%s.%05d", formatter, number);
+    final String result = RESULTS.getString(key);
+    return result;
+  }
+  
   /**
    * Gets and formats the string defined for the given result number from the
    * i18 resource bundle. Calling this method is equivalent to calling
