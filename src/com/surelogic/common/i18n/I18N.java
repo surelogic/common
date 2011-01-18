@@ -13,7 +13,6 @@ import java.util.ResourceBundle;
  * @author Tim Halloran
  */
 public final class I18N {
-
   private static final ResourceBundle BUNDLE = ResourceBundle
       .getBundle(I18N.class.getPackage().getName() + ".SureLogic");
 
@@ -24,6 +23,19 @@ public final class I18N {
 
   private static final ResourceBundle RESULTS = ResourceBundle
       .getBundle(I18N.class.getPackage().getName() + ".SureLogicResults");
+  
+  
+  
+  private I18N() {
+    // no instances
+  }
+
+  
+  
+  private static String getString(final ResourceBundle bundle,
+      final String keyTemplate, final Object... args) {
+    return bundle.getString(String.format(keyTemplate, args));
+  }
 
   /**
    * Gets the string defined for the given key from the i18n resource bundle.
@@ -43,7 +55,7 @@ public final class I18N {
    *          the key for the desired message.
    * @return the message for the given key.
    */
-  public static final String msg(final String key) {
+  public static String msg(final String key) {
     final String result = BUNDLE.getString(key);
     return result;
   }
@@ -72,7 +84,7 @@ public final class I18N {
    * @return the formatted message for the given key.
    * @see String#format(String, Object...)
    */
-  public static final String msg(final String key, Object... args) {
+  public static String msg(final String key, Object... args) {
     return String.format(I18N.msg(key), args);
   }
 
@@ -94,9 +106,8 @@ public final class I18N {
    *          the error message number.
    * @return the error message for the given number.
    */
-  public static final String err(final int number) {
-    final String key = String.format("error.%05d", number);
-    final String result = ERRORS.getString(key);
+  public static String err(final int number) {
+    final String result = getString(ERRORS, "error.%05d", number);
     return String.format(ERROR_FORMAT, number, result);
   }
 
@@ -127,7 +138,7 @@ public final class I18N {
    * @return the formatted error message for the given number.
    * @see String#format(String, Object...)
    */
-  public static final String err(final int number, Object... args) {
+  public static String err(final int number, Object... args) {
     return String.format(I18N.err(number), args);
   }
 
@@ -150,10 +161,8 @@ public final class I18N {
    * 
    * @see #resc(int)
    */
-  public static final String res(final int number) {
-    final String key = String.format("result.%05d", number);
-    final String result = RESULTS.getString(key);
-    return result;
+  public static String res(final int number) {
+    return getString(RESULTS, "result.%05d", number);
   }
 
   /**
@@ -175,21 +184,30 @@ public final class I18N {
    * 
    * @see #resc(int)
    */
-  public static final String category(final int number) {
-    final String key = String.format("category.%05d", number);
-    final String result = RESULTS.getString(key);
-    return result;
+  public static String category(final int number) {
+    return getString(RESULTS, "category.%05d", number);
   }
 
   /**
-   * @exception MissingResourceException
-   *              If no category using the given formatter and index number is
-   *              found.
+   * Gets the string defined for the given category number with the given
+   * formatting type from the i18 resource
+   * bundle. The key for the result message in the SureLogic properties file is
+   * <i>category.formater.nnnnn</i>. For example, <tt>I18N.category(2001, "prefix")</tt> would result in the
+   * string <tt>"non-trivial effects"</tt> if the definition
+   * 
+   * <pre>
+   * category.prefix.02001=non-trivial effects
+   * </pre>
+   * 
+   * is contained in the SureLogicResults properties file. If the key is not
+   * defined in the SureLogicResults properties file an exception is thrown.
+   * 
+   * @param number
+   *          the result message number.
+   * @return the result message for the given number.
    */
-  public static final String category(final int number, final String formatter) {
-    final String key = String.format("category.%s.%05d", formatter, number);
-    final String result = RESULTS.getString(key);
-    return result;
+  public static String category(final int number, final String formatter) {
+    return getString(RESULTS, "category.%s.%05d", formatter, number);
   }
   
   /**
@@ -220,7 +238,7 @@ public final class I18N {
    * @see String#format(String, Object...)
    * @see #resc(int, Object...)
    */
-  public static final String res(final int number, Object... args) {
+  public static String res(final int number, Object... args) {
     return String.format(I18N.res(number), args);
   }
 
@@ -236,7 +254,7 @@ public final class I18N {
    * @return a canonical version of the analysis result.
    * @see #res(int)
    */
-  public static final String resc(final int number) {
+  public static String resc(final int number) {
     res(number); // toss result, but ensure the call works
     return "(" + number + ")";
   }
@@ -256,7 +274,7 @@ public final class I18N {
    * @return a canonical version of the analysis result.
    * @see #res(int, Object...)
    */
-  public static final String resc(final int number, Object... args) {
+  public static String resc(final int number, Object... args) {
     res(number, args); // toss result, but ensure the call works
     final StringBuilder b = new StringBuilder();
     b.append('(').append(number);
@@ -267,7 +285,26 @@ public final class I18N {
     return b.toString();
   }
 
-  private I18N() {
-    // no instances
+  /**
+   * Gets a string defined for the given category number from the i18 resource
+   * bundle; the string is used for for miscellaneous internal tagging, such as for
+   * {@link edu.cmu.cs.fluid.sea.proxy#addTrustedPromise_or} labels.
+   * The key for the result message in the SureLogic properties file is
+   * <i>misc.nnnnn</i>. For example, <tt>I18N.misc(2001)</tt> would result in the
+   * string <tt>"by effects"</tt> if the definition
+   * 
+   * <pre>
+   * category.02001=by effects
+   * </pre>
+   * 
+   * is contained in the SureLogicResults properties file. If the key is not
+   * defined in the SureLogicResults properties file an exception is thrown.
+   * 
+   * @param number
+   *          the result message number.
+   * @return the result message for the given number.
+   */
+  public static String misc(final int number) {
+    return getString(RESULTS, "misc.%05d", number);
   }
 }
