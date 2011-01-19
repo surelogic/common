@@ -288,7 +288,7 @@ public final class I18N {
   /**
    * Gets a string defined for the given category number from the i18 resource
    * bundle; the string is used for for miscellaneous internal tagging, such as for
-   * {@link edu.cmu.cs.fluid.sea.proxy#addTrustedPromise_or} labels.
+   * {@link edu.cmu.cs.fluid.sea.proxy.ResultDropBuilder#addTrustedPromise_or} labels.
    * The key for the result message in the SureLogic properties file is
    * <i>misc.nnnnn</i>. For example, <tt>I18N.misc(2001)</tt> would result in the
    * string <tt>"by effects"</tt> if the definition
