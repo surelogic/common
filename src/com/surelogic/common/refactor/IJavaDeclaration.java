@@ -28,5 +28,7 @@ public interface IJavaDeclaration {
 	 */
 	String forSyntax();
 	
+	boolean isImplicit();
+	
 	JavaDeclInfo snapshot();
 }

@@ -48,7 +48,7 @@ public class JavaDeclInfo extends Entity implements IJavaDeclInfoClient {
 			return new Field((TypeContext) parent, attributes.get(Field.FIELD));
 		case METHOD:
 			String[] params = separateByColons(attributes.get(Method.PARAMS));
-			return new Method((TypeContext) parent, attributes.get(Method.METHOD), params);
+			return new Method((TypeContext) parent, attributes.get(Method.METHOD), params, attributes.containsKey(Method.IS_IMPLICIT));
 		case PARAM:
 			return new MethodParameter((Method) parent, 
 					Integer.valueOf(attributes.get(MethodParameter.PARAM_NUM))); 

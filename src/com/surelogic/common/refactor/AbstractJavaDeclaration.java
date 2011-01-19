@@ -20,4 +20,8 @@ public abstract class AbstractJavaDeclaration implements IJavaDeclaration {
 	}
 	
 	abstract DeclKind getKind();
+	
+	public boolean isImplicit() {
+		return false;
+	}
 }

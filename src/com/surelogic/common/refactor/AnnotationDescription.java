@@ -16,6 +16,7 @@ public class AnnotationDescription implements Comparable<AnnotationDescription> 
 	private final IJavaDeclaration assumptionTarget;
 	private final CU cu;
 	private final CU assumptionCU;
+	private boolean matched = false;
 
 	public AnnotationDescription(final String annotation,
 			final String contents, final IJavaDeclaration target) {
@@ -42,6 +43,10 @@ public class AnnotationDescription implements Comparable<AnnotationDescription> 
 		this.assumptionCU = assumptionCU;
 	}
 
+	public void setAsMatched() {
+		matched = true;
+	}
+	
 	public IJavaDeclaration getTarget() {
 		return target;
 	}

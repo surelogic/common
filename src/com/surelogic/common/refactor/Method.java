@@ -11,11 +11,13 @@ import java.util.Arrays;
 public class Method extends AbstractJavaDeclaration {
 	public static final String METHOD = "method";
 	public static final String PARAMS = "params";
+	public static final String IS_IMPLICIT = "is-implicit";
 	
 	private final TypeContext type;
 	private final String method;
 	private final String[] params;
-
+	private final boolean isImplicit;
+	
 	/**
 	 * Construct a new method with the given type and param classes
 	 * 
@@ -25,12 +27,18 @@ public class Method extends AbstractJavaDeclaration {
 	 *            are no parameters
 	 */
 	public Method(final TypeContext type, final String method,
-			final String[] params) {
+			final String[] params, boolean isImplicit) {
 		this.type = type;
 		this.method = method;
 		this.params = params;
+		this.isImplicit = isImplicit;
 	}
 
+	@Override
+	public boolean isImplicit() {
+		return isImplicit;
+	}
+	
 	/**
 	 * The name of the method
 	 * 
