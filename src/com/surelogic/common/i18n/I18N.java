@@ -201,12 +201,12 @@ public final class I18N {
    * 
    * is contained in the SureLogicResults properties file. If the key is not
    * defined in the SureLogicResults properties file an exception is thrown.
-   * 
    * @param number
    *          the result message number.
+   * 
    * @return the result message for the given number.
    */
-  public static String category(final int number, final String formatter) {
+  public static String category(final String formatter, final int number) {
     return getString(RESULTS, "category.%s.%05d", formatter, number);
   }
   
