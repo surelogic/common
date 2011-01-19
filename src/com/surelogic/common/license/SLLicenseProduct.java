@@ -16,7 +16,7 @@ public enum SLLicenseProduct {
 
 	SIERRA("Sierra"),
 
-	WWW_SURELOGIC_COM("www.surelogic.com");
+	EXEMPT("Exempt");
 
 	private final String f_symbol;
 
@@ -31,7 +31,7 @@ public enum SLLicenseProduct {
 	 *         {@code false} otherwise.
 	 */
 	public boolean needsLicense() {
-		if (this == WWW_SURELOGIC_COM)
+		if (this == EXEMPT)
 			return false;
 		if (this == ALL_TOOLS)
 			return false;
