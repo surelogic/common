@@ -13,9 +13,10 @@ import com.surelogic.common.jdbc.RowHandler;
 import com.surelogic.common.jdbc.SingleRowHandler;
 
 /**
- * Represents a single line of a stack trace. This class should be available
- * only in flashlight-common, but due to some class loading issues it needs to
- * be in derby-common.
+ * Represents a single line of a stack trace in the Flashlight tool. This class
+ * should be available only in flashlight-common, but due to some class loading
+ * issues it needs to be in common, i.e., the same project that exports the
+ * derby.jar.
  * 
  * @author nathan
  * 
