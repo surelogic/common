@@ -65,6 +65,9 @@ public class AnnotationDescription implements Comparable<AnnotationDescription> 
 
 	@Override
 	public String toString() {
+		if (getContents() == null) {
+			return String.format("@%s", getAnnotation());
+		}
 		return String.format("@%s(%s)", getAnnotation(), getContents());
 	}
 
@@ -150,7 +153,9 @@ public class AnnotationDescription implements Comparable<AnnotationDescription> 
 
 		public CU(final String p, final String pakkage, final String cu) {
 			proj = p;
-			
+			if (cu == null) {
+				throw new IllegalArgumentException();
+			}
 			final int lastSeparator = cu.lastIndexOf('/');
 			if (lastSeparator >= 0) {
 				this.cu = cu.substring(lastSeparator+1);
