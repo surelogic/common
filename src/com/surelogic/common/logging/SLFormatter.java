@@ -8,6 +8,7 @@ import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 
 import com.surelogic.*;
+import com.surelogic.common.SLUtility;
 
 /**
  * A concise format for SureLogic loggers.
@@ -55,7 +56,7 @@ public final class SLFormatter extends Formatter {
 		formatMsgTail(b, formatMessage(record), record.getSourceClassName(),
 				record.getSourceMethodName());
 
-		b.append(System.getProperty("line.separator"));
+		b.append(SLUtility.PLATFORM_LINE_SEPARATOR);
 		final Throwable t = record.getThrown();
 		if (t != null) {
 		  final StringWriter sw = new StringWriter();

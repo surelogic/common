@@ -39,6 +39,7 @@ public final class SLUtility {
 	public static final String UTF8 = "UTF8";
 	public static final String YES = "Yes";
 	public static final String NO = "No";
+	public static final String PLATFORM_LINE_SEPARATOR = String.format("%n");
 
 	/**
 	 * Returns an {@code int} value of the passed {@code long} value or

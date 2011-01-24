@@ -396,7 +396,7 @@ public final class FileUtility {
 	 */
 	public static String getFileContentsAsStringOrDefaultValue(File textFile,
 			String value) {
-		final String lf = System.getProperty("line.separator");
+		final String lf = SLUtility.PLATFORM_LINE_SEPARATOR;
 		final StringBuilder b = new StringBuilder();
 		try {
 			final BufferedReader r = new BufferedReader(
@@ -431,7 +431,7 @@ public final class FileUtility {
 	 *             if something goes wrong.
 	 */
 	public static String getFileContentsAsString(final File textFile) {
-		final String lf = System.getProperty("line.separator");
+		final String lf = SLUtility.PLATFORM_LINE_SEPARATOR;
 		final StringBuilder b = new StringBuilder();
 		try {
 			final BufferedReader r = new BufferedReader(

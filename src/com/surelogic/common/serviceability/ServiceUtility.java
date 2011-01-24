@@ -48,7 +48,7 @@ public final class ServiceUtility {
 			final boolean includeVersionInfo, final String ideVersion,
 			final boolean includeUsage) {
 		final StringBuilder b = new StringBuilder();
-		final String lf = System.getProperty("line.separator");
+		final String lf = SLUtility.PLATFORM_LINE_SEPARATOR;
 
 		b.append("   Date: ");
 		b.append(SLUtility.toStringHMS(new Date()));
@@ -149,7 +149,7 @@ public final class ServiceUtility {
 			final String ideVersion, final boolean includeUsage,
 			final File ideLogFile) {
 		final StringBuilder b = new StringBuilder();
-		final String lf = System.getProperty("line.separator");
+		final String lf = SLUtility.PLATFORM_LINE_SEPARATOR;
 
 		b.append("   Date: ");
 		b.append(SLUtility.toStringHMS(new Date()));
