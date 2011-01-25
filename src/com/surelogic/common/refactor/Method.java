@@ -141,6 +141,7 @@ public class Method extends AbstractJavaDeclaration {
 	public JavaDeclInfo snapshot() {
 		final JavaDeclInfo info = new JavaDeclInfo(this, type.snapshot(), METHOD, method);
 		info.addAttribute(PARAMS, addColons(params));
+		info.addAttribute(IS_IMPLICIT, Boolean.toString(isImplicit));
 		return info;
 	}
 }
