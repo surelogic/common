@@ -54,7 +54,9 @@ public class JavaDeclInfo extends Entity implements IJavaDeclInfoClient {
 					Integer.valueOf(attributes.get(MethodParameter.PARAM_NUM))); 
 		case TYPE_CONTEXT:
 			final String name = attributes.get(IJavaDeclaration.NAME);
-			if (parent instanceof TypeContext) {
+			if (parent == null) {
+				return new TypeContext(name);
+			} else if (parent instanceof TypeContext) {
 				return new TypeContext((TypeContext) parent, name);
 			} else {
 				return new TypeContext((Method) parent, name);
