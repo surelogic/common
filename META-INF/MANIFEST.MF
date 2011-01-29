@@ -6,6 +6,10 @@ Bundle-Version: 4.0.0.qualifier
 Bundle-Vendor: SureLogic, Inc.
 Export-Package: com.surelogic,
  com.surelogic.common,
+ com.surelogic.common.adhoc,
+ com.surelogic.common.adhoc.jobs,
+ com.surelogic.common.adhoc.model,
+ com.surelogic.common.adhoc.model.parser,
  com.surelogic.common.base64,
  com.surelogic.common.concurrent,
  com.surelogic.common.derby,
