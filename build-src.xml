@@ -1,0 +1,38 @@
+<project name="AdHocCommon" default="build-src">
+
+	<property name="src" value="${basedir}/src" />
+	<property name="antlr-lib" value="${basedir}/../common/lib/build" />
+	<property name="parser-dir" value="${src}/com/surelogic/common/adhoc/model/parser" />
+	
+	<taskdef resource="org/apache/tools/ant/antlr/antlib.xml">
+		<classpath>
+			<pathelement location="${antlr-lib}/antlr-ant-task.jar" />
+		</classpath>
+	</taskdef>
+	
+	<macrodef name="genAntlr">
+		<attribute name="target" />
+		<attribute name="outputdir" />
+		<sequential>
+			<mkdir dir="@{outputdir}" />
+			<antlr3 target="@{target}" outputdirectory="@{outputdir}"
+				libdirectory="@{outputdir}">
+				<classpath>
+					<pathelement location="${antlr-lib}/antlr-3.1.jar" />
+				</classpath>
+			</antlr3>
+		</sequential>
+	</macrodef>
+	
+	<target name="build-src" depends="clean">
+		<genAntlr target="${parser-dir}/ColumnAnnotation.g" outputdir="${parser-dir}" />
+		<echo message="All source code created..." />
+	</target>
+	
+	<target name="clean">
+		<delete quiet="true">
+			<fileset dir="${parser-dir}" includes="*.java" />
+			<fileset dir="${parser-dir}" includes="*.tokens" />
+		</delete>
+	</target>
+</project>
