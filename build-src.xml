@@ -27,7 +27,7 @@
 
 	<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 
-	<target name="build-src" depends="clean">
+	<target name="build-src">
 		<genAntlr target="${parser-dir}/ColumnAnnotation.g" outputdir="${parser-dir}" />
 		<echo message="All source code created..." />
 	</target>
