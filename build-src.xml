@@ -4,6 +4,8 @@
 	<property name="antlr-lib" value="${basedir}/lib/build" />
 	<property name="parser-dir" value="${src}/com/surelogic/common/adhoc/model/parser" />
 
+	<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
 	<taskdef resource="org/apache/tools/ant/antlr/antlib.xml">
 		<classpath>
 			<pathelement location="${antlr-lib}/antlr-ant-task.jar" />
@@ -23,10 +25,14 @@
 		</sequential>
 	</macrodef>
 
+	<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
 	<target name="build-src" depends="clean">
 		<genAntlr target="${parser-dir}/ColumnAnnotation.g" outputdir="${parser-dir}" />
 		<echo message="All source code created..." />
 	</target>
+
+	<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 
 	<target name="clean">
 		<delete quiet="true">
@@ -34,4 +40,7 @@
 			<fileset dir="${parser-dir}" includes="*.tokens" />
 		</delete>
 	</target>
+
+	<!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
+
 </project>
