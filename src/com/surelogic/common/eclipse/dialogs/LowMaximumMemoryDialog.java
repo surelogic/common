@@ -17,7 +17,7 @@ import org.eclipse.swt.widgets.Shell;
 import com.surelogic.common.CommonImages;
 import com.surelogic.common.eclipse.SLImages;
 import com.surelogic.common.eclipse.SWTUtility;
-import com.surelogic.common.eclipse.logging.SLEclipseStatusUtility;
+import com.surelogic.common.core.logging.SLEclipseStatusUtility;
 import com.surelogic.common.eclipse.preferences.PreferenceConstants;
 import com.surelogic.common.i18n.I18N;
 

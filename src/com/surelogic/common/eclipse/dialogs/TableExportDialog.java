@@ -20,7 +20,7 @@ import org.eclipse.swt.widgets.Text;
 
 import com.surelogic.common.CommonImages;
 import com.surelogic.common.eclipse.SLImages;
-import com.surelogic.common.eclipse.jobs.TableExportJob;
+import com.surelogic.common.core.jobs.TableExportJob;
 import com.surelogic.common.export.ExportFactory;
 import com.surelogic.common.export.ExportTableDataSource;
 import com.surelogic.common.export.ITableExporter;

@@ -17,9 +17,9 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import com.surelogic.common.eclipse.BalloonUtility;
-import com.surelogic.common.eclipse.JDTUtility;
+import com.surelogic.common.core.JDTUtility;
 import com.surelogic.common.eclipse.SLImages;
-import com.surelogic.common.eclipse.jobs.EclipseJob;
+import com.surelogic.common.core.jobs.EclipseJob;
 import com.surelogic.common.eclipse.preferences.PreferenceConstants;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.jobs.SLJob;

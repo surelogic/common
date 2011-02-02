@@ -26,7 +26,7 @@ import com.surelogic.common.adhoc.jobs.ExportResultDataInTreeHTMLFormatJob;
 import com.surelogic.common.adhoc.jobs.ExportResultDataJob;
 import com.surelogic.common.eclipse.SLImages;
 import com.surelogic.common.eclipse.SWTUtility;
-import com.surelogic.common.eclipse.jobs.EclipseJob;
+import com.surelogic.common.core.jobs.EclipseJob;
 import com.surelogic.common.i18n.I18N;
 
 public final class ExportResultDataDialog extends Dialog {

@@ -27,10 +27,10 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.UIJob;
 
 import com.surelogic.common.CommonImages;
-import com.surelogic.common.eclipse.JDTUtility;
+import com.surelogic.common.core.JDTUtility;
 import com.surelogic.common.eclipse.SLImages;
 import com.surelogic.common.eclipse.jobs.SLUIJob;
-import com.surelogic.common.eclipse.preferences.IPreferenceAccessor;
+import com.surelogic.common.core.preferences.IPreferenceAccessor;
 import com.surelogic.common.i18n.I18N;
 
 public final class JavaProjectSelectionDialog extends Dialog {
