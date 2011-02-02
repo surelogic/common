@@ -1,0 +1,450 @@
+package com.surelogic.common.eclipse;
+
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+
+import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IProjectDescription;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.IJobManager;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.ui.plugin.AbstractUIPlugin;
+
+import com.surelogic.common.SLUtility;
+import com.surelogic.common.i18n.I18N;
+import com.surelogic.common.license.SLLicenseProduct;
+import com.surelogic.common.license.SLLicenseUtility;
+import com.surelogic.common.logging.SLLogger;
+
+public class EclipseUtility {
+
+	/**
+	 * Gets the path to the open Eclipse workspace.
+	 * 
+	 * @return the path to the open Eclipse workspace.
+	 */
+	public static File getWorkspacePath() {
+		final IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		final IWorkspaceRoot root = workspace.getRoot();
+		final IPath location = root.getLocation();
+		if (location == null) {
+			throw new IllegalStateException(I18N.err(44,
+					"IWorkspaceRoot.getLocation()"));
+		}
+		return location.toFile();
+	}
+
+	/**
+	 * Try to create an appropriate IFile object
+	 */
+	public static IFile resolveIFile(String path) {
+		try {
+			final IWorkspace workspace = ResourcesPlugin.getWorkspace();
+			final IWorkspaceRoot root = workspace.getRoot();
+			if (!path.startsWith("file:")) {
+				return root.getFile(new Path(path));
+			}
+			final URI loc = new URI(path);
+			// Try to use Eclipse to find the right thing
+			IFile[] files = root.findFilesForLocationURI(loc);
+			for (IFile file : files) {
+				if (file.exists()) {
+					return file;
+				}
+			}	
+			if (loc.getAuthority() == null) {
+				return null;
+			}
+			if (loc.getAuthority().length() != 0) {
+				return null;
+			}
+			// Assume that the path is under the workspace
+			final File rootFile = getWorkspacePath();
+			File f = new File(loc);
+			IPath p = new Path(computePath(rootFile, f).toString());
+			return root.getFile(p);
+		} catch (IllegalArgumentException e) {
+			return null;
+		} catch (URISyntaxException e) {
+			return null;
+		}
+	}
+
+	private static StringBuilder computePath(File root, File here) {
+		if (root.equals(here)) {
+			return new StringBuilder("/");
+		}
+		StringBuilder sb = computePath(root, here.getParentFile());
+		if (sb != null) {
+			// Check for ending slash
+			if (sb.charAt(sb.length() - 1) != '/') {
+				sb.append('/');
+			}
+			return sb.append(here.getName());
+		}
+		return null;
+	}
+
+	/**
+	 * Checks if any active job is assignment-compatible with the passed type.
+	 * 
+	 * @param type
+	 *            a type of job.
+	 * @return {@code true} if any active job is assignment-compatible with the
+	 *         passed type, {@code false} otherwise.
+	 */
+	public static boolean isActiveJobOfType(final Class<? extends Job> type) {
+		if (type == null) {
+			return false;
+		}
+		final IJobManager manager = Job.getJobManager();
+		for (final Job job : manager.find(null)) {
+			if (type.isInstance(job)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Counts the number of active jobs that are assignment-compatible with the
+	 * passed type.
+	 * 
+	 * @param type
+	 *            a type of job.
+	 * @return the count of active jobs that are assignment-compatible with the
+	 *         passed type.
+	 */
+	public static int getActiveJobCountOfType(final Class<? extends Job> type) {
+		int result = 0;
+		if (type != null) {
+			final IJobManager manager = Job.getJobManager();
+			for (final Job job : manager.find(null)) {
+				if (type.isInstance(job)) {
+					result++;
+				}
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * Tries to lookup an {@link IProject} with the given name.
+	 * 
+	 * @param name
+	 *            the name of the project.
+	 * @return the {@link IProject}, or {code null} if none.
+	 */
+	public static IProject getProject(final String name) {
+		if (name.contains("/")) {
+			return null;
+		}
+		final IWorkspace ws = ResourcesPlugin.getWorkspace();
+		final IWorkspaceRoot wsRoot = ws.getRoot();
+		return wsRoot.getProject(name);
+	}
+
+	/**
+	 * Resolves IPath objects into File objects
+	 */
+	public static File resolveIPath(IPath path) {
+		File loc = path.toFile();
+		if (!loc.exists()) {
+			IResource res = ResourcesPlugin.getWorkspace().getRoot()
+					.findMember(path);
+			if (res == null) {
+				return null;
+			}
+			loc = res.getLocation().toFile();
+		}
+		return loc;
+	}
+
+	/**
+	 * Helper method: it recursively creates a folder path.
+	 * 
+	 * @param folder
+	 *            the folder path.
+	 * @param monitor
+	 *            a progress monitor to track progress.
+	 * @throws CoreException
+	 *             if something goes wrong within Eclipse.
+	 * @see java.io.File#mkdirs()
+	 */
+	public static void createFolderHelper(final IFolder folder,
+			final IProgressMonitor monitor) throws CoreException {
+		if (!folder.exists()) {
+			final IContainer parent = folder.getParent();
+			if (parent instanceof IFolder && !((IFolder) parent).exists()) {
+				createFolderHelper((IFolder) parent, monitor);
+			}
+			folder.create(false, true, monitor);
+		}
+	}
+
+	private static final String BUNDLE_VERSION = "Bundle-Version";
+	private static final String DOT_QUALIFIER = ".qualifier";
+
+	/**
+	 * Gets the version of the passed activator as read from its bundle headers.
+	 * <p>
+	 * This method is a bit of a hack in the sense that a complete version
+	 * number is only returned outside of development, i.e., in a real release.
+	 * So for a real release expect a string similar to
+	 * 
+	 * <pre>
+	 * 3.1.1.201001151440
+	 * </pre>
+	 * 
+	 * However, in a development or meta-Eclipse a string similar to
+	 * <tt>3.1.1.qualifier</tt> is returned from the bundle headers which we
+	 * truncate to
+	 * 
+	 * <pre>
+	 * 3.1.1
+	 * </pre>
+	 * 
+	 * @param activator
+	 *            a plug-in to query.
+	 * @return a string that represents the version of the passed activator.
+	 */
+	public static String getVersion(final AbstractUIPlugin activator) {
+		final String rawVersionS = (String) Activator.getDefault().getBundle()
+				.getHeaders().get(BUNDLE_VERSION);
+		if (rawVersionS.endsWith(DOT_QUALIFIER)) {
+			return rawVersionS.substring(0, rawVersionS.length()
+					- DOT_QUALIFIER.length());
+		}
+		return rawVersionS;
+	}
+
+	/**
+	 * Gets the date that the version of the passed activator was released or
+	 * today's date.
+	 * <p>
+	 * This method uses {@link #getVersion(AbstractUIPlugin)} to obtain a
+	 * version string similar to
+	 * 
+	 * <pre>
+	 * 3.1.1.201001151440
+	 * </pre>
+	 * 
+	 * The <tt>"20100115"</tt> portion of the string (after the last
+	 * <tt>"."</tt>) is then parsed as a date using the pattern
+	 * <tt>"yyyyMMdd"</tt>.
+	 * 
+	 * @param activator
+	 *            a plug-in to query.
+	 * @return the date the version was released or today's date.
+	 */
+	public static Date getReleaseDate(final AbstractUIPlugin activator) {
+		final String rawVersionS = (String) Activator.getDefault().getBundle()
+				.getHeaders().get(BUNDLE_VERSION);
+		if (rawVersionS.endsWith(DOT_QUALIFIER))
+			return new Date();
+
+		final int lastDotIndex = rawVersionS.lastIndexOf('.');
+		if (lastDotIndex == -1)
+			return new Date();
+		if (lastDotIndex + 9 > rawVersionS.length())
+			return new Date();
+
+		final String dateS = rawVersionS.substring(lastDotIndex + 1,
+				lastDotIndex + 9);
+
+		final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+		try {
+			final Date result = dateFormat.parse(dateS);
+			return result;
+		} catch (ParseException ignore) {
+		}
+		return new Date();
+
+	}
+
+	/**
+	 * Constructs an Eclipse job to lookup the release date of the passed
+	 * plug-in and set it as the product release date of the passed product.
+	 * 
+	 * @param product
+	 *            a product.
+	 * @param activator
+	 *            a plug-in.
+	 * @return an Eclipse job.
+	 */
+	public static Job getProductReleaseDateJob(final SLLicenseProduct product,
+			final AbstractUIPlugin activator) {
+		if (product == null)
+			throw new IllegalArgumentException(I18N.err(44, "product"));
+		if (activator == null)
+			throw new IllegalArgumentException(I18N.err(44, "activator"));
+
+		final Job job = new Job("Looking up " + product + " release date") {
+			@Override
+			protected IStatus run(IProgressMonitor monitor) {
+				monitor.beginTask(getName(), 2);
+				try {
+					Date releaseDate = getReleaseDate(activator);
+					monitor.worked(1);
+					SLLicenseUtility.setReleaseDateFor(product, releaseDate);
+					monitor.worked(1);
+				} finally {
+					monitor.done();
+				}
+				return Status.OK_STATUS;
+			}
+		};
+		return job;
+	}
+
+	public static void main(String[] args) {
+		System.out.println(SLUtility.toStringHumanDay(getReleaseDate(null)));
+	}
+
+	public static IProject unzipToWorkspace(final File projectZip)
+			throws CoreException, IOException {
+		final String zipName = projectZip.getName();
+		final String name;
+		if (zipName.lastIndexOf('.') >= 0) {
+			// Remove suffix
+			name = zipName.substring(0, zipName.lastIndexOf('.'));
+		} else {
+			name = zipName;
+		}
+		return unzipToWorkspace(name, new FileInputStream(projectZip));
+	}
+
+	public static IProject unzipToWorkspace(final URL zip)
+			throws CoreException, IOException {
+		final String zipPath = zip.getPath();
+		final int lastSlash = zipPath.lastIndexOf('/');
+		final String zipName = zipPath.substring(lastSlash + 1);
+		final String name;
+		if (zipName.lastIndexOf('.') >= 0) {
+			// Remove suffix
+			name = zipName.substring(0, zipName.lastIndexOf('.'));
+		} else {
+			name = zipName;
+		}
+		return unzipToWorkspace(name, zip.openStream());
+	}
+
+	public static IProject unzipToWorkspace(final String name,
+			final InputStream is) throws IOException, CoreException {
+		final IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		final File root = workspace.getRoot().getLocation().toFile();
+		final File project = new File(root, name);
+		if (project.exists()) {
+			return null;
+		}
+
+		final ZipInputStream zis = new ZipInputStream(is);
+		final byte[] buf = new byte[32768];
+		ZipEntry ze = zis.getNextEntry();
+		while (ze != null) {
+			final File f = new File(root, ze.getName());
+			if (f.exists()) {
+				return null;
+			}
+			if (ze.isDirectory()) {
+				f.mkdirs();
+			} else {
+				f.getParentFile().mkdirs();
+
+				// Copy the data
+				// System.out.println("Creating " + f);
+				OutputStream out = new FileOutputStream(f);
+				out = new BufferedOutputStream(out, 32768);
+				int numRead;
+				while ((numRead = zis.read(buf)) > 0) {
+					out.write(buf, 0, numRead);
+				}
+				out.close();
+			}
+			zis.closeEntry();
+			ze = zis.getNextEntry();
+		}
+		return importProject(project);
+	}
+
+	/**
+	 * Assumes that .project is "just" in the project directory
+	 * 
+	 * @param projectRoot
+	 *            The project directory
+	 * @throws CoreException
+	 */
+	public static IProject importProject(final File projectRoot)
+			throws CoreException {
+		final IWorkspace workspace = ResourcesPlugin.getWorkspace();
+		IProjectDescription description = newProjectDescription(workspace,
+				new File(projectRoot, ".project"));
+		final String projectName;
+		if (description != null) {
+			projectName = description.getName();
+		} else {
+			projectName = projectRoot.getName();
+		}
+		final IProject proj = workspace.getRoot().getProject(projectName);
+		if (!proj.exists()) {
+			if (description == null) {
+				description = workspace.newProjectDescription(projectName);
+				description
+						.setLocation(new Path(projectRoot.getAbsolutePath()));
+			}
+			proj.create(description, new NullProgressMonitor());
+			proj.open(new NullProgressMonitor());
+			SLLogger.getLogger().info(
+					"Created and opened project '" + proj + "'");
+		}
+		return proj;
+	}
+
+	private static IProjectDescription newProjectDescription(
+			final IWorkspace workspace, final File projectFile) {
+		// If there is no file or the user has already specified forget it
+		if (projectFile == null) {
+			return null;
+		}
+		final IPath path = new Path(projectFile.getPath());
+
+		IProjectDescription newDescription = null;
+
+		try {
+			newDescription = workspace.loadProjectDescription(path);
+		} catch (final CoreException exception) {
+			// no good couldn't get the name
+		}
+		return newDescription;
+	}
+
+	private EclipseUtility() {
+		// no instances
+	}
+}
