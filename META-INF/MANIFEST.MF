@@ -1,11 +1,12 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: SureLogic Common Code for Eclipse
-Bundle-SymbolicName: com.surelogic.common.eclipse;singleton:=true
+Bundle-Name: SureLogic User Interface Eclipse Common Code
+Bundle-SymbolicName: com.surelogic.common.ui;singleton:=true
 Bundle-Version: 4.0.0.qualifier
 Bundle-Activator: com.surelogic.common.eclipse.Activator
 Bundle-Vendor: SureLogic, Inc.
 Require-Bundle: com.surelogic.common,
+ com.surelogic.common.core,
  org.eclipse.core.runtime,
  org.eclipse.jface,
  org.eclipse.ui,

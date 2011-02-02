@@ -16,7 +16,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.progress.UIJob;
 
-import com.surelogic.common.eclipse.adhoc.EclipseQueryUtility;
+import com.surelogic.common.core.adhoc.EclipseQueryUtility;
 import com.surelogic.common.eclipse.adhoc.views.QueryResultNavigator;
 import com.surelogic.common.CommonImages;
 import com.surelogic.common.ILifecycle;

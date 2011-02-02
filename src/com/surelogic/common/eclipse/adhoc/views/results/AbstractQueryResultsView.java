@@ -38,7 +38,7 @@ import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.part.ViewPart;
 
-import com.surelogic.common.eclipse.adhoc.EclipseQueryUtility;
+import com.surelogic.common.core.adhoc.EclipseQueryUtility;
 import com.surelogic.common.eclipse.adhoc.views.QueryResultNavigator;
 import com.surelogic.common.eclipse.adhoc.views.editor.AbstractQueryEditorView;
 import com.surelogic.common.eclipse.adhoc.views.editor.SQLSyntaxHighlighterSkipFirstLine;

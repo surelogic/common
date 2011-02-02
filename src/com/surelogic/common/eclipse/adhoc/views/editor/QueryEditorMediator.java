@@ -43,7 +43,7 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.UIJob;
 
-import com.surelogic.common.eclipse.adhoc.EclipseQueryUtility;
+import com.surelogic.common.core.adhoc.EclipseQueryUtility;
 import com.surelogic.common.eclipse.adhoc.dialogs.AddSubQueryDialog;
 import com.surelogic.common.eclipse.adhoc.dialogs.VariableValueDialog;
 import com.surelogic.common.CommonImages;
