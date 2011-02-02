@@ -1,0 +1,21 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: SureLogic Non-User Interface Common Code for Eclipse
+Bundle-SymbolicName: com.surelogic.common.eclipse.core;singleton:=true
+Bundle-Version: 4.0.0.qualifier
+Bundle-Activator: com.surelogic.common.eclipse.core.Activator
+Bundle-Vendor: SureLogic, Inc.
+Require-Bundle: com.surelogic.common,
+ org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ org.eclipse.jdt.core
+Eclipse-LazyStart: true
+Bundle-ActivationPolicy: lazy
+Export-Package: com.surelogic.common.eclipse.core,
+ com.surelogic.common.eclipse.core.adhoc,
+ com.surelogic.common.eclipse.core.builder,
+ com.surelogic.common.eclipse.core.jobs,
+ com.surelogic.common.eclipse.core.logging,
+ com.surelogic.common.eclipse.core.preferences
+Bundle-ClassPath: .
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
