@@ -1,11 +1,11 @@
-package com.surelogic.common.eclipse.core.preferences;
+package com.surelogic.common.core.preferences;
 
 import java.io.File;
 
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 
 import com.surelogic.common.FileUtility;
-import com.surelogic.common.eclipse.core.EclipseUtility;
+import com.surelogic.common.core.EclipseUtility;
 import com.surelogic.common.i18n.I18N;
 
 public abstract class AbstractPrefInitializer extends AbstractPreferenceInitializer {

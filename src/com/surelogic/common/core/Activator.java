@@ -1,4 +1,4 @@
-package com.surelogic.common.eclipse.core;
+package com.surelogic.common.core;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ import org.eclipse.core.runtime.Plugin;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
-import com.surelogic.common.eclipse.core.logging.EclipseHandler;
+import com.surelogic.common.core.logging.EclipseHandler;
 import com.surelogic.common.logging.SLLogger;
 
 /**

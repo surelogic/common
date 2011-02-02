@@ -1,4 +1,4 @@
-package com.surelogic.common.eclipse.core.logging;
+package com.surelogic.common.core.logging;
 
 import java.lang.management.ManagementFactory;
 import java.util.Date;
@@ -12,7 +12,7 @@ import org.eclipse.core.runtime.Status;
 import org.osgi.framework.Bundle;
 
 import com.surelogic.common.SLUtility;
-import com.surelogic.common.eclipse.core.Activator;
+import com.surelogic.common.core.Activator;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.jobs.SLSeverity;
 import com.surelogic.common.jobs.SLStatus;

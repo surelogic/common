@@ -1,10 +1,10 @@
-package com.surelogic.common.eclipse.core.jobs;
+package com.surelogic.common.core.jobs;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.jobs.Job;
 
-import com.surelogic.common.eclipse.core.logging.SLEclipseStatusUtility;
+import com.surelogic.common.core.logging.SLEclipseStatusUtility;
 import com.surelogic.common.jobs.SLJob;
 import com.surelogic.common.jobs.SLStatus;
 

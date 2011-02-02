@@ -1,10 +1,10 @@
-package com.surelogic.common.eclipse.core.adhoc;
+package com.surelogic.common.core.adhoc;
 
 import com.surelogic.common.adhoc.AdHocQueryFullyBound;
 import com.surelogic.common.adhoc.AdHocQueryResultSqlData;
 import com.surelogic.common.adhoc.jobs.CancellableAdHocQueryJob;
 import com.surelogic.common.adhoc.jobs.CancellableAdHocQueryMonitorJob;
-import com.surelogic.common.eclipse.core.jobs.EclipseJob;
+import com.surelogic.common.core.jobs.EclipseJob;
 
 /**
  * A utility for queries in Eclipse.

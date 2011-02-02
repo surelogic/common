@@ -11,11 +11,11 @@ Require-Bundle: com.surelogic.common,
  org.eclipse.jdt.core
 Eclipse-LazyStart: true
 Bundle-ActivationPolicy: lazy
-Export-Package: com.surelogic.common.eclipse.core,
- com.surelogic.common.eclipse.core.adhoc,
- com.surelogic.common.eclipse.core.builder,
- com.surelogic.common.eclipse.core.jobs,
- com.surelogic.common.eclipse.core.logging,
- com.surelogic.common.eclipse.core.preferences
+Export-Package: com.surelogic.common.core,
+ com.surelogic.common.core.adhoc,
+ com.surelogic.common.core.builder,
+ com.surelogic.common.core.jobs,
+ com.surelogic.common.core.logging,
+ com.surelogic.common.core.preferences
 Bundle-ClassPath: .
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

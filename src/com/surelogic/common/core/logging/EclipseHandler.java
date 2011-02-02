@@ -1,4 +1,4 @@
-package com.surelogic.common.eclipse.core.logging;
+package com.surelogic.common.core.logging;
 
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -7,7 +7,7 @@ import java.util.logging.LogRecord;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 
-import com.surelogic.common.eclipse.core.Activator;
+import com.surelogic.common.core.Activator;
 import com.surelogic.common.logging.SLFormatter;
 import com.surelogic.common.logging.SLLogger;
 

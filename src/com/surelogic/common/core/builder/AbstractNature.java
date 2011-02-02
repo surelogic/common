@@ -1,4 +1,4 @@
-package com.surelogic.common.eclipse.core.builder;
+package com.surelogic.common.core.builder;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;

@@ -1,4 +1,4 @@
-package com.surelogic.common.eclipse.core;
+package com.surelogic.common.core;
 
 import java.net.MalformedURLException;
 import java.net.URL;

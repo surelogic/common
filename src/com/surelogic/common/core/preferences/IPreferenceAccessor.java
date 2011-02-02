@@ -1,4 +1,4 @@
-package com.surelogic.common.eclipse.core.preferences;
+package com.surelogic.common.core.preferences;
 
 public interface IPreferenceAccessor<T> {
 	T get();

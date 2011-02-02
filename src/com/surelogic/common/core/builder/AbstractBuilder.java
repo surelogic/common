@@ -1,4 +1,4 @@
-package com.surelogic.common.eclipse.core.builder;
+package com.surelogic.common.core.builder;
 
 import org.eclipse.core.resources.*;
 

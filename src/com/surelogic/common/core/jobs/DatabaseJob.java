@@ -1,4 +1,4 @@
-package com.surelogic.common.eclipse.core.jobs;
+package com.surelogic.common.core.jobs;
 
 import org.eclipse.core.runtime.jobs.Job;
 
