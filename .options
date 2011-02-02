@@ -7,6 +7,6 @@
 # i.e., messages at that level and above are logged.  For example, if
 # ".../debug/fine=false" and ".../debug/finer=true" then the former is ignored
 # and all messages at FINER and above are logged.
-com.surelogic.common.eclipse/fine=false
-com.surelogic.common.eclipse/finer=false
-com.surelogic.common.eclipse/finest=false
+com.surelogic.common.core/fine=false
+com.surelogic.common.core/finer=false
+com.surelogic.common.core/finest=false

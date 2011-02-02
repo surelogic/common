@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: SureLogic Non-User Interface Eclipse Common Code
 Bundle-SymbolicName: com.surelogic.common.core;singleton:=true
 Bundle-Version: 4.0.0.qualifier
-Bundle-Activator: com.surelogic.common.eclipse.core.Activator
+Bundle-Activator: com.surelogic.common.core.Activator
 Bundle-Vendor: SureLogic, Inc.
 Require-Bundle: com.surelogic.common,
  org.eclipse.core.runtime,

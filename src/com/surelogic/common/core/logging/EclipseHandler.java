@@ -20,9 +20,9 @@ import com.surelogic.common.logging.SLLogger;
  * the <tt>.options</tt> file
  * 
  * <pre>
- * com.surelogic.common.eclipse/fine=false
- * com.surelogic.common.eclipse/finer=true
- * com.surelogic.common.eclipse/finest=false
+ * com.surelogic.common.core/fine=false
+ * com.surelogic.common.core/finer=true
+ * com.surelogic.common.core/finest=false
  * </pre>
  * 
  * would cause all {@link Level#INFO} and {@link Level#FINER} messages to be
@@ -34,11 +34,11 @@ public final class EclipseHandler extends Handler {
 
 	static {
 		final boolean logFine = "true".equalsIgnoreCase(Platform
-				.getDebugOption("com.surelogic.common.eclipse/fine"));
+				.getDebugOption("com.surelogic.common.core/fine"));
 		final boolean logFiner = "true".equalsIgnoreCase(Platform
-				.getDebugOption("com.surelogic.common.eclipse/finer"));
+				.getDebugOption("com.surelogic.common.core/finer"));
 		final boolean logFinest = "true".equalsIgnoreCase(Platform
-				.getDebugOption("com.surelogic.common.eclipse/finest"));
+				.getDebugOption("com.surelogic.common.core/finest"));
 
 		if (logFinest)
 			TRACE_LEVEL = Level.FINEST;
@@ -81,15 +81,16 @@ public final class EclipseHandler extends Handler {
 
 		if (level == Level.SEVERE) {
 			final int code = tryToExtractServiceabilityNumber(b.toString());
-			log(SLEclipseStatusUtility.createErrorStatus(code, b.toString(), record
-					.getThrown()));
+			log(SLEclipseStatusUtility.createErrorStatus(code, b.toString(),
+					record.getThrown()));
 		} else if (level == Level.WARNING) {
 			final int code = tryToExtractServiceabilityNumber(b.toString());
-			log(SLEclipseStatusUtility.createWarningStatus(code, b.toString(), record
-					.getThrown()));
+			log(SLEclipseStatusUtility.createWarningStatus(code, b.toString(),
+					record.getThrown()));
 		} else {
 			b.insert(0, "(" + level.toString() + ") ");
-			log(SLEclipseStatusUtility.createInfoStatus(b.toString(), record.getThrown()));
+			log(SLEclipseStatusUtility.createInfoStatus(b.toString(),
+					record.getThrown()));
 		}
 	}
 
@@ -97,7 +98,7 @@ public final class EclipseHandler extends Handler {
 		if (Activator.getDefault() != null) {
 			Activator.getDefault().getLog().log(status);
 		} else {
-			System.err.println(status.getCode()+": "+status.getMessage());
+			System.err.println(status.getCode() + ": " + status.getMessage());
 		}
 	}
 
