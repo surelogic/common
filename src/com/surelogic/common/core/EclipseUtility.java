@@ -45,6 +45,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobManager;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.framework.Bundle;
 
 import com.surelogic.common.SLUtility;
@@ -54,6 +55,13 @@ import com.surelogic.common.license.SLLicenseUtility;
 import com.surelogic.common.logging.SLLogger;
 
 public class EclipseUtility {
+
+	/**
+	 * Defines the SureLogic preference node. The preferences obtained by
+	 * {@link #getPreferences()} use this node within the instance scope (
+	 * {@link InstanceScope}) of Eclipse-based preferences.
+	 */
+	public static final String PREFERENCES_NODE = "com.surelogic.common.core.preferences";
 
 	/**
 	 * Gets the Eclipse {@link IEclipsePreferences} for the SureLogic

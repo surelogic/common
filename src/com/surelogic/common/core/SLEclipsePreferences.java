@@ -29,8 +29,6 @@ final class SLEclipsePreferences {
 		// singleton
 	}
 
-	private static final String NODE = "com.surelogic.common.core.preferences";
-
 	private IEclipsePreferences f_preferences;
 
 	/**
@@ -39,11 +37,12 @@ final class SLEclipsePreferences {
 	void init() {
 		final boolean isNull;
 		synchronized (this) {
-			f_preferences = new InstanceScope().getNode(NODE);
+			f_preferences = new InstanceScope()
+					.getNode(EclipseUtility.PREFERENCES_NODE);
 			isNull = f_preferences == null;
 		}
 		if (isNull) {
-			final String msg = I18N.err(218, NODE);
+			final String msg = I18N.err(218, EclipseUtility.PREFERENCES_NODE);
 			SLLogger.getLogger().log(Level.SEVERE, msg);
 			throw new IllegalStateException(msg);
 		}
@@ -68,7 +67,8 @@ final class SLEclipsePreferences {
 			result = f_preferences;
 		}
 		if (result == null)
-			throw new IllegalStateException(I18N.err(220, NODE));
+			throw new IllegalStateException(I18N.err(220,
+					EclipseUtility.PREFERENCES_NODE));
 		return result;
 	}
 
@@ -84,7 +84,8 @@ final class SLEclipsePreferences {
 		try {
 			result.flush();
 		} catch (BackingStoreException e) {
-			SLLogger.getLogger().log(Level.SEVERE, I18N.err(219, NODE), e);
+			SLLogger.getLogger().log(Level.SEVERE,
+					I18N.err(219, EclipseUtility.PREFERENCES_NODE), e);
 		}
 	}
 }
