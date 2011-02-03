@@ -2,19 +2,20 @@ package com.surelogic.common.core;
 
 import java.util.logging.Level;
 
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.service.prefs.BackingStoreException;
-import org.osgi.service.prefs.Preferences;
 
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.logging.SLLogger;
 
 /**
- * This class manages Eclipse {@link Preferences} for the SureLogic
+ * This class manages Eclipse {@link IEclipsePreferences} for the SureLogic
  * Eclipse-based tools.
  * <p>
- * This class is not public and the Eclipse {@link Preferences} it manages
- * should be obtained via the {@link EclipseUtility#getPreferences()} method.
+ * This class is not public and the Eclipse {@link IEclipsePreferences} it
+ * manages should be obtained via the {@link EclipseUtility#getPreferences()}
+ * method.
  */
 final class SLEclipsePreferences {
 
@@ -30,7 +31,7 @@ final class SLEclipsePreferences {
 
 	private static final String NODE = "com.surelogic.common.core.preferences";
 
-	private Preferences f_preferences;
+	private IEclipsePreferences f_preferences;
 
 	/**
 	 * Called the plug-in {@link Activator}.
@@ -61,8 +62,8 @@ final class SLEclipsePreferences {
 	 * 
 	 * @see EclipseUtility#getPreferences()
 	 */
-	Preferences getPreferences() {
-		final Preferences result;
+	IEclipsePreferences getPreferences() {
+		final IEclipsePreferences result;
 		synchronized (this) {
 			result = f_preferences;
 		}
@@ -75,7 +76,7 @@ final class SLEclipsePreferences {
 	 * Called the plug-in {@link Activator}.
 	 */
 	void dispose() {
-		final Preferences result;
+		final IEclipsePreferences result;
 		synchronized (this) {
 			result = f_preferences;
 			f_preferences = null;

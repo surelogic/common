@@ -44,8 +44,8 @@ import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobManager;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.osgi.framework.Bundle;
-import org.osgi.service.prefs.Preferences;
 
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
@@ -56,8 +56,8 @@ import com.surelogic.common.logging.SLLogger;
 public class EclipseUtility {
 
 	/**
-	 * Gets the Eclipse {@link Preferences} for the SureLogic Eclipse-based
-	 * tools.
+	 * Gets the Eclipse {@link IEclipsePreferences} for the SureLogic
+	 * Eclipse-based tools.
 	 * <p>
 	 * These preferences are persisted within per-workspace.
 	 * 
@@ -66,7 +66,7 @@ public class EclipseUtility {
 	 *             if the SureLogic Eclipse preferences are not loaded. This
 	 *             would indicate a bug.
 	 */
-	public static Preferences getPreferences() {
+	public static IEclipsePreferences getPreferences() {
 		return SLEclipsePreferences.getInstance().getPreferences();
 	}
 
