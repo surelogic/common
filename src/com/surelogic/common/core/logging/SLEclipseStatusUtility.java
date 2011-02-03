@@ -60,10 +60,10 @@ public final class SLEclipseStatusUtility {
 		 * 
 		 * @param maxMemoryMB
 		 *            the current JVM maximum memory in megabytes.
-		 * @param permGenMB
+		 * @param maxPermGenMB
 		 *            the current JVM maximum PermGen memory in megabytes.
 		 */
-		void notifyLowMemory(long maxMemoryMB, long permGenMB);
+		void notifyLowMemory(long maxMemoryMB, long maxPermGenMB);
 	}
 
 	/**
@@ -83,9 +83,19 @@ public final class SLEclipseStatusUtility {
 		}
 
 		@Override
-		public void notifyLowMemory(long maxMemoryMB, long permGenMB) {
+		public void notifyLowMemory(long maxMemoryMB, long maxPermGenMB) {
+			if (maxMemoryMB < SLEclipseStatusUtility.LOW_MEM_THRESHOLD) {
+				SLLogger.getLogger().warning(
+						I18N.msg("common.touch.lowMemory", maxMemoryMB,
+								SLEclipseStatusUtility.LOW_MEM_THRESHOLD,
+								SLEclipseStatusUtility.LOW_MEM_THRESHOLD));
+			}
+			if (maxPermGenMB < SLEclipseStatusUtility.LOW_PERMGEN_THRESHOLD) {
+			}
 			SLLogger.getLogger().warning(
-					I18N.msg("common.touch.lowMemory", maxMemoryMB, permGenMB));
+					I18N.msg("common.touch.lowPermGen", maxPermGenMB,
+							SLEclipseStatusUtility.LOW_PERMGEN_THRESHOLD,
+							SLEclipseStatusUtility.LOW_PERMGEN_THRESHOLD));
 		}
 	}
 
