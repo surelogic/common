@@ -13,6 +13,7 @@ import org.osgi.framework.Bundle;
 
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.core.Activator;
+import com.surelogic.common.core.preferences.PreferencesUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.jobs.SLSeverity;
 import com.surelogic.common.jobs.SLStatus;
@@ -47,15 +48,6 @@ public final class SLEclipseStatusUtility {
 		ILicenseObserver getLicenseObserver();
 
 		/**
-		 * Called to check if the tool user wants the check for low memory
-		 * performed.
-		 * 
-		 * @return {@code true} if a check should be made, {@code false}
-		 *         otherwise.
-		 */
-		boolean warnAboutLowMaximumMemory();
-
-		/**
 		 * Called if the memory appears to low to run the SureLogic tools.
 		 * 
 		 * @param maxMemoryMB
@@ -75,11 +67,6 @@ public final class SLEclipseStatusUtility {
 		@Override
 		public ILicenseObserver getLicenseObserver() {
 			return new LogOutputLicenseObserver();
-		}
-
-		@Override
-		public boolean warnAboutLowMaximumMemory() {
-			return true;
 		}
 
 		@Override
@@ -146,7 +133,7 @@ public final class SLEclipseStatusUtility {
 	 * The user can opt-out of this warning.
 	 */
 	private static void warnAboutLowMaximumMemory(TouchNotificationUI ui) {
-		if (!ui.warnAboutLowMaximumMemory())
+		if (!PreferencesUtility.warnAboutLowMaximumMemory())
 			return;
 		final Runtime rt = Runtime.getRuntime();
 		final long maxMemoryMB = SLUtility.byteToMByte(rt.maxMemory());
