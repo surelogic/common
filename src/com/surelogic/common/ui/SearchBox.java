@@ -21,7 +21,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.progress.UIJob;
 
 import com.surelogic.common.CommonImages;
-import com.surelogic.common.eclipse.jobs.SLUIJob;
+import com.surelogic.common.ui.jobs.SLUIJob;
 
 public final class SearchBox {
 

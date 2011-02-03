@@ -14,8 +14,8 @@ import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.progress.UIJob;
 
-import com.surelogic.common.eclipse.jobs.SLUIJob;
 import com.surelogic.common.logging.SLLogger;
+import com.surelogic.common.ui.jobs.SLUIJob;
 
 /**
  * Provides a set of convenience methods for creating HTML pages.

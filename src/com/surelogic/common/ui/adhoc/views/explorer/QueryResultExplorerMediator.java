@@ -15,10 +15,10 @@ import com.surelogic.common.ILifecycle;
 import com.surelogic.common.adhoc.AdHocManager;
 import com.surelogic.common.adhoc.AdHocManagerAdapter;
 import com.surelogic.common.adhoc.AdHocQueryResult;
-import com.surelogic.common.eclipse.jobs.SLUIJob;
-import com.surelogic.common.eclipse.tooltip.ToolTip;
 import com.surelogic.common.ui.SLImages;
 import com.surelogic.common.ui.adhoc.views.QueryResultNavigator;
+import com.surelogic.common.ui.jobs.SLUIJob;
+import com.surelogic.common.ui.tooltip.ToolTip;
 
 public final class QueryResultExplorerMediator extends AdHocManagerAdapter
 		implements ILifecycle {

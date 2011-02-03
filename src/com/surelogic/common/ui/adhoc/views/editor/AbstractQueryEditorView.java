@@ -30,11 +30,11 @@ import org.eclipse.ui.progress.UIJob;
 import com.surelogic.common.CommonImages;
 import com.surelogic.common.adhoc.AdHocManager;
 import com.surelogic.common.adhoc.AdHocQuery;
-import com.surelogic.common.eclipse.jobs.SLUIJob;
-import com.surelogic.common.eclipse.tooltip.ToolTip;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.ui.PageBook;
 import com.surelogic.common.ui.SLImages;
+import com.surelogic.common.ui.jobs.SLUIJob;
+import com.surelogic.common.ui.tooltip.ToolTip;
 
 public abstract class AbstractQueryEditorView extends ViewPart {
 

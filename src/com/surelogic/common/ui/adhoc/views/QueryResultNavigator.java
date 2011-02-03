@@ -18,12 +18,12 @@ import com.surelogic.common.adhoc.AdHocManagerAdapter;
 import com.surelogic.common.adhoc.AdHocQueryResult;
 import com.surelogic.common.adhoc.AdHocQueryResultSqlData;
 import com.surelogic.common.adhoc.IAdHocDataSource;
-import com.surelogic.common.eclipse.jobs.SLUIJob;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.ui.SLImages;
 import com.surelogic.common.ui.adhoc.dialogs.ExportResultDataDialog;
 import com.surelogic.common.ui.adhoc.dialogs.ShowSqlDialog;
 import com.surelogic.common.ui.adhoc.dialogs.VariableValueDialog;
+import com.surelogic.common.ui.jobs.SLUIJob;
 
 /**
  * This class provides actions to navigate forward and backward among a tree of

@@ -12,8 +12,8 @@ import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.part.ViewPart;
 
 import com.surelogic.common.adhoc.AdHocManager;
-import com.surelogic.common.eclipse.tooltip.ToolTip;
 import com.surelogic.common.ui.adhoc.views.QueryResultNavigator;
+import com.surelogic.common.ui.tooltip.ToolTip;
 
 public abstract class AbstractQueryResultExplorerView extends ViewPart {
 

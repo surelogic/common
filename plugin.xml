@@ -7,6 +7,6 @@
 
 	<extension point="org.eclipse.core.runtime.preferences">
 		<initializer
-			class="com.surelogic.common.eclipse.preferences.PreferenceInitializer" />
+			class="com.surelogic.common.ui.preferences.PreferenceInitializer" />
 	</extension>
 </plugin>

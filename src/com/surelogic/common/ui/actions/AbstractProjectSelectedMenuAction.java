@@ -19,7 +19,7 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 
-import com.surelogic.common.eclipse.dialogs.JavaProjectSelectionDialog;
+import com.surelogic.common.ui.dialogs.JavaProjectSelectionDialog;
 
 /**
  * This class allows both a main menu action and a right-click context menu on
