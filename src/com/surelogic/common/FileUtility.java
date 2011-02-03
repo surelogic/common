@@ -119,6 +119,44 @@ public final class FileUtility {
 	}
 
 	/**
+	 * Ensures that the specified director exists in the file system. Throws an
+	 * exception if the directory doesn't exist and can't be created.
+	 * 
+	 * @param path
+	 *            the desired directory.
+	 * @throws IllegalStateException
+	 *             if the passed directory is {code null} or the directory
+	 *             doesn't exist and can't be created.
+	 */
+	public static void ensureDirectoryExists(final String path) {
+		if (path == null) {
+			throw new IllegalArgumentException(I18N.err(44, "path"));
+		}
+		final File p = new File(path);
+		ensureDirectoryExists(p);
+	}
+
+	/**
+	 * Ensures that the specified director exists in the file system. Throws an
+	 * exception if the directory doesn't exist and can't be created.
+	 * 
+	 * 
+	 * @param path
+	 *            the desired directory.
+	 * @throws IllegalStateException
+	 *             if the passed directory is {code null} or the directory
+	 *             doesn't exist and can't be created.
+	 */
+	public static void ensureDirectoryExists(final File path) {
+		if (path == null) {
+			throw new IllegalStateException(I18N.err(44, "path"));
+		}
+		if (!FileUtility.createDirectory(path)) {
+			throw new IllegalStateException("Unable to create " + path);
+		}
+	}
+
+	/**
 	 * Tries to recursively copy the entire contents of the file or folder
 	 * located at src to dest.
 	 * 
@@ -202,16 +240,16 @@ public final class FileUtility {
 			// Ignore
 		}
 	}
-	
+
 	public static class TempFileFilter implements FilenameFilter {
 		final String prefix;
 		final String suffix;
-		
+
 		public TempFileFilter(String pre, String suf) {
 			prefix = pre;
 			suffix = suf;
 		}
-		
+
 		public File createTempFile() throws IOException {
 			return File.createTempFile(prefix, suffix);
 		}
@@ -222,12 +260,12 @@ public final class FileUtility {
 			f.mkdir();
 			return f;
 		}
-		
+
 		public boolean accept(File dir, String name) {
 			return name.startsWith(prefix) && name.endsWith(suffix);
 		}
 	}
-	
+
 	/**
 	 * This method performs a rough calculation of the space being used by the
 	 * passed file or directory. The calculation is recursive and includes
@@ -311,9 +349,11 @@ public final class FileUtility {
 	 * @return {@code true} if and only if the copy is successful, {@code false}
 	 *         otherwise.
 	 */
-	public static boolean copy(final String source, InputStream is, final File to) {
+	public static boolean copy(final String source, InputStream is,
+			final File to) {
 		try {
-			return copyToStream(source, is, to.getAbsolutePath(), new FileOutputStream(to), true) != null;
+			return copyToStream(source, is, to.getAbsolutePath(),
+					new FileOutputStream(to), true) != null;
 		} catch (FileNotFoundException e) {
 			SLLogger.getLogger().log(Level.SEVERE,
 					I18N.err(112, source, to.getAbsolutePath()), e);
@@ -324,8 +364,8 @@ public final class FileUtility {
 	/**
 	 * @return the MD5 hash of the copied data
 	 */
-	public static byte[] copyToStream(final String source, InputStream is, 
-			                           final String target, OutputStream os, boolean closeOutput) {
+	public static byte[] copyToStream(final String source, InputStream is,
+			final String target, OutputStream os, boolean closeOutput) {
 		try {
 			try {
 				final MessageDigest md = MessageDigest.getInstance("MD5");
@@ -360,7 +400,7 @@ public final class FileUtility {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Copies the contents of one file to another file.
 	 * 
@@ -514,8 +554,8 @@ public final class FileUtility {
 			final File destination, final boolean moveOldToNew,
 			final SLJob optionalStartUp, final SLJob optionalFinishUp) {
 		final SLJob job = new AbstractSLJob(I18N.msg(
-				"common.jobs.name.moveDataDirectory", existing
-						.getAbsolutePath(), destination.getAbsolutePath())) {
+				"common.jobs.name.moveDataDirectory",
+				existing.getAbsolutePath(), destination.getAbsolutePath())) {
 
 			public SLStatus run(final SLProgressMonitor monitor) {
 				monitor.begin();
@@ -553,8 +593,8 @@ public final class FileUtility {
 							 * Failed to clear out the destination directory.
 							 */
 							final int code = 92;
-							final String msg = I18N.err(code, destination
-									.getAbsolutePath());
+							final String msg = I18N.err(code,
+									destination.getAbsolutePath());
 							return SLStatus.createErrorStatus(code, msg);
 						}
 					}
@@ -567,9 +607,9 @@ public final class FileUtility {
 							 * destination.
 							 */
 							final int code = 95;
-							final String msg = I18N.err(code, existing
-									.getAbsolutePath(), destination
-									.getAbsolutePath());
+							final String msg = I18N.err(code,
+									existing.getAbsolutePath(),
+									destination.getAbsolutePath());
 							return SLStatus.createErrorStatus(code, msg);
 						}
 					}
@@ -585,8 +625,8 @@ public final class FileUtility {
 							 * Failed to create the destination data directory.
 							 */
 							final int code = 156;
-							final String msg = I18N.err(code, destination
-									.getAbsolutePath());
+							final String msg = I18N.err(code,
+									destination.getAbsolutePath());
 							return SLStatus.createErrorStatus(code, msg);
 						}
 
@@ -636,17 +676,17 @@ public final class FileUtility {
 			throws IOException {
 		zipDirAndMore(tempDir, zipFile).close();
 	}
-	
+
 	/**
 	 * Like zipDir, but returns the ZipInfo so you can add more to it
 	 */
 	public static ZipInfo zipDirAndMore(final File tempDir, final File zipFile)
-	throws IOException {
+			throws IOException {
 		final ZipInfo info = new ZipInfo(zipFile);
 		info.zipDir(tempDir, tempDir);
 		return info;
 	}
-	
+
 	public static void unzipFile(final File zipFile, final File targetDir)
 			throws IOException {
 		unzipFile(new ZipFile(zipFile), targetDir, null);
@@ -766,12 +806,13 @@ public final class FileUtility {
 	public static String getPrefix(String name) {
 		// Find the last segment
 		int lastSlash = name.lastIndexOf('/');
-		int lastBackslash = name.lastIndexOf('\\');		
-		int lastSeparator = lastSlash > lastBackslash ? lastSlash+1 : lastBackslash+1;
+		int lastBackslash = name.lastIndexOf('\\');
+		int lastSeparator = lastSlash > lastBackslash ? lastSlash + 1
+				: lastBackslash + 1;
 		int lastDot = name.lastIndexOf('.');
 		return name.substring(lastSeparator, lastDot);
 	}
-	
+
 	public static String normalizePath(String path) {
 		if (path == null) {
 			return null;
