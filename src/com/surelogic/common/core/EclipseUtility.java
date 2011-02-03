@@ -187,6 +187,24 @@ public class EclipseUtility {
 	}
 
 	/**
+	 * Constructs a path within the current workspace with the passed fragment
+	 * added to it.
+	 * <p>
+	 * This method is often used to construct locations for tool data
+	 * directories. For example, {@code getADataDirectoryPath(".flashlight")}
+	 * would be the default location of the Flashlight data directory.
+	 * 
+	 * @param fragment
+	 *            the last fragment to add to the workspace path.
+	 * @return the constructed data directory path.
+	 */
+	public static String getADataDirectoryPath(String fragment) {
+		final File root = EclipseUtility.getWorkspacePath();
+		final File path = new File(root, fragment);
+		return path.getAbsolutePath();
+	}
+
+	/**
 	 * Try to create an appropriate IFile object
 	 */
 	public static IFile resolveIFile(String path) {
