@@ -27,18 +27,18 @@ public class DialogTouchNotificationUI extends
 	}
 
 	@Override
-	public void notifyLowMemory(final long maxMemoryMB, final long permGenMB) {
+	public void notifyLowMemory(final long maxMemoryMB, final long maxPermGenMB) {
 		final UIJob job = new SLUIJob() {
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
 				final LowMaximumMemoryDialog dialog = new LowMaximumMemoryDialog(
-						maxMemoryMB, permGenMB);
+						maxMemoryMB, maxPermGenMB);
 				dialog.open();
 				return Status.OK_STATUS;
 			}
 		};
 		job.schedule();
 		// go ahead and write it to the log also
-		super.notifyLowMemory(maxMemoryMB, permGenMB);
+		super.notifyLowMemory(maxMemoryMB, maxPermGenMB);
 	}
 }
