@@ -60,6 +60,10 @@ public class EclipseUtility {
 	 * Defines the SureLogic preference node. The preferences obtained by
 	 * {@link #getPreferences()} use this node within the instance scope (
 	 * {@link InstanceScope}) of Eclipse-based preferences.
+	 * <p>
+	 * To obtain a version of the SureLogic preferences usable in the Eclipse
+	 * UI, e.g., in the implementation of a properties dialog, see
+	 * <tt>EclipseUIUtility.getPreferences()</tt>.
 	 */
 	public static final String PREFERENCES_NODE = "com.surelogic.common.core.preferences";
 
@@ -68,11 +72,17 @@ public class EclipseUtility {
 	 * Eclipse-based tools.
 	 * <p>
 	 * These preferences are persisted within per-workspace.
+	 * <p>
+	 * To obtain a version of the SureLogic preferences usable in the Eclipse
+	 * UI, e.g., in the implementation of a properties dialog, see
+	 * <tt>EclipseUIUtility.getPreferences()</tt>.
 	 * 
 	 * @return the SureLogic Eclipse preferences.
 	 * @throws IllegalStateException
 	 *             if the SureLogic Eclipse preferences are not loaded. This
 	 *             would indicate a bug.
+	 * 
+	 * @see #PREFERENCES_NODE
 	 */
 	public static IEclipsePreferences getPreferences() {
 		return SLEclipsePreferences.getInstance().getPreferences();
