@@ -18,7 +18,6 @@ Require-Bundle: com.surelogic.common,
  org.eclipse.ui.ide,
  org.eclipse.ui.editors,
  org.eclipse.update.configurator,
- org.apache.ant,
  org.eclipse.jface.text
 Eclipse-LazyStart: true
 Bundle-ActivationPolicy: lazy
