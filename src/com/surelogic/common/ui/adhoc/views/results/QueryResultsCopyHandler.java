@@ -1,4 +1,4 @@
-package com.surelogic.common.eclipse.adhoc.views.results;
+package com.surelogic.common.ui.adhoc.views.results;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;

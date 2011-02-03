@@ -1,4 +1,4 @@
-package com.surelogic.common.eclipse.adhoc.views.results;
+package com.surelogic.common.ui.adhoc.views.results;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -39,9 +39,6 @@ import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.part.ViewPart;
 
 import com.surelogic.common.core.adhoc.EclipseQueryUtility;
-import com.surelogic.common.eclipse.adhoc.views.QueryResultNavigator;
-import com.surelogic.common.eclipse.adhoc.views.editor.AbstractQueryEditorView;
-import com.surelogic.common.eclipse.adhoc.views.editor.SQLSyntaxHighlighterSkipFirstLine;
 import com.surelogic.common.CommonImages;
 import com.surelogic.common.Justification;
 import com.surelogic.common.XUtil;
@@ -65,6 +62,9 @@ import com.surelogic.common.ui.SLImages;
 import com.surelogic.common.ui.SWTUtility;
 import com.surelogic.common.ui.TableUtility;
 import com.surelogic.common.ui.ViewUtility;
+import com.surelogic.common.ui.adhoc.views.QueryResultNavigator;
+import com.surelogic.common.ui.adhoc.views.editor.AbstractQueryEditorView;
+import com.surelogic.common.ui.adhoc.views.editor.SQLSyntaxHighlighterSkipFirstLine;
 
 public abstract class AbstractQueryResultsView extends ViewPart {
 

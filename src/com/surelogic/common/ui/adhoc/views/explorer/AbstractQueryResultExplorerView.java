@@ -1,4 +1,4 @@
-package com.surelogic.common.eclipse.adhoc.views.explorer;
+package com.surelogic.common.ui.adhoc.views.explorer;
 
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -11,9 +11,9 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.part.ViewPart;
 
-import com.surelogic.common.eclipse.adhoc.views.QueryResultNavigator;
 import com.surelogic.common.adhoc.AdHocManager;
 import com.surelogic.common.eclipse.tooltip.ToolTip;
+import com.surelogic.common.ui.adhoc.views.QueryResultNavigator;
 
 public abstract class AbstractQueryResultExplorerView extends ViewPart {
 

@@ -1,4 +1,4 @@
-package com.surelogic.common.eclipse.adhoc.dialogs;
+package com.surelogic.common.ui.adhoc.dialogs;
 
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -12,9 +12,9 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
-import com.surelogic.common.eclipse.adhoc.views.editor.SQLSyntaxHighlighter;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.ui.SWTUtility;
+import com.surelogic.common.ui.adhoc.views.editor.SQLSyntaxHighlighter;
 
 /**
  * Dialog to show the SQL that produced a query result.

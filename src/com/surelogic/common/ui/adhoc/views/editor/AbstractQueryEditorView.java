@@ -1,4 +1,4 @@
-package com.surelogic.common.eclipse.adhoc.views.editor;
+package com.surelogic.common.ui.adhoc.views.editor;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;

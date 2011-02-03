@@ -1,4 +1,4 @@
-package com.surelogic.common.eclipse.adhoc.views;
+package com.surelogic.common.ui.adhoc.views;
 
 import java.io.File;
 import java.util.ArrayList;

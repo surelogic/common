@@ -1,4 +1,4 @@
-package com.surelogic.common.eclipse.adhoc.views;
+package com.surelogic.common.ui.adhoc.views;
 
 import java.util.Map;
 import java.util.Set;
@@ -11,9 +11,6 @@ import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.ui.progress.UIJob;
 
-import com.surelogic.common.eclipse.adhoc.dialogs.ExportResultDataDialog;
-import com.surelogic.common.eclipse.adhoc.dialogs.ShowSqlDialog;
-import com.surelogic.common.eclipse.adhoc.dialogs.VariableValueDialog;
 import com.surelogic.common.CommonImages;
 import com.surelogic.common.ILifecycle;
 import com.surelogic.common.adhoc.AdHocManager;
@@ -24,6 +21,9 @@ import com.surelogic.common.adhoc.IAdHocDataSource;
 import com.surelogic.common.eclipse.jobs.SLUIJob;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.ui.SLImages;
+import com.surelogic.common.ui.adhoc.dialogs.ExportResultDataDialog;
+import com.surelogic.common.ui.adhoc.dialogs.ShowSqlDialog;
+import com.surelogic.common.ui.adhoc.dialogs.VariableValueDialog;
 
 /**
  * This class provides actions to navigate forward and backward among a tree of

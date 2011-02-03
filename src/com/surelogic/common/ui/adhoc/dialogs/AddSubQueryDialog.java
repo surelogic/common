@@ -1,4 +1,4 @@
-package com.surelogic.common.eclipse.adhoc.dialogs;
+package com.surelogic.common.ui.adhoc.dialogs;
 
 import java.util.ArrayList;
 import java.util.HashSet;

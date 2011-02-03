@@ -1,4 +1,4 @@
-package com.surelogic.common.eclipse.adhoc.views.explorer;
+package com.surelogic.common.ui.adhoc.views.explorer;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -11,7 +11,6 @@ import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.progress.UIJob;
 
-import com.surelogic.common.eclipse.adhoc.views.QueryResultNavigator;
 import com.surelogic.common.ILifecycle;
 import com.surelogic.common.adhoc.AdHocManager;
 import com.surelogic.common.adhoc.AdHocManagerAdapter;
@@ -19,6 +18,7 @@ import com.surelogic.common.adhoc.AdHocQueryResult;
 import com.surelogic.common.eclipse.jobs.SLUIJob;
 import com.surelogic.common.eclipse.tooltip.ToolTip;
 import com.surelogic.common.ui.SLImages;
+import com.surelogic.common.ui.adhoc.views.QueryResultNavigator;
 
 public final class QueryResultExplorerMediator extends AdHocManagerAdapter
 		implements ILifecycle {

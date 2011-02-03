@@ -1,4 +1,4 @@
-package com.surelogic.common.eclipse.actions;
+package com.surelogic.common.ui.actions;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -1,4 +1,4 @@
-package com.surelogic.common.eclipse.adhoc.views.editor;
+package com.surelogic.common.ui.adhoc.views.editor;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -44,8 +44,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.UIJob;
 
 import com.surelogic.common.core.adhoc.EclipseQueryUtility;
-import com.surelogic.common.eclipse.adhoc.dialogs.AddSubQueryDialog;
-import com.surelogic.common.eclipse.adhoc.dialogs.VariableValueDialog;
 import com.surelogic.common.CommonImages;
 import com.surelogic.common.ILifecycle;
 import com.surelogic.common.adhoc.AdHocManager;
@@ -59,6 +57,8 @@ import com.surelogic.common.ui.Activator;
 import com.surelogic.common.ui.PageBook;
 import com.surelogic.common.ui.SLImages;
 import com.surelogic.common.ui.SWTUtility;
+import com.surelogic.common.ui.adhoc.dialogs.AddSubQueryDialog;
+import com.surelogic.common.ui.adhoc.dialogs.VariableValueDialog;
 import com.surelogic.common.xml.XMLMemo;
 
 public final class QueryEditorMediator extends AdHocManagerAdapter implements

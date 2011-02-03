@@ -1,4 +1,4 @@
-package com.surelogic.common.eclipse.adhoc.dialogs;
+package com.surelogic.common.ui.adhoc.dialogs;
 
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;

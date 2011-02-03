@@ -1,4 +1,4 @@
-package com.surelogic.common.eclipse.actions;
+package com.surelogic.common.ui.actions;
 
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;

@@ -1,4 +1,4 @@
-package com.surelogic.common.eclipse.adhoc.views.menu;
+package com.surelogic.common.ui.adhoc.views.menu;
 
 import java.util.List;
 import java.util.Map;
@@ -17,7 +17,6 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.progress.UIJob;
 
 import com.surelogic.common.core.adhoc.EclipseQueryUtility;
-import com.surelogic.common.eclipse.adhoc.views.QueryResultNavigator;
 import com.surelogic.common.CommonImages;
 import com.surelogic.common.ILifecycle;
 import com.surelogic.common.adhoc.AdHocManager;
@@ -31,6 +30,7 @@ import com.surelogic.common.eclipse.tooltip.ToolTip;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.ui.PageBook;
 import com.surelogic.common.ui.SLImages;
+import com.surelogic.common.ui.adhoc.views.QueryResultNavigator;
 
 public final class QueryMenuMediator extends AdHocManagerAdapter implements
 		ILifecycle {
