@@ -23,6 +23,4 @@ public interface IAutoPerspectiveSwitchPreferences {
 	boolean getAutoPerspectiveSwitch();
 
 	void setAutoPerspectiveSwitch(boolean value);
-
-	String DATA_DIRECTORY = "data-directory";
 }
