@@ -32,13 +32,14 @@ public class Activator extends Plugin {
 		 * debug trace settings for this plug-in.
 		 */
 		SLLogger.addHandler(new EclipseHandler());
+		SLEclipsePreferences.getInstance().init();
 	}
 
 	@Override
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
 		try {
-			// SLImages.dispose();
+			SLEclipsePreferences.getInstance().dispose();
 		} finally {
 			super.stop(context);
 		}

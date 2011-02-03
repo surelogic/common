@@ -45,6 +45,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobManager;
 import org.eclipse.core.runtime.jobs.Job;
 import org.osgi.framework.Bundle;
+import org.osgi.service.prefs.Preferences;
 
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
@@ -53,6 +54,21 @@ import com.surelogic.common.license.SLLicenseUtility;
 import com.surelogic.common.logging.SLLogger;
 
 public class EclipseUtility {
+
+	/**
+	 * Gets the Eclipse {@link Preferences} for the SureLogic Eclipse-based
+	 * tools.
+	 * <p>
+	 * These preferences are persisted within per-workspace.
+	 * 
+	 * @return the SureLogic Eclipse preferences.
+	 * @throws IllegalStateException
+	 *             if the SureLogic Eclipse preferences are not loaded. This
+	 *             would indicate a bug.
+	 */
+	public static Preferences getPreferences() {
+		return SLEclipsePreferences.getInstance().getPreferences();
+	}
 
 	/**
 	 * Gets the directory where the passed plug-in identifier is located. Works
