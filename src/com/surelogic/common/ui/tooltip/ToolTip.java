@@ -406,7 +406,7 @@ public class ToolTip {
 				.currentThread()
 				.getContextClassLoader()
 				.getResource(
-						"/com/surelogic/common/eclipse/tooltip/ToolTipHoverStyleSheet.css");
+						"/com/surelogic/common/ui/tooltip/ToolTipHoverStyleSheet.css");
 		if (styleSheetURL != null) {
 			BufferedReader reader = null;
 			try {
