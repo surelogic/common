@@ -7,7 +7,7 @@ import com.surelogic.common.ui.Activator;
  */
 public class PreferenceConstants {
 
-	private static final String PREFIX = "com.surelogic.common.eclipse.";
+	private static final String PREFIX = "com.surelogic.common.ui.";
 
 	public static final String P_WARN_LOW_MAXIMUM_MEMORY = PREFIX
 			+ "warn-low-maximum-memory";
