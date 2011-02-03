@@ -9,13 +9,12 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.progress.UIJob;
 
+import com.surelogic.common.core.preferences.IAutoPerspectiveSwitchPreferences;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.ui.SLImages;
 import com.surelogic.common.ui.SWTUtility;
 import com.surelogic.common.ui.ViewUtility;
-import com.surelogic.common.ui.dialogs.ConfirmPerspectiveSwitchDialog;
 import com.surelogic.common.ui.jobs.SLUIJob;
-import com.surelogic.common.ui.preferences.IAutoPerspectiveSwitchPreferences;
 
 public abstract class AbstractConfirmPerspectiveSwitch {
 	private final AtomicBoolean f_dialogOpen = new AtomicBoolean(false);
