@@ -20,12 +20,12 @@ import org.eclipse.swt.widgets.Text;
 
 import com.surelogic.common.core.JDTUtility;
 import com.surelogic.common.core.jobs.EclipseJob;
+import com.surelogic.common.core.preferences.PreferencesUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.jobs.SLJob;
 import com.surelogic.common.serviceability.ServiceUtility;
 import com.surelogic.common.ui.BalloonUtility;
 import com.surelogic.common.ui.SLImages;
-import com.surelogic.common.ui.preferences.PreferenceConstants;
 
 /**
  * Dialog send a problem report to SureLogic.
@@ -98,14 +98,14 @@ public final class SendProblemReportDialog extends TitleAreaDialog {
 		email.setText(I18N.msg("common.send.problemReport.dialog.email"));
 		email.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, false, false));
 		final Text emailText = new Text(panel, SWT.SINGLE | SWT.BORDER);
-		emailText.setText(PreferenceConstants.getServicabilityEmail());
+		emailText.setText(PreferencesUtility.getServicabilityEmail());
 		emailText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		final Label name = new Label(panel, SWT.RIGHT);
 		name.setText(I18N.msg("common.send.problemReport.dialog.name"));
 		name.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, false, false));
 		final Text nameText = new Text(panel, SWT.SINGLE | SWT.BORDER);
-		nameText.setText(PreferenceConstants.getServicabilityName());
+		nameText.setText(PreferencesUtility.getServicabilityName());
 		nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		final Button sendVersion = new Button(panel, SWT.CHECK);
@@ -135,8 +135,7 @@ public final class SendProblemReportDialog extends TitleAreaDialog {
 
 		final Label summary = new Label(panel, SWT.RIGHT);
 		summary.setText(I18N.msg("common.send.problemReport.dialog.summary"));
-		summary
-				.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, false, false));
+		summary.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, false, false));
 		final Text summaryText = new Text(panel, SWT.SINGLE | SWT.BORDER);
 		summaryText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
@@ -218,8 +217,8 @@ public final class SendProblemReportDialog extends TitleAreaDialog {
 			});
 			f_previewButton.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event event) {
-					ShowTextDialog.showText(getShell(), I18N
-							.msg("common.send.problemReport.dialog.title"),
+					ShowTextDialog.showText(getShell(),
+							I18N.msg("common.send.problemReport.dialog.title"),
 							getMsg());
 				}
 			});
@@ -236,26 +235,24 @@ public final class SendProblemReportDialog extends TitleAreaDialog {
 		public String getMsg() {
 			File ideLogFile = f_sendEclipseLog.getSelection() ? JDTUtility
 					.getEclipseLogFile() : null;
-			return ServiceUtility.composeAProblemReport(f_aboutTool, f_email
-					.getText(), f_name.getText(), f_summary.getText(), f_tip
-					.getText(), f_sendVersion.getSelection(), JDTUtility
-					.getProductInfo(), f_sendUsage.getSelection(), ideLogFile);
+			return ServiceUtility.composeAProblemReport(f_aboutTool,
+					f_email.getText(), f_name.getText(), f_summary.getText(),
+					f_tip.getText(), f_sendVersion.getSelection(),
+					JDTUtility.getProductInfo(), f_sendUsage.getSelection(),
+					ideLogFile);
 		}
 
 		public void okPressed() {
-			PreferenceConstants.setServicabilityEmail(f_email.getText());
-			PreferenceConstants.setServicabilityName(f_name.getText());
+			PreferencesUtility.setServicabilityEmail(f_email.getText());
+			PreferencesUtility.setServicabilityName(f_name.getText());
 
 			final String msg = getMsg();
 			final SLJob job = ServiceUtility.sendToSureLogic(msg,
 					new Runnable() {
 						public void run() {
-							BalloonUtility
-									.showMessage(
-											I18N
-													.msg("common.send.problemReport.sent.title"),
-											I18N
-													.msg("common.send.problemReport.sent.message"));
+							BalloonUtility.showMessage(
+									I18N.msg("common.send.problemReport.sent.title"),
+									I18N.msg("common.send.problemReport.sent.message"));
 						}
 					});
 			EclipseJob.getInstance().schedule(job);

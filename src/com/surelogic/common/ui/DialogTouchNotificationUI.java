@@ -10,7 +10,6 @@ import com.surelogic.common.license.ILicenseObserver;
 import com.surelogic.common.ui.dialogs.LowMaximumMemoryDialog;
 import com.surelogic.common.ui.dialogs.NoLicenseDialog;
 import com.surelogic.common.ui.jobs.SLUIJob;
-import com.surelogic.common.ui.preferences.PreferenceConstants;
 
 public class DialogTouchNotificationUI extends
 		SLEclipseStatusUtility.LogTouchNotificationUI {
@@ -19,11 +18,6 @@ public class DialogTouchNotificationUI extends
 	public ILicenseObserver getLicenseObserver() {
 		return new NoLicenseDialog(
 				new SLEclipseStatusUtility.LogOutputLicenseObserver());
-	}
-
-	@Override
-	public boolean warnAboutLowMaximumMemory() {
-		return !PreferenceConstants.warnAboutLowMaximumMemory();
 	}
 
 	@Override

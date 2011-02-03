@@ -18,12 +18,12 @@ import org.eclipse.swt.widgets.Text;
 
 import com.surelogic.common.core.JDTUtility;
 import com.surelogic.common.core.jobs.EclipseJob;
+import com.surelogic.common.core.preferences.PreferencesUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.jobs.SLJob;
 import com.surelogic.common.serviceability.ServiceUtility;
 import com.surelogic.common.ui.BalloonUtility;
 import com.surelogic.common.ui.SLImages;
-import com.surelogic.common.ui.preferences.PreferenceConstants;
 
 /**
  * Dialog send a tip for improvement to SureLogic.
@@ -96,14 +96,14 @@ public final class SendTipDialog extends TitleAreaDialog {
 		email.setText(I18N.msg("common.send.tip.dialog.email"));
 		email.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, false, false));
 		final Text emailText = new Text(panel, SWT.SINGLE | SWT.BORDER);
-		emailText.setText(PreferenceConstants.getServicabilityEmail());
+		emailText.setText(PreferencesUtility.getServicabilityEmail());
 		emailText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		final Label name = new Label(panel, SWT.RIGHT);
 		name.setText(I18N.msg("common.send.tip.dialog.name"));
 		name.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, false, false));
 		final Text nameText = new Text(panel, SWT.SINGLE | SWT.BORDER);
-		nameText.setText(PreferenceConstants.getServicabilityName());
+		nameText.setText(PreferencesUtility.getServicabilityName());
 		nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		final Button sendVersion = new Button(panel, SWT.CHECK);
@@ -124,8 +124,7 @@ public final class SendTipDialog extends TitleAreaDialog {
 
 		final Label summary = new Label(panel, SWT.RIGHT);
 		summary.setText(I18N.msg("common.send.tip.dialog.summary"));
-		summary
-				.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, false, false));
+		summary.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, false, false));
 		final Text summaryText = new Text(panel, SWT.SINGLE | SWT.BORDER);
 		summaryText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
@@ -204,8 +203,8 @@ public final class SendTipDialog extends TitleAreaDialog {
 			});
 			f_previewButton.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event event) {
-					ShowTextDialog.showText(getShell(), I18N
-							.msg("common.send.tip.dialog.title"), getMsg());
+					ShowTextDialog.showText(getShell(),
+							I18N.msg("common.send.tip.dialog.title"), getMsg());
 				}
 			});
 		}
@@ -226,16 +225,16 @@ public final class SendTipDialog extends TitleAreaDialog {
 		}
 
 		public void okPressed() {
-			PreferenceConstants.setServicabilityEmail(f_email.getText());
-			PreferenceConstants.setServicabilityName(f_name.getText());
+			PreferencesUtility.setServicabilityEmail(f_email.getText());
+			PreferencesUtility.setServicabilityName(f_name.getText());
 
 			final String msg = f_mediator.getMsg();
 			final SLJob job = ServiceUtility.sendToSureLogic(msg,
 					new Runnable() {
 						public void run() {
-							BalloonUtility.showMessage(I18N
-									.msg("common.send.tip.sent.title"), I18N
-									.msg("common.send.tip.sent.message"));
+							BalloonUtility.showMessage(
+									I18N.msg("common.send.tip.sent.title"),
+									I18N.msg("common.send.tip.sent.message"));
 						}
 					});
 			EclipseJob.getInstance().schedule(job);
