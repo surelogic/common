@@ -22,13 +22,13 @@ import com.surelogic.common.ui.SWTUtility;
 import com.surelogic.common.ui.preferences.PreferenceConstants;
 
 public final class LowMaximumMemoryDialog extends Dialog {
-	
+
 	private final long f_maxMemoryMB;
-	private final int f_maxPermGenMB;
-	
+	private final long f_maxPermGenMB;
+
 	private static final int f_widthHint = 350;
 
-	public LowMaximumMemoryDialog(final long maxMemoryMB, final int permGenMB) {
+	public LowMaximumMemoryDialog(final long maxMemoryMB, final long permGenMB) {
 		super(SWTUtility.getShell());
 		f_maxMemoryMB = maxMemoryMB;
 		f_maxPermGenMB = permGenMB;
@@ -61,11 +61,13 @@ public final class LowMaximumMemoryDialog extends Dialog {
 
 		int numWarnings = 0;
 		if (f_maxMemoryMB < SLEclipseStatusUtility.LOW_MEM_THRESHOLD) {
-			createLabel(msgPanel, I18N.msg("sierra.eclipse.lowMemoryWarning1", f_maxMemoryMB));
+			createLabel(msgPanel,
+					I18N.msg("sierra.eclipse.lowMemoryWarning1", f_maxMemoryMB));
 			numWarnings++;
 		}
 		if (f_maxPermGenMB < SLEclipseStatusUtility.LOW_PERMGEN_THRESHOLD) {
-			createLabel(msgPanel, I18N.msg("sierra.eclipse.lowPermGenWarning1", f_maxPermGenMB));
+			createLabel(msgPanel, I18N.msg("sierra.eclipse.lowPermGenWarning1",
+					f_maxPermGenMB));
 			numWarnings++;
 		}
 		if (numWarnings == 1) {
@@ -74,18 +76,21 @@ public final class LowMaximumMemoryDialog extends Dialog {
 			createLabel(msgPanel, I18N.msg("sierra.eclipse.lowMemoryWarnings2"));
 		}
 		Group recommendations = new Group(msgPanel, SWT.NONE);
-		recommendations.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+		recommendations.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
+				true));
 		gridLayout = new GridLayout();
 		recommendations.setLayout(gridLayout);
 		recommendations.setText(I18N.msg("sierra.eclipse.lowMemoryWarning3"));
-		
+
 		if (f_maxMemoryMB < SLEclipseStatusUtility.LOW_MEM_THRESHOLD) {
 			final int mem = SLEclipseStatusUtility.LOW_MEM_THRESHOLD;
-			createLabel(recommendations, I18N.msg("sierra.eclipse.lowMemoryWarning4", mem, mem));
+			createLabel(recommendations,
+					I18N.msg("sierra.eclipse.lowMemoryWarning4", mem, mem));
 		}
 		if (f_maxPermGenMB < SLEclipseStatusUtility.LOW_PERMGEN_THRESHOLD) {
 			final int mem = SLEclipseStatusUtility.LOW_PERMGEN_THRESHOLD;
-			createLabel(recommendations, I18N.msg("sierra.eclipse.lowPermGenWarning4", mem, mem));
+			createLabel(recommendations,
+					I18N.msg("sierra.eclipse.lowPermGenWarning4", mem, mem));
 		}
 		createLabel(msgPanel, I18N.msg("sierra.eclipse.lowMemoryWarning5"));
 		createLabel(msgPanel, I18N.msg("sierra.eclipse.lowMemoryWarning6"));
@@ -111,7 +116,7 @@ public final class LowMaximumMemoryDialog extends Dialog {
 		msg.setLayoutData(data);
 		msg.setText(text);
 	}
-	
+
 	@Override
 	protected void createButtonsForButtonBar(Composite parent) {
 		createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL,

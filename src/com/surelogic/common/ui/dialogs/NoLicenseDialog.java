@@ -19,20 +19,27 @@ import com.surelogic.common.ui.jobs.SLUIJob;
 
 public final class NoLicenseDialog implements ILicenseObserver {
 
-	private static final NoLicenseDialog INSTANCE = new NoLicenseDialog();
+	/**
+	 * Writes messages to the Eclipse log. May be {@code null}.
+	 */
+	private final ILicenseObserver f_toEclipseLog;
 
-	public static final NoLicenseDialog getInstance() {
-		return INSTANCE;
-	}
-
-	private NoLicenseDialog() {
-		// singleton
+	/**
+	 * Constructs a new instance.
+	 * 
+	 * @param toEclipseLog
+	 *            Writes messages to the Eclipse log. May be {@code null}.
+	 */
+	public NoLicenseDialog(ILicenseObserver toEclipseLog) {
+		f_toEclipseLog = toEclipseLog;
 	}
 
 	public void notifyNoLicenseFor(final String subject) {
 		final UIJob job = new SLUIJob() {
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
+				if (f_toEclipseLog != null)
+					f_toEclipseLog.notifyNoLicenseFor(subject);
 				final String title = I18N
 						.msg("common.manage.licenses.dialog.noLicense.title");
 				final String msg = I18N.msg(
@@ -63,6 +70,8 @@ public final class NoLicenseDialog implements ILicenseObserver {
 				 */
 				if (!f_alreadyNotified.contains(subject)) {
 					f_alreadyNotified.add(subject);
+					if (f_toEclipseLog != null)
+						f_toEclipseLog.notifyExpiration(subject, expiration);
 					final String title = I18N
 							.msg("common.manage.licenses.dialog.expiration.title");
 					final String msg = I18N.msg(
