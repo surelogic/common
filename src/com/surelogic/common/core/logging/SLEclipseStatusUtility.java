@@ -70,28 +70,11 @@ public final class SLEclipseStatusUtility {
 	 * A console implementation to use as a default if {@code null} is passed to
 	 * {@link SLEclipseStatusUtility#touch(TouchNotificationUI)}.
 	 */
-	private static class TouchNotificationUIConsole implements
-			TouchNotificationUI {
+	public static class LogTouchNotificationUI implements TouchNotificationUI {
 
 		@Override
 		public ILicenseObserver getLicenseObserver() {
-			return new ILicenseObserver() {
-
-				@Override
-				public void notifyNoLicenseFor(String productName) {
-					SLLogger.getLogger().log(
-							Level.SEVERE,
-							I18N.msg("common.touch.license.noLicense",
-									productName));
-				}
-
-				@Override
-				public void notifyExpiration(String productName, Date expiration) {
-					SLLogger.getLogger().warning(
-							I18N.msg("common.touch.license.expiration",
-									productName, expiration));
-				}
-			};
+			return new LogOutputLicenseObserver();
 		}
 
 		@Override
@@ -107,6 +90,26 @@ public final class SLEclipseStatusUtility {
 	}
 
 	/**
+	 * An implementation of {@link ILicenseObserver} that outputs errors and
+	 * warnings to the log.
+	 */
+	public static class LogOutputLicenseObserver implements ILicenseObserver {
+
+		@Override
+		public void notifyNoLicenseFor(String productName) {
+			SLLogger.getLogger().log(Level.SEVERE,
+					I18N.msg("common.touch.license.noLicense", productName));
+		}
+
+		@Override
+		public void notifyExpiration(String productName, Date expiration) {
+			SLLogger.getLogger().warning(
+					I18N.msg("common.touch.license.expiration", productName,
+							expiration));
+		}
+	}
+
+	/**
 	 * Used by other plug-ins to "touch" common-eclipse-core and ensure it
 	 * loads.
 	 * 
@@ -116,7 +119,7 @@ public final class SLEclipseStatusUtility {
 	 */
 	public static void touch(TouchNotificationUI ui) {
 		if (ui == null)
-			ui = new TouchNotificationUIConsole();
+			ui = new LogTouchNotificationUI();
 		/*
 		 * Only warn when our first plug-in is loaded.
 		 */

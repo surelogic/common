@@ -12,7 +12,14 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.Dictionary;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -26,15 +33,18 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobManager;
 import org.eclipse.core.runtime.jobs.Job;
+import org.osgi.framework.Bundle;
 
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
@@ -43,6 +53,106 @@ import com.surelogic.common.license.SLLicenseUtility;
 import com.surelogic.common.logging.SLLogger;
 
 public class EclipseUtility {
+
+	/**
+	 * Gets the directory where the passed plug-in identifier is located. Works
+	 * for both directories and Jar files.
+	 * 
+	 * @param plugInId
+	 *            the id of an installed plug-in.
+	 * @return the path to the plug-in or Jar.
+	 */
+	public static String getDirectoryOf(final String plugInId) {
+		final Bundle bundle = Platform.getBundle(plugInId);
+		if (bundle == null) {
+			throw new IllegalStateException("null bundle returned for "
+					+ plugInId);
+		}
+
+		final URL relativeURL = bundle.getEntry("");
+		try {
+			URL commonPathURL = FileLocator.resolve(relativeURL);
+			final String commonDirectory = commonPathURL.getPath();
+			if (commonDirectory.startsWith("file:")
+					&& commonDirectory.endsWith(".jar!/")) {
+				// Jar file
+				return commonDirectory.substring(5,
+						commonDirectory.length() - 2);
+			}
+			return commonDirectory;
+		} catch (Exception e) {
+			throw new IllegalStateException(
+					"failed to resolve a path for the URL " + relativeURL);
+		}
+	}
+
+	/**
+	 * Gets a list of plug-in identifiers needed to run the given plug-in id,
+	 * including itself.
+	 * 
+	 * @param plugInId
+	 *            the id of an installed plug-in.
+	 * @return A comma-separated list of plug-in identifiers needed to run the
+	 *         given plug-in id, including itself.
+	 */
+	public static Set<String> getDependencies(final String plugInId) {
+		final Bundle bundle = Platform.getBundle(plugInId);
+		if (bundle == null) {
+			return Collections.emptySet();
+		}
+		return getDependencies(bundle, new HashSet<String>());
+	}
+
+	/**
+	 * Returns the set of dependencies for the given plug-in bundle.
+	 * 
+	 * @param b
+	 *            Not a checked plug-in
+	 * @param checked
+	 *            The set of plug-ins that we're already checked
+	 */
+	private static Set<String> getDependencies(Bundle b, Set<String> checked) {
+		checked.add(b.getSymbolicName());
+
+		Dictionary<String, String> d = b.getHeaders();
+		String deps = d.get("Require-Bundle");
+		if (deps != null) {
+			String lastId = null;
+			List<String> ids = new ArrayList<String>();
+			List<String> optional = null;
+			final StringTokenizer st = new StringTokenizer(deps, ";, ");
+			while (st.hasMoreTokens()) {
+				String id = st.nextToken();
+				if ("resolution:=optional".equals(id) && lastId != null) {
+					if (optional == null) {
+						optional = new ArrayList<String>();
+					}
+					optional.add(lastId);
+				}
+				if (id.indexOf('=') >= 0 || id.indexOf('"') >= 0) {
+					// Ignore any property stuff
+					// (e.g. version info)
+					// System.out.println("Ignoring: "+id);
+					continue;
+				}
+				lastId = id;
+				ids.add(id);
+			}
+			for (String id : ids) {
+				// System.out.println("Considering: "+id);
+				if (checked.contains(id)) {
+					continue;
+				}
+				final Bundle bundle = Platform.getBundle(id);
+				if (bundle == null && !optional.contains(id)) {
+					throw new IllegalArgumentException("Couldn't find bundle "
+							+ id + " required for " + b.getSymbolicName());
+				}
+				getDependencies(bundle, checked);
+			}
+		}
+		return checked;
+	}
 
 	/**
 	 * Gets the path to the open Eclipse workspace.
