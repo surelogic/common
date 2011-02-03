@@ -42,4 +42,8 @@ public final class PreferencesUtility {
 			value = "";
 		EclipseUtility.getPreferences().put(P_SERVICEABILITY_NAME, value);
 	}
+
+	private PreferencesUtility() {
+		// utility
+	}
 }
