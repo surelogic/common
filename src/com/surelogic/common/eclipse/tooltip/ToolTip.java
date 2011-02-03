@@ -37,8 +37,8 @@ import org.eclipse.swt.widgets.Widget;
 
 import com.surelogic.common.CommonImages;
 import com.surelogic.common.FileUtility;
-import com.surelogic.common.eclipse.HTMLPrinter;
 import com.surelogic.common.i18n.I18N;
+import com.surelogic.common.ui.HTMLPrinter;
 
 /**
  * Enables tool tip support on tables, trees, and other controls.

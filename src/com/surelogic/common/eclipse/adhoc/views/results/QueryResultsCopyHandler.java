@@ -7,7 +7,7 @@ import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.handlers.HandlerUtil;
 
-import com.surelogic.common.eclipse.SWTUtility;
+import com.surelogic.common.ui.SWTUtility;
 
 public class QueryResultsCopyHandler extends AbstractHandler {
 	public Object execute(final ExecutionEvent event) throws ExecutionException {

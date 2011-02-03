@@ -12,10 +12,10 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.progress.UIJob;
 
 import com.surelogic.common.SLUtility;
-import com.surelogic.common.eclipse.SWTUtility;
 import com.surelogic.common.eclipse.jobs.SLUIJob;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.license.ILicenseObserver;
+import com.surelogic.common.ui.SWTUtility;
 
 public final class NoLicenseDialog implements ILicenseObserver {
 

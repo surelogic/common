@@ -26,11 +26,11 @@ import com.surelogic.common.adhoc.AdHocQuery;
 import com.surelogic.common.adhoc.AdHocQueryFullyBound;
 import com.surelogic.common.adhoc.AdHocQueryResult;
 import com.surelogic.common.adhoc.AdHocQueryResultSqlData;
-import com.surelogic.common.eclipse.PageBook;
-import com.surelogic.common.eclipse.SLImages;
 import com.surelogic.common.eclipse.jobs.SLUIJob;
 import com.surelogic.common.eclipse.tooltip.ToolTip;
 import com.surelogic.common.i18n.I18N;
+import com.surelogic.common.ui.PageBook;
+import com.surelogic.common.ui.SLImages;
 
 public final class QueryMenuMediator extends AdHocManagerAdapter implements
 		ILifecycle {

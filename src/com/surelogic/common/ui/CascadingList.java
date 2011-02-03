@@ -1,4 +1,4 @@
-package com.surelogic.common.eclipse;
+package com.surelogic.common.ui;
 
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -302,7 +302,7 @@ public class CascadingList extends ScrolledComposite {
 	 * Note: Clients should not invoke this method followed by
 	 * {@link #addColumn(CascadingList.IScrolledColumn)} as this could cause a
 	 * strange animation in several cases. Instead invoke
-	 * {@link #addColumnAfter(com.surelogic.common.eclipse.CascadingList.IColumn, int, boolean)}
+	 * {@link #addColumnAfter(com.surelogic.common.ui.CascadingList.IColumn, int, boolean)}
 	 * which combines the two operations and produces the correct animation.
 	 * 
 	 * @param columnIndex

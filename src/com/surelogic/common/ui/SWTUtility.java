@@ -1,4 +1,4 @@
-package com.surelogic.common.eclipse;
+package com.surelogic.common.ui;
 
 import java.lang.reflect.InvocationTargetException;
 

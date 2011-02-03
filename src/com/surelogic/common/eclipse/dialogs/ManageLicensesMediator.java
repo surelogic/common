@@ -21,7 +21,6 @@ import org.eclipse.swt.widgets.TableItem;
 import com.surelogic.common.CommonImages;
 import com.surelogic.common.FileUtility;
 import com.surelogic.common.ILifecycle;
-import com.surelogic.common.eclipse.SLImages;
 import com.surelogic.common.core.logging.SLEclipseStatusUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.jobs.SLStatus;
@@ -30,6 +29,7 @@ import com.surelogic.common.license.SLLicense;
 import com.surelogic.common.license.SLLicenseManager;
 import com.surelogic.common.license.SLLicenseType;
 import com.surelogic.common.license.SLLicenseUtility;
+import com.surelogic.common.ui.SLImages;
 
 final class ManageLicensesMediator implements ILifecycle {
 

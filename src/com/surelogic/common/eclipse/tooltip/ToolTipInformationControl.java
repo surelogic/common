@@ -17,7 +17,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
 
-import com.surelogic.common.eclipse.HTMLPrinter;
+import com.surelogic.common.ui.HTMLPrinter;
 
 public class ToolTipInformationControl extends AbstractInformationControl {
 

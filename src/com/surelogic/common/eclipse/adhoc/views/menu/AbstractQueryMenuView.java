@@ -14,9 +14,9 @@ import org.eclipse.ui.part.ViewPart;
 import com.surelogic.common.eclipse.adhoc.views.QueryResultNavigator;
 import com.surelogic.common.adhoc.AdHocManager;
 import com.surelogic.common.adhoc.AdHocQuery;
-import com.surelogic.common.eclipse.PageBook;
 import com.surelogic.common.eclipse.tooltip.ToolTip;
 import com.surelogic.common.i18n.I18N;
+import com.surelogic.common.ui.PageBook;
 
 public abstract class AbstractQueryMenuView extends ViewPart {
 

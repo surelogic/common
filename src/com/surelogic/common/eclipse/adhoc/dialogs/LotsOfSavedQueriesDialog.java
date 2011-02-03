@@ -10,9 +10,9 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 
 import com.surelogic.common.CommonImages;
-import com.surelogic.common.eclipse.SLImages;
-import com.surelogic.common.eclipse.SWTUtility;
 import com.surelogic.common.i18n.I18N;
+import com.surelogic.common.ui.SLImages;
+import com.surelogic.common.ui.SWTUtility;
 
 public class LotsOfSavedQueriesDialog extends MessageDialog {
 

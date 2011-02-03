@@ -48,8 +48,8 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.SelectionDialog;
 
 import com.surelogic.common.CommonImages;
-import com.surelogic.common.eclipse.SLImages;
 import com.surelogic.common.logging.SLLogger;
+import com.surelogic.common.ui.SLImages;
 
 /**
  * Dialog box for selecting Java types from a given project.  Had to write this

@@ -3,7 +3,7 @@ package com.surelogic.common.eclipse.preferences;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
 
-import com.surelogic.common.eclipse.Activator;
+import com.surelogic.common.ui.Activator;
 
 /**
  * Class used to initialize default preference values.

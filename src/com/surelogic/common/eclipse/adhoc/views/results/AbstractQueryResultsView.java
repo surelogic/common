@@ -59,12 +59,12 @@ import com.surelogic.common.adhoc.model.LeafTreeCell;
 import com.surelogic.common.adhoc.model.NonLeafColumnSummary;
 import com.surelogic.common.adhoc.model.NonLeafTreeCell;
 import com.surelogic.common.adhoc.model.TreeCell;
-import com.surelogic.common.eclipse.SLImages;
-import com.surelogic.common.eclipse.SWTUtility;
-import com.surelogic.common.eclipse.TableUtility;
-import com.surelogic.common.eclipse.ViewUtility;
 import com.surelogic.common.eclipse.tooltip.ToolTip;
 import com.surelogic.common.i18n.I18N;
+import com.surelogic.common.ui.SLImages;
+import com.surelogic.common.ui.SWTUtility;
+import com.surelogic.common.ui.TableUtility;
+import com.surelogic.common.ui.ViewUtility;
 
 public abstract class AbstractQueryResultsView extends ViewPart {
 

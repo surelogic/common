@@ -2,7 +2,7 @@
  * The Eclipse class needed a getPage() method.  Hopefully, they will add it.
  * I filed the request (with this code attached) as bug 204441
  *******************************************************************************/
-package com.surelogic.common.eclipse;
+package com.surelogic.common.ui;
 
 // package org.eclipse.ui.part;
 

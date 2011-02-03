@@ -1,4 +1,4 @@
-package com.surelogic.common.eclipse;
+package com.surelogic.common.ui;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.widgets.Composite;

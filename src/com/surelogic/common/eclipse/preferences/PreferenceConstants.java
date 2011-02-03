@@ -1,6 +1,6 @@
 package com.surelogic.common.eclipse.preferences;
 
-import com.surelogic.common.eclipse.Activator;
+import com.surelogic.common.ui.Activator;
 
 /**
  * Constant definitions for plug-in preferences with getters and setters.

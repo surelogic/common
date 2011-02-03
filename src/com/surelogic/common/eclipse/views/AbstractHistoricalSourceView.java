@@ -34,9 +34,9 @@ import org.eclipse.ui.part.ViewPart;
 
 import com.surelogic.common.AbstractJavaZip;
 import com.surelogic.common.ISourceZipFileHandles;
-import com.surelogic.common.eclipse.ViewUtility;
 import com.surelogic.common.logging.SLLogger;
 import com.surelogic.common.serviceability.UsageMeter;
+import com.surelogic.common.ui.ViewUtility;
 
 public abstract class AbstractHistoricalSourceView extends ViewPart {
 

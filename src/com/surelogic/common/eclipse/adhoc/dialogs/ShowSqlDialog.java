@@ -13,8 +13,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
 import com.surelogic.common.eclipse.adhoc.views.editor.SQLSyntaxHighlighter;
-import com.surelogic.common.eclipse.SWTUtility;
 import com.surelogic.common.i18n.I18N;
+import com.surelogic.common.ui.SWTUtility;
 
 /**
  * Dialog to show the SQL that produced a query result.

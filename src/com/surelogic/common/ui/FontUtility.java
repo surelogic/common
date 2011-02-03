@@ -1,4 +1,4 @@
-package com.surelogic.common.eclipse;
+package com.surelogic.common.ui;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Font;

@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: SureLogic User Interface Eclipse Common Code
 Bundle-SymbolicName: com.surelogic.common.ui;singleton:=true
 Bundle-Version: 4.0.0.qualifier
-Bundle-Activator: com.surelogic.common.eclipse.Activator
+Bundle-Activator: com.surelogic.common.ui.Activator
 Bundle-Vendor: SureLogic, Inc.
 Require-Bundle: com.surelogic.common,
  com.surelogic.common.core,
@@ -17,21 +17,5 @@ Require-Bundle: com.surelogic.common,
  org.eclipse.jface.text
 Eclipse-LazyStart: true
 Bundle-ActivationPolicy: lazy
-Export-Package: com.surelogic.common.eclipse,
- com.surelogic.common.eclipse.actions,
- com.surelogic.common.eclipse.adhoc.dialogs,
- com.surelogic.common.eclipse.adhoc.views,
- com.surelogic.common.eclipse.adhoc.views.editor,
- com.surelogic.common.eclipse.adhoc.views.explorer,
- com.surelogic.common.eclipse.adhoc.views.menu,
- com.surelogic.common.eclipse.adhoc.views.results,
- com.surelogic.common.eclipse.dialogs,
- com.surelogic.common.eclipse.preferences,
- com.surelogic.common.eclipse.refactor,
- com.surelogic.common.eclipse.text,
- com.surelogic.common.eclipse.tooltip,
- com.surelogic.common.eclipse.views,
- org.jdesktop.swt.animation.timing,
- org.jdesktop.swt.animation.timing.interpolation
 Bundle-ClassPath: .
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

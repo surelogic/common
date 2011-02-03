@@ -19,11 +19,11 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import com.surelogic.common.CommonImages;
-import com.surelogic.common.eclipse.SLImages;
 import com.surelogic.common.core.jobs.TableExportJob;
 import com.surelogic.common.export.ExportFactory;
 import com.surelogic.common.export.ExportTableDataSource;
 import com.surelogic.common.export.ITableExporter;
+import com.surelogic.common.ui.SLImages;
 
 public final class TableExportDialog extends Dialog {
 

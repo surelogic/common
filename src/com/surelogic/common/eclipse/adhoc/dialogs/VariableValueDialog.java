@@ -19,8 +19,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-import com.surelogic.common.eclipse.SWTUtility;
 import com.surelogic.common.i18n.I18N;
+import com.surelogic.common.ui.SWTUtility;
 
 /**
  * Dialog to allow the user to view and optionally edit variable values.
