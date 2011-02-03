@@ -182,6 +182,15 @@ public final class SLEclipseStatusUtility {
 		}
 	}
 
+	/**
+	 * Attempts to get the PermGen setting. However, this only works on Sun JVMs
+	 * so it is set to {@link Integer#MAX_VALUE} if we are not on a Sun JVM.
+	 * <p>
+	 * The implementation of this method is brittle, e.g., it assumes the
+	 * default setting is 64m.
+	 * 
+	 * @return the PermGen setting.
+	 */
 	private static PermGenArg getPermGenArg() {
 		String vendor = System.getProperty("java.vm.vendor");
 		if (!vendor.startsWith("Sun")) {
