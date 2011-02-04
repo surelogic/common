@@ -44,6 +44,7 @@ import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobManager;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.framework.Bundle;
@@ -57,15 +58,183 @@ import com.surelogic.common.logging.SLLogger;
 public class EclipseUtility {
 
 	/**
-	 * Defines the SureLogic preference node. The preferences obtained by
-	 * {@link #getPreferences()} use this node within the instance scope (
-	 * {@link InstanceScope}) of Eclipse-based preferences.
+	 * Defines the SureLogic preference node that is used by the preference API
+	 * defined below. This API can be used in UI and Non-UI Eclipse code to
+	 * manage Eclipse preferences for SureLogic tools.
 	 * <p>
 	 * To obtain a version of the SureLogic preferences usable in the Eclipse
 	 * UI, e.g., in the implementation of a properties dialog, see
 	 * <tt>EclipseUIUtility.getPreferences()</tt>.
+	 * <p>
+	 * To be compatible with the Eclipse UI preferences we set default values in
+	 * the {@link DefaultScope} and current values in the {@link InstanceScope}.
+	 * This ensures that UI code accessing preferences via
+	 * <tt>EclipseUIUtility.getPreferences()</tt> will get the same results
+	 * callers of the preference API defined in this class.
 	 */
 	public static final String PREFERENCES_NODE = "com.surelogic.common.core.preferences";
+
+	/**
+	 * The default-default value for boolean preferences (<code>false</code>).
+	 */
+	public static final boolean BOOLEAN_DEFAULT_DEFAULT = false;
+
+	/**
+	 * The default-default value for double preferences (<code>0.0</code>).
+	 */
+	public static final double DOUBLE_DEFAULT_DEFAULT = 0.0;
+
+	/**
+	 * The default-default value for float preferences (<code>0.0f</code>).
+	 */
+	public static final float FLOAT_DEFAULT_DEFAULT = 0.0f;
+
+	/**
+	 * The default-default value for int preferences (<code>0</code>).
+	 */
+	public static final int INT_DEFAULT_DEFAULT = 0;
+
+	/**
+	 * The default-default value for long preferences (<code>0L</code>).
+	 */
+	public static final long LONG_DEFAULT_DEFAULT = 0L;
+
+	/**
+	 * The default-default value for String preferences (<code>""</code>).
+	 */
+	public static final String STRING_DEFAULT_DEFAULT = "";
+
+	/*
+	 * Boolean preference API
+	 */
+
+	public static boolean getBooleanPreference(String key) {
+		return Platform.getPreferencesService().getBoolean(PREFERENCES_NODE,
+				key, BOOLEAN_DEFAULT_DEFAULT, null);
+	}
+
+	public static void setBooleanPreference(String key, boolean value) {
+		(new InstanceScope()).getNode(PREFERENCES_NODE).putBoolean(key, value);
+	}
+
+	public static boolean getDefaultBooleanPreference(String key) {
+		return (new DefaultScope()).getNode(PREFERENCES_NODE).getBoolean(key,
+				BOOLEAN_DEFAULT_DEFAULT);
+	}
+
+	public static void setDefaultBooleanPreference(String key, boolean value) {
+		(new DefaultScope()).getNode(PREFERENCES_NODE).putBoolean(key, value);
+	}
+
+	/*
+	 * Double preference API
+	 */
+
+	public static double getDoublePreference(String key) {
+		return Platform.getPreferencesService().getDouble(PREFERENCES_NODE,
+				key, DOUBLE_DEFAULT_DEFAULT, null);
+	}
+
+	public static void setDoublePreference(String key, double value) {
+		(new InstanceScope()).getNode(PREFERENCES_NODE).putDouble(key, value);
+	}
+
+	public static double getDefaultDoublePreference(String key) {
+		return (new DefaultScope()).getNode(PREFERENCES_NODE).getDouble(key,
+				DOUBLE_DEFAULT_DEFAULT);
+	}
+
+	public static void setDefaultDoublePreference(String key, double value) {
+		(new DefaultScope()).getNode(PREFERENCES_NODE).putDouble(key, value);
+	}
+
+	/*
+	 * Float preference API
+	 */
+
+	public static float getFloatPreference(String key) {
+		return Platform.getPreferencesService().getFloat(PREFERENCES_NODE, key,
+				FLOAT_DEFAULT_DEFAULT, null);
+	}
+
+	public static void setFloatPreference(String key, float value) {
+		(new InstanceScope()).getNode(PREFERENCES_NODE).putFloat(key, value);
+	}
+
+	public static float getDefaultFloatPreference(String key) {
+		return (new DefaultScope()).getNode(PREFERENCES_NODE).getFloat(key,
+				FLOAT_DEFAULT_DEFAULT);
+	}
+
+	public static void setDefaultFloatPreference(String key, float value) {
+		(new DefaultScope()).getNode(PREFERENCES_NODE).putFloat(key, value);
+	}
+
+	/*
+	 * Int preference API
+	 */
+
+	public static int getIntPreference(String key) {
+		return Platform.getPreferencesService().getInt(PREFERENCES_NODE, key,
+				INT_DEFAULT_DEFAULT, null);
+	}
+
+	public static void setIntPreference(String key, int value) {
+		(new InstanceScope()).getNode(PREFERENCES_NODE).putInt(key, value);
+	}
+
+	public static int getDefaultIntPreference(String key) {
+		return (new DefaultScope()).getNode(PREFERENCES_NODE).getInt(key,
+				INT_DEFAULT_DEFAULT);
+	}
+
+	public static void setDefaultIntPreference(String key, int value) {
+		(new DefaultScope()).getNode(PREFERENCES_NODE).putInt(key, value);
+	}
+
+	/*
+	 * Long preference API
+	 */
+
+	public static long getLongPreference(String key) {
+		return Platform.getPreferencesService().getLong(PREFERENCES_NODE, key,
+				LONG_DEFAULT_DEFAULT, null);
+	}
+
+	public static void setLongPreference(String key, long value) {
+		(new InstanceScope()).getNode(PREFERENCES_NODE).putLong(key, value);
+	}
+
+	public static long getDefaultLongPreference(String key) {
+		return (new DefaultScope()).getNode(PREFERENCES_NODE).getLong(key,
+				LONG_DEFAULT_DEFAULT);
+	}
+
+	public static void setDefaultLongPreference(String key, long value) {
+		(new DefaultScope()).getNode(PREFERENCES_NODE).putLong(key, value);
+	}
+
+	/*
+	 * String preference API
+	 */
+
+	public static String getStringPreference(String key) {
+		return Platform.getPreferencesService().getString(PREFERENCES_NODE,
+				key, STRING_DEFAULT_DEFAULT, null);
+	}
+
+	public static void setStringPreference(String key, String value) {
+		(new InstanceScope()).getNode(PREFERENCES_NODE).put(key, value);
+	}
+
+	public static String getDefaultStringPreference(String key) {
+		return (new DefaultScope()).getNode(PREFERENCES_NODE).get(key,
+				STRING_DEFAULT_DEFAULT);
+	}
+
+	public static void setDefaultStringPreference(String key, String value) {
+		(new DefaultScope()).getNode(PREFERENCES_NODE).put(key, value);
+	}
 
 	/**
 	 * Gets the Eclipse {@link IEclipsePreferences} for the SureLogic
