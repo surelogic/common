@@ -1,46 +1,52 @@
 package com.surelogic.common.core.preferences;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import com.surelogic.common.core.EclipseUtility;
 
 public final class PreferencesUtility {
 
 	private static final String PREFIX = "com.surelogic.common.core.";
+	private static final String WARN_LOW_MEMORY = PREFIX + "warnLowMemory";
+	private static final String SERVICEABILITY_EMAIL = PREFIX
+			+ "serviceability.email";
+	private static final String SERVICEABILITY_NAME = PREFIX
+			+ "serviceability.name";
 
-	public static final String P_WARN_LOW_MEMORY = PREFIX + "warnLowMemory";
+	private static final AtomicBoolean f_initializationNeeded = new AtomicBoolean(
+			true);
+
+	public static void initializeDefaultScope() {
+		if (f_initializationNeeded.compareAndSet(true, false)) {
+			EclipseUtility.setDefaultBooleanPreference(WARN_LOW_MEMORY, true);
+			/*
+			 * We'll take the default-default for the other preferences.
+			 */
+		}
+	}
 
 	public static boolean warnAboutLowMaximumMemory() {
-		return EclipseUtility.getPreferences().getBoolean(P_WARN_LOW_MEMORY,
-				true);
+		return EclipseUtility.getBooleanPreference(WARN_LOW_MEMORY);
 	}
 
 	public static void setWarnAboutLowMaximumMemory(boolean value) {
-		EclipseUtility.getPreferences().putBoolean(P_WARN_LOW_MEMORY, value);
+		EclipseUtility.setBooleanPreference(WARN_LOW_MEMORY, value);
 	}
 
-	public static final String P_SERVICEABILITY_EMAIL = PREFIX
-			+ "serviceability.email";
-
 	public static String getServicabilityEmail() {
-		return EclipseUtility.getPreferences().get(P_SERVICEABILITY_EMAIL, "");
+		return EclipseUtility.getStringPreference(SERVICEABILITY_EMAIL);
 	}
 
 	public static void setServicabilityEmail(String value) {
-		if (value == null)
-			value = "";
-		EclipseUtility.getPreferences().put(P_SERVICEABILITY_EMAIL, value);
+		EclipseUtility.setStringPreference(SERVICEABILITY_EMAIL, value);
 	}
 
-	public static final String P_SERVICEABILITY_NAME = PREFIX
-			+ "serviceability.name";
-
 	public static String getServicabilityName() {
-		return EclipseUtility.getPreferences().get(P_SERVICEABILITY_NAME, "");
+		return EclipseUtility.getStringPreference(SERVICEABILITY_NAME);
 	}
 
 	public static void setServicabilityName(String value) {
-		if (value == null)
-			value = "";
-		EclipseUtility.getPreferences().put(P_SERVICEABILITY_NAME, value);
+		EclipseUtility.setStringPreference(SERVICEABILITY_NAME, value);
 	}
 
 	private PreferencesUtility() {

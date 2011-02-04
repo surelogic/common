@@ -224,6 +224,12 @@ public class EclipseUtility {
 	}
 
 	public static void setStringPreference(String key, String value) {
+		/*
+		 * Avoid a NPE if the passed value is null, assume that this means to
+		 * use the default-default
+		 */
+		if (value == null)
+			value = STRING_DEFAULT_DEFAULT;
 		(new InstanceScope()).getNode(PREFERENCES_NODE).put(key, value);
 	}
 
