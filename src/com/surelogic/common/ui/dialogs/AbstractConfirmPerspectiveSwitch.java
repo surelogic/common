@@ -9,7 +9,8 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.progress.UIJob;
 
-import com.surelogic.common.core.preferences.IAutoPerspectiveSwitchPreferences;
+import com.surelogic.common.core.EclipseUtility;
+import com.surelogic.common.core.preferences.AutoPerspectiveSwitchPreferences;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.ui.SLImages;
 import com.surelogic.common.ui.SWTUtility;
@@ -19,9 +20,10 @@ import com.surelogic.common.ui.jobs.SLUIJob;
 public abstract class AbstractConfirmPerspectiveSwitch {
 	private final AtomicBoolean f_dialogOpen = new AtomicBoolean(false);
 	private final String perspectiveId;
-	private final IAutoPerspectiveSwitchPreferences prefs;
+	private final AutoPerspectiveSwitchPreferences prefs;
 
-	protected AbstractConfirmPerspectiveSwitch(String id, IAutoPerspectiveSwitchPreferences p) {
+	protected AbstractConfirmPerspectiveSwitch(String id,
+			AutoPerspectiveSwitchPreferences p) {
 		perspectiveId = id;
 		prefs = p;
 	}
@@ -70,16 +72,19 @@ public abstract class AbstractConfirmPerspectiveSwitch {
 	 *         otherwise.
 	 */
 	protected final boolean toPerspective(Shell shell) {
-		if (prefs.getPromptForPerspectiveSwitch()) {
+		if (prefs.getPromptPerspectiveSwitch()) {
 			ConfirmPerspectiveSwitchDialog dialog = new ConfirmPerspectiveSwitchDialog(
-					shell, SLImages.getImage(getLogo()), I18N
-							.msg(getShortPrefix()
-									+ "dialog.confirm.perspective.switch"));
+					shell, SLImages.getImage(getLogo()),
+					I18N.msg(getShortPrefix()
+							+ "dialog.confirm.perspective.switch"));
 			final boolean result = dialog.open() == Window.OK;
 			final boolean rememberMyDecision = dialog.getRememberMyDecision();
 			if (rememberMyDecision) {
-				prefs.setPromptForPerspectiveSwitch(!rememberMyDecision);
-				prefs.setAutoPerspectiveSwitch(result);
+				EclipseUtility.setBooleanPreference(
+						prefs.getPromptPerspectiveSwitchConstant(),
+						!rememberMyDecision);
+				EclipseUtility.setBooleanPreference(
+						prefs.getAutoPerspectiveSwitchConstant(), result);
 			}
 			return result;
 		} else {
