@@ -5,6 +5,7 @@ import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
 import com.surelogic.common.core.logging.EclipseHandler;
+import com.surelogic.common.core.preferences.CommonCorePreferencesUtility;
 import com.surelogic.common.logging.SLLogger;
 
 /**
@@ -32,17 +33,14 @@ public class Activator extends Plugin {
 		 * debug trace settings for this plug-in.
 		 */
 		SLLogger.addHandler(new EclipseHandler());
-		SLEclipsePreferences.getInstance().init();
+
+		CommonCorePreferencesUtility.initializeDefaultScope();
 	}
 
 	@Override
 	public void stop(BundleContext context) throws Exception {
 		plugin = null;
-		try {
-			SLEclipsePreferences.getInstance().dispose();
-		} finally {
-			super.stop(context);
-		}
+		super.stop(context);
 	}
 
 	/**

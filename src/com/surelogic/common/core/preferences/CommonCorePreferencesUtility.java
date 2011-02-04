@@ -4,7 +4,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.surelogic.common.core.EclipseUtility;
 
-public final class PreferencesUtility {
+public final class CommonCorePreferencesUtility {
 
 	private static final String PREFIX = "com.surelogic.common.core.";
 	private static final String WARN_LOW_MEMORY = PREFIX + "warnLowMemory";
@@ -49,7 +49,7 @@ public final class PreferencesUtility {
 		EclipseUtility.setStringPreference(SERVICEABILITY_NAME, value);
 	}
 
-	private PreferencesUtility() {
+	private CommonCorePreferencesUtility() {
 		// utility
 	}
 }

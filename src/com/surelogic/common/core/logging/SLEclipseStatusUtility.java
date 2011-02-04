@@ -13,7 +13,7 @@ import org.osgi.framework.Bundle;
 
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.core.Activator;
-import com.surelogic.common.core.preferences.PreferencesUtility;
+import com.surelogic.common.core.preferences.CommonCorePreferencesUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.jobs.SLSeverity;
 import com.surelogic.common.jobs.SLStatus;
@@ -133,7 +133,7 @@ public final class SLEclipseStatusUtility {
 	 * The user can opt-out of this warning.
 	 */
 	private static void warnAboutLowMaximumMemory(TouchNotificationUI ui) {
-		if (!PreferencesUtility.warnAboutLowMaximumMemory())
+		if (!CommonCorePreferencesUtility.warnAboutLowMaximumMemory())
 			return;
 		final Runtime rt = Runtime.getRuntime();
 		final long maxMemoryMB = SLUtility.byteToMByte(rt.maxMemory());

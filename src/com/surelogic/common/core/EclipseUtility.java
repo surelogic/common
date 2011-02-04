@@ -45,7 +45,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobManager;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.DefaultScope;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.framework.Bundle;
 
@@ -240,27 +239,6 @@ public class EclipseUtility {
 
 	public static void setDefaultStringPreference(String key, String value) {
 		(new DefaultScope()).getNode(PREFERENCES_NODE).put(key, value);
-	}
-
-	/**
-	 * Gets the Eclipse {@link IEclipsePreferences} for the SureLogic
-	 * Eclipse-based tools.
-	 * <p>
-	 * These preferences are persisted within per-workspace.
-	 * <p>
-	 * To obtain a version of the SureLogic preferences usable in the Eclipse
-	 * UI, e.g., in the implementation of a properties dialog, see
-	 * <tt>EclipseUIUtility.getPreferences()</tt>.
-	 * 
-	 * @return the SureLogic Eclipse preferences.
-	 * @throws IllegalStateException
-	 *             if the SureLogic Eclipse preferences are not loaded. This
-	 *             would indicate a bug.
-	 * 
-	 * @see #PREFERENCES_NODE
-	 */
-	public static IEclipsePreferences getPreferences() {
-		return SLEclipsePreferences.getInstance().getPreferences();
 	}
 
 	/**
