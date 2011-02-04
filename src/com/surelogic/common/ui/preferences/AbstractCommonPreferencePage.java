@@ -37,7 +37,8 @@ public abstract class AbstractCommonPreferencePage extends
 						+ "preference.page.promptPerspectiveSwitch"), group);
 		f_promptPerspectiveSwitch.fillIntoGrid(group, 2);
 		f_promptPerspectiveSwitch.setPage(this);
-		f_promptPerspectiveSwitch.setPreferenceStore(getPreferenceStore());
+		f_promptPerspectiveSwitch.setPreferenceStore(EclipseUIUtility
+				.getPreferences());
 		f_promptPerspectiveSwitch.load();
 
 		f_autoPerspectiveSwitch = new BooleanFieldEditor(
@@ -46,7 +47,8 @@ public abstract class AbstractCommonPreferencePage extends
 						+ "preference.page.autoPerspectiveSwitch"), group);
 		f_autoPerspectiveSwitch.fillIntoGrid(group, 2);
 		f_autoPerspectiveSwitch.setPage(this);
-		f_autoPerspectiveSwitch.setPreferenceStore(getPreferenceStore());
+		f_autoPerspectiveSwitch.setPreferenceStore(EclipseUIUtility
+				.getPreferences());
 		f_autoPerspectiveSwitch.load();
 	}
 
