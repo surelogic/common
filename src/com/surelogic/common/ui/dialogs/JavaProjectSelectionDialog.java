@@ -1,6 +1,9 @@
 package com.surelogic.common.ui.dialogs;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -27,33 +30,41 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.UIJob;
 
 import com.surelogic.common.CommonImages;
+import com.surelogic.common.core.EclipseUtility;
 import com.surelogic.common.core.JDTUtility;
-import com.surelogic.common.core.preferences.IPreferenceAccessor;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.ui.SLImages;
 import com.surelogic.common.ui.jobs.SLUIJob;
 
 public final class JavaProjectSelectionDialog extends Dialog {
-	public static class Config  {
+
+	public static class Config {
 		final String f_label;
 		final String f_shellTitle;
 		final Image f_shellImage;
 
 		final List<IJavaProject> f_initiallySelectedJavaProjects;
-		final IPreferenceAccessor<Boolean> f_alwaysChooseFromDialog;
+		final String f_alwaysChooseFromDialogPreferenceConstant; // may be null
 
-		public Config(final String label,
-			final String shellTitle, final Image shellImage,
-			final List<IJavaProject> initiallySelectedJavaProjects, 
-			final IPreferenceAccessor<Boolean> alwaysChooseFromDialog) {
+		public Config(final String label, final String shellTitle,
+				final Image shellImage,
+				final List<IJavaProject> initiallySelectedJavaProjects,
+				final String alwaysChooseFromDialogPreferenceConstant) {
 			f_label = label;
 			f_shellTitle = shellTitle;
 			f_shellImage = shellImage;
 			f_initiallySelectedJavaProjects = initiallySelectedJavaProjects;
-			f_alwaysChooseFromDialog = alwaysChooseFromDialog;
+			f_alwaysChooseFromDialogPreferenceConstant = alwaysChooseFromDialogPreferenceConstant;
 		}
-	}	
-	
+
+		public Config(final String label, final String shellTitle,
+				final Image shellImage,
+				final List<IJavaProject> initiallySelectedJavaProjects) {
+			this(label, shellTitle, shellImage, initiallySelectedJavaProjects,
+					null);
+		}
+	}
+
 	private final Config config;
 	private final List<IJavaProject> f_openJavaProjects;
 	private Table f_projectTable;
@@ -70,7 +81,15 @@ public final class JavaProjectSelectionDialog extends Dialog {
 		 * wants to choose from a dialog then we show the project selection
 		 * dialog.
 		 */
-		if (config.f_initiallySelectedJavaProjects.isEmpty() || config.f_alwaysChooseFromDialog.get()) {
+		final boolean alwaysChooseFromDialog;
+		if (config.f_alwaysChooseFromDialogPreferenceConstant != null) {
+			alwaysChooseFromDialog = EclipseUtility
+					.getBooleanPreference(config.f_alwaysChooseFromDialogPreferenceConstant);
+		} else {
+			alwaysChooseFromDialog = true;
+		}
+		if (config.f_initiallySelectedJavaProjects.isEmpty()
+				|| alwaysChooseFromDialog) {
 
 			final List<IJavaProject> openJavaProjects = JDTUtility
 					.getJavaProjects();
@@ -99,9 +118,9 @@ public final class JavaProjectSelectionDialog extends Dialog {
 					public IStatus runInUIThread(final IProgressMonitor monitor) {
 						final Shell shell = PlatformUI.getWorkbench()
 								.getActiveWorkbenchWindow().getShell();
-						final JavaProjectSelectionDialog dialog = 
-							new JavaProjectSelectionDialog(shell, config, 
-									openJavaProjects, mutableProjectList);
+						final JavaProjectSelectionDialog dialog = new JavaProjectSelectionDialog(
+								shell, config, openJavaProjects,
+								mutableProjectList);
 
 						if (dialog.open() == Window.CANCEL) {
 							return Status.CANCEL_STATUS;
@@ -120,8 +139,8 @@ public final class JavaProjectSelectionDialog extends Dialog {
 		return config.f_initiallySelectedJavaProjects;
 	}
 
-	private JavaProjectSelectionDialog(final Shell parentShell, final Config config,
-			final List<IJavaProject> openJavaProjects,
+	private JavaProjectSelectionDialog(final Shell parentShell,
+			final Config config, final List<IJavaProject> openJavaProjects,
 			final List<IJavaProject> mutableProjectList) {
 		super(parentShell);
 		this.config = config;
@@ -201,18 +220,23 @@ public final class JavaProjectSelectionDialog extends Dialog {
 			}
 		});
 
-		final Button check = new Button(panel, SWT.CHECK);
-		check.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false));
-		check
-				.setText("Show this dialog even when projects are selected in the Package Explorer");
-		check.setSelection(config.f_alwaysChooseFromDialog.get());
-		check.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(final Event event) {
-				final boolean show = !config.f_alwaysChooseFromDialog.get();
-				config.f_alwaysChooseFromDialog.set(show);
-				check.setSelection(show);
-			}
-		});
+		if (config.f_alwaysChooseFromDialogPreferenceConstant != null) {
+			final Button check = new Button(panel, SWT.CHECK);
+			check.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false));
+			check.setText("Show this dialog even when projects are selected in the Package Explorer");
+			check.setSelection(EclipseUtility
+					.getBooleanPreference(config.f_alwaysChooseFromDialogPreferenceConstant));
+			check.addListener(SWT.Selection, new Listener() {
+				public void handleEvent(final Event event) {
+					final boolean show = !EclipseUtility
+							.getBooleanPreference(config.f_alwaysChooseFromDialogPreferenceConstant);
+					EclipseUtility.setBooleanPreference(
+							config.f_alwaysChooseFromDialogPreferenceConstant,
+							show);
+					check.setSelection(show);
+				}
+			});
+		}
 
 		return panel;
 	}
