@@ -20,7 +20,7 @@ import org.eclipse.swt.widgets.Text;
 
 import com.surelogic.common.core.JDTUtility;
 import com.surelogic.common.core.jobs.EclipseJob;
-import com.surelogic.common.core.preferences.PreferencesUtility;
+import com.surelogic.common.core.preferences.CommonCorePreferencesUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.jobs.SLJob;
 import com.surelogic.common.serviceability.ServiceUtility;
@@ -98,14 +98,14 @@ public final class SendProblemReportDialog extends TitleAreaDialog {
 		email.setText(I18N.msg("common.send.problemReport.dialog.email"));
 		email.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, false, false));
 		final Text emailText = new Text(panel, SWT.SINGLE | SWT.BORDER);
-		emailText.setText(PreferencesUtility.getServicabilityEmail());
+		emailText.setText(CommonCorePreferencesUtility.getServicabilityEmail());
 		emailText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		final Label name = new Label(panel, SWT.RIGHT);
 		name.setText(I18N.msg("common.send.problemReport.dialog.name"));
 		name.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, false, false));
 		final Text nameText = new Text(panel, SWT.SINGLE | SWT.BORDER);
-		nameText.setText(PreferencesUtility.getServicabilityName());
+		nameText.setText(CommonCorePreferencesUtility.getServicabilityName());
 		nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		final Button sendVersion = new Button(panel, SWT.CHECK);
@@ -243,8 +243,9 @@ public final class SendProblemReportDialog extends TitleAreaDialog {
 		}
 
 		public void okPressed() {
-			PreferencesUtility.setServicabilityEmail(f_email.getText());
-			PreferencesUtility.setServicabilityName(f_name.getText());
+			CommonCorePreferencesUtility.setServicabilityEmail(f_email
+					.getText());
+			CommonCorePreferencesUtility.setServicabilityName(f_name.getText());
 
 			final String msg = getMsg();
 			final SLJob job = ServiceUtility.sendToSureLogic(msg,
