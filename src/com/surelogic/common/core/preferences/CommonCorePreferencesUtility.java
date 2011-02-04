@@ -7,11 +7,6 @@ import com.surelogic.common.core.EclipseUtility;
 public final class CommonCorePreferencesUtility {
 
 	private static final String PREFIX = "com.surelogic.common.core.";
-	private static final String WARN_LOW_MEMORY = PREFIX + "warnLowMemory";
-	private static final String SERVICEABILITY_EMAIL = PREFIX
-			+ "serviceability.email";
-	private static final String SERVICEABILITY_NAME = PREFIX
-			+ "serviceability.name";
 
 	private static final AtomicBoolean f_initializationNeeded = new AtomicBoolean(
 			true);
@@ -24,6 +19,12 @@ public final class CommonCorePreferencesUtility {
 			 */
 		}
 	}
+
+	private static final String WARN_LOW_MEMORY = PREFIX + "warnLowMemory";
+	private static final String SERVICEABILITY_EMAIL = PREFIX
+			+ "serviceability.email";
+	private static final String SERVICEABILITY_NAME = PREFIX
+			+ "serviceability.name";
 
 	public static boolean warnAboutLowMaximumMemory() {
 		return EclipseUtility.getBooleanPreference(WARN_LOW_MEMORY);
