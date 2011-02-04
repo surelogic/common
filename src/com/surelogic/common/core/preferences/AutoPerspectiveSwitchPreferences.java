@@ -7,7 +7,7 @@ import com.surelogic.common.core.EclipseUtility;
  * switching to their perspective but prompting the user (with a dialog) if this
  * perspective switch is okay, but use separate preference settings.
  */
-public abstract class IAutoPerspectiveSwitchPreferences {
+public abstract class AutoPerspectiveSwitchPreferences {
 	/**
 	 * Boolean preference suffix that indicates if the user should be prompted
 	 * by a dialog to switch to another perspective.
