@@ -125,7 +125,7 @@ public final class FileUtility {
 	 * @param path
 	 *            the desired directory.
 	 * @throws IllegalStateException
-	 *             if the passed directory is {code null} or the directory
+	 *             if the passed directory is {@code null} or the directory
 	 *             doesn't exist and can't be created.
 	 */
 	public static void ensureDirectoryExists(final String path) {
