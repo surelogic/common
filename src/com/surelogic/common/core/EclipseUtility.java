@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -47,6 +48,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.framework.Bundle;
+import org.osgi.service.prefs.BackingStoreException;
 
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
@@ -72,6 +74,20 @@ public class EclipseUtility {
 	 * callers of the preference API defined in this class.
 	 */
 	public static final String PREFERENCES_NODE = "com.surelogic.common.core.preferences";
+
+	/**
+	 * Persists any preference changes to the disk. Only called from
+	 * {@link Activator#stop(org.osgi.framework.BundleContext)}.
+	 */
+	static void persistPreferences() {
+		try {
+			(new DefaultScope()).getNode(PREFERENCES_NODE).flush();
+			(new InstanceScope()).getNode(PREFERENCES_NODE).flush();
+		} catch (BackingStoreException e) {
+			SLLogger.getLogger().log(Level.SEVERE,
+					I18N.err(218, PREFERENCES_NODE), e);
+		}
+	}
 
 	/**
 	 * The default-default value for boolean preferences (<code>false</code>).

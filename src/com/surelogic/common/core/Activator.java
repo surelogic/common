@@ -39,8 +39,12 @@ public class Activator extends Plugin {
 
 	@Override
 	public void stop(BundleContext context) throws Exception {
+		try {
+			EclipseUtility.persistPreferences();
+		} finally {
+			super.stop(context);
+		}
 		plugin = null;
-		super.stop(context);
 	}
 
 	/**
