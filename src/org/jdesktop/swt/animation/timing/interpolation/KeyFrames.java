@@ -42,7 +42,7 @@ package org.jdesktop.swt.animation.timing.interpolation;
  */
 public class KeyFrames {
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	private KeyValues keyValues;
 	private KeyTimes keyTimes;
 	private KeyInterpolators interpolators;
@@ -55,7 +55,7 @@ public class KeyFrames {
 	 * @param keyValues
 	 *            values that will be assumed at each time in keyTimes
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public KeyFrames(KeyValues keyValues) {
 		init(keyValues, null, (Interpolator) null);
 	}
@@ -75,7 +75,7 @@ public class KeyFrames {
 	 *             since these structures are meant to have corresponding
 	 *             entries; an exception is thrown otherwise.
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public KeyFrames(KeyValues keyValues, KeyTimes keyTimes) {
 		init(keyValues, keyTimes, (Interpolator) null);
 	}
@@ -109,7 +109,7 @@ public class KeyFrames {
 	 *             (interpolators == null), one, or one less than the size of
 	 *             keyTimes.
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public KeyFrames(KeyValues keyValues, KeyTimes keyTimes,
 			Interpolator... interpolators) {
 		init(keyValues, keyTimes, interpolators);
@@ -135,7 +135,7 @@ public class KeyFrames {
 	 *             (interpolators == null), one, or one less than the size of
 	 *             keyTimes.
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public KeyFrames(KeyValues keyValues, Interpolator... interpolators) {
 		init(keyValues, null, interpolators);
 	}
@@ -144,7 +144,7 @@ public class KeyFrames {
 	 * Utility function called by constructors to perform common initialization
 	 * chores
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	private void init(KeyValues keyValues, KeyTimes keyTimes,
 			Interpolator... interpolators) {
 		int numFrames = keyValues.getSize();
@@ -179,12 +179,12 @@ public class KeyFrames {
 		this.interpolators = new KeyInterpolators(numFrames - 1, interpolators);
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	Class getType() {
 		return keyValues.getType();
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	KeyValues getKeyValues() {
 		return keyValues;
 	}

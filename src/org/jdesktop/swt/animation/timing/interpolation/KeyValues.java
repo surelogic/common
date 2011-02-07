@@ -76,7 +76,7 @@ public class KeyValues<T> {
 	 *             if an {@link Evaluator} cannot be found that can interpolate
 	 *             between the value types supplied
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static <T> KeyValues<T> create(T... params) {
 		return new KeyValues(params);
 	}
@@ -92,7 +92,7 @@ public class KeyValues<T> {
 	 * @throws IllegalArgumentException
 	 *             if params does not have at least one value.
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public static <T> KeyValues<T> create(Evaluator evaluator, T... params) {
 		return new KeyValues(evaluator, params);
 	}
@@ -107,7 +107,7 @@ public class KeyValues<T> {
 	/**
 	 * Private constructor, called by factory method
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private KeyValues(Evaluator evaluator, T... params) {
 		if (params == null) {
 			throw new IllegalArgumentException("params array cannot be null");

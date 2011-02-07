@@ -74,7 +74,7 @@ public abstract class Evaluator<T> {
 	/**
 	 * HashMap that holds all registered evaluators
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	private static final Map<Class<?>, Class<? extends Evaluator>> impls = new HashMap<Class<?>, Class<? extends Evaluator>>();
 
 	/**
@@ -99,7 +99,7 @@ public abstract class Evaluator<T> {
 		impls.put(CubicCurve2D.class, EvaluatorCubicCurve2D.class);
 	}
 
-	@SuppressWarnings({ "unused", "unchecked" })
+	@SuppressWarnings({ "unused", "rawtypes" })
 	private static void register(Class<?> type, Class<? extends Evaluator> impl) {
 		impls.put(type, impl);
 	}
@@ -109,7 +109,7 @@ public abstract class Evaluator<T> {
 		impls.remove(type);
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	static <T> Evaluator<T> create(Class<?> type) {
 		Class<? extends Evaluator> interpClass = null;
 		for (Class<?> klass : impls.keySet()) {

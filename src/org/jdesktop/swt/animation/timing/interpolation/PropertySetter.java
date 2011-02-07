@@ -190,7 +190,7 @@ public class PropertySetter extends TimingTargetAdapter {
 	 *             if appropriate set/get methods cannot be found for
 	 *             propertyName.
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public static <T> Animator createAnimator(int duration, Object object,
 			String propertyName, Evaluator evaluator, T... params) {
 		PropertySetter ps = new PropertySetter(object, propertyName, evaluator,
@@ -287,7 +287,7 @@ public class PropertySetter extends TimingTargetAdapter {
 	 *             if appropriate set/get methods cannot be found for
 	 *             propertyName.
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	public <T> PropertySetter(Object object, String propertyName,
 			Evaluator evaluator, T... params) {
 		this(object, propertyName, new KeyFrames(KeyValues.create(evaluator,
@@ -306,7 +306,7 @@ public class PropertySetter extends TimingTargetAdapter {
 	 *             if the application does not have appropriate permissions to
 	 *             request access to the Method
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	private void setupMethodInfo() throws NoSuchMethodException {
 		try {
 			String firstChar = propertyName.substring(0, 1);
@@ -404,7 +404,7 @@ public class PropertySetter extends TimingTargetAdapter {
 	 * Returns the type used in this property setter (defers to KeyFrames for
 	 * this information).
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	private Class getType() {
 		return keyFrames.getType();
 	}

@@ -75,7 +75,7 @@ public class KeyTimes {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	ArrayList getTimes() {
 		return times;
 	}
