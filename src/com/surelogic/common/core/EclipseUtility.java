@@ -775,6 +775,18 @@ public class EclipseUtility {
 		return newDescription;
 	}
 
+	/**
+	 * Checks if a bundle identified by the given id exists.
+	 * 
+	 * @param viewId
+	 *            a view identifier
+	 * @return code true} if the view identified by the given id exists,
+	 *         {@code false} otherwise.
+	 */
+	public static boolean bundleExists(final String id) {
+		return Platform.getBundle(id) != null;
+	}
+
 	private EclipseUtility() {
 		// no instances
 	}
