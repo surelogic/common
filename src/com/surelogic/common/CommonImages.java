@@ -9,7 +9,7 @@ import javax.swing.ImageIcon;
 
 public final class CommonImages {
 
-	public static final String PATH = "/com/surelogic/common/images/";
+	public static final String PATH = "/lib/images/";
 
 	/*
 	 * Symbolic image names
