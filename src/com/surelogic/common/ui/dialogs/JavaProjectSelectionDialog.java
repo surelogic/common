@@ -38,7 +38,7 @@ import com.surelogic.common.ui.jobs.SLUIJob;
 
 public final class JavaProjectSelectionDialog extends Dialog {
 
-	public static class Config {
+	public static class Configuration {
 		final String f_label;
 		final String f_shellTitle;
 		final Image f_shellImage;
@@ -46,7 +46,7 @@ public final class JavaProjectSelectionDialog extends Dialog {
 		final List<IJavaProject> f_initiallySelectedJavaProjects;
 		final String f_alwaysChooseFromDialogPreferenceConstant; // may be null
 
-		public Config(final String label, final String shellTitle,
+		public Configuration(final String label, final String shellTitle,
 				final Image shellImage,
 				final List<IJavaProject> initiallySelectedJavaProjects,
 				final String alwaysChooseFromDialogPreferenceConstant) {
@@ -56,16 +56,9 @@ public final class JavaProjectSelectionDialog extends Dialog {
 			f_initiallySelectedJavaProjects = initiallySelectedJavaProjects;
 			f_alwaysChooseFromDialogPreferenceConstant = alwaysChooseFromDialogPreferenceConstant;
 		}
-
-		public Config(final String label, final String shellTitle,
-				final Image shellImage,
-				final List<IJavaProject> initiallySelectedJavaProjects) {
-			this(label, shellTitle, shellImage, initiallySelectedJavaProjects,
-					null);
-		}
 	}
 
-	private final Config config;
+	private final Configuration f_configuration;
 	private final List<IJavaProject> f_openJavaProjects;
 	private Table f_projectTable;
 	/**
@@ -74,7 +67,7 @@ public final class JavaProjectSelectionDialog extends Dialog {
 	 */
 	private final List<IJavaProject> f_selectedProjects;
 
-	public static List<IJavaProject> getProjects(final Config config) {
+	public static List<IJavaProject> getProjects(final Configuration config) {
 		/*
 		 * If the set of initially selected Java projects is empty (meaning that
 		 * there is no selection in the Package Explorer) or the user always
@@ -140,10 +133,10 @@ public final class JavaProjectSelectionDialog extends Dialog {
 	}
 
 	private JavaProjectSelectionDialog(final Shell parentShell,
-			final Config config, final List<IJavaProject> openJavaProjects,
+			final Configuration config, final List<IJavaProject> openJavaProjects,
 			final List<IJavaProject> mutableProjectList) {
 		super(parentShell);
-		this.config = config;
+		this.f_configuration = config;
 		setShellStyle(getShellStyle() | SWT.RESIZE | SWT.MAX);
 		f_openJavaProjects = openJavaProjects;
 		Collections.sort(f_openJavaProjects, new Comparator<IJavaProject>() {
@@ -158,8 +151,8 @@ public final class JavaProjectSelectionDialog extends Dialog {
 	@Override
 	protected final void configureShell(final Shell newShell) {
 		super.configureShell(newShell);
-		newShell.setImage(config.f_shellImage);
-		newShell.setText(config.f_shellTitle);
+		newShell.setImage(f_configuration.f_shellImage);
+		newShell.setText(f_configuration.f_shellTitle);
 	}
 
 	@Override
@@ -170,7 +163,7 @@ public final class JavaProjectSelectionDialog extends Dialog {
 
 		final Label label = new Label(panel, SWT.WRAP);
 		label.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false));
-		label.setText(config.f_label);
+		label.setText(f_configuration.f_label);
 
 		f_projectTable = new Table(panel, SWT.FULL_SELECTION | SWT.CHECK);
 		final GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
@@ -183,7 +176,7 @@ public final class JavaProjectSelectionDialog extends Dialog {
 			item.setText(jp.getElementName());
 			item.setImage(SLImages.getImage(CommonImages.IMG_PROJECT));
 			item.setData(jp);
-			if (config.f_initiallySelectedJavaProjects.contains(jp) || onlyOne) {
+			if (f_configuration.f_initiallySelectedJavaProjects.contains(jp) || onlyOne) {
 				item.setChecked(true);
 				f_selectedProjects.add(jp);
 			}
@@ -220,18 +213,18 @@ public final class JavaProjectSelectionDialog extends Dialog {
 			}
 		});
 
-		if (config.f_alwaysChooseFromDialogPreferenceConstant != null) {
+		if (f_configuration.f_alwaysChooseFromDialogPreferenceConstant != null) {
 			final Button check = new Button(panel, SWT.CHECK);
 			check.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false));
 			check.setText("Show this dialog even when projects are selected in the Package Explorer");
 			check.setSelection(EclipseUtility
-					.getBooleanPreference(config.f_alwaysChooseFromDialogPreferenceConstant));
+					.getBooleanPreference(f_configuration.f_alwaysChooseFromDialogPreferenceConstant));
 			check.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(final Event event) {
 					final boolean show = !EclipseUtility
-							.getBooleanPreference(config.f_alwaysChooseFromDialogPreferenceConstant);
+							.getBooleanPreference(f_configuration.f_alwaysChooseFromDialogPreferenceConstant);
 					EclipseUtility.setBooleanPreference(
-							config.f_alwaysChooseFromDialogPreferenceConstant,
+							f_configuration.f_alwaysChooseFromDialogPreferenceConstant,
 							show);
 					check.setSelection(show);
 				}

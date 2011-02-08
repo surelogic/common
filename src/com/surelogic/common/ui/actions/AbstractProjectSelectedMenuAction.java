@@ -115,7 +115,7 @@ public abstract class AbstractProjectSelectedMenuAction implements
 	private void run_private(final List<IJavaProject> selectedProjects,
 			final List<String> projectNames) {
 		// Need a dialog?
-		final JavaProjectSelectionDialog.Config info = getDialogInfo(selectedProjects);
+		final JavaProjectSelectionDialog.Configuration info = getDialogInfo(selectedProjects);
 		if (info != null) {
 			List<IJavaProject> newProjects = JavaProjectSelectionDialog.getProjects(info);
 			if (newProjects != selectedProjects) {
@@ -126,7 +126,7 @@ public abstract class AbstractProjectSelectedMenuAction implements
 		run(selectedProjects, projectNames);		
 	}
 	
-	protected JavaProjectSelectionDialog.Config getDialogInfo(List<IJavaProject> selectedProjects) {
+	protected JavaProjectSelectionDialog.Configuration getDialogInfo(List<IJavaProject> selectedProjects) {
 		return null;
 	}
 }
