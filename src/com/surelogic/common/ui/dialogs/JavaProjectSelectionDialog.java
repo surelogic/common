@@ -133,7 +133,8 @@ public final class JavaProjectSelectionDialog extends Dialog {
 	}
 
 	private JavaProjectSelectionDialog(final Shell parentShell,
-			final Configuration config, final List<IJavaProject> openJavaProjects,
+			final Configuration config,
+			final List<IJavaProject> openJavaProjects,
 			final List<IJavaProject> mutableProjectList) {
 		super(parentShell);
 		this.f_configuration = config;
@@ -176,7 +177,8 @@ public final class JavaProjectSelectionDialog extends Dialog {
 			item.setText(jp.getElementName());
 			item.setImage(SLImages.getImage(CommonImages.IMG_PROJECT));
 			item.setData(jp);
-			if (f_configuration.f_initiallySelectedJavaProjects.contains(jp) || onlyOne) {
+			if (f_configuration.f_initiallySelectedJavaProjects.contains(jp)
+					|| onlyOne) {
 				item.setChecked(true);
 				f_selectedProjects.add(jp);
 			}
@@ -216,16 +218,18 @@ public final class JavaProjectSelectionDialog extends Dialog {
 		if (f_configuration.f_alwaysChooseFromDialogPreferenceConstant != null) {
 			final Button check = new Button(panel, SWT.CHECK);
 			check.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false));
-			check.setText("Show this dialog even when projects are selected in the Package Explorer");
+			check.setText(I18N
+					.msg("common.dialog.showDialogEvenWhenProjectsAreSelected"));
 			check.setSelection(EclipseUtility
 					.getBooleanPreference(f_configuration.f_alwaysChooseFromDialogPreferenceConstant));
 			check.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(final Event event) {
 					final boolean show = !EclipseUtility
 							.getBooleanPreference(f_configuration.f_alwaysChooseFromDialogPreferenceConstant);
-					EclipseUtility.setBooleanPreference(
-							f_configuration.f_alwaysChooseFromDialogPreferenceConstant,
-							show);
+					EclipseUtility
+							.setBooleanPreference(
+									f_configuration.f_alwaysChooseFromDialogPreferenceConstant,
+									show);
 					check.setSelection(show);
 				}
 			});
