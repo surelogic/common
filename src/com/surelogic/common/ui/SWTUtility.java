@@ -18,7 +18,12 @@ import com.surelogic.common.i18n.I18N;
  * Utility to help with SWT stuff.
  */
 public final class SWTUtility {
-	// From http://blog.zvikico.com/2008/07/eclipse-gracefully-loading-a-plugin.html
+
+	/*
+	 * Adapted from the below article
+	 * http://blog.zvikico.com/2008/07/eclipse-gracefully-loading-a-plugin.html
+	 */
+
 	private static Shell findStartedShell() {
 		Shell result = null;
 		final Display currentDisplay = Display.getCurrent();
@@ -30,20 +35,22 @@ public final class SWTUtility {
 		}
 		return result;
 	}
-	
-	public static void startup(final IRunnableWithProgress startupOp) throws InvocationTargetException, InterruptedException {
+
+	public static void startup(final IRunnableWithProgress startupOp)
+			throws InvocationTargetException, InterruptedException {
 		final Shell activeShell = findStartedShell();
 		if (activeShell != null) {
-			final ProgressMonitorDialog progressMonitorDialog =
-				new ProgressMonitorDialog(activeShell);
+			final ProgressMonitorDialog progressMonitorDialog = new ProgressMonitorDialog(
+					activeShell);
 			progressMonitorDialog.run(false, false, startupOp);
 		} else {
 			startupOp.run(new NullProgressMonitor());
 		}
 	}
-	
+
 	public static Shell getShell() {
-		IWorkbenchWindow window = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+		IWorkbenchWindow window = PlatformUI.getWorkbench()
+				.getActiveWorkbenchWindow();
 		return window == null ? null : window.getShell();
 	}
 
