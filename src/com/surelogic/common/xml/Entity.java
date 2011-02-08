@@ -52,6 +52,10 @@ public class Entity {
 		return name;
 	}
 	
+	public final String getEntityName() {
+		return getName();
+	}
+	
 	public String getId() {
 		return id;
 	}
