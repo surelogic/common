@@ -59,7 +59,6 @@ import com.surelogic.common.core.adhoc.EclipseQueryUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.ui.EclipseUIUtility;
 import com.surelogic.common.ui.SLImages;
-import com.surelogic.common.ui.SWTUtility;
 import com.surelogic.common.ui.TableUtility;
 import com.surelogic.common.ui.adhoc.views.QueryResultNavigator;
 import com.surelogic.common.ui.adhoc.views.editor.AbstractQueryEditorView;
@@ -697,7 +696,7 @@ public abstract class AbstractQueryResultsView extends ViewPart {
 				}
 			}
 			if (b.length() > 0) {
-				final Clipboard cb = new Clipboard(SWTUtility.getShell()
+				final Clipboard cb = new Clipboard(EclipseUIUtility.getShell()
 						.getDisplay());
 				cb.setContents(
 						new Object[] {

@@ -26,16 +26,16 @@ import com.surelogic.common.adhoc.jobs.ExportResultDataInTreeHTMLFormatJob;
 import com.surelogic.common.adhoc.jobs.ExportResultDataJob;
 import com.surelogic.common.core.jobs.EclipseJob;
 import com.surelogic.common.i18n.I18N;
+import com.surelogic.common.ui.EclipseUIUtility;
 import com.surelogic.common.ui.SLImages;
-import com.surelogic.common.ui.SWTUtility;
 
 public final class ExportResultDataDialog extends Dialog {
 
 	public static void open(final AdHocQueryResultSqlData data) {
 		if (data == null)
 			throw new IllegalArgumentException(I18N.err(44, "data"));
-		final Dialog dialog = new ExportResultDataDialog(SWTUtility.getShell(),
-				data);
+		final Dialog dialog = new ExportResultDataDialog(
+				EclipseUIUtility.getShell(), data);
 		dialog.open();
 	}
 
@@ -170,8 +170,8 @@ public final class ExportResultDataDialog extends Dialog {
 	}
 
 	private void changeFileExtension(final String from, final String to) {
-		final StringBuilder b = new StringBuilder(f_exportFilenameText
-				.getText());
+		final StringBuilder b = new StringBuilder(
+				f_exportFilenameText.getText());
 		if (b.toString().endsWith(from)) {
 			b.replace(b.length() - from.length(), b.length(), to);
 		}

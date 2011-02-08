@@ -43,18 +43,18 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.UIJob;
 
-import com.surelogic.common.core.adhoc.EclipseQueryUtility;
 import com.surelogic.common.CommonImages;
 import com.surelogic.common.ILifecycle;
 import com.surelogic.common.adhoc.AdHocManager;
 import com.surelogic.common.adhoc.AdHocManagerAdapter;
 import com.surelogic.common.adhoc.AdHocQuery;
 import com.surelogic.common.adhoc.AdHocQueryFullyBound;
+import com.surelogic.common.core.adhoc.EclipseQueryUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.ui.Activator;
+import com.surelogic.common.ui.EclipseUIUtility;
 import com.surelogic.common.ui.PageBook;
 import com.surelogic.common.ui.SLImages;
-import com.surelogic.common.ui.SWTUtility;
 import com.surelogic.common.ui.adhoc.dialogs.AddSubQueryDialog;
 import com.surelogic.common.ui.adhoc.dialogs.VariableValueDialog;
 import com.surelogic.common.ui.jobs.SLUIJob;
@@ -348,7 +348,7 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements
 					AddSubQueryDialog.openNoOtherQueries();
 				} else {
 					final AddSubQueryDialog dialog = new AddSubQueryDialog(
-							SWTUtility.getShell(), available);
+							EclipseUIUtility.getShell(), available);
 					if (Window.OK == dialog.open()) {
 						if (f_edit.addSubQueries(dialog.getSelectedQueries())) {
 							f_edit.markAsChanged();
@@ -653,8 +653,8 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements
 					.getGlobalVariableValues();
 			if (!query.isCompletelySubstitutedBy(variables)) {
 				final VariableValueDialog dialog = new VariableValueDialog(
-						SWTUtility.getShell(), query.getVariables(), null,
-						false);
+						EclipseUIUtility.getShell(), query.getVariables(),
+						null, false);
 				if (dialog.open() != Window.OK) {
 					// bail out because the user canceled the dialog
 					return;

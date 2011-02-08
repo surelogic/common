@@ -14,7 +14,7 @@ import org.eclipse.ui.progress.UIJob;
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.license.ILicenseObserver;
-import com.surelogic.common.ui.SWTUtility;
+import com.surelogic.common.ui.EclipseUIUtility;
 import com.surelogic.common.ui.jobs.SLUIJob;
 
 public final class NoLicenseDialog implements ILicenseObserver {
@@ -44,7 +44,7 @@ public final class NoLicenseDialog implements ILicenseObserver {
 						.msg("common.manage.licenses.dialog.noLicense.title");
 				final String msg = I18N.msg(
 						"common.manage.licenses.dialog.noLicense.msg", subject);
-				final Shell shell = SWTUtility.getShell();
+				final Shell shell = EclipseUIUtility.getShell();
 				if (MessageDialog.openQuestion(shell, title, msg)) {
 					ManageLicensesDialog.open(shell);
 				}
@@ -77,7 +77,7 @@ public final class NoLicenseDialog implements ILicenseObserver {
 					final String msg = I18N.msg(
 							"common.manage.licenses.dialog.expiration.msg",
 							subject, SLUtility.toStringDay(expiration));
-					final Shell shell = SWTUtility.getShell();
+					final Shell shell = EclipseUIUtility.getShell();
 					if (MessageDialog.openQuestion(shell, title, msg)) {
 						ManageLicensesDialog.open(shell);
 					}

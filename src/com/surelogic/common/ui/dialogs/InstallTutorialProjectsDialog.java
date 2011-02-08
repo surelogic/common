@@ -33,8 +33,8 @@ import com.surelogic.common.jobs.AbstractSLJob;
 import com.surelogic.common.jobs.SLJob;
 import com.surelogic.common.jobs.SLProgressMonitor;
 import com.surelogic.common.jobs.SLStatus;
+import com.surelogic.common.ui.EclipseUIUtility;
 import com.surelogic.common.ui.SLImages;
-import com.surelogic.common.ui.SWTUtility;
 import com.surelogic.common.ui.jobs.SLUIJob;
 
 public class InstallTutorialProjectsDialog extends TitleAreaDialog {
@@ -165,7 +165,7 @@ public class InstallTutorialProjectsDialog extends TitleAreaDialog {
 										IProgressMonitor monitor) {
 									MessageDialog
 											.openInformation(
-													SWTUtility.getShell(),
+													EclipseUIUtility.getShell(),
 													"Project Exists in Workspace",
 													"The project\n\n"
 															+ projectName

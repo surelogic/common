@@ -21,8 +21,8 @@ import org.eclipse.swt.widgets.TableItem;
 import com.surelogic.common.CommonImages;
 import com.surelogic.common.adhoc.AdHocQuery;
 import com.surelogic.common.i18n.I18N;
+import com.surelogic.common.ui.EclipseUIUtility;
 import com.surelogic.common.ui.SLImages;
-import com.surelogic.common.ui.SWTUtility;
 
 /**
  * Dialog to allow the user to select what sub-queries to add to a query.
@@ -33,7 +33,7 @@ public class AddSubQueryDialog extends Dialog {
 	 * Informs the user that no other queries exist.
 	 */
 	public static void openNoOtherQueries() {
-		MessageDialog.openInformation(SWTUtility.getShell(), I18N
+		MessageDialog.openInformation(EclipseUIUtility.getShell(), I18N
 				.msg("adhoc.query.dialog.addASubQuery.title"), I18N
 				.msg("adhoc.query.dialog.addASubQuery.noQueries.msg"));
 	}

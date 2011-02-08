@@ -18,8 +18,8 @@ import com.surelogic.common.CommonImages;
 import com.surelogic.common.core.logging.SLEclipseStatusUtility;
 import com.surelogic.common.core.preferences.CommonCorePreferencesUtility;
 import com.surelogic.common.i18n.I18N;
+import com.surelogic.common.ui.EclipseUIUtility;
 import com.surelogic.common.ui.SLImages;
-import com.surelogic.common.ui.SWTUtility;
 
 public final class LowMaximumMemoryDialog extends Dialog {
 
@@ -29,7 +29,7 @@ public final class LowMaximumMemoryDialog extends Dialog {
 	private static final int f_widthHint = 350;
 
 	public LowMaximumMemoryDialog(final long maxMemoryMB, final long permGenMB) {
-		super(SWTUtility.getShell());
+		super(EclipseUIUtility.getShell());
 		f_maxMemoryMB = maxMemoryMB;
 		f_maxPermGenMB = permGenMB;
 	}

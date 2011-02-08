@@ -13,7 +13,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
 import com.surelogic.common.i18n.I18N;
-import com.surelogic.common.ui.SWTUtility;
+import com.surelogic.common.ui.EclipseUIUtility;
 import com.surelogic.common.ui.adhoc.views.editor.SQLSyntaxHighlighter;
 
 /**
@@ -28,7 +28,7 @@ public final class ShowSqlDialog extends Dialog {
 	 *            the SQL query.
 	 */
 	public static void open(String sql) {
-		Dialog dialog = new ShowSqlDialog(SWTUtility.getShell(), sql);
+		Dialog dialog = new ShowSqlDialog(EclipseUIUtility.getShell(), sql);
 		dialog.open();
 	}
 

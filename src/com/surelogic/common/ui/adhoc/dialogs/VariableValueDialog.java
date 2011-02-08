@@ -20,7 +20,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import com.surelogic.common.i18n.I18N;
-import com.surelogic.common.ui.SWTUtility;
+import com.surelogic.common.ui.EclipseUIUtility;
 
 /**
  * Dialog to allow the user to view and optionally edit variable values.
@@ -40,14 +40,13 @@ public final class VariableValueDialog extends Dialog {
 		if (variableValues == null || variableValues.isEmpty()) {
 			MessageDialog
 					.openInformation(
-							SWTUtility.getShell(),
-							I18N
-									.msg("adhoc.query.dialog.variableValues.noVariables.title"),
-							I18N
-									.msg("adhoc.query.dialog.variableValues.noVariables.msg"));
+							EclipseUIUtility.getShell(),
+							I18N.msg("adhoc.query.dialog.variableValues.noVariables.title"),
+							I18N.msg("adhoc.query.dialog.variableValues.noVariables.msg"));
 		} else {
-			VariableValueDialog dialog = new VariableValueDialog(SWTUtility
-					.getShell(), variableValues.keySet(), variableValues, true);
+			VariableValueDialog dialog = new VariableValueDialog(
+					EclipseUIUtility.getShell(), variableValues.keySet(),
+					variableValues, true);
 			dialog.open();
 		}
 	}
@@ -66,8 +65,8 @@ public final class VariableValueDialog extends Dialog {
 	 * @param parentShell
 	 *            the shell to use.
 	 * @param variables
-	 *            the set of variables to allow the user to edit, or {@code
-	 *            null} if none.
+	 *            the set of variables to allow the user to edit, or
+	 *            {@code null} if none.
 	 * @param variableValues
 	 *            the set of variable values to display in the dialog, or
 	 *            {@code null} if none.

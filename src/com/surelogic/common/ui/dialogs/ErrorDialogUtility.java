@@ -8,7 +8,7 @@ import org.eclipse.swt.widgets.Shell;
 
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.logging.SLLogger;
-import com.surelogic.common.ui.SWTUtility;
+import com.surelogic.common.ui.EclipseUIUtility;
 
 /**
  * A helpful utility class to make using the platform {@link ErrorDialog} a bit
@@ -60,7 +60,7 @@ public final class ErrorDialogUtility {
 	public static void open(Shell shell, String title, IStatus reason,
 			boolean log) {
 		if (shell == null)
-			shell = SWTUtility.getShell();
+			shell = EclipseUIUtility.getShell();
 		if (title == null)
 			title = I18N.msg("common.error.dialog.title");
 		final String msg = I18N.msg("common.error.dialog.eclipse.msg");

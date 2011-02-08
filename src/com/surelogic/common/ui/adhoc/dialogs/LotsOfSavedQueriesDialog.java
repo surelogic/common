@@ -11,8 +11,8 @@ import org.eclipse.swt.widgets.Shell;
 
 import com.surelogic.common.CommonImages;
 import com.surelogic.common.i18n.I18N;
+import com.surelogic.common.ui.EclipseUIUtility;
 import com.surelogic.common.ui.SLImages;
-import com.surelogic.common.ui.SWTUtility;
 
 public class LotsOfSavedQueriesDialog extends MessageDialog {
 
@@ -22,7 +22,7 @@ public class LotsOfSavedQueriesDialog extends MessageDialog {
 
 	public static boolean show(Shell shell) {
 		final LotsOfSavedQueriesDialog dialog = new LotsOfSavedQueriesDialog(
-				shell == null ? SWTUtility.getShell() : shell);
+				shell == null ? EclipseUIUtility.getShell() : shell);
 		dialog.open();
 		return dialog.f_rememberMyDecision;
 	}
