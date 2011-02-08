@@ -40,7 +40,6 @@ import org.eclipse.ui.part.ViewPart;
 
 import com.surelogic.common.CommonImages;
 import com.surelogic.common.Justification;
-import com.surelogic.common.XUtil;
 import com.surelogic.common.adhoc.AdHocManager;
 import com.surelogic.common.adhoc.AdHocQuery;
 import com.surelogic.common.adhoc.AdHocQueryFullyBound;
@@ -214,13 +213,10 @@ public abstract class AbstractQueryResultsView extends ViewPart {
 		tooltip.activateToolTip(queryDescription);
 		/*
 		 * Add a hyperlink to edit the query if the result was a failure or an
-		 * update count. Also always do this if the SureLogic experimental code
-		 * flag is on.
+		 * update count.
 		 */
 		if (result.getManager().getDataSource().getEditorViewId() != null
-				&& (result instanceof AdHocQueryResultSqlException
-						|| result instanceof AdHocQueryResultSqlUpdateCount || XUtil
-						.useExperimental())) {
+				&& (result instanceof AdHocQueryResultSqlException || result instanceof AdHocQueryResultSqlUpdateCount)) {
 			queryDescription.setText(result.toLinkString());
 		} else {
 			queryDescription.setText(result.toString());
