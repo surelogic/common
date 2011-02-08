@@ -42,9 +42,14 @@ public final class SLUtility {
 	public static final String PLATFORM_LINE_SEPARATOR = String.format("%n");
 
 	/**
+	 * The string identifier of the Flashlight client plug-in.
+	 */
+	public static final String FLASHLIGHT_ID = "com.surelogic.flashlight";
+
+	/**
 	 * Returns an {@code int} value of the passed {@code long} value or
-	 * {@link Integer#MAX_VALUE} if the long is too bit to fit into an {@code
-	 * int}.
+	 * {@link Integer#MAX_VALUE} if the long is too bit to fit into an
+	 * {@code int}.
 	 * 
 	 * @param value
 	 *            the long value.
@@ -153,7 +158,8 @@ public final class SLUtility {
 	 * and be legal Java code.
 	 * <p>
 	 * For example, The string <code>This "doggie" \ "kitty" is nice</code>
-	 * would generate the string <code>This \"doggie\" \\ \"kitty\" is nice</code>.
+	 * would generate the string
+	 * <code>This \"doggie\" \\ \"kitty\" is nice</code>.
 	 * 
 	 * @param s
 	 *            the string to escape.
@@ -198,8 +204,8 @@ public final class SLUtility {
 	 * As an example, calling this method with <code>"Hello world!"</code> as
 	 * its parameter may produce the result <code>"new OString(new long[] {
 	 *     0x3676CB307FBD35FEL, 0xECFB991E2033C169L, 0xD8C3D3E365645589L
-	 * }).toString()"</code>. If this code is compiled and executed later, it will produce the
-	 * string <code>"Hello world!"</code> again.
+	 * }).toString()"</code>. If this code is compiled and executed later, it
+	 * will produce the string <code>"Hello world!"</code> again.
 	 * 
 	 * @param s
 	 *            The string to obfuscate. This may not contain null characters.
@@ -772,8 +778,8 @@ public final class SLUtility {
 		conn.setDoInput(true);
 		conn.setDoOutput(true);
 		conn.setUseCaches(false);
-		PrintWriter wr = new PrintWriter(new OutputStreamWriter(conn
-				.getOutputStream()));
+		PrintWriter wr = new PrintWriter(new OutputStreamWriter(
+				conn.getOutputStream()));
 		try {
 			/*
 			 * Send the request.
