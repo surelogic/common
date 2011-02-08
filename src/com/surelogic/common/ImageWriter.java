@@ -14,7 +14,6 @@ import java.util.Set;
 public class ImageWriter {
 
 	private final static String IMAGE_FOLDER = "image_files";
-	private final static String IMAGE_PATH = "/com/surelogic/common/images/";
 
 	private final Set<String> f_images = new HashSet<String>();
 	private final File f_imageDir;
@@ -81,10 +80,9 @@ public class ImageWriter {
 				return false;
 			}
 		}
-		final ClassLoader cl = Thread.currentThread().getContextClassLoader();
 		boolean success = true;
 		for (final String image : f_images) {
-			success &= FileUtility.copy(cl.getResource(IMAGE_PATH + image),
+			success &= FileUtility.copy(CommonImages.getImageURL(image),
 					new File(f_imageDir, image));
 		}
 		return success;
