@@ -44,7 +44,7 @@ public final class SLUtility {
 	/**
 	 * The string identifier of the Flashlight client plug-in.
 	 */
-	public static final String FLASHLIGHT_ID = "com.surelogic.flashlight";
+	public static final String FLASHLIGHT_ID = "com.surelogic.flashlight.client.eclipse";
 
 	/**
 	 * Returns an {@code int} value of the passed {@code long} value or
