@@ -12,9 +12,9 @@ import org.eclipse.ui.progress.UIJob;
 import com.surelogic.common.core.EclipseUtility;
 import com.surelogic.common.core.preferences.AutoPerspectiveSwitchPreferences;
 import com.surelogic.common.i18n.I18N;
+import com.surelogic.common.ui.EclipseUIUtility;
 import com.surelogic.common.ui.SLImages;
 import com.surelogic.common.ui.SWTUtility;
-import com.surelogic.common.ui.ViewUtility;
 import com.surelogic.common.ui.jobs.SLUIJob;
 
 public abstract class AbstractConfirmPerspectiveSwitch {
@@ -41,13 +41,13 @@ public abstract class AbstractConfirmPerspectiveSwitch {
 						 * Now prompt the user to change to the new perspective,
 						 * if we are not already in it.
 						 */
-						final boolean inCodeReviewPerspective = ViewUtility
+						final boolean inCodeReviewPerspective = EclipseUIUtility
 								.isPerspectiveOpen(perspectiveId);
 						if (!inCodeReviewPerspective) {
 							final boolean change = toPerspective(SWTUtility
 									.getShell());
 							if (change) {
-								ViewUtility.showPerspective(perspectiveId);
+								EclipseUIUtility.showPerspective(perspectiveId);
 							}
 						}
 					} finally {

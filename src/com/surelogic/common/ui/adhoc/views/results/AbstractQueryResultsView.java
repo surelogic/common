@@ -38,7 +38,6 @@ import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.part.ViewPart;
 
-import com.surelogic.common.core.adhoc.EclipseQueryUtility;
 import com.surelogic.common.CommonImages;
 import com.surelogic.common.Justification;
 import com.surelogic.common.XUtil;
@@ -56,11 +55,12 @@ import com.surelogic.common.adhoc.model.LeafTreeCell;
 import com.surelogic.common.adhoc.model.NonLeafColumnSummary;
 import com.surelogic.common.adhoc.model.NonLeafTreeCell;
 import com.surelogic.common.adhoc.model.TreeCell;
+import com.surelogic.common.core.adhoc.EclipseQueryUtility;
 import com.surelogic.common.i18n.I18N;
+import com.surelogic.common.ui.EclipseUIUtility;
 import com.surelogic.common.ui.SLImages;
 import com.surelogic.common.ui.SWTUtility;
 import com.surelogic.common.ui.TableUtility;
-import com.surelogic.common.ui.ViewUtility;
 import com.surelogic.common.ui.adhoc.views.QueryResultNavigator;
 import com.surelogic.common.ui.adhoc.views.editor.AbstractQueryEditorView;
 import com.surelogic.common.ui.adhoc.views.editor.SQLSyntaxHighlighterSkipFirstLine;
@@ -394,10 +394,8 @@ public abstract class AbstractQueryResultsView extends ViewPart {
 					} else if (justification == Justification.CENTER) {
 						column.setAlignment(SWT.CENTER);
 					}
-					column
-							.addListener(
-									SWT.Selection,
-									TableUtility.SORT_COLUMN_NUMERICALLY_THEN_LEXICALLY);
+					column.addListener(SWT.Selection,
+							TableUtility.SORT_COLUMN_NUMERICALLY_THEN_LEXICALLY);
 					column.setMoveable(true);
 				}
 			}
@@ -424,8 +422,8 @@ public abstract class AbstractQueryResultsView extends ViewPart {
 					if (model.isColumnVisible(colI)) {
 						final Cell cell = row[colI];
 						item.setText(itemIndex, cell.getText());
-						item.setImage(itemIndex, SLImages.getImage(cell
-								.getImageSymbolicName()));
+						item.setImage(itemIndex,
+								SLImages.getImage(cell.getImageSymbolicName()));
 						itemIndex++;
 					}
 				}
@@ -720,7 +718,7 @@ public abstract class AbstractQueryResultsView extends ViewPart {
 		final String viewId = query.getManager().getDataSource()
 				.getEditorViewId();
 		if (viewId != null) {
-			final IViewPart view = ViewUtility.showView(viewId);
+			final IViewPart view = EclipseUIUtility.showView(viewId);
 			if (view instanceof AbstractQueryEditorView) {
 				((AbstractQueryEditorView) view).editInEditor(query);
 			}

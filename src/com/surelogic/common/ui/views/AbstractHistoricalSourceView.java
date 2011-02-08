@@ -36,7 +36,7 @@ import com.surelogic.common.AbstractJavaZip;
 import com.surelogic.common.ISourceZipFileHandles;
 import com.surelogic.common.logging.SLLogger;
 import com.surelogic.common.serviceability.UsageMeter;
-import com.surelogic.common.ui.ViewUtility;
+import com.surelogic.common.ui.EclipseUIUtility;
 
 public abstract class AbstractHistoricalSourceView extends ViewPart {
 
@@ -149,7 +149,7 @@ public abstract class AbstractHistoricalSourceView extends ViewPart {
 	protected static void tryToOpenInEditor(final Class<?> viewClass,
 			final String run, final String pkg, final String type,
 			int lineNumber) {
-		final AbstractHistoricalSourceView view = (AbstractHistoricalSourceView) ViewUtility
+		final AbstractHistoricalSourceView view = (AbstractHistoricalSourceView) EclipseUIUtility
 				.showView(viewClass.getName(), null,
 						IWorkbenchPage.VIEW_VISIBLE);
 		if (view != null) {
@@ -178,7 +178,7 @@ public abstract class AbstractHistoricalSourceView extends ViewPart {
 	protected static void tryToOpenInEditorUsingMethodName(
 			final Class<?> viewClass, final String run, final String pkg,
 			final String type, final String method) {
-		final AbstractHistoricalSourceView view = (AbstractHistoricalSourceView) ViewUtility
+		final AbstractHistoricalSourceView view = (AbstractHistoricalSourceView) EclipseUIUtility
 				.showView(viewClass.getName(), null,
 						IWorkbenchPage.VIEW_VISIBLE);
 		if (view != null) {
@@ -198,7 +198,7 @@ public abstract class AbstractHistoricalSourceView extends ViewPart {
 	protected static void tryToOpenInEditorUsingFieldName(
 			final Class<?> viewClass, final String run, final String pkg,
 			final String type, final String field) {
-		final AbstractHistoricalSourceView view = (AbstractHistoricalSourceView) ViewUtility
+		final AbstractHistoricalSourceView view = (AbstractHistoricalSourceView) EclipseUIUtility
 				.showView(viewClass.getName(), null,
 						IWorkbenchPage.VIEW_VISIBLE);
 		if (view != null) {
