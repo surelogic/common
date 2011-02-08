@@ -314,6 +314,7 @@ public class EclipseUtility {
 	 * @param checked
 	 *            The set of plug-ins that we're already checked
 	 */
+	@SuppressWarnings("unchecked")
 	private static Set<String> getDependencies(Bundle b, Set<String> checked) {
 		checked.add(b.getSymbolicName());
 

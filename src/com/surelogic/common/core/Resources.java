@@ -55,6 +55,7 @@ public class Resources {
 		return null;
 	}
 
+	@SuppressWarnings("unchecked")
 	public static Iterable<URL> findURLs(Plugin p, String prefixPath,
 			String pattern, boolean recurse) {
 		final Enumeration<URL> e = p.getBundle().findEntries(prefixPath,
