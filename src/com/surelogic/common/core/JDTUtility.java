@@ -1,19 +1,37 @@
 package com.surelogic.common.core;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.core.resources.*;
+import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProduct;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jdt.core.IAccessRule;
+import org.eclipse.jdt.core.IClasspathAttribute;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
@@ -27,6 +45,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 
+import com.surelogic.common.LibResources;
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.logging.SLLogger;
@@ -38,6 +57,210 @@ public final class JDTUtility {
 
 	private JDTUtility() {
 		// no instances
+	}
+
+	/**
+	 * Adds a Jar to the classpath of an Eclipse Java project.
+	 * 
+	 * @param javaProject
+	 *            an Eclipse Java project.
+	 * @param jarFile
+	 *            a Jar file.
+	 * @return {@code true} if the addition was successful, {@code false}
+	 *         otherwise. A log entry is made if the addition failed.
+	 * 
+	 * @throws IllegalArgumentException
+	 *             if either parameter is {@code null}.
+	 */
+	public static boolean addJarToClasspath(final IJavaProject javaProject,
+			final IFile jarFile) {
+		if (javaProject == null)
+			throw new IllegalArgumentException(I18N.err(44, "javaProject"));
+		if (jarFile == null)
+			throw new IllegalArgumentException(I18N.err(44, "jarFile"));
+		try {
+			final IClasspathEntry[] orig = javaProject.getRawClasspath();
+			final List<IClasspathEntry> entries = new ArrayList<IClasspathEntry>();
+
+			entries.add(JavaCore.newLibraryEntry(jarFile.getFullPath(), null,
+					null, new IAccessRule[0], new IClasspathAttribute[0], false));
+			for (IClasspathEntry e : orig) {
+				entries.add(e);
+			}
+
+			javaProject.setRawClasspath(
+					entries.toArray(new IClasspathEntry[entries.size()]), null);
+			return true;
+		} catch (JavaModelException jme) {
+			SLLogger.getLogger().log(
+					Level.SEVERE,
+					I18N.err(219, jarFile.getFullPath(), javaProject
+							.getProject().getName()), jme);
+		}
+		return false;
+	}
+
+	/**
+	 * Removes an entry from the classpath of an Eclipse Java project. If the
+	 * passed path is not in the classpath then no changes are made.
+	 * 
+	 * @param javaProject
+	 *            an Eclipse Java project.
+	 * @param path
+	 *            a path or Jar file.
+	 * @return {@code true} if the addition was successful, {@code false}
+	 *         otherwise. A log entry is made if the addition failed.
+	 * 
+	 * @throws IllegalArgumentException
+	 *             if either parameter is {@code null}.
+	 */
+	public static boolean removeJarFromClasspath(
+			final IJavaProject javaProject, final IPath path) {
+		if (javaProject == null)
+			throw new IllegalArgumentException(I18N.err(44, "javaProject"));
+		if (path == null)
+			throw new IllegalArgumentException(I18N.err(44, "jarFile"));
+		try {
+			final IClasspathEntry[] orig = javaProject.getRawClasspath();
+			final List<IClasspathEntry> entries = new ArrayList<IClasspathEntry>();
+
+			boolean removed = false;
+			for (IClasspathEntry e : orig) {
+				if (path.equals(e.getPath()))
+					removed = true;
+				else
+					entries.add(e);
+			}
+			if (removed)
+				javaProject.setRawClasspath(
+						entries.toArray(new IClasspathEntry[entries.size()]),
+						null);
+			return true;
+		} catch (JavaModelException jme) {
+			SLLogger.getLogger().log(
+					Level.SEVERE,
+					I18N.err(220, path.toString(), javaProject.getProject()
+							.getName()), jme);
+		}
+		return false;
+	}
+
+	public static abstract class IPathFilter {
+		public abstract boolean match(IPath path);
+
+		public boolean stopAfterMatch() {
+			return true;
+		}
+	}
+
+	/**
+	 * Matches all known versions of the promises.jar on a path.
+	 */
+	static class PromisesJarMatcher extends IPathFilter {
+		final List<IPath> results = new ArrayList<IPath>();
+
+		public boolean stopAfterMatch() {
+			return false; // Check the whole classpath
+		}
+
+		@Override
+		public boolean match(IPath path) {
+			// Check if path is an older version of the promises
+			for (String name : LibResources.PROMISES_JAR_OLD_VERSIONS) {
+				if (name.equals(path.lastSegment())) {
+					results.add(path);
+					return true;
+				}
+			}
+			// Check if path is the current version of the promises
+			if (LibResources.PROMISES_JAR.equals(path.lastSegment())) {
+				results.add(path);
+				return true;
+			}
+			return false;
+		}
+	}
+
+	/**
+	 * Checks if the passed Jar file is on the classpath of the passed Eclipse
+	 * Java project.
+	 * 
+	 * @param jp
+	 *            an Eclipse Java project.
+	 * @param file
+	 *            a Jar file.
+	 * @return {@code true} if the file is found on the classpath, {@code false}
+	 *         otherwise.
+	 */
+	public static boolean isOnClasspath(IJavaProject jp, final IFile file) {
+		return isOnClasspath(jp, new IPathFilter() {
+			public boolean match(IPath path) {
+				return file.getFullPath().equals(path);
+			}
+		});
+	}
+
+	/**
+	 * Checks if the anything that matches with the passed {@link IPathFilter}
+	 * is on the classpath of the passed Eclipse Java project.
+	 * 
+	 * @param jp
+	 *            an Eclipse Java project.
+	 * @param matcher
+	 *            an implementation of {@link IPathFilter}.
+	 * @return {@code true} if a match is found on the classpath, {@code false}
+	 *         otherwise.
+	 */
+	public static boolean isOnClasspath(IJavaProject jp, IPathFilter matcher) {
+		boolean rv = false;
+		try {
+			for (IClasspathEntry e : jp.getRawClasspath()) {
+				if (e.getEntryKind() == IClasspathEntry.CPE_LIBRARY) {
+					if (matcher.match(e.getPath())) {
+						if (matcher.stopAfterMatch()) {
+							return true;
+						} else {
+							rv = true;
+						}
+					}
+				}
+			}
+		} catch (JavaModelException e) {
+			// Ignore this problem
+		}
+		return rv;
+	}
+
+	/**
+	 * Checks if the current promises.jar, as specified by
+	 * {@link LibResources#PROMISES_JAR}, is on the Eclipse Java project's
+	 * classpath.
+	 * 
+	 * @return {@code true} if the current promises.jar is on the classpath,
+	 *         {@code false} otherwise.
+	 */
+	public static boolean isPromisesJarOnClasspath(IJavaProject jp) {
+		return isOnClasspath(jp, new IPathFilter() {
+			public boolean match(IPath path) {
+				return LibResources.PROMISES_JAR.equals(path.lastSegment());
+			}
+		});
+	}
+
+	/**
+	 * Gets all the promise.jars on the classpath of the given project. The
+	 * older versions are determined by the
+	 * {@link LibResources#PROMISES_JAR_OLD_VERSIONS} array. The current version
+	 * is determined by {@link LibResources#PROMISES_JAR}.
+	 * 
+	 * @param jp
+	 *            an Eclipse Java project.
+	 * @return a (possibly empty) list of promise.jar files.
+	 */
+	public static List<IPath> findPromisesJarsOnClasspath(IJavaProject jp) {
+		PromisesJarMatcher matcher = new PromisesJarMatcher();
+		isOnClasspath(jp, matcher);
+		return matcher.results;
 	}
 
 	/**
