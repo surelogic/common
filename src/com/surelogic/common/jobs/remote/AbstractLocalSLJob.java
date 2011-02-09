@@ -184,19 +184,20 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 	}
 
 	public SLStatus run(final SLProgressMonitor topMonitor) {
-		final boolean debug = verbose && LOG.isLoggable(Level.FINE);
-		CommandlineJava cmdj = new CommandlineJava();
-		setupJVM(debug, cmdj);
-
-		if (debug) {
-			System.out.println("Starting process:");
-			for (String arg : cmdj.getCommandline()) {
-				System.out.println("\t" + arg);
-			}
-		}
-		ProcessBuilder pb = new ProcessBuilder(cmdj.getCommandline());
-		pb.redirectErrorStream(true);
 		try {
+			final boolean debug = true;//verbose && LOG.isLoggable(Level.FINE);
+			CommandlineJava cmdj = new CommandlineJava();
+			setupJVM(debug, cmdj);
+
+			if (debug) {
+				System.out.println("Starting process:");
+				for (String arg : cmdj.getCommandline()) {
+					System.out.println("\t" + arg);
+				}
+			}
+			ProcessBuilder pb = new ProcessBuilder(cmdj.getCommandline());
+			pb.redirectErrorStream(true);
+
 			Process p = pb.start();
 			Streams s = getStreams(p);
 			BufferedReader br = new BufferedReader(new InputStreamReader(s.in));
