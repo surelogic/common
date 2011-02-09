@@ -78,8 +78,8 @@ public final class JDTUtility {
 	 */
 	public static File getEclipseLogFile() {
 		final IWorkspaceRoot wsRoot = ResourcesPlugin.getWorkspace().getRoot();
-		final IPath log = wsRoot.getLocation().addTrailingSeparator().append(
-				".metadata/.log");
+		final IPath log = wsRoot.getLocation().addTrailingSeparator()
+				.append(".metadata/.log");
 		final File logFile = log.makeAbsolute().toFile();
 		if (!logFile.exists()) {
 			final String msg = I18N.err(137, logFile.getAbsolutePath());
@@ -89,11 +89,23 @@ public final class JDTUtility {
 	}
 
 	/**
-	 * Get the major Java version for the source level
+	 * Gets the source-level Java version of the passed project
+	 * 
+	 * @param jp
+	 *            a Java project.
+	 * @return the source-level Java version.
 	 */
-	public static int getMajorJavaVersion(final IJavaProject jp) {
+	public static String getJavaSourceVersion(final IJavaProject jp) {
 		final String javaVersion = jp.getOption(
 				"org.eclipse.jdt.core.compiler.source", true);
+		return javaVersion;
+	}
+
+	/**
+	 * Get the major Java version for the source level
+	 */
+	public static int getMajorJavaSourceVersion(final IJavaProject jp) {
+		final String javaVersion = getJavaSourceVersion(jp);
 		return Integer.parseInt(javaVersion.substring(2, 3));
 	}
 
@@ -327,16 +339,16 @@ public final class JDTUtility {
 		});
 		return projectNames;
 	}
-	
+
 	public static List<IProject> getProjects() {
 		List<IJavaProject> projs = getJavaProjects();
 		List<IProject> rv = new ArrayList<IProject>();
-		for(IJavaProject p : projs) {
+		for (IJavaProject p : projs) {
 			rv.add(p.getProject());
 		}
 		return rv;
 	}
- 
+
 	/**
 	 * Gets the {@link IJavaProject} reference for the passed project name or
 	 * {@code null} if there is no Java project using that name.
@@ -606,8 +618,8 @@ public final class JDTUtility {
 
 	private static void projectsUpToDate(final IWorkspaceRoot root,
 			final Map<IJavaProject, Boolean> status) throws JavaModelException {
-		final List<IJavaProject> projs = new ArrayList<IJavaProject>(status
-				.size());
+		final List<IJavaProject> projs = new ArrayList<IJavaProject>(
+				status.size());
 		for (final Map.Entry<IJavaProject, Boolean> e : status.entrySet()) {
 			projs.add(e.getKey());
 			e.setValue(null);
@@ -700,8 +712,7 @@ public final class JDTUtility {
 						}
 						for (final IType t : cu.getTypes()) {
 							final String name = t.getFullyQualifiedName()
-									.replace('.', '/')
-									+ ".class";
+									.replace('.', '/') + ".class";
 							final IPath path = out.append(name);
 							final long clTime = root.getFile(path)
 									.getLocalTimeStamp();
@@ -908,7 +919,7 @@ public final class JDTUtility {
 			return true;
 		}
 	}
-	
+
 	public static JavaProjectResources collectAllResources(IJavaProject jp) {
 		JavaProjectResources result = new JavaProjectResources(jp);
 		try {
@@ -919,13 +930,13 @@ public final class JDTUtility {
 		}
 		return result;
 	}
-	
-	private static void collectAllResources(JavaProjectResources jpr, IContainer p) throws CoreException {
-		for(IResource res : p.members()) {
+
+	private static void collectAllResources(JavaProjectResources jpr,
+			IContainer p) throws CoreException {
+		for (IResource res : p.members()) {
 			if (res instanceof IContainer) {
 				collectAllResources(jpr, (IContainer) res);
-			} 
-			else if (res instanceof IFile) {
+			} else if (res instanceof IFile) {
 				jpr.resources.add(res);
 				if (jpr.project.isOnClasspath(res)) {
 					IFile f = (IFile) res;
@@ -935,7 +946,7 @@ public final class JDTUtility {
 					}
 				}
 			} else {
-				System.out.println("Ignoring: "+res);
+				System.out.println("Ignoring: " + res);
 			}
 		}
 	}
