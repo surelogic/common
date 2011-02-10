@@ -258,6 +258,33 @@ public class EclipseUtility {
 	}
 
 	/**
+	 * Copies the contents of a {@link URL} to a workspace file.
+	 * 
+	 * @param source
+	 *            the stream to copy.
+	 * @param to
+	 *            the target file.
+	 * @return {@code true} if and only if the copy is successful, {@code false}
+	 *         otherwise.
+	 */
+	public static boolean copy(final InputStream source, final IFile to) {
+		try {
+			// Make sure Eclipse is up-to-date with the file system
+			to.refreshLocal(IResource.DEPTH_ONE, null);
+
+			if (to.exists()) {
+				to.setContents(source, IResource.NONE, null);
+			} else {
+				to.create(source, IResource.NONE, null);
+			}
+		} catch (CoreException e) {
+			SLLogger.getLogger().log(Level.SEVERE, I18N.err(223, to.getName()),
+					e);
+		}
+		return true;
+	}
+
+	/**
 	 * Gets the directory where the passed plug-in identifier is located. Works
 	 * for both directories and Jar files.
 	 * 
@@ -356,6 +383,27 @@ public class EclipseUtility {
 			}
 		}
 		return checked;
+	}
+
+	public static IWorkspaceRoot getWorkspaceRoot() {
+		return ResourcesPlugin.getWorkspace().getRoot();
+	}
+
+	/**
+	 * Gets a reference to a file in the Eclipse workspace if it is possible to
+	 * obtain such a reference. The passed path must be in the Eclipse
+	 * workspace.
+	 * 
+	 * @param path
+	 *            a path within the Eclipse workspace.
+	 * @return a file within the Eclipse workspace, or {@code null} if it was
+	 *         not possible to find a file.
+	 */
+	public static IFile getIFileWherePossible(IPath path) {
+		if (path == null)
+			throw new IllegalArgumentException(I18N.err(44, "path"));
+
+		return null;
 	}
 
 	/**

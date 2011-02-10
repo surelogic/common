@@ -55,49 +55,8 @@ import com.surelogic.common.logging.SLLogger;
 public final class JDTUtility {
 
 	/**
-	 * Adds a Jar to the classpath of an Eclipse Java project.
-	 * 
-	 * @param javaProject
-	 *            an Eclipse Java project.
-	 * @param jarFile
-	 *            a Jar file.
-	 * @return {@code true} if the addition was successful, {@code false}
-	 *         otherwise. A log entry is made if the addition failed.
-	 * 
-	 * @throws IllegalArgumentException
-	 *             if either parameter is {@code null}.
-	 */
-	public static boolean addJarToClasspath(final IJavaProject javaProject,
-			final IFile jarFile) {
-		if (javaProject == null)
-			throw new IllegalArgumentException(I18N.err(44, "javaProject"));
-		if (jarFile == null)
-			throw new IllegalArgumentException(I18N.err(44, "jarFile"));
-		try {
-			final IClasspathEntry[] orig = javaProject.getRawClasspath();
-			final List<IClasspathEntry> entries = new ArrayList<IClasspathEntry>();
-
-			entries.add(JavaCore.newLibraryEntry(jarFile.getFullPath(), null,
-					null, new IAccessRule[0], new IClasspathAttribute[0], false));
-			for (IClasspathEntry e : orig) {
-				entries.add(e);
-			}
-
-			javaProject.setRawClasspath(
-					entries.toArray(new IClasspathEntry[entries.size()]), null);
-			return true;
-		} catch (JavaModelException jme) {
-			SLLogger.getLogger().log(
-					Level.SEVERE,
-					I18N.err(219, jarFile.getFullPath(), javaProject
-							.getProject().getName()), jme);
-		}
-		return false;
-	}
-
-	/**
-	 * Removes an entry from the classpath of an Eclipse Java project. If the
-	 * passed path is not in the classpath then no changes are made.
+	 * Adds an entry to the classpath of the passed Eclipse Java project. The
+	 * entry is placed as the last entry in the project's classpath.
 	 * 
 	 * @param javaProject
 	 *            an Eclipse Java project.
@@ -109,12 +68,55 @@ public final class JDTUtility {
 	 * @throws IllegalArgumentException
 	 *             if either parameter is {@code null}.
 	 */
-	public static boolean removeJarFromClasspath(
-			final IJavaProject javaProject, final IPath path) {
+	public static boolean addToEndOfClasspath(final IJavaProject javaProject,
+			final IPath path) {
 		if (javaProject == null)
 			throw new IllegalArgumentException(I18N.err(44, "javaProject"));
 		if (path == null)
-			throw new IllegalArgumentException(I18N.err(44, "jarFile"));
+			throw new IllegalArgumentException(I18N.err(44, "path"));
+		try {
+			final IClasspathEntry[] orig = javaProject.getRawClasspath();
+			final List<IClasspathEntry> entries = new ArrayList<IClasspathEntry>();
+
+			for (IClasspathEntry e : orig) {
+				entries.add(e);
+			}
+			entries.add(JavaCore.newLibraryEntry(path, null, null,
+					new IAccessRule[0], new IClasspathAttribute[0], false));
+
+			javaProject.setRawClasspath(
+					entries.toArray(new IClasspathEntry[entries.size()]), null);
+			return true;
+		} catch (JavaModelException jme) {
+			SLLogger.getLogger().log(
+					Level.SEVERE,
+					I18N.err(219, path.toString(), javaProject.getProject()
+							.getName()), jme);
+		}
+		return false;
+	}
+
+	/**
+	 * Removes an entry from the classpath of an Eclipse Java project. If the
+	 * passed path is not in the classpath then no changes are made to the
+	 * project's classpath.
+	 * 
+	 * @param javaProject
+	 *            an Eclipse Java project.
+	 * @param path
+	 *            a path or Jar file.
+	 * @return {@code true} if the addition was successful, {@code false}
+	 *         otherwise. A log entry is made if the addition failed.
+	 * 
+	 * @throws IllegalArgumentException
+	 *             if either parameter is {@code null}.
+	 */
+	public static boolean removeFromClasspath(IJavaProject javaProject,
+			IPath path) {
+		if (javaProject == null)
+			throw new IllegalArgumentException(I18N.err(44, "javaProject"));
+		if (path == null)
+			throw new IllegalArgumentException(I18N.err(44, "path"));
 		try {
 			final IClasspathEntry[] orig = javaProject.getRawClasspath();
 			final List<IClasspathEntry> entries = new ArrayList<IClasspathEntry>();
@@ -140,6 +142,11 @@ public final class JDTUtility {
 		return false;
 	}
 
+	/**
+	 * An abstract base class for matching classpath entries.
+	 * 
+	 * @see JDTUtility#isOnClasspath(IJavaProject, IPathFilter)
+	 */
 	public static abstract class IPathFilter {
 		public abstract boolean match(IPath path);
 
@@ -149,18 +156,47 @@ public final class JDTUtility {
 	}
 
 	/**
-	 * Checks if the passed Jar file is on the classpath of the passed Eclipse
+	 * Checks if the passed pathname is on the classpath of the passed Eclipse
 	 * Java project.
 	 * 
-	 * @param jp
+	 * @param javaProject
+	 *            an Eclipse Java project.
+	 * @param pathname
+	 *            a path.
+	 * @return {@code true} if the path is found on the classpath, {@code false}
+	 *         otherwise.
+	 */
+	public static boolean isOnClasspath(IJavaProject javaProject,
+			final IPath pathname) {
+		if (javaProject == null)
+			throw new IllegalArgumentException(I18N.err(44, "javaProject"));
+		if (pathname == null)
+			throw new IllegalArgumentException(I18N.err(44, "pathname"));
+		return isOnClasspath(javaProject, new IPathFilter() {
+			public boolean match(IPath path) {
+				return pathname.equals(path);
+			}
+		});
+	}
+
+	/**
+	 * Checks if the passed file is on the classpath of the passed Eclipse Java
+	 * project.
+	 * 
+	 * @param javaProject
 	 *            an Eclipse Java project.
 	 * @param file
 	 *            a Jar file.
 	 * @return {@code true} if the file is found on the classpath, {@code false}
 	 *         otherwise.
 	 */
-	public static boolean isOnClasspath(IJavaProject jp, final IFile file) {
-		return isOnClasspath(jp, new IPathFilter() {
+	public static boolean isOnClasspath(IJavaProject javaProject,
+			final IFile file) {
+		if (javaProject == null)
+			throw new IllegalArgumentException(I18N.err(44, "javaProject"));
+		if (file == null)
+			throw new IllegalArgumentException(I18N.err(44, "file"));
+		return isOnClasspath(javaProject, new IPathFilter() {
 			public boolean match(IPath path) {
 				return file.getFullPath().equals(path);
 			}
@@ -171,17 +207,24 @@ public final class JDTUtility {
 	 * Checks if the anything that matches with the passed {@link IPathFilter}
 	 * is on the classpath of the passed Eclipse Java project.
 	 * 
-	 * @param jp
+	 * @param javaProject
 	 *            an Eclipse Java project.
 	 * @param matcher
 	 *            an implementation of {@link IPathFilter}.
 	 * @return {@code true} if a match is found on the classpath, {@code false}
 	 *         otherwise.
+	 * 
+	 * @see IPathFilter
 	 */
-	public static boolean isOnClasspath(IJavaProject jp, IPathFilter matcher) {
+	public static boolean isOnClasspath(IJavaProject javaProject,
+			IPathFilter matcher) {
+		if (javaProject == null)
+			throw new IllegalArgumentException(I18N.err(44, "javaProject"));
+		if (matcher == null)
+			throw new IllegalArgumentException(I18N.err(44, "matcher"));
 		boolean rv = false;
 		try {
-			for (IClasspathEntry e : jp.getRawClasspath()) {
+			for (IClasspathEntry e : javaProject.getRawClasspath()) {
 				if (e.getEntryKind() == IClasspathEntry.CPE_LIBRARY) {
 					if (matcher.match(e.getPath())) {
 						if (matcher.stopAfterMatch()) {
@@ -615,8 +658,7 @@ public final class JDTUtility {
 	 */
 	public static boolean noCompilationErrors(final ICompilationUnit cu,
 			final IProgressMonitor monitor) throws CoreException {
-		final boolean result = false; // assume it has errors or has never been
-		// built
+		final boolean result = false; // assume it has errors or is not built
 		final IJavaProject javaProject = cu.getJavaProject();
 		if (javaProject.hasBuildState()) {
 			return noCompilationErrors(cu.getCorrespondingResource(), monitor);
