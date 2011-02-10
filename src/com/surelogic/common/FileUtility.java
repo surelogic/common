@@ -341,7 +341,8 @@ public final class FileUtility {
 	 * Copies the contents of a {@link InputStream} to a file.
 	 * 
 	 * @param source
-	 *            a label identifying the source of the stream
+	 *            a label identifying the source of the stream that is used for
+	 *            logging an error (should one occur).
 	 * @param is
 	 *            the stream to copy from
 	 * @param to
