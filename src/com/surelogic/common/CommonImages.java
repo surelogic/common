@@ -82,6 +82,7 @@ public final class CommonImages {
 	public static final String IMG_INFO = "info.gif";
 	public static final String IMG_INTERFACE = "interface.gif";
 	public static final String IMG_JAR = "jar.gif";
+	public static final String IMG_JAR_SAVEAS = "jar_saveas.gif";
 	public static final String IMG_JAVA_COMP_UNIT = "java_comp_unit.gif";
 	public static final String IMG_JETTY_LOG = "jetty_log.gif";
 	public static final String IMG_JSURE_DECR = "jsure_decr.gif";
