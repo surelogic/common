@@ -45,7 +45,6 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 
-import com.surelogic.common.LibResources;
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.logging.SLLogger;
@@ -54,10 +53,6 @@ import com.surelogic.common.logging.SLLogger;
  * A collection of useful JDT spells.
  */
 public final class JDTUtility {
-
-	private JDTUtility() {
-		// no instances
-	}
 
 	/**
 	 * Adds a Jar to the classpath of an Eclipse Java project.
@@ -154,34 +149,6 @@ public final class JDTUtility {
 	}
 
 	/**
-	 * Matches all known versions of the promises.jar on a path.
-	 */
-	static class PromisesJarMatcher extends IPathFilter {
-		final List<IPath> results = new ArrayList<IPath>();
-
-		public boolean stopAfterMatch() {
-			return false; // Check the whole classpath
-		}
-
-		@Override
-		public boolean match(IPath path) {
-			// Check if path is an older version of the promises
-			for (String name : LibResources.PROMISES_JAR_OLD_VERSIONS) {
-				if (name.equals(path.lastSegment())) {
-					results.add(path);
-					return true;
-				}
-			}
-			// Check if path is the current version of the promises
-			if (LibResources.PROMISES_JAR.equals(path.lastSegment())) {
-				results.add(path);
-				return true;
-			}
-			return false;
-		}
-	}
-
-	/**
 	 * Checks if the passed Jar file is on the classpath of the passed Eclipse
 	 * Java project.
 	 * 
@@ -229,38 +196,6 @@ public final class JDTUtility {
 			// Ignore this problem
 		}
 		return rv;
-	}
-
-	/**
-	 * Checks if the current promises.jar, as specified by
-	 * {@link LibResources#PROMISES_JAR}, is on the Eclipse Java project's
-	 * classpath.
-	 * 
-	 * @return {@code true} if the current promises.jar is on the classpath,
-	 *         {@code false} otherwise.
-	 */
-	public static boolean isPromisesJarOnClasspath(IJavaProject jp) {
-		return isOnClasspath(jp, new IPathFilter() {
-			public boolean match(IPath path) {
-				return LibResources.PROMISES_JAR.equals(path.lastSegment());
-			}
-		});
-	}
-
-	/**
-	 * Gets all the promise.jars on the classpath of the given project. The
-	 * older versions are determined by the
-	 * {@link LibResources#PROMISES_JAR_OLD_VERSIONS} array. The current version
-	 * is determined by {@link LibResources#PROMISES_JAR}.
-	 * 
-	 * @param jp
-	 *            an Eclipse Java project.
-	 * @return a (possibly empty) list of promise.jar files.
-	 */
-	public static List<IPath> findPromisesJarsOnClasspath(IJavaProject jp) {
-		PromisesJarMatcher matcher = new PromisesJarMatcher();
-		isOnClasspath(jp, matcher);
-		return matcher.results;
 	}
 
 	/**
@@ -1173,4 +1108,9 @@ public final class JDTUtility {
 			}
 		}
 	}
+
+	private JDTUtility() {
+		// utility
+	}
+
 }
