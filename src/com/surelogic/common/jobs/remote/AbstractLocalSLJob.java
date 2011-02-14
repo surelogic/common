@@ -370,7 +370,7 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 		
 		final Project proj = new Project();
 		final Path path = cmdj.createClasspath(proj);
-		setupClassPath(debug, proj, path);
+		setupClassPath(debug, cmdj, proj, path);
 		// TODO convert into error if things are really missing
 		if (debug) {
 			for (String p : path.list()) {
@@ -385,7 +385,7 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 		if (port > 0) {
 			cmdj.createVmArgument().setValue("-D"+RemoteSLJobConstants.REMOTE_PORT_PROP+"="+port);
 		}
-		finishSetupJVM(debug, cmdj);
+		finishSetupJVM(debug, cmdj, proj);
 	}
 	
 	/**
@@ -395,13 +395,14 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 	
 	/**
 	 * Setup the classpath for the remote JVM
+	 * @param cmdj 
 	 */
-	protected abstract void setupClassPath(boolean debug, Project proj, Path path);
+	protected abstract void setupClassPath(boolean debug, CommandlineJava cmdj, Project proj, Path path);
 	
 	/**
 	 * Finish setting JVM arguments
 	 */
-	protected abstract void finishSetupJVM(boolean debug, CommandlineJava cmdj);
+	protected abstract void finishSetupJVM(boolean debug, CommandlineJava cmdj, Project proj);
 	
 	private void cancel(Process p, final PrintStream pout) {
 		pout.println("##" + Local.CANCEL);
