@@ -34,8 +34,7 @@ public abstract class AbstractRemoteSLJob {
 			out = System.out;
 		} else {		
 			try {
-				ServerSocket serverSocket = new ServerSocket(Integer.parseInt(port));
-				Socket socket = serverSocket.accept();
+				Socket socket = new Socket("localhost", Integer.parseInt(port));
 				in = socket.getInputStream();
 				out = new PrintStream(socket.getOutputStream());
 			} catch (Exception e) {

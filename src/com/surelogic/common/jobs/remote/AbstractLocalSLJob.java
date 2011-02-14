@@ -126,40 +126,31 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 	}
 	
 	static class Streams {
+		final Process process;
 		final InputStream in;
 		final OutputStream out;
 		
-		Streams(InputStream in, OutputStream out) {
+		Streams(Process p, InputStream in, OutputStream out) {
+			this.process = p;
 			this.in = in;
 			this.out = out;
 		}
 	}
 	
-	private Streams getStreams(Process p) throws Exception {
+	private Streams getStreams(ProcessBuilder pb) throws Exception {
 		if (port > 0) {
-			// TODO wait until the process has really started up?
-			int retry = 3;
-			do {
-				retry--;
-				try {
-					Thread.sleep(100);
-					Socket s = new Socket("localhost", port);					
-					startOutputProcessingThread(p);
-					return new Streams(s.getInputStream(), s.getOutputStream());
-				} catch(Exception e) {
-					if (retry <= 0) {
-						// Try to read the first part of the stream, because something failed
-						final byte[] buf = new byte[1024];	
-						final int read = p.getInputStream().read(buf);
-						System.out.write(buf, 0, read);
-						System.out.println();
-						System.out.flush();
-						throw e;
-					}
-				}
-			} while (retry > 0);
+			// Setup a server socket and have the new process contact us
+			ServerSocket serverSocket = new ServerSocket(port);
+			
+			Process p = pb.start();
+			startOutputProcessingThread(p);
+			
+			Socket s = serverSocket.accept();
+			return new Streams(p, s.getInputStream(), s.getOutputStream());
 		}
-		return new Streams(p.getInputStream(), p.getOutputStream());
+		// Use stdin/out
+		Process p = pb.start();
+		return new Streams(p, p.getInputStream(), p.getOutputStream());
 	}
 	
 	/**
@@ -198,8 +189,7 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 			ProcessBuilder pb = new ProcessBuilder(cmdj.getCommandline());
 			pb.redirectErrorStream(true);
 
-			Process p = pb.start();
-			Streams s = getStreams(p);
+			Streams s = getStreams(pb);
 			BufferedReader br = new BufferedReader(new InputStreamReader(s.in));
 			String firstLine = br.readLine();
 			if (debug) {
@@ -230,7 +220,7 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 			// Copy any output
 			final PrintStream pout = new PrintStream(s.out);
 			if (TestCode.SCAN_CANCELLED.equals(testCode)) {
-				cancel(p, pout);
+				cancel(s.process, pout);
 			}
 			topMonitor.begin(work);
 			
@@ -244,7 +234,7 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 					numLines++;
 				}
 				if (monitor.isCanceled()) {
-					cancel(p, pout);
+					cancel(s.process, pout);
 				}
 
 				if (line.startsWith("##")) {
@@ -283,7 +273,7 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 							}
 							String msg = copyException(cmd, st.nextToken(), br);
 							System.out.println("Terminating run");
-							p.destroy();
+							s.process.destroy();
 							if (msg
 									.contains("FAILED:  java.lang.OutOfMemoryError")) {
 								throw newException(
@@ -321,7 +311,7 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 				System.out.println(line);
 			}
 			// See if the process already died?
-			int value = handleExitValue(p);
+			int value = handleExitValue(s.process);
 			br.close();
 			pout.close();
 			if (value != 0) {
