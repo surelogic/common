@@ -129,11 +129,19 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 		final Process process;
 		final InputStream in;
 		final OutputStream out;
+		private final ServerSocket ss;
 		
-		Streams(Process p, InputStream in, OutputStream out) {
+		Streams(Process p, InputStream in, OutputStream out, ServerSocket ss) {
 			this.process = p;
 			this.in = in;
 			this.out = out;
+			this.ss = ss;
+		}
+		
+		void close() throws IOException {
+			if (ss != null) {
+				ss.close();
+			}
 		}
 	}
 	
@@ -146,11 +154,11 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 			startOutputProcessingThread(p);
 			
 			Socket s = serverSocket.accept();
-			return new Streams(p, s.getInputStream(), s.getOutputStream());
+			return new Streams(p, s.getInputStream(), s.getOutputStream(), serverSocket);
 		}
 		// Use stdin/out
 		Process p = pb.start();
-		return new Streams(p, p.getInputStream(), p.getOutputStream());
+		return new Streams(p, p.getInputStream(), p.getOutputStream(), null);
 	}
 	
 	/**
@@ -175,6 +183,7 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 	}
 
 	public SLStatus run(final SLProgressMonitor topMonitor) {
+		Streams s = null;
 		try {
 			final boolean debug = true;//verbose && LOG.isLoggable(Level.FINE);
 			CommandlineJava cmdj = new CommandlineJava();
@@ -189,7 +198,7 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 			ProcessBuilder pb = new ProcessBuilder(cmdj.getCommandline());
 			pb.redirectErrorStream(true);
 
-			Streams s = getStreams(pb);
+			s = getStreams(pb);
 			BufferedReader br = new BufferedReader(new InputStreamReader(s.in));
 			String firstLine = br.readLine();
 			if (debug) {
@@ -319,7 +328,16 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 				throw newException(RemoteSLJobConstants.ERROR_PROCESS_FAILED, value);
 			}
 		} catch (Exception e) {
-			throw new RuntimeException(e);
+			//throw new RuntimeException(e);
+			status.addChild(SLStatus.createErrorStatus(e));
+		} finally {
+			if (s != null) {
+				try {
+					s.close();
+				} catch (IOException e) {
+					status.addChild(SLStatus.createErrorStatus(e));
+				}
+			}
 		}
 		// FIX status not built if exception thrown
 		return status.build();
