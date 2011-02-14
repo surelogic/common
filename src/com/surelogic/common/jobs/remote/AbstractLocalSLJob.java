@@ -440,9 +440,10 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 				t.interrupt();
 			} catch (InterruptedException ie) {
 				long time = System.currentTimeMillis() - start;
-				throw new RuntimeException(
-						"Timeout waiting for process to exit: " + time
+				System.out.println("Timeout waiting for process to exit: " + time
 								+ " ms");
+				throw new RuntimeException(e);
+
 			}
 			System.out.println("Process result after waiting = " + value);
 		}
