@@ -33,6 +33,8 @@ public abstract class AbstractXMLReader extends NestedXMLReader {
 	
 	public static final String FLAVOR_ATTR = "flavor";
 	
+	public static final String PROJECTS = "projects";
+	
 	/**
 	 * @param l The listener that handles the top-level elements
 	 */
