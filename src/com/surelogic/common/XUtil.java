@@ -12,7 +12,8 @@ package com.surelogic.common;
  * on the Java command line or as a VM argument within Eclipse.
  */
 public final class XUtil {
-	public static final boolean testing = System.getProperty("dc.testing","false").equals("true");
+	public static final String testingProp = "dc.testing";	
+	public static final boolean testing = System.getProperty(testingProp,"false").equals("true");
 	public static final boolean testingWorkspace = System.getProperty("jsure.test.workspace","false").equals("true");
 	
 	public static final boolean debug = System.getProperty("SureLogicDebug","false").equals("true");
