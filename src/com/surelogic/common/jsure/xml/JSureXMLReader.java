@@ -40,8 +40,9 @@ public class JSureXMLReader extends AbstractXMLReader {
 			if (flavor != null) {
 				//throw new UnsupportedOperationException();
 				next.addRef(last);
+			} else {
+				next.setSource(new SourceRef(last));
 			}
-			next.setSource(new SourceRef(last));
 		}
 		else if (SUPPORTING_INFO.equals(lastName)) {
 			next.addInfo(new MoreInfo(last));
