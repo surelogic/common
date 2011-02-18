@@ -167,7 +167,7 @@ public abstract class AbstractRemoteSLJob {
 	}
 
 	protected static class Monitor implements SLProgressMonitor {
-		final PrintStream out;
+		public final PrintStream out;
 		boolean cancelled = false;
 
 		private Monitor(final PrintStream out) {

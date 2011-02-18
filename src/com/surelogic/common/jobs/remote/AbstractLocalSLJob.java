@@ -374,7 +374,7 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 			cmdj.createVmArgument().setValue("-verbose");
 		}
 		*/
-		cmdj.setClassname(getRemoteClass().getCanonicalName());
+		cmdj.setClassname(getRemoteClassName());
 		
 		final Project proj = new Project();
 		final Path path = cmdj.createClasspath(proj);
@@ -394,6 +394,10 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 			cmdj.createVmArgument().setValue("-D"+RemoteSLJobConstants.REMOTE_PORT_PROP+"="+port);
 		}
 		finishSetupJVM(debug, cmdj, proj);
+	}
+	
+	protected String getRemoteClassName() {
+		return getRemoteClass().getCanonicalName();
 	}
 	
 	/**
