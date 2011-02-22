@@ -46,6 +46,14 @@ public class XMLCreator {
 	}
 	
 	public final void addAttribute(String name, String value) {
+		String oldValue = attributes.get(name);
+		if (oldValue != null) {
+			if (oldValue.equals(value)) {
+				return;
+			} else {
+				throw new IllegalStateException("Attribute set twice: "+name+" = "+oldValue+", "+value);
+			}
+		}
 		if (firstAttr) {
 			firstAttr = false;
 		} else {
