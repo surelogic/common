@@ -182,6 +182,21 @@ public final class SLUtility {
 			if (c == '\\' || c == '\"') {
 				b.insert(index, '\\');
 				index++;
+			} else if (c == '\t') {
+				b.replace(index, index + 1, "\\t");
+				index++;
+			} else if (c == '\b') {
+				b.replace(index, index + 1, "\\b");
+				index++;
+			} else if (c == '\n') {
+				b.replace(index, index + 1, "\\n");
+				index++;
+			} else if (c == '\r') {
+				b.replace(index, index + 1, "\\r");
+				index++;
+			} else if (c == '\f') {
+				b.replace(index, index + 1, "\\f");
+				index++;
 			}
 			index++;
 		}
@@ -701,16 +716,18 @@ public final class SLUtility {
 	 * @return a possibly empty array containing the lines within <tt>s</tt>.
 	 */
 	public static String[] separateLines(final String s) {
-		if (s == null)
+		if (s == null) {
 			return new String[0];
+		}
 		List<String> result = new ArrayList<String>();
 
 		final BufferedReader r = new BufferedReader(new StringReader(s));
 		while (true) {
 			try {
 				final String line = r.readLine();
-				if (line == null)
+				if (line == null) {
 					break;
+				}
 				result.add(line);
 			} catch (IOException ignore) {
 				break;
