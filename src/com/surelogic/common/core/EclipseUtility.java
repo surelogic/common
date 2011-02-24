@@ -58,6 +58,8 @@ import com.surelogic.common.logging.SLLogger;
 
 public class EclipseUtility {
 
+	public static final String DOT_PROJECT = ".project";
+
 	/**
 	 * Defines the SureLogic preference node that is used by the preference API
 	 * defined below. This API can be used in UI and Non-UI Eclipse code to
@@ -784,7 +786,7 @@ public class EclipseUtility {
 			throws CoreException {
 		final IWorkspace workspace = ResourcesPlugin.getWorkspace();
 		IProjectDescription description = newProjectDescription(workspace,
-				new File(projectRoot, ".project"));
+				new File(projectRoot, DOT_PROJECT));
 		final String projectName;
 		if (description != null) {
 			projectName = description.getName();
