@@ -13,6 +13,14 @@ package com.surelogic.common;
  */
 public final class XUtil {
 	public static final String testingProp = "dc.testing";	
+	
+	private static final String f_updateScript = System.getProperty("SureLogicUpdateScript");
+	static {
+		if (f_updateScript != null) {
+			System.setProperty(testingProp, "true");
+		}
+	}
+	
 	public static final boolean testing = System.getProperty(testingProp,"false").equals("true");
 	public static final boolean testingWorkspace = System.getProperty("jsure.test.workspace","false").equals("true");
 	
@@ -52,8 +60,6 @@ public final class XUtil {
 	public static String runTest() {
 		return f_runTest;
 	}
-	
-	private static final String f_updateScript = System.getProperty("SureLogicUpdateScript");
 	
 	private static final String f_recordScript = computeRecordScriptValue();
 	
