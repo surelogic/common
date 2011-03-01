@@ -13,6 +13,7 @@ package com.surelogic.common;
  */
 public final class XUtil {
 	public static final String testingProp = "dc.testing";	
+	public static final String ignoreProposalsProp = "jsure.test.ignore.proposals";
 	
 	private static final String f_updateScript = System.getProperty("SureLogicUpdateScript");
 	static {
@@ -23,6 +24,7 @@ public final class XUtil {
 	
 	public static final boolean testing = System.getProperty(testingProp,"false").equals("true");
 	public static final boolean testingWorkspace = System.getProperty("jsure.test.workspace","false").equals("true");
+	public static final boolean ignoreProposals = System.getProperty(ignoreProposalsProp,"false").equals("true");
 	
 	public static final boolean debug = System.getProperty("SureLogicDebug","false").equals("true");
 	
