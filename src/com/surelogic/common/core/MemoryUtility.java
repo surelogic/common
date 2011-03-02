@@ -9,7 +9,7 @@ import com.surelogic.common.SLUtility;
 
 public class MemoryUtility {
 
-	public static final int MAX_SIZE = 2048;
+	public static final int MAX_SIZE = 4096;
 
 	private static AtomicInteger f_maxMemorySize = new AtomicInteger();
 
