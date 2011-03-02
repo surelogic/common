@@ -29,12 +29,13 @@ public abstract class AbstractRemoteSLJob {
 			throw new IllegalStateException();
 		}		
 		*/
+		Socket socket = null;
 		if (port == null) {
 			in  = System.in;
 			out = System.out;
 		} else {		
 			try {
-				Socket socket = new Socket("localhost", Integer.parseInt(port));
+				socket = new Socket("localhost", Integer.parseInt(port));
 				in = socket.getInputStream();
 				out = new PrintStream(socket.getOutputStream());
 			} catch (Exception e) {
@@ -96,11 +97,23 @@ public abstract class AbstractRemoteSLJob {
 			processStatus(mon, status);
 			checkInput(br, mon, "Scanning complete (" + (end - start) + " ms)");
 
-			if (out != System.out) {
+			if (socket == null) {
+				out.println("No socket to close");
+			}
+			out.println("Closing std streams");
+			System.out.close();
+			System.in.close();
+			
+			if (socket != null) {
+				out.println("Closing socket streams");
+				out.println();
+				out.flush();
 				out.close();
 				in.close();
+				socket.close();
 				System.exit(0);
 			}
+			System.exit(0);
 		} catch (final Throwable e) {
 			outputFailure(out, null, e);
 			System.exit(-RemoteSLJobConstants.ERROR_JOB_FAILED);

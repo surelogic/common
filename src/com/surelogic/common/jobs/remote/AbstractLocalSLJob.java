@@ -1,10 +1,8 @@
 package com.surelogic.common.jobs.remote;
 
 import java.io.*;
-import java.net.*;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.logging.*;
 
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.types.*;
@@ -29,12 +27,15 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 	private final int port; // <=0 if just using System.in/out
 	protected final SLStatus.Builder status   = new SLStatus.Builder();
 	private Stack<SubSLProgressMonitor> tasks = new Stack<SubSLProgressMonitor>();
+	private SLProgressMonitor topMonitor;
+	private Process remoteVM;
+	private Thread handlerThread; // Only if using a port
 	
 	protected AbstractLocalSLJob(String name, int work, ILocalConfig config) {
-		this(name, work, config, -1);
+		this(name, work, config, null);
 	}
 		
-	protected AbstractLocalSLJob(String name, int work, ILocalConfig config, int port) {
+	protected AbstractLocalSLJob(String name, int work, ILocalConfig config, Console console) {
 		super(name);
 		this.work  = work;
 		if (work <= 0) {
@@ -43,9 +44,13 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 		testCode   = TestCode.getTestCode(config.getTestCode());
 		memorySize = config.getMemorySize();
 		this.verbose = config.isVerbose();
-		this.port = port;
+		this.port = console == null ? -1 : console.getPort();
 	}
-
+	
+	public synchronized void setHandlerThread(Thread handler) {
+		handlerThread = handler;
+	}
+	
 	protected RemoteSLJobException newException(int number, Object... args) {
 		throw new RemoteSLJobException(number, args);
 	}
@@ -125,67 +130,16 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 		return errMsg;
 	}
 	
-	static class Streams {
-		final Process process;
-		final InputStream in;
-		final OutputStream out;
-		private final ServerSocket ss;
-		
-		Streams(Process p, InputStream in, OutputStream out, ServerSocket ss) {
-			this.process = p;
-			this.in = in;
-			this.out = out;
-			this.ss = ss;
-		}
-		
-		void close() throws IOException {
-			if (ss != null) {
-				ss.close();
-			}
-		}
+	final boolean debug = true;//verbose && LOG.isLoggable(Level.FINE);
+	
+	public void reportException(Exception e) {
+		status.addChild(SLStatus.createErrorStatus(e));		
 	}
 	
-	private Streams getStreams(ProcessBuilder pb) throws Exception {
-		if (port > 0) {
-			// Setup a server socket and have the new process contact us
-			ServerSocket serverSocket = new ServerSocket(port);
-			
-			Process p = pb.start();
-			startOutputProcessingThread(p);
-			
-			Socket s = serverSocket.accept();
-			return new Streams(p, s.getInputStream(), s.getOutputStream(), serverSocket);
-		}
-		// Use stdin/out
-		Process p = pb.start();
-		return new Streams(p, p.getInputStream(), p.getOutputStream(), null);
-	}
-	
-	/**
-	 * Starts a thread to process the output from p
-	 * (needed to keep it from blocking)
-	 */
-	private void startOutputProcessingThread(final Process p) {			
-		Thread t = new Thread(new Runnable() {
-			public void run() {
-				final byte[] buf = new byte[1024];	
-				int read;
-				try {
-					while ((read = p.getInputStream().read(buf)) > 0) {
-						System.out.write(buf, 0, read);
-					}	
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		});
-		t.start();
-	}
-
 	public SLStatus run(final SLProgressMonitor topMonitor) {
-		Streams s = null;
 		try {
-			final boolean debug = true;//verbose && LOG.isLoggable(Level.FINE);
+			this.topMonitor = topMonitor;
+			
 			CommandlineJava cmdj = new CommandlineJava();
 			setupJVM(debug, cmdj);
 
@@ -198,8 +152,38 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 			ProcessBuilder pb = new ProcessBuilder(cmdj.getCommandline());
 			pb.redirectErrorStream(true);
 
-			s = getStreams(pb);
-			BufferedReader br = new BufferedReader(new InputStreamReader(s.in));
+			remoteVM = pb.start();
+			if (port < 0) {
+				// Use stdin/out
+				BufferedReader br = new BufferedReader(new InputStreamReader(remoteVM.getInputStream()));
+				BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(remoteVM.getOutputStream()));
+				handleInput(br, bw);
+			} else {
+				// Handle stdin to prevent the remote VM from blocking
+				final byte[] buf = new byte[1024];	
+				int read;
+				try {
+					while ((read = remoteVM.getInputStream().read(buf)) > 0) {
+						System.out.write(buf, 0, read);
+					}	
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				// Wait for the handler to finish
+				synchronized (this) {
+					if (handlerThread != null) {
+						handlerThread.join();
+					}
+				}
+			}
+		} catch(Exception e) {
+			reportException(e);
+		}
+		return status.build();
+	}
+				
+	public void handleInput(BufferedReader br, BufferedWriter outputStream) {			
+		try {
 			String firstLine = br.readLine();
 			if (debug) {
 				while (firstLine != null) {
@@ -227,9 +211,9 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 			firstLines[0] = firstLine;
 
 			// Copy any output
-			final PrintStream pout = new PrintStream(s.out);
+			final PrintWriter pout = new PrintWriter(outputStream);
 			if (TestCode.SCAN_CANCELLED.equals(testCode)) {
-				cancel(s.process, pout);
+				cancel(remoteVM, pout);
 			}
 			topMonitor.begin(work);
 			
@@ -243,7 +227,7 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 					numLines++;
 				}
 				if (monitor.isCanceled()) {
-					cancel(s.process, pout);
+					cancel(remoteVM, pout);
 				}
 
 				if (line.startsWith("##")) {
@@ -282,7 +266,7 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 							}
 							String msg = copyException(cmd, st.nextToken(), br);
 							System.out.println("Terminating run");
-							s.process.destroy();
+							remoteVM.destroy();
 							if (msg
 									.contains("FAILED:  java.lang.OutOfMemoryError")) {
 								throw newException(
@@ -320,7 +304,7 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 				System.out.println(line);
 			}
 			// See if the process already died?
-			int value = handleExitValue(s.process);
+			int value = handleExitValue(remoteVM);
 			br.close();
 			pout.close();
 			if (value != 0) {
@@ -328,19 +312,8 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 				throw newException(RemoteSLJobConstants.ERROR_PROCESS_FAILED, value);
 			}
 		} catch (Exception e) {
-			//throw new RuntimeException(e);
-			status.addChild(SLStatus.createErrorStatus(e));
-		} finally {
-			if (s != null) {
-				try {
-					s.close();
-				} catch (IOException e) {
-					status.addChild(SLStatus.createErrorStatus(e));
-				}
-			}
+			reportException(e);
 		}
-		// FIX status not built if exception thrown
-		return status.build();
 	}
 
 	protected final void setupJVM(boolean debug, CommandlineJava cmdj) {
@@ -416,7 +389,7 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 	 */
 	protected abstract void finishSetupJVM(boolean debug, CommandlineJava cmdj, Project proj);
 	
-	private void cancel(Process p, final PrintStream pout) {
+	private void cancel(Process p, final PrintWriter pout) {
 		pout.println("##" + Local.CANCEL);
 		p.destroy();
 		throw newException(RemoteSLJobConstants.ERROR_JOB_CANCELLED);
