@@ -15,7 +15,10 @@ implements IClientHandlerFactory {
 	
 	protected AbstractLocalHandlerFactory(String name, int startingPort) {
 		console = new Console(name, this, startingPort);
-		console.start();
+		
+		if (startingPort > 0) {
+			console.start();
+		}
 	}
 	
 	public final T newJob(String name, int work, T2 config) {
