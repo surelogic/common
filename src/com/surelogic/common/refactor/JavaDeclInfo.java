@@ -11,6 +11,13 @@ public class JavaDeclInfo extends Entity implements IJavaDeclInfoClient {
 
 	// Indicates what the info is from / used for 
 	public static final String PARENT = "parent";
+
+	static {
+		for(DeclKind k : DeclKind.values()) {
+			internString(k.toString());
+		}
+		internString(PARENT);
+	}
 	
 	JavaDeclInfo parent;
 	final DeclKind kind;
@@ -27,6 +34,9 @@ public class JavaDeclInfo extends Entity implements IJavaDeclInfoClient {
 		super(name, a);
 		parent = null;
 		kind = DeclKind.valueOf(getValue(a, INFO_KIND));
+		if (kind.equals(DeclKind.TYPE_CONTEXT)) {
+			maybeReplace(IJavaDeclaration.NAME);
+		}
 	}
 
 	public JavaDeclInfo getParent() {
@@ -54,6 +64,7 @@ public class JavaDeclInfo extends Entity implements IJavaDeclInfoClient {
 					Integer.valueOf(attributes.get(MethodParameter.PARAM_NUM))); 
 		case TYPE_CONTEXT:
 			final String name = attributes.get(IJavaDeclaration.NAME);
+			
 			if (parent == null) {
 				return new TypeContext(name);
 			} else if (parent instanceof TypeContext) {

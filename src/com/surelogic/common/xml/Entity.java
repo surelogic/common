@@ -5,8 +5,25 @@ import java.util.*;
 import org.xml.sax.Attributes;
 
 public class Entity {
+	protected static final Map<String,String> interned = Collections.synchronizedMap(new HashMap<String, String>());
+	public static void internString(String v) {
+		interned.put(v, v);
+	}
+	static {
+		internString("true");
+		internString("false");
+	}
+	
+	protected void maybeReplace(String attr) {
+		String value  = attributes.get(attr);
+		String intern = Entity.maybeIntern(value);
+		if (intern != value) {
+			attributes.put(attr, intern);
+		}
+	}
+	
 	final String name;
-	protected final Map<String,String> attributes = new HashMap<String,String>();		
+	protected final Map<String,String> attributes = new HashMap<String,String>(4, 1.0f);
 	final String id;
 	final List<MoreInfo> infos = new ArrayList<MoreInfo>(0);
 	final List<Entity> refs = new ArrayList<Entity>(0);
@@ -29,7 +46,7 @@ public class Entity {
 			for (int i = 0; i < a.getLength(); i++) {
 				final String aName = a.getQName(i);
 				final String aValue = a.getValue(i);
-				attributes.put(aName, aValue);
+				attributes.put(aName.intern(), getInternValue(aValue));
 			}
 		}
 		id = attributes.get(XMLConstants.ID_ATTR);
@@ -41,6 +58,23 @@ public class Entity {
 			attributes.putAll(a);
 		}
 		id = attributes.get(XMLConstants.ID_ATTR);
+	}
+	
+	protected String getInternValue(String v) {		
+		String intern = interned.get(v);
+		if (intern != null) {
+			return intern;
+		}
+		return v;
+	}
+	
+	public static String maybeIntern(String v) {
+		String intern = interned.get(v);
+		if (intern != null) {
+			return intern;
+		}
+		internString(v);
+		return v;
 	}
 	
 	@Override 
