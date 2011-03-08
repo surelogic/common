@@ -25,8 +25,8 @@ public class Entity {
 	final String name;
 	protected final Map<String,String> attributes = new HashMap<String,String>(4, 1.0f);
 	final String id;
-	final List<MoreInfo> infos = new ArrayList<MoreInfo>(0);
-	final List<Entity> refs = new ArrayList<Entity>(0);
+	List<MoreInfo> infos = Collections.emptyList();
+	List<Entity> refs = Collections.emptyList();
 	SourceRef source;
 	
 	public static String getValue(Attributes a, String name) {
@@ -99,10 +99,16 @@ public class Entity {
 	}
 
 	public void addInfo(MoreInfo e) {
+		if (infos.isEmpty()) {
+			infos = new ArrayList<MoreInfo>(1);
+		}
 		infos.add(e);
 	}
 	
 	public void addRef(Entity e) {
+		if (refs.isEmpty()) {
+			refs = new ArrayList<Entity>(1);
+		}
 		refs.add(e);
 	}
 	
