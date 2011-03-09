@@ -21,11 +21,12 @@ public final class LimitRowHandler<T> implements ResultHandler<List<T>> {
 		this.limit = limit;
 	}
 
+	@Override
 	public List<T> handle(final Result result) {
 		int count = 0;
 		List<T> resultList = new ArrayList<T>();
 		for (Row r : result) {
-			if (count < limit) {
+			if (count++ < limit) {
 				resultList.add(handler.handle(r));
 			} else {
 				return resultList;
