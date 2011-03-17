@@ -6,8 +6,9 @@ import org.xml.sax.Attributes;
 
 public class Entity {
 	protected static final Map<String,String> interned = Collections.synchronizedMap(new HashMap<String, String>());
-	public static void internString(String v) {
+	public static String internString(String v) {
 		interned.put(v, v);
+		return v;
 	}
 	static {
 		internString("true");
