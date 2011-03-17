@@ -353,7 +353,7 @@ public final class FileUtility {
 	public static boolean copy(final String source, InputStream is,
 			final File to) {
 		try {
-			return copyToStream(source, is, to.getAbsolutePath(),
+			return copyToStream(false, source, is, to.getAbsolutePath(),
 					new FileOutputStream(to), true) != null;
 		} catch (FileNotFoundException e) {
 			SLLogger.getLogger().log(Level.SEVERE,
@@ -362,23 +362,27 @@ public final class FileUtility {
 		}
 	}
 
+	private static final byte[] noBytes = new byte[0];
+	
 	/**
 	 * @return the MD5 hash of the copied data
 	 */
-	public static byte[] copyToStream(final String source, InputStream is,
+	public static byte[] copyToStream(final boolean computeHash, final String source, InputStream is,
 			final String target, OutputStream os, boolean closeOutput) {
 		try {
 			try {
-				final MessageDigest md = MessageDigest.getInstance("MD5");
+				final MessageDigest md = computeHash ? MessageDigest.getInstance("MD5") : null;
 				is = new BufferedInputStream(is, 8192);
 
 				final byte[] buf = new byte[8192];
 				int num;
 				while ((num = is.read(buf)) >= 0) {
 					os.write(buf, 0, num);
-					md.update(buf, 0, num);
+					if (computeHash) {
+						md.update(buf, 0, num);
+					}
 				}
-				return md.digest();
+				return computeHash ? md.digest() : noBytes;
 			} finally {
 				if (is != null) {
 					is.close();

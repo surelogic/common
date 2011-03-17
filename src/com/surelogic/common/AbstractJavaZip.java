@@ -137,7 +137,7 @@ public abstract class AbstractJavaZip<T> {
 				try {
 					out.putNextEntry(new ZipEntry(pathName));
 					String className = null;
-					byte[] hash = FileUtility.copyToStream(getFullPath(resource), is,
+					byte[] hash = FileUtility.copyToStream(true, getFullPath(resource), is,
 							pathName, out, false);
 					if (hash != null) {
 						long time = getTimestamp(resource);
