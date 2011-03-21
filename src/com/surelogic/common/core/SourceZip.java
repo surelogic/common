@@ -49,14 +49,19 @@ public class SourceZip extends AbstractJavaZip<IResource> {
 	
 	@Override
 	protected InputStream getFileContents(IResource res) throws IOException {
-		IFile file = (IFile) res;
+		final IFile file = (IFile) res;
 		try {
 			return file.getContents();
 		} catch (CoreException e) {
-			LOG.severe("Error adding " + file.getName() + " to ZIP.");
-			final IOException io = new IOException();
-			io.initCause(e);
-			throw io;
+			File f = file.getLocation().toFile();
+			try {
+				return new FileInputStream(f);
+			} catch (IOException ioe) {
+				LOG.severe("Error adding " + file.getName() + " to ZIP.");
+				final IOException io = new IOException();
+				io.initCause(e);
+				throw io;
+			}
 		}
 	}
 
