@@ -1,7 +1,6 @@
 package com.surelogic.common.xml;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import com.surelogic.common.CharBuffer;
 
@@ -39,6 +38,7 @@ public final class Entities {
 		}
 		ASCII_CONTROL.define("\\fffe", String.valueOf((char) 0xfffe));
 		ASCII_CONTROL.define("\\ffff", String.valueOf((char) 0xffff));
+		ASCII_CONTROL.generateCharMap();
 	}
 
 	private final boolean wrapForXML;
@@ -47,6 +47,29 @@ public final class Entities {
 		wrapForXML = wrap;
 	}
 	
+	private void generateCharMap() {
+		for(Tuple t : f_NameValue) {
+			if (t instanceof CharValueTuple) {
+				CharValueTuple cvt = (CharValueTuple) t; 				
+				System.out.println("Mapping "+((int) cvt.f_value)+" to "+cvt.f_name);
+				f_map.put(Integer.valueOf((int) cvt.f_value), cvt.f_name);				
+			}
+		}
+		checkCharMap();
+	}
+	
+	private void checkCharMap() {
+		for(Tuple t : f_NameValue) {
+			if (t instanceof CharValueTuple) {
+				CharValueTuple cvt = (CharValueTuple) t; 		
+				String mapped = f_map.get(Integer.valueOf(cvt.f_value));
+				if (mapped == null) {
+					System.out.println("Couldn't find mapping for "+cvt.f_name);
+				}
+			}
+		}
+	}
+
 	public static void start(final String name, final StringBuilder b) {
 		start(name, b, 0);
 	}
@@ -212,6 +235,7 @@ public final class Entities {
 	}
 
 	private final List<Tuple> f_NameValue = new ArrayList<Tuple>();
+	private Map<Integer,String> f_map = new HashMap<Integer,String>();
 
 	public String escape(final String text) {
 		// Allocate space for original text plus 5 single-character entities
@@ -281,25 +305,37 @@ public final class Entities {
 	}
 	
 	public static String escapeControlChars(String text) {
+		return ASCII_CONTROL.convertChars(text);
 		/*
-		for(int i=text.length()-1; i>=0; i--) {
-			if (text.charAt(i) < 9) {
-				System.out.println("Found control char");
-				break;
-			}
-		}
-		*/
 		try {
 			String rv = ASCII_CONTROL.escape(text);		
-			/*
-			if (!rv.equals(text)) {
-				System.out.println("Changed: "+rv);
-			}		
-			*/
 			return rv;
 		} catch(Throwable t) {
 			t.printStackTrace();
 		}
 		return null;
+		*/
+	}
+	
+	String convertChars(String text) {
+		//checkCharMap();
+		
+		final int len = text.length();
+		StringBuilder sb = new StringBuilder(len);
+		for(int i=0; i<len; i++) {
+			final char ch = text.charAt(i);
+			String mapped = f_map.get(Integer.valueOf(ch));
+			if (mapped != null) {
+				sb.append(mapped);
+			} else {
+				if (ch == 0) {
+					System.out.println("Leaving in zero");
+					sb.append("\\0");
+				} else {
+					sb.append(ch);
+				}
+			}
+		}
+		return sb.toString();
 	}
 }
