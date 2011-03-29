@@ -12,12 +12,41 @@ import com.surelogic.common.CharBuffer;
 public final class Entities {
 
 	private static final Entities E;
-
+	private static final Entities ASCII_CONTROL = new Entities(false);
+		
 	static {
-		E = new Entities();
+		E = new Entities(true);
 		E.defineStandardXML();
+		
+		// U+0009, U+000A, U+000D: these are the only C0 controls accepted in XML 1.0
+		//RestrictedChar	   ::=   	[#x1-#x8] | [#xB-#xC] | [#xE-#x1F] | [#x7F-#x84] | [#x86-#x9F]		
+		for(int i=0; i<9;i++) {			
+			ASCII_CONTROL.define("\\"+i, String.valueOf((char) i));
+		}
+		ASCII_CONTROL.define("\\b", "\u000b");
+		ASCII_CONTROL.define("\\c", "\u000c");
+		for(int i=14; i<32;i++) {			
+			ASCII_CONTROL.define("\\"+Integer.toHexString(i), String.valueOf((char) i));
+		}
+		for(int i=0x7F; i<=0x84;i++) {			
+			ASCII_CONTROL.define("\\"+Integer.toHexString(i), String.valueOf((char) i));
+		}
+		for(int i=0x86; i<=0x9F;i++) {			
+			ASCII_CONTROL.define("\\"+Integer.toHexString(i), String.valueOf((char) i));
+		}
+		for(int i=0xD800; i<0xE000;i++) {			
+			ASCII_CONTROL.define("\\"+Integer.toHexString(i), String.valueOf((char) i));
+		}
+		ASCII_CONTROL.define("\\fffe", String.valueOf((char) 0xfffe));
+		ASCII_CONTROL.define("\\ffff", String.valueOf((char) 0xffff));
 	}
 
+	private final boolean wrapForXML;
+	
+	private Entities(boolean wrap) {
+		wrapForXML = wrap;
+	}
+	
 	public static void start(final String name, final StringBuilder b) {
 		start(name, b, 0);
 	}
@@ -108,8 +137,10 @@ public final class Entities {
 	 */
 	private abstract static class Tuple {
 		final String f_name;
-
-		Tuple(final String name) {
+		final boolean wrapForXML;
+		
+		Tuple(boolean wrapForXML, final String name) {
+			this.wrapForXML = wrapForXML;
 			f_name = name;
 		}
 
@@ -128,17 +159,21 @@ public final class Entities {
 		 * Get the value.
 		 */
 		public final void appendName(StringBuilder sb) {
-			sb.append('&');
+			if (wrapForXML) {
+				sb.append('&');
+			} 
 			sb.append(f_name);
-			sb.append(';');
+			if (wrapForXML) {
+				sb.append(';');
+			}
 		}
 	}
 
 	private static final class CharValueTuple extends Tuple {
 		final char f_value;
 
-		CharValueTuple(final String name, final String value) {
-			super(name);
+		CharValueTuple(boolean wrapForXML, final String name, final String value) {
+			super(wrapForXML, name);
 			if (value.length() != 1) {
 				throw new IllegalArgumentException(
 						"Value must have length of 1");
@@ -160,8 +195,8 @@ public final class Entities {
 	private static final class StringValueTuple extends Tuple {
 		final String f_value;
 
-		StringValueTuple(final String name, final String value) {
-			super(name);
+		StringValueTuple(boolean wrapForXML, final String name, final String value) {
+			super(wrapForXML, name);
 			f_value = value;
 		}
 
@@ -228,8 +263,8 @@ public final class Entities {
 	public void define(final String name, final String value) {
 		assert name != null;
 		assert value != null;
-		final Tuple tuple = value.length() == 1 ? new CharValueTuple(name,
-				value) : new StringValueTuple(name, value);
+		final Tuple tuple = value.length() == 1 ? new CharValueTuple(wrapForXML, name,
+				value) : new StringValueTuple(wrapForXML, name, value);
 		f_NameValue.add(tuple);
 	}
 
@@ -243,5 +278,28 @@ public final class Entities {
 		define("gt", ">");
 		define("lt", "<");
 		define("quot", "\"");
+	}
+	
+	public static String escapeControlChars(String text) {
+		/*
+		for(int i=text.length()-1; i>=0; i--) {
+			if (text.charAt(i) < 9) {
+				System.out.println("Found control char");
+				break;
+			}
+		}
+		*/
+		try {
+			String rv = ASCII_CONTROL.escape(text);		
+			/*
+			if (!rv.equals(text)) {
+				System.out.println("Changed: "+rv);
+			}		
+			*/
+			return rv;
+		} catch(Throwable t) {
+			t.printStackTrace();
+		}
+		return null;
 	}
 }
