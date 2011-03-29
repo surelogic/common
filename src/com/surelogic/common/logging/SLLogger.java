@@ -26,8 +26,7 @@ public class SLLogger {
 	 * <p>
 	 * The default is to show all logged messages at INFO and above.
 	 */
-	@Unique
-	@AggregateInRegion("LoggerState")
+	@UniqueInRegion("LoggerState")
 	public static final AtomicReference<Level> LEVEL;
 
 	static {
@@ -76,23 +75,20 @@ public class SLLogger {
 	 * Everyone can reuse the same instance of this formatter because the
 	 * format() method uses no instance state.
 	 */
-	@Unique
-	@AggregateInRegion("LoggerState")
+	@UniqueInRegion("LoggerState")
 	private static final AtomicReference<SLFormatter> f_formatter = new AtomicReference<SLFormatter>(
 			new SLFormatter());
 
 	/**
 	 * A simple cache of loggers we have already configured.
 	 */
-	@Unique
-	@AggregateInRegion("LoggerState")
+	@UniqueInRegion("LoggerState")
 	private static final Map<String, Logger> f_nameToLogger = new HashMap<String, Logger>();
 
 	/**
 	 * A list of the handlers we manage for logging.
 	 */
-	@Unique
-	@AggregateInRegion("LoggerState")
+	@UniqueInRegion("LoggerState")
 	private static final List<Handler> f_handlers = new ArrayList<Handler>();
 
 	/**

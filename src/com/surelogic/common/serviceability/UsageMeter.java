@@ -36,7 +36,6 @@ public final class UsageMeter {
 	}
 
 	@Unique
-	@Aggregate
 	private XMLMemo f_memo = new XMLMemo(f_usageFile);
 
 	/**
