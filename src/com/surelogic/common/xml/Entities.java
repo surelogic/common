@@ -51,7 +51,7 @@ public final class Entities {
 		for(Tuple t : f_NameValue) {
 			if (t instanceof CharValueTuple) {
 				CharValueTuple cvt = (CharValueTuple) t; 				
-				System.out.println("Mapping "+((int) cvt.f_value)+" to "+cvt.f_name);
+				//System.out.println("Mapping "+((int) cvt.f_value)+" to "+cvt.f_name);
 				f_map.put(Integer.valueOf((int) cvt.f_value), cvt.f_name);				
 			}
 		}
@@ -328,12 +328,14 @@ public final class Entities {
 			if (mapped != null) {
 				sb.append(mapped);
 			} else {
+				/*
 				if (ch == 0) {
 					System.out.println("Leaving in zero");
 					sb.append("\\0");
 				} else {
+				*/
 					sb.append(ch);
-				}
+				//}
 			}
 		}
 		return sb.toString();
