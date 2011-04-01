@@ -31,7 +31,7 @@ public abstract class ColumnViewerSorter<T> extends ViewerComparator {
 
 	private TableColumn f_column;
 
-	private TableViewer f_viewer;
+	private ColumnViewer f_viewer;
 
 	/**
 	 * Constructs an object to help sort a JFace viewer. Typical use would be as
@@ -52,7 +52,7 @@ public abstract class ColumnViewerSorter<T> extends ViewerComparator {
 	 * @param column
 	 *            the table column from the viewer to sort.
 	 */
-	public ColumnViewerSorter(TableViewer viewer, TableColumn column) {
+	public ColumnViewerSorter(ColumnViewer viewer, TableColumn column) {
 		this.f_column = column;
 		this.f_viewer = viewer;
 		this.f_column.addSelectionListener(new SelectionAdapter() {
