@@ -45,6 +45,14 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 		memorySize = config.getMemorySize();
 		this.verbose = config.isVerbose();
 		this.port = console == null ? -1 : console.getPort();
+		if (config.getLogPath() != null) {
+		    try {
+                log = new PrintStream(new File(config.getLogPath()));
+            } catch (FileNotFoundException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+		}
 	}
 	
 	public synchronized void setHandlerThread(Thread handler) {
@@ -104,17 +112,17 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 			label = mon.getName();
 		}
 		StringBuilder sb = new StringBuilder(label + ' ' + type.toString().toLowerCase());
-		System.out.println("Sierra tool "+type.toString().toLowerCase()+":"+msg);
+		println("Sierra tool "+type.toString().toLowerCase()+":"+msg);
 		sb.append(": ").append(msg).append('\n');
 
 		String line = br.readLine();
 		while (line != null && line.startsWith("\t")) {
-			System.out.println(line);
+			println(line);
 			sb.append(' ').append(line).append('\n');
 			line = br.readLine();
 		}
 		if (line != null) {
-			System.out.println(line);
+			println(line);
 		}
 		final String errMsg = sb.toString();
 		final SLStatus child;
@@ -144,9 +152,9 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 			setupJVM(debug, cmdj);
 
 			if (debug) {
-				System.out.println("Starting process:");
+				println("Starting process:");
 				for (String arg : cmdj.getCommandline()) {
-					System.out.println("\t" + arg);
+					println("\t" + arg);
 				}
 			}
 			ProcessBuilder pb = new ProcessBuilder(cmdj.getCommandline());
@@ -164,7 +172,7 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 				int read;
 				try {
 					while ((read = remoteVM.getInputStream().read(buf)) > 0) {
-						System.out.write(buf, 0, read);
+						write(buf, 0, read);
 					}	
 				} catch (IOException e) {
 					e.printStackTrace();
@@ -179,10 +187,13 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 		} catch(Exception e) {
 			reportException(e);
 		}
+		if (log != null) {
+		    log.close();
+		}
 		return status.build();
 	}
-				
-	public void handleInput(BufferedReader br, BufferedWriter outputStream) {			
+
+    public void handleInput(BufferedReader br, BufferedWriter outputStream) {			
 		try {
 			String firstLine = br.readLine();
 			if (debug) {
@@ -191,7 +202,7 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 					// from RemoteTool
 					if (firstLine.startsWith("[")) {
 						// if (!firstLine.endsWith("rt.jar]")) {
-						System.out.println(firstLine);
+						println(firstLine);
 						// }
 						firstLine = br.readLine();
 					} else {
@@ -200,7 +211,7 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 				}
 			}
 			if (verbose) {
-				System.out.println("First line = " + firstLine);
+				println("First line = " + firstLine);
 			}
 
 			if (firstLine == null) {
@@ -238,7 +249,7 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 						switch (cmd) {
 						case TASK:
 							if (verbose) {
-								System.out.println(line);
+								println(line);
 							}
 							final String task = st.nextToken();
 							final String work = st.nextToken();
@@ -256,16 +267,16 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 							break;
 						case WARNING:
 							if (verbose) {
-								System.out.println(line);
+								println(line);
 							}
 							copyException(cmd, st.nextToken(), br);
 							break;
 						case FAILED:
 							if (verbose) {
-								System.out.println(line);
+								println(line);
 							}
 							String msg = copyException(cmd, st.nextToken(), br);
-							System.out.println("Terminating run");
+							println("Terminating run");
 							remoteVM.destroy();
 							if (msg
 									.contains("FAILED:  java.lang.OutOfMemoryError")) {
@@ -276,7 +287,7 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 							throw new RuntimeException(msg);
 						case DONE:
 							if (verbose) {
-								System.out.println(line);
+								println(line);
 							}
 							tasks.pop();
 							/*
@@ -288,20 +299,20 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 							break;
 						default:
 							if (verbose) {
-								System.out.println(line);
+								println(line);
 							}
 						}
 					} else if (verbose) {
-						System.out.println(line);
+						println(line);
 					}
 				} else if (verbose) {
-					System.out.println(line);
+					println(line);
 				}
 				line = br.readLine();
 			}
 			line = br.readLine();
 			if (line != null) {
-				System.out.println(line);
+				println(line);
 			}
 			// See if the process already died?
 			int value = handleExitValue(remoteVM);
@@ -356,9 +367,9 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 		if (debug) {
 			for (String p : path.list()) {
 				if (!new File(p).exists()) {
-					System.out.println("Does not exist: " + p);
+					println("Does not exist: " + p);
 				} else if (debug) {
-					System.out.println("Path: " + p);
+					println("Path: " + p);
 				}
 			}
 		}		
@@ -411,7 +422,7 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 		try {
 			value = p.exitValue();
 			if (verbose) {
-				System.out.println("Process result after waiting = " + value);
+				println("Process result after waiting = " + value);
 			}
 		} catch (IllegalThreadStateException e) {
 			// Not done yet
@@ -435,13 +446,30 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 				t.interrupt();
 			} catch (InterruptedException ie) {
 				long time = System.currentTimeMillis() - start;
-				System.out.println("Timeout waiting for process to exit: " + time
+				println("Timeout waiting for process to exit: " + time
 								+ " ms");
 				throw new RuntimeException(e);
 
 			}
-			System.out.println("Process result after waiting = " + value);
+			println("Process result after waiting = " + value);
 		}
 		return value;
 	}
+	
+	private PrintStream log;
+	
+	protected final void println(String msg) {
+	    System.out.println(msg);
+	    if (log != null) {
+	        log.println(msg);
+	    }
+	}
+	
+    
+    private void write(byte[] buf, int i, int read) {
+        System.out.write(buf, i, read);
+        if (log != null) {
+            log.write(buf, i, read);
+        }
+    }
 }
