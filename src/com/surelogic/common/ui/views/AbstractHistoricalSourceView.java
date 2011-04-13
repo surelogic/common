@@ -77,6 +77,9 @@ public abstract class AbstractHistoricalSourceView extends ViewPart {
 	 */
 	private boolean showSourceFile(final ISourceZipFileHandles sources,
 			String qname) {
+	    if (qname == null) {
+	        return false;
+	    }
 		// FIXME We use ANON_ONWARDS, b/c we don't record any type location info
 		// about types defined within an anonymous class
 		qname = ANON_ONWARDS.matcher(qname).replaceFirst("");
