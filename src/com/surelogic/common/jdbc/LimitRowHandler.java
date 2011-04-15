@@ -29,11 +29,9 @@ public final class LimitRowHandler<T> implements
         for (Row r : result) {
             if (count++ < limit) {
                 resultList.add(handler.handle(r));
-            } else {
-                return new LimitedResult<T>(resultList, true);
             }
         }
-        return new LimitedResult<T>(resultList, false);
+        return new LimitedResult<T>(resultList, count);
     }
 
     /**

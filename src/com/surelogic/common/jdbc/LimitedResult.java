@@ -16,19 +16,23 @@ import java.util.ListIterator;
 public class LimitedResult<T> implements List<T> {
 
     private final List<T> result;
-    private final boolean hasMore;
+    private final int fullCount;
 
-    public LimitedResult(final List<T> result, final boolean hasMore) {
+    public LimitedResult(final List<T> result, final int extraCount) {
         this.result = result;
-        this.hasMore = hasMore;
+        this.fullCount = extraCount;
     }
 
     public List<T> getResult() {
         return result;
     }
 
-    public boolean hasMore() {
-        return hasMore;
+    public boolean isLimited() {
+        return fullCount > result.size();
+    }
+
+    public int getFullCount() {
+        return fullCount;
     }
 
     @Override
@@ -154,6 +158,10 @@ public class LimitedResult<T> implements List<T> {
     @Override
     public List<T> subList(final int fromIndex, final int toIndex) {
         return result.subList(fromIndex, toIndex);
+    }
+
+    public int getExtraCount() {
+        return getFullCount() - size();
     }
 
 }
