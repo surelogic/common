@@ -1,5 +1,5 @@
 package com.surelogic.common.jobs.remote;
 
 public enum Remote {
-  TASK, SUBTASK, WORK, WARNING, FAILED, DONE
+  TASK, SUBTASK, SUBTASK_DONE, WORK, WARNING, FAILED, DONE
 }

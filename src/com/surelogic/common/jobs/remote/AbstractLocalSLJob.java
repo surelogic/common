@@ -254,14 +254,26 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 							final String task = st.nextToken();
 							final String work = st.nextToken();
 							// LOG.info(task+": "+work);
-							SubSLProgressMonitor mon = new SubSLProgressMonitor(monitor, task, 1);
+							SubSLProgressMonitor mon = new SubSLProgressMonitor(monitor, task, 20);
 							tasks.push(mon);
 							mon.begin(Integer.valueOf(work.trim()));
 							break;
 						case SUBTASK:
+							if (verbose) {
+								println(line);
+							}
 							monitor.subTask(st.nextToken());
 							break;
+						case SUBTASK_DONE:
+							if (verbose) {
+								println(line);
+							}
+							monitor.subTaskDone();
+							break;
 						case WORK:
+							if (verbose) {
+								println(line);
+							}
 							monitor.worked(Integer.valueOf(st.nextToken()
 									.trim()));
 							break;

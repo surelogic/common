@@ -246,7 +246,7 @@ public abstract class AbstractRemoteSLJob {
 		}
 		
 		public void subTaskDone() {
-		  // Do nothing
+			out.println("##" + Remote.SUBTASK_DONE);
 		}
 
 		public void worked(final int work) {
