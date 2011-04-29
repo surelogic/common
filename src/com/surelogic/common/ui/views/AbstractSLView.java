@@ -1,7 +1,7 @@
 package com.surelogic.common.ui.views;
 
 import java.io.*;
-import java.util.LinkedList;
+import java.util.*;
 
 import org.eclipse.jface.action.*;
 import org.eclipse.jface.dialogs.*;
@@ -152,6 +152,63 @@ public abstract class AbstractSLView extends ViewPart {
 			pw.println(s); // TODO what if there are newlines?
 		}
 		pw.println(); // Marker for the end of the list
+	}
+	
+	protected abstract class SelectionAction<T> extends Action {
+		protected SelectionAction(String label) {
+			super(label);
+		}
+		@Override
+		public void run() {				
+			if (getViewer() != null) {
+				IStructuredSelection s = (IStructuredSelection) getViewer().getSelection();
+				run(s);
+			}
+		}
+		/**
+		 * @return true if performed on at least one element
+		 */
+		protected abstract boolean run(IStructuredSelection s);
+		protected abstract boolean run(T elt);
+	}
+	
+	protected abstract class SingleSelectAction<T> extends SelectionAction<T> {
+		protected SingleSelectAction(String label) {
+			super(label);
+		}
+
+		@SuppressWarnings("unchecked")
+		@Override
+		public boolean run(IStructuredSelection s) {				
+			if (s.size() == 1) {
+				return run((T) s.getFirstElement());
+			} else {
+				// TODO ignore with warning?
+			}
+			return false;
+		}
+
+	}
+	
+	protected abstract class MultiSelectAction<T> extends SelectionAction<T> {
+		protected MultiSelectAction(String label) {
+			super(label);
+		}
+
+		@SuppressWarnings("unchecked")
+		@Override
+		public boolean run(IStructuredSelection s) {				
+			if (s.size() > 0) {
+				boolean success = false;
+				Iterator it = s.iterator();
+				while (it.hasNext()) {
+					Object o = it.next();
+					success |= run((T) o);
+				}
+				return success;
+			}
+			return false;
+		}
 	}
 }
 
