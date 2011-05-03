@@ -17,7 +17,9 @@ Require-Bundle: com.surelogic.common,
  org.eclipse.jface.text
 Eclipse-LazyStart: true
 Bundle-ActivationPolicy: lazy
-Bundle-ClassPath: .
+Bundle-ClassPath: .,
+ lib/org.swtchart_0.7.0.v20110128.jar,
+ lib/org.swtchart.ext_0.7.0.v20110128.jar
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: com.surelogic.common.ui,
  com.surelogic.common.ui.actions,
@@ -35,4 +37,6 @@ Export-Package: com.surelogic.common.ui,
  com.surelogic.common.ui.tooltip,
  com.surelogic.common.ui.views,
  org.jdesktop.swt.animation.timing,
- org.jdesktop.swt.animation.timing.interpolation
+ org.jdesktop.swt.animation.timing.interpolation,
+ org.swtchart,
+ org.swtchart.ext
