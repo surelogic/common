@@ -625,8 +625,9 @@ abstract public class Series implements ISeries {
      *            the width to draw series
      * @param height
      *            the height to draw series
+     * @param h 
      */
-    public void draw(GC gc, int width, int height) {
+    public void draw(GC gc, int width, int height, ISeriesHandler h) {
 
         if (!visible || width < 0 || height < 0 || xSeries == null
                 || xSeries.length == 0 || ySeries == null
@@ -640,7 +641,7 @@ abstract public class Series implements ISeries {
             return;
         }
 
-        draw(gc, width, height, xAxis, yAxis);
+        draw(gc, width, height, xAxis, yAxis, h);
     }
 
     /**
@@ -658,5 +659,5 @@ abstract public class Series implements ISeries {
      *            the y axis
      */
     abstract protected void draw(GC gc, int width, int height, Axis xAxis,
-            Axis yAxis);
+            Axis yAxis, ISeriesHandler h);
 }

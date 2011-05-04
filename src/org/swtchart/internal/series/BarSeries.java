@@ -379,12 +379,13 @@ public class BarSeries extends Series implements IBarSeries {
      * @see Series#draw(GC, int, int, Axis, Axis)
      */
     @Override
-    protected void draw(GC gc, int width, int height, Axis xAxis, Axis yAxis) {
+    protected void draw(GC gc, int width, int height, Axis xAxis, Axis yAxis, ISeriesHandler sh) {
 
         // draw riser
         Rectangle[] rs = getBoundsForCompressedSeries();
         for (int i = 0; i < rs.length; i++) {
             drawRiser(gc, rs[i].x, rs[i].y, rs[i].width, rs[i].height);
+            sh.handleDataPoint(i, this, new Point(rs[i].x + rs[i].width/2, rs[i].y + rs[i].height/2));
         }
 
         // draw label and error bars

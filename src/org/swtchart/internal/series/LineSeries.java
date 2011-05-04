@@ -9,6 +9,7 @@ package org.swtchart.internal.series;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Display;
 import org.swtchart.Chart;
 import org.swtchart.ILineSeries;
@@ -408,7 +409,7 @@ public class LineSeries extends Series implements ILineSeries {
      * @see Series#draw(GC, int, int, Axis, Axis)
      */
     @Override
-    protected void draw(GC gc, int width, int height, Axis xAxis, Axis yAxis) {
+    protected void draw(GC gc, int width, int height, Axis xAxis, Axis yAxis, ISeriesHandler h) {
         int oldAntialias = gc.getAntialias();
         int oldLineWidth = gc.getLineWidth();
         gc.setAntialias(antialias);
@@ -420,7 +421,7 @@ public class LineSeries extends Series implements ILineSeries {
 
         if (symbolType != PlotSymbolType.NONE || getLabel().isVisible()
                 || getXErrorBar().isVisible() || getYErrorBar().isVisible()) {
-            drawSymbolAndLabel(gc, width, height, xAxis, yAxis);
+            drawSymbolAndLabel(gc, width, height, xAxis, yAxis, h);
         }
 
         gc.setAntialias(oldAntialias);
@@ -556,9 +557,10 @@ public class LineSeries extends Series implements ILineSeries {
      *            the x axis
      * @param yAxis
      *            the y axis
+     * @param sh 
      */
     private void drawSymbolAndLabel(GC gc, int width, int height, Axis xAxis,
-            Axis yAxis) {
+            Axis yAxis, ISeriesHandler sh) {
 
         // get x and y series
         double[] xseries = compressor.getCompressedXSeries();
@@ -588,6 +590,8 @@ public class LineSeries extends Series implements ILineSeries {
                 v = xAxis.getPixelCoordinate(xseries[i]);
                 h = yAxis.getPixelCoordinate(yseries[i]);
             }
+            sh.handleDataPoint(i, this, new Point(h, v));
+            
             if (getSymbolType() != PlotSymbolType.NONE) {
                 drawSeriesSymbol(gc, h, v, color);
             }

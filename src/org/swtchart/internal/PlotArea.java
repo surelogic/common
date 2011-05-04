@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseMoveListener;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Color;
@@ -26,13 +28,14 @@ import org.swtchart.ILineSeries;
 import org.swtchart.IPlotArea;
 import org.swtchart.ISeries;
 import org.swtchart.ISeriesSet;
+import org.swtchart.internal.series.ISeriesHandler;
 import org.swtchart.internal.series.Series;
 import org.swtchart.internal.series.SeriesSet;
 
 /**
  * Plot area to draw series and grids.
  */
-public class PlotArea extends Composite implements PaintListener, IPlotArea {
+public class PlotArea extends Composite implements PaintListener, IPlotArea, MouseMoveListener {
 
     /** the chart */
     protected Chart chart;
@@ -52,6 +55,8 @@ public class PlotArea extends Composite implements PaintListener, IPlotArea {
     /** the default background color */
     private static final int DEFAULT_BACKGROUND = SWT.COLOR_WHITE;
 
+    private final List<SeriesPoint> points = new ArrayList<SeriesPoint>();
+    
     /**
      * Constructor.
      *
@@ -71,6 +76,7 @@ public class PlotArea extends Composite implements PaintListener, IPlotArea {
 
         setBackground(Display.getDefault().getSystemColor(DEFAULT_BACKGROUND));
         addPaintListener(this);
+        addMouseMoveListener(this);
     }
 
     /**
@@ -147,16 +153,19 @@ public class PlotArea extends Composite implements PaintListener, IPlotArea {
                     listener.paintControl(e);
                 }
             }
-
+            
+            points.clear();
+            final ISeriesHandler h = new SeriesHandler(points);            
+            
             // draw series. The line series should be drawn on bar series.
             for (ISeries series : chart.getSeriesSet().getSeries()) {
                 if (series instanceof IBarSeries) {
-                    ((Series) series).draw(gc, p.x, p.y);
+                    ((Series) series).draw(gc, p.x, p.y, h);
                 }
             }
             for (ISeries series : chart.getSeriesSet().getSeries()) {
                 if (series instanceof ILineSeries) {
-                    ((Series) series).draw(gc, p.x, p.y);
+                    ((Series) series).draw(gc, p.x, p.y, h);
                 }
             }
 
@@ -203,4 +212,57 @@ public class PlotArea extends Composite implements PaintListener, IPlotArea {
             imageCache.dispose();
         }
     }
+
+	@Override
+	public void mouseMove(MouseEvent e) {
+		//System.out.println("Mouse at "+e.x+", "+e.y);
+		SeriesPoint p = findClosestPoint(e.x, e.y);
+		if (p != null) {
+			System.out.println("Closest to "+p.series.getId()+":"+p.index);
+		}
+	}
+	
+	private SeriesPoint findClosestPoint(final int x, final int y) {		
+		SeriesPoint closest = null;
+		int distance = Integer.MAX_VALUE;
+		for(SeriesPoint p : points) {
+			final int d = computeDistance(x, y, p.point);
+			if (d < distance) {
+				distance = d;
+				closest = p;
+			}
+		}
+		return closest;
+	}
+
+	private static int computeDistance(int x, int y, Point p) {
+		final int dx = x - p.x;
+		final int dy = y - p.y;
+		return dx*dx + dy*dy;
+	}
+	
+	static class SeriesPoint {
+		final Point point;
+		final ISeries series;
+		final int index;
+		
+		SeriesPoint(int i, ISeries s, Point p) {
+			point = p;
+			series = s;
+			index = i;
+		}		
+	}
+	
+	static class SeriesHandler implements ISeriesHandler {
+		final List<SeriesPoint> points;
+		
+		public SeriesHandler(List<SeriesPoint> p) {
+			points = p;
+		}
+
+		@Override
+		public void handleDataPoint(int x, ISeries s, Point p) {
+			points.add(new SeriesPoint(x, s, p));
+		}
+	}
 }
