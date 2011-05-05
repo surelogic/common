@@ -10,10 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.MouseEvent;
-import org.eclipse.swt.events.MouseMoveListener;
-import org.eclipse.swt.events.PaintEvent;
-import org.eclipse.swt.events.PaintListener;
+import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
@@ -32,10 +29,12 @@ import org.swtchart.internal.series.ISeriesHandler;
 import org.swtchart.internal.series.Series;
 import org.swtchart.internal.series.SeriesSet;
 
+import com.surelogic.common.ui.tooltip.*;
+
 /**
  * Plot area to draw series and grids.
  */
-public class PlotArea extends Composite implements PaintListener, IPlotArea, MouseMoveListener {
+public class PlotArea extends Composite implements PaintListener, IPlotArea, MouseTrackListener, MouseMoveListener {
 
     /** the chart */
     protected Chart chart;
@@ -57,6 +56,8 @@ public class PlotArea extends Composite implements PaintListener, IPlotArea, Mou
 
     private final List<SeriesPoint> points = new ArrayList<SeriesPoint>();
     
+    private CompactToolTipInformationControl tip;
+    
     /**
      * Constructor.
      *
@@ -76,7 +77,15 @@ public class PlotArea extends Composite implements PaintListener, IPlotArea, Mou
 
         setBackground(Display.getDefault().getSystemColor(DEFAULT_BACKGROUND));
         addPaintListener(this);
+        addMouseTrackListener(this);
         addMouseMoveListener(this);
+        /*
+        ToolTip t = new ToolTip(chart.getShell());
+        t.activateToolTip(chart);
+        */
+        // NO_TRIM implies not resizable by the user
+        tip = new CompactToolTipInformationControl(chart.getShell(), SWT.NO_TRIM);                
+        tip.setVisible(false);
     }
 
     /**
@@ -213,21 +222,42 @@ public class PlotArea extends Composite implements PaintListener, IPlotArea, Mou
         }
     }
 
+    @Override
+    public void mouseMove(MouseEvent e) {
+    	//System.out.println("Mouse at "+e.x+", "+e.y);
+		tip.setVisible(false);
+    }
+    
 	@Override
-	public void mouseMove(MouseEvent e) {
-		//System.out.println("Mouse at "+e.x+", "+e.y);
+	public void mouseEnter(MouseEvent e) {
+		tip.setVisible(false);
+	}
+
+	@Override
+	public void mouseExit(MouseEvent e) {
+		tip.setVisible(false);
+	}	
+	
+	@Override
+	public void mouseHover(MouseEvent e) {
 		SeriesPoint p = findClosestPoint(e.x, e.y);
 		if (p != null) {
-			System.out.println("Closest to "+p.series.getId()+":"+p.index);
+			final String msg = "Close to "+p.series.getId()+":"+p.index;
+			System.out.println(msg);
+			tip.setTip(msg);
+			tip.setHoverLocation(chart.toDisplay(p.point));
+			tip.setSize(6*msg.length(), 20);
+			tip.setVisible(true);
 		}
 	}
 	
 	private SeriesPoint findClosestPoint(final int x, final int y) {		
 		SeriesPoint closest = null;
-		int distance = Integer.MAX_VALUE;
+		int distance = 4000; //Integer.MAX_VALUE;
 		for(SeriesPoint p : points) {
 			final int d = computeDistance(x, y, p.point);
-			if (d < distance) {
+			//System.out.println(p.series.getId()+":"+p.index+" = "+d);	
+			if (d < distance) {						
 				distance = d;
 				closest = p;
 			}
