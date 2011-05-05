@@ -242,8 +242,9 @@ public class PlotArea extends Composite implements PaintListener, IPlotArea, Mou
 	public void mouseHover(MouseEvent e) {
 		SeriesPoint p = findClosestPoint(e.x, e.y);
 		if (p != null) {
-			final String msg = "Close to "+p.series.getId()+":"+p.index;
-			System.out.println(msg);
+			final String point = p.series.getId()+"["+p.index+"]";
+			final String msg = point+"="+((int) p.series.getYSeries()[p.index]);
+			System.out.println("Close to "+point);
 			tip.setTip(msg);
 			tip.setHoverLocation(chart.toDisplay(p.point));
 			tip.setSize(6*msg.length(), 20);
