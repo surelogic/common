@@ -35,7 +35,9 @@ import com.surelogic.common.ui.tooltip.*;
  * Plot area to draw series and grids.
  */
 public class PlotArea extends Composite implements PaintListener, IPlotArea, MouseTrackListener, MouseMoveListener {
-
+	private static final int TIP_HEIGHT = 20;
+	private static final int MIN_TIP_TIME = 200;
+	
     /** the chart */
     protected Chart chart;
 
@@ -57,6 +59,8 @@ public class PlotArea extends Composite implements PaintListener, IPlotArea, Mou
     private final List<SeriesPoint> points = new ArrayList<SeriesPoint>();
     
     private CompactToolTipInformationControl tip;
+    
+    private long tipOnTime = Long.MIN_VALUE;
     
     /**
      * Constructor.
@@ -225,17 +229,29 @@ public class PlotArea extends Composite implements PaintListener, IPlotArea, Mou
     @Override
     public void mouseMove(MouseEvent e) {
     	//System.out.println("Mouse at "+e.x+", "+e.y);
-		tip.setVisible(false);
+    	if (tip.isVisible()) {
+    		final long now = System.currentTimeMillis();
+    		if (now - tipOnTime > MIN_TIP_TIME) {
+    			//System.out.println("Turning off tip -- due to move");
+    			tip.setVisible(false);
+    		}
+    	}
     }
     
 	@Override
 	public void mouseEnter(MouseEvent e) {
+		/*
+		System.out.println("Turning off tip -- due to enter");
 		tip.setVisible(false);
+		*/
 	}
 
 	@Override
 	public void mouseExit(MouseEvent e) {
+		/*
+		System.out.println("Turning off tip -- due to exit");
 		tip.setVisible(false);
+		*/
 	}	
 	
 	@Override
@@ -244,11 +260,13 @@ public class PlotArea extends Composite implements PaintListener, IPlotArea, Mou
 		if (p != null) {
 			final String point = p.series.getId()+"["+p.index+"]";
 			final String msg = point+"="+((int) p.series.getYSeries()[p.index]);
-			System.out.println("Close to "+point);
+			//System.out.println("Close to "+point);
+			Point loc = chart.toDisplay(p.point);
+			tip.setHoverLocation(new Point(loc.x, loc.y - TIP_HEIGHT));
 			tip.setTip(msg);
-			tip.setHoverLocation(chart.toDisplay(p.point));
-			tip.setSize(6*msg.length(), 20);
+			tip.setSize(6*msg.length(), TIP_HEIGHT);
 			tip.setVisible(true);
+			tipOnTime = System.currentTimeMillis();
 		}
 	}
 	
