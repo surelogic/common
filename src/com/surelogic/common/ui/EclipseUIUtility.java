@@ -3,7 +3,8 @@ package com.surelogic.common.ui;
 import java.lang.reflect.InvocationTargetException;
 import java.util.logging.Level;
 
-import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.filesystem.*;
+import org.eclipse.core.runtime.*;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
@@ -12,12 +13,8 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.IPerspectiveDescriptor;
-import org.eclipse.ui.IViewPart;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.*;
+import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 
 import com.surelogic.common.Justification;
@@ -230,6 +227,26 @@ public final class EclipseUIUtility {
 		}
 	}
 
+	/**
+	 * Open the file with the given path with an Eclipse editor
+	 */
+	public static boolean openInEditor(String path) {
+		IFileStore fileStore = EFS.getLocalFileSystem().getStore(new Path(path));
+		if (!fileStore.fetchInfo().isDirectory() && fileStore.fetchInfo().exists()) {
+			final IWorkbenchWindow window = getIWorkbenchWindow();
+			if (window != null) {
+				final IWorkbenchPage page =  window.getActivePage();
+				try {
+					IEditorPart p = IDE.openEditorOnFileStore(page, fileStore);
+					return p != null;
+				} catch (PartInitException e) {
+					/* some code */
+				}
+			}
+		}
+		return false;
+	}
+	
 	private EclipseUIUtility() {
 		// utility
 	}
