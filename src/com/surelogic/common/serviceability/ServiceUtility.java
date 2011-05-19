@@ -8,6 +8,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.Date;
 
+import com.surelogic.Utility;
 import com.surelogic.common.FileUtility;
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
@@ -15,6 +16,7 @@ import com.surelogic.common.jobs.SLJob;
 import com.surelogic.common.jobs.SLProgressMonitor;
 import com.surelogic.common.jobs.SLStatus;
 
+@Utility
 public final class ServiceUtility {
 	private final static String f_serviceLocation = I18N
 			.msg("common.serviceability.supportrequest.url");
@@ -38,15 +40,11 @@ public final class ServiceUtility {
 	 * @param ideVersion
 	 *            a string representing the version of the IDE that created this
 	 *            tip. The OS and Java versions are looked up by this method.
-	 * @param includeUsage
-	 *            {@code true} if data from the SureLogic feature usage log
-	 *            should be included in the generated tip, {@code false} if not.
 	 * @return a tip in a format to send to SureLogic.
 	 */
 	public static String composeATip(final String tool, final String email,
 			final String name, final String summary, final String tip,
-			final boolean includeVersionInfo, final String ideVersion,
-			final boolean includeUsage) {
+			final boolean includeVersionInfo, final String ideVersion) {
 		final StringBuilder b = new StringBuilder();
 		final String lf = SLUtility.PLATFORM_LINE_SEPARATOR;
 
@@ -100,13 +98,6 @@ public final class ServiceUtility {
 
 		b.append(tip);
 
-		if (includeUsage) {
-			b.append(lf).append(lf);
-			b.append(ServiceabilityConstants.USAGE_LOG_TITLE);
-			b.append(lf).append(lf);
-			b.append(UsageMeter.getInstance().getFileContents());
-		}
-
 		return b.toString();
 	}
 
@@ -131,23 +122,15 @@ public final class ServiceUtility {
 	 *            a string representing the version of the IDE that created this
 	 *            problem report. The OS and Java versions are looked up by this
 	 *            method.
-	 * @param includeUsage
-	 *            {@code true} if data from the SureLogic feature usage log
-	 *            should be included in the generated problem report, {@code
-	 *            false} if not.
 	 * @param ideLogFile
 	 *            a reference to the IDE log file, or {@code null} if no IDE log
 	 *            file should be included in this problem report.
-	 * @param ideLogFileI18nKey
-	 *            a key to lookup the title for the IDE log file. See
-	 *            {@link I18N#msg(String)}.
 	 * @return a problem report in a format to send to SureLogic.
 	 */
 	public static String composeAProblemReport(final String tool,
 			final String email, final String name, final String summary,
 			final String report, final boolean includeVersionInfo,
-			final String ideVersion, final boolean includeUsage,
-			final File ideLogFile) {
+			final String ideVersion, final File ideLogFile) {
 		final StringBuilder b = new StringBuilder();
 		final String lf = SLUtility.PLATFORM_LINE_SEPARATOR;
 
@@ -200,13 +183,6 @@ public final class ServiceUtility {
 		}
 
 		b.append(report);
-
-		if (includeUsage) {
-			b.append(lf).append(lf);
-			b.append(ServiceabilityConstants.USAGE_LOG_TITLE);
-			b.append(lf).append(lf);
-			b.append(UsageMeter.getInstance().getFileContents());
-		}
 
 		if (ideLogFile != null) {
 			b.append(lf).append(lf);

@@ -22,7 +22,6 @@ import com.surelogic.common.jobs.SLStatus;
 import com.surelogic.common.license.SLLicenseProduct;
 import com.surelogic.common.license.SLLicenseUtility;
 import com.surelogic.common.logging.SLLogger;
-import com.surelogic.common.serviceability.UsageMeter;
 
 /**
  * A job to run a fully bound query on the database and report the results to
@@ -76,10 +75,6 @@ public final class AdHocQueryJob extends AbstractSLJob {
 		if (failed != null) {
 			return failed;
 		}
-
-		UsageMeter.getInstance().tickUse(
-				"AdHocQuery ran query '" + f_query.getQuery().getDescription()
-						+ "'");
 
 		final DBConnection datasource = f_parentResultOrNull == null ? manager
 				.getDataSource().getDB() : f_parentResultOrNull.getDB();

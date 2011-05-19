@@ -24,7 +24,6 @@ import com.surelogic.common.jobs.SLStatus;
 import com.surelogic.common.license.SLLicenseProduct;
 import com.surelogic.common.license.SLLicenseUtility;
 import com.surelogic.common.logging.SLLogger;
-import com.surelogic.common.serviceability.UsageMeter;
 
 public class CancellableAdHocQueryJob extends AbstractSLJob {
 
@@ -110,10 +109,6 @@ public class CancellableAdHocQueryJob extends AbstractSLJob {
 			if (failed != null) {
 				return failed;
 			}
-
-			UsageMeter.getInstance().tickUse(
-					"AdHocQuery ran query '"
-							+ f_query.getQuery().getDescription() + "'");
 
 			try {
 				AdHocQueryResult queryResult;
