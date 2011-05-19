@@ -35,7 +35,6 @@ import org.eclipse.ui.part.ViewPart;
 import com.surelogic.common.AbstractJavaZip;
 import com.surelogic.common.ISourceZipFileHandles;
 import com.surelogic.common.logging.SLLogger;
-import com.surelogic.common.serviceability.UsageMeter;
 import com.surelogic.common.ui.EclipseUIUtility;
 
 public abstract class AbstractHistoricalSourceView extends ViewPart {
@@ -48,7 +47,6 @@ public abstract class AbstractHistoricalSourceView extends ViewPart {
 
 	@Override
 	public void createPartControl(final Composite parent) {
-		UsageMeter.getInstance().tickUse("Flashlight SourceView opened");
 		source = new StyledText(parent, SWT.V_SCROLL | SWT.H_SCROLL
 				| SWT.BORDER | SWT.READ_ONLY);
 		// source.setFont(JFaceResources.getTextFont());
@@ -77,9 +75,9 @@ public abstract class AbstractHistoricalSourceView extends ViewPart {
 	 */
 	private boolean showSourceFile(final ISourceZipFileHandles sources,
 			String qname) {
-	    if (qname == null) {
-	        return false;
-	    }
+		if (qname == null) {
+			return false;
+		}
 		// FIXME We use ANON_ONWARDS, b/c we don't record any type location info
 		// about types defined within an anonymous class
 		qname = ANON_ONWARDS.matcher(qname).replaceFirst("");
@@ -190,8 +188,8 @@ public abstract class AbstractHistoricalSourceView extends ViewPart {
 				final boolean loaded = view.showSourceFile(sources,
 						pkg == null ? type : pkg + '.' + type);
 				if (loaded) {
-					final int lineNumber = computeLineFromMethod(
-							view.source.getText(), type, method);
+					final int lineNumber = computeLineFromMethod(view.source
+							.getText(), type, method);
 					view.showAndSelectLine(lineNumber);
 				}
 			}
@@ -210,8 +208,8 @@ public abstract class AbstractHistoricalSourceView extends ViewPart {
 				final boolean loaded = view.showSourceFile(sources,
 						pkg == null ? type : pkg + '.' + type);
 				if (loaded) {
-					final int lineNumber = computeLineFromField(
-							view.source.getText(), type, field);
+					final int lineNumber = computeLineFromField(view.source
+							.getText(), type, field);
 					view.showAndSelectLine(lineNumber);
 				}
 			}
@@ -319,8 +317,8 @@ public abstract class AbstractHistoricalSourceView extends ViewPart {
 
 		TypeVisitor(final String type) {
 			typeList = new LinkedList<String>();
-			for (String typePart : ANON.matcher(type).replaceAll("")
-					.split("[.$]")) {
+			for (String typePart : ANON.matcher(type).replaceAll("").split(
+					"[.$]")) {
 				typeList.addFirst(typePart);
 			}
 			currentType = new LinkedList<String>();

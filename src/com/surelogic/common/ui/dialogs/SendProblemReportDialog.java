@@ -115,13 +115,6 @@ public final class SendProblemReportDialog extends TitleAreaDialog {
 				.msg("common.send.problemReport.dialog.sendVersion"));
 		sendVersion.setSelection(true);
 
-		final Button sendUsage = new Button(panel, SWT.CHECK);
-		sendUsage.setLayoutData(new GridData(SWT.DEFAULT, SWT.DEFAULT, false,
-				false, 2, 1));
-		sendUsage.setText(I18N
-				.msg("common.send.problemReport.dialog.sendUsage"));
-		sendUsage.setSelection(false);
-
 		final Button sendEclipseLog = new Button(panel, SWT.CHECK);
 		sendEclipseLog.setLayoutData(new GridData(SWT.DEFAULT, SWT.DEFAULT,
 				false, false, 2, 1));
@@ -135,7 +128,8 @@ public final class SendProblemReportDialog extends TitleAreaDialog {
 
 		final Label summary = new Label(panel, SWT.RIGHT);
 		summary.setText(I18N.msg("common.send.problemReport.dialog.summary"));
-		summary.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, false, false));
+		summary
+				.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, false, false));
 		final Text summaryText = new Text(panel, SWT.SINGLE | SWT.BORDER);
 		summaryText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
@@ -161,7 +155,7 @@ public final class SendProblemReportDialog extends TitleAreaDialog {
 		Dialog.applyDialogFont(panel);
 
 		f_mediator = new Mediator(emailText, nameText, summaryText, tipText,
-				sendVersion, sendUsage, sendEclipseLog, preview);
+				sendVersion, sendEclipseLog, preview);
 		f_mediator.init();
 
 		return contents;
@@ -182,19 +176,16 @@ public final class SendProblemReportDialog extends TitleAreaDialog {
 		private final Text f_summary;
 		private final Text f_tip;
 		private final Button f_sendVersion;
-		private final Button f_sendUsage;
 		private final Button f_sendEclipseLog;
 		private final Button f_previewButton;
 
 		public Mediator(Text email, Text name, Text summary, Text tip,
-				Button sendVersion, Button sendUsage, Button sendEclipseLog,
-				Button previewButton) {
+				Button sendVersion, Button sendEclipseLog, Button previewButton) {
 			f_email = email;
 			f_name = name;
 			f_summary = summary;
 			f_tip = tip;
 			f_sendVersion = sendVersion;
-			f_sendUsage = sendUsage;
 			f_sendEclipseLog = sendEclipseLog;
 			f_previewButton = previewButton;
 		}
@@ -217,8 +208,8 @@ public final class SendProblemReportDialog extends TitleAreaDialog {
 			});
 			f_previewButton.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(Event event) {
-					ShowTextDialog.showText(getShell(),
-							I18N.msg("common.send.problemReport.dialog.title"),
+					ShowTextDialog.showText(getShell(), I18N
+							.msg("common.send.problemReport.dialog.title"),
 							getMsg());
 				}
 			});
@@ -235,11 +226,10 @@ public final class SendProblemReportDialog extends TitleAreaDialog {
 		public String getMsg() {
 			File ideLogFile = f_sendEclipseLog.getSelection() ? JDTUtility
 					.getEclipseLogFile() : null;
-			return ServiceUtility.composeAProblemReport(f_aboutTool,
-					f_email.getText(), f_name.getText(), f_summary.getText(),
-					f_tip.getText(), f_sendVersion.getSelection(),
-					JDTUtility.getProductInfo(), f_sendUsage.getSelection(),
-					ideLogFile);
+			return ServiceUtility.composeAProblemReport(f_aboutTool, f_email
+					.getText(), f_name.getText(), f_summary.getText(), f_tip
+					.getText(), f_sendVersion.getSelection(), JDTUtility
+					.getProductInfo(), ideLogFile);
 		}
 
 		public void okPressed() {
@@ -251,9 +241,12 @@ public final class SendProblemReportDialog extends TitleAreaDialog {
 			final SLJob job = ServiceUtility.sendToSureLogic(msg,
 					new Runnable() {
 						public void run() {
-							BalloonUtility.showMessage(
-									I18N.msg("common.send.problemReport.sent.title"),
-									I18N.msg("common.send.problemReport.sent.message"));
+							BalloonUtility
+									.showMessage(
+											I18N
+													.msg("common.send.problemReport.sent.title"),
+											I18N
+													.msg("common.send.problemReport.sent.message"));
 						}
 					});
 			EclipseJob.getInstance().schedule(job);
