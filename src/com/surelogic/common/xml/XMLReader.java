@@ -75,6 +75,14 @@ public abstract class XMLReader extends DefaultHandler {
 	}
 	
 	@Override
+	public void characters(char buf[], int offset, int len) throws SAXException {
+		if (!inside.isEmpty()) {
+			Entity e = inside.peek();
+			e.addToCData(buf, offset, len);
+		}
+	}
+	
+	@Override
 	public final void endElement(String uri, String localName, String name)
 	throws SAXException {
 		if (checkForRoot(name, null) != null) {

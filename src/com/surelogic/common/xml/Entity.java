@@ -29,6 +29,26 @@ public class Entity {
 	List<MoreInfo> infos = Collections.emptyList();
 	List<Entity> refs = Collections.emptyList();
 	SourceRef source;
+	StringBuilder chars;
+	String contents;	
+	
+	public final void addToCData(char[] buf, int offset, int len) {
+		if (chars == null) {
+			chars = new StringBuilder(len);
+		}
+		chars.append(buf, offset, len);
+	}
+	
+	public String getCData() {
+		if (contents == null) {
+			if (chars == null) {
+				contents = null;
+			} else {
+				contents = chars.toString();
+			}
+		}
+		return contents;
+	}
 	
 	public static String getValue(Attributes a, String name) {
 		for (int i = 0; i < a.getLength(); i++) {
