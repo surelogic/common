@@ -7,7 +7,7 @@ import org.eclipse.swt.widgets.Display;
 
 public class SendProblemReportPreviewPage extends WizardPage {
 
-	public SendProblemReportPreviewPage() {
+	SendProblemReportPreviewPage() {
 		super("previewInformation");
 		setTitle("Preview your input");
 		setDescription("A description of this page");

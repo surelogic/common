@@ -15,7 +15,7 @@ import com.surelogic.common.i18n.I18N;
 
 public class SendProblemReportCollectInformationPage extends WizardPage {
 
-	public SendProblemReportCollectInformationPage() {
+	SendProblemReportCollectInformationPage() {
 		super("collectInformation");
 	}
 

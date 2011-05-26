@@ -201,6 +201,13 @@ public final class EclipseUIUtility {
 		}
 	}
 
+	/**
+	 * Gets the shell being used by the active workbench window. This method
+	 * should always be invoked from within the SWT UI thread.
+	 * 
+	 * @return a shell or {@code null} if the shell being used by the active
+	 *         workbench window can't be determined.
+	 */
 	public static Shell getShell() {
 		IWorkbenchWindow window = PlatformUI.getWorkbench()
 				.getActiveWorkbenchWindow();
@@ -231,11 +238,13 @@ public final class EclipseUIUtility {
 	 * Open the file with the given path with an Eclipse editor
 	 */
 	public static boolean openInEditor(String path) {
-		IFileStore fileStore = EFS.getLocalFileSystem().getStore(new Path(path));
-		if (!fileStore.fetchInfo().isDirectory() && fileStore.fetchInfo().exists()) {
+		IFileStore fileStore = EFS.getLocalFileSystem()
+				.getStore(new Path(path));
+		if (!fileStore.fetchInfo().isDirectory()
+				&& fileStore.fetchInfo().exists()) {
 			final IWorkbenchWindow window = getIWorkbenchWindow();
 			if (window != null) {
-				final IWorkbenchPage page =  window.getActivePage();
+				final IWorkbenchPage page = window.getActivePage();
 				try {
 					IEditorPart p = IDE.openEditorOnFileStore(page, fileStore);
 					return p != null;
@@ -246,7 +255,7 @@ public final class EclipseUIUtility {
 		}
 		return false;
 	}
-	
+
 	private EclipseUIUtility() {
 		// utility
 	}
