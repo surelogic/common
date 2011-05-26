@@ -1,18 +1,20 @@
 package com.surelogic.common.xml;
 
 import java.io.*;
-import java.util.Stack;
+import java.util.*;
 import java.util.logging.Level;
 
 import javax.xml.parsers.*;
 
 import org.xml.sax.*;
+import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.helpers.DefaultHandler;
 
 import com.surelogic.common.logging.SLLogger;
 
-public abstract class XMLReader extends DefaultHandler {
+public abstract class XMLReader extends DefaultHandler implements LexicalHandler {
 	public static final String PROJECT_ATTR = "project";
+	public static final String COMMENT_TAG = "<comment>";
 	
 	protected final Stack<Entity> inside = new Stack<Entity>();
 	protected final IXMLResultListener listener;
@@ -43,6 +45,10 @@ public abstract class XMLReader extends DefaultHandler {
 		try {
 			// Parse the input
 			SAXParser saxParser = factory.newSAXParser();
+			if (this instanceof LexicalHandler) {
+				org.xml.sax.XMLReader xmlReader = saxParser.getXMLReader();
+				xmlReader.setProperty("http://xml.org/sax/properties/lexical-handler", this); 
+			}
 			saxParser.parse(stream, this);
 		} catch (SAXException e) {
 			SLLogger.getLogger().log(Level.SEVERE, "Problem parsing JSure XML file", e);
@@ -116,5 +122,47 @@ public abstract class XMLReader extends DefaultHandler {
 	 */
 	protected void handleNestedEntity(Entity next, Entity last, String lastName) {
 		throw new UnsupportedOperationException("There should be no nested entities");
+	}
+
+	@Override
+	public void comment(char[] ch, int start, int length) throws SAXException {
+		if (!inside.isEmpty()) {
+			Entity e = inside.peek();
+			String c = new String(ch, start, length);
+			Map<String,String> a = new HashMap<String,String>(1);
+			a.put(COMMENT_TAG, c);
+			e.addRef(new Entity(COMMENT_TAG, a));
+		}
+	}
+
+	@Override
+	public void endCDATA() throws SAXException {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void endDTD() throws SAXException {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void endEntity(String name) throws SAXException {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void startCDATA() throws SAXException {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void startDTD(String name, String publicId, String systemId)
+			throws SAXException {
+		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void startEntity(String name) throws SAXException {
+		// TODO Auto-generated method stub
 	}
 }
