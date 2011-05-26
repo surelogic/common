@@ -90,8 +90,15 @@ public final class Entities {
 		indent(b, indent);
 	}
 	
-	public static void closeStart(StringBuilder b, boolean end) {
-		b.append(end ? "/>\n" : ">\n");
+	public static void closeStart(StringBuilder b, boolean end) {	
+		closeStart(b, end, true);
+	}
+	
+	public static void closeStart(StringBuilder b, boolean end, boolean newline) {		
+		b.append(end ? "/>" : ">");
+		if (newline) {
+			b.append('\n');
+		}
 	}
 	
 	/**
@@ -105,7 +112,9 @@ public final class Entities {
 	}
 
 	public static void end(String name, StringBuilder b, int indent) {
-		indent(b, indent);
+		if (indent > 0) {
+			indent(b, indent);
+		}
 		b.append("</").append(name).append(">\n");
 	}
 	
