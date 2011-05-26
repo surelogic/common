@@ -44,7 +44,7 @@ public class SendProblemReportWizard extends Wizard implements INewWizard {
 	 */
 	public static void open(Shell shell, final String aboutTool,
 			final String imageSymbolicName) {
-		String title = I18N.msg("common.send.problemReport.dialog.title");
+		String title = I18N.msg("common.send.problemReport.wizard.title");
 		if (!"".equals(aboutTool)) {
 			title = aboutTool + " " + title;
 		}
@@ -84,6 +84,7 @@ public class SendProblemReportWizard extends Wizard implements INewWizard {
 
 	@Override
 	public boolean performFinish() {
+
 		return true;
 	}
 
