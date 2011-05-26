@@ -114,9 +114,9 @@ public final class Entities {
 	 */
 	private static void add(final String name, final String value,
 			final StringBuilder b) {
-		b.append(' ').append(name).append("='");
+		b.append(' ').append(name).append("=\"");
 		b.append(value);
-		b.append('\'');
+		b.append('\"');
 	}
 
 	public static void addAttribute(final String name, final String value,
