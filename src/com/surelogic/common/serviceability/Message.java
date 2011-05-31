@@ -154,7 +154,7 @@ public abstract class Message {
 		}
 
 		if (!(f_description == null || "".equals(f_summary))) {
-			b.append(f_summary);
+			b.append(f_description);
 		}
 	}
 }
