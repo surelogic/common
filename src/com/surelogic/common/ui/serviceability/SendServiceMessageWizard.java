@@ -123,6 +123,7 @@ public class SendServiceMessageWizard extends Wizard {
 		String title = I18N.msg(f_data.propPfx() + "title");
 		setWindowTitle(f_data.getProduct() + " " + title);
 		setNeedsProgressMonitor(true);
+		setHelpAvailable(false);
 	}
 
 	@Override
