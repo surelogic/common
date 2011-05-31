@@ -21,7 +21,7 @@ import com.surelogic.common.serviceability.ProblemReportMessage;
 public class SendServiceMessageCollectInformationPage extends WizardPage {
 
 	SendServiceMessageCollectInformationPage(Message data) {
-		super("collectInformation");
+		super("collect");
 		f_data = data;
 	}
 
@@ -40,20 +40,20 @@ public class SendServiceMessageCollectInformationPage extends WizardPage {
 		panel.setLayout(gridLayout);
 
 		final Label info = new Label(panel, SWT.WRAP);
-		info.setText(I18N.msg("common.send.problemReport.wizard.info"));
+		info.setText(I18N.msg(f_data.propPfx() + "info"));
 		GridData data = new GridData(SWT.FILL, SWT.DEFAULT, true, false, 2, 1);
 		data.widthHint = CONTENTS_WIDTH_HINT;
 		info.setLayoutData(data);
 
 		final Label email = new Label(panel, SWT.RIGHT);
-		email.setText(I18N.msg("common.send.problemReport.wizard.email"));
+		email.setText(I18N.msg(f_data.propPfx() + "email"));
 		email.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, false, false));
 		final Text emailText = new Text(panel, SWT.SINGLE | SWT.BORDER);
 		emailText.setText(CommonCorePreferencesUtility.getServicabilityEmail());
 		emailText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		final Label name = new Label(panel, SWT.RIGHT);
-		name.setText(I18N.msg("common.send.problemReport.wizard.name"));
+		name.setText(I18N.msg(f_data.propPfx() + "name"));
 		name.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, false, false));
 		final Text nameText = new Text(panel, SWT.SINGLE | SWT.BORDER);
 		nameText.setText(CommonCorePreferencesUtility.getServicabilityName());
@@ -62,30 +62,34 @@ public class SendServiceMessageCollectInformationPage extends WizardPage {
 		final Button sendVersion = new Button(panel, SWT.CHECK);
 		sendVersion.setLayoutData(new GridData(SWT.DEFAULT, SWT.DEFAULT, false,
 				false, 2, 1));
-		sendVersion.setText(I18N
-				.msg("common.send.problemReport.wizard.sendVersion"));
+		sendVersion.setText(I18N.msg(f_data.propPfx() + "sendVersion"));
 		sendVersion.setSelection(true);
 
-		final Button sendEclipseLog = new Button(panel, SWT.CHECK);
-		sendEclipseLog.setLayoutData(new GridData(SWT.DEFAULT, SWT.DEFAULT,
-				false, false, 2, 1));
-		sendEclipseLog.setText(I18N
-				.msg("common.send.problemReport.wizard.sendEclipseLog"));
-		sendEclipseLog.setSelection(true);
+		final Button sendEclipseLog;
+		if (f_data instanceof ProblemReportMessage) {
+			sendEclipseLog = new Button(panel, SWT.CHECK);
+			sendEclipseLog.setLayoutData(new GridData(SWT.DEFAULT, SWT.DEFAULT,
+					false, false, 2, 1));
+			sendEclipseLog.setText(I18N
+					.msg(f_data.propPfx() + "sendEclipseLog"));
+			sendEclipseLog.setSelection(true);
+		} else {
+			sendEclipseLog = null;
+		}
 
 		final Label space = new Label(panel, SWT.NONE);
 		space.setLayoutData(new GridData(SWT.DEFAULT, SWT.DEFAULT, false,
 				false, 2, 1));
 
 		final Label summary = new Label(panel, SWT.RIGHT);
-		summary.setText(I18N.msg("common.send.problemReport.wizard.summary"));
+		summary.setText(I18N.msg(f_data.propPfx() + "summary"));
 		summary
 				.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, false, false));
 		final Text summaryText = new Text(panel, SWT.SINGLE | SWT.BORDER);
 		summaryText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		final Label description = new Label(panel, SWT.WRAP);
-		description.setText(I18N.msg("common.send.problemReport.wizard.desc"));
+		description.setText(I18N.msg(f_data.propPfx() + "desc"));
 		data = new GridData(SWT.FILL, SWT.DEFAULT, true, false, 2, 1);
 		data.widthHint = CONTENTS_WIDTH_HINT;
 		description.setLayoutData(data);
@@ -135,14 +139,16 @@ public class SendServiceMessageCollectInformationPage extends WizardPage {
 		summaryText.addListener(SWT.Modify, listener);
 		descriptionText.addListener(SWT.Modify, listener);
 		sendVersion.addListener(SWT.Selection, listener);
-		sendEclipseLog.addListener(SWT.Selection, listener);
+		if (f_data instanceof ProblemReportMessage) {
+			sendEclipseLog.addListener(SWT.Selection, listener);
+		}
 		/*
 		 * We have to run this a bit later so that the OK button is created.
 		 */
 		emailText.getDisplay().asyncExec(updatePageComplete);
 
-		setTitle(I18N.msg("common.send.problemReport.wizard.msg.title"));
-		setMessage(I18N.msg("common.send.problemReport.wizard.msg"),
+		setTitle(I18N.msg(f_data.propPfx() + "msg.title"));
+		setMessage(I18N.msg(f_data.propPfx() + "msg"),
 				IMessageProvider.INFORMATION);
 	}
 }

@@ -1,22 +1,19 @@
 package com.surelogic.common.ui.serviceability;
 
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.INewWizard;
-import org.eclipse.ui.IWorkbench;
 
 import com.surelogic.common.CommonImages;
 import com.surelogic.common.core.JDTUtility;
 import com.surelogic.common.i18n.I18N;
-import com.surelogic.common.license.SLLicenseProduct;
 import com.surelogic.common.serviceability.Message;
 import com.surelogic.common.serviceability.ProblemReportMessage;
+import com.surelogic.common.serviceability.TipMessage;
 import com.surelogic.common.ui.EclipseUIUtility;
 import com.surelogic.common.ui.SLImages;
 
-public class SendServiceMessageWizard extends Wizard implements INewWizard {
+public class SendServiceMessageWizard extends Wizard {
 
 	/**
 	 * Used to open the Send Problem Report dialog using the shell being used by
@@ -29,8 +26,9 @@ public class SendServiceMessageWizard extends Wizard implements INewWizard {
 	 *            This image is only displayed on some operating systems (e.g.,
 	 *            Windows).
 	 */
-	public static void open(String product, final String imageSymbolicName) {
-		open(null, product, imageSymbolicName);
+	public static void openProblemReport(String product,
+			final String imageSymbolicName) {
+		openProblemReport(null, product, imageSymbolicName);
 	}
 
 	/**
@@ -45,10 +43,13 @@ public class SendServiceMessageWizard extends Wizard implements INewWizard {
 	 *            This image is only displayed on some operating systems (e.g.,
 	 *            Windows).
 	 */
-	public static void open(Shell shell, String product,
+	public static void openProblemReport(Shell shell, String product,
 			final String imageSymbolicName) {
-		final SendServiceMessageWizard wizard = new SendServiceMessageWizard(
-				product);
+		ProblemReportMessage prm = new ProblemReportMessage();
+		if (product == null)
+			product = "UNKNOWN";
+		prm.setProduct(product);
+		SendServiceMessageWizard wizard = new SendServiceMessageWizard(prm);
 		if (shell == null)
 			shell = EclipseUIUtility.getShell();
 		final WizardDialog dialog = new WizardDialog(shell, wizard) {
@@ -63,41 +64,83 @@ public class SendServiceMessageWizard extends Wizard implements INewWizard {
 		dialog.open();
 	}
 
-	private final String f_windowTitle;
-	private final Message f_data;
+	/**
+	 * Used to open the Send Tip for Improvement dialog using the shell being
+	 * used by the active workbench window.
+	 * 
+	 * @param product
+	 *            the SureLogic tool this tip for improvement is about.
+	 * @param imageSymbolicName
+	 *            an image name from {@link CommonImages} to use for the window.
+	 *            This image is only displayed on some operating systems (e.g.,
+	 *            Windows).
+	 */
+	public static void openTip(String product, final String imageSymbolicName) {
+		openTip(null, product, imageSymbolicName);
+	}
 
-	private SendServiceMessageCollectInformationPage f_collectInformationPage;
-	private SendServiceMessagePreviewPage f_previewInformationPage;
-
-	private SendServiceMessageWizard(String product) {
+	/**
+	 * Used to open the Send Tip for Improvement dialog.
+	 * 
+	 * @param shell
+	 *            a shell.
+	 * @param product
+	 *            the SureLogic tool this tip for improvement is about.
+	 * @param imageSymbolicName
+	 *            an image name from {@link CommonImages} to use for the window.
+	 *            This image is only displayed on some operating systems (e.g.,
+	 *            Windows).
+	 */
+	public static void openTip(Shell shell, String product,
+			final String imageSymbolicName) {
+		TipMessage tip = new TipMessage();
 		if (product == null)
 			product = "UNKNOWN";
-		String title = I18N.msg("common.send.problemReport.wizard.title");
-		if (product != null) {
-			title = product + " " + title;
-		}
-		f_windowTitle = title;
-		f_data = new ProblemReportMessage();
-		f_data.setProduct(product);
+		tip.setProduct(product);
+		SendServiceMessageWizard wizard = new SendServiceMessageWizard(tip);
+		if (shell == null)
+			shell = EclipseUIUtility.getShell();
+		final WizardDialog dialog = new WizardDialog(shell, wizard) {
+			@Override
+			protected void configureShell(Shell newShell) {
+				super.configureShell(newShell);
+				if (imageSymbolicName != null)
+					newShell.setImage(SLImages.getImage(imageSymbolicName));
+
+			}
+		};
+		dialog.open();
+	}
+
+	private final Message f_data;
+
+	private SendServiceMessageCollectInformationPage f_collect;
+	private SendServiceMessagePreviewPage f_preview;
+
+	private SendServiceMessageWizard(Message data) {
+		f_data = data;
 		f_data.setIdeVersion(JDTUtility.getProductInfo());
+		String title = I18N.msg(f_data.propPfx() + "title");
+		setWindowTitle(f_data.getProduct() + " " + title);
+		setNeedsProgressMonitor(true);
 	}
 
 	@Override
 	public void addPages() {
-		setWindowTitle(f_windowTitle);
-		f_collectInformationPage = new SendServiceMessageCollectInformationPage(
-				f_data);
-		addPage(f_collectInformationPage);
-		f_previewInformationPage = new SendServiceMessagePreviewPage(f_data);
-		addPage(f_previewInformationPage);
+		f_collect = new SendServiceMessageCollectInformationPage(f_data);
+		addPage(f_collect);
+		f_preview = new SendServiceMessagePreviewPage(f_data);
+		addPage(f_preview);
 	}
 
 	@Override
-	public boolean performFinish() {
+	public boolean canFinish() {
 		return f_data.minimumDataEntered();
 	}
 
 	@Override
-	public void init(IWorkbench workbench, IStructuredSelection selection) {
+	public boolean performFinish() {
+		// TODO send to server
+		return true;
 	}
 }
