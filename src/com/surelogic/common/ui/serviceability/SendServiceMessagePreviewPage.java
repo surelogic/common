@@ -5,13 +5,18 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 
-public class SendProblemReportPreviewPage extends WizardPage {
+import com.surelogic.common.serviceability.Message;
 
-	SendProblemReportPreviewPage() {
+public class SendServiceMessagePreviewPage extends WizardPage {
+
+	SendServiceMessagePreviewPage(Message data) {
 		super("previewInformation");
 		setTitle("Preview your input");
 		setDescription("A description of this page");
+		f_data = data;
 	}
+
+	private final Message f_data;
 
 	@Override
 	public void createControl(Composite parent) {

@@ -211,9 +211,10 @@ public final class SendTipDialog extends TitleAreaDialog {
 		}
 
 		public String getMsg() {
-			return ServiceUtility.composeATip(f_aboutTool, f_email.getText(),
-					f_name.getText(), f_summary.getText(), f_tip.getText(),
-					f_sendVersion.getSelection(), JDTUtility.getProductInfo());
+			// return ServiceUtility.composeATip(f_aboutTool, f_email.getText(),
+			// f_name.getText(), f_summary.getText(), f_tip.getText(),
+			// f_sendVersion.getSelection(), JDTUtility.getProductInfo());
+			return "";
 		}
 
 		public void okPressed() {

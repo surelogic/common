@@ -12,19 +12,23 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 
+import com.surelogic.common.core.JDTUtility;
 import com.surelogic.common.core.preferences.CommonCorePreferencesUtility;
 import com.surelogic.common.i18n.I18N;
+import com.surelogic.common.serviceability.Message;
+import com.surelogic.common.serviceability.ProblemReportMessage;
 
-public class SendProblemReportCollectInformationPage extends WizardPage {
+public class SendServiceMessageCollectInformationPage extends WizardPage {
 
-	SendProblemReportCollectInformationPage() {
+	SendServiceMessageCollectInformationPage(Message data) {
 		super("collectInformation");
+		f_data = data;
 	}
 
 	private static final int CONTENTS_WIDTH_HINT = 400;
 	private static final int TIP_HEIGHT_HINT = 150;
-	
-	private Mediator f_mediator = null;
+
+	private final Message f_data;
 
 	@Override
 	public void createControl(Composite parent) {
@@ -75,104 +79,70 @@ public class SendProblemReportCollectInformationPage extends WizardPage {
 
 		final Label summary = new Label(panel, SWT.RIGHT);
 		summary.setText(I18N.msg("common.send.problemReport.wizard.summary"));
-		summary.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, false, false));
+		summary
+				.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, false, false));
 		final Text summaryText = new Text(panel, SWT.SINGLE | SWT.BORDER);
 		summaryText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-		final Label tip = new Label(panel, SWT.WRAP);
-		tip.setText(I18N.msg("common.send.problemReport.wizard.tip"));
+		final Label description = new Label(panel, SWT.WRAP);
+		description.setText(I18N.msg("common.send.problemReport.wizard.desc"));
 		data = new GridData(SWT.FILL, SWT.DEFAULT, true, false, 2, 1);
 		data.widthHint = CONTENTS_WIDTH_HINT;
-		tip.setLayoutData(data);
+		description.setLayoutData(data);
 
-		final Text tipText = new Text(panel, SWT.MULTI | SWT.BORDER
+		final Text descriptionText = new Text(panel, SWT.MULTI | SWT.BORDER
 				| SWT.V_SCROLL | SWT.H_SCROLL);
 		data = new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1);
 		data.heightHint = TIP_HEIGHT_HINT;
-		tipText.setLayoutData(data);
+		descriptionText.setLayoutData(data);
 
 		parent.pack();
-		
-		f_mediator = new Mediator(emailText, nameText, summaryText, tipText,
-				sendVersion, sendEclipseLog);
-		f_mediator.init();
+
+		final Runnable updatePageComplete = new Runnable() {
+			public void run() {
+				f_data.setEmail(emailText.getText());
+				f_data.setName(nameText.getText());
+				f_data.setSummary(summaryText.getText());
+				f_data.setDescription(descriptionText.getText());
+				f_data.setSendVersionInfo(sendVersion.getSelection());
+				if (f_data instanceof ProblemReportMessage) {
+					ProblemReportMessage prm = (ProblemReportMessage) f_data;
+					if (sendEclipseLog.getSelection()) {
+						/*
+						 * Only lookup the log file if it looks like it hasn't
+						 * been set. If the value is non-null it has probably
+						 * been set correctly.
+						 */
+						if (prm.getIdeLogFile() == null)
+							prm.setIdeLogFile(JDTUtility.getEclipseLogFile());
+					} else {
+						prm.setIdeLogFile(null);
+					}
+				}
+
+				setPageComplete(f_data.minimumDataEntered());
+			}
+		};
+
+		final Listener listener = new Listener() {
+			public void handleEvent(Event event) {
+				updatePageComplete.run();
+			}
+		};
+
+		emailText.addListener(SWT.Modify, listener);
+		nameText.addListener(SWT.Modify, listener);
+		summaryText.addListener(SWT.Modify, listener);
+		descriptionText.addListener(SWT.Modify, listener);
+		sendVersion.addListener(SWT.Selection, listener);
+		sendEclipseLog.addListener(SWT.Selection, listener);
+		/*
+		 * We have to run this a bit later so that the OK button is created.
+		 */
+		emailText.getDisplay().asyncExec(updatePageComplete);
 
 		setTitle(I18N.msg("common.send.problemReport.wizard.msg.title"));
 		setMessage(I18N.msg("common.send.problemReport.wizard.msg"),
 				IMessageProvider.INFORMATION);
-	}
-	
-	private final class Mediator {
-
-		private final Text f_email;
-		private final Text f_name;
-		private final Text f_summary;
-		private final Text f_tip;
-		private final Button f_sendVersion;
-		private final Button f_sendEclipseLog;
-
-		public Mediator(Text email, Text name, Text summary, Text tip,
-				Button sendVersion, Button sendEclipseLog) {
-			f_email = email;
-			f_name = name;
-			f_summary = summary;
-			f_tip = tip;
-			f_sendVersion = sendVersion;
-			f_sendEclipseLog = sendEclipseLog;
-		}
-
-		public void init() {
-			final Listener modifyListener = new Listener() {
-				public void handleEvent(Event event) {
-					setButtonState();
-				}
-			};
-			f_summary.addListener(SWT.Modify, modifyListener);
-			f_tip.addListener(SWT.Modify, modifyListener);
-			/*
-			 * We have to run this a bit later so that the OK button is created.
-			 */
-			f_tip.getDisplay().asyncExec(new Runnable() {
-				public void run() {
-					setButtonState();
-				}
-			});
-		}
-
-		private void setButtonState() {
-			final boolean tipTyped = f_tip.getText().length() != 0;
-			final boolean summaryTyped = f_summary.getText().length() != 0;
-			final boolean hasText = tipTyped && summaryTyped;
-			setPageComplete(hasText);
-		}
-
-//		public String getMsg() {
-//			File ideLogFile = f_sendEclipseLog.getSelection() ? JDTUtility
-//					.getEclipseLogFile() : null;
-//			return ServiceUtility.composeAProblemReport(f_aboutTool, f_email
-//					.getText(), f_name.getText(), f_summary.getText(), f_tip
-//					.getText(), f_sendVersion.getSelection(), JDTUtility
-//					.getProductInfo(), ideLogFile);
-//		}
-//
-//		public void okPressed() {
-//			CommonCorePreferencesUtility.setServicabilityEmail(f_email
-//					.getText());
-//			CommonCorePreferencesUtility.setServicabilityName(f_name.getText());
-//
-//			final String msg = getMsg();
-//			final SLJob job = ServiceUtility.sendToSureLogic(msg,
-//					new Runnable() {
-//						public void run() {
-//							BalloonUtility
-//									.showMessage(
-//											I18N
-//													.msg("common.send.problemReport.sent.title"),
-//											I18N
-//													.msg("common.send.problemReport.sent.message"));
-//						}
-//					});
-//			EclipseJob.getInstance().schedule(job);
-//		}
 	}
 }

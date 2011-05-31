@@ -226,10 +226,11 @@ public final class SendProblemReportDialog extends TitleAreaDialog {
 		public String getMsg() {
 			File ideLogFile = f_sendEclipseLog.getSelection() ? JDTUtility
 					.getEclipseLogFile() : null;
-			return ServiceUtility.composeAProblemReport(f_aboutTool, f_email
-					.getText(), f_name.getText(), f_summary.getText(), f_tip
-					.getText(), f_sendVersion.getSelection(), JDTUtility
-					.getProductInfo(), ideLogFile);
+			// return ServiceUtility.composeAProblemReport(f_aboutTool, f_email
+			// .getText(), f_name.getText(), f_summary.getText(), f_tip
+			// .getText(), f_sendVersion.getSelection(), JDTUtility
+			// .getProductInfo(), ideLogFile);
+			return "";
 		}
 
 		public void okPressed() {
