@@ -27,7 +27,7 @@ public class SendServiceMessageWizard extends Wizard {
 	 *            Windows).
 	 */
 	public static void openProblemReport(String product,
-			final String imageSymbolicName) {
+			String imageSymbolicName) {
 		openProblemReport(null, product, imageSymbolicName);
 	}
 
@@ -44,24 +44,12 @@ public class SendServiceMessageWizard extends Wizard {
 	 *            Windows).
 	 */
 	public static void openProblemReport(Shell shell, String product,
-			final String imageSymbolicName) {
+			String imageSymbolicName) {
 		ProblemReportMessage prm = new ProblemReportMessage();
 		if (product == null)
 			product = "UNKNOWN";
 		prm.setProduct(product);
-		SendServiceMessageWizard wizard = new SendServiceMessageWizard(prm);
-		if (shell == null)
-			shell = EclipseUIUtility.getShell();
-		final WizardDialog dialog = new WizardDialog(shell, wizard) {
-			@Override
-			protected void configureShell(Shell newShell) {
-				super.configureShell(newShell);
-				if (imageSymbolicName != null)
-					newShell.setImage(SLImages.getImage(imageSymbolicName));
-
-			}
-		};
-		dialog.open();
+		openHelper(shell, prm, imageSymbolicName);
 	}
 
 	/**
@@ -75,7 +63,7 @@ public class SendServiceMessageWizard extends Wizard {
 	 *            This image is only displayed on some operating systems (e.g.,
 	 *            Windows).
 	 */
-	public static void openTip(String product, final String imageSymbolicName) {
+	public static void openTip(String product, String imageSymbolicName) {
 		openTip(null, product, imageSymbolicName);
 	}
 
@@ -92,12 +80,17 @@ public class SendServiceMessageWizard extends Wizard {
 	 *            Windows).
 	 */
 	public static void openTip(Shell shell, String product,
-			final String imageSymbolicName) {
+			String imageSymbolicName) {
 		TipMessage tip = new TipMessage();
 		if (product == null)
 			product = "UNKNOWN";
 		tip.setProduct(product);
-		SendServiceMessageWizard wizard = new SendServiceMessageWizard(tip);
+		openHelper(shell, tip, imageSymbolicName);
+	}
+
+	private static void openHelper(Shell shell, Message message,
+			final String imageSymbolicName) {
+		SendServiceMessageWizard wizard = new SendServiceMessageWizard(message);
 		if (shell == null)
 			shell = EclipseUIUtility.getShell();
 		final WizardDialog dialog = new WizardDialog(shell, wizard) {
@@ -119,6 +112,7 @@ public class SendServiceMessageWizard extends Wizard {
 
 	private SendServiceMessageWizard(Message data) {
 		f_data = data;
+		f_data.setDirty();
 		f_data.setIdeVersion(JDTUtility.getProductInfo());
 		String title = I18N.msg(f_data.propPfx() + "title");
 		setWindowTitle(f_data.getProduct() + " " + title);
