@@ -84,8 +84,8 @@ public final class JDTUtility {
 			entries.add(JavaCore.newLibraryEntry(path, null, null,
 					new IAccessRule[0], new IClasspathAttribute[0], false));
 
-			javaProject.setRawClasspath(
-					entries.toArray(new IClasspathEntry[entries.size()]), null);
+			javaProject.setRawClasspath(entries
+					.toArray(new IClasspathEntry[entries.size()]), null);
 			return true;
 		} catch (JavaModelException jme) {
 			SLLogger.getLogger().log(
@@ -129,9 +129,8 @@ public final class JDTUtility {
 					entries.add(e);
 			}
 			if (removed)
-				javaProject.setRawClasspath(
-						entries.toArray(new IClasspathEntry[entries.size()]),
-						null);
+				javaProject.setRawClasspath(entries
+						.toArray(new IClasspathEntry[entries.size()]), null);
 			return true;
 		} catch (JavaModelException jme) {
 			SLLogger.getLogger().log(
@@ -274,17 +273,21 @@ public final class JDTUtility {
 	/**
 	 * Gets a reference to the Eclipse log file. This file is under the
 	 * workspace in <tt>.metadata/.log</tt>.
+	 * <p>
+	 * It is possible that this file may not exist. This is the case if the user
+	 * deletes the log entries from the <b>Error Log</b> view. If this occurs a
+	 * warning is logged.
 	 * 
 	 * @return a reference to the Eclipse log file.
 	 */
 	public static File getEclipseLogFile() {
 		final IWorkspaceRoot wsRoot = ResourcesPlugin.getWorkspace().getRoot();
-		final IPath log = wsRoot.getLocation().addTrailingSeparator()
-				.append(".metadata/.log");
+		final IPath log = wsRoot.getLocation().addTrailingSeparator().append(
+				".metadata/.log");
 		final File logFile = log.makeAbsolute().toFile();
 		if (!logFile.exists()) {
 			final String msg = I18N.err(137, logFile.getAbsolutePath());
-			SLLogger.getLogger().log(Level.SEVERE, msg, new Exception(msg));
+			SLLogger.getLogger().log(Level.WARNING, msg, new Exception(msg));
 		}
 		return logFile;
 	}
@@ -818,8 +821,8 @@ public final class JDTUtility {
 
 	private static void projectsUpToDate(final IWorkspaceRoot root,
 			final Map<IJavaProject, Boolean> status) throws JavaModelException {
-		final List<IJavaProject> projs = new ArrayList<IJavaProject>(
-				status.size());
+		final List<IJavaProject> projs = new ArrayList<IJavaProject>(status
+				.size());
 		for (final Map.Entry<IJavaProject, Boolean> e : status.entrySet()) {
 			projs.add(e.getKey());
 			e.setValue(null);
@@ -912,7 +915,8 @@ public final class JDTUtility {
 						}
 						for (final IType t : cu.getTypes()) {
 							final String name = t.getFullyQualifiedName()
-									.replace('.', '/') + ".class";
+									.replace('.', '/')
+									+ ".class";
 							final IPath path = out.append(name);
 							final long clTime = root.getFile(path)
 									.getLocalTimeStamp();
