@@ -39,12 +39,10 @@ public class SendServiceMessagePreviewPage extends WizardPage {
 	@Override
 	public void setVisible(boolean visible) {
 		if (visible) {
-			System.out.println("preview visible");
 			f_data.generateMessage(false);
 			f_descriptionText.setText(f_data.getMessage());
 
 		} else {
-			System.out.println("preview invisible");
 			f_data.setMessage(f_descriptionText.getText());
 		}
 		super.setVisible(visible);
