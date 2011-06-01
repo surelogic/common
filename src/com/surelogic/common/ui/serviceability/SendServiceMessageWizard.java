@@ -1,5 +1,7 @@
 package com.surelogic.common.ui.serviceability;
 
+import java.lang.reflect.InvocationTargetException;
+
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
@@ -7,12 +9,19 @@ import org.eclipse.swt.widgets.Shell;
 
 import com.surelogic.common.CommonImages;
 import com.surelogic.common.core.JDTUtility;
+import com.surelogic.common.core.logging.SLEclipseStatusUtility;
+import com.surelogic.common.core.preferences.CommonCorePreferencesUtility;
 import com.surelogic.common.i18n.I18N;
+import com.surelogic.common.jobs.SLJob;
 import com.surelogic.common.serviceability.Message;
 import com.surelogic.common.serviceability.ProblemReportMessage;
+import com.surelogic.common.serviceability.ServiceUtility;
 import com.surelogic.common.serviceability.TipMessage;
+import com.surelogic.common.ui.BalloonUtility;
 import com.surelogic.common.ui.EclipseUIUtility;
 import com.surelogic.common.ui.SLImages;
+import com.surelogic.common.ui.dialogs.ErrorDialogUtility;
+import com.surelogic.common.ui.jobs.SLJobWrapperRunnableWithProgress;
 
 public class SendServiceMessageWizard extends Wizard {
 
@@ -145,7 +154,28 @@ public class SendServiceMessageWizard extends Wizard {
 
 	@Override
 	public boolean performFinish() {
-		// TODO send to server
+		CommonCorePreferencesUtility.setServicabilityEmail(f_data.getEmail());
+		CommonCorePreferencesUtility.setServicabilityName(f_data.getName());
+		f_data.generateMessage(false);
+		final String msg = f_data.getMessage();
+		final SLJob job = ServiceUtility.sendToSureLogic(msg, new Runnable() {
+			public void run() {
+				BalloonUtility.showMessage(I18N.msg(f_data.propPfx()
+						+ "sent.title"), I18N.msg(f_data.propPfx()
+						+ "sent.message"));
+			}
+		});
+		final SLJobWrapperRunnableWithProgress rwp = new SLJobWrapperRunnableWithProgress(
+				job);
+		try {
+			getContainer().run(true, false, rwp);
+		} catch (InvocationTargetException e) {
+			ErrorDialogUtility.open(null, null, SLEclipseStatusUtility
+					.convert(rwp.getResultAsSLStatus()));
+			return false;
+		} catch (InterruptedException e) {
+			return false;
+		}
 		return true;
 	}
 }

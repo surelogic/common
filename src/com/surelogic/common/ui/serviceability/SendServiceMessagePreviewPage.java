@@ -6,6 +6,8 @@ import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 
 import com.surelogic.common.i18n.I18N;
@@ -30,6 +32,11 @@ public class SendServiceMessagePreviewPage extends WizardPage {
 		f_descriptionText = new Text(panel, SWT.MULTI | SWT.BORDER
 				| SWT.V_SCROLL | SWT.H_SCROLL);
 		f_descriptionText.setFont(JFaceResources.getTextFont());
+		f_descriptionText.addListener(SWT.Modify, new Listener() {
+			public void handleEvent(Event event) {
+				f_data.setMessage(f_descriptionText.getText());
+			}
+		});
 
 		setTitle(I18N.msg(f_data.propPfx() + "preview.msg.title"));
 		setMessage(I18N.msg(f_data.propPfx() + "preview.msg"),
@@ -41,9 +48,6 @@ public class SendServiceMessagePreviewPage extends WizardPage {
 		if (visible) {
 			f_data.generateMessage(false);
 			f_descriptionText.setText(f_data.getMessage());
-
-		} else {
-			f_data.setMessage(f_descriptionText.getText());
 		}
 		super.setVisible(visible);
 	}
