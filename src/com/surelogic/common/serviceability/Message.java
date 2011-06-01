@@ -13,6 +13,7 @@ public abstract class Message {
 	}
 
 	public final void setProduct(String product) {
+		setDirty(f_product, product);
 		f_product = product;
 	}
 
@@ -23,6 +24,7 @@ public abstract class Message {
 	}
 
 	public final void setEmail(String email) {
+		setDirty(f_email, email);
 		f_email = email;
 	}
 
@@ -33,6 +35,7 @@ public abstract class Message {
 	}
 
 	public final void setName(String name) {
+		setDirty(f_name, name);
 		f_name = name;
 	}
 
@@ -43,6 +46,7 @@ public abstract class Message {
 	}
 
 	public final void setSummary(String summary) {
+		setDirty(f_summary, summary);
 		f_summary = summary;
 	}
 
@@ -53,6 +57,7 @@ public abstract class Message {
 	}
 
 	public final void setDescription(String description) {
+		setDirty(f_description, description);
 		f_description = description;
 	}
 
@@ -63,6 +68,7 @@ public abstract class Message {
 	}
 
 	public final void setSendVersionInfo(boolean sendVersionInfo) {
+		setDirty(f_sendVersionInfo, sendVersionInfo);
 		f_sendVersionInfo = sendVersionInfo;
 	}
 
@@ -73,6 +79,7 @@ public abstract class Message {
 	}
 
 	public final void setIdeVersion(String ideVersion) {
+		setDirty(f_ideVersion, ideVersion);
 		f_ideVersion = ideVersion;
 	}
 
@@ -82,6 +89,18 @@ public abstract class Message {
 		final boolean tipTyped = f_description.length() != 0;
 		final boolean summaryTyped = f_summary.length() != 0;
 		return tipTyped && summaryTyped;
+	}
+
+	private boolean f_dirty = false;
+
+	public final void setDirty() {
+		f_dirty = true;
+	}
+
+	protected <T> void setDirty(T currentValue, T newValue) {
+		if ((currentValue == null && newValue != null)
+				|| (currentValue != null && !currentValue.equals(newValue)))
+			setDirty();
 	}
 
 	private String f_message;
@@ -94,10 +113,13 @@ public abstract class Message {
 		f_message = message;
 	}
 
-	public final void generateMessage() {
-		final StringBuilder b = new StringBuilder();
-		generateMessageHelper(b);
-		f_message = b.toString();
+	public final void generateMessage(boolean force) {
+		if (force || f_dirty) {
+			f_dirty = false;
+			final StringBuilder b = new StringBuilder();
+			generateMessageHelper(b);
+			f_message = b.toString();
+		}
 	}
 
 	public abstract String getMessageTypeString();

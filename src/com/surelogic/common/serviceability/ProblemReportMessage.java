@@ -24,6 +24,7 @@ public final class ProblemReportMessage extends Message {
 	}
 
 	public void setIdeLogFile(File ideLogFile) {
+		setDirty(f_ideLogFile, ideLogFile);
 		f_ideLogFile = ideLogFile;
 	}
 
