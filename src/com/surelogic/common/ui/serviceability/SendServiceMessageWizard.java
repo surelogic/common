@@ -2,6 +2,7 @@ package com.surelogic.common.ui.serviceability;
 
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
 
 import com.surelogic.common.CommonImages;
@@ -94,6 +95,15 @@ public class SendServiceMessageWizard extends Wizard {
 		if (shell == null)
 			shell = EclipseUIUtility.getShell();
 		final WizardDialog dialog = new WizardDialog(shell, wizard) {
+
+			@Override
+			protected void setShellStyle(int newShellStyle) {
+				// This is a total hack to make the wizard modeless
+				super.setShellStyle(SWT.CLOSE | SWT.MAX | SWT.TITLE
+						| SWT.BORDER | SWT.MODELESS | SWT.RESIZE
+						| getDefaultOrientation());
+			}
+
 			@Override
 			protected void configureShell(Shell newShell) {
 				super.configureShell(newShell);

@@ -1,6 +1,7 @@
 package com.surelogic.common.ui.serviceability;
 
 import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -96,6 +97,7 @@ public class SendServiceMessageCollectInformationPage extends WizardPage {
 
 		final Text descriptionText = new Text(panel, SWT.MULTI | SWT.BORDER
 				| SWT.V_SCROLL | SWT.H_SCROLL);
+		descriptionText.setFont(JFaceResources.getTextFont());
 		data = new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1);
 		data.heightHint = TIP_HEIGHT_HINT;
 		descriptionText.setLayoutData(data);
