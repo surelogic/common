@@ -244,8 +244,17 @@ public final class Entities {
 	}
 
 	private final List<Tuple> f_NameValue = new ArrayList<Tuple>();
+	private final Map<String,String> f_ValueName = new HashMap<String, String>();
 	private Map<Integer,String> f_map = new HashMap<Integer,String>();
 
+
+	public static String unescape(String c) {
+		for(Map.Entry<String, String> e : E.f_ValueName.entrySet()) {
+			c = c.replace(e.getKey(), e.getValue());
+		}
+		return c;
+	}
+	
 	public String escape(final String text) {
 		// Allocate space for original text plus 5 single-character entities
 		final StringBuilder sb = new StringBuilder(text.length() + 10);
@@ -299,6 +308,7 @@ public final class Entities {
 		final Tuple tuple = value.length() == 1 ? new CharValueTuple(wrapForXML, name,
 				value) : new StringValueTuple(wrapForXML, name, value);
 		f_NameValue.add(tuple);
+		f_ValueName.put('&'+name+';', value);
 	}
 
 	/**
