@@ -16,6 +16,7 @@ public abstract class XMLReader extends DefaultHandler implements LexicalHandler
 	public static final String PROJECT_ATTR = "project";
 	public static final String COMMENT_TAG = "<comment>";
 	
+	protected final List<String> comments = new ArrayList<String>();
 	protected final Stack<Entity> inside = new Stack<Entity>();
 	protected final IXMLResultListener listener;
 	
@@ -126,12 +127,14 @@ public abstract class XMLReader extends DefaultHandler implements LexicalHandler
 
 	@Override
 	public void comment(char[] ch, int start, int length) throws SAXException {
+		final String c = new String(ch, start, length);
 		if (!inside.isEmpty()) {
 			Entity e = inside.peek();
-			String c = new String(ch, start, length);
 			Map<String,String> a = new HashMap<String,String>(1);
 			a.put(COMMENT_TAG, c);
 			e.addRef(new Entity(COMMENT_TAG, a));
+		} else {
+			comments.add(c);
 		}
 	}
 
