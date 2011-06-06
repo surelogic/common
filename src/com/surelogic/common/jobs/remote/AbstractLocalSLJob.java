@@ -102,7 +102,7 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 		}
 	}
 	
-	private String copyException(Remote type, String msg, BufferedReader br)
+	private String copyException(final Remote type, final String msg, final BufferedReader br)
 	throws IOException {
 		String label;
 		if (tasks.isEmpty()) {
@@ -111,27 +111,48 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 			SubSLProgressMonitor mon = tasks.peek();
 			label = mon.getName();
 		}
-		StringBuilder sb = new StringBuilder(label + ' ' + type.toString().toLowerCase());
+		final StringBuilder sb = new StringBuilder(label + ' ' + type.toString().toLowerCase());
 		println("Sierra tool "+type.toString().toLowerCase()+":"+msg);
 		sb.append(": ").append(msg).append('\n');
 
+		// Reconstitute stack trace
+		final List<StackTraceElement> trace = new ArrayList<StackTraceElement>();				
+		final String exception = br.readLine();
 		String line = br.readLine();
 		while (line != null && line.startsWith("\t")) {
 			println(line);
 			sb.append(' ').append(line).append('\n');
 			line = br.readLine();
+			
+			// \tat pkg.getMethod(Foo.java:99)
+			final String[] tokens = line.split("[ (:)]");
+			int lastDot = tokens[1].lastIndexOf('.');
+			String tdecl, method;
+			if (lastDot < 0) {
+				tdecl  = "";
+				method = tokens[1];
+			} else {
+				tdecl  = tokens[1].substring(0, lastDot);
+				method = tokens[1].substring(lastDot+1);
+			}
+			StackTraceElement ste = new StackTraceElement(tdecl, method, tokens[2], Integer.parseInt(tokens[3]));
+			trace.add(ste);
 		}
 		if (line != null) {
 			println(line);
 		}
+		
+		final Exception ex = new Exception(exception);
+		ex.setStackTrace(trace.toArray(new StackTraceElement[trace.size()]));
+		
 		final String errMsg = sb.toString();
 		final SLStatus child;
 		switch (type) {
 		case FAILED:
-			child = SLStatus.createErrorStatus(-1, errMsg);
+			child = SLStatus.createErrorStatus(-1, errMsg, ex);
 			break;
 		default:
-			child = SLStatus.createWarningStatus(-1, errMsg);
+			child = SLStatus.createWarningStatus(-1, errMsg, ex);
 		    break;
 		}
 		status.addChild(child);
