@@ -280,7 +280,7 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 							mon.begin(Integer.valueOf(work.trim()));
 							break;
 						case SUBTASK:
-							if (verbose) {
+							if (verbose && !line.contains("Uniqueness")) {
 								println(line);
 							}
 							monitor.subTask(st.nextToken());
