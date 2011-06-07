@@ -135,8 +135,12 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 				tdecl  = tokens[1].substring(0, lastDot);
 				method = tokens[1].substring(lastDot+1);
 			}
-			StackTraceElement ste = new StackTraceElement(tdecl, method, tokens[2], Integer.parseInt(tokens[3]));
-			trace.add(ste);
+			try {
+				StackTraceElement ste = new StackTraceElement(tdecl, method, tokens[2], Integer.parseInt(tokens[3]));
+				trace.add(ste);
+			} catch(NumberFormatException nfe) {
+				// Ignore this line, since it's not part of the trace
+			}
 		}
 		if (line != null) {
 			println(line);
