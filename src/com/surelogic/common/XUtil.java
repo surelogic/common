@@ -26,7 +26,12 @@ public final class XUtil {
 	public static final boolean testingWorkspace = System.getProperty("jsure.test.workspace","false").equals("true");
 	public static final boolean ignoreProposals = System.getProperty(ignoreProposalsProp,"false").equals("true");
 	
+	/**
+	 * For doing remote debugging on the JSure JVM
+	 */
 	public static final boolean debug = System.getProperty("SureLogicDebug","false").equals("true");
+
+	public static final boolean profile = System.getProperty("SureLogicProfile","false").equals("true");
 	
 	private static final boolean f_useDeveloperMode = 
 		System.getProperty("SureLogicDev") != null;
