@@ -352,7 +352,7 @@ public final class JDTUtility {
 	 * 
 	 * @param projectName
 	 *            the project name the element is contained within. For example,
-	 *            <code>JEdit</code>.
+	 *            <code>JEdit</code>.  If null, try all projects
 	 * @param packageName
 	 *            the package name the element is contained within. For example,
 	 *            <code>com.surelogic.sierra</code>. the package name is
@@ -379,7 +379,7 @@ public final class JDTUtility {
 			final IJavaModel model = JavaCore.create(wsRoot);
 			if (model != null) {
 				for (final IJavaProject project : model.getJavaProjects()) {
-					if (project.getElementName().equals(projectName)) {
+					if (projectName == null || project.getElementName().equals(projectName)) {
 						String packageNameHolder = null;
 						if (!(packageName == null)
 								&& !packageName
