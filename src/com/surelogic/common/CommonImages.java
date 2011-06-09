@@ -155,6 +155,7 @@ public final class CommonImages {
 	public static final String IMG_SUGGESTIONS_WARNINGS = "suggestions_warnings.gif";
 	public static final String IMG_TALLYHO = "tallyho.gif";
 	public static final String IMG_TEAM_SERVER_DECR = "team_server_decr.gif";
+	public static final String IMG_TIMEOUT_X = "timeout_x.gif";
 	public static final String IMG_TRAFFIC_LIGHT_GREEN = "traffic_light_green.png";
 	public static final String IMG_TRAFFIC_LIGHT_RED = "traffic_light_red.png";
 	public static final String IMG_TRAFFIC_LIGHT_YELLOW = "traffic_light_yellow.png";
