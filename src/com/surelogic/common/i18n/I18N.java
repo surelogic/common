@@ -192,7 +192,7 @@ public final class I18N {
    * Gets the string defined for the given category number with the given
    * formatting type from the i18 resource
    * bundle. The key for the result message in the SureLogic properties file is
-   * <i>category.formater.nnnnn</i>. For example, <tt>I18N.category(2001, "prefix")</tt> would result in the
+   * <i>category.formatter.nnnnn</i>. For example, <tt>I18N.category(2001, "prefix")</tt> would result in the
    * string <tt>"non-trivial effects"</tt> if the definition
    * 
    * <pre>
