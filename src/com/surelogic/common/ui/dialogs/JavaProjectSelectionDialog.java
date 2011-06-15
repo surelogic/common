@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -55,7 +56,7 @@ public final class JavaProjectSelectionDialog extends Dialog {
 			f_label = label;
 			f_shellTitle = shellTitle;
 			f_shellImage = shellImage;
-			f_initiallySelectedJavaProjects = initiallySelectedJavaProjects;
+			f_initiallySelectedJavaProjects = new CopyOnWriteArrayList<IJavaProject>(initiallySelectedJavaProjects);
 			f_alwaysChooseFromDialogPreferenceConstant = alwaysChooseFromDialogPreferenceConstant;
 			f_prvUsrSelProjectListPreferenceConstant = previousUserSelectedProjectListPreferenceConstant;
 		}
@@ -117,6 +118,19 @@ public final class JavaProjectSelectionDialog extends Dialog {
 				};
 				job.schedule();
 			} else {
+				// merge in the last project's selected projects (if any)
+				if (config.f_prvUsrSelProjectListPreferenceConstant != null) {
+					List<String> prevSel = EclipseUtility
+							.getStringListPreference(config.f_prvUsrSelProjectListPreferenceConstant);
+					for (String projectName : prevSel) {
+						IJavaProject javaProj = JDTUtility
+								.getJavaProject(projectName);
+						if (javaProj != null)
+							config.f_initiallySelectedJavaProjects
+									.add(javaProj);
+					}
+				}
+
 				final List<IJavaProject> mutableProjectList = new ArrayList<IJavaProject>();
 				final UIJob job = new SLUIJob() {
 					@Override
@@ -137,6 +151,20 @@ public final class JavaProjectSelectionDialog extends Dialog {
 				if (status == Status.CANCEL_STATUS) {
 					return Collections.emptyList();
 				} else {
+					// persist this selection (if any)
+					if (config.f_prvUsrSelProjectListPreferenceConstant != null) {
+						List<String> usrSel = new ArrayList<String>();
+						for (final IJavaProject javaProject : mutableProjectList) {
+							String projectName = javaProject.getElementName();
+							if (projectName != null && projectName.length() > 0) {
+								usrSel.add(projectName);
+							}
+						}
+						EclipseUtility
+								.setStringListPreference(
+										config.f_prvUsrSelProjectListPreferenceConstant,
+										usrSel);
+					}
 					return mutableProjectList;
 				}
 			}
