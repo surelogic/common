@@ -45,16 +45,19 @@ public final class JavaProjectSelectionDialog extends Dialog {
 
 		final List<IJavaProject> f_initiallySelectedJavaProjects;
 		final String f_alwaysChooseFromDialogPreferenceConstant; // may be null
+		final String f_prvUsrSelProjectListPreferenceConstant; // may be null
 
 		public Configuration(final String label, final String shellTitle,
 				final Image shellImage,
 				final List<IJavaProject> initiallySelectedJavaProjects,
-				final String alwaysChooseFromDialogPreferenceConstant) {
+				final String alwaysChooseFromDialogPreferenceConstant,
+				final String previousUserSelectedProjectListPreferenceConstant) {
 			f_label = label;
 			f_shellTitle = shellTitle;
 			f_shellImage = shellImage;
 			f_initiallySelectedJavaProjects = initiallySelectedJavaProjects;
 			f_alwaysChooseFromDialogPreferenceConstant = alwaysChooseFromDialogPreferenceConstant;
+			f_prvUsrSelProjectListPreferenceConstant = previousUserSelectedProjectListPreferenceConstant;
 		}
 	}
 
@@ -67,6 +70,15 @@ public final class JavaProjectSelectionDialog extends Dialog {
 	 */
 	private final List<IJavaProject> f_selectedProjects;
 
+	/**
+	 * Opens the dialog and gets projects from the user if necessary based upon
+	 * the users preferences.
+	 * 
+	 * @param config
+	 *            the dialog configuration. This contains information about what
+	 *            to display and what preferences to access.
+	 * @return
+	 */
 	public static List<IJavaProject> getProjects(final Configuration config) {
 		/*
 		 * If the set of initially selected Java projects is empty (meaning that
@@ -217,11 +229,15 @@ public final class JavaProjectSelectionDialog extends Dialog {
 
 		if (f_configuration.f_alwaysChooseFromDialogPreferenceConstant != null) {
 			final Button check = new Button(panel, SWT.CHECK);
-			check.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false));
-			check.setText(I18N
-					.msg("common.dialog.showDialogEvenWhenProjectsAreSelected"));
-			check.setSelection(EclipseUtility
-					.getBooleanPreference(f_configuration.f_alwaysChooseFromDialogPreferenceConstant));
+			check
+					.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true,
+							false));
+			check
+					.setText(I18N
+							.msg("common.dialog.showDialogEvenWhenProjectsAreSelected"));
+			check
+					.setSelection(EclipseUtility
+							.getBooleanPreference(f_configuration.f_alwaysChooseFromDialogPreferenceConstant));
 			check.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(final Event event) {
 					final boolean show = !EclipseUtility

@@ -27,9 +27,8 @@ import com.surelogic.common.ui.dialogs.JavaProjectSelectionDialog;
  */
 public abstract class AbstractProjectSelectedMenuAction implements
 		IObjectActionDelegate, IWorkbenchWindowActionDelegate {
-	
-	protected abstract void run(List<IJavaProject> selectedProjects,
-			List<String> projectNames);
+
+	protected abstract void runActionOn(List<IJavaProject> selectedProjects);
 
 	private IStructuredSelection f_currentSelection = null;
 
@@ -46,7 +45,6 @@ public abstract class AbstractProjectSelectedMenuAction implements
 					.getRoot();
 			final IJavaModel javaModel = JavaCore.create(root);
 			final List<IJavaProject> selectedProjects = new ArrayList<IJavaProject>();
-			final List<String> selectedProjectNames = new ArrayList<String>();
 			for (Object selection : f_currentSelection.toArray()) {
 				final IJavaProject javaProject;
 				outer: if (selection instanceof IJavaProject) {
@@ -68,12 +66,10 @@ public abstract class AbstractProjectSelectedMenuAction implements
 					continue;
 
 				selectedProjects.add(javaProject);
-				selectedProjectNames.add(javaProject.getElementName());
 			}
-			run_private(selectedProjects, selectedProjectNames);
+			runHelper(selectedProjects);
 		} else {
-			run_private(Collections.<IJavaProject> emptyList(), Collections
-					.<String> emptyList());
+			runHelper(Collections.<IJavaProject> emptyList());
 		}
 	}
 
@@ -100,33 +96,30 @@ public abstract class AbstractProjectSelectedMenuAction implements
 		}
 		return names;
 	}
-	
+
 	public void run() {
 		run((IAction) null);
 	}
-	
+
 	public void run(List<IJavaProject> projects) {
-		if (projects.isEmpty()) {
+		if (projects == null || projects.isEmpty()) {
 			return;
 		}
-		run_private(projects, getNames(projects));
+		runHelper(projects);
 	}
-	
-	private void run_private(final List<IJavaProject> selectedProjects,
-			final List<String> projectNames) {
+
+	private void runHelper(final List<IJavaProject> selectedProjects) {
+		List<IJavaProject> projects = selectedProjects;
 		// Need a dialog?
-		final JavaProjectSelectionDialog.Configuration info = getDialogInfo(selectedProjects);
+		final JavaProjectSelectionDialog.Configuration info = getDialogInfo(projects);
 		if (info != null) {
-			List<IJavaProject> newProjects = JavaProjectSelectionDialog.getProjects(info);
-			if (newProjects != selectedProjects) {
-				run(newProjects, getNames(newProjects));
-				return;
-			}
+			projects = JavaProjectSelectionDialog.getProjects(info);
 		}
-		run(selectedProjects, projectNames);		
+		runActionOn(projects);
 	}
-	
-	protected JavaProjectSelectionDialog.Configuration getDialogInfo(List<IJavaProject> selectedProjects) {
+
+	protected JavaProjectSelectionDialog.Configuration getDialogInfo(
+			List<IJavaProject> selectedProjects) {
 		return null;
 	}
 }
