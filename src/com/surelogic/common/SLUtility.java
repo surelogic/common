@@ -48,8 +48,8 @@ public final class SLUtility {
 
 	/**
 	 * Returns an {@code int} value of the passed {@code long} value or
-	 * {@link Integer#MAX_VALUE} if the long is too bit to fit into an
-	 * {@code int}.
+	 * {@link Integer#MAX_VALUE} if the long is too bit to fit into an {@code
+	 * int}.
 	 * 
 	 * @param value
 	 *            the long value.
@@ -158,8 +158,7 @@ public final class SLUtility {
 	 * and be legal Java code.
 	 * <p>
 	 * For example, The string <code>This "doggie" \ "kitty" is nice</code>
-	 * would generate the string
-	 * <code>This \"doggie\" \\ \"kitty\" is nice</code>.
+	 * would generate the string <code>This \"doggie\" \\ \"kitty\" is nice</code>.
 	 * 
 	 * @param s
 	 *            the string to escape.
@@ -219,8 +218,8 @@ public final class SLUtility {
 	 * As an example, calling this method with <code>"Hello world!"</code> as
 	 * its parameter may produce the result <code>"new OString(new long[] {
 	 *     0x3676CB307FBD35FEL, 0xECFB991E2033C169L, 0xD8C3D3E365645589L
-	 * }).toString()"</code>. If this code is compiled and executed later, it
-	 * will produce the string <code>"Hello world!"</code> again.
+	 * }).toString()"</code>. If this code is compiled and executed later, it will produce the
+	 * string <code>"Hello world!"</code> again.
 	 * 
 	 * @param s
 	 *            The string to obfuscate. This may not contain null characters.
@@ -795,8 +794,8 @@ public final class SLUtility {
 		conn.setDoInput(true);
 		conn.setDoOutput(true);
 		conn.setUseCaches(false);
-		PrintWriter wr = new PrintWriter(new OutputStreamWriter(
-				conn.getOutputStream()));
+		PrintWriter wr = new PrintWriter(new OutputStreamWriter(conn
+				.getOutputStream()));
 		try {
 			/*
 			 * Send the request.
@@ -834,6 +833,38 @@ public final class SLUtility {
 		} finally {
 			wr.close();
 		}
+	}
+
+	private static final int ENCODED_STRING_LENGTH_LENGTH = 8;
+	private static final String ENCODED_FORMAT = "%0"
+			+ ENCODED_STRING_LENGTH_LENGTH + "d%s";
+
+	public static List<String> decodeStringList(String value) {
+		final List<String> result = new ArrayList<String>();
+		int at = 0;
+		while (true) {
+			if (value.length() < at + ENCODED_STRING_LENGTH_LENGTH)
+				break;
+			final String encodedLength = value.substring(at, at
+					+ ENCODED_STRING_LENGTH_LENGTH);
+			final int length = Integer.parseInt(encodedLength);
+			at += ENCODED_STRING_LENGTH_LENGTH;
+
+			if (value.length() < at + length)
+				break;
+			final String string = value.substring(at, at + length);
+			result.add(string);
+			at += length;
+		}
+		return result;
+	}
+
+	public static String encodeStringList(List<String> list) {
+		final StringBuilder b = new StringBuilder();
+		for (final String s : list) {
+			b.append(String.format(ENCODED_FORMAT, s.length(), s));
+		}
+		return b.toString();
 	}
 
 	private SLUtility() {
