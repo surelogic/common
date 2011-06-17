@@ -25,6 +25,7 @@ import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import com.surelogic.Utility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.jobs.AbstractSLJob;
 import com.surelogic.common.jobs.SLJob;
@@ -36,6 +37,7 @@ import com.surelogic.common.logging.SLLogger;
 /**
  * A utility to help with file operations.
  */
+@Utility
 public final class FileUtility {
 
     private FileUtility() {
