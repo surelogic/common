@@ -75,7 +75,7 @@ public abstract class AbstractRemoteSLJob {
 			final BufferedReader br = new BufferedReader(new InputStreamReader(in));
 			out.println("Created reader");
 
-			final Monitor mon = new Monitor(out);
+			final Monitor mon = new Monitor(br, out);
 			checkInput(br, mon, "Created monitor");
 
 			final SLJob job = init(br, mon);
@@ -169,6 +169,12 @@ public abstract class AbstractRemoteSLJob {
 	protected void checkInput(final BufferedReader br,
 			final Monitor mon, final String msg) throws IOException {
 		out.println(msg);
+		checkIfCancelled(br, mon);
+		out.flush();
+	}
+
+	private void checkIfCancelled(final BufferedReader br, final Monitor mon)
+			throws IOException {
 		if (br.ready()) {
 			final String line = br.readLine();
 			out.println("Received: " + line);
@@ -176,14 +182,15 @@ public abstract class AbstractRemoteSLJob {
 				mon.setCanceled(true);
 			}
 		}
-		out.flush();
 	}
 
-	protected static class Monitor implements SLProgressMonitor {
+	protected class Monitor implements SLProgressMonitor {
+		private final BufferedReader br;
 		public final PrintStream out;
 		boolean cancelled = false;
 
-		private Monitor(final PrintStream out) {
+		private Monitor(BufferedReader br, final PrintStream out) {
+			this.br = br;
 			this.out = out;
 		}
 
@@ -243,14 +250,25 @@ public abstract class AbstractRemoteSLJob {
 
 		public void subTask(final String name) {
 			out.println("##" + Remote.SUBTASK + ", " + name);
+			checkIfCancelled();
 		}
 		
 		public void subTaskDone() {
 			out.println("##" + Remote.SUBTASK_DONE);
+			checkIfCancelled();
 		}
 
 		public void worked(final int work) {
 			out.println("##" + Remote.WORK + ", " + work);
+			checkIfCancelled();
+		}
+		
+		private void checkIfCancelled() {
+			try {
+				AbstractRemoteSLJob.this.checkIfCancelled(br, this);
+			} catch(IOException e) {
+				failed("Problem while checking if cancelled", e);
+			}
 		}
 	}
 }
