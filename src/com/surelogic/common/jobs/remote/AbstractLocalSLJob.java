@@ -186,7 +186,7 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 			pb.redirectErrorStream(true);
 
 			remoteVM = pb.start();
-			if (port < 0) {
+			if (port <= 0) {
 				// Use stdin/out
 				BufferedReader br = new BufferedReader(new InputStreamReader(remoteVM.getInputStream()));
 				BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(remoteVM.getOutputStream()));
