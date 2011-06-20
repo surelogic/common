@@ -163,7 +163,7 @@ public class ScopedResourcesSelectionDialog extends AbstractDebugCheckboxSelecti
 	
 	public static IResource[] showSaveDialog(IProject[] projects, Config config) {
 		IResource[] resources = EclipseUIUtility.getScopedDirtyResources(projects);
-		if (!config.getAlwaysSavePref()) {
+		if (!config.getAlwaysSavePref() && resources.length > 0) {
 			ScopedResourcesSelectionDialog lsd = new ScopedResourcesSelectionDialog(DebugUIPlugin.getShell(),
 					new AdaptableList(resources),
 					new WorkbenchContentProvider(),
