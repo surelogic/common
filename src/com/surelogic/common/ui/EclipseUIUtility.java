@@ -1,9 +1,13 @@
 package com.surelogic.common.ui;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Level;
 
 import org.eclipse.core.filesystem.*;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.*;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
@@ -255,7 +259,38 @@ public final class EclipseUIUtility {
 		}
 		return false;
 	}
-
+	
+	/**
+	 * Copied from:
+	 *    org.eclipse.debug.internal.ui.launchConfigurations.SaveScopeResourcesHandler
+	 * 
+	 * Builds the list of editors that apply to this build that need to be saved
+	 * 
+	 * @param projects the projects involved in this build, used to scope the searching process
+	 * @return the list of dirty editors for this launch to save, never null
+	 */
+	public static IResource[] getScopedDirtyResources(IProject[] projects) {
+		final Set<IResource> dirtyres = new HashSet<IResource>();
+		IWorkbenchWindow[] windows = PlatformUI.getWorkbench().getWorkbenchWindows();
+		for(int l = 0; l < windows.length; l++) {
+			IWorkbenchPage[] pages = windows[l].getPages();
+			for(int i = 0; i < pages.length; i++) {
+				IEditorPart[] eparts = pages[i].getDirtyEditors();
+				for(int j = 0; j < eparts.length; j++) {
+					IResource resource = (IResource)eparts[j].getEditorInput().getAdapter(IResource.class);
+					if(resource != null) {
+						for(int k = 0; k < projects.length; k++) {
+							if(projects[k].equals(resource.getProject())) {
+								dirtyres.add(resource);
+							}
+						}
+					}
+				}
+			}
+		}
+		return dirtyres.toArray(new IResource[dirtyres.size()]);
+	}
+	
 	private EclipseUIUtility() {
 		// utility
 	}
