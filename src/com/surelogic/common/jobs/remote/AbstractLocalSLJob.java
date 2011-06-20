@@ -122,7 +122,6 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 		while (line != null && line.startsWith("\t")) {
 			println(line);
 			sb.append(' ').append(line).append('\n');
-			line = br.readLine();
 			
 			// \tat pkg.getMethod(Foo.java:99)
 			final String[] tokens = line.split("[ (:)]");
@@ -141,6 +140,7 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 			} catch(NumberFormatException nfe) {
 				// Ignore this line, since it's not part of the trace
 			}
+			line = br.readLine();
 		}
 		if (line != null) {
 			println(line);
