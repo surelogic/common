@@ -150,13 +150,16 @@ public abstract class AbstractRemoteSLJob {
 	private static void outputFailure(final PrintStream out, final String msg,
 			final Throwable e) {
 		final StackTraceElement[] trace = e.getStackTrace();
+		/*
 		out.println("Caught exception");
 		for (final StackTraceElement ste : trace) {
 			out.println("\t at " + ste);
 		}
+		*/
 		if (msg == null) {
 			out.println("##" + Remote.FAILED + ", " + e.getClass().getName()
 					+ " : " + e.getMessage());
+			out.println(e.getClass().getName() + " : " + e.getMessage());
 		} else {
 			out.println("##" + Remote.FAILED + ", " + msg + " - "
 					+ e.getClass().getName() + " : " + e.getMessage());

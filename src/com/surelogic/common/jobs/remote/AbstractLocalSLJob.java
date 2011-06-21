@@ -118,6 +118,8 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 		// Reconstitute stack trace
 		final List<StackTraceElement> trace = new ArrayList<StackTraceElement>();				
 		final String exception = br.readLine();
+		println(exception);
+		
 		String line = br.readLine();
 		while (line != null && line.startsWith("\t")) {
 			println(line);
