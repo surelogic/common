@@ -3,6 +3,7 @@ package com.surelogic.common.ui.dialogs;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.debug.internal.ui.*;
+import org.eclipse.debug.internal.ui.launchConfigurations.*;
 import org.eclipse.jface.dialogs.*;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.IContentProvider;
@@ -45,7 +46,7 @@ public class ScopedResourcesSelectionDialog extends AbstractDebugCheckboxSelecti
 		fContentProvider = contentProvider;
 		fLabelProvider = labelProvider;
 		setShellStyle(getShellStyle() | SWT.RESIZE);
-		setShowSelectAllButtons(true);
+		//setShowSelectAllButtons(true);
 	}
 	
 	/* (non-Javadoc)
