@@ -100,9 +100,8 @@ public class CascadingList extends ScrolledComposite {
 	 * 
 	 * @param c
 	 *            a control.
-	 * @return the index of the column that <code>c</code> exists within, or
-	 *         -1 if <code>c</code> is not within a column of this cascading
-	 *         list.
+	 * @return the index of the column that <code>c</code> exists within, or -1
+	 *         if <code>c</code> is not within a column of this cascading list.
 	 */
 	public int getColumnIndexOf(Control c) {
 		if (c instanceof Composite) {
@@ -125,16 +124,19 @@ public class CascadingList extends ScrolledComposite {
 
 	/**
 	 * Implemented by objects that contribute a column to this cascading list.
-	 * 
-	 * @see CascadingList#addColumn(IColumn);
-	 * @see CascadingList#addColumnAfter(IScrolledColumn, int)
 	 */
-	static public interface IScrolledColumn {
-		void createContents(Composite panel);
-	}
-
 	static public interface IColumn {
-		Composite createContents(Composite cascadingListContents);
+		/**
+		 * Method that creates the contents of the column. This method should
+		 * return a panel that is created as a child of the passed panel, not
+		 * the passed panel itself.
+		 * 
+		 * @param panel
+		 *            the cascading list to be used as the parent control
+		 * @return a composite created by this method to hold the contents of
+		 *         the column.
+		 */
+		Composite createContents(Composite panel);
 	}
 
 	/**
@@ -224,7 +226,7 @@ public class CascadingList extends ScrolledComposite {
 	 * @throws IllegalStateException
 	 *             if something goes wrong while adding the column.
 	 */
-	public int addColumn(IScrolledColumn column, boolean noSpaceBefore) {
+	public int addScrolledColumn(IColumn column, boolean noSpaceBefore) {
 		try {
 			rememberColumnViewportOrigins();
 			final ScrolledComposite columnViewport = new ScrolledComposite(
@@ -280,10 +282,10 @@ public class CascadingList extends ScrolledComposite {
 	 * @throws IllegalStateException
 	 *             if something goes wrong while adding the column.
 	 */
-	public int addColumnAfter(IScrolledColumn column, int columnIndex,
+	public int addScrolledColumnAfter(IColumn column, int columnIndex,
 			boolean noSpaceBefore) {
 		emptyAfterHelper(columnIndex);
-		return addColumn(column, noSpaceBefore);
+		return addScrolledColumn(column, noSpaceBefore);
 	}
 
 	/**
@@ -300,10 +302,12 @@ public class CascadingList extends ScrolledComposite {
 	 * the specified column index.
 	 * <p>
 	 * Note: Clients should not invoke this method followed by
-	 * {@link #addColumn(CascadingList.IScrolledColumn)} as this could cause a
-	 * strange animation in several cases. Instead invoke
-	 * {@link #addColumnAfter(com.surelogic.common.ui.CascadingList.IColumn, int, boolean)}
-	 * which combines the two operations and produces the correct animation.
+	 * {@link #addColumn(CascadingList.IColumn)} or
+	 * {@link #addScrolledColumn(IColumn, boolean)} because this could cause a
+	 * strange animation which is distracting to the user. Instead invoke
+	 * {@link #addColumnAfter(IColumn, int, boolean)} or
+	 * {@link #addScrolledColumnAfter(IColumn, int, boolean)} which combines the
+	 * two operations and produces the correct animation.
 	 * 
 	 * @param columnIndex
 	 *            a column index that is a column of this cascading list. A
@@ -328,9 +332,9 @@ public class CascadingList extends ScrolledComposite {
 	}
 
 	public int getNumColumns() {
-	  return f_columns.size();
+		return f_columns.size();
 	}
-	
+
 	public interface ICascadingListObserver {
 		void notify(CascadingList cascadingList);
 	}
@@ -359,8 +363,9 @@ public class CascadingList extends ScrolledComposite {
 	 * @param columnIndex
 	 *            a column index that is a column of this cascading list.
 	 * 
-	 * @see #addColumnAfter(CascadingList.IScrolledColumn, int)
 	 * @see #emptyAfter(int)
+	 * @see #addColumnAfter(IColumn, int, boolean)
+	 * @see #addScrolledColumnAfter(IColumn, int, boolean)
 	 */
 	private void emptyAfterHelper(int columnIndex) {
 		int index = 0;
@@ -458,8 +463,7 @@ public class CascadingList extends ScrolledComposite {
 						 */
 						scrollBarWidth = bar.getSize().x;
 					} else {
-						SLLogger
-								.getLogger()
+						SLLogger.getLogger()
 								.log(Level.WARNING,
 										"null vertical scroll bar for a column in the cascading list.");
 					}
