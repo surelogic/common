@@ -5,5 +5,9 @@ public interface ILocalConfig {
 	int getMemorySize();
 	String getTestCode();
 	boolean isVerbose();
+
+	/**
+	 * @return A path to where you want the console output to go
+	 */
 	String getLogPath();
 }
