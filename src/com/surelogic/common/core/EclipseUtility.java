@@ -83,8 +83,8 @@ public class EclipseUtility {
 	 */
 	static void persistPreferences() {
 		try {
-			DefaultScope.INSTANCE.getNode(PREFERENCES_NODE).flush();
-			DefaultScope.INSTANCE.getNode(PREFERENCES_NODE).flush();
+			(new DefaultScope()).getNode(PREFERENCES_NODE).flush();
+			(new InstanceScope()).getNode(PREFERENCES_NODE).flush();
 		} catch (BackingStoreException e) {
 			SLLogger.getLogger().log(Level.SEVERE,
 					I18N.err(218, PREFERENCES_NODE), e);
@@ -137,16 +137,16 @@ public class EclipseUtility {
 	}
 
 	public static void setBooleanPreference(String key, boolean value) {
-		InstanceScope.INSTANCE.getNode(PREFERENCES_NODE).putBoolean(key, value);
+		(new InstanceScope()).getNode(PREFERENCES_NODE).putBoolean(key, value);
 	}
 
 	public static boolean getDefaultBooleanPreference(String key) {
-		return DefaultScope.INSTANCE.getNode(PREFERENCES_NODE).getBoolean(key,
+		return (new DefaultScope()).getNode(PREFERENCES_NODE).getBoolean(key,
 				BOOLEAN_DEFAULT_DEFAULT);
 	}
 
 	public static void setDefaultBooleanPreference(String key, boolean value) {
-		DefaultScope.INSTANCE.getNode(PREFERENCES_NODE).putBoolean(key, value);
+		(new DefaultScope()).getNode(PREFERENCES_NODE).putBoolean(key, value);
 	}
 
 	/*
@@ -159,16 +159,16 @@ public class EclipseUtility {
 	}
 
 	public static void setDoublePreference(String key, double value) {
-		InstanceScope.INSTANCE.getNode(PREFERENCES_NODE).putDouble(key, value);
+		(new InstanceScope()).getNode(PREFERENCES_NODE).putDouble(key, value);
 	}
 
 	public static double getDefaultDoublePreference(String key) {
-		return DefaultScope.INSTANCE.getNode(PREFERENCES_NODE).getDouble(key,
+		return (new DefaultScope()).getNode(PREFERENCES_NODE).getDouble(key,
 				DOUBLE_DEFAULT_DEFAULT);
 	}
 
 	public static void setDefaultDoublePreference(String key, double value) {
-		DefaultScope.INSTANCE.getNode(PREFERENCES_NODE).putDouble(key, value);
+		(new DefaultScope()).getNode(PREFERENCES_NODE).putDouble(key, value);
 	}
 
 	/*
@@ -181,16 +181,16 @@ public class EclipseUtility {
 	}
 
 	public static void setFloatPreference(String key, float value) {
-		InstanceScope.INSTANCE.getNode(PREFERENCES_NODE).putFloat(key, value);
+		(new InstanceScope()).getNode(PREFERENCES_NODE).putFloat(key, value);
 	}
 
 	public static float getDefaultFloatPreference(String key) {
-		return DefaultScope.INSTANCE.getNode(PREFERENCES_NODE).getFloat(key,
+		return (new DefaultScope()).getNode(PREFERENCES_NODE).getFloat(key,
 				FLOAT_DEFAULT_DEFAULT);
 	}
 
 	public static void setDefaultFloatPreference(String key, float value) {
-		DefaultScope.INSTANCE.getNode(PREFERENCES_NODE).putFloat(key, value);
+		(new DefaultScope()).getNode(PREFERENCES_NODE).putFloat(key, value);
 	}
 
 	/*
@@ -203,16 +203,16 @@ public class EclipseUtility {
 	}
 
 	public static void setIntPreference(String key, int value) {
-		InstanceScope.INSTANCE.getNode(PREFERENCES_NODE).putInt(key, value);
+		(new InstanceScope()).getNode(PREFERENCES_NODE).putInt(key, value);
 	}
 
 	public static int getDefaultIntPreference(String key) {
-		return DefaultScope.INSTANCE.getNode(PREFERENCES_NODE).getInt(key,
+		return (new DefaultScope()).getNode(PREFERENCES_NODE).getInt(key,
 				INT_DEFAULT_DEFAULT);
 	}
 
 	public static void setDefaultIntPreference(String key, int value) {
-		DefaultScope.INSTANCE.getNode(PREFERENCES_NODE).putInt(key, value);
+		(new DefaultScope()).getNode(PREFERENCES_NODE).putInt(key, value);
 	}
 
 	/*
@@ -225,16 +225,16 @@ public class EclipseUtility {
 	}
 
 	public static void setLongPreference(String key, long value) {
-		InstanceScope.INSTANCE.getNode(PREFERENCES_NODE).putLong(key, value);
+		(new InstanceScope()).getNode(PREFERENCES_NODE).putLong(key, value);
 	}
 
 	public static long getDefaultLongPreference(String key) {
-		return DefaultScope.INSTANCE.getNode(PREFERENCES_NODE).getLong(key,
+		return (new DefaultScope()).getNode(PREFERENCES_NODE).getLong(key,
 				LONG_DEFAULT_DEFAULT);
 	}
 
 	public static void setDefaultLongPreference(String key, long value) {
-		DefaultScope.INSTANCE.getNode(PREFERENCES_NODE).putLong(key, value);
+		(new DefaultScope()).getNode(PREFERENCES_NODE).putLong(key, value);
 	}
 
 	/*
@@ -253,16 +253,16 @@ public class EclipseUtility {
 		 */
 		if (value == null)
 			value = STRING_DEFAULT_DEFAULT;
-		InstanceScope.INSTANCE.getNode(PREFERENCES_NODE).put(key, value);
+		(new InstanceScope()).getNode(PREFERENCES_NODE).put(key, value);
 	}
 
 	public static String getDefaultStringPreference(String key) {
-		return DefaultScope.INSTANCE.getNode(PREFERENCES_NODE).get(key,
+		return (new DefaultScope()).getNode(PREFERENCES_NODE).get(key,
 				STRING_DEFAULT_DEFAULT);
 	}
 
 	public static void setDefaultStringPreference(String key, String value) {
-		DefaultScope.INSTANCE.getNode(PREFERENCES_NODE).put(key, value);
+		(new DefaultScope()).getNode(PREFERENCES_NODE).put(key, value);
 	}
 
 	/*
@@ -284,11 +284,11 @@ public class EclipseUtility {
 			encodedList = null;
 		else
 			encodedList = SLUtility.encodeStringList(value);
-		InstanceScope.INSTANCE.getNode(PREFERENCES_NODE).put(key, encodedList);
+		(new InstanceScope()).getNode(PREFERENCES_NODE).put(key, encodedList);
 	}
 
 	public static List<String> getDefaultStringListPreference(String key) {
-		final String encodedList = DefaultScope.INSTANCE.getNode(
+		final String encodedList = (new DefaultScope()).getNode(
 				PREFERENCES_NODE).get(key, null);
 		if (encodedList == null)
 			return STRING_LIST_DEFAULT_DEFAULT;
@@ -303,7 +303,7 @@ public class EclipseUtility {
 			encodedList = null;
 		else
 			encodedList = SLUtility.encodeStringList(value);
-		DefaultScope.INSTANCE.getNode(PREFERENCES_NODE).put(key, encodedList);
+		(new DefaultScope()).getNode(PREFERENCES_NODE).put(key, encodedList);
 	}
 
 	/**
@@ -874,8 +874,8 @@ public class EclipseUtility {
 	 * 
 	 * @param viewId
 	 *            a view identifier
-	 * @return code true} if the view identified by the given id exists,
-	 *         {@code false} otherwise.
+	 * @return code true} if the view identified by the given id exists, {@code
+	 *         false} otherwise.
 	 */
 	public static boolean bundleExists(final String id) {
 		return Platform.getBundle(id) != null;
