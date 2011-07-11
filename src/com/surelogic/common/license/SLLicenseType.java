@@ -1,8 +1,11 @@
 package com.surelogic.common.license;
 
+import com.surelogic.Immutable;
+
 /**
  * The types of licenses supported by SureLogic.
  */
+@Immutable
 public enum SLLicenseType {
 
 	/**

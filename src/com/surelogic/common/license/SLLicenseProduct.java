@@ -3,9 +3,12 @@ package com.surelogic.common.license;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.surelogic.Immutable;
+
 /**
  * The products licensed by SureLogic.
  */
+@Immutable
 public enum SLLicenseProduct {
 
 	ALL_TOOLS("All Tools"),
