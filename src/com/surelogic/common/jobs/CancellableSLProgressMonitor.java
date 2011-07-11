@@ -2,6 +2,8 @@ package com.surelogic.common.jobs;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.surelogic.Unique;
+
 /**
  * Partial implementation of a progress monitor that remembers if it has been
  * canceled. This implementation is thread-safe.
@@ -10,7 +12,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * a useful building block for progress monitor implementations.
  */
 public abstract class CancellableSLProgressMonitor implements SLProgressMonitor {
-
+	@Unique("return")
+	protected CancellableSLProgressMonitor() {
+		// Nothing to do
+	}
+	
 	private final AtomicBoolean f_canceled = new AtomicBoolean(false);
 
 	public boolean isCanceled() {
