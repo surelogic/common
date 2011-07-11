@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.surelogic.Immutable;
+import com.surelogic.Vouch;
 
 /**
  * The products licensed by SureLogic.
@@ -69,7 +70,7 @@ public enum SLLicenseProduct {
 	 * See page 154 of Bloch's <i>Effective Java</i> (second edition) for a
 	 * further description of supporting a fromString operation.
 	 */
-
+	@Vouch("Immutable")
 	private static final Map<String, SLLicenseProduct> stringToEnum = new HashMap<String, SLLicenseProduct>();
 	static {
 		for (SLLicenseProduct type : values()) {
