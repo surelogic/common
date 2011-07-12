@@ -236,7 +236,7 @@ public class SLLogger {
 	 * @return a suitable Logger.
 	 * 
 	 */
-	public static synchronized Logger getLogger() {
+	public static /*synchronized*/ Logger getLogger() {
 		return getLogger("");
 	}
 
