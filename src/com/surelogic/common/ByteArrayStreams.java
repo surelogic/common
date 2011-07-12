@@ -56,11 +56,13 @@ public final class ByteArrayStreams {
   /**
    * The current output stream if any.
    */
+  @Unique
   private MyOutputStream outStream;
   
   /**
    * The current input stream if any.
    */
+  @Unique
   private MyInputStream inStream;
   
   /**
