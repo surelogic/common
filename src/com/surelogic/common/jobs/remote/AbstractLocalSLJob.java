@@ -147,10 +147,13 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 		if (line != null) {
 			println(line);
 		}
-		
-		final Exception ex = new Exception(exception);
-		ex.setStackTrace(trace.toArray(new StackTraceElement[trace.size()]));
-		
+		final Exception ex;
+		if (!trace.isEmpty()) {
+			ex = new Exception(exception);
+			ex.setStackTrace(trace.toArray(new StackTraceElement[trace.size()]));
+		} else {
+			ex = null;
+		}
 		final String errMsg = sb.toString();
 		final SLStatus child;
 		switch (type) {
