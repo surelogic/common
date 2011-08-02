@@ -2,6 +2,7 @@ package com.surelogic.common.ui;
 
 import java.util.Comparator;
 
+import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Event;
@@ -10,6 +11,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
+import com.surelogic.Utility;
 import com.surelogic.common.StringComparators;
 
 /**
@@ -17,10 +19,33 @@ import com.surelogic.common.StringComparators;
  * <p>
  * Try to use {@link ColumnViewerSorter} instead of this class if you can.
  */
+@Utility
 public final class TableUtility {
 
 	private TableUtility() {
 		// no instances
+	}
+
+	/**
+	 * Pack the columns of our table to the ideal width.
+	 * 
+	 * @param tableViewer
+	 *            a table viewer.
+	 */
+	public static void packColumns(TableViewer tableViewer) {
+		packColumns(tableViewer.getTable());
+	}
+
+	/**
+	 * Pack the columns of our table to the ideal width.
+	 * 
+	 * @param tableViewer
+	 *            a table.
+	 */
+	public static void packColumns(Table table) {
+		for (final TableColumn col : table.getColumns()) {
+			col.pack();
+		}
 	}
 
 	private static class SortListener implements Listener {
