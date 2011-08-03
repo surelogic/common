@@ -64,6 +64,7 @@ public final class CommonImages {
 	public static final String IMG_FILTER = "filter.gif";
 	public static final String IMG_FINDBUGS_FINDING = "findbugs_finding.gif";
 	public static final String IMG_FL_APP = "fl_app.gif";
+	public static final String IMG_FL_COMP_UNIT = "fl_comp_unit.gif";
 	public static final String IMG_FL_LOGO = "fl_logo.gif";
 	public static final String IMG_FL_PAGE = "fl_page.gif";
 	public static final String IMG_FL_PREP_DATA = "fl_prep_data.gif";
@@ -85,7 +86,9 @@ public final class CommonImages {
 	public static final String IMG_JAR_SAVEAS = "jar_saveas.gif";
 	public static final String IMG_JAVA_COMP_UNIT = "java_comp_unit.gif";
 	public static final String IMG_JETTY_LOG = "jetty_log.gif";
+	public static final String IMG_JSURE_COMP_UNIT = "jsure_comp_unit.gif";
 	public static final String IMG_JSURE_FINDER = "jsure_finder.gif";
+	public static final String IMG_JSURE_GRAPH = "jsure_graph.gif";
 	public static final String IMG_JSURE_LOGO = "jsure_logo.gif";
 	public static final String IMG_JSURE_MODEL_PROBLEMS = "jsure_model_problems.gif";
 	public static final String IMG_JSURE_NO_VERIFY_GRAY = "jsure_no_verify_gray.gif";
