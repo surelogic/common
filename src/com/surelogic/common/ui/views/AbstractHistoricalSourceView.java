@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -28,36 +29,84 @@ import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.part.ViewPart;
 
 import com.surelogic.common.AbstractJavaZip;
 import com.surelogic.common.ISourceZipFileHandles;
+import com.surelogic.common.SLUtility;
 import com.surelogic.common.logging.SLLogger;
 import com.surelogic.common.ui.EclipseUIUtility;
 
 public abstract class AbstractHistoricalSourceView extends ViewPart {
 
 	// FIX replace with SourceViewer?
-	StyledText source;
-	JavaSyntaxHighlighter highlighter;
-	ISourceZipFileHandles lastSources = null;
-	String lastType = null;
+	private StyledText f_source;
+	private JavaSyntaxHighlighter f_highlighter;
+	private ISourceZipFileHandles f_lastSources = null;
+	private String f_lastType = null;
+
+	private Label f_sourceLabel;
+	private Date f_sourceCopyTime = null;
 
 	@Override
 	public void createPartControl(final Composite parent) {
-		source = new StyledText(parent, SWT.V_SCROLL | SWT.H_SCROLL
-				| SWT.BORDER | SWT.READ_ONLY);
-		// source.setFont(JFaceResources.getTextFont());
-		source.setText("No source to show.");
+		GridLayout gl = new GridLayout();
+		gl.horizontalSpacing = gl.verticalSpacing = 0;
+		gl.marginHeight = gl.marginWidth = 0;
+		parent.setLayout(gl);
+		f_sourceLabel = new Label(parent, SWT.NONE);
+		f_sourceLabel.setText(" ");
+		f_sourceLabel.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
+				false));
 
-		highlighter = new JavaSyntaxHighlighter(source.getDisplay());
+		f_source = new StyledText(parent, SWT.V_SCROLL | SWT.H_SCROLL
+				| SWT.BORDER | SWT.READ_ONLY);
+		f_source.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+		f_highlighter = new JavaSyntaxHighlighter(f_source.getDisplay());
+
+		clearSourceCodeFromView();
 	}
 
 	@Override
 	public void setFocus() {
-		source.setFocus();
+		f_source.setFocus();
+	}
+
+	/**
+	 * Clears out the source code from this view.
+	 */
+	public final void clearSourceCodeFromView() {
+		f_source.setText(" ");
+		f_sourceLabel.setText("No source code to show.");
+		f_sourceCopyTime = null;
+	}
+
+	/**
+	 * Sets the time when the displayed source code was snapshot. This is
+	 * displayed to the user.
+	 * 
+	 * @param when
+	 *            a time. A {@code null} value means that the snapshot time is
+	 *            unknown.
+	 */
+	public final void setSourceSnapshotTime(Date when) {
+		f_sourceCopyTime = when;
+	}
+
+	/**
+	 * Gets the time when the displayed source code was snapshot.
+	 * 
+	 * @return a time. A {@code null} value means that the snapshot time is
+	 *         unknown.
+	 */
+	public Date getSourceSnapshotTime() {
+		return f_sourceCopyTime;
 	}
 
 	/*
@@ -81,7 +130,7 @@ public abstract class AbstractHistoricalSourceView extends ViewPart {
 		// FIXME We use ANON_ONWARDS, b/c we don't record any type location info
 		// about types defined within an anonymous class
 		qname = ANON_ONWARDS.matcher(qname).replaceFirst("");
-		if (lastSources == sources && lastType == qname) {
+		if (f_lastSources == sources && f_lastType == qname) {
 			return true; // Should be populated from before
 		}
 		for (final File f : sources.getSourceZips()) {
@@ -94,8 +143,8 @@ public abstract class AbstractHistoricalSourceView extends ViewPart {
 						final String path = fileMap.get(qname);
 						if (path != null) {
 							populate(zf, path);
-							lastSources = sources;
-							lastType = qname;
+							f_lastSources = sources;
+							f_lastType = qname;
 							return true;
 						}
 					}
@@ -140,9 +189,14 @@ public abstract class AbstractHistoricalSourceView extends ViewPart {
 		 * char[] buf = new char[4096]; int read; while ((read = br.read(buf))
 		 * >= 0) { sb.append(buf, 0, read); }
 		 */
-		source.setFont(JFaceResources.getTextFont());
-		source.setText(sb.toString());
-		source.setStyleRanges(highlighter.computeRanges(source.getText()));
+		f_source.setFont(JFaceResources.getTextFont());
+		f_source.setText(sb.toString());
+		f_source.setStyleRanges(f_highlighter.computeRanges(f_source.getText()));
+
+		String sourceInfo = path
+				+ (f_sourceCopyTime == null ? "" : " at "
+						+ SLUtility.toStringHMS(f_sourceCopyTime));
+		f_sourceLabel.setText(sourceInfo);
 	}
 
 	protected abstract ISourceZipFileHandles findSources(String run);
@@ -188,8 +242,8 @@ public abstract class AbstractHistoricalSourceView extends ViewPart {
 				final boolean loaded = view.showSourceFile(sources,
 						pkg == null ? type : pkg + '.' + type);
 				if (loaded) {
-					final int lineNumber = computeLineFromMethod(view.source
-							.getText(), type, method);
+					final int lineNumber = computeLineFromMethod(
+							view.f_source.getText(), type, method);
 					view.showAndSelectLine(lineNumber);
 				}
 			}
@@ -208,8 +262,8 @@ public abstract class AbstractHistoricalSourceView extends ViewPart {
 				final boolean loaded = view.showSourceFile(sources,
 						pkg == null ? type : pkg + '.' + type);
 				if (loaded) {
-					final int lineNumber = computeLineFromField(view.source
-							.getText(), type, field);
+					final int lineNumber = computeLineFromField(
+							view.f_source.getText(), type, field);
 					view.showAndSelectLine(lineNumber);
 				}
 			}
@@ -230,7 +284,7 @@ public abstract class AbstractHistoricalSourceView extends ViewPart {
 		/*
 		 * Show the line, move up a bit if we can.
 		 */
-		source.setTopIndex(lineNumber < 5 ? 0 : lineNumber - 5);
+		f_source.setTopIndex(lineNumber < 5 ? 0 : lineNumber - 5);
 
 		if (lineNumber < 0) {
 			SLLogger.getLogger().info(
@@ -242,14 +296,14 @@ public abstract class AbstractHistoricalSourceView extends ViewPart {
 		 * Highlight the line by selecting it in the widget.
 		 */
 		try {
-			final int start = source.getOffsetAtLine(lineNumber);
+			final int start = f_source.getOffsetAtLine(lineNumber);
 			final int end;
-			if (lineNumber + 1 > source.getLineCount()) {
-				end = source.getCharCount();
+			if (lineNumber + 1 > f_source.getLineCount()) {
+				end = f_source.getCharCount();
 			} else {
-				end = source.getOffsetAtLine(lineNumber + 1);
+				end = f_source.getOffsetAtLine(lineNumber + 1);
 			}
-			source.setSelection(start, end);
+			f_source.setSelection(start, end);
 		} catch (IllegalArgumentException e) {
 			SLLogger.getLogger().log(
 					Level.INFO,
@@ -317,8 +371,8 @@ public abstract class AbstractHistoricalSourceView extends ViewPart {
 
 		TypeVisitor(final String type) {
 			typeList = new LinkedList<String>();
-			for (String typePart : ANON.matcher(type).replaceAll("").split(
-					"[.$]")) {
+			for (String typePart : ANON.matcher(type).replaceAll("")
+					.split("[.$]")) {
 				typeList.addFirst(typePart);
 			}
 			currentType = new LinkedList<String>();
