@@ -14,6 +14,7 @@ public final class CommonImages {
 	/*
 	 * Symbolic image names
 	 */
+	public static final String IMG_ANALYSIS_RESULT = "analysis_result.gif";
 	public static final String IMG_ANNOTATION = "annotation.gif";
 	public static final String IMG_ANNOTATION_ERROR = "annotation_error.gif";
 	public static final String IMG_ANNOTATION_PROPOSED = "annotation_proposed.gif";
@@ -166,6 +167,7 @@ public final class CommonImages {
 	public static final String IMG_TRUSTED_DECR = "trusted_decr.gif";
 	public static final String IMG_UNKNOWN = "unknown.gif";
 	public static final String IMG_UP = "up.gif";
+	public static final String IMG_VERIFICATION_RESULT = "verification_result.gif";
 	public static final String IMG_VIRTUAL_DECR = "virtual_decr.gif";
 	public static final String IMG_WARNING_DECR = "warning_decr.gif";
 	public static final String IMG_WARNING = "warning.gif";
