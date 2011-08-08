@@ -216,6 +216,21 @@ public final class RadioArrowMenu {
 		}
 	}
 
+	/**
+	 * Sets if a particular menu choice is enabled or disabled.
+	 * 
+	 * @param choice
+	 *            a menu choice.
+	 * @param enabled
+	 *            {@code true} if the choice is enabled, {@code false}
+	 *            otherwise.
+	 */
+	public void setEnabled(Object choice, boolean enabled) {
+		Composite item = f_choiceToComposite.get(choice);
+		if (item != null && !item.isDisposed())
+			setEnabledHelper(item, enabled);
+	}
+
 	public interface IRadioMenuObserver {
 		void selected(Object choice, RadioArrowMenu menu);
 
