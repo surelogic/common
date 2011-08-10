@@ -47,11 +47,14 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 		this.port = console == null ? -1 : console.getPort();
 		if (config.getLogPath() != null) {
 		    try {
+		    	System.out.println("Creating log file");
                 log = new PrintStream(new File(config.getLogPath()));
             } catch (FileNotFoundException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
+		} else {
+			System.out.println("No log file to open");
 		}
 	}
 	
@@ -218,7 +221,10 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 			reportException(e);
 		}
 		if (log != null) {
+			System.out.println("Closing log file");
 		    log.close();
+		} else {
+			System.out.println("No log file to close");
 		}
 		return status.build();
 	}
