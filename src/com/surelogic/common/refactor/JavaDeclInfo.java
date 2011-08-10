@@ -77,7 +77,12 @@ public class JavaDeclInfo extends Entity implements IJavaDeclInfoClient {
 		throw new IllegalStateException("Unexpected: "+kind);
 	}
 
+	private final String[] noStrings = new String[0];
+	
 	private String[] separateByColons(String s) {
+		if ("".equals(s)) {
+			return noStrings;
+		}
 		return s.split(":");
 	}
 
