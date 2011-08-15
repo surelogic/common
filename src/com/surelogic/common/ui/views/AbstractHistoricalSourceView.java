@@ -207,11 +207,13 @@ public abstract class AbstractHistoricalSourceView extends ViewPart {
 		final AbstractHistoricalSourceView view = (AbstractHistoricalSourceView) EclipseUIUtility
 				.showView(viewClass.getName(), null,
 						IWorkbenchPage.VIEW_VISIBLE);
+		//System.out.println("View = "+view);
 		if (view != null) {
 			ISourceZipFileHandles sources = view.findSources(run);
 			if (sources != null) {
 				final boolean loaded = view.showSourceFile(sources,
-						pkg == null ? type : pkg + '.' + type);
+						pkg == null || pkg.length() == 0 ? type : pkg + '.' + type);
+				//System.out.println("Loading "+type+": "+loaded);
 				if (loaded) {
 					/*
 					 * The line numbers passed to this method are typically 1
