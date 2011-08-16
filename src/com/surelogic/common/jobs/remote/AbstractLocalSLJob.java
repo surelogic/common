@@ -115,17 +115,17 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 			label = mon.getName();
 		}
 		final StringBuilder sb = new StringBuilder(label + ' ' + type.toString().toLowerCase());
-		println("Sierra tool "+type.toString().toLowerCase()+":"+msg);
+		printErr("Tool got "+type.toString().toLowerCase()+":"+msg);
 		sb.append(": ").append(msg).append('\n');
 
 		// Reconstitute stack trace
 		final List<StackTraceElement> trace = new ArrayList<StackTraceElement>();				
 		final String exception = br.readLine();
-		println(exception);
+		printErr(exception);
 		
 		String line = br.readLine();
 		while (line != null && line.startsWith("\t")) {
-			println(line);
+			printErr(line);
 			sb.append(' ').append(line).append('\n');
 			
 			// \tat pkg.getMethod(Foo.java:99)
@@ -148,7 +148,7 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 			line = br.readLine();
 		}
 		if (line != null) {
-			println(line);
+			printErr(line);
 		}
 		final Exception ex;
 		if (!trace.isEmpty()) {
@@ -299,13 +299,13 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 									.trim()));
 							break;
 						case WARNING:							
-							println(line);							
+							printErr(line);							
 							copyException(cmd, st.nextToken(), br);
 							break;
 						case FAILED:						
-							println(line);
+							printErr(line);
 							String msg = copyException(cmd, st.nextToken(), br);
-							println("Terminating run");
+							printErr("Terminating run");
 							remoteVM.destroy();
 							if (msg
 									.contains("FAILED:  java.lang.OutOfMemoryError")) {
@@ -468,7 +468,7 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 				t.interrupt();
 			} catch (InterruptedException ie) {
 				long time = System.currentTimeMillis() - start;
-				println("Timeout waiting for process to exit: " + time
+				printErr("Timeout waiting for process to exit: " + time
 								+ " ms");
 				throw new RuntimeException(e);
 
@@ -480,8 +480,16 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 	
 	private PrintStream log;
 	
+	protected final void printErr(String msg) {
+		println(msg, true);
+	}
+	
 	protected final void println(String msg) {
-		if (verbose) {
+		println(msg, verbose);
+	}
+	
+	protected final void println(String msg, boolean toConsole) {
+		if (toConsole) {
 			System.out.println(msg);
 		}
 	    if (log != null) {
