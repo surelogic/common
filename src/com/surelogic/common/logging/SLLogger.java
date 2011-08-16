@@ -72,6 +72,14 @@ public class SLLogger {
 	}
 
 	/**
+	 * Like Logger.isLoggable(), except it compares against SLLogger.LEVEL
+	 */
+	public static boolean isLoggable(Level lvl) {
+		final Level current = LEVEL.get();
+		return current.intValue() <= lvl.intValue();
+	}
+	
+	/**
 	 * Everyone can reuse the same instance of this formatter because the
 	 * format() method uses no instance state.
 	 */
