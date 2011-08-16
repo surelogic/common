@@ -171,8 +171,6 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 		return errMsg;
 	}
 	
-	final boolean debug = true;//verbose && LOG.isLoggable(Level.FINE);
-	
 	public void reportException(Exception e) {
 		status.addChild(SLStatus.createErrorStatus(e));		
 	}
@@ -182,14 +180,13 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 			this.topMonitor = topMonitor;
 			
 			CommandlineJava cmdj = new CommandlineJava();
-			setupJVM(debug, cmdj);
-
-			if (debug) {
-				println("Starting process:");
-				for (String arg : cmdj.getCommandline()) {
-					println("\t" + arg);
-				}
+			setupJVM(cmdj);
+			
+			println("Starting process:");
+			for (String arg : cmdj.getCommandline()) {
+				println("\t" + arg);
 			}
+			
 			ProcessBuilder pb = new ProcessBuilder(cmdj.getCommandline());
 			pb.redirectErrorStream(true);
 
@@ -232,23 +229,19 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
     public void handleInput(BufferedReader br, BufferedWriter outputStream) {			
 		try {
 			String firstLine = br.readLine();
-			if (debug) {
-				while (firstLine != null) {
-					// Copy verbose output until we get to the first line
-					// from RemoteTool
-					if (firstLine.startsWith("[")) {
-						// if (!firstLine.endsWith("rt.jar]")) {
-						println(firstLine);
-						// }
-						firstLine = br.readLine();
-					} else {
-						break;
-					}
+			while (firstLine != null) {
+				// Copy verbose output until we get to the first line
+				// from RemoteTool
+				if (firstLine.startsWith("[")) {
+					// if (!firstLine.endsWith("rt.jar]")) {
+					println(firstLine);
+					// }
+					firstLine = br.readLine();
+				} else {
+					break;
 				}
-			}
-			if (verbose) {
-				println("First line = " + firstLine);
-			}
+			}			
+			println("First line = " + firstLine);			
 
 			if (firstLine == null) {
 				throw newException(RemoteSLJobConstants.ERROR_NO_OUTPUT_FROM_JOB);
@@ -284,9 +277,7 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 						Remote cmd   = Remote.valueOf(first);
 						switch (cmd) {
 						case TASK:
-							if (verbose) {
-								println(line);
-							}
+							println(line);							
 							final String task = st.nextToken();
 							final String work = st.nextToken();
 							// LOG.info(task+": "+work);
@@ -295,34 +286,24 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 							mon.begin(Integer.valueOf(work.trim()));
 							break;
 						case SUBTASK:
-							if (verbose && !line.contains("Uniqueness")) {
-								println(line);
-							}
+							println(line);							
 							monitor.subTask(st.nextToken());
 							break;
-						case SUBTASK_DONE:
-							if (verbose) {
-								println(line);
-							}
+						case SUBTASK_DONE:							
+							println(line);							
 							monitor.subTaskDone();
 							break;
-						case WORK:
-							if (verbose) {
-								println(line);
-							}
+						case WORK:							
+							println(line);							
 							monitor.worked(Integer.valueOf(st.nextToken()
 									.trim()));
 							break;
-						case WARNING:
-							if (verbose) {
-								println(line);
-							}
+						case WARNING:							
+							println(line);							
 							copyException(cmd, st.nextToken(), br);
 							break;
-						case FAILED:
-							if (verbose) {
-								println(line);
-							}
+						case FAILED:						
+							println(line);
 							String msg = copyException(cmd, st.nextToken(), br);
 							println("Terminating run");
 							remoteVM.destroy();
@@ -333,10 +314,8 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 										memorySize);
 							}
 							throw new RuntimeException(msg);
-						case DONE:
-							if (verbose) {
-								println(line);
-							}
+						case DONE:							
+							println(line);							
 							tasks.pop();
 							/*
 							if (tasks.isEmpty()) {
@@ -346,14 +325,12 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 							*/
 							break;
 						default:
-							if (verbose) {
-								println(line);
-							}
+							println(line);
 						}
-					} else if (verbose) {
+					} else {
 						println(line);
 					}
-				} else if (verbose) {
+				} else {
 					println(line);
 				}
 				line = br.readLine();
@@ -375,7 +352,7 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 		}
 	}
 
-	protected final void setupJVM(boolean debug, CommandlineJava cmdj) {
+	protected final void setupJVM(CommandlineJava cmdj) {
 		if (testCode != null) {
 			cmdj.createVmArgument().setValue(
 					"-D" + RemoteSLJobConstants.TEST_CODE_PROPERTY + "="
@@ -410,22 +387,21 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 		
 		final Project proj = new Project();
 		final Path path = cmdj.createClasspath(proj);
-		setupClassPath(debug, cmdj, proj, path);
+		setupClassPath(verbose, cmdj, proj, path);
 		// TODO convert into error if things are really missing
-		if (debug) {
-			for (String p : path.list()) {
-				if (!new File(p).exists()) {
-					println("Does not exist: " + p);
-				} else if (debug) {
-					println("Path: " + p);
-				}
+		for (String p : path.list()) {
+			if (!new File(p).exists()) {
+				println("Does not exist: " + p);
+			} else {
+				println("Path: " + p);
 			}
-		}		
+		}
+				
 		//cmdj.createArgument().setValue("This is a argument.");
 		if (port > 0) {
 			cmdj.createVmArgument().setValue("-D"+RemoteSLJobConstants.REMOTE_PORT_PROP+"="+port);
 		}
-		finishSetupJVM(debug, cmdj, proj);
+		finishSetupJVM(verbose, cmdj, proj);
 	}
 	
 	protected String getRemoteClassName() {
@@ -469,9 +445,7 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 		int value;
 		try {
 			value = p.exitValue();
-			if (verbose) {
-				println("Process result after waiting = " + value);
-			}
+			println("Process result after waiting = " + value);			
 		} catch (IllegalThreadStateException e) {
 			// Not done yet
 			final Thread currentThread = Thread.currentThread();
@@ -507,7 +481,9 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 	private PrintStream log;
 	
 	protected final void println(String msg) {
-	    System.out.println(msg);
+		if (verbose) {
+			System.out.println(msg);
+		}
 	    if (log != null) {
 	        log.println(msg);
 	    }
