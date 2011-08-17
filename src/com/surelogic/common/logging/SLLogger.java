@@ -72,14 +72,6 @@ public class SLLogger {
 	}
 
 	/**
-	 * Like Logger.isLoggable(), except it compares against SLLogger.LEVEL
-	 */
-	public static boolean isLoggable(Level lvl) {
-		final Level current = LEVEL.get();
-		return current.intValue() <= lvl.intValue();
-	}
-	
-	/**
 	 * Everyone can reuse the same instance of this formatter because the
 	 * format() method uses no instance state.
 	 */
@@ -154,7 +146,7 @@ public class SLLogger {
 			}
 		}
 	}
-	
+
 	static {
 		/*
 		 * We use a property scheme to try to avoid duplicate logging on the EJB
@@ -244,7 +236,7 @@ public class SLLogger {
 	 * @return a suitable Logger.
 	 * 
 	 */
-	public static /*synchronized*/ Logger getLogger() {
+	public static Logger getLogger() {
 		return getLogger("");
 	}
 
