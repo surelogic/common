@@ -375,7 +375,7 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
     private String getRest(String line) {
     	if (XUtil.testing) {
     		final int comma = line.indexOf(',');
-    		return line.substring(comma);
+    		return line.substring(comma+1);
     	} 
     	return line;
     }
