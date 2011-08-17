@@ -5,10 +5,12 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
 
-import org.eclipse.core.filesystem.*;
+import org.eclipse.core.filesystem.EFS;
+import org.eclipse.core.filesystem.IFileStore;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.*;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
@@ -17,15 +19,24 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.*;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IPerspectiveDescriptor;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IViewReference;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
 
+import com.surelogic.Utility;
 import com.surelogic.common.Justification;
 import com.surelogic.common.core.EclipseUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.logging.SLLogger;
 
+@Utility
 public final class EclipseUIUtility {
 
 	/**
@@ -93,6 +104,32 @@ public final class EclipseUIUtility {
 			}
 		}
 		return win;
+	}
+
+	/**
+	 * Gets the view if it is currently active in the workbench.
+	 * 
+	 * @param viewId
+	 *            the id of the view extension to use
+	 * @return the view or {@code null} if it can't be found.
+	 */
+	public static IViewPart getView(final String viewId) {
+		final IWorkbenchWindow window = getIWorkbenchWindow();
+		if (window == null)
+			return null;
+		final IWorkbenchPage page = window.getActivePage();
+		if (page == null)
+			return null;
+		IViewReference[] refs = page.getViewReferences();
+		if (refs == null)
+			return null;
+		for (IViewReference vr : refs) {
+			String id = vr.getId();
+			if (id != null && id.equals(viewId)) {
+				return vr.getView(false);
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -259,28 +296,32 @@ public final class EclipseUIUtility {
 		}
 		return false;
 	}
-	
+
 	/**
-	 * Copied from:
-	 *    org.eclipse.debug.internal.ui.launchConfigurations.SaveScopeResourcesHandler
+	 * Copied from: org.eclipse.debug.internal.ui.launchConfigurations.
+	 * SaveScopeResourcesHandler
 	 * 
 	 * Builds the list of editors that apply to this build that need to be saved
 	 * 
-	 * @param projects the projects involved in this build, used to scope the searching process
+	 * @param projects
+	 *            the projects involved in this build, used to scope the
+	 *            searching process
 	 * @return the list of dirty editors for this launch to save, never null
 	 */
 	public static IResource[] getScopedDirtyResources(IProject[] projects) {
 		final Set<IResource> dirtyres = new HashSet<IResource>();
-		IWorkbenchWindow[] windows = PlatformUI.getWorkbench().getWorkbenchWindows();
-		for(int l = 0; l < windows.length; l++) {
+		IWorkbenchWindow[] windows = PlatformUI.getWorkbench()
+				.getWorkbenchWindows();
+		for (int l = 0; l < windows.length; l++) {
 			IWorkbenchPage[] pages = windows[l].getPages();
-			for(int i = 0; i < pages.length; i++) {
+			for (int i = 0; i < pages.length; i++) {
 				IEditorPart[] eparts = pages[i].getDirtyEditors();
-				for(int j = 0; j < eparts.length; j++) {
-					IResource resource = (IResource)eparts[j].getEditorInput().getAdapter(IResource.class);
-					if(resource != null) {
-						for(int k = 0; k < projects.length; k++) {
-							if(projects[k].equals(resource.getProject())) {
+				for (int j = 0; j < eparts.length; j++) {
+					IResource resource = (IResource) eparts[j].getEditorInput()
+							.getAdapter(IResource.class);
+					if (resource != null) {
+						for (int k = 0; k < projects.length; k++) {
+							if (projects[k].equals(resource.getProject())) {
 								dirtyres.add(resource);
 							}
 						}
@@ -290,7 +331,7 @@ public final class EclipseUIUtility {
 		}
 		return dirtyres.toArray(new IResource[dirtyres.size()]);
 	}
-	
+
 	private EclipseUIUtility() {
 		// utility
 	}
