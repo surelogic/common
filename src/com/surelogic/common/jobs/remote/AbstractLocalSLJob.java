@@ -8,6 +8,7 @@ import org.apache.tools.ant.Project;
 import org.apache.tools.ant.types.*;
 
 import com.surelogic.common.SLUtility;
+import com.surelogic.common.XUtil;
 import com.surelogic.common.jobs.*;
 import com.surelogic.common.logging.SLLogger;
 
@@ -131,11 +132,11 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 		// Reconstitute stack trace
 		final List<StackTraceElement> trace = new ArrayList<StackTraceElement>();				
 		final String exception = br.readLine();
-		printErr(exception);
+		//printErr(exception);
 		
 		String line = br.readLine();
 		while (line != null && line.startsWith("\t")) {
-			printErr(line);
+			//printErr(line);
 			sb.append(' ').append(line).append('\n');
 			
 			// \tat pkg.getMethod(Foo.java:99)
@@ -173,9 +174,11 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 		final SLStatus child;
 		switch (type) {
 		case FAILED:
+			printErr(Level.SEVERE, errMsg, ex);
 			child = SLStatus.createErrorStatus(-1, errMsg, ex);
 			break;
 		default:
+			printErr(Level.WARNING, errMsg, ex);
 			child = SLStatus.createWarningStatus(-1, errMsg, ex);
 		    break;
 		}
@@ -311,18 +314,18 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 									.trim()));
 							break;
 						case WARNING:							
-							printErr(line);
+							printErr(Level.WARNING, getRest(line));
 							break;
 						case WARNING_TRACE:
-							printErr(line);
+							printErr(Level.WARNING, getRest(line));
 							ExceptionalResult w = copyException(cmd, st.nextToken(), br);
 							line = w.nextLine;
 							continue;
 						case FAILED:						
-							printErr(line);
+							printErr(Level.SEVERE, getRest(line));
 							ExceptionalResult e = copyException(cmd, st.nextToken(), br);
 							println(e.nextLine);
-							printErr("Terminating run");
+							printErr(Level.SEVERE, "Terminating run");
 							remoteVM.destroy();
 							if (e.errorMsg
 									.contains("FAILED:  java.lang.OutOfMemoryError")) {
@@ -369,6 +372,14 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 		}
 	}
 
+    private String getRest(String line) {
+    	if (XUtil.testing) {
+    		final int comma = line.indexOf(',');
+    		return line.substring(comma);
+    	} 
+    	return line;
+    }
+    
 	protected final void setupJVM(CommandlineJava cmdj) {
 		if (testCode != null) {
 			cmdj.createVmArgument().setValue(
@@ -485,8 +496,8 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 				t.interrupt();
 			} catch (InterruptedException ie) {
 				long time = System.currentTimeMillis() - start;
-				printErr("Timeout waiting for process to exit: " + time
-								+ " ms");
+				printErr(Level.WARNING, 
+						 "Timeout waiting for process to exit: " + time	+ " ms");
 				throw new RuntimeException(e);
 
 			}
@@ -497,16 +508,33 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 	
 	private PrintStream log;
 	
-	protected final void printErr(String msg) {
-		println(msg, true);
+	protected final void printErr(Level l, String msg) {
+		printErr(l, msg, null);
+	}
+	
+	protected final void printErr(Level l, String msg, Throwable t) {
+		if (XUtil.testing) {
+			if (t == null) {
+				LOG.log(l, msg);
+			} else {
+				LOG.log(l, msg, t);
+			}		
+		} else {
+			 System.out.println(msg);
+			 if (t != null) {
+				 t.printStackTrace(System.out);
+			 }
+		}
+	    if (log != null) {
+	        log.println(msg);
+	        if (t != null) {
+	        	t.printStackTrace(log);
+	        }
+	    }
 	}
 	
 	protected final void println(String msg) {
-		println(msg, verbose);
-	}
-	
-	protected final void println(String msg, boolean toConsole) {
-		if (toConsole) {
+		if (verbose) {
 			System.out.println(msg);
 		}
 	    if (log != null) {
