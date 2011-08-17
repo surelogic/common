@@ -5,9 +5,12 @@ package com.surelogic.common.jobs.remote;
 
 import java.io.*;
 import java.net.*;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogRecord;
 
 import com.surelogic.common.jobs.*;
-import com.surelogic.common.logging.SLLogger;
+import com.surelogic.common.logging.*;
 
 public abstract class AbstractRemoteSLJob {	
 	private static final String CANCEL = "##" + Local.CANCEL;
@@ -77,7 +80,10 @@ public abstract class AbstractRemoteSLJob {
 
 			final Monitor mon = new Monitor(br, out);
 			checkInput(br, mon, "Created monitor");
-
+			
+			SLLogger.addHandler(new LogHandler(mon));
+			checkInput(br, mon, "Created log handler");
+			
 			final SLJob job = init(br, mon);
 			checkInput(br, mon, "Initialized job");
 
@@ -215,7 +221,7 @@ public abstract class AbstractRemoteSLJob {
 		}
 
 		public void error(final String msg, final Throwable t) {
-			out.println("##" + Remote.WARNING + ", " + msg);
+			out.println("##" + Remote.WARNING_TRACE + ", " + msg);
 			t.printStackTrace(out);
 		}
 
@@ -272,6 +278,56 @@ public abstract class AbstractRemoteSLJob {
 			} catch(IOException e) {
 				failed("Problem while checking if cancelled", e);
 			}
+		}
+	}
+	
+	protected class LogHandler extends Handler {
+		private final Monitor monitor;
+		
+		protected LogHandler(Monitor mon) {
+			monitor = mon;
+		}
+
+		@Override
+		public void publish(LogRecord record) {
+			if (record == null) {
+				return;
+			}
+			if (!isLoggable(record)) {
+				return;
+			}
+			final String message = record.getMessage() == null ? "" : record
+					.getMessage();
+			final StringBuilder b = new StringBuilder();
+			SLFormatter.formatMsgTail(b, message, record.getSourceClassName(),
+					record.getSourceMethodName());
+			
+			final String msg  = b.toString();
+			final Level level = record.getLevel();
+			if (level == Level.SEVERE) {
+				if (record.getThrown() != null) {
+					monitor.failed(msg, record.getThrown());
+				} else {
+					monitor.failed(msg);
+				}
+			}
+			else if (level == Level.WARNING) {
+				if (record.getThrown() != null) {
+					monitor.error(msg, record.getThrown());
+				} else {
+					monitor.error(msg);
+				}
+			}			
+		}
+		
+		@Override
+		public void close() throws SecurityException {
+			// nothing to do
+		}
+
+		@Override
+		public void flush() {
+			// nothing to do
 		}
 	}
 }

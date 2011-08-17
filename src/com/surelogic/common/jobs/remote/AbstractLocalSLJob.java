@@ -105,7 +105,17 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 		}
 	}
 	
-	private String copyException(final Remote type, final String msg, final BufferedReader br)
+	class ExceptionalResult {
+		final String errorMsg;
+		final String nextLine;
+		
+		ExceptionalResult(String e, String l) {
+			errorMsg = e;
+			nextLine = l;
+		}
+	}
+	
+	private ExceptionalResult copyException(final Remote type, final String msg, final BufferedReader br)
 	throws IOException {
 		String label;
 		if (tasks.isEmpty()) {
@@ -115,7 +125,7 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 			label = mon.getName();
 		}
 		final StringBuilder sb = new StringBuilder(label + ' ' + type.toString().toLowerCase());
-		printErr("Tool got "+type.toString().toLowerCase()+":"+msg);
+		// printErr("Tool got "+type.toString().toLowerCase()+":"+msg);
 		sb.append(": ").append(msg).append('\n');
 
 		// Reconstitute stack trace
@@ -147,9 +157,11 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 			}
 			line = br.readLine();
 		}
+		/*
 		if (line != null) {
 			printErr(line);
 		}
+		*/
 		final Exception ex;
 		if (!trace.isEmpty()) {
 			ex = new Exception(exception);
@@ -168,7 +180,7 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 		    break;
 		}
 		status.addChild(child);
-		return errMsg;
+		return new ExceptionalResult(errMsg, line);
 	}
 	
 	public void reportException(Exception e) {
@@ -299,21 +311,26 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 									.trim()));
 							break;
 						case WARNING:							
-							printErr(line);							
-							copyException(cmd, st.nextToken(), br);
+							printErr(line);
 							break;
+						case WARNING_TRACE:
+							printErr(line);
+							ExceptionalResult w = copyException(cmd, st.nextToken(), br);
+							line = w.nextLine;
+							continue;
 						case FAILED:						
 							printErr(line);
-							String msg = copyException(cmd, st.nextToken(), br);
+							ExceptionalResult e = copyException(cmd, st.nextToken(), br);
+							println(e.nextLine);
 							printErr("Terminating run");
 							remoteVM.destroy();
-							if (msg
+							if (e.errorMsg
 									.contains("FAILED:  java.lang.OutOfMemoryError")) {
 								throw newException(
 										RemoteSLJobConstants.ERROR_MEMORY_SIZE_TOO_SMALL,
 										memorySize);
 							}
-							throw new RuntimeException(msg);
+							throw new RuntimeException(e.errorMsg);
 						case DONE:							
 							println(line);							
 							tasks.pop();
