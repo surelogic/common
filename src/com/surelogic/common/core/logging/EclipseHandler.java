@@ -47,11 +47,12 @@ public final class EclipseHandler extends Handler {
 		else if (logFine)
 			TRACE_LEVEL = Level.FINE;
 		else
-			TRACE_LEVEL = Level.INFO;
+			TRACE_LEVEL = Level.OFF;
 	}
 
 	public EclipseHandler() {
-		SLLogger.setLevel(TRACE_LEVEL);
+		if (TRACE_LEVEL != Level.OFF)
+			SLLogger.setLevel(TRACE_LEVEL);
 	}
 
 	@Override
