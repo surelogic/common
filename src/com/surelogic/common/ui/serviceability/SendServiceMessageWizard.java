@@ -58,7 +58,8 @@ public class SendServiceMessageWizard extends Wizard {
 	 */
 	public static void openProblemReport(Shell shell, String product,
 			String imageSymbolicName) {
-		ProblemReportMessage prm = new ProblemReportMessage();
+		ProblemReportMessage prm = new ProblemReportMessage(
+				JDTUtility.getEclipseLogFile());
 		if (product == null)
 			product = "UNKNOWN";
 		prm.setProduct(product);
@@ -118,7 +119,13 @@ public class SendServiceMessageWizard extends Wizard {
 			SLStatus status, File scanLog) {
 		JSureScanFailureMessage sfm = new JSureScanFailureMessage(scanLog);
 		sfm.setProduct(product);
-		sfm.setMessage(status.getMessage());
+		String msg = status.getMessage();
+		if (msg == null || msg.isEmpty()) {
+			msg = sfm.getMessageTypeString();
+		} else {
+			msg = sfm.getMessageTypeString() + " : " + status.getMessage();
+		}
+		sfm.setMessage(msg);
 		sfm.setDescription(status.toString());
 		openHelper(null, sfm, CommonImages.IMG_JSURE_LOGO);
 	}

@@ -13,10 +13,10 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 
-import com.surelogic.common.core.JDTUtility;
 import com.surelogic.common.core.preferences.CommonCorePreferencesUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.serviceability.Message;
+import com.surelogic.common.serviceability.MessageWithLog;
 import com.surelogic.common.serviceability.ProblemReportMessage;
 
 public class SendServiceMessageCollectInformationPage extends WizardPage {
@@ -67,13 +67,14 @@ public class SendServiceMessageCollectInformationPage extends WizardPage {
 		sendVersion.setSelection(true);
 
 		final Button sendEclipseLog;
-		if (f_data instanceof ProblemReportMessage) {
+		if (f_data instanceof MessageWithLog) {
+			final MessageWithLog mwl = (MessageWithLog) f_data;
 			sendEclipseLog = new Button(panel, SWT.CHECK);
 			sendEclipseLog.setLayoutData(new GridData(SWT.DEFAULT, SWT.DEFAULT,
 					false, false, 2, 1));
-			sendEclipseLog.setText(I18N
-					.msg(f_data.propPfx() + "sendEclipseLog"));
-			sendEclipseLog.setSelection(true);
+			sendEclipseLog
+					.setText(I18N.msg(f_data.propPfx() + "sendEclipseLog"));
+			sendEclipseLog.setSelection(mwl.getSendLog());
 		} else {
 			sendEclipseLog = null;
 		}
@@ -84,9 +85,10 @@ public class SendServiceMessageCollectInformationPage extends WizardPage {
 
 		final Label summary = new Label(panel, SWT.RIGHT);
 		summary.setText(I18N.msg(f_data.propPfx() + "summary"));
-		summary
-				.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, false, false));
+		summary.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, false, false));
 		final Text summaryText = new Text(panel, SWT.SINGLE | SWT.BORDER);
+		if (f_data.getMessage() != null)
+			summaryText.setText(f_data.getMessage());
 		summaryText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		final Label description = new Label(panel, SWT.WRAP);
@@ -98,6 +100,8 @@ public class SendServiceMessageCollectInformationPage extends WizardPage {
 		final Text descriptionText = new Text(panel, SWT.MULTI | SWT.BORDER
 				| SWT.V_SCROLL | SWT.H_SCROLL);
 		descriptionText.setFont(JFaceResources.getTextFont());
+		if (f_data.getDescription() != null)
+			descriptionText.setText(f_data.getDescription());
 		data = new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1);
 		data.heightHint = TIP_HEIGHT_HINT;
 		descriptionText.setLayoutData(data);
@@ -111,19 +115,9 @@ public class SendServiceMessageCollectInformationPage extends WizardPage {
 				f_data.setSummary(summaryText.getText());
 				f_data.setDescription(descriptionText.getText());
 				f_data.setSendVersionInfo(sendVersion.getSelection());
-				if (f_data instanceof ProblemReportMessage) {
-					ProblemReportMessage prm = (ProblemReportMessage) f_data;
-					if (sendEclipseLog.getSelection()) {
-						/*
-						 * Only lookup the log file if it looks like it hasn't
-						 * been set. If the value is non-null it has probably
-						 * been set correctly.
-						 */
-						if (prm.getIdeLogFile() == null)
-							prm.setIdeLogFile(JDTUtility.getEclipseLogFile());
-					} else {
-						prm.setIdeLogFile(null);
-					}
+				if (f_data instanceof MessageWithLog) {
+					final MessageWithLog mwl = (MessageWithLog) f_data;
+					mwl.setSendLog(sendEclipseLog.getSelection());
 				}
 
 				setPageComplete(f_data.minimumDataEntered());
