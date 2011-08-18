@@ -1124,8 +1124,8 @@ public final class JDTUtility {
 		}
 	}
 
-	public static JavaProjectResources collectAllResources(IJavaProject jp) {
-		JavaProjectResources result = new JavaProjectResources(jp);
+	public static JavaProjectResources collectAllResources(IJavaProject jp, JavaProjectResources.Filter filter) {
+		JavaProjectResources result = new JavaProjectResources(jp, filter);
 		try {
 			collectAllResources(result, jp.getProject());
 		} catch (CoreException e) {
