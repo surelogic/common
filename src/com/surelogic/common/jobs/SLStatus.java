@@ -1,6 +1,5 @@
 package com.surelogic.common.jobs;
 
-import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -9,7 +8,6 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import com.surelogic.common.i18n.I18N;
-import com.surelogic.common.logging.SLLogger;
 
 /**
  * An IDE independent status object.
