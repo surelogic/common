@@ -2,8 +2,10 @@ package com.surelogic.common.jobs;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import com.surelogic.common.i18n.I18N;
 
@@ -130,8 +132,46 @@ public final class SLStatus {
 
 	@Override
 	public String toString() {
-		return "[SLStatus: " + f_severity + " code=" + f_code + " \""
-				+ f_message + "\" exception=" + f_exception + "]";
+		final StringBuilder b = new StringBuilder();
+		toStringHelper(b, this);
+		return b.toString();
+	}
+
+	public void logTo(Logger log) {
+		final StringBuilder b = new StringBuilder();
+		toStringHelperMessage(b, this, false);
+		toStringHelperChildren(b, this);
+		log.log(f_severity.toLevel(), b.toString(), f_exception);
+	}
+
+	private static void toStringHelper(StringBuilder b, SLStatus status) {
+		toStringHelperMessage(b, status, true);
+		Throwable t = status.getException();
+		if (t != null) {
+			b.append("\nException:");
+			final Writer writer = new StringWriter();
+			final PrintWriter printWriter = new PrintWriter(writer);
+			t.printStackTrace(printWriter);
+			b.append(writer.toString());
+		}
+		toStringHelperChildren(b, status);
+	}
+
+	private static void toStringHelperMessage(StringBuilder b, SLStatus status,
+			boolean showSeverity) {
+		if (showSeverity)
+			b.append(status.getSeverity().toString()).append(" ");
+		final int code = status.getCode();
+		if (code != OK)
+			b.append("(SureLogic #").append(code).append(") ");
+		b.append(status.getMessage());
+	}
+
+	private static void toStringHelperChildren(StringBuilder b, SLStatus status) {
+		for (SLStatus child : status.getChildren()) {
+			b.append("\nCaused by:");
+			toStringHelper(b, child);
+		}
 	}
 
 	/*
