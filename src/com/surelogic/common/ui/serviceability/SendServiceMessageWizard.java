@@ -15,6 +15,7 @@ import com.surelogic.common.core.preferences.CommonCorePreferencesUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.jobs.SLJob;
 import com.surelogic.common.jobs.SLStatus;
+import com.surelogic.common.serviceability.JSureScanFailureMessage;
 import com.surelogic.common.serviceability.Message;
 import com.surelogic.common.serviceability.ProblemReportMessage;
 import com.surelogic.common.serviceability.ServiceUtility;
@@ -105,14 +106,21 @@ public class SendServiceMessageWizard extends Wizard {
 	 * <p>
 	 * Must be called from the UI thread.
 	 * 
+	 * @param product
+	 *            the SureLogic JSure tool this crash report is about. Must be
+	 *            non-null.
 	 * @param status
-	 *            the status message about the scan crash. Must be non-
-	 *            {@code null}.
+	 *            the status message about the scan crash. Must be non-null.
 	 * @param scanLog
-	 *            the scan log file. Must be non- {@code null}.
+	 *            the scan log file. Must be non-null.
 	 */
-	public static void openJSureScanCrashReport(SLStatus status, File scanLog) {
-
+	public static void openJSureScanCrashReport(String product,
+			SLStatus status, File scanLog) {
+		JSureScanFailureMessage sfm = new JSureScanFailureMessage(scanLog);
+		sfm.setProduct(product);
+		sfm.setMessage(status.getMessage());
+		sfm.setDescription(status.toString());
+		openHelper(null, sfm, CommonImages.IMG_JSURE_LOGO);
 	}
 
 	private static void openHelper(Shell shell, Message message,
