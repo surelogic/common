@@ -1,5 +1,6 @@
 package com.surelogic.common.jobs;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -8,6 +9,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import com.surelogic.common.i18n.I18N;
+import com.surelogic.common.logging.SLLogger;
 
 /**
  * An IDE independent status object.
@@ -141,6 +143,7 @@ public final class SLStatus {
 		final StringBuilder b = new StringBuilder();
 		toStringHelperMessage(b, this, false);
 		toStringHelperChildren(b, this);
+		b.append("\n");
 		log.log(f_severity.toLevel(), b.toString(), f_exception);
 	}
 
@@ -148,7 +151,7 @@ public final class SLStatus {
 		toStringHelperMessage(b, status, true);
 		Throwable t = status.getException();
 		if (t != null) {
-			b.append("\nException:");
+			b.append("\nException: ");
 			final Writer writer = new StringWriter();
 			final PrintWriter printWriter = new PrintWriter(writer);
 			t.printStackTrace(printWriter);
@@ -169,7 +172,7 @@ public final class SLStatus {
 
 	private static void toStringHelperChildren(StringBuilder b, SLStatus status) {
 		for (SLStatus child : status.getChildren()) {
-			b.append("\nCaused by:");
+			b.append("\n[Contributing] ");
 			toStringHelper(b, child);
 		}
 	}
