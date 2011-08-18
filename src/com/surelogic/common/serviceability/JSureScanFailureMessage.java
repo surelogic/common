@@ -4,9 +4,8 @@ import java.io.File;
 
 import com.surelogic.common.FileUtility;
 import com.surelogic.common.SLUtility;
-import com.surelogic.common.i18n.I18N;
 
-public final class JSureScanFailureMessage extends Message {
+public final class JSureScanFailureMessage extends MessageWithLog {
 
 	@Override
 	public String getMessageTypeString() {
@@ -19,28 +18,22 @@ public final class JSureScanFailureMessage extends Message {
 	}
 
 	public JSureScanFailureMessage(File scanLog) {
-		if (scanLog == null)
-			throw new IllegalStateException(I18N.err(44, "scanLog"));
-		f_scanLog = scanLog;
-	}
-
-	private final File f_scanLog;
-
-	public File getScanLog() {
-		return f_scanLog;
+		super(scanLog);
 	}
 
 	@Override
 	protected void generateMessageHelper(StringBuilder b) {
 		super.generateMessageHelper(b);
 
-		final String lf = SLUtility.PLATFORM_LINE_SEPARATOR;
-		b.append(lf).append(lf);
-		b.append(ServiceabilityConstants.TITLE_PREFIX);
-		b.append(" ");
-		b.append(f_scanLog.getAbsolutePath());
-		b.append(" ---");
-		b.append(lf).append(lf);
-		b.append(FileUtility.getFileContentsAsString(f_scanLog));
+		if (getSendLog()) {
+			final String lf = SLUtility.PLATFORM_LINE_SEPARATOR;
+			b.append(lf).append(lf);
+			b.append(ServiceabilityConstants.TITLE_PREFIX);
+			b.append(" ");
+			b.append(getLogFile().getAbsolutePath());
+			b.append(" ---");
+			b.append(lf).append(lf);
+			b.append(FileUtility.getFileContentsAsString(getLogFile()));
+		}
 	}
 }
