@@ -1,5 +1,6 @@
 package com.surelogic.common.ui.serviceability;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 
 import org.eclipse.jface.wizard.Wizard;
@@ -13,6 +14,7 @@ import com.surelogic.common.core.logging.SLEclipseStatusUtility;
 import com.surelogic.common.core.preferences.CommonCorePreferencesUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.jobs.SLJob;
+import com.surelogic.common.jobs.SLStatus;
 import com.surelogic.common.serviceability.Message;
 import com.surelogic.common.serviceability.ProblemReportMessage;
 import com.surelogic.common.serviceability.ServiceUtility;
@@ -98,6 +100,21 @@ public class SendServiceMessageWizard extends Wizard {
 		openHelper(shell, tip, imageSymbolicName);
 	}
 
+	/**
+	 * Asks the user if they want to report a scan crash to SureLogic.
+	 * <p>
+	 * Must be called from the UI thread.
+	 * 
+	 * @param status
+	 *            the status message about the scan crash. Must be non-
+	 *            {@code null}.
+	 * @param scanLog
+	 *            the scan log file. Must be non- {@code null}.
+	 */
+	public static void openJSureScanCrashReport(SLStatus status, File scanLog) {
+
+	}
+
 	private static void openHelper(Shell shell, Message message,
 			final String imageSymbolicName) {
 		SendServiceMessageWizard wizard = new SendServiceMessageWizard(message);
@@ -160,9 +177,9 @@ public class SendServiceMessageWizard extends Wizard {
 		final String msg = f_data.getMessage();
 		final SLJob job = ServiceUtility.sendToSureLogic(msg, new Runnable() {
 			public void run() {
-				BalloonUtility.showMessage(I18N.msg(f_data.propPfx()
-						+ "sent.title"), I18N.msg(f_data.propPfx()
-						+ "sent.message"));
+				BalloonUtility.showMessage(
+						I18N.msg(f_data.propPfx() + "sent.title"),
+						I18N.msg(f_data.propPfx() + "sent.message"));
 			}
 		});
 		final SLJobWrapperRunnableWithProgress rwp = new SLJobWrapperRunnableWithProgress(
@@ -170,8 +187,8 @@ public class SendServiceMessageWizard extends Wizard {
 		try {
 			getContainer().run(true, false, rwp);
 		} catch (InvocationTargetException e) {
-			ErrorDialogUtility.open(null, null, SLEclipseStatusUtility
-					.convert(rwp.getResultAsSLStatus()));
+			ErrorDialogUtility.open(null, null,
+					SLEclipseStatusUtility.convert(rwp.getResultAsSLStatus()));
 			return false;
 		} catch (InterruptedException e) {
 			return false;
