@@ -24,8 +24,12 @@ public class ToolProperties extends Properties {
 	public static final String EXCLUDE_PATH = "scan.exclude.source.path";
 	public static final String EXCLUDED_PKGS = "scan.exclude.package";
 
-	public static ToolProperties read(File projectDir) {
+	public static ToolProperties readFromProject(File projectDir) {
         final File properties = new File(projectDir, PROPS_FILE);
+        return read(properties);
+	}
+	
+	public static ToolProperties read(File properties) {
         if (properties.exists() && properties.isFile()) {
             final ToolProperties props = new ToolProperties();
             // props.put(PROJECT_KEY, p);
@@ -53,7 +57,7 @@ public class ToolProperties extends Properties {
 		return l.split("[ ,]*");
 	}
 	
-	public String[] getExcludedSourcePath() {
+	public String[] getExcludedSourcePaths() {
 		return getListProperty(EXCLUDE_PATH);
 	}
 	
