@@ -91,7 +91,11 @@ public abstract class Message {
 		return tipTyped && summaryTyped;
 	}
 
-	private boolean f_dirty = false;
+	/**
+	 * This bit is updated in the background job that loads in logs. See the
+	 * implementation of {@link MessageWithLog}.
+	 */
+	private volatile boolean f_dirty = false;
 
 	public final void setDirty() {
 		f_dirty = true;
