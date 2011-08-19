@@ -17,7 +17,6 @@ import com.surelogic.common.core.preferences.CommonCorePreferencesUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.serviceability.Message;
 import com.surelogic.common.serviceability.MessageWithLog;
-import com.surelogic.common.serviceability.ProblemReportMessage;
 
 public class SendServiceMessageCollectInformationPage extends WizardPage {
 
@@ -106,8 +105,6 @@ public class SendServiceMessageCollectInformationPage extends WizardPage {
 		data.heightHint = TIP_HEIGHT_HINT;
 		descriptionText.setLayoutData(data);
 
-		parent.pack();
-
 		final Runnable updatePageComplete = new Runnable() {
 			public void run() {
 				f_data.setEmail(emailText.getText());
@@ -135,7 +132,7 @@ public class SendServiceMessageCollectInformationPage extends WizardPage {
 		summaryText.addListener(SWT.Modify, listener);
 		descriptionText.addListener(SWT.Modify, listener);
 		sendVersion.addListener(SWT.Selection, listener);
-		if (f_data instanceof ProblemReportMessage) {
+		if (f_data instanceof MessageWithLog) {
 			sendEclipseLog.addListener(SWT.Selection, listener);
 		}
 		/*

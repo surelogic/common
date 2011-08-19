@@ -10,6 +10,7 @@ import org.eclipse.swt.widgets.Shell;
 
 import com.surelogic.common.CommonImages;
 import com.surelogic.common.core.JDTUtility;
+import com.surelogic.common.core.jobs.EclipseJob;
 import com.surelogic.common.core.logging.SLEclipseStatusUtility;
 import com.surelogic.common.core.preferences.CommonCorePreferencesUtility;
 import com.surelogic.common.i18n.I18N;
@@ -17,6 +18,7 @@ import com.surelogic.common.jobs.SLJob;
 import com.surelogic.common.jobs.SLStatus;
 import com.surelogic.common.serviceability.JSureScanFailureMessage;
 import com.surelogic.common.serviceability.Message;
+import com.surelogic.common.serviceability.MessageWithLog;
 import com.surelogic.common.serviceability.ProblemReportMessage;
 import com.surelogic.common.serviceability.ServiceUtility;
 import com.surelogic.common.serviceability.TipMessage;
@@ -63,6 +65,7 @@ public class SendServiceMessageWizard extends Wizard {
 		if (product == null)
 			product = "UNKNOWN";
 		prm.setProduct(product);
+		startJobToReadInLog(prm);
 		openHelper(shell, prm, imageSymbolicName);
 	}
 
@@ -127,7 +130,16 @@ public class SendServiceMessageWizard extends Wizard {
 		}
 		sfm.setMessage(msg);
 		sfm.setDescription(status.toString());
+		startJobToReadInLog(sfm);
 		openHelper(null, sfm, CommonImages.IMG_JSURE_LOGO);
+	}
+
+	private static void startJobToReadInLog(MessageWithLog msg) {
+		/*
+		 * We do this here because code in 'common' can't start jobs.
+		 */
+		final SLJob job = msg.getReadInLogContentsJob();
+		EclipseJob.getInstance().schedule(job, false, true);
 	}
 
 	private static void openHelper(Shell shell, Message message,
