@@ -153,7 +153,7 @@ public abstract class AbstractRemoteSLJob {
 		}
 	}
 
-	private static void outputFailure(final PrintStream out, final String msg,
+	private void outputFailure(final PrintStream out, final String msg,
 			final Throwable e) {
 		final StackTraceElement[] trace = e.getStackTrace();
 		/*
@@ -173,8 +173,16 @@ public abstract class AbstractRemoteSLJob {
 		for (final StackTraceElement ste : trace) {
 			out.println("\tat " + ste);
 		}
+		cleanup();
 	}
 
+	/**
+	 * Used to cleanup when done
+	 */
+	protected void cleanup() {
+		// Nothing to do yet
+	}
+	
 	protected void checkInput(final BufferedReader br,
 			final Monitor mon, final String msg) throws IOException {
 		out.println(msg);
