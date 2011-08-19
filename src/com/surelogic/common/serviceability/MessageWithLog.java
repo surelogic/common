@@ -80,7 +80,7 @@ public abstract class MessageWithLog extends Message {
 		setDirty(f_sendLog, value);
 		f_sendLog = value;
 	}
-	
+
 	@Override
 	protected void generateMessageHelper(StringBuilder b) {
 		super.generateMessageHelper(b);
@@ -89,9 +89,8 @@ public abstract class MessageWithLog extends Message {
 			final String lf = SLUtility.PLATFORM_LINE_SEPARATOR;
 			b.append(lf).append(lf);
 			b.append(ServiceabilityConstants.TITLE_PREFIX);
-			b.append(" ");
 			b.append(getLogFile().getAbsolutePath());
-			b.append(" ---");
+			b.append(ServiceabilityConstants.TITLE_SUFFIX);
 			b.append(lf).append(lf);
 			b.append(getLogFileContents());
 		}
