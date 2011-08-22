@@ -56,7 +56,8 @@ public final class JavaProjectSelectionDialog extends Dialog {
 			f_label = label;
 			f_shellTitle = shellTitle;
 			f_shellImage = shellImage;
-			f_initiallySelectedJavaProjects = new CopyOnWriteArrayList<IJavaProject>(initiallySelectedJavaProjects);
+			f_initiallySelectedJavaProjects = new CopyOnWriteArrayList<IJavaProject>(
+					initiallySelectedJavaProjects);
 			f_alwaysChooseFromDialogPreferenceConstant = alwaysChooseFromDialogPreferenceConstant;
 			f_prvUsrSelProjectListPreferenceConstant = previousUserSelectedProjectListPreferenceConstant;
 		}
@@ -118,16 +119,21 @@ public final class JavaProjectSelectionDialog extends Dialog {
 				};
 				job.schedule();
 			} else {
-				// merge in the last project's selected projects (if any)
-				if (config.f_prvUsrSelProjectListPreferenceConstant != null) {
-					List<String> prevSel = EclipseUtility
-							.getStringListPreference(config.f_prvUsrSelProjectListPreferenceConstant);
-					for (String projectName : prevSel) {
-						IJavaProject javaProj = JDTUtility
-								.getJavaProject(projectName);
-						if (javaProj != null)
-							config.f_initiallySelectedJavaProjects
-									.add(javaProj);
+				/*
+				 * If no projects are selected then use the last set of projects
+				 * scanned (if any). Hopefully, this helps the tool user.
+				 */
+				if (config.f_initiallySelectedJavaProjects.isEmpty()) {
+					if (config.f_prvUsrSelProjectListPreferenceConstant != null) {
+						List<String> prevSel = EclipseUtility
+								.getStringListPreference(config.f_prvUsrSelProjectListPreferenceConstant);
+						for (String projectName : prevSel) {
+							IJavaProject javaProj = JDTUtility
+									.getJavaProject(projectName);
+							if (javaProj != null)
+								config.f_initiallySelectedJavaProjects
+										.add(javaProj);
+						}
 					}
 				}
 
@@ -257,15 +263,11 @@ public final class JavaProjectSelectionDialog extends Dialog {
 
 		if (f_configuration.f_alwaysChooseFromDialogPreferenceConstant != null) {
 			final Button check = new Button(panel, SWT.CHECK);
-			check
-					.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true,
-							false));
-			check
-					.setText(I18N
-							.msg("common.dialog.showDialogEvenWhenProjectsAreSelected"));
-			check
-					.setSelection(EclipseUtility
-							.getBooleanPreference(f_configuration.f_alwaysChooseFromDialogPreferenceConstant));
+			check.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, true, false));
+			check.setText(I18N
+					.msg("common.dialog.showDialogEvenWhenProjectsAreSelected"));
+			check.setSelection(EclipseUtility
+					.getBooleanPreference(f_configuration.f_alwaysChooseFromDialogPreferenceConstant));
 			check.addListener(SWT.Selection, new Listener() {
 				public void handleEvent(final Event event) {
 					final boolean show = !EclipseUtility
