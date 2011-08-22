@@ -86,7 +86,11 @@ public abstract class AbstractRemoteSLJob {
 			
 			final SLJob job = init(br, mon);
 			checkInput(br, mon, "Initialized job");
-
+			if (job == null) {
+				mon.failed("Null job");
+				System.exit(-RemoteSLJobConstants.ERROR_JOB_FAILED);
+			}
+			
 			switch (testCode) {
 			case SCAN_FAILED:
 				outputFailure(out, "Testing scan failure",
