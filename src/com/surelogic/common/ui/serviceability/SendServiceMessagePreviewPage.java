@@ -1,19 +1,24 @@
 package com.surelogic.common.ui.serviceability;
 
+import java.io.File;
+
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 
+import com.surelogic.common.FileUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.serviceability.Message;
+import com.surelogic.common.ui.EclipseUIUtility;
 import com.surelogic.common.ui.printing.SLPrintingUtility;
 
 public class SendServiceMessagePreviewPage extends WizardPage {
@@ -45,16 +50,29 @@ public class SendServiceMessagePreviewPage extends WizardPage {
 		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
 		f_descriptionText.setLayoutData(data);
 
-		Button print = new Button(panel, SWT.PUSH);
-		print.setText("Print...");
+		final Link link = new Link(panel, SWT.WRAP);
+		link.setText(I18N.msg("common.serviceability.printOrSave"));
 		data = new GridData(SWT.LEFT, SWT.CENTER, false, false);
-		print.setLayoutData(data);
-		print.addListener(SWT.Selection, new Listener() {
+		link.setLayoutData(data);
+		link.addListener(SWT.Selection, new Listener() {
 			@Override
 			public void handleEvent(Event event) {
-				String text = f_descriptionText.getText();
-				SLPrintingUtility.printText(f_data.getMessageTypeString(),
-						text, true);
+				if ("print".equals(event.text)) {
+					final String text = f_descriptionText.getText();
+					SLPrintingUtility.printText(f_data.getMessageTypeString(),
+							text, true);
+				} else if ("save".equals(event.text)) {
+					final String text = f_descriptionText.getText();
+
+					FileDialog fileDialog = new FileDialog(EclipseUIUtility
+							.getShell(), SWT.SAVE);
+					fileDialog.setFilterExtensions(new String[] { "*.txt" });
+					final String pathName = fileDialog.open();
+					if (pathName != null) {
+						File textFile = new File(pathName);
+						FileUtility.putStringIntoAFile(textFile, text);
+					}
+				}
 			}
 		});
 
