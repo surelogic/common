@@ -1,5 +1,7 @@
 package com.surelogic.common.base64;
 
+import java.io.FileNotFoundException;
+
 /**
  * <p>
  * Encodes and decodes to and from Base64 notation.
@@ -1124,11 +1126,18 @@ public class Base64 {
 	 * @since 2.1
 	 */
 	public static boolean encodeToFile(byte[] dataToEncode, String filename) {
+		try {
+			return encodeToStream(dataToEncode, new java.io.FileOutputStream(filename));
+		} catch (FileNotFoundException e) {
+			return false;
+		}
+	}
+	
+	public static boolean encodeToStream(byte[] dataToEncode, java.io.OutputStream out) {
 		boolean success = false;
 		Base64.OutputStream bos = null;
 		try {
-			bos = new Base64.OutputStream(
-					new java.io.FileOutputStream(filename), Base64.ENCODE);
+			bos = new Base64.OutputStream(out, Base64.ENCODE);
 			bos.write(dataToEncode);
 			success = true;
 		} // end try
@@ -1138,7 +1147,9 @@ public class Base64 {
 		} // end catch: IOException
 		finally {
 			try {
-				bos.close();
+				if (bos != null) {
+					bos.close();
+				}
 			} catch (Exception e) {
 			}
 		} // end finally
