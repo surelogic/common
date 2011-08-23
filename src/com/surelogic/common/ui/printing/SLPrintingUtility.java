@@ -32,9 +32,17 @@ public final class SLPrintingUtility {
 	 * for the correct printer to print with and gives the user a chance to
 	 * cancel the printing.
 	 * 
+	 * @param title
+	 *            the title of the document, {@code null} if you don't want a
+	 *            title to be printed.
 	 * @param text
+	 *            the document text, cannot be {@code null}.
+	 * @param printPageNumbers
+	 *            {@code true} if you want page numbers printed, {@code false}
+	 *            otherwise.
 	 */
-	static public void printText(final String text) {
+	static public void printText(final String title, final String text,
+			final boolean printPageNumbers) {
 		final UIJob job = new SLUIJob() {
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
@@ -59,7 +67,7 @@ public final class SLPrintingUtility {
 						monitor.beginTask("Printing SureLogic Report",
 								IProgressMonitor.UNKNOWN);
 						try {
-							print(printer, text);
+							print(printer, title, text, printPageNumbers);
 						} finally {
 							printer.dispose();
 							monitor.done();
@@ -81,43 +89,41 @@ public final class SLPrintingUtility {
 		String tabs;
 		GC gc;
 		Font printerFont;
-		Color printerForegroundColor;
 		int tabWidth = 0;
 		int lineHeight = 0;
 		StringBuilder wordBuffer;
 		int x, y;
 		int index, end;
+		String title;
 		String textToPrint;
+		Rectangle clientArea;
+		boolean printPageNumbers;
+		int pageNumber = 1;
+		int padX, padY;
 	}
 
-	private static void print(Printer printer, String text) {
+	private static void print(Printer printer, String title, String text,
+			boolean printPageNumbers) {
 		Config c = new Config();
 		c.printer = printer;
-		c.textToPrint = text;
+		c.title = title;
+		c.textToPrint = text + " ";
+		c.printPageNumbers = printPageNumbers;
 
 		if (printer.startJob("SureLogic Report")) {
 			/*
 			 * the string is the job name - shows up in the printer's job list
 			 */
-			Rectangle clientArea = printer.getClientArea();
-			Rectangle trim = printer.computeTrim(0, 0, 0, 0);
+			c.clientArea = printer.getClientArea();
 			Point dpi = printer.getDPI();
-			/*
-			 * one inch from left side of paper
-			 */
-			c.leftMargin = dpi.x + trim.x;
-			/*
-			 * one inch from right side of paper
-			 */
-			c.rightMargin = clientArea.width - dpi.x + trim.x + trim.width;
-			/*
-			 * one inch from top edge of paper
-			 */
-			c.topMargin = dpi.y + trim.y;
-			/*
-			 * one inch from bottom edge of paper
-			 */
-			c.bottomMargin = clientArea.height - dpi.y + trim.y + trim.height;
+			c.padX = dpi.x / 10;
+			c.padY = dpi.y / 10;
+
+			c.leftMargin = c.clientArea.x + c.padX;
+			c.rightMargin = c.clientArea.x + c.clientArea.width - c.padX;
+
+			c.topMargin = c.clientArea.y + c.padY + (dpi.y / 4);
+			c.bottomMargin = c.clientArea.y + c.clientArea.height - c.padY;
 
 			/*
 			 * Create a buffer for computing tab width.
@@ -139,8 +145,7 @@ public final class SLPrintingUtility {
 			c.tabWidth = c.gc.stringExtent(c.tabs).x;
 			c.lineHeight = c.gc.getFontMetrics().getHeight();
 
-			c.printerForegroundColor = printer.getSystemColor(SWT.COLOR_BLACK);
-			c.gc.setForeground(c.printerForegroundColor);
+			c.gc.setForeground(printer.getSystemColor(SWT.COLOR_BLACK));
 
 			/*
 			 * Print text to current gc using word wrap.
@@ -152,7 +157,6 @@ public final class SLPrintingUtility {
 			 * Cleanup graphics resources used in printing.
 			 */
 			c.printerFont.dispose();
-			c.printerForegroundColor.dispose();
 			c.gc.dispose();
 		}
 	}
@@ -165,21 +169,21 @@ public final class SLPrintingUtility {
 		 */
 		for (String name : names) {
 			try {
-				Font f = new Font(printer, name, 9, SWT.NONE);
-				System.out.println("Got FONT " + name);
+				Font f = new Font(printer, name, 8, SWT.NONE);
 				return f;
-			} catch (Exception e) {
-				// didn't work
+			} catch (Exception ignore) {
+				// didn't work, we'll try the next
 			}
 		}
 		/*
-		 * Well, go with the crappy default.
+		 * Well, go with the (awful) default.
 		 */
 		return printer.getSystemFont();
 	}
 
 	private static void printText(Config c) {
 		c.printer.startPage();
+		decoratePage(c);
 		c.wordBuffer = new StringBuilder();
 		c.x = c.leftMargin;
 		c.y = c.topMargin;
@@ -239,7 +243,46 @@ public final class SLPrintingUtility {
 			if (c.index + 1 < c.end) {
 				c.y = c.topMargin;
 				c.printer.startPage();
+				decoratePage(c);
 			}
 		}
+	}
+
+	private static void decoratePage(Config c) {
+		Color oldColor = c.gc.getForeground();
+		c.gc.setForeground(c.printer.getSystemColor(SWT.COLOR_DARK_RED));
+
+		/*
+		 * Page number (optional)
+		 */
+		if (c.printPageNumbers) {
+			final String pn = "page " + c.pageNumber++;
+			final Point pnEx = c.gc.stringExtent(pn);
+
+			int pnX = c.clientArea.x + c.clientArea.width - pnEx.x - c.padX;
+			int pnY = c.clientArea.y + c.padY;
+			c.gc.drawString(pn, pnX, pnY);
+		}
+
+		/*
+		 * Title (optional)
+		 */
+		if (c.title != null) {
+			int titleX = c.clientArea.x + c.padX;
+			int titleY = c.clientArea.y + c.padY;
+			c.gc.drawString(c.title, titleX, titleY);
+		}
+
+		/*
+		 * Box (last so it doesn't cropped by the page number or title)
+		 */
+		final int padBox = 20;
+		c.gc.setForeground(c.printer.getSystemColor(SWT.COLOR_BLUE));
+		c.gc.setLineWidth(5);
+		c.gc.drawRectangle(c.clientArea.x + padBox, c.clientArea.y + padBox,
+				c.clientArea.width - padBox * 2, c.clientArea.height - padBox
+						* 2);
+
+		c.gc.setForeground(oldColor);
 	}
 }

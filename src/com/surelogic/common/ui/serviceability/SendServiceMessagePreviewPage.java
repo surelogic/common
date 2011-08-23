@@ -4,7 +4,6 @@ import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -54,7 +53,8 @@ public class SendServiceMessagePreviewPage extends WizardPage {
 			@Override
 			public void handleEvent(Event event) {
 				String text = f_descriptionText.getText();
-				SLPrintingUtility.printText(text);
+				SLPrintingUtility.printText(f_data.getMessageTypeString(),
+						text, true);
 			}
 		});
 
