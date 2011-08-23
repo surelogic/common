@@ -5,6 +5,9 @@ import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
@@ -12,6 +15,7 @@ import org.eclipse.swt.widgets.Text;
 
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.serviceability.Message;
+import com.surelogic.common.ui.printing.SLPrintingUtility;
 
 public class SendServiceMessagePreviewPage extends WizardPage {
 
@@ -27,7 +31,9 @@ public class SendServiceMessagePreviewPage extends WizardPage {
 	public void createControl(Composite parent) {
 		Composite panel = new Composite(parent, SWT.NONE);
 		setControl(panel);
-		panel.setLayout(new FillLayout());
+
+		GridLayout gridLayout = new GridLayout();
+		panel.setLayout(gridLayout);
 
 		f_descriptionText = new Text(panel, SWT.MULTI | SWT.BORDER
 				| SWT.V_SCROLL | SWT.H_SCROLL);
@@ -35,6 +41,20 @@ public class SendServiceMessagePreviewPage extends WizardPage {
 		f_descriptionText.addListener(SWT.Modify, new Listener() {
 			public void handleEvent(Event event) {
 				f_data.setMessage(f_descriptionText.getText());
+			}
+		});
+		GridData data = new GridData(SWT.FILL, SWT.FILL, true, true);
+		f_descriptionText.setLayoutData(data);
+
+		Button print = new Button(panel, SWT.PUSH);
+		print.setText("Print...");
+		data = new GridData(SWT.LEFT, SWT.CENTER, false, false);
+		print.setLayoutData(data);
+		print.addListener(SWT.Selection, new Listener() {
+			@Override
+			public void handleEvent(Event event) {
+				String text = f_descriptionText.getText();
+				SLPrintingUtility.printText(text);
 			}
 		});
 
