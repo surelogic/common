@@ -142,13 +142,24 @@ public abstract class AbstractRemoteSLJob {
 	private static void processStatus(final Monitor mon, final SLStatus status) {
 		// Only look at the leaves
 		if (status.getChildren().isEmpty()) {
-			if (status.getSeverity() == SLSeverity.OK) {
+			switch (status.getSeverity()) {
+			case ERROR:
+				if (status.getException() == null) {
+					mon.failed(status.getMessage());
+				} else {
+					mon.failed(status.getMessage(), status.getException());
+				}
+				break;
+			case WARNING:
+				if (status.getException() == null) {
+					mon.error(status.getMessage());
+				} else {
+					mon.error(status.getMessage(), status.getException());
+				}
+				break;
+			default:
+			case OK:
 				return; // Nothing to do
-			}
-			if (status.getException() == null) {
-				mon.error(status.getMessage());
-			} else {
-				mon.error(status.getMessage(), status.getException());
 			}
 		} else {
 			for (final SLStatus c : status.getChildren()) {
@@ -177,6 +188,7 @@ public abstract class AbstractRemoteSLJob {
 		for (final StackTraceElement ste : trace) {
 			out.println("\tat " + ste);
 		}
+		out.flush();
 		cleanup();
 	}
 
