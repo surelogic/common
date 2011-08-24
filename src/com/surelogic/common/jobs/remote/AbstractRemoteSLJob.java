@@ -47,8 +47,8 @@ public abstract class AbstractRemoteSLJob {
 				System.exit(-RemoteSLJobConstants.ERROR_PROCESS_FAILED);
 			}
 		} 		
-		MemoryWarningSystem.setDefaultPolicy();
-		out.println("Started low memory detector");
+		//MemoryWarningSystem.setDefaultPolicy();
+		//out.println("Started low memory detector");
 		
 		final TestCode testCode = TestCode.getTestCode(System
 				.getProperty(RemoteSLJobConstants.TEST_CODE_PROPERTY));
