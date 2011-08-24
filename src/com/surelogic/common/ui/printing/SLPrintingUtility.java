@@ -59,7 +59,8 @@ public final class SLPrintingUtility {
 				if (printerData == null)
 					return Status.CANCEL_STATUS;
 
-				final Printer printer = new Printer(printerData);
+				final Printer printer = getPrinter(printerData);
+
 				final Job printJob = new Job("Printing SureLogic Report") {
 
 					@Override
@@ -100,6 +101,39 @@ public final class SLPrintingUtility {
 		boolean printPageNumbers;
 		int pageNumber = 1;
 		int padX, padY;
+	}
+
+	/**
+	 * We want a landscape printer, so try to set that and return a printer. If
+	 * that doesn't work use what we were passed.
+	 * 
+	 * @param data
+	 *            the printer data.
+	 * @return a printer.
+	 * 
+	 * @throws IllegalArgumentException
+	 *             if the specified printer data does not represent a valid
+	 *             printer.
+	 */
+	private static Printer getPrinter(final PrinterData data) {
+		/**
+		 * Use landscape mode, if possible
+		 */
+		if (data.orientation != PrinterData.LANDSCAPE) {
+			final int oldOrientation = data.orientation;
+			data.orientation = PrinterData.LANDSCAPE;
+			try {
+				Printer result = new Printer(data);
+				return result;
+			} catch (Exception ignore) {
+				/*
+				 * We'll try again without landscape orientation
+				 */
+			}
+			data.orientation = oldOrientation;
+		}
+
+		return new Printer(data);
 	}
 
 	private static void print(Printer printer, String title, String text,
@@ -161,6 +195,14 @@ public final class SLPrintingUtility {
 		}
 	}
 
+	/**
+	 * We need a fixed width font so this method tries to find one that works on
+	 * Windows, OS X, and Linux.
+	 * 
+	 * @param printer
+	 *            a printer.
+	 * @return a fixed width font at 9 points.
+	 */
 	private static Font getPrinterFont(Printer printer) {
 		String[] names = { "Consolas", "Terminal", "Monaco", "Mono",
 				"Anonymous Pro", "Courier New", "Courier" };
@@ -169,7 +211,7 @@ public final class SLPrintingUtility {
 		 */
 		for (String name : names) {
 			try {
-				Font f = new Font(printer, name, 8, SWT.NONE);
+				Font f = new Font(printer, name, 9, SWT.NONE);
 				return f;
 			} catch (Exception ignore) {
 				// didn't work, we'll try the next
