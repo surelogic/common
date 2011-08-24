@@ -272,6 +272,8 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 			}
 			topMonitor.begin(work);
 			
+			// Used to help detect imminent OOM issues
+			int numConsecutiveGCs = 0;
 			String line = br.readLine();
 			while (line != null) {
 				final SLProgressMonitor monitor = 
@@ -346,13 +348,23 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 							break;
 						default:
 							println(line);
-						}
+						} // end of switch
 					} else {
 						println(line);
-					}
+					} // end of check for more tokens
+					
+					numConsecutiveGCs = 0;
 				} else {
+					if (line.startsWith("[Full GC")) {
+						numConsecutiveGCs++;
+						if (numConsecutiveGCs > 3) {
+							printErr(Level.WARNING, "Probably low on memory: "+numConsecutiveGCs+" full GCs");
+						}
+					} else {
+						numConsecutiveGCs = 0;
+					}
 					println(line);
-				}
+				} // end of check for ##
 				line = br.readLine();
 			}
 			line = br.readLine();
