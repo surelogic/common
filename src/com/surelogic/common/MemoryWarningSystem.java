@@ -35,9 +35,9 @@ public enum MemoryWarningSystem {
     NotificationEmitter emitter = (NotificationEmitter) mbean;
     emitter.addNotificationListener(new NotificationListener() {
       public void handleNotification(Notification n, Object hb) {
-    	SLLogger.getLogger().warning("Got notification: "+n.getType());
+    	//SLLogger.getLogger().warning("Got notification: "+n.getType());
         if (n.getType().equals(
-            MemoryNotificationInfo.MEMORY_COLLECTION_THRESHOLD_EXCEEDED)) {
+            MemoryNotificationInfo.MEMORY_THRESHOLD_EXCEEDED)) {
           long maxMemory = tenuredGenPool.getUsage().getMax();
           long usedMemory = tenuredGenPool.getUsage().getUsed();
           for (Listener listener : listeners) {
@@ -63,9 +63,9 @@ public enum MemoryWarningSystem {
     if (percentage <= 0.0 || percentage > 1.0) {
       throw new IllegalArgumentException("Percentage not in range");
     }
-    long maxMemory = tenuredGenPool.getCollectionUsage().getMax();
+    long maxMemory = tenuredGenPool.getUsage().getMax();
     long warningThreshold = (long) (maxMemory * percentage);
-    tenuredGenPool.setCollectionUsageThreshold(warningThreshold);
+    tenuredGenPool.setUsageThreshold(warningThreshold);
   }
 
   /**
@@ -78,7 +78,7 @@ public enum MemoryWarningSystem {
       // TODO I don't know whether this approach is better, or whether
       // we should rather check for the pool name "Tenured Gen"?
       if (pool.getType() == MemoryType.HEAP &&
-          pool.isCollectionUsageThresholdSupported()) {
+          pool.isUsageThresholdSupported()) {
         return pool;
       }
     }
