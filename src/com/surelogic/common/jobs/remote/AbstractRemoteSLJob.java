@@ -9,6 +9,7 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
+import com.surelogic.common.MemoryWarningSystem;
 import com.surelogic.common.jobs.*;
 import com.surelogic.common.logging.*;
 
@@ -23,7 +24,7 @@ public abstract class AbstractRemoteSLJob {
 	 */
 
 	@SuppressWarnings("incomplete-switch")
-	protected final void run() {
+	protected final void run() {		
 		// Setup streams
 		final String port = System.getProperty(RemoteSLJobConstants.REMOTE_PORT_PROP);
 		/*
@@ -45,7 +46,9 @@ public abstract class AbstractRemoteSLJob {
 			    e.printStackTrace();
 				System.exit(-RemoteSLJobConstants.ERROR_PROCESS_FAILED);
 			}
-		} 
+		} 		
+		MemoryWarningSystem.setDefaultPolicy();
+		out.println("Started low memory detector");
 		
 		final TestCode testCode = TestCode.getTestCode(System
 				.getProperty(RemoteSLJobConstants.TEST_CODE_PROPERTY));

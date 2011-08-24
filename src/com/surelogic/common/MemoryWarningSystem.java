@@ -1,9 +1,13 @@
 package com.surelogic.common;
 
 import javax.management.*;
+
+import com.surelogic.common.logging.SLLogger;
+
 import java.lang.management.*;
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * This memory warning system will call the listener when we
@@ -31,6 +35,7 @@ public enum MemoryWarningSystem {
     NotificationEmitter emitter = (NotificationEmitter) mbean;
     emitter.addNotificationListener(new NotificationListener() {
       public void handleNotification(Notification n, Object hb) {
+    	SLLogger.getLogger().warning("Got notification: "+n.getType());
         if (n.getType().equals(
             MemoryNotificationInfo.MEMORY_COLLECTION_THRESHOLD_EXCEEDED)) {
           long maxMemory = tenuredGenPool.getUsage().getMax();
@@ -78,5 +83,24 @@ public enum MemoryWarningSystem {
       }
     }
     throw new AssertionError("Could not find tenured space");
+  }
+  
+  private static final AtomicBoolean initialized = new AtomicBoolean(false);
+  
+  /**
+   * Convenience method to setup a default policy
+   */
+  public static void setDefaultPolicy() {
+	  if (initialized.getAndSet(true)) {
+		  return;
+	  }
+	  
+	  INSTANCE.addListener(new Listener() {
+		@Override
+		public void memoryUsageLow(long usedMemory, long maxMemory) {
+			SLLogger.getLogger().warning("Used "+usedMemory+" out of "+maxMemory);			
+		}		  
+	  });
+	  setPercentageUsageThreshold(0.90);
   }
 }
