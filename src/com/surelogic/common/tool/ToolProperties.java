@@ -23,7 +23,7 @@ public class ToolProperties extends Properties {
 	public static final String PROPS_FILE = "surelogic-tools.properties";
 	
 	public static final String EXCLUDE_PATH = "scan.exclude.source.folder";
-	public static final String EXCLUDED_PKGS = "scan.exclude.package";
+	public static final String EXCLUDED_PKGS = "scan.exclude.source.package";
 
 	public static ToolProperties readFromProject(File projectDir) {
         final File properties = new File(projectDir, PROPS_FILE);
