@@ -26,6 +26,7 @@ public class MemoryUtility {
 			if (runJava(MAX_SIZE)) {
 				return MAX_SIZE;
 			}
+			// This doesn't work right on 64-bit JVMs
 			final int initial = SLUtility.getCurrentMaxMemorySizeInMb();
 			final int mm = computeMaxMemorySizeInMb(initial, MAX_SIZE);
 			f_maxMemorySize.set(mm);
