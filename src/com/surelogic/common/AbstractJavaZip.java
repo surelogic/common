@@ -7,6 +7,7 @@ import java.util.logging.Logger;
 import java.util.zip.*;
 
 import com.surelogic.common.logging.SLLogger;
+import com.surelogic.common.tool.ToolProperties;
 import com.surelogic.common.xml.XMLUtil;
 
 public abstract class AbstractJavaZip<T> {
@@ -53,8 +54,21 @@ public abstract class AbstractJavaZip<T> {
 		}
 	}
 	
+	public static final String[] CONFIG_FILES = {
+		".project", ".classpath", ToolProperties.PROPS_FILE
+	};
+	
 	public void generateSourceZipContents(final ZipOutputStream out,
 			final T root) throws IOException {
+		for(String name : CONFIG_FILES) {
+			T config = getFile(root, name);
+			if (isFile(config)) {
+				out.putNextEntry(new ZipEntry(name));
+				FileUtility.copyToStream(false, name, getFileContents(config), "zip", out, false);
+				out.closeEntry();
+			}
+		}
+		
 		TempInfo info = new TempInfo();
 		addAnnotatedResourcesToZip(out, info, root);
 
@@ -99,6 +113,8 @@ public abstract class AbstractJavaZip<T> {
 
 	protected abstract String getJavaPackageNameOrNull(T res);
 
+	protected abstract T getFile(T res, String name);
+	
 	protected abstract InputStream getFileContents(T res) throws IOException;
 
 	protected abstract T[] getMembers(T res) throws IOException;
