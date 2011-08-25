@@ -3,6 +3,7 @@ package com.surelogic.common.tool;
 import java.io.*;
 import java.util.*;
 import java.util.logging.Level;
+import java.util.regex.Pattern;
 
 import com.surelogic.common.logging.SLLogger;
 
@@ -21,7 +22,7 @@ public class ToolProperties extends Properties {
 	
 	public static final String PROPS_FILE = "surelogic-tools.properties";
 	
-	public static final String EXCLUDE_PATH = "scan.exclude.source.path";
+	public static final String EXCLUDE_PATH = "scan.exclude.source.folder";
 	public static final String EXCLUDED_PKGS = "scan.exclude.package";
 
 	public static ToolProperties readFromProject(File projectDir) {
@@ -67,5 +68,17 @@ public class ToolProperties extends Properties {
 	 */
 	public String[] getExcludedPackages() {
 		return getListProperty(EXCLUDED_PKGS);
+	}
+	
+	public static Pattern[] makePackageMatchers(String[] patterns) {
+		final Pattern[] excludePatterns = new Pattern[patterns.length];
+		int i = 0;
+		for (String pattern : patterns) {
+			final String pattern2 = pattern.replaceAll("\\.", "\\.")
+					.replaceAll("\\*", ".*");
+			excludePatterns[i] = Pattern.compile(pattern2);
+			i++;
+		}
+		return excludePatterns;
 	}
 }
