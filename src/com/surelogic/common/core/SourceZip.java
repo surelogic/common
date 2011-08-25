@@ -107,6 +107,15 @@ public class SourceZip extends AbstractJavaZip<IResource> {
 	}
 
 	@Override
+	protected IResource getFile(IResource res, String name) {
+		if (res instanceof IContainer) {
+			IContainer c = (IContainer) res;
+			return c.findMember(name);
+		}
+		return null;
+	}
+	
+	@Override
 	protected String getName(IResource res) {
 		return res.getName();
 	}
@@ -123,6 +132,9 @@ public class SourceZip extends AbstractJavaZip<IResource> {
 
 	@Override
 	protected boolean isFile(IResource res) {
+		if (res == null) {
+			return false;
+		}
 		return (res.getType() == IResource.FILE);
 	}
 
