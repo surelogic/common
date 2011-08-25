@@ -4,18 +4,21 @@ import com.surelogic.common.i18n.I18N;
 
 public class RemoteSLJobException extends RuntimeException {
   private static final long serialVersionUID = 1L;
+  private final String label;
   private final int number;
   private final Object[] args;
   
-  public RemoteSLJobException(final int number, Object... args) {
+  public RemoteSLJobException(String label, final int number, Object... args) {
+	this.label = label;
     this.number = number;
     this.args = args;
   }
   
-  public RemoteSLJobException(final int number, Throwable t) {
+  public RemoteSLJobException(String label, final int number, Throwable t) {
     super(t);
+	this.label = label;
     this.number = number;
-    this.args = null; // FIX
+    this.args = new Object[0];
   }
   
   public int getErrorNum() {
@@ -30,5 +33,10 @@ public class RemoteSLJobException extends RuntimeException {
     args2[0] = name;
     System.arraycopy(args, 0, args2, 1, args.length);
     return I18N.err(number, args2);
+  }
+  
+  @Override
+  public String getMessage() {
+	  return getToolMessage(label);
   }
 }

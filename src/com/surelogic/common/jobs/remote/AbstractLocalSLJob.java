@@ -64,7 +64,7 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 	}
 	
 	protected RemoteSLJobException newException(int number, Object... args) {
-		throw new RemoteSLJobException(number, args);
+		throw new RemoteSLJobException(getName(), number, args);
 	}
 	
 	protected boolean addToPath(Project proj, Path path, String name) {
@@ -230,6 +230,12 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 				}
 			}
 		} catch(Exception e) {
+			if (e instanceof RemoteSLJobException) {
+				if (topMonitor.isCanceled()) {
+					return SLStatus.CANCEL_STATUS;
+				}
+				throw (RemoteSLJobException) e;
+			}
 			reportException(e);
 		}
 		if (log != null) {
@@ -380,6 +386,9 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 				throw newException(RemoteSLJobConstants.ERROR_PROCESS_FAILED, value);
 			}
 		} catch (Exception e) {
+			if (e instanceof RemoteSLJobException) {
+				throw (RemoteSLJobException) e;
+			}
 			reportException(e);
 		}
 	}
