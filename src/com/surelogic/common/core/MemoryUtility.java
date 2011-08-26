@@ -1,6 +1,8 @@
 package com.surelogic.common.core;
 
 import java.io.IOException;
+import java.lang.management.*;
+import java.lang.reflect.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.tools.ant.types.CommandlineJava;
@@ -20,6 +22,7 @@ public class MemoryUtility {
 	 * @return the maximum heap size in megabytes.
 	 */
 	public static int computeMaxMemorySizeInMb() {
+		System.out.println("Physical mem = "+computePhysMemorySizeInMb());
 		final int maxMemorySizeCache = f_maxMemorySize.get();
 
 		if (maxMemorySizeCache == 0) {
@@ -98,5 +101,20 @@ public class MemoryUtility {
 		} catch (InterruptedException e) {
 			return false;
 		}
+	}
+	
+	public static int computePhysMemorySizeInMb() {
+		OperatingSystemMXBean mxbean = ManagementFactory.getOperatingSystemMXBean();	
+		try {
+			Class<?> c = Class.forName("com.sun.management.OperatingSystemMXBean");
+			if (c.isInstance(mxbean)) {
+				Method m = c.getDeclaredMethod("getTotalPhysicalMemorySize");
+				Long l = (Long) m.invoke(mxbean);
+				return (int) (l / (1024*1024));
+			}
+		} catch (Exception e) {
+			// ignore it
+		}
+		return -1;
 	}
 }
