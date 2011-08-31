@@ -38,6 +38,9 @@ public class RegressionUtility {
 			String defaultName) {
 		File path = new File(projectPath);
 		File[] files = path.listFiles(filter);
+		if (files == null) {
+			return projectPath; // No oracle to look at
+		}
 		File file = null;
 		for (File zip : files) {
 			if (file == null) {
