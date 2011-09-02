@@ -8,8 +8,8 @@ import com.surelogic.common.jobs.SLStatus;
  * Interface for external scan crash reporters.
  * <p>
  * This abstraction is necessary because the Eclipse UI, which is used by the
- * Eclipse JSure and Eclipse clients to report scan failures, is not available
- * to the code that runs the external scans.
+ * Eclipse JSure and Sierra clients to report scan failures, is not available to
+ * the code that runs the external scans.
  */
 public interface IScanCrashReporter {
 
@@ -23,5 +23,5 @@ public interface IScanCrashReporter {
 	 *            the log file for the scan within the scan directory. Cannot be
 	 *            {@code null}, but reporters should check that the file exists.
 	 */
-	void reportJSureScanCrash(SLStatus status, File scanLog);
+	void reportScanCrash(SLStatus status, File scanLog);
 }

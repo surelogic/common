@@ -9,10 +9,10 @@ import com.surelogic.common.jobs.SLStatus;
 import com.surelogic.common.logging.SLLogger;
 
 /**
- * Manages how to report JSure scan crashes. Typical use is
+ * Manages how to report Sierra scan crashes. Typical use is
  * 
  * <pre>
- * JSureScanCrashReport.getInstance().getReporter()
+ * SierraScanCrashReport.getInstance().getReporter()
  * 		.reportJSureScanCrash(status, logFile);
  * </pre>
  * 
@@ -36,15 +36,15 @@ import com.surelogic.common.logging.SLLogger;
  */
 @ThreadSafe
 @Singleton
-public final class JSureScanCrashReport {
+public final class SierraScanCrashReport {
 
-	private static final JSureScanCrashReport INSTANCE = new JSureScanCrashReport();
+	private static final SierraScanCrashReport INSTANCE = new SierraScanCrashReport();
 
-	public static JSureScanCrashReport getInstance() {
+	public static SierraScanCrashReport getInstance() {
 		return INSTANCE;
 	}
 
-	private JSureScanCrashReport() {
+	private SierraScanCrashReport() {
 		// singleton
 	}
 
