@@ -21,6 +21,7 @@ import com.surelogic.common.serviceability.Message;
 import com.surelogic.common.serviceability.MessageWithLog;
 import com.surelogic.common.serviceability.ProblemReportMessage;
 import com.surelogic.common.serviceability.ServiceUtility;
+import com.surelogic.common.serviceability.SierraScanFailureMessage;
 import com.surelogic.common.serviceability.TipMessage;
 import com.surelogic.common.ui.BalloonUtility;
 import com.surelogic.common.ui.EclipseUIUtility;
@@ -106,13 +107,14 @@ public class SendServiceMessageWizard extends Wizard {
 	}
 
 	/**
-	 * Asks the user if they want to report a scan crash to SureLogic.
+	 * Asks the user if they want to report a JSure scan crash to SureLogic.
 	 * <p>
 	 * Must be called from the UI thread.
 	 * 
 	 * @param product
-	 *            the SureLogic JSure tool this crash report is about. Must be
-	 *            non-null.
+	 *            the SureLogic tool this crash report is about. Must be
+	 *            non-null. This is known to be JSure, however, the client may
+	 *            include a version as well as a name.
 	 * @param status
 	 *            the status message about the scan crash. Must be non-null.
 	 * @param scanLog
@@ -132,6 +134,36 @@ public class SendServiceMessageWizard extends Wizard {
 		sfm.setDescription(status.toString());
 		startJobToReadInLog(sfm);
 		openHelper(null, sfm, CommonImages.IMG_JSURE_LOGO);
+	}
+
+	/**
+	 * Asks the user if they want to report a Sierra scan crash to SureLogic.
+	 * <p>
+	 * Must be called from the UI thread.
+	 * 
+	 * @param product
+	 *            the SureLogic tool this crash report is about. Must be
+	 *            non-null. This is known to be Sierra, however, the client may
+	 *            include a version as well as a name.
+	 * @param status
+	 *            the status message about the scan crash. Must be non-null.
+	 * @param scanLog
+	 *            the scan log file. Must be non-null.
+	 */
+	public static void openSierraScanCrashReport(String product,
+			SLStatus status, File scanLog) {
+		SierraScanFailureMessage sfm = new SierraScanFailureMessage(scanLog);
+		sfm.setProduct(product);
+		String msg = status.getMessage();
+		if (msg == null || msg.isEmpty()) {
+			msg = sfm.getMessageTypeString();
+		} else {
+			msg = sfm.getMessageTypeString() + " : " + status.getMessage();
+		}
+		sfm.setMessage(msg);
+		sfm.setDescription(status.toString());
+		startJobToReadInLog(sfm);
+		openHelper(null, sfm, CommonImages.IMG_SIERRA_LOGO);
 	}
 
 	private static void startJobToReadInLog(MessageWithLog msg) {
