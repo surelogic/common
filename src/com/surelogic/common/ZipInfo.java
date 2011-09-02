@@ -16,6 +16,10 @@ public class ZipInfo {
 		zos.close();
 	}
 	
+	/**
+     * @param baseDir the directory to create paths relative to
+     * @param zipDir the directory to zip up
+	 */
 	public void zipDir(final File baseDir, final File zipDir) throws IOException {
 		if (!zipDir.exists()) {
 			return;

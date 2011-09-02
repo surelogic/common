@@ -697,16 +697,19 @@ public final class FileUtility {
      */
     public static void zipDir(final File tempDir, final File zipFile)
             throws IOException {
-        zipDirAndMore(tempDir, zipFile).close();
+        zipDirAndMore(tempDir, tempDir, zipFile).close();
     }
 
     /**
      * Like zipDir, but returns the ZipInfo so you can add more to it
+     * 
+     * @param baseDir the directory to create paths relative to
+     * @param zipDir the directory to zip up
      */
-    public static ZipInfo zipDirAndMore(final File tempDir, final File zipFile)
+    public static ZipInfo zipDirAndMore(File baseDir, File zipDir, final File zipFile)
             throws IOException {
         final ZipInfo info = new ZipInfo(zipFile);
-        info.zipDir(tempDir, tempDir);
+        info.zipDir(baseDir, zipDir);
         return info;
     }
 
