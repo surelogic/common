@@ -12,21 +12,20 @@ import com.surelogic.common.logging.SLLogger;
  * Manages how to report Sierra scan crashes. Typical use is
  * 
  * <pre>
- * SierraScanCrashReport.getInstance().getReporter()
- * 		.reportJSureScanCrash(status, logFile);
+ * SierraScanCrashReport.getInstance().getReporter().reportScanCrash(status, logFile);
  * </pre>
  * 
  * this will always work because {@code null} is never returned from
  * {@link #getInstance()} or {@link #getReporter()}.
  * <p>
  * The reporter can be changed via {@link #setReporter(IScanCrashReporter)}
- * which is done by the JSure Eclipse plug-in to prompt the user to send a
+ * which is done by the Sierra Eclipse plug-in to prompt the user to send a
  * report to SureLogic.
  * <p>
  * The default reporter just logs the crash
  * 
  * <pre>
- * public void reportJSureScanCrash(SLStatus status, File scanLog) {
+ * public void reportScanCrash(SLStatus status, File scanLog) {
  * 	status.logTo(SLLogger.getLogger());
  * }
  * </pre>

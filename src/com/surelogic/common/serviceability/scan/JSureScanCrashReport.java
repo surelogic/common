@@ -12,8 +12,7 @@ import com.surelogic.common.logging.SLLogger;
  * Manages how to report JSure scan crashes. Typical use is
  * 
  * <pre>
- * JSureScanCrashReport.getInstance().getReporter()
- * 		.reportJSureScanCrash(status, logFile);
+ * JSureScanCrashReport.getInstance().getReporter().reportScanCrash(status, logFile);
  * </pre>
  * 
  * this will always work because {@code null} is never returned from
@@ -26,7 +25,7 @@ import com.surelogic.common.logging.SLLogger;
  * The default reporter just logs the crash
  * 
  * <pre>
- * public void reportJSureScanCrash(SLStatus status, File scanLog) {
+ * public void reportScanCrash(SLStatus status, File scanLog) {
  * 	status.logTo(SLLogger.getLogger());
  * }
  * </pre>
