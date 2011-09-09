@@ -9,11 +9,11 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
-import com.surelogic.common.MemoryWarningSystem;
 import com.surelogic.common.jobs.*;
 import com.surelogic.common.logging.*;
 
 public abstract class AbstractRemoteSLJob {	
+	public static final String LOG_SUFFIX = ".log.txt";
 	private static final String CANCEL = "##" + Local.CANCEL;
 	private InputStream in;
 	protected PrintStream out;
