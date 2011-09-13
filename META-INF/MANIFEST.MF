@@ -238,5 +238,5 @@ Bundle-ClassPath: .,
  lib/runtime/ant.jar,
  lib/runtime/asm-3.3.1.jar,
  lib/runtime/asm-commons-3.3.1.jar,
- lib/runtime/promises-4.0.1.jar
+ lib/runtime/promises-4.0.2.jar
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

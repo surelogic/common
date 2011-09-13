@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry exported="true" kind="lib" path="lib/runtime/promises-4.0.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/runtime/promises-4.0.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/runtime/commons-lang3-3.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/runtime/asm-3.3.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/runtime/asm-commons-3.3.1.jar"/>
