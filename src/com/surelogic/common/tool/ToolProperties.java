@@ -55,7 +55,7 @@ public class ToolProperties extends Properties {
 		if (l == null) {
 			return noStrings;
 		}
-		return l.split("[ ,]*");
+		return l.split("[ ,]+");
 	}
 	
 	public String[] getExcludedSourcePaths() {
