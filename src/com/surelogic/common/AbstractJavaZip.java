@@ -32,7 +32,7 @@ public abstract class AbstractJavaZip<T> {
 		}
 	}
 	
-	private static class TempInfo {
+	protected static class TempInfo {
 		final Map<String, Map<String, String>> fileMap = new TreeMap<String, Map<String, String>>();
 		final Map<String, FileInfo> fileInfo = new HashMap<String, FileInfo>();
 		
@@ -123,11 +123,8 @@ public abstract class AbstractJavaZip<T> {
 
 	protected abstract long getTimestamp(T res);
 	
-	private void addAnnotatedResourcesToZip(final ZipOutputStream out, 
+	protected final void addAnnotatedFileToZip(final ZipOutputStream out, 
 			TempInfo info, final T resource) {
-		if (!isAccessible(resource)) {
-			return;
-		}
 		String pathName;
 		try {
 			pathName = getFullPath(resource);
@@ -139,67 +136,77 @@ public abstract class AbstractJavaZip<T> {
 		if (pathName.startsWith("/")) {
 			pathName = pathName.substring(1);
 		}
-		if (isFile(resource)) {
-			final String packageName = getJavaPackageNameOrNull(resource);
-			if (packageName == null) {
-				return;
-			}
-			/*
-			 * if (resource.toString().contains("pphtml")) {
-			 * System.out.println("Looking at: "+resource); }
-			 */
+		
+		final String packageName = getJavaPackageNameOrNull(resource);
+		if (packageName == null) {
+			return;
+		}
+		/*
+		 * if (resource.toString().contains("pphtml")) {
+		 * System.out.println("Looking at: "+resource); }
+		 */
+		try {
+			final InputStream is = getFileContents(resource);
 			try {
-				final InputStream is = getFileContents(resource);
-				try {
-					out.putNextEntry(new ZipEntry(pathName));
-					String className = null;
-					byte[] hash = FileUtility.copyToStream(true, getFullPath(resource), is,
-							pathName, out, false);
-					if (hash != null) {
-						long time = getTimestamp(resource);
-						info.fileInfo.put(pathName, new FileInfo(time, hash));
+				out.putNextEntry(new ZipEntry(pathName));
+				String className = null;
+				byte[] hash = FileUtility.copyToStream(true, getFullPath(resource), is,
+						pathName, out, false);
+				if (hash != null) {
+					long time = getTimestamp(resource);
+					info.fileInfo.put(pathName, new FileInfo(time, hash));
+				} else {
+					return;
+				}
+				className = getName(resource);
+				final String classKey = className;
+				// remove ".java"
+				className = className.substring(0, className.length() - 5);
+				Map<String, String> classNameToSource;
+				if (info.fileMap.containsKey(packageName)) {
+					classNameToSource = info.fileMap.get(packageName);
+				} else {
+					classNameToSource = new TreeMap<String, String>();
+					info.fileMap.put(packageName, classNameToSource);
+				}
+
+				// Changed to map non-main classes
+				final String srcPath = "/" + pathName;
+				final String zipPath = pathName;
+				classNameToSource.put(classKey, srcPath);
+				final String[] types = getIncludedTypes(resource);
+				if (types == null || types.length == 0) {
+					if (className.equals("package-info")) {
+						classNameToSource.put(
+								packageName + '.' + className, zipPath);
 					} else {
-						return;
+						classNameToSource.put(classKey, zipPath);
 					}
-					className = getName(resource);
-					final String classKey = className;
-					// remove ".java"
-					className = className.substring(0, className.length() - 5);
-					Map<String, String> classNameToSource;
-					if (info.fileMap.containsKey(packageName)) {
-						classNameToSource = info.fileMap.get(packageName);
-					} else {
-						classNameToSource = new TreeMap<String, String>();
-						info.fileMap.put(packageName, classNameToSource);
-					}
-					// Changed to map non-main classes
-					final String srcPath = "/" + pathName;
-					final String zipPath = pathName;
-					classNameToSource.put(classKey, srcPath);
-					final String[] types = getIncludedTypes(resource);
-					if (types == null || types.length == 0) {
-						if (className.equals("package-info")) {
-							classNameToSource.put(
-									packageName + '.' + className, zipPath);
-						} else {
-							classNameToSource.put(classKey, zipPath);
-						}
-					} else {
-						for (final String t : types) {
-							classNameToSource.put(t, zipPath);
-						}
-					}
-					out.closeEntry();
-				} finally {
-					if (is != null) {
-						is.close();
+				} else {
+					for (final String t : types) {
+						classNameToSource.put(t, zipPath);
 					}
 				}
-			} catch (final IOException e) {
-				LOG.log(Level.SEVERE, "Error adding " + pathName + " to ZIP.",
-						e);
-				return;
+				out.closeEntry();
+			} finally {
+				if (is != null) {
+					is.close();
+				}
 			}
+		} catch (final IOException e) {
+			LOG.log(Level.SEVERE, "Error adding " + pathName + " to ZIP.",
+					e);
+			return;
+		}
+	}
+	
+	protected void addAnnotatedResourcesToZip(final ZipOutputStream out, 
+			TempInfo info, final T resource) {
+		if (!isAccessible(resource)) {
+			return;
+		}
+		if (isFile(resource)) {
+			addAnnotatedFileToZip(out, info, resource);
 		} else { // Resource is an container
 			T[] members;
 			try {
