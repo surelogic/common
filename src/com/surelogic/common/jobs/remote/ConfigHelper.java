@@ -40,10 +40,16 @@ public final class ConfigHelper {
 	public void addPluginToPath(final boolean debug, Collection<File> path, final String pluginId, boolean unpacked) {
 		final String pluginDir = getPluginDir(debug, pluginId);
 		if (unpacked) {
-			boolean workspaceExists = addToPath(path, pluginDir + "/bin", false); // in workspace
-			if (!workspaceExists) {
+			File loc = new File(pluginDir);
+			if (loc.isDirectory()) {
+				boolean workspaceExists = addToPath(path, pluginDir + "/bin", false); // in workspace
+				if (!workspaceExists) {
+					addToPath(path, pluginDir+"/"+loc.getName()+".jar"); // in Ant	
+				}
+			} else {
 				addToPath(path, pluginDir); // as plugin
 			}
+
 		} else if (pluginDir.endsWith(".jar")) {
 			addToPath(path, pluginDir); // as plugin
 		} else {
