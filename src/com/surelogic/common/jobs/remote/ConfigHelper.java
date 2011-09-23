@@ -44,7 +44,7 @@ public final class ConfigHelper {
 			if (loc.isDirectory()) {
 				boolean workspaceExists = addToPath(path, pluginDir + "/bin", false); // in workspace
 				if (!workspaceExists) {
-					boolean jarExists = addToPath(path, pluginDir+"/"+loc.getName()+".jar"); // in Ant	
+					boolean jarExists = addToPath(path, pluginDir+"/"+loc.getName()+".jar", false); // in Ant	
 					if (!jarExists) {
 						addToPath(path, pluginDir); // as plugin
 					}
