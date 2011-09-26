@@ -24,6 +24,7 @@ public abstract class AbstractXMLReader extends NestedXMLReader {
 	public static final String PATH_ATTR = "path";
 	public static final String URI_ATTR  = "uri";
 	public static final String OFFSET_ATTR = "offset";
+	public static final String LENGTH_ATTR = "length";
 	public static final String PKG_ATTR = "pkg";
 	public static final String CUNIT_ATTR = "cu";
 	
