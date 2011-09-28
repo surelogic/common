@@ -297,7 +297,12 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 					StringTokenizer st = new StringTokenizer(line, "#,");
 					if (st.hasMoreTokens()) {
 						String first = st.nextToken();
-						Remote cmd   = Remote.valueOf(first);
+						Remote cmd;
+						try {
+							cmd = Remote.valueOf(first);
+						} catch(Exception e) {
+							cmd = Remote.OTHER;
+						}
 						switch (cmd) {
 						case TASK:
 							println(line);							
