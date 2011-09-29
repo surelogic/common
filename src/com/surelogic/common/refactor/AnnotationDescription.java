@@ -9,6 +9,7 @@ public class AnnotationDescription implements Comparable<AnnotationDescription> 
 
 	private final String annotation;
 	private final String contents;
+	private final String replacedContents;
 	private final IJavaDeclaration target;
 	private final IJavaDeclaration assumptionTarget;
 	private final CU cu;
@@ -16,11 +17,11 @@ public class AnnotationDescription implements Comparable<AnnotationDescription> 
 
 	public AnnotationDescription(final String annotation,
 			final String contents, final IJavaDeclaration target) {
-		this(annotation, contents, target, null, null, null);
+		this(annotation, contents, null, target, null, null, null);
 	}
 
 	public AnnotationDescription(final String annotation,
-			final String contents, final IJavaDeclaration target,
+			final String contents, final String replaced, final IJavaDeclaration target,
 			final IJavaDeclaration assumptionTarget, final CU cu,
 			final CU assumptionCU) {
 		if (annotation == null) {
@@ -35,6 +36,7 @@ public class AnnotationDescription implements Comparable<AnnotationDescription> 
 		this.assumptionTarget = assumptionTarget;
 		this.annotation = annotation;
 		this.contents = contents;
+		this.replacedContents = replaced;
 		this.cu = cu;
 		this.assumptionCU = assumptionCU;
 	}
@@ -66,17 +68,24 @@ public class AnnotationDescription implements Comparable<AnnotationDescription> 
 	public int compareTo(final AnnotationDescription o) {
 		int compare = cmp.compare(getAnnotation(), o.getAnnotation());
 		if (compare == 0) {
-			if (contents == null && o.contents == null) {
-				compare = 0;
-			} else if (contents == null) {
-				compare = -1;
-			} else if (o.contents == null) {
-				compare = 1;
-			} else {
-				compare = o.contents.compareTo(contents);
-			}
+			compare = compare(contents, o.contents);
+		}
+		if (compare == 0) {
+			compare = compare(replacedContents, o.replacedContents);
 		}
 		return compare;
+	}
+	
+	private static int compare(String s1, String s2) {
+		if (s1 == null && s2 == null) {
+			return 0;
+		} else if (s1 == null) {
+			return -1;
+		} else if (s2 == null) {
+			return 1;
+		} else {
+			return s2.compareTo(s1);
+		}
 	}
 
 	public boolean hasContents() {
