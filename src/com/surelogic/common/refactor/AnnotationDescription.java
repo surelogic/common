@@ -99,6 +99,7 @@ public class AnnotationDescription implements Comparable<AnnotationDescription> 
 		result = prime * result
 				+ (annotation == null ? 0 : annotation.hashCode());
 		result = prime * result + (contents == null ? 0 : contents.hashCode());
+		result = prime * result + (replacedContents == null ? 0 : replacedContents.hashCode());
 		result = prime * result + (target == null ? 0 : target.hashCode());
 		return result;
 	}
@@ -115,30 +116,23 @@ public class AnnotationDescription implements Comparable<AnnotationDescription> 
 			return false;
 		}
 		final AnnotationDescription other = (AnnotationDescription) obj;
-		if (annotation == null) {
-			if (other.annotation != null) {
+		return isSame(annotation, other.annotation) &&
+		       isSame(contents, other.contents) &&
+		       isSame(replacedContents, other.replacedContents) &&
+		       isSame(target, other.target);
+	}
+
+	private static <T> boolean isSame(T o1, T o2) {
+		if (o1 == null) {
+			if (o2 != null) {
 				return false;
 			}
-		} else if (!annotation.equals(other.annotation)) {
-			return false;
-		}
-		if (contents == null) {
-			if (other.contents != null) {
-				return false;
-			}
-		} else if (!contents.equals(other.contents)) {
-			return false;
-		}
-		if (target == null) {
-			if (other.target != null) {
-				return false;
-			}
-		} else if (!target.equals(other.target)) {
+		} else if (!o1.equals(o2)) {
 			return false;
 		}
 		return true;
 	}
-
+	
 	public CU getCU() {
 		return cu;
 	}
