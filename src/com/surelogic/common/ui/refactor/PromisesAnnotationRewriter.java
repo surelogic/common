@@ -26,6 +26,7 @@ import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.ImportDeclaration;
+import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MarkerAnnotation;
 import org.eclipse.jdt.core.dom.MemberValuePair;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
@@ -35,6 +36,7 @@ import org.eclipse.jdt.core.dom.SingleMemberAnnotation;
 import org.eclipse.jdt.core.dom.StringLiteral;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
+import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
 import org.eclipse.jdt.core.dom.rewrite.ListRewrite;
 import org.eclipse.text.edits.TextEdit;
@@ -428,7 +430,55 @@ public class PromisesAnnotationRewriter {
 	private static final String ASSUME = "Assume";
 	private static final String ASSUMES = "Assumes";
 
-	class AssumptionMergeStrategy implements Mergeable {
+	abstract class AbstractMergeable implements Mergeable {
+		@SuppressWarnings("unchecked")
+		protected void extractExistingAnnos(final Annotation cur, final Set<String> contents) {		
+			final Expression e = extractValue(cur);
+			if (e instanceof StringLiteral) {
+				final String lit = ((StringLiteral) e).getLiteralValue();
+				handleExistingAnno(lit, contents);
+			} else if (e instanceof ArrayInitializer) {
+				final ArrayInitializer init = (ArrayInitializer) e;
+				final List<Expression> es = init.expressions();
+				for (final Expression ex : es) {
+					if (ex instanceof Annotation) {
+						extractExistingAnnos((Annotation) ex, contents);
+					}
+				}
+			} else if (e instanceof InfixExpression) {
+				final InfixExpression ex = (InfixExpression) e;
+				if (ex.getOperator() == Operator.PLUS) {
+					// Assume to be a string concatenation
+					StringBuilder sb = new StringBuilder();
+					sb.append(extractString(ex.getLeftOperand()));
+					sb.append(extractString(ex.getRightOperand()));
+					if (ex.hasExtendedOperands()) {
+						for(Object o : ex.extendedOperands()) {
+							sb.append(extractString((Expression) o));
+						}
+					}
+				}
+			}
+		}
+
+		private String extractString(Expression e) {
+			if (e instanceof StringLiteral) {
+				return ((StringLiteral) e).getLiteralValue();
+			}
+			SLLogger.getLogger().warning("Unexpected expression in anno: "+e);
+			return e.toString();
+		}
+		
+		protected void handleExistingAnno(String s, Set<String> contents) {
+			// Default thing to do
+			contents.add(s);
+		}
+	}
+	
+	/**
+	 * Creates assumptions for the annotations
+	 */
+	class AssumptionMergeStrategy extends AbstractMergeable {
 
 		final List<AnnotationDescription> newAnnotations;
 
@@ -436,29 +486,11 @@ public class PromisesAnnotationRewriter {
 			this.newAnnotations = new ArrayList<AnnotationDescription>(anns);
 		}
 
-		@SuppressWarnings("unchecked")
 		public Annotation merge(final AST ast, final Annotation cur,
 				final IJavaDeclaration target, final Set<String> imports) {
 			final Set<String> existing = new HashSet<String>();
 			if (cur != null) {
-				final Expression e = extractValue(cur);
-				if (e instanceof StringLiteral) {
-					final String lit = ((StringLiteral) e).getLiteralValue();
-					existing.add(lit);
-				} else if (e instanceof ArrayInitializer) {
-					final ArrayInitializer init = (ArrayInitializer) e;
-					final List<Expression> es = init.expressions();
-					for (final Expression ex : es) {
-						if (ex instanceof Annotation) {
-							final Expression val = extractValue((Annotation) ex);
-							if (val instanceof StringLiteral) {
-								final String lit = ((StringLiteral) val)
-										.getLiteralValue();
-								existing.add(lit);
-							}
-						}
-					}
-				}
+				extractExistingAnnos(cur, existing);
 			}
 			for (final AnnotationDescription desc : newAnnotations) {
 				addImport(ASSUME, imports);
@@ -493,7 +525,10 @@ public class PromisesAnnotationRewriter {
 	private static final String REQUIRESLOCK = "RequiresLock";
 	private static final String AGGREGATE = "Aggregate";
 
-	class CommaDelimitedMergeStrategy implements Mergeable {
+	/**
+	 * Combines the annotations into a one, separated by commas
+	 */
+	class CommaDelimitedMergeStrategy extends AbstractMergeable {
 
 		final List<AnnotationDescription> newAnnotations;
 		final String name;
@@ -522,16 +557,7 @@ public class PromisesAnnotationRewriter {
 				}
 			}
 			if (a != null) {
-				final Expression e = extractValue(a);
-				if (e instanceof StringLiteral) {
-					final StringLiteral lit = (StringLiteral) e;
-					final String ss = lit.getLiteralValue();
-					if (ss != null && ss.length() > 0) {
-						for (final String s : ss.split(",")) {
-							contents.add(s.trim());
-						}
-					}
-				}
+				extractExistingAnnos(a, contents);
 			}
 			if (contents.isEmpty()) {
 				final MarkerAnnotation ma = ast.newMarkerAnnotation();
@@ -547,21 +573,61 @@ public class PromisesAnnotationRewriter {
 				return ann;
 			}
 		}
+		@Override
+		protected void handleExistingAnno(String ss, Set<String> contents) {
+			if (ss != null && ss.length() > 0) {
+				for (final String s : ss.split(",")) {
+					contents.add(s.trim());
+				}
+			}
+		}
 	}
 
-	class DefaultMergeStrategy implements Mergeable {
+	/**
+	 * Adds the annotation, wrapping the whole thing in a 'plural' annotation if needed
+	 */
+	class DefaultMergeStrategy extends AbstractMergeable {
 
 		final String name;
 		final String wrapper;
 		final Set<AnnotationDescription> newAnnotations;
-
+		final Map<String,AnnotationDescription> altAnnotations;
+		
 		DefaultMergeStrategy(final List<AnnotationDescription> anns) {
-			this.newAnnotations = new HashSet<AnnotationDescription>(anns);
+			// Figure out which set the annos need to be in
+			// (allocating the sets on demand)
+			Set<AnnotationDescription> newA = Collections.emptySet();
+			Set<AnnotationDescription> altA = Collections.emptySet();
+			for(AnnotationDescription a : anns) {
+				final boolean replacing = a.getReplacedContents() != null;
+				Set<AnnotationDescription> set = replacing ? altA : newA;								
+				if (set.isEmpty()) {
+					set = new HashSet<AnnotationDescription>();
+					if (replacing) {
+						altA = set;
+					} else {
+						newA = set;
+					}
+				}
+				set.add(a);
+			}
+			
+			this.newAnnotations = newA;
+			if (altA.isEmpty()) {
+				altAnnotations = Collections.emptyMap();
+			} else {
+				altAnnotations = new HashMap<String,AnnotationDescription>(altA.size());
+				for(AnnotationDescription a : altA) {
+					AnnotationDescription old = altAnnotations.put(a.getReplacedContents(), a);
+					if (old != null) {
+						SLLogger.getLogger().warning("Multiple replacements for "+a.getReplacedContents());	
+					}
+				}
+			}
 			this.name = anns.get(0).getAnnotation();
 			this.wrapper = name + "s";
 		}
 
-		@SuppressWarnings("unchecked")
 		public Annotation merge(final AST ast, final Annotation cur,
 				final IJavaDeclaration target, final Set<String> imports) {
 			final Set<String> newContents = new HashSet<String>();
@@ -569,29 +635,27 @@ public class PromisesAnnotationRewriter {
 				newContents.add(desc.getContents());
 			}
 			if (cur != null) {
-				final Expression e = extractValue(cur);
-				if (e instanceof StringLiteral) {
-					final String lit = ((StringLiteral) e).getLiteralValue();
-					newContents.add(lit);
-				} else if (e instanceof ArrayInitializer) {
-					final ArrayInitializer init = (ArrayInitializer) e;
-					final List<Expression> es = init.expressions();
-					for (final Expression ex : es) {
-						if (ex instanceof Annotation) {
-							final Expression val = extractValue((Annotation) ex);
-							if (val instanceof StringLiteral) {
-								final String lit = ((StringLiteral) val)
-										.getLiteralValue();
-								newContents.add(lit);
-							}
-						}
-					}
+				extractExistingAnnos(cur, newContents);
+			} else {
+				// check if we're supposed to replace something
+				for (final String alt : altAnnotations.keySet()) {				
+					SLLogger.getLogger().warning("Not replacing @"+name+"("+alt+") as expected");					
 				}
-			}
+			}			
 			return createWrappedAnnotation(ast, name, wrapper, newContents,
 					imports);
 		}
 
+		@Override
+		protected void handleExistingAnno(String s, Set<String> contents) {
+			AnnotationDescription alt = altAnnotations.get(s);
+			if (alt != null) {
+				contents.add(alt.getContents());
+			} else {
+				contents.add(s);
+			}
+		}
+		
 		public boolean match(final Annotation a) {
 			final String aName = a.getTypeName().getFullyQualifiedName()
 					.replaceAll(".*\\.", "");
