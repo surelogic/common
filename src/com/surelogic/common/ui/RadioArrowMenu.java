@@ -103,8 +103,7 @@ public final class RadioArrowMenu {
 				break;
 			}
 			// At least one choice
-			int i = (f_focusChoice == null) ? 0 : f_choices
-					.indexOf(f_focusChoice);
+			int i = (f_focusChoice == null) ? 0 : f_choices.indexOf(f_focusChoice);
 			if (e.keyCode == SWT.ARROW_UP) {
 				i--;
 				if (i < 0 || i >= f_choices.size()) {
@@ -203,14 +202,12 @@ public final class RadioArrowMenu {
 				}
 				if (enabled) {
 					if (l.getParent().getParent() == selected) {
-						l.setForeground(display
-								.getSystemColor(SWT.COLOR_LIST_SELECTION_TEXT));
+						l.setForeground(display.getSystemColor(SWT.COLOR_LIST_SELECTION_TEXT));
 					} else {
 						l.setForeground(null);
 					}
 				} else {
-					l.setForeground(display
-							.getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
+					l.setForeground(display.getSystemColor(SWT.COLOR_TITLE_INACTIVE_FOREGROUND));
 				}
 			}
 		}
@@ -277,8 +274,7 @@ public final class RadioArrowMenu {
 		new Label(parent, SWT.NONE);
 	}
 
-	private Composite constructChoice(final Object choice, Image image,
-			Composite parent) {
+	private Composite constructChoice(final Object choice, Image image, Composite parent) {
 		final Composite result = new Composite(parent, SWT.NONE);
 		FillLayout fill = new FillLayout(SWT.HORIZONTAL);
 		fill.marginHeight = 1;
@@ -291,29 +287,29 @@ public final class RadioArrowMenu {
 		layout.marginWidth = 0;
 		layout.numColumns = 3;
 		mezzanine.setLayout(layout);
-		// mezzanine.setLayoutData(new GridData(SWT.DEFAULT, SWT.CENTER, true,
-		// false));
 
 		final Label prefixImage = new Label(mezzanine, SWT.NONE);
 		prefixImage.setImage(image);
-		prefixImage.setLayoutData(new GridData(SWT.DEFAULT, SWT.CENTER, false,
-				false));
+		prefixImage.setLayoutData(new GridData(SWT.DEFAULT, SWT.CENTER, false, false));
 		final Label textLabel = new Label(mezzanine, SWT.LEFT);
 		textLabel.setText(choice.toString());
-		textLabel
-				.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false));
+		textLabel.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false));
 		final Label arrowImage = new Label(mezzanine, SWT.RIGHT);
-		arrowImage.setImage(SLImages
-				.getImage(CommonImages.IMG_RIGHT_ARROW_SMALL));
-		arrowImage
-				.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		arrowImage.setImage(SLImages.getImage(CommonImages.IMG_RIGHT_ARROW_SMALL));
+		arrowImage.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 
-		f_choiceToComposite.put(choice, result);
-		textLabel.addListener(SWT.MouseDown, new Listener() {
+		final Listener choiceClickListener = new Listener() {
 			public void handleEvent(Event event) {
 				selected(result, choice, true);
 			}
-		});
+		};
+		mezzanine.addListener(SWT.MouseDown, choiceClickListener);
+		prefixImage.addListener(SWT.MouseDown, choiceClickListener);
+		textLabel.addListener(SWT.MouseDown, choiceClickListener);
+		arrowImage.addListener(SWT.MouseDown, choiceClickListener);
+		
+		f_choiceToComposite.put(choice, result);
+		
 		int i = f_choices.indexOf(choice);
 		if (i < 0) {
 			f_choices.add(choice);
@@ -323,8 +319,7 @@ public final class RadioArrowMenu {
 		return result;
 	}
 
-	private void selected(Composite button, Object choice,
-			boolean notifyObservers) {
+	private void selected(Composite button, Object choice, boolean notifyObservers) {
 		focused(button, choice);
 
 		if (f_selectedChoice != null) {
@@ -373,8 +368,7 @@ public final class RadioArrowMenu {
 		final Display display = button.getShell().getDisplay();
 		Color selected = display.getSystemColor(SWT.COLOR_LIST_SELECTION);
 		setBackground(button, selected);
-		setLabelTextColorDeep(button,
-				display.getSystemColor(SWT.COLOR_LIST_SELECTION_TEXT));
+		setLabelTextColorDeep(button, display.getSystemColor(SWT.COLOR_LIST_SELECTION_TEXT));
 	}
 
 	private void unhighlight(Composite button) {
@@ -444,8 +438,7 @@ public final class RadioArrowMenu {
 		final Display display = button.getShell().getDisplay();
 		Color focused;
 		if (hasFocus) {
-			focused = display
-					.getSystemColor(SWT.COLOR_TITLE_BACKGROUND_GRADIENT);
+			focused = display.getSystemColor(SWT.COLOR_TITLE_BACKGROUND_GRADIENT);
 		} else {
 			focused = display.getSystemColor(SWT.COLOR_BLACK);
 		}
