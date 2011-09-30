@@ -197,9 +197,6 @@ public final class RadioArrowMenu {
 			} else if (control instanceof Label) {
 				final Label l = (Label) control;
 				l.setEnabled(enabled);
-				if (!l.getText().equals("")) {
-					// Nothing to do
-				}
 				if (enabled) {
 					if (l.getParent().getParent() == selected) {
 						l.setForeground(display.getSystemColor(SWT.COLOR_LIST_SELECTION_TEXT));
@@ -307,9 +304,9 @@ public final class RadioArrowMenu {
 		prefixImage.addListener(SWT.MouseDown, choiceClickListener);
 		textLabel.addListener(SWT.MouseDown, choiceClickListener);
 		arrowImage.addListener(SWT.MouseDown, choiceClickListener);
-		
+
 		f_choiceToComposite.put(choice, result);
-		
+
 		int i = f_choices.indexOf(choice);
 		if (i < 0) {
 			f_choices.add(choice);
