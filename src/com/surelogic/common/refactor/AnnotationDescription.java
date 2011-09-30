@@ -57,6 +57,10 @@ public class AnnotationDescription implements Comparable<AnnotationDescription> 
 		return contents;
 	}
 
+	public String getReplacedContents() {
+		return replacedContents;
+	}
+	
 	@Override
 	public String toString() {
 		if (getContents() == null) {
