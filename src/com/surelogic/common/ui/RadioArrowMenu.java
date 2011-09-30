@@ -293,7 +293,6 @@ public final class RadioArrowMenu {
 		prefixImage.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
 		final Label textLabel = new Label(mezzanine, SWT.LEFT);
 		textLabel.setText(choice.toString());
-		textLabel.setBackground(textLabel.getDisplay().getSystemColor(SWT.COLOR_MAGENTA));
 		textLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		final Label arrowImage = new Label(mezzanine, SWT.RIGHT);
 		arrowImage.setImage(SLImages.getImage(CommonImages.IMG_RIGHT_ARROW_SMALL));
