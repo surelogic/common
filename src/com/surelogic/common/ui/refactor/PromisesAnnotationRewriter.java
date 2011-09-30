@@ -54,12 +54,21 @@ public class PromisesAnnotationRewriter {
 	private final ASTParser parser;
 	private ASTNode ast;
 	private ASTRewrite rewrite;
-
-	public PromisesAnnotationRewriter() {
+	private final Set<String> allowsMultipleAnnos;
+	
+	  /**
+	   * @param annos A set of annotation names that allow multiple annotations on a given declaration
+	   */
+	public PromisesAnnotationRewriter(Set<String> annos) {
 		parser = ASTParser.newParser(AST.JLS3);
 		parser.setResolveBindings(true);
 		parser.setBindingsRecovery(true);
 		parser.setStatementsRecovery(true);
+		allowsMultipleAnnos = annos;
+	}
+	
+	public PromisesAnnotationRewriter() {
+		this(null);		
 	}
 
 	/**
@@ -589,11 +598,15 @@ public class PromisesAnnotationRewriter {
 	class DefaultMergeStrategy extends AbstractMergeable {
 
 		final String name;
+		final boolean allowsMultiple;
 		final String wrapper;
 		final Set<AnnotationDescription> newAnnotations;
 		final Map<String,AnnotationDescription> altAnnotations;
 		
 		DefaultMergeStrategy(final List<AnnotationDescription> anns) {
+			this.name = anns.get(0).getAnnotation();
+			allowsMultiple = allowsMultipleAnnos != null && allowsMultipleAnnos.contains(name);			
+			
 			// Figure out which set the annos need to be in
 			// (allocating the sets on demand)
 			Set<AnnotationDescription> newA = Collections.emptySet();
@@ -611,7 +624,9 @@ public class PromisesAnnotationRewriter {
 				}
 				set.add(a);
 			}
-			
+			if (!allowsMultiple) {
+				// TODO sanity checks?
+			}
 			this.newAnnotations = newA;
 			if (altA.isEmpty()) {
 				altAnnotations = Collections.emptyMap();
@@ -624,7 +639,6 @@ public class PromisesAnnotationRewriter {
 					}
 				}
 			}
-			this.name = anns.get(0).getAnnotation();
 			this.wrapper = name + "s";
 		}
 
@@ -648,7 +662,17 @@ public class PromisesAnnotationRewriter {
 
 		@Override
 		protected void handleExistingAnno(String s, Set<String> contents) {
-			AnnotationDescription alt = altAnnotations.get(s);
+			if (altAnnotations.isEmpty()) {
+				contents.add(s);
+				return;
+			}			
+			AnnotationDescription alt;
+			if (allowsMultiple) {
+				alt = altAnnotations.get(s);			
+			} else {
+				// TODO check if there's more than one?
+				alt = altAnnotations.values().iterator().next();
+			}
 			if (alt != null) {
 				contents.add(alt.getContents());
 			} else {
