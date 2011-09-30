@@ -158,7 +158,7 @@ public final class RadioArrowMenu {
 	public void addChoice(Object choice, Image image) {
 		if (choice == null)
 			throw new IllegalArgumentException("choice must be non-null");
-		Composite button = constructChoice(choice, image, f_panel);
+		final Composite button = constructChoice(choice, image, f_panel);
 
 		if (f_focusChoice == null) {
 			focused(button, choice); // Set to be the first one
@@ -276,7 +276,7 @@ public final class RadioArrowMenu {
 
 	private Composite constructChoice(final Object choice, Image image, Composite parent) {
 		final Composite result = new Composite(parent, SWT.NONE);
-		FillLayout fill = new FillLayout(SWT.HORIZONTAL);
+		final FillLayout fill = new FillLayout(SWT.HORIZONTAL);
 		fill.marginHeight = 1;
 		fill.marginWidth = 1;
 		result.setLayout(fill);
@@ -290,13 +290,14 @@ public final class RadioArrowMenu {
 
 		final Label prefixImage = new Label(mezzanine, SWT.NONE);
 		prefixImage.setImage(image);
-		prefixImage.setLayoutData(new GridData(SWT.DEFAULT, SWT.CENTER, false, false));
+		prefixImage.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
 		final Label textLabel = new Label(mezzanine, SWT.LEFT);
 		textLabel.setText(choice.toString());
-		textLabel.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false));
+		textLabel.setBackground(textLabel.getDisplay().getSystemColor(SWT.COLOR_MAGENTA));
+		textLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		final Label arrowImage = new Label(mezzanine, SWT.RIGHT);
 		arrowImage.setImage(SLImages.getImage(CommonImages.IMG_RIGHT_ARROW_SMALL));
-		arrowImage.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+		arrowImage.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
 
 		final Listener choiceClickListener = new Listener() {
 			public void handleEvent(Event event) {
