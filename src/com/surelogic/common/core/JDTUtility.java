@@ -1208,9 +1208,48 @@ public final class JDTUtility {
 			}
 		};
 	}
+
+	/**
+	 * Recursively compute the set of projects and their dependent projects
+	 * @throws JavaModelException 
+	 */
+	public static Collection<IJavaProject> getAllRequiredProjects(List<IJavaProject> selected) {
+		final Set<IJavaProject> required = new HashSet<IJavaProject>();
+		for(IJavaProject p : selected) {
+			getAllRequiredProjects(required, p);
+		}
+		return required;
+	}
 	
+	private static void getAllRequiredProjects(Set<IJavaProject> collected, IJavaProject p) {
+		if (p == null) {
+			return; 
+		}
+		if (collected.contains(p)) {
+			return; // Done with this project
+		}
+		collected.add(p);
+
+		try {
+			for (IClasspathEntry cpe : p.getResolvedClasspath(true)) {
+				if (cpe.getEntryKind() == IClasspathEntry.CPE_PROJECT) {
+					final String projName = cpe.getPath().lastSegment();
+					IJavaProject dependency = getJavaProject(projName);
+					if (dependency == null) {
+						throw new IllegalStateException("Unable to find project '"+projName+"'required by "+p.getElementName());
+					}
+					getAllRequiredProjects(collected, dependency);
+				}
+			}
+		} catch (JavaModelException e) {
+			throw new IllegalStateException("Could not resolve classpath for "+p.getElementName());
+		}
+	}
+
 	private JDTUtility() {
 		// utility
 	}
+
+
 
 }
