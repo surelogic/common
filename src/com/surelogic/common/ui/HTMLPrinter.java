@@ -19,10 +19,6 @@ import com.surelogic.common.ui.jobs.SLUIJob;
 
 /**
  * Provides a set of convenience methods for creating HTML pages.
- * <p>
- * Moved into this package from
- * <code>org.eclipse.jface.internal.text.revisions</code>.
- * </p>
  */
 public final class HTMLPrinter {
 

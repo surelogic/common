@@ -298,9 +298,6 @@ public final class EclipseUIUtility {
 	}
 
 	/**
-	 * Copied from: org.eclipse.debug.internal.ui.launchConfigurations.
-	 * SaveScopeResourcesHandler
-	 * 
 	 * Builds the list of editors that apply to this build that need to be saved
 	 * 
 	 * @param projects
