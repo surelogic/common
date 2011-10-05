@@ -363,7 +363,7 @@ public final class RadioArrowMenu {
 
 	private void highlight(Composite button) {
 		final Display display = button.getShell().getDisplay();
-		Color selected = display.getSystemColor(SWT.COLOR_LIST_SELECTION);
+		final Color selected = display.getSystemColor(SWT.COLOR_LIST_SELECTION);
 		setBackground(button, selected);
 		setLabelTextColorDeep(button, display.getSystemColor(SWT.COLOR_LIST_SELECTION_TEXT));
 	}
@@ -402,13 +402,6 @@ public final class RadioArrowMenu {
 		}
 	}
 
-	/*
-	 * private void setAlignmentDeep(Control c, int alignment) { if (c
-	 * instanceof Composite) { for (Control child : ((Composite)
-	 * c).getChildren()) { setAlignmentDeep(child, alignment); } } else { if (c
-	 * instanceof Label) { Label l = (Label) c; if (!l.getText().equals("")) {
-	 * l.setAlignment(alignment); } } } }
-	 */
 	private void focused(Composite button, Object choice) {
 		if (f_focusChoice != null) {
 			// already focused?
@@ -433,13 +426,12 @@ public final class RadioArrowMenu {
 
 	private void focus(Composite button, boolean hasFocus) {
 		final Display display = button.getShell().getDisplay();
-		Color focused;
+		final Color focused;
 		if (hasFocus) {
 			focused = display.getSystemColor(SWT.COLOR_TITLE_BACKGROUND_GRADIENT);
 		} else {
 			focused = display.getSystemColor(SWT.COLOR_BLACK);
 		}
 		button.setBackground(focused);
-		// setAlignmentDeep(button, SWT.RIGHT);
 	}
 }
