@@ -171,6 +171,10 @@ public final class CommonImages {
     public static final String IMG_VIRTUAL_DECR = "virtual_decr.gif";
     public static final String IMG_WARNING_DECR = "warning_decr.gif";
     public static final String IMG_WARNING = "warning.gif";
+    public static final String IMG_GREEN_CIRCLE = "test_green.png";
+    public static final String IMG_RED_CIRCLE = "test_red.png";
+    public static final String IMG_GRAY_CIRCLE = "test_gray.png";
+    public static final String IMG_YELLOW_CIRCLE = "test_yellow.png";
 
     /**
      * Gets the URL to the passed name within this package.
