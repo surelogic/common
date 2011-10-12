@@ -90,6 +90,7 @@ public final class CommonImages {
     public static final String IMG_JSURE_COMP_UNIT = "jsure_comp_unit.gif";
     public static final String IMG_JSURE_DRUM = "jsure_drum.gif";
     public static final String IMG_JSURE_FINDER = "jsure_finder.gif";
+    public static final String IMG_JSURE_FINDER_DOT = "jsure_finder_dot.gif";
     public static final String IMG_JSURE_GRAPH = "jsure_graph.gif";
     public static final String IMG_JSURE_LOGO = "jsure_logo.gif";
     public static final String IMG_JSURE_MODEL_PROBLEMS = "jsure_model_problems.gif";
