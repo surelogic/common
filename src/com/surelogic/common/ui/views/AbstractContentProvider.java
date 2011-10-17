@@ -1,13 +1,15 @@
 package com.surelogic.common.ui.views;
 
+import org.eclipse.jface.viewers.IColorProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 
 public abstract class AbstractContentProvider 
-implements IStructuredContentProvider, ILabelProvider {
+implements IStructuredContentProvider, ILabelProvider, IColorProvider {
 	@Override
 	public void dispose() {
 		// TODO Auto-generated method stub
@@ -42,4 +44,11 @@ implements IStructuredContentProvider, ILabelProvider {
 
 	}
 
+	public Color getForeground(Object element) {
+		return null;
+	}
+
+	public Color getBackground(Object element) {
+		return null;
+	}
 }
