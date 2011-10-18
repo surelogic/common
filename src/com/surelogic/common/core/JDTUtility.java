@@ -391,11 +391,12 @@ public final class JDTUtility {
 						final IType type = project.findType(packageNameHolder,
 								className, new NullProgressMonitor());
 
-						if (type != null && type.exists()
-								&& occurrenceCount > 0) {
-							return lookupAnonymous(type, occurrenceCount);
-						} else {
-							return type;
+						if (type != null && type.exists()) {
+							if (occurrenceCount > 0) {
+								return lookupAnonymous(type, occurrenceCount);
+							} else {
+								return type;
+							}
 						}
 					}
 				}
