@@ -16,10 +16,15 @@ public class SourceRef {
 		maybeReplace(AbstractXMLReader.PATH_ATTR);
 		maybeReplace(AbstractXMLReader.PKG_ATTR);
 		maybeReplace(AbstractXMLReader.CUNIT_ATTR);
+		maybeReplace(AbstractXMLReader.JAVA_ID_ATTR);
+		maybeReplace(AbstractXMLReader.WITHIN_DECL_ATTR);
 	}
 	
 	private void maybeReplace(String attr) {
 		String value  = attributes.get(attr);
+		if (value == null) {
+			return;
+		}
 		String intern = Entity.maybeIntern(value);
 		if (intern != value) {
 			attributes.put(attr, intern);
