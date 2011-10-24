@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -847,5 +848,29 @@ public final class FileUtility {
             path = path.substring(1);
         }
         return path;
+    }
+    
+    /**
+     * Iterate over all the files in the specified directory, 
+     * using the filerunner as a FileFilter
+     */
+    public static void recursiveIterate(final FileRunner r, File f) {
+    	if (f.isFile()) {	
+    		r.iterate(f);
+    	}
+    	else if (f.isDirectory()) {
+    		for(File child : f.listFiles(r)) {
+    			recursiveIterate(r, child);
+    		}
+    	}
+    	// otherwise, f doesn't exist, so do nothing
+    }
+    
+    public static abstract class FileRunner implements FileFilter {
+    	public boolean accept(File pathname) {
+    		return true;
+    	}
+    	
+    	protected abstract void iterate(File f);
     }
 }
