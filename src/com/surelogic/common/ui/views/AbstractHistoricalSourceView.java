@@ -341,11 +341,12 @@ public abstract class AbstractHistoricalSourceView extends ViewPart {
     private static int computeLineFromField(final String source,
             final String type, final String field) {
         ASTParser parser = ASTParser.newParser(AST.JLS3);
-        parser.setSource(source.toCharArray());
         parser.setUnitName("temp____");
         parser.setProject(null);
         parser.setKind(ASTParser.K_COMPILATION_UNIT);
         parser.setStatementsRecovery(true);
+        parser.setSource(source.toCharArray());
+
         CompilationUnit cu = (CompilationUnit) parser.createAST(null);
         @SuppressWarnings("unchecked")
         List<AbstractTypeDeclaration> decls = cu.types();
@@ -356,6 +357,19 @@ public abstract class AbstractHistoricalSourceView extends ViewPart {
             if (v.getPosition() != 0) {
                 // Subtract one because we are zero-based instead of one-based.
                 return cu.getLineNumber(v.getPosition()) - 1;
+            } else {
+                // This is a last ditch effort. I don't know why the parser
+                // sometimes won't parse certain types, but this will at least
+                // try to show us the field.
+                int idx = 0;
+                for (String typePart : ANON.matcher(type).replaceAll("")
+                        .split("[.$]")) {
+                    idx = source.indexOf(typePart, idx);
+                }
+                idx = source.indexOf(field, idx);
+                if (idx > 0) {
+                    return cu.getLineNumber(idx) - 1;
+                }
             }
         }
         return cu.getLineNumber(0) - 1;
