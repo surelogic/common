@@ -278,7 +278,7 @@ public final class EclipseUIUtility {
 	/**
 	 * Open the file with the given path with an Eclipse editor
 	 */
-	public static boolean openInEditor(String path) {
+	public static IEditorPart openInEditor(String path) {
 		IFileStore fileStore = EFS.getLocalFileSystem()
 				.getStore(new Path(path));
 		if (!fileStore.fetchInfo().isDirectory()
@@ -288,13 +288,13 @@ public final class EclipseUIUtility {
 				final IWorkbenchPage page = window.getActivePage();
 				try {
 					IEditorPart p = IDE.openEditorOnFileStore(page, fileStore);
-					return p != null;
+					return p;
 				} catch (PartInitException e) {
 					/* some code */
 				}
 			}
 		}
-		return false;
+		return null;
 	}
 
 	/**
