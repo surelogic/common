@@ -19,6 +19,7 @@ import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IViewPart;
@@ -297,6 +298,20 @@ public final class EclipseUIUtility {
 		return null;
 	}
 
+	public static IEditorPart openInEditor(IEditorInput input, String editorId) {
+		final IWorkbenchWindow window = getIWorkbenchWindow();
+		if (window != null) {
+			final IWorkbenchPage page = window.getActivePage();
+			try {
+				IEditorPart p = IDE.openEditor(page, input, editorId);
+				return p;
+			} catch (PartInitException e) {
+				/* some code */
+			}
+		}
+		return null;
+	}
+	
 	/**
 	 * Builds the list of editors that apply to this build that need to be saved
 	 * 
