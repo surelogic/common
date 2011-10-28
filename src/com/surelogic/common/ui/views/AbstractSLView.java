@@ -17,6 +17,8 @@ import org.eclipse.ui.part.*;
  * @author Edwin
  */
 public abstract class AbstractSLView extends ViewPart {
+	protected static final String[] noStrings = new String[0];
+	
 	protected Clipboard f_clipboard;
 
 	private Action f_doubleClickAction;
