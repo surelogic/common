@@ -12,8 +12,10 @@ import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
+import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.ByteBuffer;
@@ -521,6 +523,37 @@ public final class FileUtility {
         return b.toString();
     }
 
+    public static String getStreamContentsAsString(String label, InputStream input) {
+        try {
+        	return getReaderContentsAsString(new InputStreamReader(input));
+        } catch (final IOException e) {
+            final String msg = I18N.err(117, label);
+            SLLogger.getLogger().log(Level.SEVERE, msg, e);
+            throw new IllegalStateException(msg, e);
+        }
+    }
+    
+    private static String getReaderContentsAsString(Reader reader) throws IOException {
+        final String lf = SLUtility.PLATFORM_LINE_SEPARATOR;
+        final StringBuilder b = new StringBuilder();
+        final BufferedReader r = new BufferedReader(reader);
+        boolean first = true;
+        while (true) {
+            final String s = r.readLine();
+            if (s == null) {
+                break;
+            }
+            if (first) {
+                first = false;
+            } else {
+                b.append(lf);
+            }
+            b.append(s);
+        }
+        r.close();
+        return b.toString();
+    }
+    
     /**
      * Puts the contents of string into a file.
      * 
