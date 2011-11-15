@@ -51,10 +51,12 @@ public abstract class XMLReader extends DefaultHandler implements LexicalHandler
 				xmlReader.setProperty("http://xml.org/sax/properties/lexical-handler", this); 
 			}
 			saxParser.parse(stream, this);
+		/*
 		} catch (SAXException e) {
 			SLLogger.getLogger().log(Level.SEVERE, "Problem parsing JSure XML file", e);
 		} catch (ParserConfigurationException e) {
 			SLLogger.getLogger().log(Level.SEVERE, "Problem parsing JSure XML file", e);
+		*/
 		} finally {
 			listener.done();
 			stream.close();
