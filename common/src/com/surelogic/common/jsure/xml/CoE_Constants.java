@@ -45,6 +45,9 @@ public final class CoE_Constants {
   public static final String FLAGS_TAG_FMT    = " "+ATTR_FLAGS+"=\"%s\"";
   public static final String REDDOT_TAG_FMT   = " "+ATTR_REDDOTS+"=\"%s\"";
   
+  /** Flag to render no adornment */
+  public final static int NONE = 0;
+  
   /** Flag to render the assume (A) adornment */
   public final static int ASSUME = 0x001;
 
