@@ -7,6 +7,13 @@ import java.net.URL;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
+import com.surelogic.Utility;
+
+/**
+ * A utility that defines all the images used by SureLogic code as well as some
+ * utility methods to obtain references to the files on the filesystem.
+ */
+@Utility
 public final class CommonImages {
 
 	public static final String PATH = "/lib/images/";
