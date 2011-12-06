@@ -51,6 +51,7 @@ import com.surelogic.common.refactor.TypeContext;
 
 public class PromisesAnnotationRewriter {
 
+	private static final String PROMISE_PKG = "com.surelogic";
 	private final ASTParser parser;
 	private ASTNode ast;
 	private ASTRewrite rewrite;
@@ -370,8 +371,16 @@ public class PromisesAnnotationRewriter {
 		public void endVisit(final CompilationUnit node) {
 			// Add any new imports
 			final List<ImportDeclaration> importNodes = node.imports();
+
+			// Check for existing imports	
 			for (final ImportDeclaration i : importNodes) {
-				imports.remove(i.getName().getFullyQualifiedName());
+				final String qname = i.getName().getFullyQualifiedName();
+				if (PROMISE_PKG.equals(qname)) {
+					// This should handle any promises (unless ambiguous? TODO)
+					super.endVisit(node);
+					return;
+				}
+				imports.remove(qname);
 			}
 			if (imports.size() > 0) {
 				final AST ast = node.getAST();
@@ -783,7 +792,7 @@ public class PromisesAnnotationRewriter {
 	}
 
 	static void addImport(final String promise, final Set<String> imports) {
-		imports.add("com.surelogic." + promise);
+		imports.add(PROMISE_PKG+'.' + promise);
 	}
 
 	/**
