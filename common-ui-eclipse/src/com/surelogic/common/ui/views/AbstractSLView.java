@@ -23,7 +23,7 @@ public abstract class AbstractSLView extends ViewPart {
 
 	private Action f_doubleClickAction;
 
-	protected Control f_viewerControl;
+	private Control f_viewerControl;
 
 	@Override
 	public void createPartControl(Composite parent) {
@@ -31,17 +31,28 @@ public abstract class AbstractSLView extends ViewPart {
 		f_viewerControl = buildViewer(parent);
 		makeActions();
 		if (getViewer() != null) {
-			hookDoubleClickAction(getViewer());
-			hookContextMenu(getViewer());
+			setupViewer(getViewer());
 		}
 		contributeToActionBars();
 	}
 
 	/**
 	 * Setup the custom view
+	 * 
+	 * @return null if we need to call getViewer() to get the control
 	 */
 	protected abstract Control buildViewer(Composite parent);
 
+	protected Control getCurrentControl() {
+		if (f_viewerControl != null) {
+			return f_viewerControl;
+		}
+		if (getViewer() != null) {
+			return getViewer().getControl();
+		}
+		return null;
+ 	}
+	
 	/**
 	 * Enables various functionality if non-null
 	 */
@@ -49,9 +60,14 @@ public abstract class AbstractSLView extends ViewPart {
 		return null;
 	}
 
+	protected void setupViewer(StructuredViewer viewer) {
+		hookDoubleClickAction(viewer);
+		hookContextMenu(viewer);
+	}
+	
 	@Override
 	public void setFocus() {
-		f_viewerControl.setFocus();
+		getCurrentControl().setFocus();
 	}
 
 	/********************* Setup methods ******************************/
@@ -65,8 +81,8 @@ public abstract class AbstractSLView extends ViewPart {
 				AbstractSLView.this.fillContextMenu_private(manager, s);
 			}
 		});
-		Menu menu = menuMgr.createContextMenu(f_viewerControl);
-		f_viewerControl.setMenu(menu);
+		Menu menu = menuMgr.createContextMenu(viewer.getControl());
+		viewer.getControl().setMenu(menu);
 		getSite().registerContextMenu(menuMgr, viewer);
 	}
 
@@ -121,8 +137,13 @@ public abstract class AbstractSLView extends ViewPart {
 	/********************* Utility methods ******************************/
 
 	protected final void showMessage(String message) {
-		MessageDialog.openInformation(f_viewerControl.getShell(), this
-				.getClass().getSimpleName(), message);
+		Control c = getCurrentControl();
+		if (c != null) {
+			MessageDialog.openInformation(c.getShell(), this
+					.getClass().getSimpleName(), message);
+		} else {
+			System.out.println(message);
+		}
 	}
 
 	/********************* Utility methods to help with persistent state ******************************/
