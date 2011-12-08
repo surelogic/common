@@ -30,7 +30,7 @@ public abstract class AbstractSLView extends ViewPart {
 		f_clipboard = new Clipboard(getSite().getShell().getDisplay());		
 		f_viewerControl = buildViewer(parent);
 		makeActions();
-		if (getViewer() != null) {
+		if (f_viewerControl != null && getViewer() != null) {
 			setupViewer(getViewer());
 		}
 		contributeToActionBars();
