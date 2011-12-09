@@ -11,6 +11,7 @@ public class JSureXMLReader extends AbstractXMLReader {
 	public static final String SOURCE_REF = "source-ref";
 	public static final String SUPPORTING_INFO = "supporting-info";	
 	public static final String JAVA_DECL_INFO = "java-decl-info";
+	public static final String PROPERTIES = "properties";
 	public static final String DEPONENT = "deponent";
 	public static final String DEPENDENT = "dependent";
 	
