@@ -66,8 +66,13 @@ public class Method extends AbstractJavaDeclaration {
 		return type;
 	}
 
-	public String forSyntax() {
+	public String getSignature() {
 		final StringBuilder b = new StringBuilder();
+		makeSignature(b);
+		return b.toString();
+	}
+	
+	private void makeSignature(StringBuilder b) {
 		if (method.equals(type.getName())) {
 			b.append("new");
 		} else {
@@ -81,7 +86,13 @@ public class Method extends AbstractJavaDeclaration {
 		if (params.length > 0) {
 			b.setLength(b.length() - 1);
 		}
-		b.append(") in ");
+		b.append(')');
+	}
+	
+	public String forSyntax() {
+		final StringBuilder b = new StringBuilder();
+		makeSignature(b);
+		b.append(" in ");
 		b.append(type.forSyntax());
 		return b.toString();
 	}
