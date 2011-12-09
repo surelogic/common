@@ -27,6 +27,7 @@ public final class CommonImages {
 	public static final String IMG_ANNOTATION_DECR = "annotation_decr.gif";
 	public static final String IMG_ANNOTATION_DELTA = "annotation_delta.gif";
 	public static final String IMG_ANNOTATION_ERROR = "annotation_error.gif";
+	public static final String IMG_ANNOTATION_ERROR_FIX = "annotation_error_fix.gif";
 	public static final String IMG_ANNOTATION_PROPOSED = "annotation_proposed.gif";
 	public static final String IMG_ARROW_DOWN = "arrow_down.gif";
 	public static final String IMG_ARROW_RIGHT = "arrow_right.gif";
@@ -141,6 +142,7 @@ public final class CommonImages {
 	public static final String IMG_QUERY_OBJ = "query_obj.gif";
 	public static final String IMG_QUERY = "query.gif";
 	public static final String IMG_QUICK_ASSIST = "quick_assist.gif";
+	public static final String IMG_QUICK_ASSIST_DECR = "quick_assist_decr.gif";
 	public static final String IMG_QUICK_ASSIST_FIX_ERROR = "quick_assist_fix_error.gif";
 	public static final String IMG_QUICK_ASSIST_FIX_WARNING = "quick_assist_fix_warning.gif";
 	public static final String IMG_RED_X = "red_x.gif";
