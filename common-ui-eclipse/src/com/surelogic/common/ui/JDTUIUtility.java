@@ -55,7 +55,7 @@ public class JDTUIUtility {
 	 * @param reveal
 	 *            if set, the element will be revealed.
 	 */
-	private static IEditorPart openInEditor(final IJavaElement element,
+	public static IEditorPart openInEditor(final IJavaElement element,
 			final boolean activate, final boolean reveal) {
 		try {
 			if (openInEditorMethod != null) {
