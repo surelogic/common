@@ -33,6 +33,7 @@ import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.Modifier;
 import org.eclipse.jdt.core.dom.NormalAnnotation;
 import org.eclipse.jdt.core.dom.SingleMemberAnnotation;
+import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.StringLiteral;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
@@ -47,6 +48,7 @@ import com.surelogic.common.refactor.AnnotationDescription;
 import com.surelogic.common.refactor.Field;
 import com.surelogic.common.refactor.IJavaDeclaration;
 import com.surelogic.common.refactor.Method;
+import com.surelogic.common.refactor.MethodParameter;
 import com.surelogic.common.refactor.TypeContext;
 
 public class PromisesAnnotationRewriter {
@@ -278,9 +280,22 @@ public class PromisesAnnotationRewriter {
 			//System.out.println("Looking at "+inMethod);
 			rewriteNode(node, MethodDeclaration.MODIFIERS2_PROPERTY, targetMap
 					.remove(inMethod), inMethod);
+			
+			handleParameters(node);
 			return true;
 		}
-
+		
+		private void handleParameters(final MethodDeclaration m) {
+			int i = 0;
+			for(Object o : m.parameters()) {
+				SingleVariableDeclaration p = (SingleVariableDeclaration) o;
+				MethodParameter inParameter = new MethodParameter(inMethod, i);				
+				rewriteNode(p, SingleVariableDeclaration.MODIFIERS2_PROPERTY,
+						targetMap.remove(inParameter), inParameter);
+				i++;
+			}
+		}
+		
 		/**
 		 * Rewrite the given node property to include this list of annotations
 		 * 
