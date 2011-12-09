@@ -24,6 +24,7 @@ public final class CommonImages {
 	public static final String IMG_ANALYSIS_RESULT = "analysis_result.gif";
 	public static final String IMG_ANNOTATION = "annotation.gif";
 	public static final String IMG_ANNOTATION_ABDUCTIVE = "annotation_abductive.gif";
+	public static final String IMG_ANNOTATION_DECR = "annotation_decr.gif";
 	public static final String IMG_ANNOTATION_DELTA = "annotation_delta.gif";
 	public static final String IMG_ANNOTATION_ERROR = "annotation_error.gif";
 	public static final String IMG_ANNOTATION_PROPOSED = "annotation_proposed.gif";
@@ -116,6 +117,7 @@ public final class CommonImages {
 	public static final String IMG_LICENSE_GRAY = "license_gray.gif";
 	public static final String IMG_LICENSE_NO_SEAL = "license_no_seal.gif";
 	public static final String IMG_LICENSE_NO_SEAL_GRAY = "license_no_seal_gray.gif";
+	public static final String IMG_LIGHTBULB = "lightbulb.gif";
 	public static final String IMG_LINK = "link.gif";
 	public static final String IMG_PACKAGE = "package.gif";
 	public static final String IMG_PAGE_BLUE = "page_blue.gif";
@@ -138,6 +140,9 @@ public final class CommonImages {
 	public static final String IMG_QUERY_OBJ_ROOT = "query_obj_root.gif";
 	public static final String IMG_QUERY_OBJ = "query_obj.gif";
 	public static final String IMG_QUERY = "query.gif";
+	public static final String IMG_QUICK_ASSIST = "quick_assist.gif";
+	public static final String IMG_QUICK_ASSIST_FIX_ERROR = "quick_assist_fix_error.gif";
+	public static final String IMG_QUICK_ASSIST_FIX_WARNING = "quick_assist_fix_warning.gif";
 	public static final String IMG_RED_X = "red_x.gif";
 	public static final String IMG_REDDOT_DECR = "reddot_decr.gif";
 	public static final String IMG_REFRESH = "refresh.gif";
