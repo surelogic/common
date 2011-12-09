@@ -23,6 +23,7 @@ public final class CommonImages {
 	 */
 	public static final String IMG_ANALYSIS_RESULT = "analysis_result.gif";
 	public static final String IMG_ANNOTATION = "annotation.gif";
+	public static final String IMG_ANNOTATION_ABDUCTIVE = "annotation_abductive.gif";
 	public static final String IMG_ANNOTATION_DELTA = "annotation_delta.gif";
 	public static final String IMG_ANNOTATION_ERROR = "annotation_error.gif";
 	public static final String IMG_ANNOTATION_PROPOSED = "annotation_proposed.gif";
@@ -94,6 +95,7 @@ public final class CommonImages {
 	public static final String IMG_JAR = "jar.gif";
 	public static final String IMG_JAR_SAVEAS = "jar_saveas.gif";
 	public static final String IMG_JAVA_COMP_UNIT = "java_comp_unit.gif";
+	public static final String IMG_JAVA_DECLS_TREE = "java_decls_tree.gif";
 	public static final String IMG_JETTY_LOG = "jetty_log.gif";
 	public static final String IMG_JSURE_COMP_UNIT = "jsure_comp_unit.gif";
 	public static final String IMG_JSURE_DRUM = "jsure_drum.gif";
