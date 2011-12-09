@@ -1,15 +1,30 @@
 package com.surelogic.common.ui.views;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Iterator;
+import java.util.LinkedList;
 
-import org.eclipse.jface.action.*;
-import org.eclipse.jface.dialogs.*;
-import org.eclipse.jface.viewers.*;
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.swt.dnd.Clipboard;
-import org.eclipse.swt.widgets.*;
-import org.eclipse.ui.*;
-import org.eclipse.ui.part.*;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.IWorkbenchActionConstants;
+import org.eclipse.ui.part.ViewPart;
 
 /**
  * Various code that's proven handy in views
@@ -18,7 +33,7 @@ import org.eclipse.ui.part.*;
  */
 public abstract class AbstractSLView extends ViewPart {
 	protected static final String[] noStrings = new String[0];
-	
+
 	protected Clipboard f_clipboard;
 
 	private Action f_doubleClickAction;
@@ -27,7 +42,7 @@ public abstract class AbstractSLView extends ViewPart {
 
 	@Override
 	public void createPartControl(Composite parent) {
-		f_clipboard = new Clipboard(getSite().getShell().getDisplay());		
+		f_clipboard = new Clipboard(getSite().getShell().getDisplay());
 		f_viewerControl = buildViewer(parent);
 		makeActions();
 		if (f_viewerControl != null && getViewer() != null) {
@@ -51,8 +66,8 @@ public abstract class AbstractSLView extends ViewPart {
 			return getViewer().getControl();
 		}
 		return null;
- 	}
-	
+	}
+
 	/**
 	 * Enables various functionality if non-null
 	 */
@@ -64,7 +79,7 @@ public abstract class AbstractSLView extends ViewPart {
 		hookDoubleClickAction(viewer);
 		hookContextMenu(viewer);
 	}
-	
+
 	@Override
 	public void setFocus() {
 		getCurrentControl().setFocus();
@@ -77,7 +92,8 @@ public abstract class AbstractSLView extends ViewPart {
 		menuMgr.setRemoveAllWhenShown(true);
 		menuMgr.addMenuListener(new IMenuListener() {
 			public void menuAboutToShow(IMenuManager manager) {
-				IStructuredSelection s = (IStructuredSelection) viewer.getSelection();
+				IStructuredSelection s = (IStructuredSelection) viewer
+						.getSelection();
 				AbstractSLView.this.fillContextMenu_private(manager, s);
 			}
 		});
@@ -86,7 +102,8 @@ public abstract class AbstractSLView extends ViewPart {
 		getSite().registerContextMenu(menuMgr, viewer);
 	}
 
-	private void fillContextMenu_private(IMenuManager manager, IStructuredSelection s) {
+	private void fillContextMenu_private(IMenuManager manager,
+			IStructuredSelection s) {
 		fillContextMenu(manager, s);
 		manager.add(new Separator());
 		// Other plug-ins can contribute there actions here
@@ -129,8 +146,7 @@ public abstract class AbstractSLView extends ViewPart {
 		// Nothing to do yet
 	}
 
-	protected void fillContextMenu(IMenuManager manager,
-			IStructuredSelection s) {
+	protected void fillContextMenu(IMenuManager manager, IStructuredSelection s) {
 		// Nothing to do yet
 	}
 
@@ -139,8 +155,8 @@ public abstract class AbstractSLView extends ViewPart {
 	protected final void showMessage(String message) {
 		Control c = getCurrentControl();
 		if (c != null) {
-			MessageDialog.openInformation(c.getShell(), this
-					.getClass().getSimpleName(), message);
+			MessageDialog.openInformation(c.getShell(), this.getClass()
+					.getSimpleName(), message);
 		} else {
 			System.out.println(message);
 		}
@@ -151,7 +167,8 @@ public abstract class AbstractSLView extends ViewPart {
 	/**
 	 * Create a list if there's something to add
 	 */
-	protected static LinkedList<String> loadStrings(BufferedReader br, LinkedList<String> strings) throws IOException {		
+	protected static LinkedList<String> loadStrings(BufferedReader br,
+			LinkedList<String> strings) throws IOException {
 		String line;
 		if (strings != null) {
 			strings.clear();
@@ -164,37 +181,41 @@ public abstract class AbstractSLView extends ViewPart {
 				strings = new LinkedList<String>();
 			}
 			strings.add(line);
-			//System.out.println("Loaded: "+line);
+			// System.out.println("Loaded: "+line);
 		}
 		return strings;
 	}
 
 	protected static void saveStrings(PrintWriter pw, LinkedList<String> strings) {
-		for(String s : strings) {
-			//System.out.println("Saving: "+s);
+		for (String s : strings) {
+			// System.out.println("Saving: "+s);
 			pw.println(s); // TODO what if there are newlines?
 		}
 		pw.println(); // Marker for the end of the list
 	}
-	
+
 	protected abstract class SelectionAction<T> extends Action {
 		protected SelectionAction(String label) {
 			super(label);
 		}
+
 		@Override
-		public void run() {				
+		public void run() {
 			if (getViewer() != null) {
-				IStructuredSelection s = (IStructuredSelection) getViewer().getSelection();
+				IStructuredSelection s = (IStructuredSelection) getViewer()
+						.getSelection();
 				run(s);
 			}
 		}
+
 		/**
 		 * @return true if performed on at least one element
 		 */
 		protected abstract boolean run(IStructuredSelection s);
+
 		protected abstract boolean run(T elt);
 	}
-	
+
 	protected abstract class SingleSelectAction<T> extends SelectionAction<T> {
 		protected SingleSelectAction(String label) {
 			super(label);
@@ -202,17 +223,15 @@ public abstract class AbstractSLView extends ViewPart {
 
 		@SuppressWarnings("unchecked")
 		@Override
-		public boolean run(IStructuredSelection s) {				
+		public boolean run(IStructuredSelection s) {
 			if (s.size() == 1) {
 				return run((T) s.getFirstElement());
-			} else {
-				// TODO ignore with warning?
 			}
 			return false;
 		}
 
 	}
-	
+
 	protected abstract class MultiSelectAction<T> extends SelectionAction<T> {
 		protected MultiSelectAction(String label) {
 			super(label);
@@ -220,9 +239,10 @@ public abstract class AbstractSLView extends ViewPart {
 
 		@SuppressWarnings("unchecked")
 		@Override
-		public boolean run(IStructuredSelection s) {				
+		public boolean run(IStructuredSelection s) {
 			if (s.size() > 0) {
 				boolean success = false;
+				@SuppressWarnings("rawtypes")
 				Iterator it = s.iterator();
 				while (it.hasNext()) {
 					Object o = it.next();
@@ -234,4 +254,3 @@ public abstract class AbstractSLView extends ViewPart {
 		}
 	}
 }
-
