@@ -43,6 +43,7 @@ import org.eclipse.jdt.core.dom.rewrite.ListRewrite;
 import org.eclipse.text.edits.TextEdit;
 import org.eclipse.text.edits.TextEditGroup;
 
+import com.surelogic.common.AnnotationConstants;
 import com.surelogic.common.logging.SLLogger;
 import com.surelogic.common.refactor.AnnotationDescription;
 import com.surelogic.common.refactor.Field;
@@ -822,7 +823,7 @@ public class PromisesAnnotationRewriter {
 			final NormalAnnotation na = (NormalAnnotation) a;
 			final List<MemberValuePair> ps = na.values();
 			for (final MemberValuePair p : ps) {
-				if (p.getName().getIdentifier().equals("value")) {
+				if (p.getName().getIdentifier().equals(AnnotationConstants.VALUE_ATTR)) {
 					return p.getValue();
 				}
 			}
