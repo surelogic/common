@@ -176,7 +176,7 @@ public abstract class AbstractJavaZip<T> {
 				classNameToSource.put(classKey, srcPath);
 				final String[] types = getIncludedTypes(resource);
 				if (types == null || types.length == 0) {
-					if (className.equals("package-info")) {
+					if (className.equals(AnnotationConstants.PACKAGE_INFO)) {
 						classNameToSource.put(
 								packageName + '.' + className, zipPath);
 					} else {
