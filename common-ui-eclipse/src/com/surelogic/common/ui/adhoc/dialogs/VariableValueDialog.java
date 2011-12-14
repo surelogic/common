@@ -1,8 +1,8 @@
 package com.surelogic.common.ui.adhoc.dialogs;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -126,7 +126,7 @@ public final class VariableValueDialog extends Dialog {
 		 * order. This is annoying, but the keys to Properties are of type
 		 * Object rather than type String so it is necessary.
 		 */
-		List<String> variables = new LinkedList<String>();
+		List<String> variables = new ArrayList<String>();
 		for (Object o : f_workValues.keySet()) {
 			String key = o.toString();
 			variables.add(key);
