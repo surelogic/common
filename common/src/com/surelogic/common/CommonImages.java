@@ -120,6 +120,7 @@ public final class CommonImages {
 	public static final String IMG_LICENSE_NO_SEAL_GRAY = "license_no_seal_gray.gif";
 	public static final String IMG_LIGHTBULB = "lightbulb.gif";
 	public static final String IMG_LINK = "link.gif";
+	public static final String IMG_OPEN_XML_TYPE = "open_xml_type.gif";
 	public static final String IMG_PACKAGE = "package.gif";
 	public static final String IMG_PAGE_BLUE = "page_blue.gif";
 	public static final String IMG_PAGE_ORANGE = "page_orange.gif";
