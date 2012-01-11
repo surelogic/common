@@ -11,7 +11,7 @@ import com.surelogic.common.SLUtility;
 
 public class MemoryUtility {
 
-	public static final int MAX_SIZE = 4096;
+	public static final int MAX_SIZE = 8192;
 
 	private static AtomicInteger f_maxMemorySize = new AtomicInteger();
 
@@ -22,17 +22,22 @@ public class MemoryUtility {
 	 * @return the maximum heap size in megabytes.
 	 */
 	public static int computeMaxMemorySizeInMb() {
-		System.out.println("Physical mem = "+computePhysMemorySizeInMb());
+		final int phys = computePhysMemorySizeInMb();
+		System.out.println("Physical mem = "+phys);
+		
 		final int maxMemorySizeCache = f_maxMemorySize.get();
 
 		if (maxMemorySizeCache == 0) {
-			if (runJava(MAX_SIZE)) {
-				return MAX_SIZE;
+			final int max = Math.min(MAX_SIZE, phys);
+			if (runJava(max)) {
+				System.out.println("Assumed max mem = "+max);
+				return max;
 			}
 			// This doesn't work right on 64-bit JVMs
 			final int initial = SLUtility.getCurrentMaxMemorySizeInMb();
-			final int mm = computeMaxMemorySizeInMb(initial, MAX_SIZE);
+			final int mm = computeMaxMemorySizeInMb(initial, max);
 			f_maxMemorySize.set(mm);
+			System.out.println("Computed max mem = "+mm);
 			return mm;
 		} else {
 			return maxMemorySizeCache;
