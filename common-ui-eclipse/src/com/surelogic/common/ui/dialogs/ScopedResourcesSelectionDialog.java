@@ -28,7 +28,6 @@ import com.surelogic.common.ui.EclipseUIUtility;
  *    
  * Opens a resizable dialog listing possible files to save, the user can select none, some or all of the files before pressing OK.
  */
-@SuppressWarnings("restriction")
 public class ScopedResourcesSelectionDialog extends AbstractDebugCheckboxSelectionDialog {
 	private final String SETTINGS_ID = "com.surelogic.common.ui.dialogs.SCOPED_SAVE_SELECTION_DIALOG";
 	Button fSavePref;
