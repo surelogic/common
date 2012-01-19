@@ -893,20 +893,26 @@ public final class FileUtility {
     
     private static void recursiveIterate(final FileRunner r, final String relativePath, File f) {
     	if (f.isFile()) {	
-    		r.iterate(relativePath, f);
+    		final String newPath = computeNewPath(relativePath, f);		
+    		r.iterate(newPath, f);
     	}
     	else if (f.isDirectory()) {
-    		final String newPath;
-    		if (relativePath.length() == 0) {
-    			newPath = f.getName();
-    		} else {
-    			newPath = relativePath+'/'+f.getName();
-    		}    		
+    		final String newPath = computeNewPath(relativePath, f);		
     		for(File child : f.listFiles(r)) {
     			recursiveIterate(r, newPath, child);
     		}
     	}
     	// otherwise, f doesn't exist, so do nothing
+    }
+    
+    private static String computeNewPath(final String relativePath, File f) {
+    	final String newPath;
+    	if (relativePath.length() == 0) {
+    		newPath = f.getName();
+    	} else {
+    		newPath = relativePath+'/'+f.getName();
+    	}    	
+    	return newPath;
     }
     
     public static abstract class FileRunner implements FileFilter {
