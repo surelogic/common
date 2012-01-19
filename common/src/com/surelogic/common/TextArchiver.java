@@ -9,7 +9,7 @@ import com.surelogic.common.FileUtility.FileRunner;
  * 
  * @author Edwin
  */
-public abstract class TextArchiver extends FileRunner {
+public class TextArchiver extends FileRunner {
 	public static final String SEPARATOR = "==================================================================================================";
 	public static final String DOES_NOT_EXIST = "File does not exist: ";
 	
@@ -27,6 +27,7 @@ public abstract class TextArchiver extends FileRunner {
 	
 	@Override
 	protected void iterate(String relativePath, File f) {
+		System.out.println("Copying "+relativePath);
 		copyContentsToStream(relativePath, f, targetOut, targetLabel);
 	}
 	
@@ -99,6 +100,7 @@ public abstract class TextArchiver extends FileRunner {
 				}
 				if (out == null) {
 					File dest = new File(destDir, path);
+					dest.getParentFile().mkdirs();
 					FileWriter fw = new FileWriter(dest);
 					out = new PrintWriter(fw);
 				}
@@ -109,5 +111,18 @@ public abstract class TextArchiver extends FileRunner {
 				out.close();
 			}
 		}
+	}
+	
+	public static void main(String... args) throws IOException {
+		File temp = File.createTempFile("TextArchiver", ".test.txt");	
+		
+		TextArchiver t = new TextArchiver(temp);		
+		File dir = new File(".");
+		System.out.println("Iterating over "+dir.getAbsolutePath());
+		FileUtility.recursiveIterate(t, dir);
+		
+		File tempDir = new File(temp.getParentFile(), temp.getName()+".dir");
+		tempDir.mkdirs();
+		TextArchiver.unarchive(temp, tempDir);
 	}
 }
