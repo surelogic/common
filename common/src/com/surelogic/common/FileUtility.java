@@ -888,12 +888,22 @@ public final class FileUtility {
      * using the filerunner as a FileFilter
      */
     public static void recursiveIterate(final FileRunner r, File f) {
+    	recursiveIterate(r, "", f);
+    }
+    
+    private static void recursiveIterate(final FileRunner r, final String relativePath, File f) {
     	if (f.isFile()) {	
-    		r.iterate(f);
+    		r.iterate(relativePath, f);
     	}
     	else if (f.isDirectory()) {
+    		final String newPath;
+    		if (relativePath.length() == 0) {
+    			newPath = f.getName();
+    		} else {
+    			newPath = relativePath+'/'+f.getName();
+    		}    		
     		for(File child : f.listFiles(r)) {
-    			recursiveIterate(r, child);
+    			recursiveIterate(r, newPath, child);
     		}
     	}
     	// otherwise, f doesn't exist, so do nothing
@@ -904,6 +914,6 @@ public final class FileUtility {
     		return true;
     	}
     	
-    	protected abstract void iterate(File f);
+    	protected abstract void iterate(String relativePath, File f);
     }
 }
