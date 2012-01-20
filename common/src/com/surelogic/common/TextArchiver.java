@@ -11,7 +11,8 @@ import com.surelogic.common.FileUtility.FileRunner;
  */
 public class TextArchiver extends FileRunner {
 	public static final String SEPARATOR = "==================================================================================================";
-	public static final String DOES_NOT_EXIST = "File does not exist: ";
+	private static final String WARNING = "== WARNING == ";
+	private static final String DOES_NOT_EXIST = "File does not exist: ";
 	
 	private final String targetLabel;
 	private final PrintStream targetOut; 
@@ -29,6 +30,14 @@ public class TextArchiver extends FileRunner {
 	protected void iterate(String relativePath, File f) {
 		System.out.println("Copying "+relativePath);
 		copyContentsToStream(relativePath, f, targetOut, targetLabel);
+	}
+	
+	public void outputWarning(String msg) {
+		outputMessage(targetOut, WARNING + msg);
+	}
+	
+	public void close() {
+		targetOut.close();
 	}
 	
 	private static void outputMessage(PrintStream out, String msg) {
@@ -50,7 +59,7 @@ public class TextArchiver extends FileRunner {
 				e.printStackTrace(out);
 			}
 		} else {
-			outputMessage(out, DOES_NOT_EXIST + source);
+			outputMessage(out, WARNING + DOES_NOT_EXIST + source);
 		}
 	}
 	
