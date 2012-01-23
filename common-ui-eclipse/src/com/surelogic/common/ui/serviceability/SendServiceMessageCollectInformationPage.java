@@ -86,8 +86,9 @@ public class SendServiceMessageCollectInformationPage extends WizardPage {
 		summary.setText(I18N.msg(f_data.propPfx() + "summary"));
 		summary.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, false, false));
 		final Text summaryText = new Text(panel, SWT.SINGLE | SWT.BORDER);
-		if (f_data.getMessage() != null)
-			summaryText.setText(f_data.getMessage());
+		if (f_data.getSummary() != null) {
+			summaryText.setText(f_data.getSummary());
+		}
 		summaryText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
 		final Label description = new Label(panel, SWT.WRAP);

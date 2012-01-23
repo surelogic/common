@@ -687,8 +687,12 @@ public class PromisesAnnotationRewriter {
 
 		@Override
 		protected void handleExistingAnno(String s, Set<String> contents) {
-			if (altAnnotations.isEmpty()) {
-				contents.add(s);
+			if (altAnnotations.isEmpty()) {				
+				if (allowsMultiple || contents.isEmpty()) {
+					contents.add(s);
+				} else {
+					// This must be a replacement, so ignore s				
+				}
 				return;
 			}			
 			AnnotationDescription alt;
