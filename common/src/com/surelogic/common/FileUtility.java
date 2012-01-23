@@ -888,7 +888,7 @@ public final class FileUtility {
      * using the filerunner as a FileFilter
      */
     public static void recursiveIterate(final FileRunner r, File f) {
-    	recursiveIterate(r, "", f);
+    	recursiveIterate(r, null, f);
     }
     
     private static void recursiveIterate(final FileRunner r, final String relativePath, File f) {
@@ -907,9 +907,13 @@ public final class FileUtility {
     
     private static String computeNewPath(final String relativePath, File f) {
     	final String newPath;
-    	if (relativePath.length() == 0) {
+    	if (relativePath == null) {
+    		newPath = "";
+    	}
+    	else if (relativePath.length() == 0) {    	
     		newPath = f.getName();
-    	} else {
+    	} 
+    	else {
     		newPath = relativePath+'/'+f.getName();
     	}    	
     	return newPath;
