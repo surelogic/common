@@ -82,24 +82,54 @@ public class SendServiceMessageWizard extends Wizard {
 	 *            Windows).
 	 */
 	public static void openTip(String product, String imageSymbolicName) {
-		openTip(null, product, imageSymbolicName);
+		openTip(null, product, imageSymbolicName, new TipMessage());
 	}
 
 	/**
-	 * Used to open the Send Tip for Improvement dialog.
+	 * Used to open the Send Tip for Improvement dialog using the shell being
+	 * used by the active workbench window. The tip message may be populated
+	 * with information.
 	 * 
-	 * @param shell
-	 *            a shell.
 	 * @param product
 	 *            the SureLogic tool this tip for improvement is about.
 	 * @param imageSymbolicName
 	 *            an image name from {@link CommonImages} to use for the window.
 	 *            This image is only displayed on some operating systems (e.g.,
 	 *            Windows).
+	 * @param tip
+	 *            the non-null tip message which may be populated with contents.
+	 * 
+	 * @throws IllegalArgumentException
+	 *             if tip is {@code null}.
+	 */
+	public static void openTip(String product, String imageSymbolicName,
+			TipMessage tip) {
+		openTip(null, product, imageSymbolicName, tip);
+	}
+
+	/**
+	 * Used to open the Send Tip for Improvement dialog. The tip message may be
+	 * populated with information.
+	 * 
+	 * @param shell
+	 *            a shell, or {@code null} to use the shell being used by the
+	 *            active workbench window.
+	 * @param product
+	 *            the SureLogic tool this tip for improvement is about.
+	 * @param imageSymbolicName
+	 *            an image name from {@link CommonImages} to use for the window.
+	 *            This image is only displayed on some operating systems (e.g.,
+	 *            Windows).
+	 * @param tip
+	 *            the non-null tip message which may be populated with contents.
+	 * 
+	 * @throws IllegalArgumentException
+	 *             if tip is {@code null}.
 	 */
 	public static void openTip(Shell shell, String product,
-			String imageSymbolicName) {
-		TipMessage tip = new TipMessage();
+			String imageSymbolicName, TipMessage tip) {
+		if (tip == null)
+			throw new IllegalArgumentException(I18N.err(44, "tip"));
 		if (product == null)
 			product = "UNKNOWN";
 		tip.setProduct(product);
