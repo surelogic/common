@@ -127,7 +127,7 @@ public class SendServiceMessageWizard extends Wizard {
 	 *             if tip is {@code null}.
 	 */
 	public static void openTip(Shell shell, String product,
-			String imageSymbolicName, TipMessage tip) {
+			String imageSymbolicName, Message tip) {
 		if (tip == null)
 			throw new IllegalArgumentException(I18N.err(44, "tip"));
 		if (product == null)
