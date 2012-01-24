@@ -22,8 +22,8 @@ public class TextArchiver extends FileRunner {
 		targetOut = new PrintStream(target);
 	}
 	
-	public void archive(String relativePath, File f) {
-		copyContentsToStream(relativePath, f, targetOut, targetLabel);
+	public final void archive(String relativePath, File f) {
+		iterate(relativePath, f);
 	}
 	
 	@Override
