@@ -133,6 +133,9 @@ public class SendServiceMessageWizard extends Wizard {
 		if (product == null)
 			product = "UNKNOWN";
 		tip.setProduct(product);
+		if (tip instanceof MessageWithLog) {
+			startJobToReadInLog((MessageWithLog) tip);
+		}
 		openHelper(shell, tip, imageSymbolicName);
 	}
 
