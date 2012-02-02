@@ -109,12 +109,20 @@ public class TextArchiver extends FileRunner {
 				}
 				if (out == null) {
 					File dest = new File(destDir, path);
-					dest.getParentFile().mkdirs();
-					FileWriter fw = new FileWriter(dest);
-					out = new PrintWriter(fw);
+					if (!dest.exists()) {
+						dest.getParentFile().mkdirs();
+						FileWriter fw = new FileWriter(dest);
+						out = new PrintWriter(fw);
+					} else {
+						System.out.println("Already exists: "+dest);
+						StringWriter sw = new StringWriter();
+						out = new PrintWriter(sw);
+					}
 				}
-				out.println(line);
-				System.out.println("\t"+line);
+				if (out != null) {
+					out.println(line);
+					System.out.println("\t"+line);
+				}
 			}			
 			if (out != null) {
 				out.close();
