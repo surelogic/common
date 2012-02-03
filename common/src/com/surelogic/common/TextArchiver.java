@@ -1,6 +1,7 @@
 package com.surelogic.common;
 
 import java.io.*;
+import java.util.*;
 
 import com.surelogic.common.FileUtility.FileRunner;
 
@@ -73,12 +74,16 @@ public class TextArchiver extends FileRunner {
 		return line;
 	}
 	
-	public static void unarchive(File srcArchive, File destDir) throws IOException {
+	/**
+	 * @return A set of warnings
+	 */
+	public static List<String> unarchive(File srcArchive, File destDir) throws IOException {
 		FileReader fr = new FileReader(srcArchive);
 		BufferedReader br = new BufferedReader(fr);
 
 		// Find separator for the first file
 		String line = findSeparator(br);
+		List<String> warnings = new ArrayList<String>();
 		
 		// Should be either SEPARATOR or null
 		while (line != null) {			
@@ -114,7 +119,9 @@ public class TextArchiver extends FileRunner {
 						FileWriter fw = new FileWriter(dest);
 						out = new PrintWriter(fw);
 					} else {
-						System.out.println("Already exists: "+dest);
+						String msg = "Already exists: "+dest;
+						System.out.println(msg);
+						warnings.add(msg);
 						StringWriter sw = new StringWriter();
 						out = new PrintWriter(sw);
 					}
@@ -128,6 +135,7 @@ public class TextArchiver extends FileRunner {
 				out.close();
 			}
 		}
+		return warnings;
 	}
 	
 	public static void main(String... args) throws IOException {
