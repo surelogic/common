@@ -893,8 +893,10 @@ public final class FileUtility {
     
     private static void recursiveIterate(final FileRunner r, final String relativePath, File f) {
     	if (f.isFile()) {	
-    		final String newPath = computeNewPath(relativePath, f);		
-    		r.iterate(newPath, f);
+    		if (f.length() != 0) {
+    			final String newPath = computeNewPath(relativePath, f);		    		
+    			r.iterate(newPath, f);
+    		}
     	}
     	else if (f.isDirectory()) {
     		final String newPath = computeNewPath(relativePath, f);		
