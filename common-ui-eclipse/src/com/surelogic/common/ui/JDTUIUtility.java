@@ -151,6 +151,63 @@ public class JDTUIUtility {
 
 	/**
 	 * Tries to open the specified Java file in the editor and highlight the
+	 * passed Java type.
+	 * 
+	 * @param projectName
+	 *            the project name the file is contained within. For example,
+	 *            <code>JEdit</code>.
+	 * @param packageName
+	 *            the package name the file is contained within. For example,
+	 *            <code>com.surelogic.sierra</code>. the package name is
+	 *            "(default package)" or null then the class is contained within
+	 *            the default package.
+	 * @param typeName
+	 *            the type name, this type may be a nested type of the form
+	 *            <code>Outer$Inner</code> or
+	 *            <code>Outer$Inner$InnerInner</code> or
+	 *            <code>Outer.Inner</code> or
+	 *            <code>Outer.Inner.InnerInner</code> (to any depth).
+	 * @return {@code true} if it was possible to open the editor, {@code false}
+	 *         otherwise.
+	 */
+	public static boolean tryToOpenInEditor(final String projectName,
+			final String packageName, final String typeName) {
+		return tryToOpenInEditor(projectName, packageName, typeName, 0);
+	}
+
+	/**
+	 * Tries to open the specified Java file in the editor and highlight the
+	 * passed Java type.
+	 * <p>
+	 * This method tries to find a match in all the open Java projects.
+	 * 
+	 * @param packageName
+	 *            the package name the file is contained within. For example,
+	 *            <code>com.surelogic.sierra</code>. the package name is
+	 *            "(default package)" or null then the class is contained within
+	 *            the default package.
+	 * @param typeName
+	 *            the type name, this type may be a nested type of the form
+	 *            <code>Outer$Inner</code> or
+	 *            <code>Outer$Inner$InnerInner</code> or
+	 *            <code>Outer.Inner</code> or
+	 *            <code>Outer.Inner.InnerInner</code> (to any depth).
+	 * @return {@code true} if it was possible to open the editor, {@code false}
+	 *         otherwise.
+	 */
+	public static boolean tryToOpenInEditor(final String packageName,
+			final String typeName, final int lineNumber) {
+		for (final String javaProjectName : JDTUtility.getJavaProjectNames()) {
+			if (tryToOpenInEditor(javaProjectName, packageName, typeName,
+					lineNumber)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Tries to open the specified Java file in the editor and highlight the
 	 * given line number. If the line number is 0 then the file is opened
 	 * highlighting the first line in the file.
 	 * <p>
@@ -167,16 +224,13 @@ public class JDTUIUtility {
 	 *            <code>Outer$Inner$InnerInner</code> or
 	 *            <code>Outer.Inner</code> or
 	 *            <code>Outer.Inner.InnerInner</code> (to any depth).
-	 * @param lineNumber
-	 *            the line number to highlight, or 0.
 	 * @return {@code true} if it was possible to open the editor, {@code false}
 	 *         otherwise.
 	 */
 	public static boolean tryToOpenInEditor(final String packageName,
-			final String typeName, final int lineNumber) {
+			final String typeName) {
 		for (final String javaProjectName : JDTUtility.getJavaProjectNames()) {
-			if (tryToOpenInEditor(javaProjectName, packageName, typeName,
-					lineNumber)) {
+			if (tryToOpenInEditor(javaProjectName, packageName, typeName)) {
 				return true;
 			}
 		}
@@ -307,8 +361,8 @@ public class JDTUIUtility {
 			return tryToOpenInEditor(projectName, srcRef.getPackageName(),
 					srcRef.getTypeName(), srcRef.getLineNumber());
 		} else {
-			return tryToOpenInEditor(srcRef.getPackageName(), srcRef
-					.getTypeName(), srcRef.getLineNumber());
+			return tryToOpenInEditor(srcRef.getPackageName(),
+					srcRef.getTypeName(), srcRef.getLineNumber());
 		}
 	}
 
