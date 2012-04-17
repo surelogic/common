@@ -93,7 +93,7 @@ public final class EclipseUIUtility {
 	 * @return the active workbench window, or {@code null} if none can be
 	 *         found.
 	 */
-	private static IWorkbenchWindow getIWorkbenchWindow() {
+	public static IWorkbenchWindow getIWorkbenchWindow() {
 		IWorkbenchWindow win = PlatformUI.getWorkbench()
 				.getActiveWorkbenchWindow();
 		if (win == null) {
