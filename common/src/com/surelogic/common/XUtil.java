@@ -29,7 +29,7 @@ public final class XUtil {
 	
 	public static final boolean loadAllLibs = System.getProperty(LOAD_ALL_LIBS,"false").equals("true");
 	static {
-		System.out.println("Loading all libraries");
+		System.out.println("Loading all libraries = "+loadAllLibs);		
 	}
 	
 	/**
