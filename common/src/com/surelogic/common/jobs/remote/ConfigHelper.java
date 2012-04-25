@@ -3,6 +3,8 @@ package com.surelogic.common.jobs.remote;
 import java.io.File;
 import java.util.*;
 
+import com.surelogic.common.logging.SLLogger;
+
 /**
  * Collects various convenience methods for dealing with plugins and their 
  * resulting classpaths
@@ -125,6 +127,9 @@ public final class ConfigHelper {
 	}
 
 	protected void findJars(Collection<File> path, File folder) {
+		if (!folder.exists()) {
+			SLLogger.getLogger().warning("Unable to find jars in non-existent folder: "+folder);
+		}
 		for (File f : folder.listFiles()) {
 			String name = f.getName();
 			if (name.endsWith(".jar")) {
