@@ -272,7 +272,7 @@ public class EclipseUtility {
 	public static List<String> getStringListPreference(String key) {
 		final String encodedList = Platform.getPreferencesService().getString(
 				PREFERENCES_NODE, key, null, null);
-		if (encodedList == null)
+		if (encodedList == null || "".equals(encodedList))
 			return STRING_LIST_DEFAULT_DEFAULT;
 		else
 			return SLUtility.decodeStringList(encodedList);
@@ -281,7 +281,7 @@ public class EclipseUtility {
 	public static void setStringListPreference(String key, List<String> value) {
 		final String encodedList;
 		if (value == null || value.isEmpty())
-			encodedList = null;
+			encodedList = ""; // null is not allowed
 		else
 			encodedList = SLUtility.encodeStringList(value);
 		(new InstanceScope()).getNode(PREFERENCES_NODE).put(key, encodedList);
@@ -874,8 +874,8 @@ public class EclipseUtility {
 	 * 
 	 * @param viewId
 	 *            a view identifier
-	 * @return code true} if the view identified by the given id exists, {@code
-	 *         false} otherwise.
+	 * @return code true} if the view identified by the given id exists,
+	 *         {@code false} otherwise.
 	 */
 	public static boolean bundleExists(final String id) {
 		return Platform.getBundle(id) != null;
