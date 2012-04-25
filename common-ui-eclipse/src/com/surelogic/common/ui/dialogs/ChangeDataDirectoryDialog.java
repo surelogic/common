@@ -25,7 +25,7 @@ import com.surelogic.common.i18n.I18N;
 
 public final class ChangeDataDirectoryDialog extends TitleAreaDialog {
 
-	private static final int CONTENTS_WIDTH_HINT = 600;
+	private static final int CONTENTS_WIDTH_HINT = 400;
 
 	private final File f_existing;
 	private final String f_title;
@@ -114,8 +114,7 @@ public final class ChangeDataDirectoryDialog extends TitleAreaDialog {
 
 		final Label newLabel = new Label(dataGroup, SWT.RIGHT);
 		newLabel.setText(I18N.msg("common.change.data.directory.dialog.new"));
-		newLabel
-				.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
+		newLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
 
 		final Text newText = new Text(dataGroup, SWT.SINGLE);
 		newText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
@@ -175,12 +174,10 @@ public final class ChangeDataDirectoryDialog extends TitleAreaDialog {
 				public void handleEvent(Event event) {
 					final DirectoryDialog dd = new DirectoryDialog(
 							f_browseButton.getShell());
-					dd
-							.setMessage(I18N
-									.msg("common.change.data.directory.dialog.new.dirBrowse.desc"));
-					dd
-							.setText(I18N
-									.msg("common.change.data.directory.dialog.new.dirBrowse.title"));
+					dd.setMessage(I18N
+							.msg("common.change.data.directory.dialog.new.dirBrowse.desc"));
+					dd.setText(I18N
+							.msg("common.change.data.directory.dialog.new.dirBrowse.title"));
 					final String path = dd.open();
 					f_newText.setText(path);
 				}
