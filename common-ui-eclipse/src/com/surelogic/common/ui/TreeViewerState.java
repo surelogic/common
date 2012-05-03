@@ -15,12 +15,12 @@ import org.eclipse.jface.viewers.TreeViewer;
 import com.surelogic.Borrowed;
 
 /**
- * Can save the user interface state and selections of a {@link TreeViewer} so
- * that it can be restored after a major update of its contents. This is done by
- * saving textual labels into paths if the node of the tree is open in the
- * viewer when this object is constructed. This approach avoids having to
- * require that the viewer whose state is saved is the viewer that gets
- * restored.
+ * Can save the user interface state (what nodes are opened and what nodes are
+ * closed) and selections of a {@link TreeViewer} so that it can be restored
+ * after a major update of its contents. This is done by saving textual labels
+ * into paths if the node of the tree is open in the viewer when this object is
+ * constructed. This approach avoids having to require that the viewer whose
+ * state is saved is the viewer that gets restored.
  * <p>
  * <i>Note: This object should be constructed and called in the SWT UI
  * thread.</i>
@@ -32,9 +32,9 @@ public final class TreeViewerState {
 	private final LinkedList<String> f_selectionPath = new LinkedList<String>();
 
 	/**
-	 * Constructs a new instance saving the visible state of the passed viewer
-	 * as well as its selections. The viewer is <i>not</i> aliased into this
-	 * object.
+	 * Constructs a new instance saving the visible state (what nodes are opened
+	 * and what nodes are closed) of the passed viewer as well as its
+	 * selections. The viewer is <i>not</i> aliased into this object.
 	 * 
 	 * @param treeViewer
 	 *            a viewer.
@@ -91,10 +91,10 @@ public final class TreeViewerState {
 	 * <p>
 	 * The <tt>matchOldAsSuffix</tt> flag allows the old label to be a suffix of
 	 * the current viewer label. This capability is useful if your label uses a
-	 * convention for marking changes such as <tt>&gt;</tt> to mark changes. For
-	 * example, the viewer may label a modified package
-	 * <tt>"&gt; my.package"</tt> but the old label might have just been
-	 * <tt>"my.package"</tt>.
+	 * convention such as <tt>&gt;</tt> to mark changes. For example, the viewer
+	 * may label a modified package <tt>"&gt; my.package"</tt> but the old label
+	 * might have just been <tt>"my.package"</tt>&mdash;of course we want these
+	 * to match.
 	 * 
 	 * @param treeViewer
 	 *            a viewer.
