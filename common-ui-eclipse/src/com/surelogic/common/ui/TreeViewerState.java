@@ -12,9 +12,18 @@ import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 
+import com.surelogic.Borrowed;
+
 /**
- * Can save the selection and state of a {@link TreeViewer} so that it can be
- * restored after a major update of its contents.
+ * Can save the user interface state and selections of a {@link TreeViewer} so
+ * that it can be restored after a major update of its contents. This is done by
+ * saving textual labels into paths if the node of the tree is open in the
+ * viewer when this object is constructed. This approach avoids having to
+ * require that the viewer whose state is saved is the viewer that gets
+ * restored.
+ * <p>
+ * <i>Note: This object should be constructed and called in the SWT UI
+ * thread.</i>
  */
 public final class TreeViewerState {
 
@@ -22,7 +31,15 @@ public final class TreeViewerState {
 
 	private final LinkedList<String> f_selectionPath = new LinkedList<String>();
 
-	public TreeViewerState(final TreeViewer treeViewer) {
+	/**
+	 * Constructs a new instance saving the visible state of the passed viewer
+	 * as well as its selections. The viewer is <i>not</i> aliased into this
+	 * object.
+	 * 
+	 * @param treeViewer
+	 *            a viewer.
+	 */
+	public TreeViewerState(@Borrowed final TreeViewer treeViewer) {
 		if (treeViewer != null) {
 			f_stringPaths.clear();
 			final TreePath[] treePaths = treeViewer.getExpandedTreePaths();
@@ -51,10 +68,41 @@ public final class TreeViewerState {
 		}
 	}
 
+	/**
+	 * Restores the tree state and selections saved within this object to the
+	 * passed viewer. Normally the viewer is the same object used to construct
+	 * this, however, it is not required to be because the restore is done by
+	 * matching text labels in the viewer.
+	 * 
+	 * @param treeViewer
+	 *            a viewer.
+	 * 
+	 * @see #restoreViewState(TreeViewer, boolean)
+	 */
 	public final void restoreViewState(final TreeViewer treeViewer) {
 		restoreViewState(treeViewer, false);
 	}
 
+	/**
+	 * Restores the tree state and selections saved within this object to the
+	 * passed viewer. Normally the viewer is the same object used to construct
+	 * this, however, it is not required to be because the restore is done by
+	 * matching text labels in the viewer.
+	 * <p>
+	 * The <tt>matchOldAsSuffix</tt> flag allows the old label to be a suffix of
+	 * the current viewer label. This capability is useful if your label uses a
+	 * convention for marking changes such as <tt>&gt;</tt> to mark changes. For
+	 * example, the viewer may label a modified package
+	 * <tt>"&gt; my.package"</tt> but the old label might have just been
+	 * <tt>"my.package"</tt>.
+	 * 
+	 * @param treeViewer
+	 *            a viewer.
+	 * @param matchOldAsSuffix
+	 *            <tt>true</tt> if a matching label allows the old to be matched
+	 *            as a suffix of the current label in the viewer, <tt>false</tt>
+	 *            if the old and new labels must match exactly.
+	 */
 	public final void restoreViewState(final TreeViewer treeViewer,
 			boolean matchOldAsSuffix) {
 		final IContentProvider cp = treeViewer.getContentProvider();
