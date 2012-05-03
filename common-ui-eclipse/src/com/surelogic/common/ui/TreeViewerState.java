@@ -6,11 +6,16 @@ import java.util.List;
 
 import org.eclipse.jface.viewers.IContentProvider;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.ITreeSelection;
+import org.eclipse.jface.viewers.ITreeViewerListener;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.TreeExpansionEvent;
 import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.Viewer;
 
 import com.surelogic.Borrowed;
 
@@ -22,10 +27,86 @@ import com.surelogic.Borrowed;
  * constructed. This approach avoids having to require that the viewer whose
  * state is saved is the viewer that gets restored.
  * <p>
+ * Several static methods help register an auto-save onto a viewer when
+ * something changes about the viewer and allow restore using that auto-save.
+ * <p>
  * <i>Note: This object should be constructed and called in the SWT UI
  * thread.</i>
  */
 public final class TreeViewerState {
+
+	private static final String KEY = TreeViewerState.class.getName();
+
+	/**
+	 * Registers listeners that save the viewer's state when it changes and uses
+	 * {@link Viewer#setData(String, Object)} to hold onto the created
+	 * {@link TreeViewerState} object.
+	 * <p>
+	 * Use {@link TreeViewerState#updateTreeViewerState(TreeViewer)} to restore
+	 * the viewer to this auto-saved state.
+	 * 
+	 * @param treeViewer
+	 *            a viewer.
+	 */
+	public static void registerListenersToSaveTreeViewerStateOnChange(
+			final TreeViewer treeViewer) {
+		if (treeViewer == null)
+			return;
+
+		treeViewer.addTreeListener(new ITreeViewerListener() {
+			public void treeExpanded(TreeExpansionEvent event) {
+				updateTreeViewerState(treeViewer);
+			}
+
+			public void treeCollapsed(TreeExpansionEvent event) {
+				updateTreeViewerState(treeViewer);
+			}
+		});
+		treeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+			public void selectionChanged(SelectionChangedEvent event) {
+				updateTreeViewerState(treeViewer);
+			}
+		});
+	}
+
+	private static void updateTreeViewerState(final TreeViewer treeViewer) {
+		if (treeViewer != null && !treeViewer.getControl().isDisposed()) {
+			final TreeViewerState contentsState = new TreeViewerState(
+					treeViewer);
+			treeViewer.setData(KEY, contentsState);
+		}
+	}
+
+	/**
+	 * Attempts to restore the viewer with the {@link TreeViewerState} object
+	 * stored on it by {@link Viewer#setData(String, Object)}.
+	 * 
+	 * @param treeViewer
+	 *            a viewer that
+	 *            {@link #registerListenersToSaveTreeViewerStateOnChange(TreeViewer)}
+	 *            was previously called on.
+	 * @param matchOldAsSuffix
+	 *            <tt>true</tt> if a matching label allows the old to be matched
+	 *            as a suffix of the current label in the viewer, <tt>false</tt>
+	 *            if the old and new labels must match exactly. See
+	 *            {@link #restoreViewState(TreeViewer, boolean)} for more
+	 *            information.
+	 * @return <tt>true</tt> if the restore was successful, <tt>false</tt>
+	 *         otherwise.
+	 */
+	public static boolean restoreSavedTreeViewerStateIfPossible(
+			final TreeViewer treeViewer, boolean matchOldAsSuffix) {
+		if (treeViewer != null) {
+
+			final Object o = treeViewer.getData(KEY);
+			if (o instanceof TreeViewerState) {
+				final TreeViewerState state = (TreeViewerState) o;
+				state.restoreViewState(treeViewer, matchOldAsSuffix);
+				return true;
+			}
+		}
+		return false;
+	}
 
 	private final List<LinkedList<String>> f_stringPaths = new ArrayList<LinkedList<String>>();
 
@@ -40,29 +121,29 @@ public final class TreeViewerState {
 	 *            a viewer.
 	 */
 	public TreeViewerState(@Borrowed final TreeViewer treeViewer) {
-		if (treeViewer != null) {
-			f_stringPaths.clear();
-			final TreePath[] treePaths = treeViewer.getExpandedTreePaths();
-			for (TreePath path : treePaths) {
-				final LinkedList<String> stringPath = new LinkedList<String>();
-				f_stringPaths.add(stringPath);
+		if (treeViewer == null)
+			return;
+		f_stringPaths.clear();
+		final TreePath[] treePaths = treeViewer.getExpandedTreePaths();
+		for (TreePath path : treePaths) {
+			final LinkedList<String> stringPath = new LinkedList<String>();
+			f_stringPaths.add(stringPath);
+			for (int i = 0; i < path.getSegmentCount(); i++) {
+				String message = path.getSegment(i).toString();
+				stringPath.add(message);
+			}
+		}
+
+		f_selectionPath.clear();
+		final ITreeSelection selection = (ITreeSelection) treeViewer
+				.getSelection();
+		if (selection != null) {
+			final TreePath[] paths = selection.getPaths();
+			if (paths != null && paths.length > 0) {
+				final TreePath path = paths[0];
 				for (int i = 0; i < path.getSegmentCount(); i++) {
 					String message = path.getSegment(i).toString();
-					stringPath.add(message);
-				}
-			}
-
-			f_selectionPath.clear();
-			final ITreeSelection selection = (ITreeSelection) treeViewer
-					.getSelection();
-			if (selection != null) {
-				final TreePath[] paths = selection.getPaths();
-				if (paths != null && paths.length > 0) {
-					final TreePath path = paths[0];
-					for (int i = 0; i < path.getSegmentCount(); i++) {
-						String message = path.getSegment(i).toString();
-						f_selectionPath.add(message);
-					}
+					f_selectionPath.add(message);
 				}
 			}
 		}
