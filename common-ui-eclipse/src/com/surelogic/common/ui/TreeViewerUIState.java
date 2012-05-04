@@ -1,13 +1,18 @@
 package com.surelogic.common.ui;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
+
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 
 import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.viewers.IContentProvider;
@@ -23,8 +28,13 @@ import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 
 import com.surelogic.Borrowed;
+import com.surelogic.common.i18n.I18N;
+import com.surelogic.common.logging.SLLogger;
 import com.surelogic.common.xml.Entities;
 import com.surelogic.common.xml.XMLConstants;
 
@@ -381,7 +391,7 @@ public final class TreeViewerUIState {
 		for (List<String> path : f_expandedPaths) {
 			b.append("    ").append(path.toString()).append("\n");
 		}
-		b.append("  selected path:\n");
+		b.append("  selected paths:\n");
 		for (List<String> path : f_selectedPaths) {
 			b.append("    ").append(path.toString()).append("\n");
 		}
@@ -396,22 +406,101 @@ public final class TreeViewerUIState {
 	private static final String SELECTED_PATH = "selectedPath";
 	private static final String ELEMENT = "element";
 
-	public static TreeViewerUIState loadFromFile(File location)
-			throws IOException {
-		if (location == null || !location.exists()) {
-			new IOException("The passed file "
-					+ (location == null ? "null" : location.getAbsolutePath())
-					+ " does not exist.");
-		}
-		final BufferedReader br = new BufferedReader(new FileReader(location));
+	public static TreeViewerUIState loadFromFile(File location) {
 		final TreeViewerUIState result = new TreeViewerUIState();
+		if (location == null || !location.exists()) {
+			/*
+			 * If the file doesn't exist we will most likely create it when we
+			 * exit. This is not a problem, it just means it is the first time
+			 * we have used this viewer instance.
+			 */
+			return result;
+		}
 		try {
-		} finally {
-			br.close();
+			final InputStream stream;
+			try {
+				stream = new FileInputStream(location);
+			} catch (FileNotFoundException e) {
+				/*
+				 * If the file doesn't exist we will most likely create it when
+				 * we exit. This is not a problem, it just means it is the first
+				 * time we have used this viewer instance.
+				 */
+				return result;
+			}
+			try {
+				final SAXParserFactory factory = SAXParserFactory.newInstance();
+				final DefaultHandler handler = new StateReader(result);
+				// Parse the input
+				SAXParser saxParser = factory.newSAXParser();
+				saxParser.parse(stream, handler);
+			} finally {
+				stream.close();
+			}
+		} catch (Exception e) {
+			SLLogger.getLogger().log(Level.WARNING,
+					I18N.err(249, location.getAbsolutePath()), e);
 		}
 		return result;
 	}
 
+	private static class StateReader extends DefaultHandler {
+
+		final TreeViewerUIState f_state;
+		LinkedList<String> f_path = null;
+		StringBuilder f_element = null;
+
+		private StateReader(TreeViewerUIState state) {
+			f_state = state;
+		}
+
+		@Override
+		public void startElement(String uri, String localName, String name,
+				Attributes attributes) throws SAXException {
+			if (name.equals(TOP)) {
+				// nothing to do until there is more than one file version
+			} else if (name.equals(EXPANDED_PATH)) {
+				f_path = new LinkedList<String>();
+			} else if (name.equals(SELECTED_PATH)) {
+				f_path = new LinkedList<String>();
+			} else if (name.equals(ELEMENT)) {
+				f_element = new StringBuilder();
+			}
+		}
+
+		@Override
+		public void endElement(String uri, String localName, String name)
+				throws SAXException {
+			if (name.equals(TOP)) {
+				// nothing to do until there is more than one file version
+			} else if (name.equals(EXPANDED_PATH)) {
+				f_state.f_expandedPaths.add(f_path);
+				f_path = null;
+			} else if (name.equals(SELECTED_PATH)) {
+				f_state.f_selectedPaths.add(f_path);
+				f_path = null;
+			} else if (name.equals(ELEMENT)) {
+				f_path.add(f_element.toString());
+				f_element = null;
+			}
+		}
+
+		@Override
+		public void characters(char[] ch, int start, int length)
+				throws SAXException {
+			if (f_element != null)
+				f_element.append(ch, start, length);
+		}
+	}
+
+	/**
+	 * Saves this to the passed file in a simple XML format.
+	 * 
+	 * @param location
+	 *            the file to output to. It will be overwritten if it exists.
+	 * @throws IOException
+	 *             if something goes wrong writing to the file.
+	 */
 	public void saveToFile(File location) throws IOException {
 		if (location != null) {
 			final PrintWriter pw = new PrintWriter(location);
