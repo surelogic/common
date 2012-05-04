@@ -22,8 +22,8 @@ import com.surelogic.Borrowed;
 /**
  * Can save the user interface state (what nodes are opened and what nodes are
  * closed) and selections of a {@link TreeViewer} so that it can be restored
- * after a major update of its contents. This is done by saving textual labels
- * into paths if the node of the tree is open in the viewer when this object is
+ * after a update of its contents. This is done by saving textual labels into
+ * paths if the node of the tree is open in the viewer when this object is
  * constructed. This approach avoids having to require that the viewer whose
  * state is saved is the viewer that gets restored.
  * <p>
@@ -33,16 +33,16 @@ import com.surelogic.Borrowed;
  * <i>Note: This object should be constructed and called in the SWT UI
  * thread.</i>
  */
-public final class TreeViewerState {
+public final class TreeViewerUIState {
 
-	private static final String KEY = TreeViewerState.class.getName();
+	private static final String KEY = TreeViewerUIState.class.getName();
 
 	/**
 	 * Registers listeners that save the viewer's state when it changes and uses
 	 * {@link Viewer#setData(String, Object)} to hold onto the created
-	 * {@link TreeViewerState} object.
+	 * {@link TreeViewerUIState} object.
 	 * <p>
-	 * Use {@link TreeViewerState#updateTreeViewerState(TreeViewer)} to restore
+	 * Use {@link TreeViewerUIState#updateTreeViewerState(TreeViewer)} to restore
 	 * the viewer to this auto-saved state.
 	 * 
 	 * @param treeViewer
@@ -71,14 +71,14 @@ public final class TreeViewerState {
 
 	private static void updateTreeViewerState(final TreeViewer treeViewer) {
 		if (treeViewer != null && !treeViewer.getControl().isDisposed()) {
-			final TreeViewerState contentsState = new TreeViewerState(
+			final TreeViewerUIState contentsState = new TreeViewerUIState(
 					treeViewer);
 			treeViewer.setData(KEY, contentsState);
 		}
 	}
 
 	/**
-	 * Attempts to restore the viewer with the {@link TreeViewerState} object
+	 * Attempts to restore the viewer with the {@link TreeViewerUIState} object
 	 * stored on it by {@link Viewer#setData(String, Object)}.
 	 * 
 	 * @param treeViewer
@@ -89,18 +89,23 @@ public final class TreeViewerState {
 	 *            <tt>true</tt> if a matching label allows the old to be matched
 	 *            as a suffix of the current label in the viewer, <tt>false</tt>
 	 *            if the old and new labels must match exactly. See
-	 *            {@link #restoreViewState(TreeViewer, boolean)} for more
-	 *            information.
+	 *            {@link #restoreViewState(TreeViewer, boolean, boolean)} for
+	 *            more information.
+	 * @param expandSelections
+	 *            <tt>true</tt> if selected nodes should be expanded even if
+	 *            they were not in the saved state, <tt>false</tt> otherwise.
+	 *            See {@link #restoreViewState(TreeViewer, boolean, boolean)}
+	 *            for more information.
 	 * @return <tt>true</tt> if the restore was successful, <tt>false</tt>
 	 *         otherwise.
 	 */
 	public static boolean restoreSavedTreeViewerStateIfPossible(
-			final TreeViewer treeViewer, boolean matchOldAsSuffix) {
+			final TreeViewer treeViewer, boolean matchOldAsSuffix,
+			boolean expandSelected) {
 		if (treeViewer != null) {
-
 			final Object o = treeViewer.getData(KEY);
-			if (o instanceof TreeViewerState) {
-				final TreeViewerState state = (TreeViewerState) o;
+			if (o instanceof TreeViewerUIState) {
+				final TreeViewerUIState state = (TreeViewerUIState) o;
 				state.restoreViewState(treeViewer, matchOldAsSuffix);
 				return true;
 			}
@@ -110,7 +115,7 @@ public final class TreeViewerState {
 
 	private final List<LinkedList<String>> f_stringPaths = new ArrayList<LinkedList<String>>();
 
-	private final LinkedList<String> f_selectionPath = new LinkedList<String>();
+	private final LinkedList<String> f_selectionPaths = new LinkedList<String>();
 
 	/**
 	 * Constructs a new instance saving the visible state (what nodes are opened
@@ -120,7 +125,7 @@ public final class TreeViewerState {
 	 * @param treeViewer
 	 *            a viewer.
 	 */
-	public TreeViewerState(@Borrowed final TreeViewer treeViewer) {
+	public TreeViewerUIState(@Borrowed final TreeViewer treeViewer) {
 		if (treeViewer == null)
 			return;
 		f_stringPaths.clear();
@@ -134,7 +139,7 @@ public final class TreeViewerState {
 			}
 		}
 
-		f_selectionPath.clear();
+		f_selectionPaths.clear();
 		final ITreeSelection selection = (ITreeSelection) treeViewer
 				.getSelection();
 		if (selection != null) {
@@ -143,7 +148,7 @@ public final class TreeViewerState {
 				final TreePath path = paths[0];
 				for (int i = 0; i < path.getSegmentCount(); i++) {
 					String message = path.getSegment(i).toString();
-					f_selectionPath.add(message);
+					f_selectionPaths.add(message);
 				}
 			}
 		}
@@ -161,7 +166,7 @@ public final class TreeViewerState {
 	 * @see #restoreViewState(TreeViewer, boolean)
 	 */
 	public final void restoreViewState(final TreeViewer treeViewer) {
-		restoreViewState(treeViewer, false);
+		restoreViewState(treeViewer, false, false);
 	}
 
 	/**
@@ -186,6 +191,39 @@ public final class TreeViewerState {
 	 */
 	public final void restoreViewState(final TreeViewer treeViewer,
 			boolean matchOldAsSuffix) {
+		restoreViewState(treeViewer, matchOldAsSuffix, false);
+	}
+
+	/**
+	 * Restores the tree state and selections saved within this object to the
+	 * passed viewer. Normally the viewer is the same object used to construct
+	 * this, however, it is not required to be because the restore is done by
+	 * matching text labels in the viewer.
+	 * <p>
+	 * The <tt>matchOldAsSuffix</tt> flag allows the old label to be a suffix of
+	 * the current viewer label. This capability is useful if your label uses a
+	 * convention such as <tt>&gt;</tt> to mark changes. For example, the viewer
+	 * may label a modified package <tt>"&gt; my.package"</tt> but the old label
+	 * might have just been <tt>"my.package"</tt>&mdash;of course we want these
+	 * to match.
+	 * <p>
+	 * The <tt>expandSelections</tt> flag allows selected nodes to be expanded
+	 * (opened) even if they were not when the viewer's state was saved. This
+	 * can be useful for editors that add items, perhaps using a context menu,
+	 * and want them to be visible when they are appear.
+	 * 
+	 * @param treeViewer
+	 *            a viewer.
+	 * @param matchOldAsSuffix
+	 *            <tt>true</tt> if a matching label allows the old to be matched
+	 *            as a suffix of the current label in the viewer, <tt>false</tt>
+	 *            if the old and new labels must match exactly.
+	 * @param expandSelections
+	 *            <tt>true</tt> if selected nodes should be expanded even if
+	 *            they were not in the saved state, <tt>false</tt> otherwise.
+	 */
+	public final void restoreViewState(final TreeViewer treeViewer,
+			boolean matchOldAsSuffix, boolean expandSelections) {
 		final IContentProvider cp = treeViewer.getContentProvider();
 		if (cp instanceof ITreeContentProvider) {
 			/*
@@ -200,9 +238,9 @@ public final class TreeViewerState {
 			 * Restore the selection (scrolls the view back to where the user
 			 * was).
 			 */
-			if (!f_selectionPath.isEmpty())
-				restoreSavedSelection(treeViewer, tcp, f_selectionPath, null,
-						null, matchOldAsSuffix);
+			if (!f_selectionPaths.isEmpty())
+				restoreSavedSelections(treeViewer, tcp, f_selectionPaths, null,
+						null, matchOldAsSuffix, expandSelections);
 		} else {
 			// System.out.println("Not a tree: "+cp);
 		}
@@ -262,9 +300,10 @@ public final class TreeViewerState {
 		}
 	}
 
-	private void restoreSavedSelection(final TreeViewer treeViewer,
+	private void restoreSavedSelections(final TreeViewer treeViewer,
 			final ITreeContentProvider tcp, LinkedList<String> path,
-			Object parent, List<Object> treePath, boolean matchOldAsSuffix) {
+			Object parent, List<Object> treePath, boolean matchOldAsSuffix,
+			boolean expandSelections) {
 		if (path.isEmpty())
 			return;
 
@@ -303,9 +342,11 @@ public final class TreeViewerState {
 							treePath.toArray()));
 					// System.out.println("Selected: "+message);
 					treeViewer.setSelection(selection);
+					if (expandSelections)
+						treeViewer.setExpandedState(selection, true);
 				} else {
-					restoreSavedSelection(treeViewer, tcp, path, element,
-							treePath, matchOldAsSuffix);
+					restoreSavedSelections(treeViewer, tcp, path, element,
+							treePath, matchOldAsSuffix, expandSelections);
 				}
 			} else {
 				// System.out.println("Couldn't find: "+message);
@@ -319,6 +360,8 @@ public final class TreeViewerState {
 			ISelection selection = new TreeSelection(new TreePath(
 					treePath.toArray()));
 			treeViewer.setSelection(selection);
+			if (expandSelections)
+				treeViewer.setExpandedState(selection, true);
 		}
 	}
 }
