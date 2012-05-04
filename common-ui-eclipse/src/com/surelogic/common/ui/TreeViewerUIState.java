@@ -406,6 +406,15 @@ public final class TreeViewerUIState {
 	private static final String SELECTED_PATH = "selectedPath";
 	private static final String ELEMENT = "element";
 
+	/**
+	 * Loads saved tree viewer state from the passed file. If the file doesn't
+	 * exist or something goes wrong reading the file an empty, but usable,
+	 * state object is returned. If any exceptions occur reading from the file
+	 * they are logged.
+	 * 
+	 * @param location
+	 *            the file to read.
+	 */
 	public static TreeViewerUIState loadFromFile(File location) {
 		final TreeViewerUIState result = new TreeViewerUIState();
 		if (location == null || !location.exists()) {
