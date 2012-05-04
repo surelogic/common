@@ -1,5 +1,10 @@
 package com.surelogic.common.ui;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,6 +25,8 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 
 import com.surelogic.Borrowed;
+import com.surelogic.common.xml.Entities;
+import com.surelogic.common.xml.XMLConstants;
 
 /**
  * Can save the user interface state, nodes that are expanded and selected, of a
@@ -166,6 +173,10 @@ public final class TreeViewerUIState {
 	 * Saved tree paths to selected nodes.
 	 */
 	private final List<LinkedList<String>> f_selectedPaths = new ArrayList<LinkedList<String>>();
+
+	private TreeViewerUIState() {
+		// only for persistence
+	}
 
 	/**
 	 * Constructs a new instance that saves the passed tree viewer's user
@@ -376,5 +387,65 @@ public final class TreeViewerUIState {
 		}
 		b.append("]");
 		return b.toString();
+	}
+
+	// PERSISTENCE
+
+	private static final String TOP = TreeViewerUIState.class.getSimpleName();
+	private static final String EXPANDED_PATH = "expandedPath";
+	private static final String SELECTED_PATH = "selectedPath";
+	private static final String ELEMENT = "element";
+
+	public static TreeViewerUIState loadFromFile(File location)
+			throws IOException {
+		if (location == null || !location.exists()) {
+			new IOException("The passed file "
+					+ (location == null ? "null" : location.getAbsolutePath())
+					+ " does not exist.");
+		}
+		final BufferedReader br = new BufferedReader(new FileReader(location));
+		final TreeViewerUIState result = new TreeViewerUIState();
+		try {
+		} finally {
+			br.close();
+		}
+		return result;
+	}
+
+	public void saveToFile(File location) throws IOException {
+		if (location != null) {
+			final PrintWriter pw = new PrintWriter(location);
+			try {
+				pw.println("<?xml version='1.0' encoding='"
+						+ XMLConstants.ENCODING + "' standalone='yes'?>");
+				pw.println("<" + TOP + ">");
+
+				for (List<String> path : f_expandedPaths) {
+					pw.println("  <" + EXPANDED_PATH + ">");
+					for (String s : path) {
+						final StringBuilder b = new StringBuilder("    ");
+						Entities.createTag(ELEMENT, s, b);
+						pw.println(b.toString());
+					}
+					pw.println("  </" + EXPANDED_PATH + ">");
+				}
+
+				for (List<String> path : f_selectedPaths) {
+					pw.println("  <" + SELECTED_PATH + ">");
+					for (String s : path) {
+						final StringBuilder b = new StringBuilder("    ");
+						Entities.createTag(ELEMENT, s, b);
+						pw.println(b.toString());
+					}
+					pw.println("  </" + SELECTED_PATH + ">");
+				}
+
+				pw.println("</" + TOP + ">");
+				pw.close();
+
+			} finally {
+				pw.close();
+			}
+		}
 	}
 }
