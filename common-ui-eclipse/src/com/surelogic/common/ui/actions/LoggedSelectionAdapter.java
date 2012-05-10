@@ -6,6 +6,12 @@ import org.eclipse.swt.events.*;
 
 import com.surelogic.common.logging.SLLogger;
 
+/**
+ * Intended to log any exceptions that get thrown while running 
+ * the adapter methods
+ * 
+ * @author Edwin
+ */
 public class LoggedSelectionAdapter extends SelectionAdapter {
 	final String context;
 	
