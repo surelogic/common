@@ -1,12 +1,9 @@
 package com.surelogic.common.ui;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.logging.Level;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
@@ -22,60 +19,6 @@ import com.surelogic.common.i18n.JavaSourceReference;
 import com.surelogic.common.logging.SLLogger;
 
 public class JDTUIUtility {
-	private static final Method openInEditorMethod;
-
-	static {
-		Method m = null;
-		try {
-			m = JavaUI.class.getMethod("openInEditor", new Class[] {
-					IJavaElement.class, boolean.class, boolean.class });
-		} catch (final SecurityException e) {
-			m = null;
-		} catch (final NoSuchMethodException e) {
-			m = null;
-		}
-		openInEditorMethod = m;
-	}
-
-	/**
-	 * Uses reflection to use the JavaUI method in Eclipse 3.3 to try and open
-	 * the {@link IJavaElement} in the editor. The new method allows us to
-	 * control if the editor is activated and/or revealed.
-	 * <p>
-	 * Opens an editor on the given Java element in the active page. Valid
-	 * elements are all Java elements that are {@link ISourceReference}. For
-	 * elements inside a compilation unit or class file, the parent is opened in
-	 * the editor is opened and the element revealed. If there already is an
-	 * open Java editor for the given element, it is returned.
-	 * 
-	 * @param element
-	 *            the Java element to open.
-	 * @param activate
-	 *            if set, the editor will be activated.
-	 * @param reveal
-	 *            if set, the element will be revealed.
-	 */
-	public static IEditorPart openInEditor(final IJavaElement element,
-			final boolean activate, final boolean reveal) {
-		try {
-			if (openInEditorMethod != null) {
-				final Object rv = openInEditorMethod.invoke(null, new Object[] {
-						element, activate, reveal });
-				return (IEditorPart) rv;
-			} else {
-				return JavaUI.openInEditor(element);
-			}
-		} catch (final CoreException e) {
-			SLLogger.getLogger().log(Level.SEVERE, I18N.err(161, element), e);
-		} catch (final IllegalArgumentException e) {
-			SLLogger.getLogger().log(Level.SEVERE, I18N.err(161, element), e);
-		} catch (final IllegalAccessException e) {
-			SLLogger.getLogger().log(Level.SEVERE, I18N.err(161, element), e);
-		} catch (final InvocationTargetException e) {
-			SLLogger.getLogger().log(Level.SEVERE, I18N.err(161, element), e);
-		}
-		return null;
-	}
 
 	/**
 	 * Tries to open the specified Java element in the editor and highlight the
@@ -87,16 +30,16 @@ public class JDTUIUtility {
 	 * @param lineNumber
 	 *            the line number to highlight, or the passed Java element if
 	 *            {@code lineNumber <= 0}.
-	 * @return @return {@code true} if it was possible to open an editor,
-	 *         {@code false} otherwise. A result of {@code false} might indicate
-	 *         that the file was opened in an external editor.
+	 * @return {@code true} if it was possible to open an editor, {@code false}
+	 *         otherwise. A result of {@code false} might indicate that the file
+	 *         was opened in an external editor.
 	 */
 	public static boolean tryToOpenInEditor(final IJavaElement element,
 			final int lineNumber) {
 		if (element instanceof ISourceReference) {
 			try {
-				final IEditorPart editorPart = openInEditor(element, false,
-						true);
+				final IEditorPart editorPart = JavaUI.openInEditor(element,
+						false, true);
 				if (lineNumber > 1) { // only move if not the first line
 					final IMarker location = ResourcesPlugin.getWorkspace()
 							.getRoot().createMarker("com.surelogic.sierra");
@@ -269,7 +212,7 @@ public class JDTUIUtility {
 			try {
 				for (final IField field : element.getFields()) {
 					if (fieldName.equals(field.getElementName())) {
-						openInEditor(field, false, true);
+						JavaUI.openInEditor(field, false, true);
 						return true;
 					}
 				}
@@ -320,7 +263,7 @@ public class JDTUIUtility {
 					 */
 					for (final IMethod method : element.getMethods()) {
 						if (method.isConstructor()) {
-							openInEditor(method, false, true);
+							JavaUI.openInEditor(method, false, true);
 							return true;
 						}
 					}
@@ -331,7 +274,7 @@ public class JDTUIUtility {
 				 */
 				for (final IMethod method : element.getMethods()) {
 					if (methodName.equals(method.getElementName())) {
-						openInEditor(method, false, true);
+						JavaUI.openInEditor(method, false, true);
 						return true;
 					}
 				}
