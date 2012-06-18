@@ -285,8 +285,6 @@ public final class QueryResultNavigator extends AdHocManagerAdapter implements
 				.msg("adhoc.query.navigator.clearSelection.tooltip"));
 		f_clearSelectionAction.setImageDescriptor(SLImages
 				.getImageDescriptor(CommonImages.IMG_QUERY_BACK));
-		f_clearSelectionAction.setDisabledImageDescriptor(SLImages
-				.getImageDescriptor(CommonImages.IMG_QUERY_GRAY));
 		addEnableWhenAResultIsSelected(f_clearSelectionAction);
 		f_showDefinedVariablesAction.setImageDescriptor(SLImages
 				.getImageDescriptor(CommonImages.IMG_INFO));
