@@ -284,8 +284,9 @@ public abstract class AbstractQueryResultsView extends ViewPart {
 				}
 
 				final AdHocQueryResultSqlData result = (AdHocQueryResultSqlData) f_result;
-				final List<AdHocQuery> subQueryList = result
-						.getQueryFullyBound().getQuery()
+				final AdHocQuery resultQuery = result.getQueryFullyBound()
+						.getQuery();
+				final List<AdHocQuery> subQueryList = resultQuery
 						.getVisibleSubQueryList();
 				final Map<String, String> variableValues = result
 						.getVariableValues();
@@ -305,7 +306,12 @@ public abstract class AbstractQueryResultsView extends ViewPart {
 					final MenuItem item = new MenuItem(menu, SWT.PUSH);
 					item.setText(query.getDescription());
 					item.setData(query);
-					item.setImage(SLImages.getImage(CommonImages.IMG_QUERY));
+					final String imageName;
+					if (resultQuery.isDefaultSubQuery(query))
+						imageName = CommonImages.IMG_QUERY_DEFAULT;
+					else
+						imageName = CommonImages.IMG_QUERY;
+					item.setImage(SLImages.getImage(imageName));
 					item.setEnabled(query
 							.isCompletelySubstitutedBy(variableValues));
 					item.addListener(SWT.Selection, runSubQuery);
