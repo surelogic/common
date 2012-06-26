@@ -429,8 +429,13 @@ public abstract class AbstractQueryResultsView extends ViewPart {
                     if (model.isColumnVisible(colI)) {
                         final Cell cell = row[colI];
                         item.setText(itemIndex, cell.getText());
-                        item.setImage(itemIndex,
-                                SLImages.getImage(cell.getImageSymbolicName()));
+                        Image image = SLImages.getImage(cell
+                                .getImageSymbolicName());
+                        // FIXME it's unclear why we need to check for disposal
+                        // here.
+                        if (image == null || !image.isDisposed()) {
+                            item.setImage(itemIndex, image);
+                        }
                         itemIndex++;
                     }
                 }
