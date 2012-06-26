@@ -431,8 +431,6 @@ public abstract class AbstractQueryResultsView extends ViewPart {
                         item.setText(itemIndex, cell.getText());
                         Image image = SLImages.getImage(cell
                                 .getImageSymbolicName());
-                        // FIXME it's unclear why we need to check for disposal
-                        // here.
                         if (image == null || !image.isDisposed()) {
                             item.setImage(itemIndex, image);
                         }
@@ -592,8 +590,6 @@ public abstract class AbstractQueryResultsView extends ViewPart {
             final NonLeafTreeCell nonLeaf = (NonLeafTreeCell) cell;
             item.setText(nonLeaf.getText());
             Image image = SLImages.getImage(nonLeaf.getImageSymbolicName());
-            // FIXME It is unclear why we would get a disposed image here, but
-            // an IllegalArgumentException is thrown if we pass one to setImage
             if (image == null || !image.isDisposed()) {
                 item.setImage(image);
             }

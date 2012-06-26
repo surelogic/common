@@ -23,8 +23,7 @@ public class Activator extends AbstractUIPlugin {
     public void stop(final BundleContext context) throws Exception {
         plugin = null;
         try {
-            // FIXME Is this being called?
-            // SLImages.dispose();
+            SLImages.dispose();
         } finally {
             super.stop(context);
         }
