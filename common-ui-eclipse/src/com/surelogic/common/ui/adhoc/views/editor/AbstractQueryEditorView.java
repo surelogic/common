@@ -42,7 +42,7 @@ public abstract class AbstractQueryEditorView extends ViewPart {
 
 	public abstract AdHocManager getManager();
 
-	public ToolTip getToolTip(Shell shell) {
+	public ToolTip getToolTip(final Shell shell) {
 		return new ToolTip(shell);
 	}
 
@@ -53,8 +53,6 @@ public abstract class AbstractQueryEditorView extends ViewPart {
 
 		final SashForm sash = new SashForm(parent, SWT.HORIZONTAL);
 		sash.setLayout(new FillLayout());
-		sash.setBackground(sash.getDisplay().getSystemColor(
-				SWT.COLOR_TITLE_BACKGROUND));
 
 		/*
 		 * Left-hand-side shows all the queries that can be selected.
