@@ -9,12 +9,12 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
 import com.surelogic.common.adhoc.AdHocManager;
 import com.surelogic.common.adhoc.AdHocQuery;
 import com.surelogic.common.i18n.I18N;
-import com.surelogic.common.ui.PageBook;
 import com.surelogic.common.ui.adhoc.views.QueryResultNavigator;
 import com.surelogic.common.ui.tooltip.ToolTip;
 

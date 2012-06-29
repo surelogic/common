@@ -14,6 +14,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.progress.UIJob;
 
 import com.surelogic.common.core.adhoc.EclipseQueryUtility;
@@ -26,7 +27,6 @@ import com.surelogic.common.adhoc.AdHocQueryFullyBound;
 import com.surelogic.common.adhoc.AdHocQueryResult;
 import com.surelogic.common.adhoc.AdHocQueryResultSqlData;
 import com.surelogic.common.i18n.I18N;
-import com.surelogic.common.ui.PageBook;
 import com.surelogic.common.ui.SLImages;
 import com.surelogic.common.ui.adhoc.views.QueryResultNavigator;
 import com.surelogic.common.ui.jobs.SLUIJob;
