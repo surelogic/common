@@ -41,6 +41,7 @@ import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.progress.UIJob;
 
 import com.surelogic.common.CommonImages;
@@ -53,7 +54,6 @@ import com.surelogic.common.core.adhoc.EclipseQueryUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.ui.Activator;
 import com.surelogic.common.ui.EclipseUIUtility;
-import com.surelogic.common.ui.PageBook;
 import com.surelogic.common.ui.SLImages;
 import com.surelogic.common.ui.adhoc.dialogs.AddSubQueryDialog;
 import com.surelogic.common.ui.adhoc.dialogs.VariableValueDialog;
