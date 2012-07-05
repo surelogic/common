@@ -28,11 +28,14 @@ public class Trace {
 	final String pakkage;
 	final String file;
 	final String loc;
+	final String methodCallClass;
+	final String methodCallName;
 	final int line;
 
 	Trace(final long id, final long parentId, final String inClass,
 			final String inPackage, final String inFile, final String location,
-			final int atLine) {
+			final int atLine, final String methodCallClass,
+			final String methodCallName) {
 		this.id = id;
 		this.parentId = parentId;
 		clazz = inClass;
@@ -40,6 +43,8 @@ public class Trace {
 		file = inFile;
 		loc = location;
 		line = atLine;
+		this.methodCallClass = methodCallClass;
+		this.methodCallName = methodCallName;
 	}
 
 	public Object get(final int i) {
@@ -54,6 +59,10 @@ public class Trace {
 			return loc;
 		case 5:
 			return line;
+		case 6:
+			return methodCallClass;
+		case 7:
+			return methodCallName;
 		default:
 			throw new IllegalArgumentException();
 		}
@@ -87,6 +96,14 @@ public class Trace {
 		return line;
 	}
 
+	public String getMethodCallClass() {
+		return methodCallClass;
+	}
+
+	public String getMethodCallName() {
+		return methodCallName;
+	}
+
 	@Override
 	public String toString() {
 		return pakkage + '.' + clazz + ':' + loc + ':' + line;
@@ -100,6 +117,7 @@ public class Trace {
 	 */
 	public static DBQuery<LinkedList<Trace>> stackTrace(final long traceId) {
 		return new DBQuery<LinkedList<Trace>>() {
+			@Override
 			public LinkedList<Trace> perform(final Query q) {
 				final Queryable<Trace> getTrace = q.prepared(
 						"Trace.selectById",
@@ -118,9 +136,11 @@ public class Trace {
 
 	private static class TraceRowHandler implements RowHandler<Trace> {
 
+		@Override
 		public Trace handle(final Row r) {
 			return new Trace(r.nextLong(), r.nextLong(), r.nextString(),
-					r.nextString(), r.nextString(), r.nextString(), r.nextInt());
+					r.nextString(), r.nextString(), r.nextString(),
+					r.nextInt(), r.nextString(), r.nextString());
 		}
 
 	}
