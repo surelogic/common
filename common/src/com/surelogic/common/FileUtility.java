@@ -53,6 +53,11 @@ public final class FileUtility {
 	 * The string name of the JSure data directory.
 	 */
 	public static final String JSURE_DATA_PATH_FRAGMENT = ".jsure-data";
+	
+	/**
+	 * The name of the promises XML diff path under the JSure data directory.
+	 */
+	public static final String JSURE_XML_DIFF_PATH_FRAGMENT = "promises-xml";
 
 	/**
 	 * The string name of the Sierra data directory.
