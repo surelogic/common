@@ -34,6 +34,7 @@ public class QueryablePreparedStatement<T> implements Queryable<T> {
 		this.rh = rh;
 	}
 
+	@Override
 	public T call(final Object... args) {
 		try {
 			JDBCUtils.fill(st, args);
@@ -49,6 +50,7 @@ public class QueryablePreparedStatement<T> implements Queryable<T> {
 		}
 	}
 
+	@Override
 	public void finished() {
 		try {
 			st.close();
