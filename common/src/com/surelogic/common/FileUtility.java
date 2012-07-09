@@ -30,11 +30,6 @@ import java.util.zip.ZipFile;
 
 import com.surelogic.Utility;
 import com.surelogic.common.i18n.I18N;
-import com.surelogic.common.jobs.AbstractSLJob;
-import com.surelogic.common.jobs.SLJob;
-import com.surelogic.common.jobs.SLProgressMonitor;
-import com.surelogic.common.jobs.SLSeverity;
-import com.surelogic.common.jobs.SLStatus;
 import com.surelogic.common.logging.SLLogger;
 
 /**
@@ -53,6 +48,11 @@ public final class FileUtility {
 	 * The string name of the JSure data directory.
 	 */
 	public static final String JSURE_DATA_PATH_FRAGMENT = ".jsure-data";
+
+	/**
+	 * The name of the promises XML diff path under the JSure data directory.
+	 */
+	public static final String JSURE_XML_DIFF_PATH_FRAGMENT = "promises-xml";
 
 	/**
 	 * The string name of the Sierra data directory.
@@ -655,154 +655,6 @@ public final class FileUtility {
 			SLLogger.getLogger().log(Level.SEVERE, msg, e);
 			throw new IllegalStateException(msg, e);
 		}
-	}
-
-	/**
-	 * This method constructs a job to move a data directory from its current
-	 * location to another.
-	 * <p>
-	 * The destination is deleted if it is not a directory or if
-	 * <tt>moveOldToNew</tt> is {@code true} and there is some existing data to
-	 * move.
-	 * 
-	 * @param existing
-	 *            the existing data directory.
-	 * @param destination
-	 *            the new data directory.
-	 * @param moveOldToNew
-	 *            {@code true} if it is desired to delete any contents at
-	 *            <tt>destination</tt> and overwrite them with the contents of
-	 *            the old data directory, {@link false} otherwise. The contents
-	 *            will only be deleted if there is some existing data to move or
-	 *            if <tt>destination</tt> is not a directory.
-	 * @param optionalStartUp
-	 *            a job run before the data directory is moved, {@code null}
-	 *            indicates no job is needed. This job is typically used to
-	 *            release resources in the data directory.
-	 * @param optionalFinishUp
-	 *            a job run after the data directory is moved, {@code null}
-	 *            indicates no job is needed. This job is typically used to
-	 *            re-attach to resources in the data directory.
-	 * @return an {@link SLJob} to move the data directory.
-	 */
-	public static SLJob moveDataDirectory(final File existing,
-			final File destination, final boolean moveOldToNew,
-			final SLJob optionalStartUp, final SLJob optionalFinishUp) {
-		final SLJob job = new AbstractSLJob(I18N.msg(
-				"common.jobs.name.moveDataDirectory",
-				existing.getAbsolutePath(), destination.getAbsolutePath())) {
-
-			@Override
-			public SLStatus run(final SLProgressMonitor monitor) {
-				monitor.begin();
-				boolean success;
-				try {
-					/*
-					 * Optionally run a start-up job to setup for this move.
-					 * Resources in the data directory might need to be
-					 * released.
-					 */
-					if (optionalStartUp != null) {
-						final SLStatus startResult = AbstractSLJob.invoke(
-								optionalStartUp, monitor, 1);
-						if (startResult.getSeverity() != SLSeverity.OK) {
-							return startResult;
-						}
-						if (monitor.isCanceled()) {
-							return SLStatus.CANCEL_STATUS;
-						}
-					}
-
-					if (destination.exists()
-							&& (moveOldToNew && existing.exists() || !destination
-									.isDirectory())) {
-						/*
-						 * Only clear out the destination directory if existing
-						 * data exists to move into it OR if the destination
-						 * path isn't a directory.
-						 * 
-						 * We don't need to be deleting stuff for no reason.
-						 */
-						success = FileUtility.recursiveDelete(destination);
-						if (!success) {
-							/*
-							 * Failed to clear out the destination directory.
-							 */
-							final int code = 92;
-							final String msg = I18N.err(code,
-									destination.getAbsolutePath());
-							return SLStatus.createErrorStatus(code, msg);
-						}
-					}
-
-					if (moveOldToNew && existing.exists()) {
-						success = existing.renameTo(destination);
-						if (!success) {
-							/*
-							 * Failed to move the existing directory to its
-							 * destination.
-							 */
-							final int code = 95;
-							final String msg = I18N.err(code,
-									existing.getAbsolutePath(),
-									destination.getAbsolutePath());
-							return SLStatus.createErrorStatus(code, msg);
-						}
-					}
-
-					/*
-					 * Create the destination data directory, if it doesn't
-					 * already exist.
-					 */
-					if (!destination.exists()) {
-						success = FileUtility.createDirectory(destination);
-						if (!success) {
-							/*
-							 * Failed to create the destination data directory.
-							 */
-							final int code = 156;
-							final String msg = I18N.err(code,
-									destination.getAbsolutePath());
-							return SLStatus.createErrorStatus(code, msg);
-						}
-
-					}
-
-					/*
-					 * Optionally run a finish-up job to setup for this move.
-					 * Resources in the data directory might need to be attached
-					 * to.
-					 */
-					if (optionalFinishUp != null) {
-						final SLStatus startResult = AbstractSLJob.invoke(
-								optionalFinishUp, monitor, 1);
-						if (startResult.getSeverity() != SLSeverity.OK) {
-							return startResult;
-						}
-					}
-				} finally {
-					monitor.done();
-				}
-				return SLStatus.OK_STATUS;
-			}
-		};
-		return job;
-	}
-
-	/**
-	 * Convenience method to move a data directory when no start or finish jobs
-	 * are needed. This method has the same effect as calling:
-	 * 
-	 * <pre>
-	 * moveDataDirectory(existing, destination, moveOldToNew, null, null)
-	 * </pre>
-	 * 
-	 * @see #moveDataDirectory(File, File, boolean, SLJob, SLJob)
-	 */
-	public static SLJob moveDataDirectory(final File existing,
-			final File destination, final boolean moveOldToNew) {
-		return moveDataDirectory(existing, destination, moveOldToNew, null,
-				null);
 	}
 
 	/**

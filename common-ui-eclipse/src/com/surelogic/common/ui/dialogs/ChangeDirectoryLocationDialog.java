@@ -23,7 +23,7 @@ import org.eclipse.swt.widgets.Text;
 
 import com.surelogic.common.i18n.I18N;
 
-public final class ChangeDataDirectoryDialog extends TitleAreaDialog {
+public final class ChangeDirectoryLocationDialog extends TitleAreaDialog {
 
 	private static final int CONTENTS_WIDTH_HINT = 400;
 
@@ -38,12 +38,6 @@ public final class ChangeDataDirectoryDialog extends TitleAreaDialog {
 		return f_newDataDirectory;
 	}
 
-	private boolean f_moveOldToNew = true;
-
-	public boolean moveOldToNew() {
-		return f_moveOldToNew;
-	}
-
 	public boolean isValidChangeToDataDirectory() {
 		if (f_newDataDirectory == null)
 			return false;
@@ -55,18 +49,15 @@ public final class ChangeDataDirectoryDialog extends TitleAreaDialog {
 
 	private Mediator f_mediator;
 
-	public ChangeDataDirectoryDialog(Shell shell, File existing, String title,
-			Image icon, String information) {
+	public ChangeDirectoryLocationDialog(Shell shell, File existing,
+			String title, Image icon, String information) {
 		super(shell);
 		if (existing == null)
 			throw new IllegalArgumentException(I18N.err(44, "existing"));
 		f_existing = existing;
-		f_title = title == null ? I18N
-				.msg("common.change.data.directory.dialog.title") : title;
+		f_title = title;
 		f_icon = icon;
-		f_information = information == null ? I18N
-				.msg("common.change.data.directory.dialog.information")
-				: information;
+		f_information = information;
 		setShellStyle(getShellStyle() | SWT.RESIZE | SWT.MAX);
 	}
 
@@ -94,16 +85,15 @@ public final class ChangeDataDirectoryDialog extends TitleAreaDialog {
 		info.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true, false));
 
 		final Group dataGroup = new Group(panel, SWT.NONE);
-		dataGroup
-				.setText(I18N.msg("common.change.data.directory.dialog.group"));
+		dataGroup.setText(I18N.msg("common.change.directory.dialog.group"));
 		data = new GridData(SWT.FILL, SWT.DEFAULT, true, false);
 		data.verticalIndent = 10;
 		dataGroup.setLayoutData(data);
 		dataGroup.setLayout(new GridLayout(3, false));
 
 		final Label currentLabel = new Label(dataGroup, SWT.RIGHT);
-		currentLabel.setText(I18N
-				.msg("common.change.data.directory.dialog.current"));
+		currentLabel
+				.setText(I18N.msg("common.change.directory.dialog.current"));
 		currentLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false,
 				false));
 
@@ -113,7 +103,7 @@ public final class ChangeDataDirectoryDialog extends TitleAreaDialog {
 				false, 2, 1));
 
 		final Label newLabel = new Label(dataGroup, SWT.RIGHT);
-		newLabel.setText(I18N.msg("common.change.data.directory.dialog.new"));
+		newLabel.setText(I18N.msg("common.change.directory.dialog.new"));
 		newLabel.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
 
 		final Text newText = new Text(dataGroup, SWT.SINGLE);
@@ -121,23 +111,16 @@ public final class ChangeDataDirectoryDialog extends TitleAreaDialog {
 
 		final Button browseButton = new Button(dataGroup, SWT.PUSH);
 		browseButton.setText(I18N
-				.msg("common.change.data.directory.dialog.new.button"));
+				.msg("common.change.directory.dialog.new.button"));
 		browseButton.setLayoutData(new GridData(SWT.DEFAULT, SWT.CENTER, false,
 				false));
 
-		final Button moveButton = new Button(panel, SWT.CHECK);
-		moveButton
-				.setText(I18N.msg("common.change.data.directory.dialog.move"));
-		moveButton.setSelection(true);
-		moveButton.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, true,
-				false));
-
-		setTitle(I18N.msg("common.change.data.directory.dialog.msg.title"));
-		setMessage(I18N.msg("common.change.data.directory.dialog.msg"),
+		setTitle(I18N.msg("common.change.directory.dialog.msg.title"));
+		setMessage(I18N.msg("common.change.directory.dialog.msg"),
 				IMessageProvider.INFORMATION);
 		Dialog.applyDialogFont(panel);
 
-		f_mediator = new Mediator(newText, browseButton, moveButton);
+		f_mediator = new Mediator(newText, browseButton);
 		f_mediator.init();
 
 		return contents;
@@ -161,12 +144,10 @@ public final class ChangeDataDirectoryDialog extends TitleAreaDialog {
 
 		private final Text f_newText;
 		private final Button f_browseButton;
-		private final Button f_moveButton;
 
-		Mediator(Text newText, Button browseButton, Button moveButton) {
+		Mediator(Text newText, Button browseButton) {
 			f_newText = newText;
 			f_browseButton = browseButton;
-			f_moveButton = moveButton;
 		}
 
 		public void init() {
@@ -175,9 +156,9 @@ public final class ChangeDataDirectoryDialog extends TitleAreaDialog {
 					final DirectoryDialog dd = new DirectoryDialog(
 							f_browseButton.getShell());
 					dd.setMessage(I18N
-							.msg("common.change.data.directory.dialog.new.dirBrowse.desc"));
+							.msg("common.change.directory.dialog.new.dirBrowse.desc"));
 					dd.setText(I18N
-							.msg("common.change.data.directory.dialog.new.dirBrowse.title"));
+							.msg("common.change.directory.dialog.new.dirBrowse.title"));
 					final String path = dd.open();
 					f_newText.setText(path);
 				}
@@ -197,7 +178,6 @@ public final class ChangeDataDirectoryDialog extends TitleAreaDialog {
 		}
 
 		private void okPressed() {
-			f_moveOldToNew = f_moveButton.getSelection();
 			f_newDataDirectory = new File(f_newText.getText());
 		}
 
