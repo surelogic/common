@@ -27,7 +27,7 @@ import com.surelogic.common.jdbc.SingleRowHandler;
 public final class Functions {
 
 	private Functions() {
-		// No instance
+		// No instaqnce
 	}
 
 	private static class TraceResultSet implements InvocationHandler {
@@ -45,6 +45,7 @@ public final class Functions {
 							new TraceResultSet(traces));
 		}
 
+		@Override
 		public Object invoke(final Object proxy, final Method method,
 				final Object[] args) throws Throwable {
 			final String methodName = method.getName();
@@ -90,9 +91,11 @@ public final class Functions {
 	 */
 	public static long lockId(final long id) {
 		return DefaultConnection.getInstance().withDefault(new DBQuery<Long>() {
+			@Override
 			public Long perform(final Query q) {
 				return q.prepared("LockId.selectRWLock",
 						new ResultHandler<Long>() {
+							@Override
 							public Long handle(final Result result) {
 								for (final Row r : result) {
 									return r.nextLong();
@@ -114,9 +117,11 @@ public final class Functions {
 	public static String objId(final long id) {
 		return DefaultConnection.getInstance().withDefault(
 				new DBQuery<String>() {
+					@Override
 					public String perform(final Query q) {
 						return q.prepared("ObjectId.selectClass",
 								SingleRowHandler.from(new RowHandler<String>() {
+									@Override
 									public String handle(final Row r) {
 										String clazz = r.nextString();
 										if (clazz.length() > 50) {
