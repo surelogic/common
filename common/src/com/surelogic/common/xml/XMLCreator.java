@@ -4,10 +4,12 @@ import java.io.*;
 import java.util.*;
 
 public class XMLCreator {
-	protected final Map<String,String> attributes = new HashMap<String,String>();
-	protected final StringBuilder b = new StringBuilder();
-	protected boolean firstAttr = true;
-	protected final PrintWriter pw;
+	final PrintWriter pw;
+	/** 
+	 * Used to buffer output to the PrintWriter above
+	 */
+	final StringBuilder sb = new StringBuilder();
+	protected final Builder b = new Builder(0);
 	
 	protected XMLCreator(OutputStream out) throws IOException {
 		if (out != null) {
@@ -17,49 +19,124 @@ public class XMLCreator {
 			pw = null;
 		}
 	}
-		
-	protected final void flushBuffer(PrintWriter pw) {
+	
+	protected final void flushBuffer() {
 		if (pw != null) {
-			pw.println(b.toString());
+			if (sb.length() > 0) {
+				pw.println(sb.toString());
+				sb.setLength(0);
+			}
+			pw.flush();
+		}
+	}    
+	
+	protected final void close() {
+		flushBuffer();		
+		if (pw != null) {
+			pw.close();
+		}
+	}
+
+	/**
+	 * Encapsulates the creation of an XML entity
+	 * 
+	 * Q: how to write the output incrementally?
+	 */
+	public class Builder {
+		final Map<String,String> attributes = new HashMap<String,String>();	
+
+		final int indent;
+		boolean firstAttr = true;		
+		String name;
+		
+		// TODO will this take up too much memory to keep everything around?
+		final List<Builder> nested = new ArrayList<Builder>(0);
+		
+		Builder(int indent) {
+			this.indent = indent;
+		}
+
+		public Builder nest(String name) {			
+			if (nested.isEmpty()) {
+				// First nested entity, so we need to close
+				Entities.closeStart(sb, false, true);	
+			}
+			flushBuffer();
+			// TODO these could be reused?
+			Builder n = new Builder(indent+1);
+			nested.add(n);
+			n.start(name);
+			return n;
+		}
+		
+		final void reset() {
+			firstAttr = true;
+			attributes.clear();
+			name = null;
+		}
+
+		public void start(String name) {
 			reset();
+			this.name = name;
+			Entities.start(name, sb, indent);
 		}
-	}
-	
-	protected final void reset() {
-		b.setLength(0);
-		firstAttr = true;
-		attributes.clear();
-	}
-	 
-	public final void addAttribute(String name, boolean value) {
-		if (value) {
-			addAttribute(name, Boolean.toString(value));
-		}
-	}
-	
-	public final boolean addAttribute(String name, Long value) {		
-		if (value == null) {
-			return false;
-		}
-		addAttribute(name, value.toString());		
-		return true;
-	}
-	
-	public final void addAttribute(String name, String value) {
-		String oldValue = attributes.get(name);
-		if (oldValue != null) {
-			if (oldValue.equals(value)) {
-				return;
+		
+		public void end() {
+			if (nested.isEmpty()) {
+				Entities.closeStart(sb, true, true);				
 			} else {
-				throw new IllegalStateException("Attribute set twice: "+name+" = "+oldValue+", "+value);
+				Entities.end(name, sb, indent);
+			}
+			flushBuffer();
+		}
+		
+		/*
+		final String build() {
+			String rv = b.toString();
+			reset();
+			return rv;
+		}
+        */
+		
+		public final void addAttribute(String name, boolean value) {
+			if (value) {
+				addAttribute(name, Boolean.toString(value));
 			}
 		}
-		if (firstAttr) {
-			firstAttr = false;
-		} else {
-			b.append("\n\t");
+		
+		public final void addAttribute(String name, int value) {			
+			addAttribute(name, Integer.toString(value));			
 		}
-		Entities.addAttribute(name, value, b);
-		attributes.put(name, value);
+
+		public final boolean addAttribute(String name, Long value) {		
+			if (value == null) {
+				return false;
+			}
+			addAttribute(name, value.toString());		
+			return true;
+		}
+
+		public final void addAttribute(String name, String value) {
+			String oldValue = attributes.get(name);
+			if (oldValue != null) {
+				if (oldValue.equals(value)) {
+					return;
+				} else {
+					throw new IllegalStateException("Attribute set twice: "+name+" = "+oldValue+", "+value);
+				}
+			}
+			if (firstAttr) {
+				firstAttr = false;
+			} else {
+				//sb.append("\n\t");
+				Entities.newLine(sb, indent);
+			}
+			Entities.addAttribute(name, value, sb);
+			attributes.put(name, value);
+		}
+		
+		public Map<String,String> getAttributes() {
+			return attributes;
+		}
 	}
 }
