@@ -184,5 +184,9 @@ public class Entity {
 		}
 		return rv;
 	}
+
+	public boolean hasRefs() {
+		return refs.isEmpty();
+	}
 }
 
