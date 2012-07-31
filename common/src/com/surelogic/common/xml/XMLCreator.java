@@ -72,6 +72,7 @@ public class XMLCreator {
 		final void reset() {
 			firstAttr = true;
 			attributes.clear();
+			nested.clear();
 			name = null;
 		}
 
@@ -89,14 +90,6 @@ public class XMLCreator {
 			}
 			flushBuffer();
 		}
-		
-		/*
-		final String build() {
-			String rv = b.toString();
-			reset();
-			return rv;
-		}
-        */
 		
 		public final void addAttribute(String name, boolean value) {
 			if (value) {
@@ -137,6 +130,26 @@ public class XMLCreator {
 		
 		public Map<String,String> getAttributes() {
 			return attributes;
+		}
+
+		public boolean hasNested() {
+			return !nested.isEmpty();
+		}
+
+		public Iterable<Builder> getNestedBuilders() {
+			if (nested.isEmpty()) {
+				return Collections.emptyList();
+			}
+			return nested;
+		}
+
+		public Entity build() {
+			//System.out.println("Building "+name+": "+this);
+			Entity e = new Entity(name, getAttributes());
+			for(Builder n : getNestedBuilders()) {
+				e.addRef(n.build());
+			}
+			return e;
 		}
 	}
 }
