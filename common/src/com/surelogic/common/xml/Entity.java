@@ -186,7 +186,7 @@ public class Entity {
 	}
 
 	public boolean hasRefs() {
-		return refs.isEmpty();
+		return !refs.isEmpty();
 	}
 }
 
