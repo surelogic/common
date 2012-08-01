@@ -28,7 +28,7 @@ public class JSureSummaryXMLReader extends AbstractXMLReader {
 	
 	@Override
 	protected void handleNestedEntity(Entity next, Entity last, String lastName) {
-		System.out.println("Looking at "+next.getName()+" in "+last.getName());
+		//System.out.println("Looking at "+last.getName()+" in "+next.getName());
 		next.addRef(last);
 	}
 }
