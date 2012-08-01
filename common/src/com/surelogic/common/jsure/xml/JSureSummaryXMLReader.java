@@ -2,6 +2,7 @@ package com.surelogic.common.jsure.xml;
 
 import org.xml.sax.Attributes;
 
+import com.surelogic.common.xml.Entity;
 import com.surelogic.common.xml.IXMLResultListener;
 
 public class JSureSummaryXMLReader extends AbstractXMLReader {
@@ -23,5 +24,11 @@ public class JSureSummaryXMLReader extends AbstractXMLReader {
 			return attributes.getValue(TIME_ATTR);
 		}
 		return null;
+	}
+	
+	@Override
+	protected void handleNestedEntity(Entity next, Entity last, String lastName) {
+		System.out.println("Looking at "+next.getName()+" in "+last.getName());
+		next.addRef(last);
 	}
 }
