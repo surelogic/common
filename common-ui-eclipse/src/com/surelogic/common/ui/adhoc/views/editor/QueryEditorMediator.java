@@ -331,10 +331,13 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements
 				cutItem.setEnabled(hasSelection);
 				copyItem.setEnabled(hasSelection);
 				final Clipboard c = new Clipboard(f_sql.getDisplay());
-				final boolean hasTextToPaste = null != c
-						.getContents(TextTransfer.getInstance());
-				pasteItem.setEnabled(hasTextToPaste);
-				c.dispose();
+				try {
+					final boolean hasTextToPaste = null != c
+							.getContents(TextTransfer.getInstance());
+					pasteItem.setEnabled(hasTextToPaste);
+				} finally {
+					c.dispose();
+				}
 			}
 		});
 		f_sql.setMenu(cpsMenu);

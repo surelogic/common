@@ -10,6 +10,7 @@ import org.eclipse.ui.handlers.HandlerUtil;
 import com.surelogic.common.ui.EclipseUIUtility;
 
 public class QueryResultsCopyHandler extends AbstractHandler {
+
 	public Object execute(final ExecutionEvent event) throws ExecutionException {
 		final Clipboard cb = new Clipboard(EclipseUIUtility.getShell()
 				.getDisplay());

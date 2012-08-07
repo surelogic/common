@@ -226,13 +226,13 @@ final class ManageLicensesMediator implements ILifecycle {
 		final Clipboard clipboard = new Clipboard(f_licenseTable.getDisplay());
 		String data = (String) clipboard
 				.getContents(TextTransfer.getInstance());
+		clipboard.dispose();
 		/*
 		 * Handle the case where the clipboard is empty and data is null. In
 		 * this case we make data the empty string.
 		 */
 		if (data == null)
 			data = "";
-		clipboard.dispose();
 
 		/*
 		 * Allow the user a chance to view/edit the clipboard data.
