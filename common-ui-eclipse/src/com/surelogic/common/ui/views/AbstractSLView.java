@@ -15,7 +15,7 @@ import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.part.ViewPart;
 
 /**
- * A helper view that calls various setup methods and handles double clicks.
+ * A helper view that calls various setup methods.
  */
 public abstract class AbstractSLView extends ViewPart {
 
