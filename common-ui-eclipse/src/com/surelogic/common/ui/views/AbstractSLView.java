@@ -14,8 +14,8 @@ import org.eclipse.ui.part.ViewPart;
  * <p>
  * <i>Implementation note:</i> This class did a lot more in the past, however,
  * it registered listeners for features that most implementers did not need or
- * want so that has been moved to those implementations to avoid slowing down
- * all views.
+ * want so that capability has been moved to those implementations (or into the
+ * libraries) to avoid slowing down all implementing views.
  */
 public abstract class AbstractSLView extends ViewPart {
 
