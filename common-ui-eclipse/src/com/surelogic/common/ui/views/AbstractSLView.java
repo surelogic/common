@@ -1,21 +1,21 @@
 package com.surelogic.common.ui.views;
 
-import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.jface.action.MenuManager;
-import org.eclipse.jface.action.Separator;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IActionBars;
-import org.eclipse.ui.IWorkbenchActionConstants;
+import org.eclipse.ui.handlers.IHandlerService;
 import org.eclipse.ui.part.ViewPart;
 
 /**
  * A helper view that calls various setup methods.
+ * <p>
+ * <i>Implementation note:</i> This class did a lot more in the past, however,
+ * it registered listeners for features that most implementers did not need or
+ * want so that has been moved to those implementations to avoid slowing down
+ * all views.
  */
 public abstract class AbstractSLView extends ViewPart {
 
@@ -56,7 +56,7 @@ public abstract class AbstractSLView extends ViewPart {
 	}
 
 	protected void setupViewer(StructuredViewer viewer) {
-		hookContextMenu(viewer);
+		// default is to do nothing
 	}
 
 	@Override
@@ -68,47 +68,81 @@ public abstract class AbstractSLView extends ViewPart {
 	 * Setup methods
 	 */
 
-	private void hookContextMenu(final StructuredViewer viewer) {
-		MenuManager menuMgr = new MenuManager("#PopupMenu");
-		menuMgr.setRemoveAllWhenShown(true);
-		menuMgr.addMenuListener(new IMenuListener() {
-			public void menuAboutToShow(IMenuManager manager) {
-				IStructuredSelection s = (IStructuredSelection) viewer
-						.getSelection();
-				AbstractSLView.this.fillContextMenu_private(manager, s);
-			}
-		});
-		Menu menu = menuMgr.createContextMenu(viewer.getControl());
-		viewer.getControl().setMenu(menu);
-		getSite().registerContextMenu(menuMgr, viewer);
-	}
-
-	private void fillContextMenu_private(IMenuManager manager,
-			IStructuredSelection s) {
-		fillContextMenu(manager, s);
-		manager.add(new Separator());
-		// Other plug-ins can contribute there actions here
-		manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
-	}
-
 	private void contributeToActionBars() {
 		IActionBars bars = getViewSite().getActionBars();
-		fillGlobalActionHandlers(bars);
 		fillLocalPullDown(bars.getMenuManager());
 		fillLocalToolBar(bars.getToolBarManager());
 	}
 
-	protected void fillGlobalActionHandlers(IActionBars bars) {
-		// Nothing to do yet
+	/**
+	 * Avoid using actions, use commands instead and hook handlers using
+	 * {@link AbstractSLView#hookHandlersToCommands(IHandlerService)}.
+	 */
+	@Deprecated
+	protected void fillLocalPullDown(IMenuManager manager) {
+		// default is to do nothing
 	}
 
-	protected abstract void fillLocalPullDown(IMenuManager manager);
+	/**
+	 * Avoid using actions, use commands instead and hook handlers using
+	 * {@link AbstractSLView#hookHandlersToCommands(IHandlerService)}.
+	 */
+	@Deprecated
+	protected void fillLocalToolBar(IToolBarManager manager) {
+		// default is to do nothing
+	}
 
-	protected abstract void fillLocalToolBar(IToolBarManager manager);
+	/**
+	 * Avoid using actions, use commands instead and hook handlers using
+	 * {@link AbstractSLView#hookHandlersToCommands(IHandlerService)}.
+	 */
+	@Deprecated
+	protected void makeActions() {
+		// default is to do nothing
+	}
 
-	protected abstract void makeActions();
-
-	protected void fillContextMenu(IMenuManager manager, IStructuredSelection s) {
-		// Nothing to do yet
+	/**
+	 * This method may be overridden to hook handlers for the view into the
+	 * view's commands: it's menu and toolbar. For example,
+	 * 
+	 * <pre>
+	 * hs.activateHandler(
+	 * 		&quot;com.surelogic.jsure.client.eclipse.command.XMLExplorerView.collapseAll&quot;,
+	 * 		new AbstractHandler() {
+	 * 			&#064;Override
+	 * 			public Object execute(ExecutionEvent event)
+	 * 					throws ExecutionException {
+	 * 				attemptCollapseAll();
+	 * 				return null;
+	 * 			}
+	 * 		});
+	 * </pre>
+	 * 
+	 * Adds a new handler given the below XML setup for a toolbar item in the
+	 * <tt>XMLExplorerView</tt> view.
+	 * 
+	 * <pre>
+	 *   &lt;extension point="org.eclipse.ui.menus"&gt;
+	 *      &lt;menuContribution
+	 *           allPopups="false"
+	 *           locationURI="menu:com.surelogic.jsure.client.eclipse.views.xml.XMLExplorerView"&gt;
+	 *        &lt;command
+	 *                 commandId="com.surelogic.jsure.client.eclipse.command.FindXMLForType"
+	 *                 icon="platform:/plugin/com.surelogic.common/lib/images/open_xml_type.gif"
+	 *                 label="Open Library Annotations..."
+	 *                 mnemonic="L"
+	 *                 style="push"
+	 *                 tooltip="Open the library annotations for a type">
+	 *           &lt;/command&gt;
+	 *     &lt;/menuContribution&gt;
+	 *  &lt;/extension&gt;
+	 * </pre>
+	 * 
+	 * @param handlerService
+	 *            provides services related to activating and deactivating
+	 *            handlers within the workbench.
+	 */
+	protected void hookHandlersToCommands(IHandlerService hs) {
+		// default is to do nothing
 	}
 }

@@ -13,17 +13,25 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.StructuredViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IViewReference;
+import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
@@ -311,7 +319,7 @@ public final class EclipseUIUtility {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Builds the list of editors that apply to this build that need to be saved
 	 * 
@@ -342,6 +350,44 @@ public final class EclipseUIUtility {
 			}
 		}
 		return dirtyres.toArray(new IResource[dirtyres.size()]);
+	}
+
+	/**
+	 * Interface to fill the context menu when it is created. Implementations
+	 * should be passed to
+	 * {@link EclipseUIUtility#hookContextMenu(IViewPart, StructuredViewer, IContextMenuFiller)}
+	 */
+	public static interface IContextMenuFiller {
+		void fillContextMenu(IMenuManager m, IStructuredSelection s);
+	}
+
+	/**
+	 * Convenience method to hook a context menu to a structured editor in a
+	 * view.
+	 * 
+	 * @param view
+	 *            the non-null view object (often <tt>this</tt>).
+	 * @param sv
+	 *            the non-null structured viewer
+	 * @param filler
+	 *            the non-null menu filler implementation (often <tt>this</tt>).
+	 */
+	public static void hookContextMenu(final IViewPart view,
+			final StructuredViewer sv, final IContextMenuFiller filler) {
+		MenuManager menuMgr = new MenuManager("#PopupMenu");
+		menuMgr.setRemoveAllWhenShown(true);
+		menuMgr.addMenuListener(new IMenuListener() {
+			public void menuAboutToShow(IMenuManager m) {
+				final IStructuredSelection s = (IStructuredSelection) sv
+						.getSelection();
+				filler.fillContextMenu(m, s);
+				// Other plug-ins can contribute there actions here
+				m.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+			}
+		});
+		Menu menu = menuMgr.createContextMenu(sv.getControl());
+		sv.getControl().setMenu(menu);
+		view.getSite().registerContextMenu(menuMgr, sv);
 	}
 
 	private EclipseUIUtility() {
