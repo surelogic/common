@@ -1,9 +1,12 @@
-package com.surelogic.common.ui.actions;
+package com.surelogic.common.ui.handlers;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.core.commands.AbstractHandler;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -11,42 +14,28 @@ import org.eclipse.jdt.core.IJavaModel;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.ui.IObjectActionDelegate;
-import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.IWorkbenchWindow;
-import org.eclipse.ui.IWorkbenchWindowActionDelegate;
+import org.eclipse.ui.handlers.HandlerUtil;
 
 import com.surelogic.common.ui.dialogs.JavaProjectSelectionDialog;
-import com.surelogic.common.ui.handlers.AbstractProjectSelectedMenuHandler;
 
-/**
- * Use {@link AbstractProjectSelectedMenuHandler} and the Eclipse command API.
- */
-@Deprecated
-public abstract class AbstractProjectSelectedMenuAction implements
-		IObjectActionDelegate, IWorkbenchWindowActionDelegate {
+public abstract class AbstractProjectSelectedMenuHandler extends
+		AbstractHandler {
 
 	protected abstract void runActionOn(List<IJavaProject> selectedProjects);
 
-	private IStructuredSelection f_currentSelection = null;
-
-	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
-		// Nothing to do
-	}
-
-	public final void run(IAction action) {
-		/*
-		 * Beware the action parameter may be null.
-		 */
-		if (f_currentSelection != null) {
+	@Override
+	final public Object execute(ExecutionEvent event) throws ExecutionException {
+		final ISelection ideSelection = HandlerUtil
+				.getActiveWorkbenchWindow(event).getActivePage().getSelection();
+		if (ideSelection instanceof IStructuredSelection) {
+			final IStructuredSelection structuredSelection = (IStructuredSelection) ideSelection;
 			final IWorkspaceRoot root = ResourcesPlugin.getWorkspace()
 					.getRoot();
 			final IJavaModel javaModel = JavaCore.create(root);
 			final List<IJavaProject> selectedProjects = new ArrayList<IJavaProject>();
-			for (Object selection : f_currentSelection.toArray()) {
+			for (Object selection : structuredSelection.toArray()) {
 				final IJavaProject javaProject;
 				outer: if (selection instanceof IJavaProject) {
 					javaProject = (IJavaProject) selection;
@@ -72,41 +61,7 @@ public abstract class AbstractProjectSelectedMenuAction implements
 		} else {
 			runHelper(Collections.<IJavaProject> emptyList());
 		}
-	}
-
-	public void selectionChanged(IAction action, ISelection selection) {
-		if (selection instanceof IStructuredSelection) {
-			f_currentSelection = (IStructuredSelection) selection;
-		} else {
-			f_currentSelection = null;
-		}
-	}
-
-	public void dispose() {
-		// Nothing to do
-	}
-
-	public void init(IWorkbenchWindow window) {
-		// Nothing to do
-	}
-
-	protected static List<String> getNames(final List<IJavaProject> projects) {
-		List<String> names = new ArrayList<String>();
-		for (IJavaProject jp : projects) {
-			names.add(jp.getElementName());
-		}
-		return names;
-	}
-
-	public void run() {
-		run((IAction) null);
-	}
-
-	public void run(List<IJavaProject> projects) {
-		if (projects == null || projects.isEmpty()) {
-			return;
-		}
-		runHelper(projects);
+		return null;
 	}
 
 	private void runHelper(final List<IJavaProject> selectedProjects) {
