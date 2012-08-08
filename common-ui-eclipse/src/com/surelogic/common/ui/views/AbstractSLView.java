@@ -24,6 +24,9 @@ public abstract class AbstractSLView extends ViewPart {
 	@Override
 	public void createPartControl(Composite parent) {
 		f_viewerControl = buildViewer(parent);
+		final IHandlerService hs = (IHandlerService) getSite().getService(
+				IHandlerService.class);
+		hookHandlersToCommands(hs);
 		makeActions();
 		if (f_viewerControl != null && getViewer() != null) {
 			setupViewer(getViewer());
