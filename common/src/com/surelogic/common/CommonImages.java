@@ -112,6 +112,7 @@ public final class CommonImages {
 	public static final String IMG_JSURE_GRAPH = "jsure_graph.gif";
 	public static final String IMG_JSURE_LOGO = "jsure_logo.gif";
 	public static final String IMG_JSURE_MODEL_PROBLEMS = "jsure_model_problems.gif";
+	public static final String IMG_JSURE_MODEL_PROBLEMS_EXIST = "jsure_model_problems_exist.gif";
 	public static final String IMG_JSURE_NO_VERIFY_GRAY = "jsure_no_verify_gray.gif";
 	public static final String IMG_JSURE_NO_VERIFY = "jsure_no_verify.gif";
 	public static final String IMG_JSURE_QUICK_REF = "jsure_quick_ref.png";
