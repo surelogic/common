@@ -540,11 +540,18 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 	
 	protected final void printErr(Level l, String msg, Throwable t) {
 		if (XUtil.testing) {
-			if (t == null) {
-				LOG.log(l, msg);
-			} else {
-				LOG.log(l, msg, t);
-			}		
+			try {
+				if (t == null) {
+					LOG.log(l, msg);
+				} else {
+					LOG.log(l, msg, t);
+				}	
+			} catch(NullPointerException e) {
+				 System.out.println(msg);
+				 if (t != null) {
+					 t.printStackTrace(System.out);
+				 }
+			}
 		} else {
 			 System.out.println(msg);
 			 if (t != null) {
