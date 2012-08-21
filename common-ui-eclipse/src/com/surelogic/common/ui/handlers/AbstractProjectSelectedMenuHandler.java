@@ -16,6 +16,8 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 import com.surelogic.common.ui.dialogs.JavaProjectSelectionDialog;
@@ -27,8 +29,14 @@ public abstract class AbstractProjectSelectedMenuHandler extends
 
 	@Override
 	final public Object execute(ExecutionEvent event) throws ExecutionException {
-		final ISelection ideSelection = HandlerUtil
-				.getActiveWorkbenchWindow(event).getActivePage().getSelection();
+		final IWorkbenchWindow window = HandlerUtil.getActiveWorkbenchWindow(event);
+		final ISelection ideSelection;
+		if (window == null) {
+			ideSelection = null;
+		} else {
+			final IWorkbenchPage page = window.getActivePage();
+			ideSelection = page == null ? null : page.getSelection();	
+		}
 		if (ideSelection instanceof IStructuredSelection) {
 			final IStructuredSelection structuredSelection = (IStructuredSelection) ideSelection;
 			final IWorkspaceRoot root = ResourcesPlugin.getWorkspace()
