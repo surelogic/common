@@ -60,12 +60,39 @@ public class InstallTutorialProjectsDialog extends TitleAreaDialog {
 	 *            the URL locations of each project to be added. The project
 	 *            should be in the form of <tt>Name.zip</tt>, where
 	 *            <tt>Name</tt> is the name of the eclipse project to be added.
+	 *            Typically these are created with a call to
+	 *            {@link ClassLoader#getResource(String)}.
 	 */
 	public static void open(final Shell shell, final String logo,
 			final String href, final URL... projects) {
+		if (projects.length == 0)
+			throw new IllegalArgumentException(I18N.err(173));
+
 		final InstallTutorialProjectsDialog dialog = new InstallTutorialProjectsDialog(
 				shell, logo, href, projects);
 		dialog.open();
+	}
+
+	/**
+	 * Used to open the dialog
+	 * 
+	 * @param logo
+	 *            a {@link CommonImages} location that corresponds to the
+	 *            application logo
+	 * @param shell
+	 *            a shell.
+	 * @param href
+	 *            the help document location of the tutorial section.
+	 * @param projects
+	 *            the URL locations of each project to be added. The project
+	 *            should be in the form of <tt>Name.zip</tt>, where
+	 *            <tt>Name</tt> is the name of the eclipse project to be added.
+	 *            Typically these are created with a call to
+	 *            {@link ClassLoader#getResource(String)}.
+	 */
+	public static void open(final Shell shell, final String logo,
+			final String href, final List<URL> projects) {
+		open(shell, logo, href, projects.toArray(new URL[projects.size()]));
 	}
 
 	public InstallTutorialProjectsDialog(final Shell parentShell,

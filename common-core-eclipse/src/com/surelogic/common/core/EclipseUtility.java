@@ -50,12 +50,14 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.framework.Bundle;
 import org.osgi.service.prefs.BackingStoreException;
 
+import com.surelogic.Utility;
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.license.SLLicenseProduct;
 import com.surelogic.common.license.SLLicenseUtility;
 import com.surelogic.common.logging.SLLogger;
 
+@Utility
 public class EclipseUtility {
 
 	public static final String DOT_PROJECT = ".project";
