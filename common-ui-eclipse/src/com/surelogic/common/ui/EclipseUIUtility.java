@@ -66,6 +66,7 @@ public final class EclipseUIUtility {
 	 * @see EclipseUtility#getPreferences()
 	 * @see EclipseUtility#PREFERENCES_NODE
 	 */
+	@SuppressWarnings("deprecation")
 	public static IPreferenceStore getPreferences() {
 		return new ScopedPreferenceStore(new InstanceScope(),
 				EclipseUtility.PREFERENCES_NODE);

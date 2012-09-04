@@ -50,6 +50,7 @@ public class CompactToolTipInformationControl extends AbstractInformationControl
 	}
 
 	// ADDED
+	@SuppressWarnings("deprecation")
 	public CompactToolTipInformationControl(final Shell parentShell, int style) {
 		super(parentShell, SWT.TOOL | SWT.ON_TOP | SWT.RESIZE | style, null, null);
 		create();
