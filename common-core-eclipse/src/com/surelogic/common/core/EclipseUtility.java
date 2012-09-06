@@ -57,6 +57,7 @@ import com.surelogic.common.license.SLLicenseProduct;
 import com.surelogic.common.license.SLLicenseUtility;
 import com.surelogic.common.logging.SLLogger;
 
+@SuppressWarnings("deprecation")
 @Utility
 public class EclipseUtility {
 
