@@ -9,6 +9,7 @@ public abstract class AbstractXMLReader extends NestedXMLReader {
 	public static final String PROOF_DROP = "proof-drop";
 	public static final String PROMISE_DROP = "promise-drop";
 	public static final String RESULT_DROP = "result-drop";
+	public static final String RESULT_FOLDER_DROP = "result-folder-drop";
 	
 	public static final String MESSAGE_ATTR = "message";
 	public static final String MESSAGE_ID_ATTR = "message-id";
