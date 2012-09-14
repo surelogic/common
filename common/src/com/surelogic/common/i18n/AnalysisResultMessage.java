@@ -37,19 +37,9 @@ public final class AnalysisResultMessage {
       f_srcRef = srcRef;
   }
 
-  public static AnalysisResultMessage getInstance(int number) {
-    I18N.res(number); // toss result, but ensure the call works
-    return new AnalysisResultMessage(null, number, noArgs);
-  }
-
   public static AnalysisResultMessage getInstance(int number, Object... args) {
     I18N.res(number, args); // toss result, but ensure the call works
     return new AnalysisResultMessage(null, number, args);
-  }
-
-  public static AnalysisResultMessage getInstance(JavaSourceReference srcRef, int number) {
-    I18N.res(number); // toss result, but ensure the call works
-    return new AnalysisResultMessage(srcRef, number, noArgs);
   }
 
   public static AnalysisResultMessage getInstance(JavaSourceReference srcRef, int number, Object... args) {
