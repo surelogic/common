@@ -1,5 +1,7 @@
 package com.surelogic.common.i18n;
 
+import com.surelogic.NonNull;
+
 /**
  * A class that stores a reference to a Java source reference. The project name
  * and line number are optional. The package name and type name are required.
@@ -12,14 +14,10 @@ public final class JavaSourceReference {
    */
   private final String f_projectName;
 
-  /**
-   * non-null
-   */
+  @NonNull
   private final String f_packageName;
 
-  /**
-   * non-null
-   */
+  @NonNull
   private final String f_typeName;
 
   /**
@@ -75,10 +73,12 @@ public final class JavaSourceReference {
     return f_projectName;
   }
 
+  @NonNull
   public String getPackageName() {
     return f_packageName;
   }
 
+  @NonNull
   public String getTypeName() {
     return f_typeName;
   }
@@ -178,7 +178,6 @@ public final class JavaSourceReference {
     if (lineNumber > 0) {
       b.append("at line ").append(lineNumber).append(' ');
     }
-    // TODO include the offset?
     b.append("in ");
     b.append(getPackageName()).append('.').append(getTypeName());
     final String projectName = getProjectName();
