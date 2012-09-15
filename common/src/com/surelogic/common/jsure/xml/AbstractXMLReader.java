@@ -11,6 +11,8 @@ public abstract class AbstractXMLReader extends NestedXMLReader {
   public static final String PROMISE_DROP = "promise-drop";
   public static final String RESULT_DROP = "result-drop";
   public static final String RESULT_FOLDER_DROP = "result-folder-drop";
+  public static final String INFO_DROP = "info-drop";
+  public static final String PROJECTS_DROP = "projects-drop";
 
   public static final String MESSAGE_ATTR = "message";
   public static final String MESSAGE_ID_ATTR = "message-id";
@@ -40,6 +42,8 @@ public abstract class AbstractXMLReader extends NestedXMLReader {
   public static final String FLAVOR_ATTR = "flavor";
 
   public static final String PROJECTS = "projects";
+  
+  public static final String INFO_LEVEL_ATTR = "info-level";
 
   /**
    * @param l
