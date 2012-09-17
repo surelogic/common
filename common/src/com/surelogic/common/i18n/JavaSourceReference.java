@@ -6,8 +6,13 @@ import com.surelogic.NonNull;
  * A class that stores a reference to a Java source reference. The project name
  * and line number are optional. The package name and type name are required.
  * This is a value object.
+ * <p>
+ * Use {@link #UNKNOWN} if an instance is needed and a source reference is not
+ * available.
  */
 public final class JavaSourceReference {
+
+  public static final JavaSourceReference UNKNOWN = new JavaSourceReference();
 
   /**
    * Optional, may be null.
@@ -62,10 +67,9 @@ public final class JavaSourceReference {
   }
 
   /**
-   * Creates an unknown source reference&mdash;usable if the code location is
-   * unknown.
+   * Creates an unknown source reference.
    */
-  public JavaSourceReference() {
+  private JavaSourceReference() {
     this(null, null, "unknown", 0, 0);
   }
 
@@ -137,15 +141,15 @@ public final class JavaSourceReference {
 
   /**
    * Returns an <i>n</i>-tuple containing the contents of this object. The
-   * result is of the form (<i>projectName</i>,<i>packageName</i>,</i>typeName<
-   * /i>,<i>lineNumber</i>).
-   * 
+   * result is of the form
+   * (<i>projectName</i>,<i>packageName</i>,</i>typeName</i>,<i>lineNumber</i>).
    * 
    * If the project name is {@code null} it is not included. If the line number
    * is 0 (meaning unknown) it is not included.
    * 
    * @return an <i>n</i>-tuple containing the contents of this object.
    */
+  @NonNull
   public String toStringCanonical() {
     final StringBuilder b = new StringBuilder();
     b.append('(');
@@ -172,6 +176,7 @@ public final class JavaSourceReference {
    * 
    * @return a human readable message about the contents of this object.
    */
+  @NonNull
   public String toStringMessage() {
     final StringBuilder b = new StringBuilder();
     final int lineNumber = getLineNumber();
@@ -187,6 +192,7 @@ public final class JavaSourceReference {
   }
 
   @Override
+  @NonNull
   public String toString() {
     return getClass().getName() + '@' + toStringCanonical();
   }
