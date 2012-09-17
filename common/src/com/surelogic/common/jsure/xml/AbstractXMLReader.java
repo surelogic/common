@@ -5,13 +5,14 @@ import com.surelogic.common.xml.NestedXMLReader;
 
 public abstract class AbstractXMLReader extends NestedXMLReader {
   public static final String DROP = "drop";
-  public static final String CU_DROP = "cu-drop";
-  public static final String IR_DROP = "ir-drop";
   public static final String PROOF_DROP = "proof-drop";
   public static final String PROMISE_DROP = "promise-drop";
   public static final String RESULT_DROP = "result-drop";
+  public static final String HINT_DROP = "hint-drop";
+  public static final String PROPOSED_PROMISE_DROP = "proposed-proimse-drop";
   public static final String RESULT_FOLDER_DROP = "result-folder-drop";
-  public static final String INFO_DROP = "info-drop";
+  public static final String MODELING_PROBLEM_DROP = "modeling-problem-drop";
+  public static final String CU_DROP = "cu-drop";
   public static final String PROJECTS_DROP = "projects-drop";
 
   public static final String MESSAGE_ATTR = "message";
@@ -37,13 +38,12 @@ public abstract class AbstractXMLReader extends NestedXMLReader {
   public static final String DERIVED_FROM_SRC_ATTR = "derived-from-src";
   public static final String PROVED_ATTR = "proved-consistent";
   public static final String USES_RED_DOT_ATTR = "uses-red-dot";
-  public static final String RESULT_ATTR = "result-type";
 
   public static final String FLAVOR_ATTR = "flavor";
 
   public static final String PROJECTS = "projects";
-  
-  public static final String INFO_LEVEL_ATTR = "info-level";
+
+  public static final String HINT_TYPE_ATTR = "hint-type";
 
   /**
    * @param l
