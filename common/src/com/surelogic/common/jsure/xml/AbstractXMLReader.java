@@ -83,9 +83,13 @@ public abstract class AbstractXMLReader extends NestedXMLReader {
   public static final String TIMEOUT = "timeout";
   public static final String VOUCHED = "vouched";
   public static final String CONSISTENT = "consistent";
+  // TODO OLD v
   public static final String TRUSTED_PROMISE = "trusted-promise";
   public static final String TRUSTED_FOLDER = "trusted-folder";
   public static final String OR_TRUSTED_PROMISE = "or-trusted-promise";
+  // TODO OLD ^
+  public static final String AND_TRUSTED_PROOF_DROP = "and-trusted-proof-drop";
+  public static final String OR_TRUSTED_PROOF_DROP = "or-trusted-proof-drop";
   public static final String OR_LABEL = "or-label";
   public static final String OR_USES_RED_DOT = "or-uses-red-dot";
   public static final String OR_PROVED = "or-proved-consistent";
