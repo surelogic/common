@@ -15,6 +15,10 @@ public abstract class AbstractXMLReader extends NestedXMLReader {
   public static final String CU_DROP = "cu-drop";
   public static final String PROJECTS_DROP = "projects-drop";
 
+  public static final String DEPONENT = "deponent";
+  public static final String MESSAGE = "message";
+  public static final String MESSAGE_ID = "message-id";
+
   public static final String MESSAGE_ATTR = "message";
   public static final String MESSAGE_ID_ATTR = "message-id";
   public static final String TYPE_ATTR = "type";
@@ -55,6 +59,37 @@ public abstract class AbstractXMLReader extends NestedXMLReader {
   public static final String DEPONENT_PROMISES = "deponent-promise";
 
   public static final String HINT_ABOUT = "hint-about";
+
+  public static final String SUB_FOLDER = "sub-folder";
+  public static final String RESULT = "result";
+
+  public static final String PROPOSED_PROMISE = "proposed-promise";
+  public static final String ANNOTATION_TYPE = "annotation-type";
+  public static final String CONTENTS = "contents";
+  public static final String REPLACED_ANNO = "replaced-annotation";
+  public static final String REPLACED_CONTENTS = "replaced-contents";
+  public static final String ORIGIN = "origin";
+  public static final String JAVA_ANNOTATION = "java-annotation";
+  public static final String FROM_PROJECT = "from-project";
+  public static final String TARGET_PROJECT = "target-project";
+  public static final String FROM_INFO = "from-info";
+  public static final String TARGET_INFO = "target-info";
+  public static final String FROM_REF = "from-ref";
+  public static final String ANNO_ATTRS = "annotation-attrs";
+  public static final String REPLACED_ATTRS = "replaced-attrs";
+  
+  public static final String CHECKED_PROMISE = "checked-promise";
+  
+  public static final String TIMEOUT = "timeout";
+  public static final String VOUCHED = "vouched";
+  public static final String CONSISTENT = "consistent";
+  public static final String TRUSTED_PROMISE = "trusted-promise";
+  public static final String TRUSTED_FOLDER = "trusted-folder";
+  public static final String OR_TRUSTED_PROMISE = "or-trusted-promise";
+  public static final String OR_LABEL = "or-label";
+  public static final String OR_USES_RED_DOT = "or-uses-red-dot";
+  public static final String OR_PROVED = "or-proved-consistent";
+  public static final String ENCLOSED_IN_FOLDER = "enclosed-in-folder";
 
   /**
    * @param l
