@@ -45,6 +45,17 @@ public abstract class AbstractXMLReader extends NestedXMLReader {
 
   public static final String HINT_TYPE_ATTR = "hint-type";
 
+  public static final String VIRTUAL = "virtual";
+  public static final String FROM_SRC = "from-src";
+  public static final String CHECKED_BY_ANALYSIS = "checked-by-analysis";
+  public static final String TO_BE_CHECKED_BY_ANALYSIS = "to-be-checked-by-analysis";
+  public static final String ASSUMED = "assumed";
+  public static final String CHECKED_BY_RESULTS = "checked-by-result";
+  public static final String DEPENDENT_PROMISES = "dependent-promise";
+  public static final String DEPONENT_PROMISES = "deponent-promise";
+
+  public static final String HINT_ABOUT = "hint-about";
+
   /**
    * @param l
    *          The listener that handles the top-level elements
