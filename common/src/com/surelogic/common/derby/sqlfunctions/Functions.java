@@ -88,53 +88,72 @@ public final class Functions {
 
     private static class Access {
         // A.INTHREAD, THO.THREADNAME , A.TS, A.RW
-        long threadId;
-        String threadName;
-        Timestamp ts;
-        boolean isRead;
+        final long threadId;
+        final String threadName;
+        final Timestamp ts;
+        final boolean isRead;
+        final boolean underConstruction;
 
-        Access(ResultSet set) throws SQLException {
+        Access(ResultSet set, boolean isStatic) throws SQLException {
             int idx = 1;
             threadId = set.getLong(idx++);
             threadName = set.getString(idx++);
             ts = set.getTimestamp(idx++);
             isRead = set.getString(idx++).equals("R");
+            underConstruction = !isStatic && set.getString(idx++).equals("Y");
         }
 
     }
 
     private static class AccessBlock {
-        long threadId;
-        String threadName;
-        Timestamp start;
+        final boolean isStatic;
+        final long threadId;
+        final String threadName;
+        final Timestamp start;
         Timestamp end;
         int reads;
         int writes;
+        int readsUC;
+        int writesUC;
 
-        AccessBlock(Access first) {
+        AccessBlock(Access first, boolean isStatic) {
             threadId = first.threadId;
             threadName = first.threadName;
             start = first.ts;
             end = first.ts;
             if (first.isRead) {
                 reads++;
+                if (first.underConstruction) {
+                    readsUC++;
+                }
             } else {
                 writes++;
+                if (first.underConstruction) {
+                    writesUC++;
+                }
             }
+
+            this.isStatic = isStatic;
         }
 
         AccessBlock accumulate(ResultSet set) throws SQLException {
             while (set.next()) {
-                Access a = new Access(set);
+                Access a = new Access(set, isStatic);
                 if (a.threadId == threadId) {
                     end = a.ts;
                     if (a.isRead) {
                         reads++;
+                        if (a.underConstruction) {
+                            readsUC++;
+                        }
                     } else {
                         writes++;
+                        if (a.underConstruction) {
+                            writesUC++;
+                        }
                     }
                 } else {
-                    return new AccessBlock(a);
+                    return new AccessBlock(a, isStatic);
                 }
             }
             return null;
@@ -154,6 +173,10 @@ public final class Functions {
                 return reads;
             case 6:
                 return writes;
+            case 7:
+                return readsUC;
+            case 8:
+                return writesUC;
             default:
                 throw new IllegalArgumentException(i
                         + " is not a valid parameter index.");
@@ -168,19 +191,20 @@ public final class Functions {
         AccessBlock next;
         boolean wasNull;
 
-        RollupAccessesResultSet(ResultSet set) throws SQLException {
+        RollupAccessesResultSet(ResultSet set, boolean isStatic)
+                throws SQLException {
             this.set = set;
             if (set.next()) {
-                next = new AccessBlock(new Access(set));
+                next = new AccessBlock(new Access(set, isStatic), isStatic);
             }
         }
 
-        static ResultSet create(ResultSet set) throws IllegalArgumentException,
-                SQLException {
+        static ResultSet create(ResultSet set, boolean isStatic)
+                throws IllegalArgumentException, SQLException {
             return (ResultSet) Proxy.newProxyInstance(
                     ResultSet.class.getClassLoader(),
                     new Class[] { ResultSet.class },
-                    new RollupAccessesResultSet(set));
+                    new RollupAccessesResultSet(set, isStatic));
         }
 
         @Override
@@ -216,7 +240,7 @@ public final class Functions {
             PreparedStatement st = conn.prepareStatement(QB
                     .get("Accesses.selectByField"));
             st.setLong(1, fieldId);
-            return RollupAccessesResultSet.create(st.executeQuery());
+            return RollupAccessesResultSet.create(st.executeQuery(), true);
         } catch (SQLException e) {
             throw new IllegalStateException(e);
         }
@@ -231,7 +255,7 @@ public final class Functions {
                     .get("Accesses.selectByFieldAndReceiver"));
             st.setLong(1, fieldId);
             st.setLong(2, receiverId);
-            return RollupAccessesResultSet.create(st.executeQuery());
+            return RollupAccessesResultSet.create(st.executeQuery(), false);
         } catch (SQLException e) {
             throw new IllegalStateException(e);
         }
