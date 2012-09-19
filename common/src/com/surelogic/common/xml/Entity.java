@@ -24,7 +24,7 @@ public class Entity {
 	}
 	
 	final String name;
-	protected final Map<String,String> attributes = new HashMap<String,String>(4, 1.0f);
+	protected final Map<String,String> attributes;
 	final String id;
 	List<MoreInfo> infos = Collections.emptyList();
 	List<Entity> refs = Collections.emptyList();
@@ -63,20 +63,26 @@ public class Entity {
 	
 	public Entity(String name, Attributes a) {
 		this.name = name;
-		if (attributes != null) {
+		if (a != null) {
+			attributes = new HashMap<String,String>(a.getLength(), 1.0f);
 			for (int i = 0; i < a.getLength(); i++) {
 				final String aName = a.getQName(i);
 				final String aValue = a.getValue(i);
 				attributes.put(aName.intern(), getInternValue(aValue));
 			}
+		} else {
+			attributes = new HashMap<String,String>(4, 1.0f);
 		}
 		id = attributes.get(XMLConstants.ID_ATTR);
 	}
 	
 	public Entity(String name, Map<String,String> a) {
 		this.name = name;
-		if (attributes != null) {
+		if (a != null) {
+			attributes = new HashMap<String,String>(a.size(), 1.0f);
 			attributes.putAll(a);
+		} else {
+			attributes = new HashMap<String,String>(4, 1.0f);
 		}
 		id = attributes.get(XMLConstants.ID_ATTR);
 	}
