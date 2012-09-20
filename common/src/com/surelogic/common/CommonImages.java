@@ -89,7 +89,6 @@ public final class CommonImages {
   public static final String IMG_FL_RUN_OBJ = "fl_run_obj.gif";
   public static final String IMG_FL_RUN_VIEW = "fl_run_view.gif";
   public static final String IMG_FOLDER = "folder.gif";
-  public static final String IMG_FOLDER_AND = "folder_and.gif";
   public static final String IMG_FOLDER_OR = "folder_or.gif";
   public static final String IMG_GRAY_X_DOT = "gray_x_dot.gif";
   public static final String IMG_GRAY_X_DOUBLE = "gray_x_double.gif";
