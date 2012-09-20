@@ -94,6 +94,7 @@ public abstract class AbstractXMLReader extends NestedXMLReader {
   public static final String OR_USES_RED_DOT = "or-uses-red-dot";
   public static final String OR_PROVED = "or-proved-consistent";
   public static final String ENCLOSED_IN_FOLDER = "enclosed-in-folder";
+  public static final String FOLDER_LOGIC_OPERATOR = "folder-logic-operator";
 
   /**
    * @param l
