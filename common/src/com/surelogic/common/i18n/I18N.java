@@ -1,5 +1,6 @@
 package com.surelogic.common.i18n;
 
+import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 /**
@@ -38,14 +39,17 @@ public final class I18N {
    * ad-hoc-query.cheer=Queries are great!
    * </pre>
    * 
-   * is contained in the SureLogic properties file.
+   * is contained in the <tt>SureLogic.properties</tt> file.
    * <p>
-   * If the given key is not defined in the SureLogic properties file an
-   * exception is thrown.
+   * If the given key is not defined in the <tt>SureLogic.properties</tt> file
+   * an exception is thrown.
    * 
    * @param key
    *          the key for the desired message.
    * @return the message for the given key.
+   * 
+   * @throws MissingResourceException
+   *           if the computed key is not found.
    */
   public static String msg(final String key) {
     final String result = BUNDLE.getString(key);
@@ -61,19 +65,21 @@ public final class I18N {
    * </pre>
    * 
    * For example, <tt>I18N.msg("hello.world", "Tim")</tt> would result in the
-   * string <tt>"Hi Tim!" if the definition
+   * string <tt>"Hi Tim!"</tt> if the definition
    * 
    * <pre>
    * hello.world=Hi %s!
    * </pre>
    * 
-   * is contained in the SureLogic properties file.
+   * is contained in the <tt>SureLogic.properties</tt> file.
    * 
    * @param key
    *          the key for the desired message.
    * @param args
    *          the variable arguments to format the resulting message with.
    * @return the formatted message for the given key.
+   * @throws MissingResourceException
+   *           if the computed key is not found.
    * @see String#format(String, Object...)
    */
   public static String msg(final String key, Object... args) {
@@ -82,21 +88,23 @@ public final class I18N {
 
   /**
    * Gets the string defined for the given error number from the i18 resource
-   * bundle. The key for the error message in the SureLogic properties file is
-   * <tt>error.</tt><i>nnnnn</i>. For example, <tt>I18N.err(23)</tt> would
-   * result in the string <tt>"(SureLogic #23) A singular problem."</tt> if the
-   * definition
+   * bundle. The key for the error message in the
+   * <tt>SureLogicErrors.properties</tt> file is <tt>error.</tt><i>nnnnn</i>.
+   * For example, <tt>I18N.err(23)</tt> would result in the string
+   * <tt>"(SureLogic #23) A singular problem."</tt> if the definition
    * 
    * <pre>
    * error.00023=A singular problem.
    * </pre>
    * 
-   * is contained in the SureLogicErrors properties file. If the key is not
-   * defined in the SureLogicErrors properties file an exception is thrown.
+   * is contained in the <tt>SureLogicErrors.properties</tt> file. If the key is
+   * not defined in the file an exception is thrown.
    * 
    * @param number
    *          the error message number.
    * @return the error message for the given number.
+   * @throws MissingResourceException
+   *           if the computed key is not found.
    */
   public static String err(final int number) {
     final String result = getString(ERRORS, "error.%05d", number);
@@ -111,23 +119,25 @@ public final class I18N {
    * String.format(I18N.err(number), args).
    * </pre>
    * 
-   * The key for the error message in the SureLogic properties file is
-   * <tt>error.</tt><i>nnnnn</i>. For example, <tt>I18N.err(24, "bad")</tt>
-   * would result in the string <tt>"(SureLogic #24) A bad problem."</tt> if the
-   * definition
+   * The key for the error message in the <tt>SureLogicErrors.properties</tt>
+   * file is <tt>error.</tt><i>nnnnn</i>. For example,
+   * <tt>I18N.err(24, "bad")</tt> would result in the string
+   * <tt>"(SureLogic #24) A bad problem."</tt> if the definition
    * 
    * <pre>
    * error.00024=A %s problem.
    * </pre>
    * 
-   * is contained in the SureLogicErrors properties file. If the key is not
-   * defined in the SureLogicErrors properties file an exception is thrown.
+   * is contained in the <tt>SureLogicErrors.properties</tt> file. If the key is
+   * not defined in the file an exception is thrown.
    * 
    * @param number
    *          the error message number.
    * @param args
    *          the variable arguments to format the resulting error message with.
    * @return the formatted error message for the given number.
+   * @throws MissingResourceException
+   *           if the computed key is not found.
    * @see String#format(String, Object...)
    */
   public static String err(final int number, Object... args) {
@@ -136,21 +146,23 @@ public final class I18N {
 
   /**
    * Gets the string defined for the given result number from the i18 resource
-   * bundle. The key for the result message in the SureLogicResults.properties
-   * file is <i>result.nnnnn</i>. For example, <tt>I18N.res(2001)</tt> would
-   * result in the string <tt>"A singular problem."</tt> if the definition
+   * bundle. The key for the result message in the
+   * <tt>SureLogicResults.properties</tt> file is <i>result.nnnnn</i>. For
+   * example, <tt>I18N.res(2001)</tt> would result in the string
+   * <tt>"A singular problem."</tt> if the definition
    * 
    * <pre>
    * result.02001=A singular problem.
    * </pre>
    * 
-   * is contained in the SureLogicResults.properties file. If the key is not
-   * defined in the SureLogicResults.properties file an exception is thrown.
+   * is contained in the <tt>SureLogicResults.properties</tt> file. If the key
+   * is not defined in the file an exception is thrown.
    * 
    * @param number
    *          the result message number.
    * @return the result message for the given number.
-   * 
+   * @throws MissingResourceException
+   *           if the computed key is not found.
    * @see #resc(int)
    */
   public static String res(final int number) {
@@ -165,16 +177,17 @@ public final class I18N {
    * String.format(I18N.err(number), args).
    * </pre>
    * 
-   * The key for the result message in the SureLogicResults.properties file is
-   * <i>nnnnn</i>. For example, <tt>I18N.res(456, "inconsistent")</tt> would
-   * result in the string <tt>"A inconsistent result."</tt> if the definition
+   * The key for the result message in the <tt>SureLogicResults.properties</tt>
+   * file is <i>nnnnn</i>. For example, <tt>I18N.res(456, "inconsistent")</tt>
+   * would result in the string <tt>"A inconsistent result."</tt> if the
+   * definition
    * 
    * <pre>
    * 00456=A %s result.
    * </pre>
    * 
-   * is contained in the SureLogicResults.properties file. If the key is not
-   * defined in the SureLogicResults.properties an exception is thrown.
+   * is contained in the <tt>SureLogicResults.properties</tt> file. If the key
+   * is not defined in the file an exception is thrown.
    * 
    * @param number
    *          the result message number.
@@ -182,6 +195,8 @@ public final class I18N {
    *          the variable arguments to format the resulting result message
    *          with.
    * @return the formatted result message for the given number.
+   * @throws MissingResourceException
+   *           if the computed key is not found.
    * @see String#format(String, Object...)
    * @see #resc(int, Object...)
    */
@@ -190,33 +205,10 @@ public final class I18N {
   }
 
   /**
-   * Gets the string defined for the given category number from the i18 resource
-   * bundle. The key for the result message in the SureLogicResults.properties
-   * file is <i>category.nnnnn</i>. For example, <tt>I18N.category(2001)</tt>
-   * would result in the string <tt>"non-trivial effects"</tt> if the definition
-   * 
-   * <pre>
-   * category.02001=non-trivial effects
-   * </pre>
-   * 
-   * is contained in the SureLogicResults.properties file. If the key is not
-   * defined in the SureLogicResults.properties file an exception is thrown.
-   * 
-   * @param number
-   *          the result message number.
-   * @return the result message for the given number.
-   * 
-   * @see #resc(int)
-   */
-  public static String category(final int number) {
-    return getString(RESULTS, "category.%05d", number);
-  }
-
-  /**
    * Gets the string defined for the given category number with the given
    * formatting type from the i18 resource bundle. The key for the result
-   * message in the SureLogicResults.properties file is
-   * <i>category.formatter.nnnnn</i>. For example,
+   * message in the <tt>SureLogicResults.properties</tt> file is
+   * <tt>category.<i>formatter</i>.nnnnn</tt>. For example,
    * <tt>I18N.category(2001, "prefix")</tt> would result in the string
    * <tt>"non-trivial effects"</tt> if the definition
    * 
@@ -224,13 +216,14 @@ public final class I18N {
    * category.prefix.02001=non-trivial effects
    * </pre>
    * 
-   * is contained in the SureLogicResults.properties file. If the key is not
-   * defined in the SureLogicResults.properties file an exception is thrown.
+   * is contained in the <tt>SureLogicResults.properties</tt> file. If the key
+   * is not defined in the file an exception is thrown.
    * 
    * @param number
    *          the result message number.
-   * 
    * @return the result message for the given number.
+   * @throws MissingResourceException
+   *           if the computed key is not found.
    */
   public static String category(final String formatter, final int number) {
     return getString(RESULTS, "category.%s.%05d", formatter, number);
@@ -281,23 +274,23 @@ public final class I18N {
 
   /**
    * Gets a string defined for the given category number from the i18 resource
-   * bundle; the string is used for for miscellaneous internal tagging, such as
-   * for
-   * {@link edu.cmu.cs.fluid.sea.proxy.ResultDropBuilder#addTrustedPromise_or}
-   * labels. The key for the result message in the SureLogic properties file is
+   * bundle; the string is used for for miscellaneous internal tagging. The key
+   * for the result message in the <tt>SureLogicResults.properties</tt> file is
    * <i>misc.nnnnn</i>. For example, <tt>I18N.misc(2001)</tt> would result in
    * the string <tt>"by effects"</tt> if the definition
    * 
    * <pre>
-   * category.02001=by effects
+   * misc.02001=by effects
    * </pre>
    * 
-   * is contained in the SureLogicResults properties file. If the key is not
-   * defined in the SureLogicResults properties file an exception is thrown.
+   * is contained in the <tt>SureLogicResults.properties</tt> file. If the key
+   * is not defined in the file an exception is thrown.
    * 
    * @param number
    *          the result message number.
    * @return the result message for the given number.
+   * @throws MissingResourceException
+   *           if the computed key is not found.
    */
   public static String misc(final int number) {
     return getString(RESULTS, "misc.%05d", number);
