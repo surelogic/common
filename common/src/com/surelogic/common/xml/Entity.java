@@ -68,7 +68,7 @@ public class Entity {
 			for (int i = 0; i < a.getLength(); i++) {
 				final String aName = a.getQName(i);
 				final String aValue = a.getValue(i);
-				attributes.put(aName.intern(), getInternValue(aValue));
+				attributes.put(aName, getInternValue(aValue));
 			}
 		} else {
 			attributes = new HashMap<String,String>(4, 1.0f);
