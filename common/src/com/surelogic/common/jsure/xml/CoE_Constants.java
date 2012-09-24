@@ -66,11 +66,11 @@ public final class CoE_Constants {
   /** Flag to render the virtual adornment */
   public final static int VIRTUAL = 0x020;
 
-  /** Flag to render the warning adornment */
-  public final static int INFO = 0x040;
+  /** Flag to render the "i" adornment */
+  public final static int HINT_INFO = 0x040;
 
   /** Flag to render the warning adornment */
-  public final static int INFO_WARNING = 0x080;
+  public final static int HINT_WARNING = 0x080;
   
   /*
    * Tags for source files
