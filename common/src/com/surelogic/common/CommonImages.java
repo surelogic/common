@@ -21,6 +21,7 @@ public final class CommonImages {
   /*
    * Symbolic image names
    */
+  public static final String IMG_ALPHA_SORT = "alpha_sort.gif";
   public static final String IMG_ANALYSIS_RESULT = "analysis_result.gif";
   public static final String IMG_ANNOTATION = "annotation.gif";
   public static final String IMG_ANNOTATION_ABDUCTIVE = "annotation_abductive.gif";
@@ -130,6 +131,7 @@ public final class CommonImages {
   public static final String IMG_LINK = "link.gif";
   public static final String IMG_OPEN_XML_TYPE = "open_xml_type.gif";
   public static final String IMG_PACKAGE = "package.gif";
+  public static final String IMG_PACKAGE_BINARY = "package_binary.gif";
   public static final String IMG_PAGE_BLUE = "page_blue.gif";
   public static final String IMG_PAGE_ORANGE = "page_orange.gif";
   public static final String IMG_PLUS = "plus.gif";
