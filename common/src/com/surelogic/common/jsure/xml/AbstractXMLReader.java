@@ -40,6 +40,7 @@ public abstract class AbstractXMLReader extends NestedXMLReader {
   public static final String CUNIT_ATTR = "cu";
 
   public static final String DERIVED_FROM_SRC_ATTR = "derived-from-src";
+  public static final String DERIVED_FROM_WARNING_ATTR = "derived-from-warning";
   public static final String PROVED_ATTR = "proved-consistent";
   public static final String USES_RED_DOT_ATTR = "uses-red-dot";
 
