@@ -122,7 +122,7 @@ public final class SLUtility {
     return result;
   }
 
-  public static String toHumanReadableStringWithCommas(final int i) {
+  public static String toStringHumanWithCommas(final int i) {
     return String.format("%,d", i);
   }
 
