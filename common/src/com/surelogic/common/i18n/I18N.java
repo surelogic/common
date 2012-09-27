@@ -327,7 +327,79 @@ public final class I18N {
    * @throws MissingResourceException
    *           if the computed key is not found.
    */
+  @Deprecated
   public static String misc(final int number) {
     return getString(RESULTS, "misc.%05d", number);
   }
+
+  private static final String OPAR = "{{{";
+  private static final String SEP = "|||";
+  private static final String CPAR = "}}}";
+  private static final String NUM = "###";
+
+  public static String toStringForUIFolderLabel(final String s, final int count) {
+    if (s == null)
+      return null;
+    final boolean single = count < 2;
+    final StringBuilder b = new StringBuilder(s);
+    while (singlePluralHelper(single, b)) {
+      // loop until it returns false
+    }
+    while (numberHelper(b, count)) {
+      // loop until it returns false
+    }
+    return b.toString();
+  }
+
+  private static final boolean singlePluralHelper(final boolean single, final StringBuilder b) {
+    final int so = b.indexOf(OPAR);
+    int ss = b.indexOf(SEP);
+    int sc = b.indexOf(CPAR);
+    if (so == -1 || sc == -1 || ss == -1)
+      return false;
+    // make sure they are in order or we ignore
+    final boolean inorder = so < ss && ss < sc;
+    if (!inorder)
+      return false;
+
+    if (single) {
+      b.delete(so, so + OPAR.length());
+      // adjust index to delete
+      final int deletedCharCount = OPAR.length();
+      ss -= deletedCharCount;
+      sc -= deletedCharCount;
+      b.delete(ss, sc + CPAR.length());
+    } else {
+      b.delete(so, ss + SEP.length());
+      // adjust index to delete
+      final int deletedCharCount = ss + SEP.length() - so;
+      sc -= deletedCharCount;
+      b.delete(sc, sc + CPAR.length());
+    }
+    return true;
+  }
+
+  private static final boolean numberHelper(final StringBuilder b, int count) {
+    final int start = b.indexOf(NUM);
+    if (start == -1)
+      return false;
+    b.replace(start, start + NUM.length(), Integer.toString(count));
+    return true;
+  }
+  // public static void main(String[] args) {
+  // String e1 =
+  // "### java.lang.Thread subtype instance {{{created|||creations}}}";
+  // System.out.println(toStringForUIFolderLabel(e1, 1));
+  // System.out.println(toStringForUIFolderLabel(e1, 50));
+  // e1 = "Concurrency ({{{one issue|||### issues}}})";
+  // System.out.println(toStringForUIFolderLabel(e1, 1));
+  // System.out.println(toStringForUIFolderLabel(e1, 50));
+  // e1 =
+  // "### java.lang.Runnable subtype instance {{{created|||creations}}} - not{{{ a|||}}} Thread{{{|||s}}}";
+  // System.out.println(toStringForUIFolderLabel(e1, 1));
+  // System.out.println(toStringForUIFolderLabel(e1, 50));
+  // e1 = "### ### -- #####";
+  // System.out.println(toStringForUIFolderLabel(e1, 1));
+  // System.out.println(toStringForUIFolderLabel(e1, 50));
+  // }
 }
