@@ -337,6 +337,45 @@ public final class I18N {
   private static final String CPAR = "}}}";
   private static final String NUM = "###";
 
+  /**
+   * 
+   * For categories and analysis results folders special processing is done on
+   * the string just before it is displayed in the user interface. It occurs
+   * after the normal String.format substitution of arguments into the format
+   * string. Special processing is based upon the number of children, <i>c</i>,
+   * of the folder or category.
+   * <ol>
+   * <li><tt>"{{{one|||many}}}"</tt> if <i>c</i> == 1 this results in
+   * <tt>"one"</tt>, if <i>c</i> > 1 this results in <tt>"many"</tt>.
+   * <li><tt>"###"</tt> is changed to <i>c</i>.
+   * </ol>
+   * 
+   * <h3>Examples:</h3>
+   * 
+   * <tt>"### java.lang.Thread subtype instance {{{created|||creations}}}"</tt><br>
+   * when <i>c</i> = 3 becomes
+   * <tt>"3 java.lang.Thread subtype instance creations"</tt><br>
+   * when <i>c</i> = 1 becomes
+   * <tt>"1 java.lang.Thread subtype instance created"</tt>
+   * <p>
+   * <tt>"Concurrency ({{{one issue|||### issues}}})"</tt><br>
+   * when <i>c</i> = 1 "Concurrency (one issue)"</tt><br>
+   * when <i>c</i> = 50 "Concurrency (50 issues)"</tt>
+   * <p>
+   * <tt>"### java.lang.Runnable subtype instance {{{created|||creations}}} - not{{{ a|||}}} Thread{{{|||s}}}"</tt>
+   * <br>
+   * when <i>c</i >= 1
+   * <tt>"1 java.lang.Runnable subtype instance created - not a Thread"</tt><br>
+   * when <i>c</i> = 2
+   * <tt>"2 java.lang.Runnable subtype instance creations - not Threads"</tt>
+   * <br>
+   * 
+   * @param s
+   *          the string to process.
+   * @param count
+   *          how many children are in the container.
+   * @return the resulting string.
+   */
   public static String toStringForUIFolderLabel(final String s, final int count) {
     if (s == null)
       return null;
@@ -386,20 +425,4 @@ public final class I18N {
     b.replace(start, start + NUM.length(), Integer.toString(count));
     return true;
   }
-  // public static void main(String[] args) {
-  // String e1 =
-  // "### java.lang.Thread subtype instance {{{created|||creations}}}";
-  // System.out.println(toStringForUIFolderLabel(e1, 1));
-  // System.out.println(toStringForUIFolderLabel(e1, 50));
-  // e1 = "Concurrency ({{{one issue|||### issues}}})";
-  // System.out.println(toStringForUIFolderLabel(e1, 1));
-  // System.out.println(toStringForUIFolderLabel(e1, 50));
-  // e1 =
-  // "### java.lang.Runnable subtype instance {{{created|||creations}}} - not{{{ a|||}}} Thread{{{|||s}}}";
-  // System.out.println(toStringForUIFolderLabel(e1, 1));
-  // System.out.println(toStringForUIFolderLabel(e1, 50));
-  // e1 = "### ### -- #####";
-  // System.out.println(toStringForUIFolderLabel(e1, 1));
-  // System.out.println(toStringForUIFolderLabel(e1, 50));
-  // }
 }
