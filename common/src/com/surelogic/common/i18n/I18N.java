@@ -174,7 +174,7 @@ public final class I18N {
    * i18 resource bundle. Calling this method is equivalent to calling
    * 
    * <pre>
-   * String.format(I18N.err(number), args).
+   * String.format(I18N.res(number), args).
    * </pre>
    * 
    * The key for the result message in the <tt>SureLogicResults.properties</tt>
@@ -183,7 +183,7 @@ public final class I18N {
    * definition
    * 
    * <pre>
-   * 00456=A %s result.
+   * result.00456=A %s result.
    * </pre>
    * 
    * is contained in the <tt>SureLogicResults.properties</tt> file. If the key
@@ -202,31 +202,6 @@ public final class I18N {
    */
   public static String res(final int number, Object... args) {
     return String.format(I18N.res(number), args);
-  }
-
-  /**
-   * Gets the string defined for the given category number with the given
-   * formatting type from the i18 resource bundle. The key for the result
-   * message in the <tt>SureLogicResults.properties</tt> file is
-   * <tt>category.<i>formatter</i>.nnnnn</tt>. For example,
-   * <tt>I18N.category(2001, "prefix")</tt> would result in the string
-   * <tt>"non-trivial effects"</tt> if the definition
-   * 
-   * <pre>
-   * category.prefix.02001=non-trivial effects
-   * </pre>
-   * 
-   * is contained in the <tt>SureLogicResults.properties</tt> file. If the key
-   * is not defined in the file an exception is thrown.
-   * 
-   * @param number
-   *          the result message number.
-   * @return the result message for the given number.
-   * @throws MissingResourceException
-   *           if the computed key is not found.
-   */
-  public static String category(final String formatter, final int number) {
-    return getString(RESULTS, "category.%s.%05d", formatter, number);
   }
 
   /**
@@ -270,6 +245,66 @@ public final class I18N {
     }
     b.append(')');
     return b.toString();
+  }
+
+  /**
+   * Gets the string defined for the given category number from the i18 resource
+   * bundle. The key for the result message in the
+   * <tt>SureLogicResults.properties</tt> file is <i>category.nnnnn</i>. For
+   * example, <tt>I18N.res(2001)</tt> would result in the string
+   * <tt>"A singular problem."</tt> if the definition
+   * 
+   * <pre>
+   * category.02001=A singular problem.
+   * </pre>
+   * 
+   * is contained in the <tt>SureLogicResults.properties</tt> file. If the key
+   * is not defined in the file an exception is thrown.
+   * 
+   * @param number
+   *          the category message number.
+   * @return the category message for the given number.
+   * @throws MissingResourceException
+   *           if the computed key is not found.
+   * @see #resc(int)
+   */
+  public static String cat(final int number) {
+    return getString(RESULTS, "category.%05d", number);
+  }
+
+  /**
+   * Gets and formats the string defined for the given category number from the
+   * i18 resource bundle. Calling this method is equivalent to calling
+   * 
+   * <pre>
+   * String.format(I18N.cat(number), args).
+   * </pre>
+   * 
+   * The key for the category message in the
+   * <tt>SureLogicResults.properties</tt> file is <i>nnnnn</i>. For example,
+   * <tt>I18N.cat(456, "inconsistent")</tt> would result in the string
+   * <tt>"A inconsistent result."</tt> if the definition
+   * 
+   * <pre>
+   * category.00456=A %s result.
+   * </pre>
+   * 
+   * is contained in the <tt>SureLogicResults.properties</tt> file. If the key
+   * is not defined in the file an exception is thrown.
+   * 
+   * @param number
+   *          the category message number.
+   * @param args
+   *          the variable arguments to format the resulting category message
+   *          with.
+   * @return the formatted category message for the given number.
+   * @throws MissingResourceException
+   *           if the computed key is not found.
+   * @see String#format(String, Object...)
+   * @see #resc(int, Object...)
+   */
+  public static String cat(final int number, Object... args) {
+    return String.format(I18N.res(number), args);
   }
 
   /**
