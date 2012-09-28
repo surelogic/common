@@ -364,7 +364,7 @@ public final class I18N {
    * <p>
    * <tt>"### java.lang.Runnable subtype instance {{{created|||creations}}} - not{{{ a|||}}} Thread{{{|||s}}}"</tt>
    * <br>
-   * when <i>c</i >= 1
+   * when <i>c</i> = 1
    * <tt>"1 java.lang.Runnable subtype instance created - not a Thread"</tt><br>
    * when <i>c</i> = 2
    * <tt>"2 java.lang.Runnable subtype instance creations - not Threads"</tt>
