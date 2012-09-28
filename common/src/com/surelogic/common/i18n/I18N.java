@@ -307,31 +307,6 @@ public final class I18N {
     return String.format(I18N.res(number), args);
   }
 
-  /**
-   * Gets a string defined for the given category number from the i18 resource
-   * bundle; the string is used for for miscellaneous internal tagging. The key
-   * for the result message in the <tt>SureLogicResults.properties</tt> file is
-   * <i>misc.nnnnn</i>. For example, <tt>I18N.misc(2001)</tt> would result in
-   * the string <tt>"by effects"</tt> if the definition
-   * 
-   * <pre>
-   * misc.02001=by effects
-   * </pre>
-   * 
-   * is contained in the <tt>SureLogicResults.properties</tt> file. If the key
-   * is not defined in the file an exception is thrown.
-   * 
-   * @param number
-   *          the result message number.
-   * @return the result message for the given number.
-   * @throws MissingResourceException
-   *           if the computed key is not found.
-   */
-  @Deprecated
-  public static String misc(final int number) {
-    return getString(RESULTS, "misc.%05d", number);
-  }
-
   private static final String OPAR = "{{{";
   private static final String SEP = "|||";
   private static final String CPAR = "}}}";
