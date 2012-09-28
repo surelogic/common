@@ -1,7 +1,9 @@
 package com.surelogic.common;
 
 import com.surelogic.NonNull;
+import com.surelogic.ThreadSafe;
 
+@ThreadSafe
 public interface IJavaRef {
 
   enum Within {
@@ -43,9 +45,8 @@ public interface IJavaRef {
    * Example: <tt>"PlanetBaron/classfolder/org/test/TestHelper.class"</tt></li>
    * <li>If {@link #getWithin()} == {@link Within#JAR_FILE} then the relative
    * path to the <tt>.class</tt> within the Jar file is returned. Examples:
-   * <tt>java.lang/Object.class</tt>
-   * <tt>java.util.concurrent.locks/AbstractQueuedSynchronizer$ConditionObject.class</tt>
-   * </li>
+   * <tt>java.lang/Object.class</tt>,
+   * <tt>java.util.concurrent.locks/AbstractQueuedSynchronizer$ConditionObject.class</tt>, <tt>/ClassAtRoot.class</tt></li>
    * </ul>
    * 
    * @return a relative path to the resource that this refers to.
