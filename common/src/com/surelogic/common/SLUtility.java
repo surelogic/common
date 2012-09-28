@@ -36,6 +36,7 @@ import com.surelogic.common.i18n.I18N;
 public final class SLUtility {
   public static final boolean is64bit = SystemUtils.OS_ARCH.indexOf("64") >= 0;
   public static final String JAVA_DEFAULT_PACKAGE = "(default package)";
+  public static final String UNKNOWN_PROJECT = "(unknown project)";
   public static final String UTF8 = "UTF8";
   public static final String YES = "Yes";
   public static final String NO = "No";
