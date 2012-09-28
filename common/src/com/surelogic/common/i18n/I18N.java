@@ -314,11 +314,11 @@ public final class I18N {
 
   /**
    * 
-   * For categories and analysis results folders special processing is done on
-   * the string just before it is displayed in the user interface. It occurs
-   * after the normal String.format substitution of arguments into the format
-   * string. Special processing is based upon the number of children, <i>c</i>,
-   * of the folder or category.
+   * For categorizing messages and analysis results folders special processing
+   * is done on the string just before it is displayed in the user interface. It
+   * occurs after the normal String.format substitution of arguments into the
+   * format string. Special processing is based upon the number of children,
+   * <i>c</i>, of the folder or category.
    * <ol>
    * <li><tt>"{{{one|||many}}}"</tt> if <i>c</i> == 1 this results in
    * <tt>"one"</tt>, if <i>c</i> > 1 this results in <tt>"many"</tt>.
@@ -339,7 +339,7 @@ public final class I18N {
    * <p>
    * <tt>"### java.lang.Runnable subtype instance {{{created|||creations}}} - not{{{ a|||}}} Thread{{{|||s}}}"</tt>
    * <br>
-   * when <i>c</i >= 1
+   * when <i>c</i> = 1
    * <tt>"1 java.lang.Runnable subtype instance created - not a Thread"</tt><br>
    * when <i>c</i> = 2
    * <tt>"2 java.lang.Runnable subtype instance creations - not Threads"</tt>
