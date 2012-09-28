@@ -27,6 +27,7 @@ import java.util.Random;
 
 import org.apache.commons.lang3.SystemUtils;
 
+import com.surelogic.NonNull;
 import com.surelogic.common.i18n.I18N;
 
 /**
@@ -45,6 +46,22 @@ public final class SLUtility {
    * The string identifier of the Flashlight client plug-in.
    */
   public static final String FLASHLIGHT_ID = "com.surelogic.flashlight.client.eclipse";
+
+  /**
+   * Filters a string returning the passed string if it is non-{@code null} and
+   * an empty string if it is {@code null}.
+   * 
+   * @param value
+   *          a string.
+   * @return <tt>value</tt> if <tt>(value != null)</tt>, <tt>""</tt> otherwise.
+   */
+  public static @NonNull
+  String nullToEmpty(String value) {
+    if (value == null)
+      return "";
+    else
+      return value;
+  }
 
   /**
    * Returns an {@code int} value of the passed {@code long} value or
