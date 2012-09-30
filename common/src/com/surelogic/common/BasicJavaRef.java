@@ -12,13 +12,72 @@ import com.surelogic.common.i18n.I18N;
 @ThreadSafe
 public class BasicJavaRef implements IJavaRef {
 
-  public static void main(String[] args) {
+  public static final class Builder {
 
-    BasicJavaRef ref = new BasicJavaRef(Within.JAVA_FILE, "java.lang/Map$Entry", "/rel/java/lang/Object.java", TypeType.ENUM, "MyPrjoe",
-        10, 20, 30);
-    System.out.println(ref.getLineNumber());
-    System.out.println(ref.getOffset());
-    System.out.println(ref.getLength());
+    private Within f_within = Within.JAVA_FILE;
+    private String f_typeNameFullyQualifiedJarStyle;
+    private String f_relativePath;
+    private TypeType f_typeType = TypeType.CLASS;
+    private String f_eclipseProjectName;
+    private int f_lineNumber;
+    private int f_offset;
+    private int f_length;
+    private String f_javaId;
+    private String f_enclosingJavaId;
+
+    public Builder(@NonNull String typeNameFullyQualifiedJarStyle) {
+      f_typeNameFullyQualifiedJarStyle = typeNameFullyQualifiedJarStyle;
+    }
+
+    public Builder setWithin(Within value) {
+      f_within = value;
+      return this;
+    }
+
+    public Builder setRelativePath(String value) {
+      f_relativePath = value;
+      return this;
+    }
+
+    public Builder setTypeType(TypeType value) {
+      f_typeType = value;
+      return this;
+    }
+
+    public Builder setEclipseProjectName(String value) {
+      f_eclipseProjectName = value;
+      return this;
+    }
+
+    public Builder setLineNumber(int value) {
+      f_lineNumber = value;
+      return this;
+    }
+
+    public Builder setOffset(int value) {
+      f_offset = value;
+      return this;
+    }
+
+    public Builder setLenght(int value) {
+      f_length = value;
+      return this;
+    }
+
+    public Builder setJavaId(String value) {
+      f_javaId = value;
+      return this;
+    }
+
+    public Builder setEnclosingJavaId(String value) {
+      f_enclosingJavaId = value;
+      return this;
+    }
+
+    public IJavaRef build() {
+      return new BasicJavaRef(f_within, f_typeNameFullyQualifiedJarStyle, f_relativePath, f_typeType, f_eclipseProjectName,
+          f_lineNumber, f_offset, f_length, f_javaId, f_enclosingJavaId);
+    }
   }
 
   @NonNull
@@ -63,14 +122,19 @@ public class BasicJavaRef implements IJavaRef {
   @NonNull
   private final TypeType f_typeType;
   @Nullable
-  private final String f_eclipseProject;
+  private final String f_eclipseProjectName;
   private final int f_lineNumber;
   private final int f_offset;
   private final int f_length;
+  @Nullable
+  private final String f_javaId;
+  @Nullable
+  private final String f_enclosingJavaId;
 
   protected BasicJavaRef(final @NonNull Within within, final @NonNull String typeNameFullyQualifiedJarStyle,
       final @Nullable String relativePathOrNullIfWithinJar, final @Nullable TypeType typeTypeOrNullifUnknown,
-      final @Nullable String eclipseProjectNameOrNullIfUnknown, final int lineNumber, final int offset, final int length) {
+      final @Nullable String eclipseProjectNameOrNullIfUnknown, final int lineNumber, final int offset, final int length,
+      final @Nullable String javaIdOrNull, final @Nullable String enclosingJavaIdOrNull) {
     if (within == null)
       throw new IllegalArgumentException(I18N.err(44, "within"));
     f_within = within;
@@ -104,10 +168,12 @@ public class BasicJavaRef implements IJavaRef {
       f_typeType = TypeType.CLASS; // default
     else
       f_typeType = typeTypeOrNullifUnknown;
-    f_eclipseProject = eclipseProjectNameOrNullIfUnknown;
+    f_eclipseProjectName = eclipseProjectNameOrNullIfUnknown;
     f_lineNumber = lineNumber > 0 ? lineNumber : -1;
     f_offset = offset > 0 ? offset : -1;
     f_length = length > 0 ? length : -1;
+    f_javaId = javaIdOrNull;
+    f_enclosingJavaId = enclosingJavaIdOrNull;
   }
 
   @NonNull
@@ -150,10 +216,10 @@ public class BasicJavaRef implements IJavaRef {
 
   @NonNull
   public final String getEclipseProjectName() {
-    if (f_eclipseProject == null)
+    if (f_eclipseProjectName == null)
       return SLUtility.UNKNOWN_PROJECT;
     else
-      return f_eclipseProject;
+      return f_eclipseProjectName;
   }
 
   @NonNull
@@ -186,13 +252,13 @@ public class BasicJavaRef implements IJavaRef {
     return f_typeNameFullyQualifiedJarStyle;
   }
 
-  public String getJavaId() {
-    // TODO Auto-generated method stub
-    return null;
+  @Nullable
+  public final String getJavaId() {
+    return f_javaId;
   }
 
-  public String getEnclosingJavaId() {
-    // TODO Auto-generated method stub
-    return null;
+  @Nullable
+  public final String getEnclosingJavaId() {
+    return f_enclosingJavaId;
   }
 }

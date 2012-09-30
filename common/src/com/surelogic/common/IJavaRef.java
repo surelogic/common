@@ -1,6 +1,7 @@
 package com.surelogic.common;
 
 import com.surelogic.NonNull;
+import com.surelogic.Nullable;
 import com.surelogic.ThreadSafe;
 
 @ThreadSafe
@@ -185,19 +186,9 @@ public interface IJavaRef {
   @NonNull
   String getTypeNameFullyQualifiedJarStyle();
 
-  /**
-   * @return the corresponding JavaIdentifier, if any
-   */
+  @Nullable
   String getJavaId();
 
+  @Nullable
   String getEnclosingJavaId();
-
-  /**
-   * Returns the original source text of the source reference from the Java
-   * source code, just the code snippet not the entire compilation unit source
-   * code.
-   * 
-   * @return the original source text of the source reference
-   */
-  String toString();
 }
