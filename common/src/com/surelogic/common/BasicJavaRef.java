@@ -59,7 +59,7 @@ public class BasicJavaRef implements IJavaRef {
       return this;
     }
 
-    public Builder setLenght(int value) {
+    public Builder setLength(int value) {
       f_length = value;
       return this;
     }
