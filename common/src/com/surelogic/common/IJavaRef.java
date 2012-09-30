@@ -4,6 +4,9 @@ import com.surelogic.NonNull;
 import com.surelogic.Nullable;
 import com.surelogic.ThreadSafe;
 
+/**
+ * A POJO referencing a location in Java code&mdash;source or binary.
+ */
 @ThreadSafe
 public interface IJavaRef {
 
