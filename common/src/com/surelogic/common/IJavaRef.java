@@ -43,10 +43,10 @@ public interface IJavaRef {
    * <li>If {@link #getWithin()} == {@link Within#CLASS_FILE} then the relative
    * path to the <tt>.class</tt> file from the workspace root is returned.
    * Example: <tt>"PlanetBaron/classfolder/org/test/TestHelper.class"</tt></li>
-   * <li>If {@link #getWithin()} == {@link Within#JAR_FILE} then the relative
-   * path to the <tt>.class</tt> within the Jar file is returned. Examples:
-   * <tt>java.lang/Object.class</tt>,
-   * <tt>java.util.concurrent.locks/AbstractQueuedSynchronizer$ConditionObject.class</tt>, <tt>/ClassAtRoot.class</tt></li>
+   * <li>If {@link #getWithin()} == {@link Within#JAR_FILE} then the result of
+   * {@link #getTypeNameFullyQualifiedJarStyle()} returned. Examples:
+   * <tt>java.lang/Object</tt>,
+   * <tt>java.util.concurrent.locks/AbstractQueuedSynchronizer$ConditionObject</tt>, <tt>/ClassAtRoot</tt></li>
    * </ul>
    * 
    * @return a relative path to the resource that this refers to.
@@ -70,36 +70,36 @@ public interface IJavaRef {
   String getFileName();
 
   /**
-   * Gets the line number of the code snippet this refers to, or <tt>0</tt> if
+   * Gets the line number of the code snippet this refers to, or <tt>-1</tt> if
    * unknown.
    * <p>
    * The result is only valid if {@link #isFromSource()} is {@code true}.
    * 
-   * @return the line number of the code snippet this refers to, or <tt>0</tt>
+   * @return the line number of the code snippet this refers to, or <tt>-1</tt>
    *         if unknown.
    */
   int getLineNumber();
 
   /**
    * Returns the character offset, from the start of the file, to the start of
-   * the code snippet this refers to, or <tt>0</tt> if unknown.
+   * the code snippet this refers to, or <tt>-1</tt> if unknown.
    * <p>
    * The result is only valid if {@link #isFromSource()} is {@code true}.
    * 
    * @return the character offset, from the start of the file, to the start of
-   *         the code snippet this refers to, or <tt>0</tt> if unknown.
+   *         the code snippet this refers to, or <tt>-1</tt> if unknown.
    * @see #getLength()
    */
   int getOffset();
 
   /**
    * Gets the length, in characters, of the code snippet this refers to, or
-   * <tt>0</tt> if unknown.
+   * <tt>-1</tt> if unknown.
    * <p>
    * The result is only valid if {@link #isFromSource()} is {@code true}.
    * 
    * @return the length, in characters, of the code snippet this refers to, or
-   *         <tt>0</tt> if unknown.
+   *         <tt>-1</tt> if unknown.
    * @see #getOffset()
    */
   int getLength();
@@ -179,7 +179,7 @@ public interface IJavaRef {
    * Examples: <tt>java.lang/Object</tt>,
    * <tt>java.util.concurrent.locks/ReentrantReadWriteLock$ReadLock</tt>
    * 
-   * @return the fully qualified Java type name that this refers toin a
+   * @return the fully qualified Java type name that this refers to in a
    *         "JAR style".
    */
   @NonNull
