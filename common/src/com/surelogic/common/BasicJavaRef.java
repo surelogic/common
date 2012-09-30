@@ -6,29 +6,52 @@ import com.surelogic.ThreadSafe;
 import com.surelogic.common.i18n.I18N;
 
 /**
- * Provides a partial implementation of this class that should be used by other
- * implementations to get the details of the {@link IJavaRef} correct.
- * 
- * @author Tim
- * 
+ * Provides a basic implementation of this class that should be extended by
+ * other implementations to get the details of the {@link IJavaRef} correct.
  */
 @ThreadSafe
-public abstract class AbstractJavaRef implements IJavaRef {
+public class BasicJavaRef implements IJavaRef {
   @NonNull
   private final Within f_within;
   @NonNull
   private final String f_relativePath;
+
+  public static void main(String[] args) {
+    BasicJavaRef ref = new BasicJavaRef(Within.JAVA_FILE, "/java/lang/Object.class", "java.lang/Object", null);
+    System.out.println(ref.getFileName());
+  }
+
+  /**
+   * Matches JAR-style fully-qualified types. We use
+   * {@link #f_typeNameFullyQualifiedJarStyle} to generate many results so we
+   * want to be sure it is correctly formatted.
+   * <p>
+   * Examples: <tt>java.lang/Object</tt>,
+   * <tt>java.util.collections/Map$Entry</tt>, <tt>/NotInAPkg</tt>
+   */
+  public static final String TYPE_NAME_FULLY_QUALIFIED_JAR_STYLE_REGEX = "([a-zA-Z]\\w*(\\.[a-zA-Z]\\w*)*)*/[a-zA-Z]\\w*(\\$[a-zA-Z]\\w*)*";
+
+  /**
+   * A string that matches {@lin #TYPE_NAME_FULLY_QUALIFIED_JAR_STYLE_REGEX}.
+   */
+  @NonNull
+  private final String f_typeNameFullyQualifiedJarStyle;
   @Nullable
   private final String f_eclipseProject;
 
-  protected AbstractJavaRef(final @NonNull Within within, final @NonNull String relativePath,
-      final @Nullable String eclipseProjectNameOrNull) {
+  protected BasicJavaRef(final @NonNull Within within, final @NonNull String relativePath,
+      final @NonNull String typeNameFullyQualifiedJarStyle, final @Nullable String eclipseProjectNameOrNull) {
     if (within == null)
       throw new IllegalArgumentException(I18N.err(44, "within"));
     f_within = within;
     if (relativePath == null)
       throw new IllegalArgumentException(I18N.err(44, "relativePath"));
     f_relativePath = relativePath;
+    if (typeNameFullyQualifiedJarStyle == null)
+      throw new IllegalArgumentException(I18N.err(44, "typeNameFullyQualifiedJarStyle"));
+    if (!typeNameFullyQualifiedJarStyle.matches(TYPE_NAME_FULLY_QUALIFIED_JAR_STYLE_REGEX))
+      throw new IllegalArgumentException(I18N.err(252, typeNameFullyQualifiedJarStyle));
+    f_typeNameFullyQualifiedJarStyle = typeNameFullyQualifiedJarStyle;
     f_eclipseProject = eclipseProjectNameOrNull;
   }
 
@@ -50,8 +73,11 @@ public abstract class AbstractJavaRef implements IJavaRef {
   @Override
   @NonNull
   public String getFileName() {
-    // TODO Auto-generated method stub
-    return null;
+    int index = f_relativePath.lastIndexOf('/');
+    if (index == -1)
+      return f_relativePath;
+    else
+      return f_relativePath.substring(index);
   }
 
   @Override
