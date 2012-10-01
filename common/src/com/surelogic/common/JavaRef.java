@@ -152,8 +152,17 @@ public class JavaRef implements IJavaRef {
   private final TypeType f_typeType;
   @Nullable
   private final String f_eclipseProjectName;
+  /**
+   * -1 indicates not valid.
+   */
   private final int f_lineNumber;
+  /**
+   * -1 indicates not valid.
+   */
   private final int f_offset;
+  /**
+   * -1 indicates not valid.
+   */
   private final int f_length;
   @Nullable
   private final String f_javaId;
@@ -301,5 +310,12 @@ public class JavaRef implements IJavaRef {
   @Nullable
   public final String getEnclosingJavaId() {
     return f_enclosingJavaId;
+  }
+
+  public Long getHash() {
+    if (f_lineNumber != -1)
+      return Long.valueOf(f_typeNameFullyQualifiedSureLogic.hashCode() + f_lineNumber);
+    else
+      return Long.valueOf(f_typeNameFullyQualifiedSureLogic.hashCode());
   }
 }

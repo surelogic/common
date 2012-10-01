@@ -196,4 +196,7 @@ public interface IJavaRef {
 
   @Nullable
   String getEnclosingJavaId();
+  
+  @NonNull
+  Long getHash();
 }
