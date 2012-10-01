@@ -123,8 +123,9 @@ public interface IJavaRef {
   String getEclipseProjectName();
 
   /**
-   * Gets the Java package name that this refers to. If the resulting package is
-   * the default package, or no package, the string defined by
+   * Gets the Java package name that this refers to&mdash;nested package names
+   * are separated by a <tt>"."</tt>. If the resulting package is the default
+   * package, or no package, the string defined by
    * {@link SLUtility#JAVA_DEFAULT_PACKAGE} is returned. The package must be
    * known for a reference to be valid, so this should always return something
    * reasonable.
@@ -137,9 +138,24 @@ public interface IJavaRef {
   String getPackageName();
 
   /**
-   * Gets the Java type name that this refers to. Nested types are separated by
-   * a <tt>"."</tt>. The type name must be known for a reference to be valid, so
-   * this should always return something reasonable.
+   * Gets the Java package name that this refers to&mdash;nested package names
+   * are separated by a <tt>"/"</tt>. If the resulting package is the default
+   * package, or no package, the string defined by
+   * {@link SLUtility#JAVA_DEFAULT_PACKAGE} is returned. The package must be
+   * known for a reference to be valid, so this should always return something
+   * reasonable.
+   * <p>
+   * Example: <tt>java/util/concurrent/locks</tt>
+   * 
+   * @return The package that the source is within.
+   */
+  @NonNull
+  String getPackageNameSlash();
+
+  /**
+   * Gets the Java type name that this refers to&mdash;nested types are
+   * separated by a <tt>"."</tt>. The type name must be known for a reference to
+   * be valid, so this should always return something reasonable.
    * <p>
    * Examples: <tt>Object</tt>,
    * <tt>AbstractQueuedSynchronizer.ConditionObject</tt>
@@ -148,6 +164,19 @@ public interface IJavaRef {
    */
   @NonNull
   String getTypeName();
+
+  /**
+   * Gets the Java type name that this refers to&mdash;nested types are
+   * separated by a <tt>"$"</tt>. The type name must be known for a reference to
+   * be valid, so this should always return something reasonable.
+   * <p>
+   * Examples: <tt>Object</tt>,
+   * <tt>AbstractQueuedSynchronizer$ConditionObject</tt>
+   * 
+   * @return the Java type name that this refers to.
+   */
+  @NonNull
+  String getTypeNameDollarSign();
 
   /**
    * Gets the "type" of Java type that this refers to: <tt>class</tt>,
@@ -196,7 +225,7 @@ public interface IJavaRef {
 
   @Nullable
   String getEnclosingJavaId();
-  
+
   @NonNull
   Long getHash();
 }

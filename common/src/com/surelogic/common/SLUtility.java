@@ -35,11 +35,16 @@ import com.surelogic.common.i18n.I18N;
  */
 public final class SLUtility {
   public static final boolean is64bit = SystemUtils.OS_ARCH.indexOf("64") >= 0;
+  /**
+   * This is a very JDT friendly constant&mdash;many Eclipse methods recognize
+   * this particular name.
+   */
   public static final String JAVA_DEFAULT_PACKAGE = "(default package)";
   public static final String UNKNOWN_PROJECT = "(unknown project)";
   public static final String UTF8 = "UTF8";
   public static final String YES = "Yes";
   public static final String NO = "No";
+  public static final String ECLIPSE_MARKER_TYPE_NAME = "com.surelogic.marker";
   public static final String PLATFORM_LINE_SEPARATOR = String.format("%n");
   public static final Object[] EMPTY_OBJECT_ARRAY = new Object[0];
 

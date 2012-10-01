@@ -207,9 +207,9 @@ public class JavaRef implements IJavaRef {
     else
       f_typeType = typeTypeOrNullifUnknown;
     f_eclipseProjectName = eclipseProjectNameOrNullIfUnknown;
-    f_lineNumber = lineNumber > 0 ? lineNumber : -1;
-    f_offset = offset > 0 ? offset : -1;
-    f_length = length > 0 ? length : -1;
+    f_lineNumber = lineNumber > 0 && lineNumber != Integer.MAX_VALUE ? lineNumber : -1;
+    f_offset = offset > 0 && offset != Integer.MAX_VALUE ? offset : -1;
+    f_length = length > 0 && length != Integer.MAX_VALUE ? length : -1;
     f_javaId = javaIdOrNull;
     f_enclosingJavaId = enclosingJavaIdOrNull;
   }
@@ -282,9 +282,21 @@ public class JavaRef implements IJavaRef {
   }
 
   @NonNull
+  public String getPackageNameSlash() {
+    final String packageName = getPackageName();
+    return packageName.replaceAll("\\.", "/");
+  }
+
+  @NonNull
   public final String getTypeName() {
+    final String typeNameDollarSign = getTypeNameDollarSign();
+    return typeNameDollarSign.replaceAll("\\$", ".");
+  }
+
+  @NonNull
+  public String getTypeNameDollarSign() {
     int index = f_typeNameFullyQualifiedSureLogic.indexOf('/');
-    return f_typeNameFullyQualifiedSureLogic.substring(index + 1).replaceAll("\\$", ".");
+    return f_typeNameFullyQualifiedSureLogic.substring(index + 1);
   }
 
   @NonNull
@@ -317,5 +329,18 @@ public class JavaRef implements IJavaRef {
       return Long.valueOf(f_typeNameFullyQualifiedSureLogic.hashCode() + f_lineNumber);
     else
       return Long.valueOf(f_typeNameFullyQualifiedSureLogic.hashCode());
+  }
+
+  @Override
+  public String toString() {
+    final StringBuilder b = new StringBuilder("JavaRef(");
+    b.append(f_typeNameFullyQualifiedSureLogic);
+    b.append(",within=").append(f_within);
+    b.append(",typetype=").append(f_typeType);
+    b.append(",line=").append(f_lineNumber);
+    b.append(",offset=").append(f_offset);
+    b.append(",length=").append(f_length);
+    b.append(")");
+    return b.toString();
   }
 }
