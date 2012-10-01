@@ -15,7 +15,60 @@ import com.surelogic.common.i18n.I18N;
 public class JavaRef implements IJavaRef {
 
   /**
-   * Builder for {@link IJavaRef} instances.
+   * Builder for {@link IJavaRef} instances. Copy-and-modify is supported via
+   * {@link Builder#Builder(IJavaRef)}.
+   * <p>
+   * The default values are listed in the table below.
+   * <p>
+   * <table border=1>
+   * <tr>
+   * <th>Method</th>
+   * <th>Description</th>
+   * <th>Default</th>
+   * </tr>
+   * <tr>
+   * <td>{@link #setEclipseProjectName(String)}</td>
+   * <td>the Eclipse project name the code reference is within</td>
+   * <td>{@code null}</td>
+   * </tr>
+   * <tr>
+   * <td>{@link #setEnclosingJavaId(String)}</td>
+   * <td>a declaration path used by viewers</td>
+   * <td>{@code null}</td>
+   * </tr>
+   * <tr>
+   * <td>{@link #setJavaId(String)}</td>
+   * <td>a declaration path used by viewers</td>
+   * <td>{@code null}</td>
+   * </tr>
+   * <tr>
+   * <td>{@link #setLength(int)}</td>
+   * <td>the character length of the code reference in the source file</td>
+   * <td>-1</td>
+   * </tr>
+   * <tr>
+   * <td>{@link #setLineNumber(int)}</td>
+   * <td>the line number of the code reference in the source file</td>
+   * <td>-1</td>
+   * </tr>
+   * <tr>
+   * <td>{@link #setOffset(int)}</td>
+   * <td>the character offset of the code reference in the source file</td>
+   * <td>-1</td>
+   * </tr>
+   * <tr>
+   * <td>{@link #setTypeType(IJavaRef.TypeType)}</td>
+   * <td>the Java type this reference is within must be either a <tt>class</tt>,
+   * an <tt>enum</tt>, or an <tt>interface</tt></td>
+   * <td>{@link IJavaRef.TypeType#CLASS}</td>
+   * </tr>
+   * <tr>
+   * <td>{@link #setWithin(IJavaRef.Within)}</td>
+   * <td>a code reference can be within a <tt>.java</tt> file, a <tt>.class</tt>
+   * file, or a <tt>.jar</tt> file</td>
+   * <td>{@link IJavaRef.Within#JAVA_FILE}</td>
+   * </tr>
+   * </table>
    */
   @NotThreadSafe
   public static class Builder {
@@ -30,6 +83,13 @@ public class JavaRef implements IJavaRef {
     protected String f_javaId;
     protected String f_enclosingJavaId;
 
+    /**
+     * Constructs a new builder that allows copy-then-modify from another code
+     * location reference.
+     * 
+     * @param copy
+     *          a code location reference.
+     */
     public Builder(IJavaRef copy) {
       f_within = copy.getWithin();
       f_typeNameFullyQualifiedSureLogic = copy.getTypeNameFullyQualifiedSureLogic();
@@ -42,6 +102,13 @@ public class JavaRef implements IJavaRef {
       f_enclosingJavaId = copy.getEnclosingJavaId();
     }
 
+    /**
+     * Constructs a new builder for a code reference within the passed type.
+     * 
+     * @param typeNameFullyQualifiedSureLogic
+     *          a type name that is valid per
+     *          {@link SLUtility#isValidTypeNameFullyQualifiedSureLogic(String)}
+     */
     public Builder(@NonNull String typeNameFullyQualifiedSureLogic) {
       f_typeNameFullyQualifiedSureLogic = typeNameFullyQualifiedSureLogic;
     }
