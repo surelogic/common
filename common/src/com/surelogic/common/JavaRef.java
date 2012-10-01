@@ -11,7 +11,7 @@ import com.surelogic.common.i18n.I18N;
  * other implementations to get the details of the {@link IJavaRef} correct.
  */
 @ThreadSafe
-public class BasicJavaRef implements IJavaRef {
+public class JavaRef implements IJavaRef {
 
   @NotThreadSafe
   public static class Builder {
@@ -90,7 +90,7 @@ public class BasicJavaRef implements IJavaRef {
     }
 
     public IJavaRef build() {
-      return new BasicJavaRef(f_within, f_typeNameFullyQualifiedSureLogic, f_relativePath, f_typeType, f_eclipseProjectName,
+      return new JavaRef(f_within, f_typeNameFullyQualifiedSureLogic, f_relativePath, f_typeType, f_eclipseProjectName,
           f_lineNumber, f_offset, f_length, f_javaId, f_enclosingJavaId);
     }
 
@@ -159,7 +159,7 @@ public class BasicJavaRef implements IJavaRef {
   @Nullable
   private final String f_enclosingJavaId;
 
-  protected BasicJavaRef(final @NonNull Within within, final @NonNull String typeNameFullyQualifiedSureLogic,
+  protected JavaRef(final @NonNull Within within, final @NonNull String typeNameFullyQualifiedSureLogic,
       final @Nullable String relativePathOrNullIfWithinJar, final @Nullable TypeType typeTypeOrNullifUnknown,
       final @Nullable String eclipseProjectNameOrNullIfUnknown, final int lineNumber, final int offset, final int length,
       final @Nullable String javaIdOrNull, final @Nullable String enclosingJavaIdOrNull) {
