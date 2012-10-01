@@ -5,7 +5,7 @@ import com.surelogic.Nullable;
 import com.surelogic.ThreadSafe;
 
 /**
- * A POJO referencing a location in Java code&mdash;source or binary.
+ * Interface for referencing a location in Java code&mdash;source or binary.
  */
 @ThreadSafe
 public interface IJavaRef {
@@ -47,10 +47,10 @@ public interface IJavaRef {
    * <li>If {@link #getWithin()} == {@link Within#CLASS_FILE} then the relative
    * path to the <tt>.class</tt> file from the workspace root is returned.
    * Example: <tt>"PlanetBaron/classfolder/org/test/TestHelper.class"</tt></li>
-   * <li>If {@link #getWithin()} == {@link Within#JAR_FILE} then the result of
-   * {@link #getTypeNameFullyQualifiedJarStyle()} returned. Examples:
-   * <tt>java.lang/Object</tt>,
-   * <tt>java.util.concurrent.locks/AbstractQueuedSynchronizer$ConditionObject</tt>, <tt>/ClassAtRoot</tt></li>
+   * <li>If {@link #getWithin()} == {@link Within#JAR_FILE} then the result is
+   * the path to the file within the JAR file. Examples:
+   * <tt>java/lang/Object.class</tt>,
+   * <tt>java/util/concurrent/locks/AbstractQueuedSynchronizer$ConditionObject.class</tt>, <tt>ClassInDefaultPkg.class</tt></li>
    * </ul>
    * 
    * @return a relative path to the resource that this refers to.
@@ -173,21 +173,23 @@ public interface IJavaRef {
   String getTypeNameFullyQualified();
 
   /**
-   * Gets the fully qualified Java type name that this refers to in a
-   * "JAR style". The type name and package must be known for a reference to be
-   * valid, so this should always return something reasonable.
+   * Gets the fully qualified Java type name that this refers to in a particular
+   * SureLogic format. Nested package names are separated by <tt>"."</tt>, the
+   * package name is separated from the type name by a "/" (which must always
+   * appear&mdash;even if the type is in the default package), and nested type
+   * names are separated by <tt>"$"</tt>. The type name and package must be
+   * known for a reference to be valid, so this should always return something
+   * reasonable.
    * <p>
-   * If {@link #getWithin()} == {@link Within#JAR_FILE} then this method returns
-   * exactly the same result as {@link #getRelativePath()}.
-   * <p>
-   * Examples: <tt>java.lang/Object</tt>,
-   * <tt>java.util.concurrent.locks/ReentrantReadWriteLock$ReadLock</tt>
+   * Examples: <tt>java.lang/Object</tt>, <tt>java.util/Map$Entry</tt>,
+   * <tt>java.util.concurrent.locks/ReentrantReadWriteLock$ReadLock</tt>,
+   * <tt>/ClassInDefaultPkg</tt>
    * 
-   * @return the fully qualified Java type name that this refers to in a
-   *         "JAR style".
+   * @return the fully qualified Java type name that this refers to in the
+   *         SureLogic format.
    */
   @NonNull
-  String getTypeNameFullyQualifiedJarStyle();
+  String getTypeNameFullyQualifiedSureLogic();
 
   @Nullable
   String getJavaId();
