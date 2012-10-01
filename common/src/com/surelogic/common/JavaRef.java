@@ -7,8 +7,9 @@ import com.surelogic.ThreadSafe;
 import com.surelogic.common.i18n.I18N;
 
 /**
- * Provides a basic implementation of this class that should be extended by
- * other implementations to get the details of the {@link IJavaRef} correct.
+ * Provides an implementation of this class that should be extended by other
+ * implementations to get the details of the {@link IJavaRef} correct. Both the
+ * {@link Builder} and the type should be extended.
  */
 @ThreadSafe
 public class JavaRef implements IJavaRef {
@@ -16,16 +17,16 @@ public class JavaRef implements IJavaRef {
   @NotThreadSafe
   public static class Builder {
 
-    private Within f_within = Within.JAVA_FILE;
-    private final String f_typeNameFullyQualifiedSureLogic;
-    private String f_relativePath;
-    private TypeType f_typeType = TypeType.CLASS;
-    private String f_eclipseProjectName;
-    private int f_lineNumber;
-    private int f_offset;
-    private int f_length;
-    private String f_javaId;
-    private String f_enclosingJavaId;
+    protected Within f_within = Within.JAVA_FILE;
+    protected final String f_typeNameFullyQualifiedSureLogic;
+    protected String f_relativePath;
+    protected TypeType f_typeType = TypeType.CLASS;
+    protected String f_eclipseProjectName;
+    protected int f_lineNumber;
+    protected int f_offset;
+    protected int f_length;
+    protected String f_javaId;
+    protected String f_enclosingJavaId;
 
     public Builder(IJavaRef copy) {
       f_within = copy.getWithin();
@@ -44,47 +45,47 @@ public class JavaRef implements IJavaRef {
       f_typeNameFullyQualifiedSureLogic = typeNameFullyQualifiedSureLogic;
     }
 
-    public final Builder setWithin(Within value) {
+    public Builder setWithin(Within value) {
       f_within = value;
       return this;
     }
 
-    public final Builder setRelativePath(String value) {
+    public Builder setRelativePath(String value) {
       f_relativePath = value;
       return this;
     }
 
-    public final Builder setTypeType(TypeType value) {
+    public Builder setTypeType(TypeType value) {
       f_typeType = value;
       return this;
     }
 
-    public final Builder setEclipseProjectName(String value) {
+    public Builder setEclipseProjectName(String value) {
       f_eclipseProjectName = value;
       return this;
     }
 
-    public final Builder setLineNumber(int value) {
+    public Builder setLineNumber(int value) {
       f_lineNumber = value;
       return this;
     }
 
-    public final Builder setOffset(int value) {
+    public Builder setOffset(int value) {
       f_offset = value;
       return this;
     }
 
-    public final Builder setLength(int value) {
+    public Builder setLength(int value) {
       f_length = value;
       return this;
     }
 
-    public final Builder setJavaId(String value) {
+    public Builder setJavaId(String value) {
       f_javaId = value;
       return this;
     }
 
-    public final Builder setEnclosingJavaId(String value) {
+    public Builder setEnclosingJavaId(String value) {
       f_enclosingJavaId = value;
       return this;
     }
