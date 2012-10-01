@@ -14,6 +14,9 @@ import com.surelogic.common.i18n.I18N;
 @ThreadSafe
 public class JavaRef implements IJavaRef {
 
+  /**
+   * Builder for {@link IJavaRef} instances.
+   */
   @NotThreadSafe
   public static class Builder {
 
@@ -206,8 +209,8 @@ public class JavaRef implements IJavaRef {
 
   @NonNull
   public String getPackageNameSlash() {
-    final String packageName = getPackageName();
-    return packageName.replaceAll("\\.", "/");
+    final String name = getPackageNameOrNull();
+    return name == null ? "" : name.replaceAll("\\.", "/");
   }
 
   @NonNull
@@ -218,8 +221,8 @@ public class JavaRef implements IJavaRef {
 
   @NonNull
   public String getTypeNameDollarSign() {
-    final String name = getTypeName();
-    return name.replaceAll("\\.", "$");
+    String name = getTypeName();
+    return name.replaceAll("\\.", "\\$");
   }
 
   @NonNull
