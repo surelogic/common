@@ -10,10 +10,19 @@ import com.surelogic.ThreadSafe;
 @ThreadSafe
 public interface IJavaRef {
 
+  /**
+   * A referenced location in Java code can be within a <tt>.java</tt> file, a
+   * <tt>.class</tt> file, or a <tt>.jar</tt> file.
+   * 
+   */
   enum Within {
     JAVA_FILE, CLASS_FILE, JAR_FILE
   }
 
+  /**
+   * A Java type can be either a <tt>class</tt>, an <tt>enum</tt>, or an
+   * <tt>interface</tt>.
+   */
   enum TypeType {
     CLASS, ENUM, INTERFACE
   }
@@ -34,44 +43,6 @@ public interface IJavaRef {
    *         otherwise.
    */
   boolean isFromSource();
-
-  /**
-   * Gets a relative path to the resource that this refers to. The result is
-   * different depending upon what this refers to is {@link #Within}.
-   * <ul>
-   * <li>If {@link #getWithin()} == {@link Within#JAVA_FILE} then the relative
-   * path to the <tt>.java</tt> file from the workspace root is returned.
-   * Example:
-   * <tt>"PlanetBaron/src/org/planetbaron/protocol/parser/ParseException.java"</tt>
-   * </li>
-   * <li>If {@link #getWithin()} == {@link Within#CLASS_FILE} then the relative
-   * path to the <tt>.class</tt> file from the workspace root is returned.
-   * Example: <tt>"PlanetBaron/classfolder/org/test/TestHelper.class"</tt></li>
-   * <li>If {@link #getWithin()} == {@link Within#JAR_FILE} then the result is
-   * the path to the file within the JAR file. Examples:
-   * <tt>java/lang/Object.class</tt>,
-   * <tt>java/util/concurrent/locks/AbstractQueuedSynchronizer$ConditionObject.class</tt>, <tt>ClassInDefaultPkg.class</tt></li>
-   * </ul>
-   * 
-   * @return a relative path to the resource that this refers to.
-   */
-  @NonNull
-  String getRelativePath();
-
-  /**
-   * Gets the name of the file that this refers to. This is just the last name
-   * in the pathname's name sequence. The file is within a JAR file if
-   * {@link #getWithin()} == {@link Within#JAR_FILE}, otherwise it should exist
-   * in the file system (unless it has been deleted).
-   * <p>
-   * Examples: <tt>ParseException.java</tt>, <tt>TestHelper.class</tt>,
-   * <tt>Object.class</tt>,
-   * <tt>AbstractQueuedSynchronizer$ConditionObject.class</tt>
-   * 
-   * @return the name of the file that this refers to.
-   */
-  @NonNull
-  String getFileName();
 
   /**
    * Gets the line number of the code snippet this refers to, or <tt>-1</tt> if
@@ -117,18 +88,31 @@ public interface IJavaRef {
    * Examples: <tt>PlanetBaron</tt>,
    * <tt>org.eclipse.jdt.launching.JRE_CONTAINER</tt>
    * 
-   * @return the Eclipse project name or library reference that this refers to.
+   * @return the Eclipse project name or library reference that this refers to,
+   *         or {@link SLUtility#UNKNOWN_PROJECT} if unknown.
    */
   @NonNull
   String getEclipseProjectName();
 
   /**
+   * Gets the Eclipse project name or library reference (shared between
+   * projects) that this refers to. If the Eclipse project name is unknown, for
+   * any reason, then {@code null} is returned.
+   * <p>
+   * Examples: <tt>PlanetBaron</tt>,
+   * <tt>org.eclipse.jdt.launching.JRE_CONTAINER</tt>
+   * 
+   * @return the Eclipse project name or library reference that this refers to,
+   *         or {@code null} if unknown.
+   */
+  @Nullable
+  String getEclipseProjectNameOrNull();
+
+  /**
    * Gets the Java package name that this refers to&mdash;nested package names
    * are separated by a <tt>"."</tt>. If the resulting package is the default
    * package, or no package, the string defined by
-   * {@link SLUtility#JAVA_DEFAULT_PACKAGE} is returned. The package must be
-   * known for a reference to be valid, so this should always return something
-   * reasonable.
+   * {@link SLUtility#JAVA_DEFAULT_PACKAGE} is returned.
    * <p>
    * Example: <tt>java.util.concurrent.locks</tt>
    * 
@@ -139,15 +123,26 @@ public interface IJavaRef {
 
   /**
    * Gets the Java package name that this refers to&mdash;nested package names
+   * are separated by a <tt>"."</tt>. If the resulting package is the default
+   * package, or no package, then {@code null} is returned.
+   * <p>
+   * Example: <tt>java.util.concurrent.locks</tt>
+   * 
+   * @return The package that the source is within, or {@code null} for the
+   *         default package.
+   */
+  @Nullable
+  String getPackageNameOrNull();
+
+  /**
+   * Gets the Java package name that this refers to&mdash;nested package names
    * are separated by a <tt>"/"</tt>. If the resulting package is the default
-   * package, or no package, the string defined by
-   * {@link SLUtility#JAVA_DEFAULT_PACKAGE} is returned. The package must be
-   * known for a reference to be valid, so this should always return something
-   * reasonable.
+   * package, or no package, the empty string is returned.
    * <p>
    * Example: <tt>java/util/concurrent/locks</tt>
    * 
-   * @return The package that the source is within.
+   * @return The package that the source is within, or <tt>""</tt> for the
+   *         default package.
    */
   @NonNull
   String getPackageNameSlash();
@@ -157,8 +152,8 @@ public interface IJavaRef {
    * separated by a <tt>"."</tt>. The type name must be known for a reference to
    * be valid, so this should always return something reasonable.
    * <p>
-   * Examples: <tt>Object</tt>,
-   * <tt>AbstractQueuedSynchronizer.ConditionObject</tt>
+   * Examples: <tt>Object</tt>, <tt>/Map.Entry</tt>,
+   * <tt>AbstractQueuedSynchronizer.ConditionObject</tt>, <tt>package-info</tt>
    * 
    * @return the Java type name that this refers to.
    */
@@ -170,8 +165,8 @@ public interface IJavaRef {
    * separated by a <tt>"$"</tt>. The type name must be known for a reference to
    * be valid, so this should always return something reasonable.
    * <p>
-   * Examples: <tt>Object</tt>,
-   * <tt>AbstractQueuedSynchronizer$ConditionObject</tt>
+   * Examples: <tt>Object</tt>, <tt>/Map$Entry</tt>,
+   * <tt>AbstractQueuedSynchronizer$ConditionObject</tt>, <tt>package-info</tt>
    * 
    * @return the Java type name that this refers to.
    */
@@ -179,7 +174,7 @@ public interface IJavaRef {
   String getTypeNameDollarSign();
 
   /**
-   * Gets the "type" of Java type that this refers to: <tt>class</tt>,
+   * Gets the type of Java type that this refers to: <tt>class</tt>,
    * <tt>enum</tt>, or <tt>interface</tt>.
    * 
    * @return the type of Java type that this refers to.
@@ -193,8 +188,12 @@ public interface IJavaRef {
    * must be known for a reference to be valid, so this should always return
    * something reasonable.
    * <p>
-   * Examples: <tt>java.lang.Object</tt>,
-   * <tt>java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock</tt>
+   * <tt>package-info</tt> files are handled as if they were a class. They can
+   * exist as a <tt>.java</tt> or <tt>.class</tt>.
+   * <p>
+   * Examples: <tt>java.lang.Object</tt>, <tt>java.util.Map.Entry</tt>,
+   * <tt>java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock</tt>,
+   * <tt>ClassInDefaultPkg</tt>, <tt>edu.afit.smallworld.package-info</tt>
    * 
    * @return the fully qualified Java type name that this refers to.
    */
@@ -206,13 +205,16 @@ public interface IJavaRef {
    * SureLogic format. Nested package names are separated by <tt>"."</tt>, the
    * package name is separated from the type name by a "/" (which must always
    * appear&mdash;even if the type is in the default package), and nested type
-   * names are separated by <tt>"$"</tt>. The type name and package must be
+   * names are separated by <tt>"."</tt>. The type name and package must be
    * known for a reference to be valid, so this should always return something
    * reasonable.
    * <p>
-   * Examples: <tt>java.lang/Object</tt>, <tt>java.util/Map$Entry</tt>,
-   * <tt>java.util.concurrent.locks/ReentrantReadWriteLock$ReadLock</tt>,
-   * <tt>/ClassInDefaultPkg</tt>
+   * <tt>package-info</tt> files are handled as if they were a class. They can
+   * exist as a <tt>.java</tt> or <tt>.class</tt>.
+   * <p>
+   * Examples: <tt>java.lang/Object</tt>, <tt>java.util/Map.Entry</tt>,
+   * <tt>java.util.concurrent.locks/ReentrantReadWriteLock.ReadLock</tt>,
+   * <tt>/ClassInDefaultPkg</tt>, <tt>edu.afit.smallworld/package-info</tt>
    * 
    * @return the fully qualified Java type name that this refers to in the
    *         SureLogic format.

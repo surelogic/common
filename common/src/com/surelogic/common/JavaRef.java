@@ -19,7 +19,6 @@ public class JavaRef implements IJavaRef {
 
     protected Within f_within = Within.JAVA_FILE;
     protected final String f_typeNameFullyQualifiedSureLogic;
-    protected String f_relativePath;
     protected TypeType f_typeType = TypeType.CLASS;
     protected String f_eclipseProjectName;
     protected int f_lineNumber;
@@ -31,7 +30,6 @@ public class JavaRef implements IJavaRef {
     public Builder(IJavaRef copy) {
       f_within = copy.getWithin();
       f_typeNameFullyQualifiedSureLogic = copy.getTypeNameFullyQualifiedSureLogic();
-      f_relativePath = copy.getRelativePath();
       f_typeType = copy.getTypeType();
       f_eclipseProjectName = copy.getEclipseProjectName();
       f_lineNumber = copy.getLineNumber();
@@ -47,11 +45,6 @@ public class JavaRef implements IJavaRef {
 
     public Builder setWithin(Within value) {
       f_within = value;
-      return this;
-    }
-
-    public Builder setRelativePath(String value) {
-      f_relativePath = value;
       return this;
     }
 
@@ -91,8 +84,8 @@ public class JavaRef implements IJavaRef {
     }
 
     public IJavaRef build() {
-      return new JavaRef(f_within, f_typeNameFullyQualifiedSureLogic, f_relativePath, f_typeType, f_eclipseProjectName,
-          f_lineNumber, f_offset, f_length, f_javaId, f_enclosingJavaId);
+      return new JavaRef(f_within, f_typeNameFullyQualifiedSureLogic, f_typeType, f_eclipseProjectName, f_lineNumber, f_offset,
+          f_length, f_javaId, f_enclosingJavaId);
     }
 
     public IJavaRef buildOrNullOnFailure() {
@@ -109,40 +102,8 @@ public class JavaRef implements IJavaRef {
   private final Within f_within;
 
   /**
-   * Matches relative paths. We use {@link #f_relativePath} to generate many
-   * results so we want to be sure it is correctly formatted.
-   * <p>
-   * Examples: <tt>some dir/java/lang/Object.class</tt>,
-   * <tt>workspace/com/surelogic/JavaRef.java</tt>,
-   * <tt>java.util.collections/Map$Entry</tt>, <tt>NotInAPkg.java</tt>
-   */
-  public static final String RELATIVE_PATH_REGEX = "([^/]*/)*[a-zA-Z]\\w*(\\.class|\\.java)";
-
-  /**
-   * The relative path of a .java or .class file. If the resource is within a
-   * JAR this reference is {@code null} because
-   * {@link #f_typeNameFullyQualifiedSureLogic} is used as the resources
-   * relative path.
-   * <p>
-   * This string matches {@link #RELATIVE_PATH_REGEX} if non-{@code null}.
-   */
-  @Nullable
-  private final String f_relativePath;
-
-  /**
-   * Matches SureLogic formatted fully-qualified types. We use
-   * {@link #f_typeNameFullyQualifiedSureLogic} to generate many results so we
-   * want to be sure it is correctly formatted.
-   * <p>
-   * Examples: <tt>java.lang/Object</tt>,
-   * <tt>java.util.collections/Map$Entry</tt>,
-   * <tt>java.util.concurrent.locks/ReentrantReadWriteLock$ReadLock</tt>
-   * <tt>/ClassInDefaultPkg</tt>
-   */
-  public static final String TYPE_NAME_FULLY_QUALIFIED_SURELOGIC_REGEX = "([a-zA-Z]\\w*(\\.[a-zA-Z]\\w*)*)*/[a-zA-Z]\\w*(\\$[a-zA-Z]\\w*)*";
-
-  /**
-   * This string matches {@link #TYPE_NAME_FULLY_QUALIFIED_SURELOGIC_REGEX}.
+   * This string is valid according to
+   * {@link SLUtility#isValidTypeNameFullyQualifiedSureLogic(String)}.
    * 
    * @see IJavaRef#getTypeNameFullyQualifiedSureLogic()
    */
@@ -170,38 +131,17 @@ public class JavaRef implements IJavaRef {
   private final String f_enclosingJavaId;
 
   protected JavaRef(final @NonNull Within within, final @NonNull String typeNameFullyQualifiedSureLogic,
-      final @Nullable String relativePathOrNullIfWithinJar, final @Nullable TypeType typeTypeOrNullifUnknown,
-      final @Nullable String eclipseProjectNameOrNullIfUnknown, final int lineNumber, final int offset, final int length,
-      final @Nullable String javaIdOrNull, final @Nullable String enclosingJavaIdOrNull) {
+      final @Nullable TypeType typeTypeOrNullifUnknown, final @Nullable String eclipseProjectNameOrNullIfUnknown,
+      final int lineNumber, final int offset, final int length, final @Nullable String javaIdOrNull,
+      final @Nullable String enclosingJavaIdOrNull) {
     if (within == null)
       throw new IllegalArgumentException(I18N.err(44, "within"));
     f_within = within;
-    if (within == Within.JAR_FILE) {
-      f_relativePath = null;
-    } else {
-      if (relativePathOrNullIfWithinJar == null)
-        throw new IllegalArgumentException(I18N.err(254, "relativePathOrNullIfWithinJar"));
-      if (!relativePathOrNullIfWithinJar.matches(RELATIVE_PATH_REGEX))
-        throw new IllegalArgumentException(I18N.err(253, relativePathOrNullIfWithinJar, RELATIVE_PATH_REGEX));
-      f_relativePath = relativePathOrNullIfWithinJar;
-    }
     if (typeNameFullyQualifiedSureLogic == null)
       throw new IllegalArgumentException(I18N.err(44, "typeNameFullyQualifiedSureLogic"));
-    if (!typeNameFullyQualifiedSureLogic.matches(TYPE_NAME_FULLY_QUALIFIED_SURELOGIC_REGEX))
-      throw new IllegalArgumentException(I18N.err(253, typeNameFullyQualifiedSureLogic, TYPE_NAME_FULLY_QUALIFIED_SURELOGIC_REGEX));
+    if (!SLUtility.isValidTypeNameFullyQualifiedSureLogic(typeNameFullyQualifiedSureLogic))
+      throw new IllegalArgumentException(I18N.err(253, typeNameFullyQualifiedSureLogic));
     f_typeNameFullyQualifiedSureLogic = typeNameFullyQualifiedSureLogic;
-    /*
-     * .class or .java checks we can do if we have a non-null relative path
-     */
-    if (f_relativePath != null) {
-      if (within == Within.JAVA_FILE) {
-        if (!f_relativePath.endsWith("java"))
-          throw new IllegalArgumentException(I18N.err(255, f_relativePath));
-      } else {
-        if (!f_relativePath.endsWith("class"))
-          throw new IllegalArgumentException(I18N.err(256, f_relativePath));
-      }
-    }
     if (typeTypeOrNullifUnknown == null)
       f_typeType = TypeType.CLASS; // default
     else
@@ -223,35 +163,6 @@ public class JavaRef implements IJavaRef {
     return f_within == IJavaRef.Within.JAVA_FILE;
   }
 
-  @NonNull
-  public final String getRelativePath() {
-    if (f_relativePath != null)
-      return f_relativePath;
-    else {
-      /*
-       * Generate the JAR file path from our SureLogic formatted type name.
-       * 
-       * If the type is in the default package we need to remove the "/",
-       * otherwise we change all "." to "/". Finally we add a ".class" suffix to
-       * the name.
-       */
-      boolean defaultPkg = f_typeNameFullyQualifiedSureLogic.startsWith("/");
-      if (defaultPkg)
-        return f_typeNameFullyQualifiedSureLogic.substring(1) + ".class";
-      else
-        return f_typeNameFullyQualifiedSureLogic.replaceAll("\\.", "/") + ".class";
-    }
-  }
-
-  @NonNull
-  public final String getFileName() {
-    int index = f_relativePath.lastIndexOf('/');
-    if (index == -1)
-      return f_relativePath;
-    else
-      return f_relativePath.substring(index + 1);
-  }
-
   public final int getLineNumber() {
     return f_lineNumber;
   }
@@ -266,19 +177,31 @@ public class JavaRef implements IJavaRef {
 
   @NonNull
   public final String getEclipseProjectName() {
+    final String name = getEclipseProjectNameOrNull();
+    return name == null ? SLUtility.UNKNOWN_PROJECT : name;
+  }
+
+  @Nullable
+  public String getEclipseProjectNameOrNull() {
     if (f_eclipseProjectName == null)
-      return SLUtility.UNKNOWN_PROJECT;
+      return null;
     else
       return f_eclipseProjectName;
   }
 
   @NonNull
   public final String getPackageName() {
-    int index = f_typeNameFullyQualifiedSureLogic.indexOf('/');
-    if (index < 1)
-      return SLUtility.JAVA_DEFAULT_PACKAGE;
+    final String name = getPackageNameOrNull();
+    return name == null ? SLUtility.JAVA_DEFAULT_PACKAGE : name;
+  }
+
+  @Nullable
+  public String getPackageNameOrNull() {
+    int slashIndex = f_typeNameFullyQualifiedSureLogic.indexOf('/');
+    if (slashIndex < 1)
+      return null;
     else
-      return f_typeNameFullyQualifiedSureLogic.substring(0, index);
+      return f_typeNameFullyQualifiedSureLogic.substring(0, slashIndex);
   }
 
   @NonNull
@@ -289,14 +212,14 @@ public class JavaRef implements IJavaRef {
 
   @NonNull
   public final String getTypeName() {
-    final String typeNameDollarSign = getTypeNameDollarSign();
-    return typeNameDollarSign.replaceAll("\\$", ".");
+    int slashIndex = f_typeNameFullyQualifiedSureLogic.indexOf('/');
+    return f_typeNameFullyQualifiedSureLogic.substring(slashIndex + 1);
   }
 
   @NonNull
   public String getTypeNameDollarSign() {
-    int index = f_typeNameFullyQualifiedSureLogic.indexOf('/');
-    return f_typeNameFullyQualifiedSureLogic.substring(index + 1);
+    final String name = getTypeName();
+    return name.replaceAll("\\.", "$");
   }
 
   @NonNull
@@ -306,7 +229,7 @@ public class JavaRef implements IJavaRef {
 
   @NonNull
   public final String getTypeNameFullyQualified() {
-    return f_typeNameFullyQualifiedSureLogic.replaceAll("\\$|/", ".");
+    return f_typeNameFullyQualifiedSureLogic.replaceAll("/", ".");
   }
 
   @NonNull

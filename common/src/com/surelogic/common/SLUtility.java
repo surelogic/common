@@ -41,12 +41,119 @@ public final class SLUtility {
    */
   public static final String JAVA_DEFAULT_PACKAGE = "(default package)";
   public static final String UNKNOWN_PROJECT = "(unknown project)";
+  public static final String PACKAGE_INFO = "package-info";
   public static final String UTF8 = "UTF8";
   public static final String YES = "Yes";
   public static final String NO = "No";
   public static final String ECLIPSE_MARKER_TYPE_NAME = "com.surelogic.marker";
   public static final String PLATFORM_LINE_SEPARATOR = String.format("%n");
   public static final Object[] EMPTY_OBJECT_ARRAY = new Object[0];
+
+  /**
+   * Checks if the passed string is a valid Java identifier. Handles UNICODE
+   * names.
+   * 
+   * @param value
+   *          an identifier.
+   * @return {@code true} if the if the passed string is valid, {@code false}
+   *         otherwise.
+   */
+  public static boolean isValidJavaIdentifier(final String value) {
+    if (value == null)
+      return false;
+    if (value.length() == 0)
+      return false;
+    if (!Character.isJavaIdentifierStart(value.charAt(0)))
+      return false;
+    for (int i = 1; i < value.length(); i++) {
+      if (!Character.isJavaIdentifierPart(value.charAt(i)))
+        return false;
+    }
+    return true;
+  }
+
+  /**
+   * Checks if the passed string is a valid fully-qualified Java type name in a
+   * particular SureLogic format. Nested package names are separated by
+   * <tt>"."</tt>, the package name is separated from the type name by a "/"
+   * (which must always appear&mdash;even if the type is in the default
+   * package), and nested type names are separated by <tt>"."</tt>.
+   * <p>
+   * <tt>package-info</tt> files are handled as if they were a class. They can
+   * exist as a <tt>.java</tt> or <tt>.class</tt>.
+   * <p>
+   * Examples that would return {@code true}: <tt>java.lang/Object</tt>,
+   * <tt>java.util/Map.Entry</tt>,
+   * <tt>java.util.concurrent.locks/ReentrantReadWriteLock.ReadLock</tt>,
+   * <tt>/ClassInDefaultPkg</tt>, <tt>edu.afit.smallworld/package-info</tt>
+   * 
+   * @param value
+   *          a fully-qualified Java type name in the SureLogic format.
+   * @return {@code true} if the if the passed string is valid, {@code false}
+   *         otherwise.
+   */
+  public static boolean isValidTypeNameFullyQualifiedSureLogic(final String value) {
+    if (value == null)
+      return false;
+    if (value.length() == 0)
+      return false;
+    final int slashIndex = value.indexOf('/');
+    if (slashIndex == -1)
+      return false;
+
+    if (slashIndex > 0) {
+      /*
+       * Package part
+       */
+      final String pkgPart = value.substring(0, slashIndex);
+      if (!isValidDotSeparatedJavaIdentifier(pkgPart))
+        return false;
+    }
+
+    /*
+     * Type name
+     */
+    final String typePart = value.substring(slashIndex + 1);
+    if ("".equals(typePart))
+      return false;
+    if (PACKAGE_INFO.equals(typePart))
+      return true;
+    if (!isValidDotSeparatedJavaIdentifier(typePart))
+      return false;
+
+    return true;
+  }
+
+  /**
+   * Checks if the passed string is series of <tt>"."</tt> separated valid Java
+   * identifiers.
+   * <p>
+   * Examples that would return {@code true}: <tt>java.lang</tt>,
+   * <tt>java.util</tt>, <tt>Map.Entry</tt>, <tt>java.util.concurrent.locks</tt>, <tt>ClassInDefaultPkg</tt>, <tt>edu.afit.smallworld</tt>
+   * 
+   * @param value
+   *          a series of dot-separated Java identifiers.
+   * @return {@code true} if the if the passed string is valid, {@code false}
+   *         otherwise.
+   */
+  public static boolean isValidDotSeparatedJavaIdentifier(final String value) {
+    int lastDotIndex = 0;
+    while (true) {
+      int dotIndex = value.indexOf('.', lastDotIndex);
+      if (dotIndex == -1) {
+        final String id = value.substring(lastDotIndex);
+        if (!isValidJavaIdentifier(id))
+          return false;
+        break;
+      } else {
+        String id = value.substring(lastDotIndex, dotIndex);
+        if (!isValidJavaIdentifier(id))
+          return false;
+      }
+      lastDotIndex = dotIndex + 1;
+    }
+    return true;
+  }
 
   /**
    * The string identifier of the Flashlight client plug-in.
