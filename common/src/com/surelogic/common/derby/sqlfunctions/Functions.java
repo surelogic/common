@@ -193,11 +193,11 @@ public final class Functions {
             case 6:
                 return writes;
             case 7:
-                return readsUC;
-            case 8:
-                return writesUC;
-            case 9:
                 return hasHappensBefore ? "Y" : "N";
+            case 8:
+                return readsUC;
+            case 9:
+                return writesUC;
             default:
                 throw new IllegalArgumentException(i
                         + " is not a valid parameter index.");
