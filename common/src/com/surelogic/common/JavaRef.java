@@ -5,6 +5,7 @@ import com.surelogic.NotThreadSafe;
 import com.surelogic.Nullable;
 import com.surelogic.ThreadSafe;
 import com.surelogic.common.i18n.I18N;
+import com.surelogic.common.logging.SLLogger;
 
 /**
  * Provides an implementation of this class that should be extended by other
@@ -13,6 +14,12 @@ import com.surelogic.common.i18n.I18N;
  */
 @ThreadSafe
 public class JavaRef implements IJavaRef {
+
+  public static void main(String[] args) {
+    IJavaRef j = new Builder("/Object.Map.Foo").setWithin(Within.JAR_FILE).build();
+    System.out.println(j.getSimpleFileName());
+    System.out.println(j.getClasspathRelativePathname());
+  }
 
   /**
    * Builder for {@link IJavaRef} instances. Copy-and-modify is supported via
@@ -74,7 +81,7 @@ public class JavaRef implements IJavaRef {
   public static class Builder {
 
     protected Within f_within = Within.JAVA_FILE;
-    protected final String f_typeNameFullyQualifiedSureLogic;
+    protected String f_typeNameFullyQualifiedSureLogic;
     protected TypeType f_typeType = TypeType.CLASS;
     protected String f_eclipseProjectName;
     protected int f_lineNumber;
@@ -115,6 +122,61 @@ public class JavaRef implements IJavaRef {
 
     public Builder setWithin(Within value) {
       f_within = value;
+      return this;
+    }
+
+    /**
+     * Changes the type name this code reference refers to.
+     * <p>
+     * For example, if a builder, <tt>b</tt>, contains the full name
+     * <tt>"java.util/Map.Entry"</tt> and <tt>b.setTypeName("List")</tt> is
+     * invoked the full name will become <tt>"java.util/List"</tt>.
+     * 
+     * @param value
+     *          the new type name, ignored if not a valid Java type name. A
+     *          warning is logged if the value is ignored.
+     * @return a builder.
+     */
+    public Builder setTypeName(String value) {
+      if (SLUtility.isValidDotSeparatedJavaIdentifier(value)) {
+        final StringBuilder b = new StringBuilder(f_typeNameFullyQualifiedSureLogic);
+        int slashIndex = b.indexOf("/");
+        b.replace(slashIndex + 1, b.length(), value);
+        f_typeNameFullyQualifiedSureLogic = b.toString();
+      } else {
+        SLLogger.getLogger().warning(I18N.err(254, value));
+      }
+      return this;
+    }
+
+    /**
+     * Changes the package type name this code reference refers to.
+     * <p>
+     * For example, if a builder, <tt>b</tt>, contains the full name
+     * <tt>"java.util/Map.Entry"</tt> and
+     * <tt>b.setPackageName("org.apache.collections")</tt> is invoked the full
+     * name will become <tt>"org.apache.collections/Map.Entry"</tt>.
+     * 
+     * @param value
+     *          the new package name, ignored if not a valid Java type name. A
+     *          warning is logged if the value is ignored. Passing {@code null}
+     *          or <tt>""</tt> changes the package to the default package.
+     * @return a builder.
+     */
+    public Builder setPackageName(String value) {
+      final StringBuilder b = new StringBuilder(f_typeNameFullyQualifiedSureLogic);
+      int slashIndex = b.indexOf("/");
+      if (value == null)
+        value = "";
+      if ("".equals(value)) {
+        b.delete(0, slashIndex);
+      } else if (SLUtility.isValidDotSeparatedJavaIdentifier(value)) {
+        b.replace(0, slashIndex, value);
+      } else {
+        SLLogger.getLogger().warning(I18N.err(255, value));
+        return this;
+      }
+      f_typeNameFullyQualifiedSureLogic = b.toString();
       return this;
     }
 
@@ -305,6 +367,33 @@ public class JavaRef implements IJavaRef {
   @NonNull
   public final String getTypeNameFullyQualifiedSureLogic() {
     return f_typeNameFullyQualifiedSureLogic;
+  }
+
+  @NonNull
+  public String getSimpleFileName() {
+    final StringBuilder b = new StringBuilder(getTypeNameDollarSign());
+    if (getWithin() == Within.JAVA_FILE) {
+      /*
+       * The nested type is inside the .java file of the outermost type, if any
+       * nesting.
+       */
+      int dollarIndex = b.indexOf("$");
+      if (dollarIndex != -1) {
+        b.delete(dollarIndex, b.length());
+      }
+      b.append(".java");
+    } else {
+      b.append(".class");
+    }
+    return b.toString();
+  }
+
+  @NonNull
+  public String getClasspathRelativePathname() {
+    final StringBuilder b = new StringBuilder(getPackageNameSlash());
+    b.append('/');
+    b.append(getSimpleFileName());
+    return b.toString();
   }
 
   @Nullable

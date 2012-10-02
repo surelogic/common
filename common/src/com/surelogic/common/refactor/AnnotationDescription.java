@@ -155,12 +155,8 @@ public class AnnotationDescription implements Comparable<AnnotationDescription> 
 			if (cu == null) {
 				throw new IllegalArgumentException();
 			}
-			final int lastSeparator = cu.lastIndexOf('/');
-			if (lastSeparator >= 0) {
-				this.cu = cu.substring(lastSeparator+1);
-			} else {
-				this.cu = cu;
-			}
+			// the simple file name -- like TimingSource.java
+			this.cu = cu;
 			this.pakkage = pakkage;
 		}
 

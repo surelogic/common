@@ -227,6 +227,115 @@ public interface IJavaRef {
   @NonNull
   String getTypeNameFullyQualifiedSureLogic();
 
+  /**
+   * Generates the most likely simple file name that this refers to. For a full
+   * pathname relative to a point on the Java classpath use
+   * {@link #getClasspathRelativePathname()}.
+   * <p>
+   * A complexity is that if this refers to a nested type in a <tt>.java</tt>
+   * file the file is named according to the outermost type name only.
+   * <p>
+   * The table below lists some examples of what this method returns.
+   * <table border=1>
+   * <tr>
+   * <th>{@link #getTypeNameFullyQualifiedSureLogic()}</th>
+   * <th>{@link #getWithin()}</th>
+   * <th>{@link #getSimpleFileName()}</th>
+   * </tr>
+   * <tr>
+   * <td>com.surelogic/Editor</td>
+   * <td>{@link Within#JAVA_FILE}</td>
+   * <td>Editor.java</td>
+   * </tr>
+   * <tr>
+   * <td>com.surelogic/Editor.Builder</td>
+   * <td>{@link Within#JAVA_FILE}</td>
+   * <td>Editor.java</td>
+   * </tr>
+   * <tr>
+   * <td>/ClassInDefaultPkg</td>
+   * <td>{@link Within#JAVA_FILE}</td>
+   * <td>ClassInDefaultPkg.java</td>
+   * </tr>
+   * <tr>
+   * <td>java.lang/Object</td>
+   * <td>{@link Within#JAR_FILE}</td>
+   * <td>Object.class</td>
+   * </tr>
+   * <tr>
+   * <td>java.util/Map.Entry</td>
+   * <td>{@link Within#JAR_FILE}</td>
+   * <td>Map$Entry.class</td>
+   * </tr>
+   * <tr>
+   * <td>org.apache/Map.Entry</td>
+   * <td>{@link Within#CLASS_FILE}</td>
+   * <td>Map$Entry.class</td>
+   * </tr>
+   * </table>
+   * 
+   * @return a generated simple file name.
+   * 
+   * @see #getClasspathRelativePathname()
+   */
+  @NonNull
+  String getSimpleFileName();
+
+  /**
+   * Generates the most likely relative path and file name that this refers to.
+   * The returned pathname is relative to a point on the Java classpath. This
+   * may be a path on the filesystem or within a JAR file (to find out call
+   * {@link #getWithin()}). To obtain just the simple file name use
+   * {@link #getSimpleFileName()}.
+   * <p>
+   * A complexity is that if this refers to a nested type in a <tt>.java</tt>
+   * file the file is named according to the outermost type name only.
+   * <p>
+   * The table below lists some examples of what this method returns.
+   * <table border=1>
+   * <tr>
+   * <th>{@link #getTypeNameFullyQualifiedSureLogic()}</th>
+   * <th>{@link #getWithin()}</th>
+   * <th>{@link #getClasspathRelativePathname()}</th>
+   * </tr>
+   * <tr>
+   * <td>com.surelogic/Editor</td>
+   * <td>{@link Within#JAVA_FILE}</td>
+   * <td>com/surelogic/Editor.java</td>
+   * </tr>
+   * <tr>
+   * <td>com.surelogic/Editor.Builder</td>
+   * <td>{@link Within#JAVA_FILE}</td>
+   * <td>com/surelogic/Editor.java</td>
+   * </tr>
+   * <tr>
+   * <td>/ClassInDefaultPkg</td>
+   * <td>{@link Within#JAVA_FILE}</td>
+   * <td>ClassInDefaultPkg.java</td>
+   * </tr>
+   * <tr>
+   * <td>java.lang/Object</td>
+   * <td>{@link Within#JAR_FILE}</td>
+   * <td>java/lang/Object.class</td>
+   * </tr>
+   * <tr>
+   * <td>java.util/Map.Entry</td>
+   * <td>{@link Within#JAR_FILE}</td>
+   * <td>java/util/Map$Entry.class</td>
+   * </tr>
+   * <tr>
+   * <td>org.apache/Map.Entry</td>
+   * <td>{@link Within#CLASS_FILE}</td>
+   * <td>org/apache/Map$Entry.class</td>
+   * </tr>
+   * </table>
+   * 
+   * @return a generated path and file name relative to a point on the Java
+   *         classpath.
+   */
+  @NonNull
+  String getClasspathRelativePathname();
+
   @Nullable
   String getJavaId();
 
