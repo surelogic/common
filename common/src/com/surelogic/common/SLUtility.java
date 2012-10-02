@@ -48,6 +48,7 @@ public final class SLUtility {
   public static final String ECLIPSE_MARKER_TYPE_NAME = "com.surelogic.marker";
   public static final String PLATFORM_LINE_SEPARATOR = String.format("%n");
   public static final Object[] EMPTY_OBJECT_ARRAY = new Object[0];
+  public static final String JAVADOC_ANNOTATE_TAG = "annotate";
 
   /**
    * Checks if the passed string is a valid Java identifier. Handles UNICODE
