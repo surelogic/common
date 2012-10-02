@@ -15,12 +15,6 @@ import com.surelogic.common.logging.SLLogger;
 @ThreadSafe
 public class JavaRef implements IJavaRef {
 
-  public static void main(String[] args) {
-    IJavaRef j = new Builder("/Object.Map.Foo").setWithin(Within.JAR_FILE).build();
-    System.out.println(j.getSimpleFileName());
-    System.out.println(j.getClasspathRelativePathname());
-  }
-
   /**
    * Builder for {@link IJavaRef} instances. Copy-and-modify is supported via
    * {@link Builder#Builder(IJavaRef)}.
