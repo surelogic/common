@@ -110,17 +110,18 @@ public final class Functions {
         final long threadId;
         final String threadName;
         final Timestamp start;
-        Timestamp end;
         int reads;
         int writes;
         int readsUC;
         int writesUC;
+        final boolean hasHappensBefore;
+        Access lastAccess;
 
-        AccessBlock(Access first, boolean isStatic) {
+        AccessBlock(Access first, boolean isStatic, boolean hasHappensBefore) {
             threadId = first.threadId;
             threadName = first.threadName;
             start = first.ts;
-            end = first.ts;
+            lastAccess = first;
             if (first.isRead) {
                 reads++;
                 if (first.underConstruction) {
@@ -132,15 +133,20 @@ public final class Functions {
                     writesUC++;
                 }
             }
-
             this.isStatic = isStatic;
+            this.hasHappensBefore = hasHappensBefore;
         }
 
-        AccessBlock accumulate(ResultSet set) throws SQLException {
+        AccessBlock(Access first, boolean isStatic) {
+            this(first, isStatic, false);
+        }
+
+        AccessBlock accumulate(PreparedStatement hbSt, ResultSet set)
+                throws SQLException {
             while (set.next()) {
                 Access a = new Access(set, isStatic);
                 if (a.threadId == threadId) {
-                    end = a.ts;
+                    lastAccess = a;
                     if (a.isRead) {
                         reads++;
                         if (a.underConstruction) {
@@ -153,7 +159,20 @@ public final class Functions {
                         }
                     }
                 } else {
-                    return new AccessBlock(a, isStatic);
+                    boolean hasHappensBefore = false;
+                    hbSt.setLong(1, lastAccess.threadId);
+                    hbSt.setLong(2, a.threadId);
+                    hbSt.setTimestamp(3, lastAccess.ts);
+                    hbSt.setTimestamp(4, a.ts);
+                    ResultSet hbSet = hbSt.executeQuery();
+                    try {
+                        if (hbSet.next()) {
+                            hasHappensBefore = true;
+                        }
+                    } finally {
+                        hbSet.close();
+                    }
+                    return new AccessBlock(a, isStatic, hasHappensBefore);
                 }
             }
             return null;
@@ -168,7 +187,7 @@ public final class Functions {
             case 3:
                 return start;
             case 4:
-                return end;
+                return lastAccess.ts;
             case 5:
                 return reads;
             case 6:
@@ -177,6 +196,8 @@ public final class Functions {
                 return readsUC;
             case 8:
                 return writesUC;
+            case 9:
+                return hasHappensBefore ? "Y" : "N";
             default:
                 throw new IllegalArgumentException(i
                         + " is not a valid parameter index.");
@@ -186,25 +207,27 @@ public final class Functions {
 
     private static class RollupAccessesResultSet implements InvocationHandler {
 
-        ResultSet set;
+        final PreparedStatement hbSt;
+        final ResultSet set;
         AccessBlock block;
         AccessBlock next;
         boolean wasNull;
 
-        RollupAccessesResultSet(ResultSet set, boolean isStatic)
+        RollupAccessesResultSet(Connection conn, ResultSet set, boolean isStatic)
                 throws SQLException {
+            hbSt = conn.prepareStatement(QB.get("Accesses.happensBefore"));
             this.set = set;
             if (set.next()) {
                 next = new AccessBlock(new Access(set, isStatic), isStatic);
             }
         }
 
-        static ResultSet create(ResultSet set, boolean isStatic)
+        static ResultSet create(Connection conn, ResultSet set, boolean isStatic)
                 throws IllegalArgumentException, SQLException {
             return (ResultSet) Proxy.newProxyInstance(
                     ResultSet.class.getClassLoader(),
                     new Class[] { ResultSet.class },
-                    new RollupAccessesResultSet(set, isStatic));
+                    new RollupAccessesResultSet(conn, set, isStatic));
         }
 
         @Override
@@ -216,10 +239,11 @@ public final class Functions {
                     return false;
                 }
                 block = next;
-                next = block.accumulate(set);
+                next = block.accumulate(hbSt, set);
                 return true;
             } else if ("close".equals(methodName)) {
                 set.close();
+                hbSt.close();
                 return null;
             } else if (methodName.startsWith("get")) {
                 Object o = block.get((Integer) args[0]);
@@ -235,12 +259,15 @@ public final class Functions {
 
     public static ResultSet staticAccessSummary(long fieldId) {
         try {
+            // We can't use the framework code here, because we have to leave
+            // the result sets open when we return from this block.
             Connection conn = DefaultConnection.getInstance()
                     .readOnlyConnection();
             PreparedStatement st = conn.prepareStatement(QB
                     .get("Accesses.selectByField"));
             st.setLong(1, fieldId);
-            return RollupAccessesResultSet.create(st.executeQuery(), true);
+            return RollupAccessesResultSet
+                    .create(conn, st.executeQuery(), true);
         } catch (SQLException e) {
             throw new IllegalStateException(e);
         }
@@ -249,13 +276,16 @@ public final class Functions {
     public static ResultSet accessSummary(long fieldId, long receiverId)
             throws SQLException {
         try {
+            // We can't use the framework code here, because we have to leave
+            // the result sets open when we return from this block.
             Connection conn = DefaultConnection.getInstance()
                     .readOnlyConnection();
             PreparedStatement st = conn.prepareStatement(QB
                     .get("Accesses.selectByFieldAndReceiver"));
             st.setLong(1, fieldId);
             st.setLong(2, receiverId);
-            return RollupAccessesResultSet.create(st.executeQuery(), false);
+            return RollupAccessesResultSet.create(conn, st.executeQuery(),
+                    false);
         } catch (SQLException e) {
             throw new IllegalStateException(e);
         }
