@@ -15,7 +15,6 @@ public class RegressionUtility {
 	public static final String ORACLE = "oracle";
 	public static final String ORACLE_JAVAC = "oracleJavac";
 	public static final String ORACLE_SNAPSHOT = "snapshotOracle";
-    public static final boolean useSnapshotOracles = true;
 	
 	public static class Filter implements FilenameFilter {
 		private final String prefix, suffix;
@@ -120,10 +119,8 @@ public class RegressionUtility {
 	    Date date = new Date();
 	    DateFormat format = new SimpleDateFormat("yyyyMMdd");
 	    //oracleName = "oracle"+format.format(date)+SeaSnapshot.SUFFIX;
-	    if (useSnapshotOracles) {
-	        return ORACLE_SNAPSHOT + format.format(date) + JSURE_SNAPSHOT_SUFFIX;
-	    }
-	    return ORACLE_JAVAC + format.format(date) + JSURE_SNAPSHOT_SUFFIX;	
+	    return ORACLE_SNAPSHOT + format.format(date) + JSURE_SNAPSHOT_SUFFIX;	    
+	    //return ORACLE_JAVAC + format.format(date) + JSURE_SNAPSHOT_SUFFIX;	
 	}
 	
 	public static Set<String> readLinesAsSet(File lines) throws IOException {
