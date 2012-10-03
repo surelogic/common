@@ -9,7 +9,7 @@ import com.surelogic.common.JavaRef.Builder;
  * Interface for referencing a location in Java code&mdash;source or binary.
  * <p>
  * Concrete instances or this interface are constructed using
- * {@link JavaRef.Builder} &mdash;copy-and-modify is supported via
+ * {@link JavaRef.Builder}&mdash;copy-and-modify is supported via
  * {@link Builder#Builder(IJavaRef)}.
  */
 @ThreadSafe

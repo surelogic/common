@@ -1,9 +1,9 @@
 package com.surelogic.common;
 
+import com.surelogic.Immutable;
 import com.surelogic.NonNull;
 import com.surelogic.NotThreadSafe;
 import com.surelogic.Nullable;
-import com.surelogic.ThreadSafe;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.logging.SLLogger;
 
@@ -12,7 +12,7 @@ import com.surelogic.common.logging.SLLogger;
  * implementations to get the details of the {@link IJavaRef} correct. Both the
  * {@link Builder} and the type should be extended.
  */
-@ThreadSafe
+@Immutable
 public class JavaRef implements IJavaRef {
 
   /**
