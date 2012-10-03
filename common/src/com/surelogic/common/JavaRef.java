@@ -15,6 +15,29 @@ import com.surelogic.common.logging.SLLogger;
 @Immutable
 public class JavaRef implements IJavaRef {
 
+  public static void main(String[] args) {
+    IJavaRef r = new Builder("org.apache/Foo.Entry.A").setCUName("Bar.java").setEclipseProjectName("AntPrj").build();
+
+    System.out.println(((JavaRef) r).getEclipseProjectNameOrNullHelper());
+    System.out.println(((JavaRef) r).getTypeNameFullyQualifiedSureLogicHelper());
+    System.out.println(((JavaRef) r).getCUNameOrNullHelper());
+    System.out.println(r.getSimpleFileName());
+    System.out.println(r.getClasspathRelativePathname());
+    System.out.println(r.toString());
+    System.out.println(r.getClasspathRelativePathname());
+    System.out.println(r.getTypeNameFullyQualifiedSureLogic());
+    System.out.println(r.getPackageName());
+    System.out.println(r.getPackageNameOrNull());
+    System.out.println(r.getPackageNameSlash());
+    System.out.println(r.getTypeName());
+    System.out.println(r.getTypeNameDollarSign());
+    System.out.println(r.getTypeNameFullyQualified());
+    System.out.println(r.getEclipseProjectName());
+    System.out.println(r.getEclipseProjectNameOrNull());
+    System.out.println(r.getSimpleFileName());
+    System.out.println(r.getClasspathRelativePathname());
+  }
+
   /**
    * Builder for {@link IJavaRef} instances. Copy-and-modify is supported via
    * {@link Builder#Builder(IJavaRef)}.
@@ -74,10 +97,13 @@ public class JavaRef implements IJavaRef {
   @NotThreadSafe
   public static class Builder {
 
+    @NonNull
     protected Within f_within = Within.JAVA_FILE;
+    private String f_cuName;
     protected String f_typeNameFullyQualifiedSureLogic;
+    @NonNull
     protected TypeType f_typeType = TypeType.CLASS;
-    protected String f_eclipseProjectName;
+    private String f_eclipseProjectName;
     protected int f_lineNumber;
     protected int f_offset;
     protected int f_length;
@@ -111,11 +137,46 @@ public class JavaRef implements IJavaRef {
      *          {@link SLUtility#isValidTypeNameFullyQualifiedSureLogic(String)}
      */
     public Builder(@NonNull String typeNameFullyQualifiedSureLogic) {
+      if (typeNameFullyQualifiedSureLogic == null)
+        throw new IllegalArgumentException(I18N.err(44, "typeNameFullyQualifiedSureLogic"));
       f_typeNameFullyQualifiedSureLogic = typeNameFullyQualifiedSureLogic;
     }
 
     public Builder setWithin(Within value) {
-      f_within = value;
+      if (value != null)
+        f_within = value;
+      return this;
+    }
+
+    /**
+     * This method is used to explicitly set the name of the <tt>.java</tt>
+     * file&mdash;the compilation unit&mdash; when the file name is not based
+     * upon the type name this code refers to. This can occur when more then two
+     * top-level types are declared in the same compilation unit.
+     * <p>
+     * This setting only makes sense if we are within <tt>.java</tt> file (
+     * {@link Within#JAVA_FILE}) because that is the only time the CU name can
+     * be different from the type name. If it is set on a binary, the setting is
+     * ignored.
+     * 
+     * @param value
+     *          the name of the file. <tt>.java</tt> may suffix the name or
+     *          not&mdash;if not it will be added automatically. The name is
+     *          ignored if the simple file name (no extension) is not a valid
+     *          Java type name. A warning is logged if the value is ignored.
+     * @return a builder.
+     */
+    public Builder setCUName(String value) {
+      if (value == null)
+        return this;
+      final int suffix = value.indexOf(".java");
+      if (suffix != -1)
+        value = value.substring(0, suffix);
+      if (SLUtility.isValidJavaIdentifier(value)) {
+        f_cuName = value;
+      } else {
+        SLLogger.getLogger().warning(I18N.err(256, value));
+      }
       return this;
     }
 
@@ -175,7 +236,8 @@ public class JavaRef implements IJavaRef {
     }
 
     public Builder setTypeType(TypeType value) {
-      f_typeType = value;
+      if (value != null)
+        f_typeType = value;
       return this;
     }
 
@@ -209,9 +271,23 @@ public class JavaRef implements IJavaRef {
       return this;
     }
 
+    protected final String getEncodedNames() {
+      final StringBuilder b = new StringBuilder();
+      if (f_eclipseProjectName != null)
+        b.append(f_eclipseProjectName);
+      b.append(':');
+      b.append(f_typeNameFullyQualifiedSureLogic);
+      b.append('|');
+      if (f_cuName != null && f_within == Within.JAVA_FILE)
+        b.append(f_cuName);
+      return b.toString();
+    }
+
     public IJavaRef build() {
-      return new JavaRef(f_within, f_typeNameFullyQualifiedSureLogic, f_typeType, f_eclipseProjectName, f_lineNumber, f_offset,
-          f_length, f_javaId, f_enclosingJavaId);
+      if (!SLUtility.isValidTypeNameFullyQualifiedSureLogic(f_typeNameFullyQualifiedSureLogic))
+        throw new IllegalArgumentException(I18N.err(253, f_typeNameFullyQualifiedSureLogic));
+
+      return new JavaRef(f_within, getEncodedNames(), f_typeType, f_lineNumber, f_offset, f_length, f_javaId, f_enclosingJavaId);
     }
 
     public IJavaRef buildOrNullOnFailure() {
@@ -228,17 +304,55 @@ public class JavaRef implements IJavaRef {
   private final Within f_within;
 
   /**
-   * This string is valid according to
+   * This encoded name string is formatted as follows:
+   * <p>
+   * <i>project-name</i><tt>:</tt><i>type-name</i><tt>|</tt><i>CU-name</i>
+   * <p>
+   * <b>Project name</b>: This is the Eclipse project name if known.
+   * <p>
+   * <b>Type name</b> The type name is mandatory and must be valid according to
    * {@link SLUtility#isValidTypeNameFullyQualifiedSureLogic(String)}.
+   * <p>
+   * <b>Compilation Unit (.java file) name:</b> In the rare case the type name
+   * and the CU name don't match because more than one top-level type declared
+   * in a CU. The encoded string assumes <tt>.java</tt> as the file suffix and
+   * does not include it. Note that the CU name can only be different from the
+   * type name if and only if {@link #getWithin()} == {@link Within#JAVA_FILE}.
+   * <p>
+   * For example a value of <tt>":org.apache/Foo|Bar"</tt> would indicate the
+   * top-level type <tt>Foo</tt> is declared in the CU <tt>Bar.java</tt> in the
+   * package <tt>org.apache</tt>. The Eclipse project is unknown.
    * 
    * @see IJavaRef#getTypeNameFullyQualifiedSureLogic()
    */
   @NonNull
-  private final String f_typeNameFullyQualifiedSureLogic;
+  private final String f_encodedNames;
+
+  @Nullable
+  private String getEclipseProjectNameOrNullHelper() {
+    final int colonIndex = f_encodedNames.indexOf(':');
+    if (colonIndex < 1)
+      return null;
+    else
+      return f_encodedNames.substring(0, colonIndex);
+  }
+
+  private String getTypeNameFullyQualifiedSureLogicHelper() {
+    final int colonIndex = f_encodedNames.indexOf(':');
+    final int barIndex = f_encodedNames.indexOf('|');
+    return f_encodedNames.substring(colonIndex + 1, barIndex);
+  }
+
+  private String getCUNameOrNullHelper() {
+    final int barIndex = f_encodedNames.indexOf('|');
+    if (f_encodedNames.length() > barIndex)
+      return f_encodedNames.substring(barIndex + 1);
+    else
+      return null;
+  }
+
   @NonNull
   private final TypeType f_typeType;
-  @Nullable
-  private final String f_eclipseProjectName;
   /**
    * -1 indicates not valid.
    */
@@ -256,23 +370,12 @@ public class JavaRef implements IJavaRef {
   @Nullable
   private final String f_enclosingJavaId;
 
-  protected JavaRef(final @NonNull Within within, final @NonNull String typeNameFullyQualifiedSureLogic,
-      final @Nullable TypeType typeTypeOrNullifUnknown, final @Nullable String eclipseProjectNameOrNullIfUnknown,
+  protected JavaRef(final @NonNull Within within, final @NonNull String encodedNames, final @NonNull TypeType typeType,
       final int lineNumber, final int offset, final int length, final @Nullable String javaIdOrNull,
       final @Nullable String enclosingJavaIdOrNull) {
-    if (within == null)
-      throw new IllegalArgumentException(I18N.err(44, "within"));
     f_within = within;
-    if (typeNameFullyQualifiedSureLogic == null)
-      throw new IllegalArgumentException(I18N.err(44, "typeNameFullyQualifiedSureLogic"));
-    if (!SLUtility.isValidTypeNameFullyQualifiedSureLogic(typeNameFullyQualifiedSureLogic))
-      throw new IllegalArgumentException(I18N.err(253, typeNameFullyQualifiedSureLogic));
-    f_typeNameFullyQualifiedSureLogic = typeNameFullyQualifiedSureLogic;
-    if (typeTypeOrNullifUnknown == null)
-      f_typeType = TypeType.CLASS; // default
-    else
-      f_typeType = typeTypeOrNullifUnknown;
-    f_eclipseProjectName = eclipseProjectNameOrNullIfUnknown;
+    f_encodedNames = encodedNames;
+    f_typeType = typeType;
     f_lineNumber = lineNumber > 0 && lineNumber != Integer.MAX_VALUE ? lineNumber : -1;
     f_offset = offset > 0 && offset != Integer.MAX_VALUE ? offset : -1;
     f_length = length > 0 && length != Integer.MAX_VALUE ? length : -1;
@@ -309,10 +412,11 @@ public class JavaRef implements IJavaRef {
 
   @Nullable
   public String getEclipseProjectNameOrNull() {
-    if (f_eclipseProjectName == null)
+    final String name = getEclipseProjectNameOrNullHelper();
+    if (name == null)
       return null;
     else
-      return f_eclipseProjectName;
+      return name;
   }
 
   @NonNull
@@ -323,11 +427,12 @@ public class JavaRef implements IJavaRef {
 
   @Nullable
   public String getPackageNameOrNull() {
-    int slashIndex = f_typeNameFullyQualifiedSureLogic.indexOf('/');
+    final String name = getTypeNameFullyQualifiedSureLogicHelper();
+    int slashIndex = name.indexOf('/');
     if (slashIndex < 1)
       return null;
     else
-      return f_typeNameFullyQualifiedSureLogic.substring(0, slashIndex);
+      return name.substring(0, slashIndex);
   }
 
   @NonNull
@@ -338,8 +443,9 @@ public class JavaRef implements IJavaRef {
 
   @NonNull
   public final String getTypeName() {
-    int slashIndex = f_typeNameFullyQualifiedSureLogic.indexOf('/');
-    return f_typeNameFullyQualifiedSureLogic.substring(slashIndex + 1);
+    final String name = getTypeNameFullyQualifiedSureLogicHelper();
+    int slashIndex = name.indexOf('/');
+    return name.substring(slashIndex + 1);
   }
 
   @NonNull
@@ -355,25 +461,35 @@ public class JavaRef implements IJavaRef {
 
   @NonNull
   public final String getTypeNameFullyQualified() {
-    return f_typeNameFullyQualifiedSureLogic.replaceAll("/", ".");
+    final String name = getTypeNameFullyQualifiedSureLogicHelper();
+    return name.replaceAll("/", ".");
   }
 
   @NonNull
   public final String getTypeNameFullyQualifiedSureLogic() {
-    return f_typeNameFullyQualifiedSureLogic;
+    return getTypeNameFullyQualifiedSureLogicHelper();
   }
 
   @NonNull
   public String getSimpleFileName() {
     final StringBuilder b = new StringBuilder(getTypeNameDollarSign());
     if (getWithin() == Within.JAVA_FILE) {
-      /*
-       * The nested type is inside the .java file of the outermost type, if any
-       * nesting.
-       */
-      int dollarIndex = b.indexOf("$");
-      if (dollarIndex != -1) {
-        b.delete(dollarIndex, b.length());
+      final String name = getCUNameOrNullHelper();
+      if (name == null) {
+        /*
+         * The nested type is inside the .java file of the outermost type, if
+         * any nesting.
+         */
+        int dollarIndex = b.indexOf("$");
+        if (dollarIndex != -1) {
+          b.delete(dollarIndex, b.length());
+        }
+      } else {
+        /*
+         * The type must is declared at the top-level in a different file.
+         */
+        b.setLength(0); // clear
+        b.append(name);
       }
       b.append(".java");
     } else {
@@ -402,15 +518,15 @@ public class JavaRef implements IJavaRef {
 
   public Long getHash() {
     if (f_lineNumber != -1)
-      return Long.valueOf(f_typeNameFullyQualifiedSureLogic.hashCode() + f_lineNumber);
+      return Long.valueOf(f_encodedNames.hashCode() + f_lineNumber);
     else
-      return Long.valueOf(f_typeNameFullyQualifiedSureLogic.hashCode());
+      return Long.valueOf(f_encodedNames.hashCode());
   }
 
   @Override
   public String toString() {
     final StringBuilder b = new StringBuilder("JavaRef(");
-    b.append(f_typeNameFullyQualifiedSureLogic);
+    b.append(f_encodedNames);
     b.append(",within=").append(f_within);
     b.append(",typetype=").append(f_typeType);
     b.append(",line=").append(f_lineNumber);
