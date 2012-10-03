@@ -344,4 +344,17 @@ public interface IJavaRef {
 
   @NonNull
   Long getHash();
+
+  /**
+   * Gets an encoded text string that represents the data in this code
+   * reference. It is suitable for persistence, for example, in an XML
+   * attribute. The returned string can be restored to a code reference via
+   * {@link JavaRef#getInstanceFrom(String)}.
+   * 
+   * @return an encoded text string that represents the data in this code
+   *         reference.
+   * @see JavaRef#getInstanceFrom(String)
+   */
+  @NonNull
+  String encodeForPersistence();
 }
