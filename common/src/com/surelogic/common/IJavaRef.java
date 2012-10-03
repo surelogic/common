@@ -11,6 +11,10 @@ import com.surelogic.common.JavaRef.Builder;
  * Concrete instances or this interface are constructed using
  * {@link JavaRef.Builder}&mdash;copy-and-modify is supported via
  * {@link Builder#Builder(IJavaRef)}.
+ * <p>
+ * Encoding into a text string (via {@link #encodeForPersistence()}) and
+ * decoding back into an instance (via {@link JavaRef#getInstanceFrom(String)})
+ * are supported, for example, to persist to and restore from an XML attribute.
  */
 @ThreadSafe
 public interface IJavaRef {

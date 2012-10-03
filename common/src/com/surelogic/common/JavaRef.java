@@ -416,7 +416,7 @@ public class JavaRef implements IJavaRef {
   }
 
   @Nullable
-  public String getEclipseProjectNameOrNull() {
+  public final String getEclipseProjectNameOrNull() {
     final String name = getEclipseProjectNameOrNullHelper();
     if (name == null)
       return null;
@@ -431,7 +431,7 @@ public class JavaRef implements IJavaRef {
   }
 
   @Nullable
-  public String getPackageNameOrNull() {
+  public final String getPackageNameOrNull() {
     final String name = getTypeNameFullyQualifiedSureLogicHelper();
     int slashIndex = name.indexOf('/');
     if (slashIndex < 1)
@@ -441,7 +441,7 @@ public class JavaRef implements IJavaRef {
   }
 
   @NonNull
-  public String getPackageNameSlash() {
+  public final String getPackageNameSlash() {
     final String name = getPackageNameOrNull();
     return name == null ? "" : name.replaceAll("\\.", "/");
   }
@@ -454,7 +454,7 @@ public class JavaRef implements IJavaRef {
   }
 
   @NonNull
-  public String getTypeNameDollarSign() {
+  public final String getTypeNameDollarSign() {
     String name = getTypeName();
     return name.replaceAll("\\.", "\\$");
   }
@@ -476,7 +476,7 @@ public class JavaRef implements IJavaRef {
   }
 
   @NonNull
-  public String getSimpleFileName() {
+  public final String getSimpleFileName() {
     final StringBuilder b = new StringBuilder(getTypeNameDollarSign());
     if (getWithin() == Within.JAVA_FILE) {
       final String name = getCUNameOrNullHelper();
@@ -504,7 +504,7 @@ public class JavaRef implements IJavaRef {
   }
 
   @NonNull
-  public String getClasspathRelativePathname() {
+  public final String getClasspathRelativePathname() {
     final StringBuilder b = new StringBuilder(getPackageNameSlash());
     b.append('/');
     b.append(getSimpleFileName());
@@ -521,7 +521,7 @@ public class JavaRef implements IJavaRef {
     return f_enclosingJavaId;
   }
 
-  public Long getHash() {
+  public final Long getHash() {
     if (f_lineNumber != -1)
       return Long.valueOf(f_encodedNames.hashCode() + f_lineNumber);
     else
@@ -541,48 +541,65 @@ public class JavaRef implements IJavaRef {
     return b.toString();
   }
 
-  public String encodeForPersistence() {
-    return f_encodedNames + "|" + f_within + "|" + f_typeType + "|" + f_lineNumber + "|" + f_offset + "|" + f_length + "|"
-        + (f_javaId == null ? "" : f_javaId) + "|" + (f_enclosingJavaId == null ? "" : f_javaId) + "|";
+  public final String encodeForPersistence() {
+    /*
+     * Make sure this matches the getInstanceFrom() method below!
+     * 
+     * Also if this is output is changed in any way create a new version prefix.
+     * Also note that the getInstanceFrom() method will need to support both the
+     * old and new versions of the encoded string.
+     */
+    return ENCODE_V1 + f_encodedNames + "|" + f_within + "|" + f_typeType + "|" + f_lineNumber + "|" + f_offset + "|" + f_length
+        + "|" + (f_javaId == null ? "" : f_javaId) + "|" + (f_enclosingJavaId == null ? "" : f_javaId) + "|";
   }
+
+  public static final String ENCODE_V1 = "V1->";
 
   /**
    * Constructs a code reference from a text string produced by
-   * {@link IJavaRef#encodeForPersistence()}. The behavior is undefined if the
-   * string format is invalid, for example, exceptions could be thrown.
+   * {@link IJavaRef#encodeForPersistence()}. This method will fail if the
+   * string format is invalid, or is in an unsupported version&mdash;some sort
+   * of exception will be thrown.
    * 
    * @param encodedForPersistence
    *          a text string produced by {@link IJavaRef#encodeForPersistence()}.
    * @return a code reference.
+   * @see IJavaRef#encodeForPersistence()
    */
-  public static IJavaRef getInstanceFrom(String encodedForPersistence) {
-    final StringBuilder b = new StringBuilder(encodedForPersistence);
-    final String eclipseProjectName = toNext(":", b);
-    final String typeNameFullyQualifiedSureLogic = toNext("|", b);
-    final String cuName = toNext("|", b);
-    final String withinStr = toNext("|", b);
-    final String typeTypeStr = toNext("|", b);
-    final String lineNumberStr = toNext("|", b);
-    final String offsetStr = toNext("|", b);
-    final String lengthStr = toNext("|", b);
-    final String javaId = toNext("|", b);
-    final String enclosingJavaId = toNext("|", b);
+  @NonNull
+  public static IJavaRef getInstanceFrom(@NonNull String encodedForPersistence) {
+    if (encodedForPersistence == null)
+      throw new IllegalArgumentException(I18N.err(44, "encodedForPersistence"));
+    if (encodedForPersistence.startsWith(ENCODE_V1)) {
+      final StringBuilder b = new StringBuilder(encodedForPersistence.substring(ENCODE_V1.length()));
+      final String eclipseProjectName = toNext(":", b);
+      final String typeNameFullyQualifiedSureLogic = toNext("|", b);
+      final String cuName = toNext("|", b);
+      final String withinStr = toNext("|", b);
+      final String typeTypeStr = toNext("|", b);
+      final String lineNumberStr = toNext("|", b);
+      final String offsetStr = toNext("|", b);
+      final String lengthStr = toNext("|", b);
+      final String javaId = toNext("|", b);
+      final String enclosingJavaId = toNext("|", b);
 
-    final Builder builder = new Builder(typeNameFullyQualifiedSureLogic);
-    builder.setWithin(Within.valueOf(withinStr));
-    builder.setTypeType(TypeType.valueOf(typeTypeStr));
-    if (!"".equals(eclipseProjectName))
-      builder.setEclipseProjectName(eclipseProjectName);
-    if (!"".equals(cuName))
-      builder.setCUName(cuName);
-    builder.setLineNumber(Integer.parseInt(lineNumberStr));
-    builder.setOffset(Integer.parseInt(offsetStr));
-    builder.setLength(Integer.parseInt(lengthStr));
-    if (!"".equals(javaId))
-      builder.setJavaId(javaId);
-    if (!"".equals(enclosingJavaId))
-      builder.setEnclosingJavaId(enclosingJavaId);
-    return builder.build();
+      final Builder builder = new Builder(typeNameFullyQualifiedSureLogic);
+      builder.setWithin(Within.valueOf(withinStr));
+      builder.setTypeType(TypeType.valueOf(typeTypeStr));
+      if (!"".equals(eclipseProjectName))
+        builder.setEclipseProjectName(eclipseProjectName);
+      if (!"".equals(cuName))
+        builder.setCUName(cuName);
+      builder.setLineNumber(Integer.parseInt(lineNumberStr));
+      builder.setOffset(Integer.parseInt(offsetStr));
+      builder.setLength(Integer.parseInt(lengthStr));
+      if (!"".equals(javaId))
+        builder.setJavaId(javaId);
+      if (!"".equals(enclosingJavaId))
+        builder.setEnclosingJavaId(enclosingJavaId);
+      return builder.build();
+    } else
+      throw new IllegalArgumentException(I18N.err(260, encodedForPersistence));
   }
 
   private static String toNext(final String str, final StringBuilder b) {
@@ -591,5 +608,4 @@ public class JavaRef implements IJavaRef {
     b.delete(0, barIndex + 1);
     return result;
   }
-
 }
