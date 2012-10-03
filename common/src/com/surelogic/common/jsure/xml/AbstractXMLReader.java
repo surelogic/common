@@ -82,7 +82,6 @@ public abstract class AbstractXMLReader extends NestedXMLReader {
   public static final String TIMEOUT = "timeout";
   public static final String VOUCHED = "vouched";
   public static final String CONSISTENT = "consistent";
-  public static final String ENCLOSED_IN_FOLDER = "enclosed-in-folder";
   public static final String FOLDER_LOGIC_OPERATOR = "folder-logic-operator";
 
   /**
