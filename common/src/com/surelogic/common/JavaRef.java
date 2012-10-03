@@ -19,7 +19,14 @@ public class JavaRef implements IJavaRef {
     IJavaRef r = new Builder("org.apache/Foo.Entry.A").setCUName("Bar.java").setEclipseProjectName("AntPrj").build();
 
     String s = r.encodeForPersistence();
-    r = getInstanceFrom(s);
+    IJavaRef r1 = getInstanceFrom(s);
+
+    System.out.println("r == r1 : " + (((JavaRef) r).f_encodedNames == ((JavaRef) r1).f_encodedNames));
+    IJavaRef r2 = new Builder(r).setOffset(45).build();
+
+    System.out.println("r :" + r);
+    System.out.println("r2:" + r2);
+    System.out.println("r == r2 : " + (((JavaRef) r).f_encodedNames == ((JavaRef) r2).f_encodedNames));
 
     System.out.println(((JavaRef) r).getEclipseProjectNameOrNullHelper());
     System.out.println(((JavaRef) r).getTypeNameFullyQualifiedSureLogicHelper());
@@ -56,6 +63,12 @@ public class JavaRef implements IJavaRef {
    * <th>Default</th>
    * </tr>
    * <tr>
+   * <td>{@link #setCUName(String)}</td>
+   * <td><tt>.java</tt> file name in the very rare case that it is different
+   * from the type name.</td>
+   * <td>{@code null}</td>
+   * </tr>
+   * <tr>
    * <td>{@link #setEclipseProjectName(String)}</td>
    * <td>the Eclipse project name the code reference is within</td>
    * <td>{@code null}</td>
@@ -84,6 +97,17 @@ public class JavaRef implements IJavaRef {
    * <td>{@link #setOffset(int)}</td>
    * <td>the character offset of the code reference in the source file</td>
    * <td>-1</td>
+   * </tr>
+   * <tr>
+   * <td>{@link #setPackageName(String)}</td>
+   * <td>the package name this reference is within</td>
+   * <td>the name given to construct this builder</td>
+   * </tr>
+   * <tr>
+   * <td>{@link #setTypeName(String)}</td>
+   * <td>the simple type name this reference is within, including nested
+   * types&mdash;just not the package name</td>
+   * <td>the name given to construct this builder</td>
    * </tr>
    * <tr>
    * <td>{@link #setTypeType(IJavaRef.TypeType)}</td>
@@ -115,6 +139,9 @@ public class JavaRef implements IJavaRef {
     protected String f_javaId;
     protected String f_enclosingJavaId;
 
+    // to try to alias of encoded names (saves memory)
+    private String f_copyEncodedNamesAlias;
+
     /**
      * Constructs a new builder that allows copy-then-modify from another code
      * location reference.
@@ -123,15 +150,21 @@ public class JavaRef implements IJavaRef {
      *          a code location reference.
      */
     public Builder(IJavaRef copy) {
-      f_within = copy.getWithin();
-      f_typeNameFullyQualifiedSureLogic = copy.getTypeNameFullyQualifiedSureLogic();
-      f_typeType = copy.getTypeType();
-      f_eclipseProjectName = copy.getEclipseProjectName();
-      f_lineNumber = copy.getLineNumber();
-      f_offset = copy.getOffset();
-      f_length = copy.getLength();
-      f_javaId = copy.getJavaId();
-      f_enclosingJavaId = copy.getEnclosingJavaId();
+      if (!(copy instanceof JavaRef))
+        throw new IllegalArgumentException(I18N.err(261, copy.getClass().getName(), JavaRef.class.getName()));
+      final JavaRef c = (JavaRef) copy;
+      f_within = c.f_within;
+      f_eclipseProjectName = c.getEclipseProjectNameOrNullHelper();
+      f_typeNameFullyQualifiedSureLogic = c.getTypeNameFullyQualifiedSureLogicHelper();
+      f_cuName = c.getCUNameOrNullHelper();
+      f_typeType = c.f_typeType;
+      f_lineNumber = c.f_lineNumber;
+      f_offset = c.f_offset;
+      f_length = c.f_length;
+      f_javaId = c.f_javaId;
+      f_enclosingJavaId = c.f_enclosingJavaId;
+
+      f_copyEncodedNamesAlias = c.f_encodedNames;
     }
 
     /**
@@ -147,6 +180,14 @@ public class JavaRef implements IJavaRef {
       f_typeNameFullyQualifiedSureLogic = typeNameFullyQualifiedSureLogic;
     }
 
+    /**
+     * Sets if this code reference is within a <tt>.java</tt> file, a
+     * <tt>.class</tt> file, or a <tt>.jar</tt> file.
+     * 
+     * @param value
+     *          what this code reference is within.
+     * @return this builder.
+     */
     public Builder setWithin(Within value) {
       if (value != null)
         f_within = value;
@@ -169,7 +210,7 @@ public class JavaRef implements IJavaRef {
      *          not&mdash;if not it will be added automatically. The name is
      *          ignored if the simple file name (no extension) is not a valid
      *          Java type name. A warning is logged if the value is ignored.
-     * @return a builder.
+     * @return this builder.
      */
     public Builder setCUName(String value) {
       if (value == null)
@@ -195,7 +236,7 @@ public class JavaRef implements IJavaRef {
      * @param value
      *          the new type name, ignored if not a valid Java type name. A
      *          warning is logged if the value is ignored.
-     * @return a builder.
+     * @return this builder.
      */
     public Builder setTypeName(String value) {
       if (SLUtility.isValidDotSeparatedJavaIdentifier(value)) {
@@ -221,7 +262,7 @@ public class JavaRef implements IJavaRef {
      *          the new package name, ignored if not a valid Java type name. A
      *          warning is logged if the value is ignored. Passing {@code null}
      *          or <tt>""</tt> changes the package to the default package.
-     * @return a builder.
+     * @return this builder.
      */
     public Builder setPackageName(String value) {
       final StringBuilder b = new StringBuilder(f_typeNameFullyQualifiedSureLogic);
@@ -240,37 +281,87 @@ public class JavaRef implements IJavaRef {
       return this;
     }
 
+    /**
+     * Sets the type of Java type this reference is within. It must be either a
+     * <tt>class</tt>, an <tt>enum</tt>, or an <tt>interface</tt>.
+     * 
+     * @param value
+     *          the type of Java type this reference is within.
+     * @return this builder.
+     */
     public Builder setTypeType(TypeType value) {
       if (value != null)
         f_typeType = value;
       return this;
     }
 
+    /**
+     * Sets the Eclipse project name the code reference is within.
+     * 
+     * @param value
+     *          the Eclipse project name the code reference is within.
+     * @return this builder.
+     */
     public Builder setEclipseProjectName(String value) {
       f_eclipseProjectName = value;
       return this;
     }
 
+    /**
+     * Sets the line number of the code reference in the source file.
+     * 
+     * @param value
+     *          the line number of the code reference in the source file
+     * @return this builder.
+     */
     public Builder setLineNumber(int value) {
       f_lineNumber = value;
       return this;
     }
 
+    /**
+     * Sets the character offset of the code reference in the source file.
+     * 
+     * @param value
+     *          the character offset of the code reference in the source file.
+     * @return this builder.
+     */
     public Builder setOffset(int value) {
       f_offset = value;
       return this;
     }
 
+    /**
+     * Sets the character length of the code reference in the source file.
+     * 
+     * @param value
+     *          the character length of the code reference in the source file.
+     * @return this builder.
+     */
     public Builder setLength(int value) {
       f_length = value;
       return this;
     }
 
+    /**
+     * Sets a declaration path used by viewers.
+     * 
+     * @param value
+     *          a declaration path used by viewers.
+     * @return this builder.
+     */
     public Builder setJavaId(String value) {
       f_javaId = value;
       return this;
     }
 
+    /**
+     * Sets a declaration path used by viewers.
+     * 
+     * @param value
+     *          a declaration path used by viewers.
+     * @return this builder.
+     */
     public Builder setEnclosingJavaId(String value) {
       f_enclosingJavaId = value;
       return this;
@@ -283,11 +374,32 @@ public class JavaRef implements IJavaRef {
       b.append(':');
       b.append(f_typeNameFullyQualifiedSureLogic);
       b.append('|');
-      if (f_cuName != null && f_within == Within.JAVA_FILE)
+      // only use the source CU name if it is different than the type name
+      if (f_cuName != null && f_within == Within.JAVA_FILE && cuNameReallyDifferent())
         b.append(f_cuName);
-      return b.toString();
+      // try to alias from the reference we copied, if possible
+      final String result = b.toString();
+      if (result.equals(f_copyEncodedNamesAlias))
+        return f_copyEncodedNamesAlias;
+      else
+        return result;
     }
 
+    private boolean cuNameReallyDifferent() {
+      final StringBuilder b = new StringBuilder(f_typeNameFullyQualifiedSureLogic);
+      int slashIndex = b.indexOf("/");
+      b.delete(0, slashIndex + 1);
+      int dotIndex = b.indexOf(".");
+      if (dotIndex != -1)
+        b.delete(dotIndex, b.length());
+      return !f_cuName.equals(b.toString());
+    }
+
+    /**
+     * Strict builder&mdash;throws an exception if it fails.
+     * 
+     * @return a code reference.
+     */
     public IJavaRef build() {
       if (!SLUtility.isValidTypeNameFullyQualifiedSureLogic(f_typeNameFullyQualifiedSureLogic))
         throw new IllegalArgumentException(I18N.err(253, f_typeNameFullyQualifiedSureLogic));
@@ -295,6 +407,11 @@ public class JavaRef implements IJavaRef {
       return new JavaRef(f_within, getEncodedNames(), f_typeType, f_lineNumber, f_offset, f_length, f_javaId, f_enclosingJavaId);
     }
 
+    /**
+     * Sloppy builder&mdash;returns {@code null} if it fails
+     * 
+     * @return a code reference or {@code null}.
+     */
     public IJavaRef buildOrNullOnFailure() {
       try {
         return build();
@@ -333,6 +450,16 @@ public class JavaRef implements IJavaRef {
   @NonNull
   private final String f_encodedNames;
 
+  /**
+   * This is for testing {@link Builder} correctly aliases encoded names.
+   * 
+   * @return the encoded names of this.
+   */
+  @NonNull
+  public String getEncodedNames() {
+    return f_encodedNames;
+  }
+
   @Nullable
   private String getEclipseProjectNameOrNullHelper() {
     final int colonIndex = f_encodedNames.indexOf(':');
@@ -350,7 +477,7 @@ public class JavaRef implements IJavaRef {
 
   private String getCUNameOrNullHelper() {
     final int barIndex = f_encodedNames.indexOf('|');
-    if (f_encodedNames.length() > barIndex)
+    if (f_encodedNames.length() > barIndex + 1)
       return f_encodedNames.substring(barIndex + 1);
     else
       return null;
@@ -477,7 +604,7 @@ public class JavaRef implements IJavaRef {
 
   @NonNull
   public final String getSimpleFileName() {
-    final StringBuilder b = new StringBuilder(getTypeNameDollarSign());
+    final StringBuilder b = new StringBuilder(getTypeName());
     if (getWithin() == Within.JAVA_FILE) {
       final String name = getCUNameOrNullHelper();
       if (name == null) {
@@ -485,7 +612,7 @@ public class JavaRef implements IJavaRef {
          * The nested type is inside the .java file of the outermost type, if
          * any nesting.
          */
-        int dollarIndex = b.indexOf("$");
+        int dollarIndex = b.indexOf(".");
         if (dollarIndex != -1) {
           b.delete(dollarIndex, b.length());
         }
