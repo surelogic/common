@@ -1,9 +1,10 @@
-package com.surelogic.common;
+package com.surelogic.common.ref;
 
 import com.surelogic.Immutable;
 import com.surelogic.NonNull;
 import com.surelogic.NotThreadSafe;
 import com.surelogic.Nullable;
+import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.logging.SLLogger;
 

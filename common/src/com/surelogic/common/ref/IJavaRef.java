@@ -1,9 +1,10 @@
-package com.surelogic.common;
+package com.surelogic.common.ref;
 
 import com.surelogic.NonNull;
 import com.surelogic.Nullable;
 import com.surelogic.ThreadSafe;
-import com.surelogic.common.JavaRef.Builder;
+import com.surelogic.common.SLUtility;
+import com.surelogic.common.ref.JavaRef.Builder;
 
 /**
  * Interface for referencing a location in Java code&mdash;source or binary.
