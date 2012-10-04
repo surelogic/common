@@ -384,8 +384,6 @@ public abstract class Decl implements IDecl {
     public abstract IDecl build();
   }
 
-  static final IDecl[] EMPTY = new IDecl[0];
-
   @Nullable
   final IDecl f_parent;
   @NonNull
@@ -436,7 +434,7 @@ public abstract class Decl implements IDecl {
   }
 
   @NonNull
-  public IDecl[] getFormalParameters() {
-    return EMPTY;
+  public FormalParameter[] getFormalParameters() {
+    return FormalParameter.EMPTY;
   }
 }

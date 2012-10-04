@@ -161,9 +161,8 @@ public interface IDecl {
    * {@link Kind#METHOD}. If this is meaningless for the declaration, an empty
    * array is returned.
    * 
-   * @return a possibly empty list of formal parameters. All elements returned
-   *         will be of {@link Kind#PARAMETER} and {@link #getParent()}
-   *         <tt>== this</tt>.
+   * @return a possibly empty list of formal parameters.
+   * @see FormalParameter
    */
-  IDecl[] getFormalParameters();
+  FormalParameter[] getFormalParameters();
 }

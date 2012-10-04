@@ -12,7 +12,7 @@ final class DeclMethod extends DeclFormalParameters {
   final boolean f_isFinal;
   final boolean f_isAbstract;
 
-  DeclMethod(IDecl parent, String name, Visibility visibility, IDecl[] formalParameters, String formalTypeParameters,
+  DeclMethod(IDecl parent, String name, Visibility visibility, FormalParameter[] formalParameters, String formalTypeParameters,
       boolean isStatic, boolean isFinal, boolean isAbstract) {
     super(parent, name, visibility, formalParameters);
     f_formalTypeParameters = formalTypeParameters == null ? "" : formalTypeParameters;
