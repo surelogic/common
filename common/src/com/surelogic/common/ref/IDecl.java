@@ -13,6 +13,7 @@ import com.surelogic.common.SLUtility;
  * <p>
  * Concrete instances are constructed using the following builders:
  * <ul>
+ * <li>{@link Decl.ClassBuilder}</li>
  * <li>{@link Decl.PackageBuilder}</li>
  * </ul>
  */

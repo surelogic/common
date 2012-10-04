@@ -1,5 +1,8 @@
 package com.surelogic.common.ref;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.surelogic.Immutable;
 import com.surelogic.NonNull;
 import com.surelogic.NotThreadSafe;
@@ -11,7 +14,7 @@ import com.surelogic.common.i18n.I18N;
 public abstract class Decl implements IDecl {
 
   @NotThreadSafe
-  public static final class ClassBuilder extends DeclBuilderVisibility {
+  public static final class ClassBuilder extends DeclBuilderType {
 
     String f_formalTypeParameters;
     boolean f_isStatic = false;
@@ -117,6 +120,7 @@ public abstract class Decl implements IDecl {
       return this;
     }
 
+    @Override
     public IDecl build() {
       final IDecl parent;
       // if no parent just put into the default package
@@ -150,6 +154,70 @@ public abstract class Decl implements IDecl {
   }
 
   @NotThreadSafe
+  public static final class ConstructorBuilder extends DeclBuilderAllowsParameters {
+
+    List<Decl.ParameterBuilder> f_parameters = new ArrayList<Decl.ParameterBuilder>();
+
+    /**
+     * Constructs a constructor builder.
+     * <p>
+     * By default the constructor is <tt>public</tt>.
+     */
+    public ConstructorBuilder() {
+      f_visibility = Visibility.PUBLIC;
+    }
+
+    /**
+     * Sets the parent of this constructor.
+     * 
+     * @param value
+     *          the parent of this constructor.
+     * @return this builder.
+     */
+    public ConstructorBuilder setParent(DeclBuilder value) {
+      f_parent = value;
+      return this;
+    }
+
+    /**
+     * Sets the visibility of this declaration.
+     * 
+     * @param value
+     *          the visibility. If {@code null} then the visibility is changed
+     *          to {@link Visibility#PUBLIC}.
+     * @return this builder.
+     */
+    public ConstructorBuilder setVisibility(Visibility value) {
+      f_visibility = value == null ? Visibility.PUBLIC : value;
+      return this;
+    }
+
+    /**
+     * Adds a formal parameter to this declaration. The parent of the parameter
+     * is set to <tt>this</tt>.
+     * 
+     * @param value
+     *          a parameter.
+     * @return this builder.
+     */
+    public ConstructorBuilder addFormalParameter(Decl.ParameterBuilder value) {
+      if (value != null) {
+        f_parameters.add(value);
+        value.setParent(this);
+      }
+      return this;
+    }
+
+    @Override
+    public IDecl build() {
+      if (f_parent == null)
+        throw new IllegalArgumentException(I18N.err(44, "parent"));
+      final IDecl parent = f_parent.build();
+      return null;
+    }
+  }
+
+  @NotThreadSafe
   public static final class PackageBuilder extends DeclBuilder {
 
     /**
@@ -176,6 +244,7 @@ public abstract class Decl implements IDecl {
       return this;
     }
 
+    @Override
     public IDecl build() {
       if (f_name == null || "".equals(f_name)) {
         /*
@@ -213,6 +282,86 @@ public abstract class Decl implements IDecl {
       }
       return parent;
     }
+  }
+
+  @NotThreadSafe
+  public static final class ParameterBuilder extends DeclBuilder {
+
+    DeclBuilderType f_typeOf;
+    boolean f_isFinal;
+
+    /**
+     * Constructs a parameter builder.
+     * 
+     * @param name
+     *          the formal parameter name, or or <tt>arg</tt><i>n</i>, where
+     *          <i>n</i> is the number, starting at zero, indicating its order
+     *          of occurrence in the list of parameters.
+     */
+    public ParameterBuilder(String name) {
+      f_name = name;
+    }
+
+    /**
+     * Sets the parent package of this parameter.
+     * 
+     * @param value
+     *          the parent constructor or method of this parameter.
+     * @return this builder.
+     */
+    public ParameterBuilder setParent(DeclBuilderAllowsParameters value) {
+      f_parent = value;
+      return this;
+    }
+
+    /**
+     * Sets the type of this declaration.
+     * 
+     * @param value
+     *          the type of this declaration.
+     * @return this builder.
+     */
+    public ParameterBuilder setTypeOf(DeclBuilderType value) {
+      f_typeOf = value;
+      return this;
+    }
+
+    /**
+     * Sets if this declaration is declared to be <i>final</i>.
+     * 
+     * @param value
+     *          {@code true} if this declaration is declared to be <i>final</i>,
+     *          {@code false} otherwise.
+     * @return this builder.
+     */
+    public ParameterBuilder setIsFinal(boolean value) {
+      f_isFinal = value;
+      return this;
+    }
+
+    @Override
+    public IDecl build() {
+      if (f_parent == null)
+        throw new IllegalArgumentException(I18N.err(44, "parent"));
+      final IDecl parent = f_parent.build();
+      if (f_typeOf == null)
+        throw new IllegalArgumentException(I18N.err(44, "typeOf"));
+      final IDecl typeOf = f_typeOf.build();
+      if (!SLUtility.isValidJavaIdentifier(f_name))
+        throw new IllegalArgumentException(I18N.err(265, f_name));
+      if (!(parent.getKind() == Kind.CONSTRUCTOR || parent.getKind() == Kind.METHOD))
+        throw new IllegalArgumentException(I18N.err(267, f_name, parent.getKind()));
+
+      return new DeclParameter(parent, f_name, typeOf, f_isFinal);
+    }
+  }
+
+  private static abstract class DeclBuilderType extends DeclBuilderVisibility {
+    // class, enum, interface
+  }
+
+  private static abstract class DeclBuilderAllowsParameters extends DeclBuilderVisibility {
+    // constructor, method
   }
 
   private static abstract class DeclBuilderVisibility extends DeclBuilder {
