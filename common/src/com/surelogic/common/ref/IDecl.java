@@ -16,9 +16,9 @@ import com.surelogic.common.SLUtility;
  * <li>{@link Decl.ClassBuilder}</li>
  * <li>{@link Decl.ConstructorBuilder}</li>
  * <li>{@link Decl.EnumBuilder}</li>
+ * <li>{@link Decl.FieldBuilder}</li>
  * <li>{@link Decl.InitializerBuilder}</li>
  * <li>{@link Decl.InterfaceBuilder}</li>
- * <li>{@link Decl.FieldBuilder}</li>
  * <li>{@link Decl.MethodBuilder}</li>
  * <li>{@link Decl.PackageBuilder}</li>
  * <li>{@link Decl.ParameterBuilder}</li>
