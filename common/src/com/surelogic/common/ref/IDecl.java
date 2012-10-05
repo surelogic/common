@@ -78,8 +78,11 @@ public interface IDecl {
   String getName();
 
   /**
-   * Gets the type of this for a {@link Kind#FIELD} or {@link Kind#PARAMETER}.
-   * If this is meaningless for the declaration {@code null} is returned.
+   * Gets the type of this for a {@link Kind#FIELD} or {@link Kind#PARAMETER}
+   * &mdash;for a {@link Kind#METHOD} this is the return type. If
+   * {@link Kind#METHOD} then a return value of {@code null} indicates the
+   * return type of the method is <tt>void</tt>. If this is meaningless for the
+   * declaration {@code null} is returned.
    * 
    * @return the type of this declaration, {@link null} if none. All elements
    *         returned will be of {@link Kind#CLASS}, {@link Kind#INTERFACE}, or

@@ -542,6 +542,7 @@ public abstract class Decl implements IDecl {
   @NotThreadSafe
   public static final class MethodBuilder extends DeclBuilderAllowsParameters {
 
+    IDecl f_returnTypeOf;
     String f_formalTypeParameters;
     boolean f_isStatic = false;
     boolean f_isFinal = false;
@@ -553,8 +554,12 @@ public abstract class Decl implements IDecl {
      * <p>
      * By default the method has no arguments. It is <tt>public</tt>, not
      * <tt>static</tt>, not <tt>final</tt>, and not <tt>abstract</tt>.
+     * 
+     * @param name
+     *          the method name.
      */
-    public MethodBuilder() {
+    public MethodBuilder(String name) {
+      f_name = name;
       f_visibility = Visibility.PUBLIC;
     }
 
@@ -580,6 +585,29 @@ public abstract class Decl implements IDecl {
      */
     public MethodBuilder setVisibility(Visibility value) {
       f_visibility = value == null ? Visibility.PUBLIC : value;
+      return this;
+    }
+
+    /**
+     * Sets the return type of this method, a value of {@code null} indicates
+     * <tt>void</tt>.
+     * 
+     * @param value
+     *          the return type of this method, a value of {@code null}
+     *          indicates <tt>void</tt>.
+     * @return this builder.
+     * @throws IllegalArgumentException
+     *           if the passed declaration is non-{@code null} and not a
+     *           <tt>class</tt>, <tt>enum</tt>, or <tt>interface</tt>.
+     */
+    public MethodBuilder setReturnTypeOf(IDecl value) {
+      if (value != null) {
+        if (value.getKind() == Kind.CLASS || value.getKind() == Kind.ENUM || value.getKind() == Kind.INTERFACE)
+          f_returnTypeOf = value;
+        else
+          throw new IllegalArgumentException(I18N.err(271, value));
+      } else
+        f_returnTypeOf = null;
       return this;
     }
 
@@ -671,7 +699,7 @@ public abstract class Decl implements IDecl {
         throw new IllegalArgumentException(I18N.err(270, f_name));
 
       return new DeclMethod(parent, f_name, f_visibility, f_parameterTypes.toArray(new IDecl[f_parameterTypes.size()]),
-          f_formalTypeParameters, f_isStatic, f_isFinal, f_isAbstract);
+          f_returnTypeOf, f_formalTypeParameters, f_isStatic, f_isFinal, f_isAbstract);
     }
   }
 
