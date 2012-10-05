@@ -8,18 +8,18 @@ import com.surelogic.Nullable;
 final class DeclMethod extends DeclHasFormalParameters {
 
   @NonNull
-  final IDecl f_returnTypeOf;
+  final TypeRef f_returnTypeOf;
   @NonNull
-  final String f_formalTypeParameters;
+  final IDecl[] f_formalTypeParameters;
   final boolean f_isStatic;
   final boolean f_isFinal;
   final boolean f_isAbstract;
 
-  DeclMethod(IDecl parent, String name, Visibility visibility, IDecl[] formalParameterTypes, IDecl returnTypeOf,
-      String formalTypeParameters, boolean isStatic, boolean isFinal, boolean isAbstract) {
+  DeclMethod(IDecl parent, String name, Visibility visibility, TypeRef[] formalParameterTypes, TypeRef returnTypeOf,
+      IDecl[] formalTypeParameters, boolean isStatic, boolean isFinal, boolean isAbstract) {
     super(parent, name, visibility, formalParameterTypes);
     f_returnTypeOf = returnTypeOf;
-    f_formalTypeParameters = formalTypeParameters == null ? "" : formalTypeParameters;
+    f_formalTypeParameters = formalTypeParameters == null ? EMPTY : formalTypeParameters;
     f_isStatic = isStatic;
     f_isFinal = isFinal;
     f_isAbstract = isAbstract;
@@ -32,13 +32,13 @@ final class DeclMethod extends DeclHasFormalParameters {
 
   @Override
   @NonNull
-  public String getFormalTypeParameters() {
+  public IDecl[] getFormalTypeParameters() {
     return f_formalTypeParameters;
   }
 
   @Override
   @Nullable
-  public IDecl getTypeOf() {
+  public TypeRef getTypeOf() {
     return f_returnTypeOf;
   }
 
@@ -64,13 +64,13 @@ final class DeclMethod extends DeclHasFormalParameters {
     b.append(f_name);
     b.append("(");
     boolean first = true;
-    for (IDecl decl : f_formalParameterTypes) {
+    for (TypeRef typeRef : f_formalParameterTypes) {
       if (first) {
         first = false;
       } else {
         b.append(",");
       }
-      b.append(decl);
+      b.append(typeRef);
     }
     b.append("):");
     b.append(f_returnTypeOf);

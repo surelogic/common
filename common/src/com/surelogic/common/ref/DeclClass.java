@@ -7,15 +7,15 @@ import com.surelogic.NonNull;
 final class DeclClass extends DeclVisibility {
 
   @NonNull
-  final String f_formalTypeParameters;
+  final IDecl[] f_formalTypeParameters;
   final boolean f_isStatic;
   final boolean f_isFinal;
   final boolean f_isAbstract;
 
-  DeclClass(IDecl parent, String name, Visibility visibility, String formalTypeParameters, boolean isStatic, boolean isFinal,
+  DeclClass(IDecl parent, String name, Visibility visibility, IDecl[] formalTypeParameters, boolean isStatic, boolean isFinal,
       boolean isAbstract) {
     super(parent, name, visibility);
-    f_formalTypeParameters = formalTypeParameters == null ? "" : formalTypeParameters;
+    f_formalTypeParameters = formalTypeParameters == null ? EMPTY : formalTypeParameters;
     f_isStatic = isStatic;
     f_isFinal = isFinal;
     f_isAbstract = isAbstract;
@@ -28,7 +28,7 @@ final class DeclClass extends DeclVisibility {
 
   @Override
   @NonNull
-  public String getFormalTypeParameters() {
+  public IDecl[] getFormalTypeParameters() {
     return f_formalTypeParameters;
   }
 

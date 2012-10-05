@@ -22,7 +22,7 @@ public abstract class Decl implements IDecl {
   @NotThreadSafe
   public static final class ClassBuilder extends DeclBuilderVisibility {
 
-    String f_formalTypeParameters;
+    List<IDecl> f_formalTypeParameters = new ArrayList<IDecl>();
     boolean f_isStatic = false;
     boolean f_isFinal = false;
     boolean f_isAbstract = false;
@@ -77,15 +77,16 @@ public abstract class Decl implements IDecl {
     }
 
     /**
-     * Sets the formal type parameters, such as <tt>&lt;E&gt;</tt> for
-     * <tt>List&lt;E&gt;</tt>, for this class.
+     * Adds a formal type parameter to the end of the list of formal parameter
+     * types for this declaration.
      * 
      * @param value
-     *          the formal type parameters.
+     *          a formal parameter type. Ignored if {@code null}.
      * @return this builder.
      */
-    public ClassBuilder setFormalTypeParameters(String value) {
-      f_formalTypeParameters = value;
+    public ClassBuilder addFormalTypeParameter(IDecl value) {
+      if (value != null)
+        f_formalTypeParameters.add(value);
       return this;
     }
 
@@ -157,7 +158,9 @@ public abstract class Decl implements IDecl {
       if (f_isAbstract && f_isFinal)
         throw new IllegalArgumentException(I18N.err(266, f_name));
 
-      return new DeclClass(parent, f_name, f_visibility, f_formalTypeParameters, f_isStatic, f_isFinal, f_isAbstract);
+      final IDecl[] formalTypeParameters = f_formalTypeParameters.isEmpty() ? EMPTY : f_formalTypeParameters
+          .toArray(new IDecl[f_formalTypeParameters.size()]);
+      return new DeclClass(parent, f_name, f_visibility, formalTypeParameters, f_isStatic, f_isFinal, f_isAbstract);
     }
   }
 
@@ -167,7 +170,7 @@ public abstract class Decl implements IDecl {
   @NotThreadSafe
   public static final class ConstructorBuilder extends DeclBuilderVisibility {
 
-    List<IDecl> f_parameterTypes = new ArrayList<IDecl>();
+    List<TypeRef> f_parameterTypes = new ArrayList<TypeRef>();
 
     /**
      * Constructs a constructor builder.
@@ -211,16 +214,10 @@ public abstract class Decl implements IDecl {
      * @param value
      *          a formal parameter type. Ignored if {@code null}.
      * @return this builder.
-     * @throws IllegalArgumentException
-     *           if the passed declaration is not a <tt>class</tt>,
-     *           <tt>enum</tt>, or <tt>interface</tt>.
      */
-    public ConstructorBuilder addFormalParameterType(IDecl value) {
+    public ConstructorBuilder addFormalParameterType(TypeRef value) {
       if (value != null)
-        if (value.getKind() == Kind.CLASS || value.getKind() == Kind.ENUM || value.getKind() == Kind.INTERFACE)
-          f_parameterTypes.add(value);
-        else
-          throw new IllegalArgumentException(I18N.err(271, value));
+        f_parameterTypes.add(value);
       return this;
     }
 
@@ -230,7 +227,9 @@ public abstract class Decl implements IDecl {
         throw new IllegalArgumentException(I18N.err(44, "parent"));
       final IDecl parent = f_parent.build();
 
-      return new DeclConstructor(parent, f_visibility, f_parameterTypes.toArray(new IDecl[f_parameterTypes.size()]));
+      final TypeRef[] parameterTypes = f_parameterTypes.isEmpty() ? TypeRef.EMPTY : f_parameterTypes
+          .toArray(new TypeRef[f_parameterTypes.size()]);
+      return new DeclConstructor(parent, f_visibility, parameterTypes);
     }
   }
 
@@ -307,7 +306,7 @@ public abstract class Decl implements IDecl {
   @NotThreadSafe
   public static final class FieldBuilder extends DeclBuilderVisibility {
 
-    IDecl f_typeOf;
+    TypeRef f_typeOf;
     boolean f_isStatic = false;
     boolean f_isFinal = false;
 
@@ -355,18 +354,11 @@ public abstract class Decl implements IDecl {
      * Sets the type of this declaration.
      * 
      * @param value
-     *          the type of this declaration. Ignored if {@code null}.
+     *          the type of this declaration.
      * @return this builder.
-     * @throws IllegalArgumentException
-     *           if the passed declaration is not a <tt>class</tt>,
-     *           <tt>enum</tt>, or <tt>interface</tt>.
      */
-    public FieldBuilder setTypeOf(IDecl value) {
-      if (value != null)
-        if (value.getKind() == Kind.CLASS || value.getKind() == Kind.ENUM || value.getKind() == Kind.INTERFACE)
-          f_typeOf = value;
-        else
-          throw new IllegalArgumentException(I18N.err(271, value));
+    public FieldBuilder setTypeOf(TypeRef value) {
+      f_typeOf = value;
       return this;
     }
 
@@ -468,7 +460,7 @@ public abstract class Decl implements IDecl {
   @NotThreadSafe
   public static final class InterfaceBuilder extends DeclBuilderVisibility {
 
-    String f_formalTypeParameters;
+    List<IDecl> f_formalTypeParameters = new ArrayList<IDecl>();
 
     /**
      * Constructs an interface builder.
@@ -512,15 +504,16 @@ public abstract class Decl implements IDecl {
     }
 
     /**
-     * Sets the formal type parameters, such as <tt>&lt;E&gt;</tt> for
-     * <tt>List&lt;E&gt;</tt>, for this class.
+     * Adds a formal type parameter to the end of the list of formal parameter
+     * types for this declaration.
      * 
      * @param value
-     *          the formal type parameters.
+     *          a formal parameter type. Ignored if {@code null}.
      * @return this builder.
      */
-    public InterfaceBuilder setFormalTypeParameters(String value) {
-      f_formalTypeParameters = value;
+    public InterfaceBuilder addFormalTypeParameter(IDecl value) {
+      if (value != null)
+        f_formalTypeParameters.add(value);
       return this;
     }
 
@@ -540,7 +533,9 @@ public abstract class Decl implements IDecl {
       if (f_visibility == Visibility.NA)
         f_visibility = Visibility.PUBLIC;
 
-      return new DeclInterface(parent, f_name, f_visibility, f_formalTypeParameters);
+      final IDecl[] formalTypeParameters = f_formalTypeParameters.isEmpty() ? EMPTY : f_formalTypeParameters
+          .toArray(new IDecl[f_formalTypeParameters.size()]);
+      return new DeclInterface(parent, f_name, f_visibility, formalTypeParameters);
     }
   }
 
@@ -550,12 +545,12 @@ public abstract class Decl implements IDecl {
   @NotThreadSafe
   public static final class MethodBuilder extends DeclBuilderVisibility {
 
-    IDecl f_returnTypeOf;
-    String f_formalTypeParameters;
+    TypeRef f_returnTypeOf;
+    List<IDecl> f_formalTypeParameters = new ArrayList<IDecl>();
     boolean f_isStatic = false;
     boolean f_isFinal = false;
     boolean f_isAbstract = false;
-    List<IDecl> f_parameterTypes = new ArrayList<IDecl>();
+    List<TypeRef> f_parameterTypes = new ArrayList<TypeRef>();
 
     /**
      * Constructs a method builder.
@@ -609,27 +604,22 @@ public abstract class Decl implements IDecl {
      *           if the passed declaration is non-{@code null} and not a
      *           <tt>class</tt>, <tt>enum</tt>, or <tt>interface</tt>.
      */
-    public MethodBuilder setReturnTypeOf(IDecl value) {
-      if (value != null) {
-        if (value.getKind() == Kind.CLASS || value.getKind() == Kind.ENUM || value.getKind() == Kind.INTERFACE)
-          f_returnTypeOf = value;
-        else
-          throw new IllegalArgumentException(I18N.err(271, value));
-      } else
-        f_returnTypeOf = null;
+    public MethodBuilder setReturnTypeOf(TypeRef value) {
+      f_returnTypeOf = value;
       return this;
     }
 
     /**
-     * Sets the formal type parameters, such as <tt>&lt;E&gt;</tt> for
-     * <tt>List&lt;E&gt;</tt>, for this class.
+     * Adds a formal type parameter to the end of the list of formal parameter
+     * types for this declaration.
      * 
      * @param value
-     *          the formal type parameters.
+     *          a formal parameter type. Ignored if {@code null}.
      * @return this builder.
      */
-    public MethodBuilder setFormalTypeParameters(String value) {
-      f_formalTypeParameters = value;
+    public MethodBuilder addFormalTypeParameter(IDecl value) {
+      if (value != null)
+        f_formalTypeParameters.add(value);
       return this;
     }
 
@@ -679,16 +669,10 @@ public abstract class Decl implements IDecl {
      * @param value
      *          a formal parameter type. Ignored if {@code null}.
      * @return this builder.
-     * @throws IllegalArgumentException
-     *           if the passed declaration is not a <tt>class</tt>,
-     *           <tt>enum</tt>, or <tt>interface</tt>.
      */
-    public MethodBuilder addFormalParameterType(IDecl value) {
+    public MethodBuilder addFormalParameterType(TypeRef value) {
       if (value != null)
-        if (value.getKind() == Kind.CLASS || value.getKind() == Kind.ENUM || value.getKind() == Kind.INTERFACE)
-          f_parameterTypes.add(value);
-        else
-          throw new IllegalArgumentException(I18N.err(271, value));
+        f_parameterTypes.add(value);
       return this;
     }
 
@@ -707,8 +691,12 @@ public abstract class Decl implements IDecl {
       if (f_isAbstract && f_isStatic)
         throw new IllegalArgumentException(I18N.err(270, f_name));
 
-      return new DeclMethod(parent, f_name, f_visibility, f_parameterTypes.toArray(new IDecl[f_parameterTypes.size()]),
-          f_returnTypeOf, f_formalTypeParameters, f_isStatic, f_isFinal, f_isAbstract);
+      final TypeRef[] parameterTypes = f_parameterTypes.isEmpty() ? TypeRef.EMPTY : f_parameterTypes
+          .toArray(new TypeRef[f_parameterTypes.size()]);
+      final IDecl[] formalTypeParameters = f_formalTypeParameters.isEmpty() ? EMPTY : f_formalTypeParameters
+          .toArray(new IDecl[f_formalTypeParameters.size()]);
+      return new DeclMethod(parent, f_name, f_visibility, parameterTypes, f_returnTypeOf, formalTypeParameters, f_isStatic,
+          f_isFinal, f_isAbstract);
     }
   }
 
@@ -790,7 +778,7 @@ public abstract class Decl implements IDecl {
   public static final class ParameterBuilder extends DeclBuilder {
 
     int f_argumentNumber;
-    IDecl f_typeOf;
+    TypeRef f_typeOf;
     boolean f_isFinal;
 
     /**
@@ -835,18 +823,11 @@ public abstract class Decl implements IDecl {
      * Sets the type of this declaration.
      * 
      * @param value
-     *          the type of this declaration. Ignored if {@code null}.
+     *          the type of this declaration.
      * @return this builder.
-     * @throws IllegalArgumentException
-     *           if the passed declaration is not a <tt>class</tt>,
-     *           <tt>enum</tt>, or <tt>interface</tt>.
      */
-    public ParameterBuilder setTypeOf(IDecl value) {
-      if (value != null)
-        if (value.getKind() == Kind.CLASS || value.getKind() == Kind.ENUM || value.getKind() == Kind.INTERFACE)
-          f_typeOf = value;
-        else
-          throw new IllegalArgumentException(I18N.err(271, value));
+    public ParameterBuilder setTypeOf(TypeRef value) {
+      f_typeOf = value;
       return this;
     }
 
@@ -941,13 +922,13 @@ public abstract class Decl implements IDecl {
   }
 
   @Nullable
-  public IDecl getTypeOf() {
+  public TypeRef getTypeOf() {
     return null;
   }
 
   @NonNull
-  public String getFormalTypeParameters() {
-    return "";
+  public IDecl[] getFormalTypeParameters() {
+    return EMPTY;
   }
 
   @NonNull
@@ -968,8 +949,8 @@ public abstract class Decl implements IDecl {
   }
 
   @NonNull
-  public IDecl[] getFormalParameterTypes() {
-    return EMPTY;
+  public TypeRef[] getFormalParameterTypes() {
+    return TypeRef.EMPTY;
   }
 
   public int getArgumentNumber() {

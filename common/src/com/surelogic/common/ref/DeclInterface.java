@@ -7,11 +7,11 @@ import com.surelogic.NonNull;
 final class DeclInterface extends DeclVisibility {
 
   @NonNull
-  final String f_formalTypeParameters;
+  final IDecl[] f_formalTypeParameters;
 
-  DeclInterface(IDecl parent, String name, Visibility visibility, String formalTypeParameters) {
+  DeclInterface(IDecl parent, String name, Visibility visibility, IDecl[] formalTypeParameters) {
     super(parent, name, visibility);
-    f_formalTypeParameters = formalTypeParameters == null ? "" : formalTypeParameters;
+    f_formalTypeParameters = formalTypeParameters == null ? EMPTY : formalTypeParameters;
   }
 
   @NonNull
@@ -21,7 +21,7 @@ final class DeclInterface extends DeclVisibility {
 
   @Override
   @NonNull
-  public String getFormalTypeParameters() {
+  public IDecl[] getFormalTypeParameters() {
     return f_formalTypeParameters;
   }
 

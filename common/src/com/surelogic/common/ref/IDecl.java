@@ -38,7 +38,7 @@ public interface IDecl {
    * The kind of declaration.
    */
   enum Kind {
-    CLASS, CONSTRUCTOR, ENUM, FIELD, INITIALIZER, INTERFACE, METHOD, PACKAGE, PARAMETER
+    CLASS, CONSTRUCTOR, ENUM, FIELD, INITIALIZER, INTERFACE, METHOD, PACKAGE, PARAMETER, TYPE_PARAMETER
   }
 
   /**
@@ -87,18 +87,18 @@ public interface IDecl {
   String getName();
 
   /**
-   * Gets the type of this for a {@link Kind#FIELD} or {@link Kind#PARAMETER}
-   * &mdash;for a {@link Kind#METHOD} this is the return type. If
-   * {@link Kind#METHOD} then a return value of {@code null} indicates the
-   * return type of the method is <tt>void</tt>. If this is meaningless for the
-   * declaration {@code null} is returned.
+   * Gets (a) the type of this for a {@link Kind#FIELD} or
+   * {@link Kind#PARAMETER}, (b) the return type for a {@link Kind#METHOD}, or
+   * (c) the type bound for a {@link Kind#TYPE_PARAMETER}. In the case of a
+   * {@link Kind#METHOD} a return value of {@code null} indicates the return
+   * type of the method is <tt>void</tt>. In the case of a
+   * {@link Kind#TYPE_PARAMETER} a return value of {@code null} indicates no
+   * bound. If this is meaningless for the declaration {@code null} is returned.
    * 
-   * @return the type of this declaration, {@link null} if none. All elements
-   *         returned will be of {@link Kind#CLASS}, {@link Kind#INTERFACE}, or
-   *         {@link Kind#ENUM}.
+   * @return the type of this declaration, {@link null} if none.
    */
   @Nullable
-  IDecl getTypeOf();
+  TypeRef getTypeOf();
 
   /**
    * Gets the formal type parameters for a {@link Kind#CLASS},
@@ -137,7 +137,7 @@ public interface IDecl {
    * @return the formal type parameters for this declaration.
    */
   @NonNull
-  String getFormalTypeParameters();
+  IDecl[] getFormalTypeParameters();
 
   /**
    * Gets the visibility of this declaration. If this is meaningless for the
@@ -187,7 +187,7 @@ public interface IDecl {
    * @return a possibly empty list of the formal parameter types, in order.
    */
   @NonNull
-  IDecl[] getFormalParameterTypes();
+  TypeRef[] getFormalParameterTypes();
 
   /**
    * Gets the zero-based argument number of this declaration&mdash;this

@@ -10,10 +10,10 @@ final class DeclParameter extends Decl {
 
   final int f_argumentNumber;
   @NonNull
-  final IDecl f_typeOf;
+  final TypeRef f_typeOf;
   final boolean f_isFinal;
 
-  DeclParameter(IDecl parent, String name, int argumentNumber, IDecl typeOf, boolean isFinal) {
+  DeclParameter(IDecl parent, String name, int argumentNumber, TypeRef typeOf, boolean isFinal) {
     super(parent, name);
     f_argumentNumber = argumentNumber;
     if (typeOf == null)
@@ -29,7 +29,7 @@ final class DeclParameter extends Decl {
 
   @Override
   @Nullable
-  public IDecl getTypeOf() {
+  public TypeRef getTypeOf() {
     return f_typeOf;
   }
 

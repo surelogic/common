@@ -9,11 +9,11 @@ import com.surelogic.common.i18n.I18N;
 final class DeclField extends DeclVisibility {
 
   @NonNull
-  final IDecl f_typeOf;
+  final TypeRef f_typeOf;
   final boolean f_isStatic;
   final boolean f_isFinal;
 
-  DeclField(IDecl parent, String name, Visibility visibility, IDecl typeOf, boolean isStatic, boolean isFinal) {
+  DeclField(IDecl parent, String name, Visibility visibility, TypeRef typeOf, boolean isStatic, boolean isFinal) {
     super(parent, name, visibility);
     if (typeOf == null)
       throw new IllegalArgumentException(I18N.err(44, "typeOf"));
@@ -29,7 +29,7 @@ final class DeclField extends DeclVisibility {
 
   @Override
   @Nullable
-  public IDecl getTypeOf() {
+  public TypeRef getTypeOf() {
     return f_typeOf;
   }
 
