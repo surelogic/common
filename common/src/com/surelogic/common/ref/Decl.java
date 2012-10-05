@@ -888,7 +888,7 @@ public abstract class Decl implements IDecl {
     Visibility f_visibility;
   }
 
-  private static abstract class DeclBuilder {
+  public static abstract class DeclBuilder {
 
     DeclBuilder f_parent;
     String f_name;
