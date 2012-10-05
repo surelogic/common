@@ -49,6 +49,9 @@ final class DeclClass extends DeclVisibility {
 
   @Override
   String toStringHelper() {
-    return "." + f_name + f_formalTypeParameters;
+    if (f_visibility == Visibility.ANONYMOUS)
+      return ".(anonymous class)" + f_formalTypeParameters;
+    else
+      return "." + f_name + f_formalTypeParameters;
   }
 }

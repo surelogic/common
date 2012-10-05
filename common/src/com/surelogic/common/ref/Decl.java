@@ -42,7 +42,8 @@ public abstract class Decl implements IDecl {
      * Top-level classes cannot be <tt>static</tt>.
      * 
      * @param name
-     *          the simple class name, such as <tt>ClassBuilder</tt>.
+     *          the simple class name, such as <tt>ClassBuilder</tt>. This
+     *          argument is ignored if the class is anonymous.
      */
     public ClassBuilder(String name) {
       f_name = name;
@@ -974,8 +975,7 @@ public abstract class Decl implements IDecl {
     for (final Decl decl : stack) {
       b.append(decl.toStringHelper());
     }
-    // TODO Auto-generated method stub
-    return super.toString();
+    return b.toString();
   }
 
   abstract String toStringHelper();
