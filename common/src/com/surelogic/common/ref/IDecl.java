@@ -164,12 +164,12 @@ public interface IDecl {
   boolean isAbstract();
 
   /**
-   * Gets the list of formal parameters for a {@link Kind#CONSTRUCTOR} or
-   * {@link Kind#METHOD}. If this is meaningless for the declaration, an empty
-   * array is returned.
+   * Gets the ordered list, first to last, of the formal parameter types for a
+   * {@link Kind#CONSTRUCTOR} or {@link Kind#METHOD}. If this is meaningless for
+   * the declaration, an empty array is returned.
    * 
-   * @return a possibly empty list of formal parameters.
-   * @see FormalParameter
+   * @return a possibly empty list of the formal parameter types, in order.
    */
-  FormalParameter[] getFormalParameters();
+  @NonNull
+  IDecl[] getFormalParameterTypes();
 }

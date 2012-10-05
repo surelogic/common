@@ -7,19 +7,19 @@ import com.surelogic.NonNull;
 abstract class DeclFormalParameters extends DeclVisibility {
 
   @NonNull
-  final FormalParameter[] f_formalParameters;
+  final IDecl[] f_formalParameterTypes;
 
-  public DeclFormalParameters(IDecl parent, String name, Visibility visibility, FormalParameter[] formalParameters) {
+  public DeclFormalParameters(IDecl parent, String name, Visibility visibility, IDecl[] formalParameterTypes) {
     super(parent, name, visibility);
-    if (formalParameters == null)
-      f_formalParameters = FormalParameter.EMPTY;
+    if (formalParameterTypes == null)
+      f_formalParameterTypes = EMPTY;
     else
-      f_formalParameters = formalParameters;
+      f_formalParameterTypes = formalParameterTypes;
   }
 
   @Override
   @NonNull
-  public FormalParameter[] getFormalParameters() {
-    return super.getFormalParameters();
+  public IDecl[] getFormalParameterTypes() {
+    return f_formalParameterTypes;
   }
 }

@@ -6,8 +6,8 @@ import com.surelogic.NonNull;
 @Immutable
 final class DeclConstructor extends DeclFormalParameters {
 
-  DeclConstructor(IDecl parent, Visibility visibility, FormalParameter[] formalParameters) {
-    super(parent, parent.getName(), visibility, formalParameters);
+  DeclConstructor(IDecl parent, Visibility visibility, IDecl[] formalParameterTypes) {
+    super(parent, parent.getName(), visibility, formalParameterTypes);
   }
 
   @NonNull
