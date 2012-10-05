@@ -42,4 +42,13 @@ final class DeclField extends DeclVisibility {
   public boolean isFinal() {
     return f_isFinal;
   }
+
+  @Override
+  String toStringHelper() {
+    final StringBuilder b = new StringBuilder("#");
+    b.append(f_name);
+    b.append(":");
+    b.append(f_typeOf);
+    return b.toString();
+  }
 }

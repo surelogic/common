@@ -1,6 +1,7 @@
 package com.surelogic.common.ref;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import com.surelogic.Immutable;
@@ -960,4 +961,22 @@ public abstract class Decl implements IDecl {
   public int getArgumentNumber() {
     return -1;
   }
+
+  @Override
+  public String toString() {
+    LinkedList<Decl> stack = new LinkedList<Decl>();
+    Decl pushMe = this;
+    while (pushMe != null) {
+      stack.addFirst(pushMe);
+      pushMe = (Decl) pushMe.getParent();
+    }
+    final StringBuilder b = new StringBuilder();
+    for (final Decl decl : stack) {
+      b.append(decl.toStringHelper());
+    }
+    // TODO Auto-generated method stub
+    return super.toString();
+  }
+
+  abstract String toStringHelper();
 }

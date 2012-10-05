@@ -5,7 +5,7 @@ import com.surelogic.NonNull;
 import com.surelogic.Nullable;
 
 @Immutable
-final class DeclMethod extends DeclFormalParameters {
+final class DeclMethod extends DeclHasFormalParameters {
 
   @NonNull
   final IDecl f_returnTypeOf;
@@ -55,5 +55,25 @@ final class DeclMethod extends DeclFormalParameters {
   @Override
   public boolean isAbstract() {
     return f_isAbstract;
+  }
+
+  @Override
+  String toStringHelper() {
+    final StringBuilder b = new StringBuilder("#");
+    b.append(f_formalTypeParameters);
+    b.append(f_name);
+    b.append("(");
+    boolean first = true;
+    for (IDecl decl : f_formalParameterTypes) {
+      if (first) {
+        first = false;
+      } else {
+        b.append(",");
+      }
+      b.append(decl);
+    }
+    b.append("):");
+    b.append(f_returnTypeOf);
+    return b.toString();
   }
 }

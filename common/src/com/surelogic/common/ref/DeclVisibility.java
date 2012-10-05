@@ -22,4 +22,9 @@ abstract class DeclVisibility extends Decl {
   public Visibility getVisiblity() {
     return f_visibility;
   }
+
+  @Override
+  String toStringHelper() {
+    return "." + f_name;
+  }
 }

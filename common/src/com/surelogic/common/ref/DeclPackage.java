@@ -19,4 +19,9 @@ final class DeclPackage extends Decl {
   public Kind getKind() {
     return Kind.PACKAGE;
   }
+
+  @Override
+  String toStringHelper() {
+    return f_parent == null ? f_name : "." + f_name;
+  }
 }

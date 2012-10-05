@@ -24,4 +24,9 @@ final class DeclInterface extends DeclVisibility {
   public String getFormalTypeParameters() {
     return f_formalTypeParameters;
   }
+
+  @Override
+  String toStringHelper() {
+    return "." + f_name + f_formalTypeParameters;
+  }
 }

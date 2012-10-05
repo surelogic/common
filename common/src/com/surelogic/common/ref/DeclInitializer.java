@@ -22,4 +22,9 @@ final class DeclInitializer extends Decl {
   public boolean isStatic() {
     return f_isStatic;
   }
+
+  @Override
+  String toStringHelper() {
+    return f_isStatic ? ".<static init>" : ".<init>";
+  }
 }

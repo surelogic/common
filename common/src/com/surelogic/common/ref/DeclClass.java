@@ -46,4 +46,9 @@ final class DeclClass extends DeclVisibility {
   public boolean isAbstract() {
     return f_isAbstract;
   }
+
+  @Override
+  String toStringHelper() {
+    return "." + f_name + f_formalTypeParameters;
+  }
 }

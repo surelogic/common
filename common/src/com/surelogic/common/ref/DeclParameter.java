@@ -42,4 +42,9 @@ final class DeclParameter extends Decl {
   public int getArgumentNumber() {
     return f_argumentNumber;
   }
+
+  @Override
+  String toStringHelper() {
+    return " : parameter" + f_argumentNumber + "(" + f_name + "):" + f_typeOf.toString();
+  }
 }
