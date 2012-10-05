@@ -20,7 +20,7 @@ public abstract class Decl implements IDecl {
    * Constructs class {@link IDecl} instances.
    */
   @NotThreadSafe
-  public static final class ClassBuilder extends DeclBuilderType {
+  public static final class ClassBuilder extends DeclBuilderVisibility {
 
     String f_formalTypeParameters;
     boolean f_isStatic = false;
@@ -57,8 +57,9 @@ public abstract class Decl implements IDecl {
      *          the parent of this declaration.
      * @return this builder.
      */
+    @Override
     public ClassBuilder setParent(DeclBuilder value) {
-      f_parent = value;
+      super.setParent(value);
       return this;
     }
 
@@ -164,7 +165,7 @@ public abstract class Decl implements IDecl {
    * Constructs constructor {@link IDecl} instances.
    */
   @NotThreadSafe
-  public static final class ConstructorBuilder extends DeclBuilderAllowsParameters {
+  public static final class ConstructorBuilder extends DeclBuilderVisibility {
 
     List<IDecl> f_parameterTypes = new ArrayList<IDecl>();
 
@@ -184,8 +185,9 @@ public abstract class Decl implements IDecl {
      *          the parent of this declaration.
      * @return this builder.
      */
+    @Override
     public ConstructorBuilder setParent(DeclBuilder value) {
-      f_parent = value;
+      super.setParent(value);
       return this;
     }
 
@@ -236,7 +238,7 @@ public abstract class Decl implements IDecl {
    * Constructs enum {@link IDecl} instances.
    */
   @NotThreadSafe
-  public static final class EnumBuilder extends DeclBuilderType {
+  public static final class EnumBuilder extends DeclBuilderVisibility {
 
     /**
      * Constructs an enum builder.
@@ -260,8 +262,9 @@ public abstract class Decl implements IDecl {
      *          the parent of this declaration.
      * @return this builder.
      */
+    @Override
     public EnumBuilder setParent(DeclBuilder value) {
-      f_parent = value;
+      super.setParent(value);
       return this;
     }
 
@@ -329,8 +332,9 @@ public abstract class Decl implements IDecl {
      *          the parent of this declaration.
      * @return this builder.
      */
-    public FieldBuilder setParent(DeclBuilderType value) {
-      f_parent = value;
+    @Override
+    public FieldBuilder setParent(DeclBuilder value) {
+      super.setParent(value);
       return this;
     }
 
@@ -429,8 +433,9 @@ public abstract class Decl implements IDecl {
      *          the parent of this declaration.
      * @return this builder.
      */
+    @Override
     public InitializerBuilder setParent(DeclBuilder value) {
-      f_parent = value;
+      super.setParent(value);
       return this;
     }
 
@@ -461,7 +466,7 @@ public abstract class Decl implements IDecl {
    * Constructs interface {@link IDecl} instances.
    */
   @NotThreadSafe
-  public static final class InterfaceBuilder extends DeclBuilderType {
+  public static final class InterfaceBuilder extends DeclBuilderVisibility {
 
     String f_formalTypeParameters;
 
@@ -487,8 +492,9 @@ public abstract class Decl implements IDecl {
      *          the parent of this declaration.
      * @return this builder.
      */
+    @Override
     public InterfaceBuilder setParent(DeclBuilder value) {
-      f_parent = value;
+      super.setParent(value);
       return this;
     }
 
@@ -542,7 +548,7 @@ public abstract class Decl implements IDecl {
    * Constructs method {@link IDecl} instances.
    */
   @NotThreadSafe
-  public static final class MethodBuilder extends DeclBuilderAllowsParameters {
+  public static final class MethodBuilder extends DeclBuilderVisibility {
 
     IDecl f_returnTypeOf;
     String f_formalTypeParameters;
@@ -572,8 +578,9 @@ public abstract class Decl implements IDecl {
      *          the parent of this declaration.
      * @return this builder.
      */
+    @Override
     public MethodBuilder setParent(DeclBuilder value) {
-      f_parent = value;
+      super.setParent(value);
       return this;
     }
 
@@ -730,8 +737,9 @@ public abstract class Decl implements IDecl {
      *          the parent package of this package.
      * @return this builder.
      */
-    public PackageBuilder setParent(PackageBuilder value) {
-      f_parent = value;
+    @Override
+    public PackageBuilder setParent(DeclBuilder value) {
+      super.setParent(value);
       return this;
     }
 
@@ -817,8 +825,9 @@ public abstract class Decl implements IDecl {
      *          the parent constructor or method of this parameter.
      * @return this builder.
      */
-    public ParameterBuilder setParent(DeclBuilderAllowsParameters value) {
-      f_parent = value;
+    @Override
+    public ParameterBuilder setParent(DeclBuilder value) {
+      super.setParent(value);
       return this;
     }
 
@@ -877,14 +886,6 @@ public abstract class Decl implements IDecl {
     }
   }
 
-  private static abstract class DeclBuilderType extends DeclBuilderVisibility {
-    // class, enum, interface
-  }
-
-  private static abstract class DeclBuilderAllowsParameters extends DeclBuilderVisibility {
-    // constructor, method
-  }
-
   private static abstract class DeclBuilderVisibility extends DeclBuilder {
     Visibility f_visibility;
   }
@@ -893,6 +894,18 @@ public abstract class Decl implements IDecl {
 
     DeclBuilder f_parent;
     String f_name;
+
+    /**
+     * Sets the parent of this declaration.
+     * 
+     * @param value
+     *          the parent of this declaration.
+     * @return this builder.
+     */
+    public DeclBuilder setParent(DeclBuilder value) {
+      f_parent = value;
+      return this;
+    }
 
     /**
      * Builds an appropriate {@link IDecl} instance. Throws an exception if
