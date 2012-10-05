@@ -988,11 +988,6 @@ public abstract class Decl implements IDecl {
   }
 
   @NonNull
-  public IDecl[] getFormalTypeParameters() {
-    return EMPTY;
-  }
-
-  @NonNull
   public Visibility getVisiblity() {
     return Visibility.NA;
   }
@@ -1016,6 +1011,16 @@ public abstract class Decl implements IDecl {
 
   public int getArgumentNumber() {
     return -1;
+  }
+
+  @NonNull
+  public IDecl[] getFormalTypeParameters() {
+    return EMPTY;
+  }
+
+  @NonNull
+  public TypeRef[] getBounds() {
+    return TypeRef.EMPTY;
   }
 
   @Override

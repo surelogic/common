@@ -102,45 +102,6 @@ public interface IDecl {
   TypeRef getTypeOf();
 
   /**
-   * Gets the formal type parameters for a {@link Kind#CLASS},
-   * {@link Kind#INTERFACE}, or {@link Kind#METHOD}. If this is meaningless for
-   * the declaration, an empty string is returned.
-   * <p>
-   * The result of this method is intended for display and to help match type
-   * names, such as <tt>T</tt>, used for declarations within a parameterized
-   * type or method.
-   * <p>
-   * The table below shows several examples.
-   * 
-   * <table border=1>
-   * <tr>
-   * <th>Declaration</th>
-   * <th>{@link #getName()}</th>
-   * <th>{@link #getFormalTypeParameters()}</th>
-   * </tr>
-   * <tr>
-   * <td><tt>List&lt;E&gt;</tt></td>
-   * <td><tt>List</tt></td>
-   * <td><tt>&lt;E&gt;</tt></td>
-   * </tr>
-   * <tr>
-   * <td><tt>Map&lt;K,V&gt;</tt></td>
-   * <td><tt>Map</tt></td>
-   * <td><tt>&lt;K,V&gt;</tt></td>
-   * </tr>
-   * <tr>
-   * <td><tt>public &lt;T&gt; T[] toArray(T... elements) {}</tt></td>
-   * <td><tt>toArray</tt></td>
-   * <td><tt>&lt;T&gt;</tt></td>
-   * </tr>
-   * </table>
-   * 
-   * @return the formal type parameters for this declaration.
-   */
-  @NonNull
-  IDecl[] getFormalTypeParameters();
-
-  /**
    * Gets the visibility of this declaration. If this is meaningless for the
    * declaration, {@link Visibility#NA} is returned (e.g., {@link Kind#PACKAGE}
    * and {@link Kind#PARAMETER}).
@@ -198,4 +159,52 @@ public interface IDecl {
    * @return the zero-based argument number of this parameter, or -1.
    */
   int getArgumentNumber();
+
+  /**
+   * Gets the formal type parameters for a {@link Kind#CLASS},
+   * {@link Kind#INTERFACE}, or {@link Kind#METHOD}. If this is meaningless for
+   * the declaration, an empty array is returned.
+   * <p>
+   * The result of this method is intended for display and to help match type
+   * names, such as <tt>T</tt>, used for declarations within a parameterized
+   * type or method.
+   * <p>
+   * The table below shows several examples.
+   * 
+   * <table border=1>
+   * <tr>
+   * <th>Declaration</th>
+   * <th>{@link #getName()}</th>
+   * <th>{@link #getFormalTypeParameters()}</th>
+   * </tr>
+   * <tr>
+   * <td><tt>List&lt;E&gt;</tt></td>
+   * <td><tt>List</tt></td>
+   * <td><tt>&lt;E&gt;</tt></td>
+   * </tr>
+   * <tr>
+   * <td><tt>Map&lt;K,V&gt;</tt></td>
+   * <td><tt>Map</tt></td>
+   * <td><tt>&lt;K,V&gt;</tt></td>
+   * </tr>
+   * <tr>
+   * <td><tt>public &lt;T&gt; T[] toArray(T... elements) {}</tt></td>
+   * <td><tt>toArray</tt></td>
+   * <td><tt>&lt;T&gt;</tt></td>
+   * </tr>
+   * </table>
+   * 
+   * @return the formal type parameters for this declaration.
+   */
+  @NonNull
+  IDecl[] getFormalTypeParameters();
+
+  /**
+   * Gets the bounds for {@link Kind#TYPE_PARAMETER}. If this is meaningless for
+   * the declaration, an empty array is returned.
+   * 
+   * @return the bounds.
+   */
+  @NonNull
+  TypeRef[] getBounds();
 }

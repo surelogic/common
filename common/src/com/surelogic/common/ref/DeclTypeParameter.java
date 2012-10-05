@@ -19,6 +19,12 @@ public final class DeclTypeParameter extends Decl {
   }
 
   @Override
+  @NonNull
+  public TypeRef[] getBounds() {
+    return f_bounds;
+  }
+
+  @Override
   String toStringHelper() {
     final IDecl[] typeParameters = getParent().getFormalTypeParameters();
     boolean first = typeParameters[0] == this;
