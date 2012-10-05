@@ -779,18 +779,32 @@ public abstract class Decl implements IDecl {
   @NotThreadSafe
   public static final class ParameterBuilder extends DeclBuilder {
 
+    int f_argumentNumber;
     IDecl f_typeOf;
     boolean f_isFinal;
 
     /**
      * Constructs a parameter builder.
      * 
-     * @param name
-     *          the formal parameter name, or or <tt>arg</tt><i>n</i>, where
-     *          <i>n</i> is the number, starting at zero, indicating its order
-     *          of occurrence in the list of parameters.
+     * @param argumentNumber
+     *          the zero-based argument number of this parameter.
      */
-    public ParameterBuilder(String name) {
+    public ParameterBuilder(int argumentNumber) {
+      f_argumentNumber = argumentNumber;
+    }
+
+    /**
+     * Constructs a parameter builder.
+     * 
+     * @param argumentNumber
+     *          the zero-based argument number of this parameter.
+     * @param name
+     *          the formal parameter name (this is optional, use
+     *          {@link Decl.ParameterBuilder#ParameterBuilder(int)} if it is
+     *          unknown).
+     */
+    public ParameterBuilder(int argumentNumber, String name) {
+      f_argumentNumber = argumentNumber;
       f_name = name;
     }
 
@@ -845,12 +859,19 @@ public abstract class Decl implements IDecl {
       final IDecl parent = f_parent.build();
       if (f_typeOf == null)
         throw new IllegalArgumentException(I18N.err(44, "typeOf"));
-      if (!SLUtility.isValidJavaIdentifier(f_name))
-        throw new IllegalArgumentException(I18N.err(265, f_name));
+      // see http://www.javaspecialists.eu/archive/Issue059.html
+      if (f_argumentNumber < 0 || f_argumentNumber > 254)
+        throw new IllegalArgumentException(I18N.err(272, f_argumentNumber));
+      if (f_name == null || "".equals(f_name)) {
+        f_name = "arg" + f_argumentNumber;
+      } else {
+        if (!SLUtility.isValidJavaIdentifier(f_name))
+          throw new IllegalArgumentException(I18N.err(265, f_name));
+      }
       if (!(parent.getKind() == Kind.CONSTRUCTOR || parent.getKind() == Kind.METHOD))
         throw new IllegalArgumentException(I18N.err(267, f_name, parent.getKind()));
 
-      return new DeclParameter(parent, f_name, f_typeOf, f_isFinal);
+      return new DeclParameter(parent, f_name, f_argumentNumber, f_typeOf, f_isFinal);
     }
   }
 
@@ -934,5 +955,9 @@ public abstract class Decl implements IDecl {
   @NonNull
   public IDecl[] getFormalParameterTypes() {
     return EMPTY;
+  }
+
+  public int getArgumentNumber() {
+    return -1;
   }
 }

@@ -188,4 +188,13 @@ public interface IDecl {
    */
   @NonNull
   IDecl[] getFormalParameterTypes();
+
+  /**
+   * Gets the zero-based argument number of this declaration&mdash;this
+   * information is only meaningful for {@link Kind#PARAMETER}. If this is
+   * meaningless for the declaration, -1 is returned.
+   * 
+   * @return the zero-based argument number of this parameter, or -1.
+   */
+  int getArgumentNumber();
 }
