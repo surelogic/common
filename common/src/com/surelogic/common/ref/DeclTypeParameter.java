@@ -26,7 +26,21 @@ public final class DeclTypeParameter extends Decl {
 
   @Override
   String toStringHelper() {
-    // TODO
-    return "TODO";
+    final IDecl[] typeParameters = getParent().getFormalTypeParameters();
+    boolean first = typeParameters[0] == this;
+    boolean last = typeParameters[typeParameters.length - 1] == this;
+    final StringBuilder b = new StringBuilder();
+    if (first)
+      b.append("<");
+    else
+      b.append(",");
+    b.append(f_name);
+    if (f_bounds != null) {
+      b.append(" extends ");
+      b.append(f_bounds.getFullyQualified());
+    }
+    if (last)
+      b.append(">");
+    return b.toString();
   }
 }
