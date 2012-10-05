@@ -27,14 +27,23 @@ import com.surelogic.common.SLUtility;
 @ThreadSafe
 public interface IDecl {
 
+  /**
+   * Indicates where a code position is in relation to a particular declaration.
+   */
   enum Position {
     ON_DECL, WITHIN_DECL
   }
 
+  /**
+   * The kind of declaration.
+   */
   enum Kind {
     CLASS, CONSTRUCTOR, ENUM, FIELD, INITIALIZER, INTERFACE, METHOD, PACKAGE, PARAMETER
   }
 
+  /**
+   * The visibility of a declaration.
+   */
   enum Visibility {
     ANONYMOUS, DEFAULT, PRIVATE, PROTECTED, PUBLIC, NA
   }
