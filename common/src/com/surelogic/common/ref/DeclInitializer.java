@@ -8,8 +8,8 @@ final class DeclInitializer extends Decl {
 
   final boolean f_isStatic;
 
-  DeclInitializer(IDecl parent, String name, boolean isStatic) {
-    super(parent, name);
+  DeclInitializer(IDecl parent, boolean isStatic) {
+    super(parent, "");
     f_isStatic = isStatic;
   }
 
