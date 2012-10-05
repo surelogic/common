@@ -867,6 +867,63 @@ public abstract class Decl implements IDecl {
     }
   }
 
+  /**
+   * Constructs type parameter {@link IDecl} instances.
+   */
+  @NotThreadSafe
+  public static final class TypeParameterBuilder extends DeclBuilder {
+
+    TypeRef f_bounds;
+    boolean f_isFinal;
+
+    /**
+     * Constructs a type parameter builder.
+     * 
+     * @param name
+     *          the name of this type parameter.
+     */
+    public TypeParameterBuilder(String name) {
+      f_name = name;
+    }
+
+    /**
+     * Sets the parent of this declaration.
+     * 
+     * @param value
+     *          the parent of this declaration.
+     * @return this builder.
+     */
+    @Override
+    public TypeParameterBuilder setParent(DeclBuilder value) {
+      super.setParent(value);
+      return this;
+    }
+
+    /**
+     * Sets the type of this declaration.
+     * 
+     * @param value
+     *          the type of this declaration.
+     * @return this builder.
+     */
+    public TypeParameterBuilder setBounds(TypeRef value) {
+      f_bounds = value;
+      return this;
+    }
+
+    @Override
+    public IDecl build() {
+      if (f_parent == null)
+        throw new IllegalArgumentException(I18N.err(44, "parent"));
+      final IDecl parent = f_parent.build();
+
+      if (!SLUtility.isValidJavaIdentifier(f_name))
+        throw new IllegalArgumentException(I18N.err(265, f_name));
+
+      return new DeclTypeParameter(parent, f_name, f_bounds);
+    }
+  }
+
   private static abstract class DeclBuilderVisibility extends DeclBuilder {
     Visibility f_visibility;
   }

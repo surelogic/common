@@ -22,6 +22,7 @@ import com.surelogic.common.SLUtility;
  * <li>{@link Decl.MethodBuilder}</li>
  * <li>{@link Decl.PackageBuilder}</li>
  * <li>{@link Decl.ParameterBuilder}</li>
+ * <li>{@link Decl.TypeParameterBuilder}</li>
  * </ul>
  */
 @ThreadSafe
