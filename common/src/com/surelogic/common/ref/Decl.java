@@ -327,7 +327,7 @@ public abstract class Decl implements IDecl {
      *          the parent of this declaration.
      * @return this builder.
      */
-    public FieldBuilder setParent(DeclBuilderAllowsParameters value) {
+    public FieldBuilder setParent(DeclBuilderType value) {
       f_parent = value;
       return this;
     }
