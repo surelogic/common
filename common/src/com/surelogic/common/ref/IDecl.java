@@ -27,6 +27,10 @@ import com.surelogic.common.SLUtility;
 @ThreadSafe
 public interface IDecl {
 
+  enum Position {
+    ON_DECL, WITHIN_DECL
+  }
+
   enum Kind {
     CLASS, CONSTRUCTOR, ENUM, FIELD, INITIALIZER, INTERFACE, METHOD, PACKAGE, PARAMETER
   }
