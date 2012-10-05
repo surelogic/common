@@ -873,7 +873,7 @@ public abstract class Decl implements IDecl {
   @NotThreadSafe
   public static final class TypeParameterBuilder extends DeclBuilder {
 
-    TypeRef f_bounds;
+    List<TypeRef> f_bounds = new ArrayList<TypeRef>();
     boolean f_isFinal;
 
     /**
@@ -900,14 +900,16 @@ public abstract class Decl implements IDecl {
     }
 
     /**
-     * Sets the type of this declaration.
+     * Adds a type bounds to the end of the list of type bounds for this
+     * declaration.
      * 
      * @param value
-     *          the type of this declaration.
+     *          a type bounds. Ignored if {@code null}.
      * @return this builder.
      */
-    public TypeParameterBuilder setBounds(TypeRef value) {
-      f_bounds = value;
+    public TypeParameterBuilder addBounds(TypeRef value) {
+      if (value != null)
+        f_bounds.add(value);
       return this;
     }
 
@@ -920,7 +922,9 @@ public abstract class Decl implements IDecl {
       if (!SLUtility.isValidJavaIdentifier(f_name))
         throw new IllegalArgumentException(I18N.err(265, f_name));
 
-      return new DeclTypeParameter(parent, f_name, f_bounds);
+      final TypeRef[] bounds = f_bounds.isEmpty() ? TypeRef.EMPTY : f_bounds.toArray(new TypeRef[f_bounds.size()]);
+
+      return new DeclTypeParameter(parent, f_name, bounds);
     }
   }
 

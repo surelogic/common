@@ -6,9 +6,9 @@ import com.surelogic.Nullable;
 public final class DeclTypeParameter extends Decl {
 
   @Nullable
-  private final TypeRef f_bounds;
+  private final TypeRef[] f_bounds;
 
-  public DeclTypeParameter(IDecl parent, String name, TypeRef bounds) {
+  public DeclTypeParameter(IDecl parent, String name, TypeRef[] bounds) {
     super(parent, name);
     f_bounds = bounds;
   }
@@ -16,12 +16,6 @@ public final class DeclTypeParameter extends Decl {
   @NonNull
   public Kind getKind() {
     return Kind.TYPE_PARAMETER;
-  }
-
-  @Override
-  @Nullable
-  public TypeRef getTypeOf() {
-    return f_bounds;
   }
 
   @Override
@@ -35,9 +29,16 @@ public final class DeclTypeParameter extends Decl {
     else
       b.append(",");
     b.append(f_name);
-    if (f_bounds != null) {
+    if (f_bounds.length > 0) {
       b.append(" extends ");
-      b.append(f_bounds.getFullyQualified());
+      boolean firstBound = true;
+      for (TypeRef bound : f_bounds) {
+        if (firstBound)
+          firstBound = false;
+        else
+          b.append(" & ");
+        b.append(bound.getFullyQualified());
+      }
     }
     if (last)
       b.append(">");
