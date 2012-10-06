@@ -5,13 +5,13 @@ import java.util.Set;
 import com.surelogic.NonNull;
 import com.surelogic.Nullable;
 
-public final class DeclTypeParameter extends Decl {
+public final class DeclTypeParameter extends DeclWithPosition {
 
   @Nullable
   private final TypeRef[] f_bounds;
 
-  public DeclTypeParameter(IDecl parent, Set<Decl.DeclBuilder> childBuilders, String name, TypeRef[] bounds) {
-    super(parent, childBuilders, name);
+  public DeclTypeParameter(IDecl parent, Set<Decl.DeclBuilder> childBuilders, String name, int position, TypeRef[] bounds) {
+    super(parent, childBuilders, name, position);
     f_bounds = bounds;
   }
 

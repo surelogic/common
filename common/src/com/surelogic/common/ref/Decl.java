@@ -133,14 +133,7 @@ public abstract class Decl implements IDecl {
     }
 
     @Override
-    public IDecl build() {
-      final IDecl parent;
-      // if no parent just put into the default package
-      if (f_parent == null)
-        parent = new PackageBuilder(null).build();
-      else
-        parent = f_parent.build();
-
+    public IDecl buildInternal(IDecl parent) {
       // anonymous classes
       if (f_visibility == Visibility.ANONYMOUS) {
         f_isStatic = false;
@@ -163,7 +156,7 @@ public abstract class Decl implements IDecl {
 
       final IDecl[] formalTypeParameters = f_formalTypeParameters.isEmpty() ? EMPTY : f_formalTypeParameters
           .toArray(new IDecl[f_formalTypeParameters.size()]);
-      return new DeclClass(parent, f_name, f_visibility, formalTypeParameters, f_isStatic, f_isFinal, f_isAbstract);
+      return new DeclClass(parent, f_childBuilders, f_name, f_visibility, formalTypeParameters, f_isStatic, f_isFinal, f_isAbstract);
     }
   }
 
@@ -225,14 +218,10 @@ public abstract class Decl implements IDecl {
     }
 
     @Override
-    public IDecl build() {
-      if (f_parent == null)
-        throw new IllegalArgumentException(I18N.err(44, "parent"));
-      final IDecl parent = f_parent.build();
-
+    public IDecl buildInternal(IDecl parent) {
       final TypeRef[] parameterTypes = f_parameterTypes.isEmpty() ? TypeRef.EMPTY : f_parameterTypes
           .toArray(new TypeRef[f_parameterTypes.size()]);
-      return new DeclConstructor(parent, f_visibility, parameterTypes);
+      return new DeclConstructor(parent, f_childBuilders, f_visibility, parameterTypes);
     }
   }
 
@@ -284,14 +273,7 @@ public abstract class Decl implements IDecl {
     }
 
     @Override
-    public IDecl build() {
-      final IDecl parent;
-      // if no parent just put into the default package
-      if (f_parent == null)
-        parent = new PackageBuilder(null).build();
-      else
-        parent = f_parent.build();
-
+    public IDecl buildInternal(IDecl parent) {
       if (!SLUtility.isValidJavaIdentifier(f_name))
         throw new IllegalArgumentException(I18N.err(265, f_name));
 
@@ -299,7 +281,7 @@ public abstract class Decl implements IDecl {
       if (f_visibility == Visibility.NA)
         f_visibility = Visibility.PUBLIC;
 
-      return new DeclEnum(parent, f_name, f_visibility);
+      return new DeclEnum(parent, f_childBuilders, f_name, f_visibility);
     }
   }
 
@@ -392,16 +374,13 @@ public abstract class Decl implements IDecl {
     }
 
     @Override
-    public IDecl build() {
-      if (f_parent == null)
-        throw new IllegalArgumentException(I18N.err(44, "parent"));
-      final IDecl parent = f_parent.build();
+    public IDecl buildInternal(IDecl parent) {
       if (f_typeOf == null)
         throw new IllegalArgumentException(I18N.err(44, "typeOf"));
       if (!SLUtility.isValidJavaIdentifier(f_name))
         throw new IllegalArgumentException(I18N.err(265, f_name));
 
-      return new DeclField(parent, f_name, f_visibility, f_typeOf, f_isStatic, f_isFinal);
+      return new DeclField(parent, f_childBuilders, f_name, f_visibility, f_typeOf, f_isStatic, f_isFinal);
     }
   }
 
@@ -448,12 +427,8 @@ public abstract class Decl implements IDecl {
     }
 
     @Override
-    public IDecl build() {
-      if (f_parent == null)
-        throw new IllegalArgumentException(I18N.err(44, "parent"));
-      final IDecl parent = f_parent.build();
-
-      return new DeclInitializer(parent, f_isStatic);
+    public IDecl buildInternal(IDecl parent) {
+      return new DeclInitializer(parent, f_childBuilders, f_isStatic);
     }
   }
 
@@ -521,14 +496,7 @@ public abstract class Decl implements IDecl {
     }
 
     @Override
-    public IDecl build() {
-      final IDecl parent;
-      // if no parent just put into the default package
-      if (f_parent == null)
-        parent = new PackageBuilder(null).build();
-      else
-        parent = f_parent.build();
-
+    public IDecl buildInternal(IDecl parent) {
       if (!SLUtility.isValidJavaIdentifier(f_name))
         throw new IllegalArgumentException(I18N.err(265, f_name));
 
@@ -538,7 +506,7 @@ public abstract class Decl implements IDecl {
 
       final IDecl[] formalTypeParameters = f_formalTypeParameters.isEmpty() ? EMPTY : f_formalTypeParameters
           .toArray(new IDecl[f_formalTypeParameters.size()]);
-      return new DeclInterface(parent, f_name, f_visibility, formalTypeParameters);
+      return new DeclInterface(parent, f_childBuilders, f_name, f_visibility, formalTypeParameters);
     }
   }
 
@@ -680,11 +648,7 @@ public abstract class Decl implements IDecl {
     }
 
     @Override
-    public IDecl build() {
-      if (f_parent == null)
-        throw new IllegalArgumentException(I18N.err(44, "parent"));
-      final IDecl parent = f_parent.build();
-
+    public IDecl buildInternal(IDecl parent) {
       if (!SLUtility.isValidJavaIdentifier(f_name))
         throw new IllegalArgumentException(I18N.err(265, f_name));
 
@@ -698,8 +662,8 @@ public abstract class Decl implements IDecl {
           .toArray(new TypeRef[f_parameterTypes.size()]);
       final IDecl[] formalTypeParameters = f_formalTypeParameters.isEmpty() ? EMPTY : f_formalTypeParameters
           .toArray(new IDecl[f_formalTypeParameters.size()]);
-      return new DeclMethod(parent, f_name, f_visibility, parameterTypes, f_returnTypeOf, formalTypeParameters, f_isStatic,
-          f_isFinal, f_isAbstract);
+      return new DeclMethod(parent, f_childBuilders, f_name, f_visibility, parameterTypes, f_returnTypeOf, formalTypeParameters,
+          f_isStatic, f_isFinal, f_isAbstract);
     }
   }
 
@@ -756,32 +720,32 @@ public abstract class Decl implements IDecl {
   @NotThreadSafe
   public static final class ParameterBuilder extends DeclBuilder {
 
-    int f_argumentNumber;
+    int f_position;
     TypeRef f_typeOf;
     boolean f_isFinal;
 
     /**
      * Constructs a parameter builder.
      * 
-     * @param argumentNumber
+     * @param position
      *          the zero-based argument number of this parameter.
      */
-    public ParameterBuilder(int argumentNumber) {
-      f_argumentNumber = argumentNumber;
+    public ParameterBuilder(int position) {
+      f_position = position;
     }
 
     /**
      * Constructs a parameter builder.
      * 
-     * @param argumentNumber
+     * @param position
      *          the zero-based argument number of this parameter.
      * @param name
      *          the formal parameter name (this is optional, use
      *          {@link Decl.ParameterBuilder#ParameterBuilder(int)} if it is
      *          unknown).
      */
-    public ParameterBuilder(int argumentNumber, String name) {
-      f_argumentNumber = argumentNumber;
+    public ParameterBuilder(int position, String name) {
+      f_position = position;
       f_name = name;
     }
 
@@ -824,25 +788,20 @@ public abstract class Decl implements IDecl {
     }
 
     @Override
-    public IDecl build() {
-      if (f_parent == null)
-        throw new IllegalArgumentException(I18N.err(44, "parent"));
-      final IDecl parent = f_parent.build();
+    public IDecl buildInternal(IDecl parent) {
       if (f_typeOf == null)
         throw new IllegalArgumentException(I18N.err(44, "typeOf"));
-      // see http://www.javaspecialists.eu/archive/Issue059.html
-      if (f_argumentNumber < 0 || f_argumentNumber > 254)
-        throw new IllegalArgumentException(I18N.err(272, f_argumentNumber));
       if (f_name == null || "".equals(f_name)) {
-        f_name = "arg" + f_argumentNumber;
+        f_name = "arg" + f_position;
       } else {
         if (!SLUtility.isValidJavaIdentifier(f_name))
           throw new IllegalArgumentException(I18N.err(265, f_name));
       }
-      if (!(parent.getKind() == Kind.CONSTRUCTOR || parent.getKind() == Kind.METHOD))
-        throw new IllegalArgumentException(I18N.err(267, f_name, parent.getKind()));
+      final Kind parentKind = parent.getKind();
+      if (!(parentKind == Kind.CONSTRUCTOR || parentKind == Kind.METHOD))
+        throw new IllegalArgumentException(I18N.err(267, f_name, parentKind));
 
-      return new DeclParameter(parent, f_name, f_argumentNumber, f_typeOf, f_isFinal);
+      return new DeclParameter(parent, f_childBuilders, f_name, f_position, f_typeOf, f_isFinal);
     }
   }
 
@@ -852,16 +811,20 @@ public abstract class Decl implements IDecl {
   @NotThreadSafe
   public static final class TypeParameterBuilder extends DeclBuilder {
 
+    int f_position;
     List<TypeRef> f_bounds = new ArrayList<TypeRef>();
     boolean f_isFinal;
 
     /**
      * Constructs a type parameter builder.
      * 
+     * @param position
+     *          the zero-based argument number of this parameter.
      * @param name
      *          the name of this type parameter.
      */
-    public TypeParameterBuilder(String name) {
+    public TypeParameterBuilder(int position, String name) {
+      f_position = position;
       f_name = name;
     }
 
@@ -893,17 +856,17 @@ public abstract class Decl implements IDecl {
     }
 
     @Override
-    public IDecl build() {
-      if (f_parent == null)
-        throw new IllegalArgumentException(I18N.err(44, "parent"));
-      final IDecl parent = f_parent.build();
-
+    public IDecl buildInternal(IDecl parent) {
       if (!SLUtility.isValidJavaIdentifier(f_name))
         throw new IllegalArgumentException(I18N.err(265, f_name));
 
+      final Kind parentKind = parent.getKind();
+      if (!(parentKind == Kind.CLASS || parentKind == Kind.INTERFACE || parentKind == Kind.METHOD))
+        throw new IllegalArgumentException(I18N.err(263, f_name, parentKind));
+
       final TypeRef[] bounds = f_bounds.isEmpty() ? TypeRef.EMPTY : f_bounds.toArray(new TypeRef[f_bounds.size()]);
 
-      return new DeclTypeParameter(parent, f_name, bounds);
+      return new DeclTypeParameter(parent, f_childBuilders, f_name, f_position, bounds);
     }
   }
 
@@ -1061,7 +1024,7 @@ public abstract class Decl implements IDecl {
     return TypeRef.EMPTY;
   }
 
-  public int getArgumentNumber() {
+  public int getPosition() {
     return -1;
   }
 

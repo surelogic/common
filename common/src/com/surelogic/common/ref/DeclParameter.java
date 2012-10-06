@@ -8,16 +8,14 @@ import com.surelogic.Nullable;
 import com.surelogic.common.i18n.I18N;
 
 @Immutable
-final class DeclParameter extends Decl {
+final class DeclParameter extends DeclWithPosition {
 
-  final int f_argumentNumber;
   @NonNull
   final TypeRef f_typeOf;
   final boolean f_isFinal;
 
-  DeclParameter(IDecl parent, Set<Decl.DeclBuilder> childBuilders, String name, int argumentNumber, TypeRef typeOf, boolean isFinal) {
-    super(parent, childBuilders, name);
-    f_argumentNumber = argumentNumber;
+  DeclParameter(IDecl parent, Set<Decl.DeclBuilder> childBuilders, String name, int position, TypeRef typeOf, boolean isFinal) {
+    super(parent, childBuilders, name, position);
     if (typeOf == null)
       throw new IllegalArgumentException(I18N.err(44, "typeOf"));
     f_typeOf = typeOf;
@@ -41,12 +39,7 @@ final class DeclParameter extends Decl {
   }
 
   @Override
-  public int getArgumentNumber() {
-    return f_argumentNumber;
-  }
-
-  @Override
   String toStringHelper() {
-    return " : parameter" + f_argumentNumber + "(" + f_name + "):" + f_typeOf.toString();
+    return " : parameter" + f_position + "(" + f_name + "):" + f_typeOf.toString();
   }
 }

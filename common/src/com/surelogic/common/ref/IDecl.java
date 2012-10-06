@@ -164,13 +164,14 @@ public interface IDecl {
   TypeRef[] getParameterTypes();
 
   /**
-   * Gets the zero-based argument number of this declaration&mdash;this
-   * information is only meaningful for {@link Kind#PARAMETER}. If this is
-   * meaningless for the declaration, -1 is returned.
+   * Gets the zero-based position number of a parameter declaration&mdash;this
+   * information is only meaningful for {@link Kind#PARAMETER} and
+   * {@link Kind#TYPE_PARAMETER}. If this is meaningless for the declaration, -1
+   * is returned.
    * 
-   * @return the zero-based argument number of this parameter, or -1.
+   * @return the zero-based position number of this parameter, or -1.
    */
-  int getArgumentNumber();
+  int getPosition();
 
   /**
    * Gets the formal type parameters for a {@link Kind#CLASS},
