@@ -1,5 +1,7 @@
 package com.surelogic.common.ref;
 
+import java.util.Set;
+
 import com.surelogic.Immutable;
 import com.surelogic.NonNull;
 import com.surelogic.Nullable;
@@ -15,9 +17,9 @@ final class DeclMethod extends DeclHasFormalParameters {
   final boolean f_isFinal;
   final boolean f_isAbstract;
 
-  DeclMethod(IDecl parent, String name, Visibility visibility, TypeRef[] formalParameterTypes, TypeRef returnTypeOf,
-      IDecl[] formalTypeParameters, boolean isStatic, boolean isFinal, boolean isAbstract) {
-    super(parent, name, visibility, formalParameterTypes);
+  DeclMethod(IDecl parent, Set<Decl.DeclBuilder> childBuilders, String name, Visibility visibility, TypeRef[] formalParameterTypes,
+      TypeRef returnTypeOf, IDecl[] formalTypeParameters, boolean isStatic, boolean isFinal, boolean isAbstract) {
+    super(parent, childBuilders, name, visibility, formalParameterTypes);
     f_returnTypeOf = returnTypeOf;
     f_formalTypeParameters = formalTypeParameters == null ? EMPTY : formalTypeParameters;
     f_isStatic = isStatic;

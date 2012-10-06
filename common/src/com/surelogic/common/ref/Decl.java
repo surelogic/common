@@ -1,8 +1,11 @@
 package com.surelogic.common.ref;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import com.surelogic.Immutable;
 import com.surelogic.NonNull;
@@ -711,8 +714,7 @@ public abstract class Decl implements IDecl {
      * 
      * @param name
      *          the package name. <tt>""</tt> or <tt>null</tt> indicate the
-     *          default package. The name can be simple, such as <tt>com</tt>,
-     *          or nested, such as <tt>com.surelogic.work</tt>.
+     *          default package. The name must be simple, such as <tt>com</tt>.
      */
     public PackageBuilder(String name) {
       f_name = name;
@@ -732,42 +734,19 @@ public abstract class Decl implements IDecl {
     }
 
     @Override
-    public IDecl build() {
+    IDecl buildInternal(IDecl parent) {
       if (f_name == null || "".equals(f_name)) {
-        /*
-         * Default package
-         */
-        if (f_parent == null) {
-          return new DeclPackage(); // default package
+        if (parent == null) {
+          /*
+           * We are building the default package
+           */
+          return new DeclPackage(f_childBuilders); // default package
         } else
           throw new IllegalArgumentException(I18N.err(264));
       }
-
-      final StringBuilder b = new StringBuilder(f_name);
-      IDecl parent = f_parent == null ? null : f_parent.build();
-      if (parent != null && parent.getName().equals(SLUtility.JAVA_DEFAULT_PACKAGE)) {
-        /*
-         * If our parent is the default package, rather than throw an error we
-         * just ignore this problem and act as if we have no parent.
-         */
-        parent = null;
-      }
-      boolean hasDot = true;
-      while (hasDot) {
-        final int dotIndex = b.indexOf(".");
-        hasDot = dotIndex != -1;
-        final String name = hasDot ? b.substring(0, dotIndex) : b.toString();
-        if (name.length() > 0) {
-          if (SLUtility.isValidJavaIdentifier(name))
-            parent = new DeclPackage(parent, name);
-          else
-            throw new IllegalArgumentException(I18N.err(262, name, f_name));
-        } else
-          throw new IllegalArgumentException(I18N.err(263, f_name));
-        if (hasDot)
-          b.delete(0, dotIndex + 1);
-      }
-      return parent;
+      if (!SLUtility.isValidJavaIdentifier(f_name))
+        throw new IllegalArgumentException(I18N.err(265, f_name));
+      return new DeclPackage(parent, f_childBuilders, f_name);
     }
   }
 
@@ -935,46 +914,119 @@ public abstract class Decl implements IDecl {
   public static abstract class DeclBuilder {
 
     DeclBuilder f_parent;
+    final Set<DeclBuilder> f_childBuilders = new HashSet<DeclBuilder>();
     String f_name;
 
     /**
-     * Sets the parent of this declaration.
+     * Only valid after the build.
+     */
+    IDecl f_declaration;
+
+    /**
+     * Sets the parent of this declaration. If the parent is non-null then this
+     * builder is added as one of its set of child builders.
+     * <p>
+     * Multiple calls with the same value are ignored.
      * 
      * @param value
      *          the parent of this declaration.
      * @return this builder.
      */
-    public DeclBuilder setParent(DeclBuilder value) {
+    public DeclBuilder setParent(@Nullable DeclBuilder value) {
       f_parent = value;
+      if (value != null)
+        value.f_childBuilders.add(this);
       return this;
     }
 
     /**
-     * Builds an appropriate {@link IDecl} instance. Throws an exception if
-     * something goes wrong.
+     * Builds an appropriate {@link IDecl} instance by finding the root builder
+     * and constructing a declaration tree from the root out. Throws an
+     * exception if something goes wrong.
      * 
-     * @return a new {@link IDecl} instance.
+     * @return a {@link IDecl} instance for this builder.
      * @throws IllegalArgumentException
      *           if something goes wrong.
      */
-    public abstract IDecl build();
+    public final IDecl build() {
+      // find the root
+      DeclBuilder root = this;
+      while (root.f_parent != null) {
+        root = root.f_parent;
+      }
+      // build the declaration tree
+      root.buildHelper(null);
+      // returned the stashed IDecl from buildHelper
+      return f_declaration;
+    }
+
+    private final IDecl buildHelper(IDecl parent) {
+      final IDecl stash = buildInternal(parent);
+      f_declaration = stash;
+      return stash;
+    }
+
+    abstract IDecl buildInternal(IDecl parent);
   }
 
+  /**
+   * {@code null} indicates at the root.
+   */
   @Nullable
   final IDecl f_parent;
+  /**
+   * {@code null} indicates no children.
+   */
+  @Nullable
+  final IDecl[] f_children;
   @NonNull
   final String f_name;
 
-  public Decl(IDecl parent, String name) {
+  /**
+   * Constructs a declaration tree from the root out. Children are constructed
+   * by this method so that a parent-to-child and child-to-parent links can be
+   * set up that are immutable.
+   * <p>
+   * To construct children the {@link DeclBuilder#buildHelper(IDecl)} is used.
+   * 
+   * @param parent
+   *          the parent of this declaration, {@code null} if at the root of the
+   *          declaration tree.
+   * @param childBuilders
+   *          builders for all the children of this declaration.
+   * @param name
+   *          the name of this declaration.
+   */
+  public Decl(IDecl parent, Set<Decl.DeclBuilder> childBuilders, String name) {
     f_parent = parent;
     if (name == null)
       throw new IllegalArgumentException(I18N.err(44, "name"));
     f_name = name;
+    final List<IDecl> children = new ArrayList<IDecl>();
+    for (Decl.DeclBuilder childBuilder : childBuilders) {
+      children.add(childBuilder.buildHelper(this));
+    }
+    if (children.isEmpty())
+      f_children = null;
+    else
+      f_children = children.toArray(new IDecl[children.size()]);
   }
 
   @Nullable
   public final IDecl getParent() {
     return f_parent;
+  }
+
+  @NonNull
+  public final Set<IDecl> getChildren() {
+    if (f_children == null)
+      return Collections.emptySet();
+    else {
+      final Set<IDecl> result = new HashSet<IDecl>();
+      for (IDecl decl : f_children)
+        result.add(decl);
+      return result;
+    }
   }
 
   @NonNull
@@ -1005,7 +1057,7 @@ public abstract class Decl implements IDecl {
   }
 
   @NonNull
-  public TypeRef[] getFormalParameterTypes() {
+  public TypeRef[] getParameterTypes() {
     return TypeRef.EMPTY;
   }
 

@@ -1,5 +1,7 @@
 package com.surelogic.common.ref;
 
+import java.util.Set;
+
 import com.surelogic.Immutable;
 import com.surelogic.NonNull;
 
@@ -12,9 +14,9 @@ final class DeclClass extends DeclVisibility {
   final boolean f_isFinal;
   final boolean f_isAbstract;
 
-  DeclClass(IDecl parent, String name, Visibility visibility, IDecl[] formalTypeParameters, boolean isStatic, boolean isFinal,
-      boolean isAbstract) {
-    super(parent, name, visibility);
+  DeclClass(IDecl parent, Set<Decl.DeclBuilder> childBuilders, String name, Visibility visibility, IDecl[] formalTypeParameters,
+      boolean isStatic, boolean isFinal, boolean isAbstract) {
+    super(parent, childBuilders, name, visibility);
     f_formalTypeParameters = formalTypeParameters == null ? EMPTY : formalTypeParameters;
     f_isStatic = isStatic;
     f_isFinal = isFinal;

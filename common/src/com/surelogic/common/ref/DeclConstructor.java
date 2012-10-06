@@ -1,13 +1,15 @@
 package com.surelogic.common.ref;
 
+import java.util.Set;
+
 import com.surelogic.Immutable;
 import com.surelogic.NonNull;
 
 @Immutable
 final class DeclConstructor extends DeclHasFormalParameters {
 
-  DeclConstructor(IDecl parent, Visibility visibility, TypeRef[] formalParameterTypes) {
-    super(parent, parent.getName(), visibility, formalParameterTypes);
+  DeclConstructor(IDecl parent, Set<Decl.DeclBuilder> childBuilders, Visibility visibility, TypeRef[] formalParameterTypes) {
+    super(parent, childBuilders, parent.getName(), visibility, formalParameterTypes);
   }
 
   @NonNull

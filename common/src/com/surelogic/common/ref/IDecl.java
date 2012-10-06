@@ -1,5 +1,7 @@
 package com.surelogic.common.ref;
 
+import java.util.Set;
+
 import com.surelogic.NonNull;
 import com.surelogic.Nullable;
 import com.surelogic.ThreadSafe;
@@ -57,6 +59,16 @@ public interface IDecl {
    */
   @Nullable
   IDecl getParent();
+
+  /**
+   * Gets all child declarations of this declaration. The returned set is a copy
+   * and may be safely mutated.
+   * 
+   * @return the possibly empty set of declarations that have this declaration
+   *         as their parent.
+   */
+  @NonNull
+  Set<IDecl> getChildren();
 
   /**
    * Gets the kind of this declaration.
@@ -142,14 +154,14 @@ public interface IDecl {
   boolean isAbstract();
 
   /**
-   * Gets the ordered list, first to last, of the formal parameter types for a
+   * Gets the ordered list, first to last, of the parameter types for a
    * {@link Kind#CONSTRUCTOR} or {@link Kind#METHOD}. If this is meaningless for
    * the declaration, an empty array is returned.
    * 
    * @return a possibly empty list of the formal parameter types, in order.
    */
   @NonNull
-  TypeRef[] getFormalParameterTypes();
+  TypeRef[] getParameterTypes();
 
   /**
    * Gets the zero-based argument number of this declaration&mdash;this

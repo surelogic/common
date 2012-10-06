@@ -1,5 +1,7 @@
 package com.surelogic.common.ref;
 
+import java.util.Set;
+
 import com.surelogic.Immutable;
 import com.surelogic.NonNull;
 import com.surelogic.Nullable;
@@ -13,8 +15,9 @@ final class DeclField extends DeclVisibility {
   final boolean f_isStatic;
   final boolean f_isFinal;
 
-  DeclField(IDecl parent, String name, Visibility visibility, TypeRef typeOf, boolean isStatic, boolean isFinal) {
-    super(parent, name, visibility);
+  DeclField(IDecl parent, Set<Decl.DeclBuilder> childBuilders, String name, Visibility visibility, TypeRef typeOf,
+      boolean isStatic, boolean isFinal) {
+    super(parent, childBuilders, name, visibility);
     if (typeOf == null)
       throw new IllegalArgumentException(I18N.err(44, "typeOf"));
     f_typeOf = typeOf;

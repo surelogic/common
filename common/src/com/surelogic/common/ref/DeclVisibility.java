@@ -1,5 +1,7 @@
 package com.surelogic.common.ref;
 
+import java.util.Set;
+
 import com.surelogic.Immutable;
 import com.surelogic.NonNull;
 import com.surelogic.common.i18n.I18N;
@@ -10,8 +12,8 @@ abstract class DeclVisibility extends Decl {
   @NonNull
   final Visibility f_visibility;
 
-  DeclVisibility(IDecl parent, String name, Visibility visibility) {
-    super(parent, name);
+  DeclVisibility(IDecl parent, Set<Decl.DeclBuilder> childBuilders, String name, Visibility visibility) {
+    super(parent, childBuilders, name);
     if (visibility == null)
       throw new IllegalArgumentException(I18N.err(44, "visibility"));
     f_visibility = visibility;

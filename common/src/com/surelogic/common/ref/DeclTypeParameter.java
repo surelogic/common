@@ -1,5 +1,7 @@
 package com.surelogic.common.ref;
 
+import java.util.Set;
+
 import com.surelogic.NonNull;
 import com.surelogic.Nullable;
 
@@ -8,8 +10,8 @@ public final class DeclTypeParameter extends Decl {
   @Nullable
   private final TypeRef[] f_bounds;
 
-  public DeclTypeParameter(IDecl parent, String name, TypeRef[] bounds) {
-    super(parent, name);
+  public DeclTypeParameter(IDecl parent, Set<Decl.DeclBuilder> childBuilders, String name, TypeRef[] bounds) {
+    super(parent, childBuilders, name);
     f_bounds = bounds;
   }
 

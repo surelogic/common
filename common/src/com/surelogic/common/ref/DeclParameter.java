@@ -1,5 +1,7 @@
 package com.surelogic.common.ref;
 
+import java.util.Set;
+
 import com.surelogic.Immutable;
 import com.surelogic.NonNull;
 import com.surelogic.Nullable;
@@ -13,8 +15,8 @@ final class DeclParameter extends Decl {
   final TypeRef f_typeOf;
   final boolean f_isFinal;
 
-  DeclParameter(IDecl parent, String name, int argumentNumber, TypeRef typeOf, boolean isFinal) {
-    super(parent, name);
+  DeclParameter(IDecl parent, Set<Decl.DeclBuilder> childBuilders, String name, int argumentNumber, TypeRef typeOf, boolean isFinal) {
+    super(parent, childBuilders, name);
     f_argumentNumber = argumentNumber;
     if (typeOf == null)
       throw new IllegalArgumentException(I18N.err(44, "typeOf"));
