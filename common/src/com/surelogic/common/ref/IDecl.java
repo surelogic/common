@@ -154,14 +154,14 @@ public interface IDecl {
   boolean isAbstract();
 
   /**
-   * Gets the ordered list, first to last, of the parameter types for a
+   * Gets the ordered list, first to last, of the parameter declarations for a
    * {@link Kind#CONSTRUCTOR} or {@link Kind#METHOD}. If this is meaningless for
    * the declaration, an empty array is returned.
    * 
    * @return a possibly empty list of the formal parameter types, in order.
    */
   @NonNull
-  TypeRef[] getParameterTypes();
+  IDecl[] getParameters();
 
   /**
    * Gets the zero-based position number of a parameter declaration&mdash;this

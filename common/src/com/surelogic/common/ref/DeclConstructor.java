@@ -6,10 +6,10 @@ import com.surelogic.Immutable;
 import com.surelogic.NonNull;
 
 @Immutable
-final class DeclConstructor extends DeclHasFormalParameters {
+final class DeclConstructor extends DeclVisibility {
 
-  DeclConstructor(IDecl parent, Set<Decl.DeclBuilder> childBuilders, Visibility visibility, TypeRef[] formalParameterTypes) {
-    super(parent, childBuilders, parent.getName(), visibility, formalParameterTypes);
+  DeclConstructor(IDecl parent, Set<Decl.DeclBuilder> childBuilders, Visibility visibility) {
+    super(parent, childBuilders, parent.getName(), visibility);
   }
 
   @NonNull
@@ -22,15 +22,15 @@ final class DeclConstructor extends DeclHasFormalParameters {
     final StringBuilder b = new StringBuilder("#");
     b.append(f_name);
     b.append("(");
-    boolean first = true;
-    for (TypeRef typeRef : f_formalParameterTypes) {
-      if (first) {
-        first = false;
-      } else {
-        b.append(",");
-      }
-      b.append(typeRef.toString());
-    }
+//    boolean first = true;
+//    for (TypeRef typeRef : f_formalParameterTypes) {
+//      if (first) {
+//        first = false;
+//      } else {
+//        b.append(",");
+//      }
+//      b.append(typeRef.toString());
+//    }
     b.append(")");
     return b.toString();
   }

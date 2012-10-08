@@ -23,17 +23,15 @@ public abstract class Decl implements IDecl {
    * Constructs class {@link IDecl} instances.
    */
   @NotThreadSafe
-  public static final class ClassBuilder extends DeclBuilderVisibility {
+  public static final class ClassBuilder extends DeclBuilder {
 
-    List<IDecl> f_formalTypeParameters = new ArrayList<IDecl>();
+    Visibility f_visibility;
     boolean f_isStatic = false;
     boolean f_isFinal = false;
     boolean f_isAbstract = false;
 
     /**
      * Constructs a class builder.
-     * <p>
-     * If no parent is set this class is placed in the default package.
      * <p>
      * By default the class is <tt>public</tt>, not <tt>static</tt>, not
      * <tt>final</tt>, and not <tt>abstract</tt>.
@@ -80,16 +78,19 @@ public abstract class Decl implements IDecl {
     }
 
     /**
-     * Adds a formal type parameter to the end of the list of formal parameter
-     * types for this declaration.
+     * Adds a type parameter to this declaration. This is a convenience method
+     * that is the same as setting the parent of the
+     * {@link TypeParameterBuilder} to this, i.e.,
+     * <tt>o.addTypeParameter(p)</tt> has the same effect as
+     * <tt>p.setParent(o)</tt>.
      * 
      * @param value
-     *          a formal parameter type. Ignored if {@code null}.
+     *          a type parameter builder. Ignored if {@code null}.
      * @return this builder.
      */
-    public ClassBuilder addFormalTypeParameter(IDecl value) {
+    public ClassBuilder addTypeParameter(TypeParameterBuilder value) {
       if (value != null)
-        f_formalTypeParameters.add(value);
+        value.setParent(this);
       return this;
     }
 
@@ -143,6 +144,9 @@ public abstract class Decl implements IDecl {
           throw new IllegalArgumentException(I18N.err(265, f_name));
       }
 
+      if (parent == null)
+        throw new IllegalArgumentException(I18N.err(262, f_name));
+
       // NA is not allowed
       if (f_visibility == Visibility.NA)
         f_visibility = Visibility.PUBLIC;
@@ -154,9 +158,7 @@ public abstract class Decl implements IDecl {
       if (f_isAbstract && f_isFinal)
         throw new IllegalArgumentException(I18N.err(266, f_name));
 
-      final IDecl[] formalTypeParameters = f_formalTypeParameters.isEmpty() ? EMPTY : f_formalTypeParameters
-          .toArray(new IDecl[f_formalTypeParameters.size()]);
-      return new DeclClass(parent, f_childBuilders, f_name, f_visibility, formalTypeParameters, f_isStatic, f_isFinal, f_isAbstract);
+      return new DeclClass(parent, f_childBuilders, f_name, f_visibility, f_isStatic, f_isFinal, f_isAbstract);
     }
   }
 
@@ -164,9 +166,9 @@ public abstract class Decl implements IDecl {
    * Constructs constructor {@link IDecl} instances.
    */
   @NotThreadSafe
-  public static final class ConstructorBuilder extends DeclBuilderVisibility {
+  public static final class ConstructorBuilder extends DeclBuilder {
 
-    List<TypeRef> f_parameterTypes = new ArrayList<TypeRef>();
+    Visibility f_visibility;
 
     /**
      * Constructs a constructor builder.
@@ -204,24 +206,27 @@ public abstract class Decl implements IDecl {
     }
 
     /**
-     * Adds a formal parameter type to the end of the list of formal parameter
-     * types for this declaration.
+     * Adds a parameter to this declaration. This is a convenience method that
+     * is the same as setting the parent of the {@link ParameterBuilder} to
+     * this, i.e., <tt>o.addParameterType(p)</tt> has the same effect as
+     * <tt>p.setParent(o)</tt>.
      * 
      * @param value
-     *          a formal parameter type. Ignored if {@code null}.
+     *          a type parameter builder. Ignored if {@code null}.
      * @return this builder.
      */
-    public ConstructorBuilder addFormalParameterType(TypeRef value) {
+    public ConstructorBuilder addParameter(ParameterBuilder value) {
       if (value != null)
-        f_parameterTypes.add(value);
+        value.setParent(this);
       return this;
     }
 
     @Override
     public IDecl buildInternal(IDecl parent) {
-      final TypeRef[] parameterTypes = f_parameterTypes.isEmpty() ? TypeRef.EMPTY : f_parameterTypes
-          .toArray(new TypeRef[f_parameterTypes.size()]);
-      return new DeclConstructor(parent, f_childBuilders, f_visibility, parameterTypes);
+      if (parent == null)
+        throw new IllegalArgumentException(I18N.err(262, f_name));
+
+      return new DeclConstructor(parent, f_childBuilders, f_visibility);
     }
   }
 
@@ -229,7 +234,9 @@ public abstract class Decl implements IDecl {
    * Constructs enum {@link IDecl} instances.
    */
   @NotThreadSafe
-  public static final class EnumBuilder extends DeclBuilderVisibility {
+  public static final class EnumBuilder extends DeclBuilder {
+
+    Visibility f_visibility;
 
     /**
      * Constructs an enum builder.
@@ -277,6 +284,9 @@ public abstract class Decl implements IDecl {
       if (!SLUtility.isValidJavaIdentifier(f_name))
         throw new IllegalArgumentException(I18N.err(265, f_name));
 
+      if (parent == null)
+        throw new IllegalArgumentException(I18N.err(262, f_name));
+
       // NA is not allowed
       if (f_visibility == Visibility.NA)
         f_visibility = Visibility.PUBLIC;
@@ -289,8 +299,9 @@ public abstract class Decl implements IDecl {
    * Constructs field {@link IDecl} instances.
    */
   @NotThreadSafe
-  public static final class FieldBuilder extends DeclBuilderVisibility {
+  public static final class FieldBuilder extends DeclBuilder {
 
+    Visibility f_visibility;
     TypeRef f_typeOf;
     boolean f_isStatic = false;
     boolean f_isFinal = false;
@@ -379,6 +390,8 @@ public abstract class Decl implements IDecl {
         throw new IllegalArgumentException(I18N.err(44, "typeOf"));
       if (!SLUtility.isValidJavaIdentifier(f_name))
         throw new IllegalArgumentException(I18N.err(265, f_name));
+      if (parent == null)
+        throw new IllegalArgumentException(I18N.err(262, f_name));
 
       return new DeclField(parent, f_childBuilders, f_name, f_visibility, f_typeOf, f_isStatic, f_isFinal);
     }
@@ -428,6 +441,9 @@ public abstract class Decl implements IDecl {
 
     @Override
     public IDecl buildInternal(IDecl parent) {
+      if (parent == null)
+        throw new IllegalArgumentException(I18N.err(262, f_name));
+
       return new DeclInitializer(parent, f_childBuilders, f_isStatic);
     }
   }
@@ -436,9 +452,9 @@ public abstract class Decl implements IDecl {
    * Constructs interface {@link IDecl} instances.
    */
   @NotThreadSafe
-  public static final class InterfaceBuilder extends DeclBuilderVisibility {
+  public static final class InterfaceBuilder extends DeclBuilder {
 
-    List<IDecl> f_formalTypeParameters = new ArrayList<IDecl>();
+    Visibility f_visibility;
 
     /**
      * Constructs an interface builder.
@@ -482,16 +498,19 @@ public abstract class Decl implements IDecl {
     }
 
     /**
-     * Adds a formal type parameter to the end of the list of formal parameter
-     * types for this declaration.
+     * Adds a type parameter to this declaration. This is a convenience method
+     * that is the same as setting the parent of the
+     * {@link TypeParameterBuilder} to this, i.e.,
+     * <tt>o.addTypeParameter(p)</tt> has the same effect as
+     * <tt>p.setParent(o)</tt>.
      * 
      * @param value
-     *          a formal parameter type. Ignored if {@code null}.
+     *          a type parameter builder. Ignored if {@code null}.
      * @return this builder.
      */
-    public InterfaceBuilder addFormalTypeParameter(IDecl value) {
+    public InterfaceBuilder addTypeParameter(TypeParameterBuilder value) {
       if (value != null)
-        f_formalTypeParameters.add(value);
+        value.setParent(this);
       return this;
     }
 
@@ -500,13 +519,14 @@ public abstract class Decl implements IDecl {
       if (!SLUtility.isValidJavaIdentifier(f_name))
         throw new IllegalArgumentException(I18N.err(265, f_name));
 
+      if (parent == null)
+        throw new IllegalArgumentException(I18N.err(262, f_name));
+
       // NA is not allowed
       if (f_visibility == Visibility.NA)
         f_visibility = Visibility.PUBLIC;
 
-      final IDecl[] formalTypeParameters = f_formalTypeParameters.isEmpty() ? EMPTY : f_formalTypeParameters
-          .toArray(new IDecl[f_formalTypeParameters.size()]);
-      return new DeclInterface(parent, f_childBuilders, f_name, f_visibility, formalTypeParameters);
+      return new DeclInterface(parent, f_childBuilders, f_name, f_visibility);
     }
   }
 
@@ -514,14 +534,13 @@ public abstract class Decl implements IDecl {
    * Constructs method {@link IDecl} instances.
    */
   @NotThreadSafe
-  public static final class MethodBuilder extends DeclBuilderVisibility {
+  public static final class MethodBuilder extends DeclBuilder {
 
+    Visibility f_visibility;
     TypeRef f_returnTypeOf;
-    List<IDecl> f_formalTypeParameters = new ArrayList<IDecl>();
     boolean f_isStatic = false;
     boolean f_isFinal = false;
     boolean f_isAbstract = false;
-    List<TypeRef> f_parameterTypes = new ArrayList<TypeRef>();
 
     /**
      * Constructs a method builder.
@@ -581,16 +600,19 @@ public abstract class Decl implements IDecl {
     }
 
     /**
-     * Adds a formal type parameter to the end of the list of formal parameter
-     * types for this declaration.
+     * Adds a type parameter to this declaration. This is a convenience method
+     * that is the same as setting the parent of the
+     * {@link TypeParameterBuilder} to this, i.e.,
+     * <tt>o.addTypeParameter(p)</tt> has the same effect as
+     * <tt>p.setParent(o)</tt>.
      * 
      * @param value
-     *          a formal parameter type. Ignored if {@code null}.
+     *          a type parameter builder. Ignored if {@code null}.
      * @return this builder.
      */
-    public MethodBuilder addFormalTypeParameter(IDecl value) {
+    public MethodBuilder addTypeParameter(TypeParameterBuilder value) {
       if (value != null)
-        f_formalTypeParameters.add(value);
+        value.setParent(this);
       return this;
     }
 
@@ -634,16 +656,18 @@ public abstract class Decl implements IDecl {
     }
 
     /**
-     * Adds a formal parameter type to the end of the list of formal parameter
-     * types for this declaration.
+     * Adds a parameter to this declaration. This is a convenience method that
+     * is the same as setting the parent of the {@link ParameterBuilder} to
+     * this, i.e., <tt>o.addParameterType(p)</tt> has the same effect as
+     * <tt>p.setParent(o)</tt>.
      * 
      * @param value
-     *          a formal parameter type. Ignored if {@code null}.
+     *          a type parameter builder. Ignored if {@code null}.
      * @return this builder.
      */
-    public MethodBuilder addFormalParameterType(TypeRef value) {
+    public MethodBuilder addParameter(ParameterBuilder value) {
       if (value != null)
-        f_parameterTypes.add(value);
+        value.setParent(this);
       return this;
     }
 
@@ -652,18 +676,16 @@ public abstract class Decl implements IDecl {
       if (!SLUtility.isValidJavaIdentifier(f_name))
         throw new IllegalArgumentException(I18N.err(265, f_name));
 
+      if (parent == null)
+        throw new IllegalArgumentException(I18N.err(262, f_name));
+
       if (f_isAbstract && f_isFinal)
         throw new IllegalArgumentException(I18N.err(269, f_name));
 
       if (f_isAbstract && f_isStatic)
         throw new IllegalArgumentException(I18N.err(270, f_name));
 
-      final TypeRef[] parameterTypes = f_parameterTypes.isEmpty() ? TypeRef.EMPTY : f_parameterTypes
-          .toArray(new TypeRef[f_parameterTypes.size()]);
-      final IDecl[] formalTypeParameters = f_formalTypeParameters.isEmpty() ? EMPTY : f_formalTypeParameters
-          .toArray(new IDecl[f_formalTypeParameters.size()]);
-      return new DeclMethod(parent, f_childBuilders, f_name, f_visibility, parameterTypes, f_returnTypeOf, formalTypeParameters,
-          f_isStatic, f_isFinal, f_isAbstract);
+      return new DeclMethod(parent, f_childBuilders, f_name, f_visibility, f_returnTypeOf, f_isStatic, f_isFinal, f_isAbstract);
     }
   }
 
@@ -791,12 +813,17 @@ public abstract class Decl implements IDecl {
     public IDecl buildInternal(IDecl parent) {
       if (f_typeOf == null)
         throw new IllegalArgumentException(I18N.err(44, "typeOf"));
+
       if (f_name == null || "".equals(f_name)) {
         f_name = "arg" + f_position;
       } else {
         if (!SLUtility.isValidJavaIdentifier(f_name))
           throw new IllegalArgumentException(I18N.err(265, f_name));
       }
+
+      if (parent == null)
+        throw new IllegalArgumentException(I18N.err(262, f_name));
+
       final Kind parentKind = parent.getKind();
       if (!(parentKind == Kind.CONSTRUCTOR || parentKind == Kind.METHOD))
         throw new IllegalArgumentException(I18N.err(267, f_name, parentKind));
@@ -860,6 +887,9 @@ public abstract class Decl implements IDecl {
       if (!SLUtility.isValidJavaIdentifier(f_name))
         throw new IllegalArgumentException(I18N.err(265, f_name));
 
+      if (parent == null)
+        throw new IllegalArgumentException(I18N.err(262, f_name));
+
       final Kind parentKind = parent.getKind();
       if (!(parentKind == Kind.CLASS || parentKind == Kind.INTERFACE || parentKind == Kind.METHOD))
         throw new IllegalArgumentException(I18N.err(263, f_name, parentKind));
@@ -868,10 +898,6 @@ public abstract class Decl implements IDecl {
 
       return new DeclTypeParameter(parent, f_childBuilders, f_name, f_position, bounds);
     }
-  }
-
-  private static abstract class DeclBuilderVisibility extends DeclBuilder {
-    Visibility f_visibility;
   }
 
   public static abstract class DeclBuilder {
@@ -1020,8 +1046,8 @@ public abstract class Decl implements IDecl {
   }
 
   @NonNull
-  public TypeRef[] getParameterTypes() {
-    return TypeRef.EMPTY;
+  public IDecl[] getParameters() {
+    return EMPTY;
   }
 
   public int getPosition() {

@@ -8,16 +8,13 @@ import com.surelogic.NonNull;
 @Immutable
 final class DeclClass extends DeclVisibility {
 
-  @NonNull
-  final IDecl[] f_formalTypeParameters;
   final boolean f_isStatic;
   final boolean f_isFinal;
   final boolean f_isAbstract;
 
-  DeclClass(IDecl parent, Set<Decl.DeclBuilder> childBuilders, String name, Visibility visibility, IDecl[] formalTypeParameters,
-      boolean isStatic, boolean isFinal, boolean isAbstract) {
+  DeclClass(IDecl parent, Set<Decl.DeclBuilder> childBuilders, String name, Visibility visibility, boolean isStatic,
+      boolean isFinal, boolean isAbstract) {
     super(parent, childBuilders, name, visibility);
-    f_formalTypeParameters = formalTypeParameters == null ? EMPTY : formalTypeParameters;
     f_isStatic = isStatic;
     f_isFinal = isFinal;
     f_isAbstract = isAbstract;
@@ -31,7 +28,7 @@ final class DeclClass extends DeclVisibility {
   @Override
   @NonNull
   public IDecl[] getTypeParameters() {
-    return f_formalTypeParameters;
+    return null; // TODO
   }
 
   @Override
@@ -52,8 +49,8 @@ final class DeclClass extends DeclVisibility {
   @Override
   String toStringHelper() {
     if (f_visibility == Visibility.ANONYMOUS)
-      return ".(anonymous class)" + f_formalTypeParameters;
+      return ".(anonymous class)"; // TODO
     else
-      return "." + f_name + f_formalTypeParameters;
+      return "." + f_name; // TODO
   }
 }
