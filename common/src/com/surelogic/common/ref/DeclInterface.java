@@ -19,6 +19,6 @@ final class DeclInterface extends DeclVisibility {
 
   @Override
   String toStringHelper() {
-    return "." + f_name + Decl.toStringTypeParameters(this);
+    return "." + f_name + Decl.toStringHelperTypeParameters(this);
   }
 }

@@ -9,7 +9,10 @@ import com.surelogic.Nullable;
 @Immutable
 final class DeclMethod extends DeclVisibility {
 
-  @NonNull
+  /**
+   * {@code null} indicates <tt>void</tt>.
+   */
+  @Nullable
   final TypeRef f_returnTypeOf;
   final boolean f_isStatic;
   final boolean f_isFinal;
@@ -52,6 +55,13 @@ final class DeclMethod extends DeclVisibility {
 
   @Override
   String toStringHelper() {
-    return "#" + f_name + Decl.toStringParameters(this) + ":" + f_returnTypeOf.getFullyQualified();
+    final StringBuilder b = new StringBuilder("#");
+    b.append(f_name);
+    b.append(Decl.toStringHelperParameters(this));
+    if (f_returnTypeOf != null) {
+      b.append(":");
+      b.append(f_returnTypeOf.getFullyQualified());
+    }
+    return b.toString();
   }
 }

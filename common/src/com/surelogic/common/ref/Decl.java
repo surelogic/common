@@ -159,6 +159,16 @@ public abstract class Decl implements IDecl {
       if (f_isAbstract && f_isFinal)
         throw new IllegalArgumentException(I18N.err(266, f_name));
 
+      final Set<Integer> usedTypeParmPositions = new HashSet<Integer>();
+      for (DeclBuilder b : f_childBuilders) {
+        if (b instanceof TypeParameterBuilder) {
+          final Integer position = Integer.valueOf(((TypeParameterBuilder) b).f_position);
+          if (usedTypeParmPositions.contains(position))
+            throw new IllegalArgumentException(I18N.err(274, position));
+          usedTypeParmPositions.add(position);
+        }
+      }
+
       return new DeclClass(parent, f_childBuilders, f_name, f_visibility, f_isStatic, f_isFinal, f_isAbstract);
     }
   }
@@ -226,6 +236,16 @@ public abstract class Decl implements IDecl {
     public IDecl buildInternal(IDecl parent) {
       if (parent == null)
         throw new IllegalArgumentException(I18N.err(262, f_name));
+
+      final Set<Integer> usedParmPositions = new HashSet<Integer>();
+      for (DeclBuilder b : f_childBuilders) {
+        if (b instanceof ParameterBuilder) {
+          final Integer position = Integer.valueOf(((ParameterBuilder) b).f_position);
+          if (usedParmPositions.contains(position))
+            throw new IllegalArgumentException(I18N.err(273, position));
+          usedParmPositions.add(position);
+        }
+      }
 
       return new DeclConstructor(parent, f_childBuilders, f_visibility);
     }
@@ -527,6 +547,16 @@ public abstract class Decl implements IDecl {
       if (f_visibility == Visibility.NA)
         f_visibility = Visibility.PUBLIC;
 
+      final Set<Integer> usedTypeParmPositions = new HashSet<Integer>();
+      for (DeclBuilder b : f_childBuilders) {
+        if (b instanceof TypeParameterBuilder) {
+          final Integer position = Integer.valueOf(((TypeParameterBuilder) b).f_position);
+          if (usedTypeParmPositions.contains(position))
+            throw new IllegalArgumentException(I18N.err(274, position));
+          usedTypeParmPositions.add(position);
+        }
+      }
+
       return new DeclInterface(parent, f_childBuilders, f_name, f_visibility);
     }
   }
@@ -686,6 +716,22 @@ public abstract class Decl implements IDecl {
       if (f_isAbstract && f_isStatic)
         throw new IllegalArgumentException(I18N.err(270, f_name));
 
+      final Set<Integer> usedParmPositions = new HashSet<Integer>();
+      final Set<Integer> usedTypeParmPositions = new HashSet<Integer>();
+      for (DeclBuilder b : f_childBuilders) {
+        if (b instanceof ParameterBuilder) {
+          final Integer position = Integer.valueOf(((ParameterBuilder) b).f_position);
+          if (usedParmPositions.contains(position))
+            throw new IllegalArgumentException(I18N.err(273, position));
+          usedParmPositions.add(position);
+        } else if (b instanceof TypeParameterBuilder) {
+          final Integer position = Integer.valueOf(((TypeParameterBuilder) b).f_position);
+          if (usedTypeParmPositions.contains(position))
+            throw new IllegalArgumentException(I18N.err(274, position));
+          usedTypeParmPositions.add(position);
+        }
+      }
+
       return new DeclMethod(parent, f_childBuilders, f_name, f_visibility, f_returnTypeOf, f_isStatic, f_isFinal, f_isAbstract);
     }
   }
@@ -695,6 +741,13 @@ public abstract class Decl implements IDecl {
    */
   @NotThreadSafe
   public static final class PackageBuilder extends DeclBuilder {
+
+    /**
+     * Constructs a package builder for the default package.
+     */
+    public PackageBuilder() {
+      f_name = null;
+    }
 
     /**
      * Constructs a package builder.
@@ -963,7 +1016,8 @@ public abstract class Decl implements IDecl {
   @Nullable
   final IDecl f_parent;
   /**
-   * {@code null} indicates no children.
+   * {@code null} indicates no children. Call {@link #getChildren()} instead of
+   * using this field directly.
    */
   @Nullable
   final IDecl[] f_children;
@@ -1062,7 +1116,7 @@ public abstract class Decl implements IDecl {
   @NonNull
   public final List<IDecl> getParameters() {
     List<IDecl> work = new ArrayList<IDecl>();
-    for (IDecl decl : f_children) {
+    for (IDecl decl : getChildren()) {
       if (decl instanceof DeclParameter)
         work.add(decl);
     }
@@ -1077,7 +1131,7 @@ public abstract class Decl implements IDecl {
   @NonNull
   public final List<IDecl> getTypeParameters() {
     List<IDecl> work = new ArrayList<IDecl>();
-    for (IDecl decl : f_children) {
+    for (IDecl decl : getChildren()) {
       if (decl instanceof DeclTypeParameter)
         work.add(decl);
     }
@@ -1107,7 +1161,7 @@ public abstract class Decl implements IDecl {
 
   abstract String toStringHelper();
 
-  protected static String toStringTypeParameters(IDecl decl) {
+  protected static String toStringHelperTypeParameters(IDecl decl) {
     List<IDecl> params = decl.getTypeParameters();
     if (params.isEmpty())
       return "";
@@ -1119,13 +1173,13 @@ public abstract class Decl implements IDecl {
         first = false;
       else
         b.append(",");
-      b.append(param);
+      b.append(((Decl) param).toStringHelper());
     }
     b.append(">");
     return b.toString();
   }
 
-  protected static String toStringParameters(IDecl decl) {
+  protected static String toStringHelperParameters(IDecl decl) {
     List<IDecl> params = decl.getParameters();
     final StringBuilder b = new StringBuilder("(");
     boolean first = true;
@@ -1134,7 +1188,7 @@ public abstract class Decl implements IDecl {
         first = false;
       else
         b.append(",");
-      b.append(param);
+      b.append(((Decl) param).toStringHelper());
     }
     b.append(")");
     return b.toString();

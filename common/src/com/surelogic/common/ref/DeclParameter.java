@@ -40,6 +40,6 @@ final class DeclParameter extends DeclWithPosition {
 
   @Override
   String toStringHelper() {
-    return f_typeOf.getFullyQualified() + " " + f_name;
+    return f_name + ":" + f_typeOf.getFullyQualified();
   }
 }

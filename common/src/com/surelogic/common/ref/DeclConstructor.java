@@ -19,6 +19,6 @@ final class DeclConstructor extends DeclVisibility {
 
   @Override
   String toStringHelper() {
-    return "#" + f_name + Decl.toStringParameters(this);
+    return "#" + f_name + Decl.toStringHelperParameters(this);
   }
 }
