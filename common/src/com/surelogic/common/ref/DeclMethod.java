@@ -34,7 +34,7 @@ final class DeclMethod extends DeclHasFormalParameters {
 
   @Override
   @NonNull
-  public IDecl[] getFormalTypeParameters() {
+  public IDecl[] getTypeParameters() {
     return f_formalTypeParameters;
   }
 

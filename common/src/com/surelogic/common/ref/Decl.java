@@ -1029,7 +1029,7 @@ public abstract class Decl implements IDecl {
   }
 
   @NonNull
-  public IDecl[] getFormalTypeParameters() {
+  public IDecl[] getTypeParameters() {
     return EMPTY;
   }
 

@@ -174,9 +174,9 @@ public interface IDecl {
   int getPosition();
 
   /**
-   * Gets the formal type parameters for a {@link Kind#CLASS},
-   * {@link Kind#INTERFACE}, or {@link Kind#METHOD}. If this is meaningless for
-   * the declaration, an empty array is returned.
+   * Gets the type parameters for a {@link Kind#CLASS}, {@link Kind#INTERFACE},
+   * or {@link Kind#METHOD}. If this is meaningless for the declaration, an
+   * empty array is returned.
    * <p>
    * The result of this method is intended for display and to help match type
    * names, such as <tt>T</tt>, used for declarations within a parameterized
@@ -188,7 +188,7 @@ public interface IDecl {
    * <tr>
    * <th>Declaration</th>
    * <th>{@link #getName()}</th>
-   * <th>{@link #getFormalTypeParameters()}</th>
+   * <th>{@link #getTypeParameters()}</th>
    * </tr>
    * <tr>
    * <td><tt>List&lt;E&gt;</tt></td>
@@ -207,10 +207,10 @@ public interface IDecl {
    * </tr>
    * </table>
    * 
-   * @return the formal type parameters for this declaration.
+   * @return the ordered list of type parameters for this declaration.
    */
   @NonNull
-  IDecl[] getFormalTypeParameters();
+  IDecl[] getTypeParameters();
 
   /**
    * Gets the bounds for {@link Kind#TYPE_PARAMETER}. If this is meaningless for

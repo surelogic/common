@@ -28,7 +28,7 @@ public final class DeclTypeParameter extends DeclWithPosition {
 
   @Override
   String toStringHelper() {
-    final IDecl[] typeParameters = getParent().getFormalTypeParameters();
+    final IDecl[] typeParameters = getParent().getTypeParameters();
     boolean first = typeParameters[0] == this;
     boolean last = typeParameters[typeParameters.length - 1] == this;
     final StringBuilder b = new StringBuilder();

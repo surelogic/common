@@ -23,7 +23,7 @@ final class DeclInterface extends DeclVisibility {
 
   @Override
   @NonNull
-  public IDecl[] getFormalTypeParameters() {
+  public IDecl[] getTypeParameters() {
     return f_formalTypeParameters;
   }
 
