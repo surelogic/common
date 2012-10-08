@@ -18,8 +18,6 @@ import com.surelogic.common.i18n.I18N;
 @Immutable
 public abstract class Decl implements IDecl {
 
-  static final IDecl[] EMPTY = new IDecl[0];
-
   /**
    * Constructs class {@link IDecl} instances.
    */

@@ -1,11 +1,11 @@
 package com.surelogic.common.ref;
 
 import com.surelogic.NonNull;
+import com.surelogic.ValueObject;
 import com.surelogic.common.i18n.I18N;
 
+@ValueObject
 public final class TypeRef {
-
-  public static final TypeRef[] EMPTY = new TypeRef[0];
 
   private final String f_fullyQualified;
   private final String f_compact;
@@ -54,5 +54,41 @@ public final class TypeRef {
   @NonNull
   public String getCompact() {
     return f_compact;
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((f_compact == null) ? 0 : f_compact.hashCode());
+    result = prime * result + ((f_fullyQualified == null) ? 0 : f_fullyQualified.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (!(obj instanceof TypeRef))
+      return false;
+    TypeRef other = (TypeRef) obj;
+    if (f_compact == null) {
+      if (other.f_compact != null)
+        return false;
+    } else if (!f_compact.equals(other.f_compact))
+      return false;
+    if (f_fullyQualified == null) {
+      if (other.f_fullyQualified != null)
+        return false;
+    } else if (!f_fullyQualified.equals(other.f_fullyQualified))
+      return false;
+    return true;
+  }
+
+  @Override
+  public String toString() {
+    return "TypeRef(" + f_fullyQualified + ":" + f_compact + ")";
   }
 }
