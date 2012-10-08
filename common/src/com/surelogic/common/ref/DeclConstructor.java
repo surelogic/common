@@ -19,19 +19,6 @@ final class DeclConstructor extends DeclVisibility {
 
   @Override
   String toStringHelper() {
-    final StringBuilder b = new StringBuilder("#");
-    b.append(f_name);
-    b.append("(");
-//    boolean first = true;
-//    for (TypeRef typeRef : f_formalParameterTypes) {
-//      if (first) {
-//        first = false;
-//      } else {
-//        b.append(",");
-//      }
-//      b.append(typeRef.toString());
-//    }
-    b.append(")");
-    return b.toString();
+    return "#" + f_name + Decl.toStringParameters(this);
   }
 }

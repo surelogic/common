@@ -18,13 +18,7 @@ final class DeclInterface extends DeclVisibility {
   }
 
   @Override
-  @NonNull
-  public IDecl[] getTypeParameters() {
-    return null; // TODO
-  }
-
-  @Override
   String toStringHelper() {
-    return "." + f_name; // TODO
+    return "." + f_name + Decl.toStringTypeParameters(this);
   }
 }

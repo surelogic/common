@@ -1,16 +1,17 @@
 package com.surelogic.common.ref;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import com.surelogic.NonNull;
-import com.surelogic.Nullable;
 
 public final class DeclTypeParameter extends DeclWithPosition {
 
-  @Nullable
-  private final TypeRef[] f_bounds;
+  @NonNull
+  private final List<TypeRef> f_bounds;
 
-  public DeclTypeParameter(IDecl parent, Set<Decl.DeclBuilder> childBuilders, String name, int position, TypeRef[] bounds) {
+  public DeclTypeParameter(IDecl parent, Set<Decl.DeclBuilder> childBuilders, String name, int position, List<TypeRef> bounds) {
     super(parent, childBuilders, name, position);
     f_bounds = bounds;
   }
@@ -22,22 +23,15 @@ public final class DeclTypeParameter extends DeclWithPosition {
 
   @Override
   @NonNull
-  public TypeRef[] getBounds() {
-    return f_bounds;
+  public List<TypeRef> getBounds() {
+    return new ArrayList<TypeRef>(f_bounds);
   }
 
   @Override
   String toStringHelper() {
-    final IDecl[] typeParameters = getParent().getTypeParameters();
-    boolean first = typeParameters[0] == this;
-    boolean last = typeParameters[typeParameters.length - 1] == this;
     final StringBuilder b = new StringBuilder();
-    if (first)
-      b.append("<");
-    else
-      b.append(",");
     b.append(f_name);
-    if (f_bounds.length > 0) {
+    if (f_bounds.size() > 0) {
       b.append(" extends ");
       boolean firstBound = true;
       for (TypeRef bound : f_bounds) {
@@ -48,8 +42,6 @@ public final class DeclTypeParameter extends DeclWithPosition {
         b.append(bound.getFullyQualified());
       }
     }
-    if (last)
-      b.append(">");
     return b.toString();
   }
 }

@@ -1,5 +1,6 @@
 package com.surelogic.common.ref;
 
+import java.util.List;
 import java.util.Set;
 
 import com.surelogic.NonNull;
@@ -156,12 +157,13 @@ public interface IDecl {
   /**
    * Gets the ordered list, first to last, of the parameter declarations for a
    * {@link Kind#CONSTRUCTOR} or {@link Kind#METHOD}. If this is meaningless for
-   * the declaration, an empty array is returned.
+   * the declaration, an empty array is returned. The returned set is a copy and
+   * may be safely mutated.
    * 
    * @return a possibly empty list of the formal parameter types, in order.
    */
   @NonNull
-  IDecl[] getParameters();
+  List<IDecl> getParameters();
 
   /**
    * Gets the zero-based position number of a parameter declaration&mdash;this
@@ -176,48 +178,21 @@ public interface IDecl {
   /**
    * Gets the type parameters for a {@link Kind#CLASS}, {@link Kind#INTERFACE},
    * or {@link Kind#METHOD}. If this is meaningless for the declaration, an
-   * empty array is returned.
-   * <p>
-   * The result of this method is intended for display and to help match type
-   * names, such as <tt>T</tt>, used for declarations within a parameterized
-   * type or method.
-   * <p>
-   * The table below shows several examples.
-   * 
-   * <table border=1>
-   * <tr>
-   * <th>Declaration</th>
-   * <th>{@link #getName()}</th>
-   * <th>{@link #getTypeParameters()}</th>
-   * </tr>
-   * <tr>
-   * <td><tt>List&lt;E&gt;</tt></td>
-   * <td><tt>List</tt></td>
-   * <td><tt>&lt;E&gt;</tt></td>
-   * </tr>
-   * <tr>
-   * <td><tt>Map&lt;K,V&gt;</tt></td>
-   * <td><tt>Map</tt></td>
-   * <td><tt>&lt;K,V&gt;</tt></td>
-   * </tr>
-   * <tr>
-   * <td><tt>public &lt;T&gt; T[] toArray(T... elements) {}</tt></td>
-   * <td><tt>toArray</tt></td>
-   * <td><tt>&lt;T&gt;</tt></td>
-   * </tr>
-   * </table>
+   * empty array is returned. The returned set is a copy and may be safely
+   * mutated.
    * 
    * @return the ordered list of type parameters for this declaration.
    */
   @NonNull
-  IDecl[] getTypeParameters();
+  List<IDecl> getTypeParameters();
 
   /**
    * Gets the bounds for {@link Kind#TYPE_PARAMETER}. If this is meaningless for
-   * the declaration, an empty array is returned.
+   * the declaration, an empty array is returned. The returned set is a copy and
+   * may be safely mutated.
    * 
    * @return the bounds.
    */
   @NonNull
-  TypeRef[] getBounds();
+  List<TypeRef> getBounds();
 }

@@ -51,7 +51,7 @@ final class DeclField extends DeclVisibility {
     final StringBuilder b = new StringBuilder("#");
     b.append(f_name);
     b.append(":");
-    b.append(f_typeOf);
+    b.append(f_typeOf.getFullyQualified());
     return b.toString();
   }
 }

@@ -2,6 +2,7 @@ package com.surelogic.common.ref;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -894,9 +895,7 @@ public abstract class Decl implements IDecl {
       if (!(parentKind == Kind.CLASS || parentKind == Kind.INTERFACE || parentKind == Kind.METHOD))
         throw new IllegalArgumentException(I18N.err(263, f_name, parentKind));
 
-      final TypeRef[] bounds = f_bounds.isEmpty() ? TypeRef.EMPTY : f_bounds.toArray(new TypeRef[f_bounds.size()]);
-
-      return new DeclTypeParameter(parent, f_childBuilders, f_name, f_position, bounds);
+      return new DeclTypeParameter(parent, f_childBuilders, f_name, f_position, f_bounds);
     }
   }
 
@@ -970,6 +969,21 @@ public abstract class Decl implements IDecl {
   final IDecl[] f_children;
   @NonNull
   final String f_name;
+
+  /**
+   * Sorts parameters and type parameters by argument position.
+   */
+  final Comparator<IDecl> f_byPosition = new Comparator<IDecl>() {
+    public int compare(IDecl o1, IDecl o2) {
+      if (o1 == null && o2 == null)
+        return 0;
+      if (o1 == null && o2 != null)
+        return -1;
+      if (o1 != null && o2 == null)
+        return 1;
+      return o1.getPosition() - o2.getPosition();
+    }
+  };
 
   /**
    * Constructs a declaration tree from the root out. Children are constructed
@@ -1046,8 +1060,14 @@ public abstract class Decl implements IDecl {
   }
 
   @NonNull
-  public IDecl[] getParameters() {
-    return EMPTY;
+  public final List<IDecl> getParameters() {
+    List<IDecl> work = new ArrayList<IDecl>();
+    for (IDecl decl : f_children) {
+      if (decl instanceof DeclParameter)
+        work.add(decl);
+    }
+    Collections.sort(work, f_byPosition);
+    return work;
   }
 
   public int getPosition() {
@@ -1055,13 +1075,19 @@ public abstract class Decl implements IDecl {
   }
 
   @NonNull
-  public IDecl[] getTypeParameters() {
-    return EMPTY;
+  public final List<IDecl> getTypeParameters() {
+    List<IDecl> work = new ArrayList<IDecl>();
+    for (IDecl decl : f_children) {
+      if (decl instanceof DeclTypeParameter)
+        work.add(decl);
+    }
+    Collections.sort(work, f_byPosition);
+    return work;
   }
 
   @NonNull
-  public TypeRef[] getBounds() {
-    return TypeRef.EMPTY;
+  public List<TypeRef> getBounds() {
+    return Collections.emptyList();
   }
 
   @Override
@@ -1080,4 +1106,37 @@ public abstract class Decl implements IDecl {
   }
 
   abstract String toStringHelper();
+
+  protected static String toStringTypeParameters(IDecl decl) {
+    List<IDecl> params = decl.getTypeParameters();
+    if (params.isEmpty())
+      return "";
+
+    final StringBuilder b = new StringBuilder("<");
+    boolean first = true;
+    for (IDecl param : params) {
+      if (first)
+        first = false;
+      else
+        b.append(",");
+      b.append(param);
+    }
+    b.append(">");
+    return b.toString();
+  }
+
+  protected static String toStringParameters(IDecl decl) {
+    List<IDecl> params = decl.getParameters();
+    final StringBuilder b = new StringBuilder("(");
+    boolean first = true;
+    for (IDecl param : params) {
+      if (first)
+        first = false;
+      else
+        b.append(",");
+      b.append(param);
+    }
+    b.append(")");
+    return b.toString();
+  }
 }

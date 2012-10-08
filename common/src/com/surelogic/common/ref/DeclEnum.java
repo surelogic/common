@@ -16,4 +16,9 @@ public final class DeclEnum extends DeclVisibility {
   public Kind getKind() {
     return Kind.ENUM;
   }
+
+  @Override
+  String toStringHelper() {
+    return "." + f_name;
+  }
 }

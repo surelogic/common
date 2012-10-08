@@ -26,12 +26,6 @@ final class DeclClass extends DeclVisibility {
   }
 
   @Override
-  @NonNull
-  public IDecl[] getTypeParameters() {
-    return null; // TODO
-  }
-
-  @Override
   public boolean isStatic() {
     return f_isStatic;
   }
@@ -49,8 +43,8 @@ final class DeclClass extends DeclVisibility {
   @Override
   String toStringHelper() {
     if (f_visibility == Visibility.ANONYMOUS)
-      return ".(anonymous class)"; // TODO
+      return ".(anonymous class)" + Decl.toStringTypeParameters(this);
     else
-      return "." + f_name; // TODO
+      return "." + f_name + Decl.toStringTypeParameters(this);
   }
 }

@@ -30,12 +30,6 @@ final class DeclMethod extends DeclVisibility {
   }
 
   @Override
-  @NonNull
-  public IDecl[] getTypeParameters() {
-    return null; // TODO
-  }
-
-  @Override
   @Nullable
   public TypeRef getTypeOf() {
     return f_returnTypeOf;
@@ -58,21 +52,6 @@ final class DeclMethod extends DeclVisibility {
 
   @Override
   String toStringHelper() {
-    final StringBuilder b = new StringBuilder("#");
-//    b.append(f_formalTypeParameters);
-    b.append(f_name);
-    b.append("(");
-//    boolean first = true;
-//    for (TypeRef typeRef : f_formalParameterTypes) {
-//      if (first) {
-//        first = false;
-//      } else {
-//        b.append(",");
-//      }
-//      b.append(typeRef);
-//    }
-    b.append("):");
-    b.append(f_returnTypeOf);
-    return b.toString();
+    return "#" + f_name + Decl.toStringParameters(this) + ":" + f_returnTypeOf.getFullyQualified();
   }
 }
