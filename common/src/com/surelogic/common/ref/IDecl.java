@@ -1,5 +1,6 @@
 package com.surelogic.common.ref;
 
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 
@@ -49,6 +50,8 @@ public interface IDecl {
   enum Kind {
     CLASS, CONSTRUCTOR, ENUM, FIELD, INITIALIZER, INTERFACE, METHOD, PACKAGE, PARAMETER, TYPE_PARAMETER
   }
+
+  public static final EnumSet<IDecl.Kind> TYPE_KINDS = EnumSet.of(IDecl.Kind.CLASS, IDecl.Kind.ENUM, IDecl.Kind.INTERFACE);
 
   /**
    * The visibility of a declaration.
