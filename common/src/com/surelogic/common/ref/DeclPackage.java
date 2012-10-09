@@ -13,8 +13,8 @@ final class DeclPackage extends Decl {
     super(null, childBuilders, SLUtility.JAVA_DEFAULT_PACKAGE);
   }
 
-  DeclPackage(IDecl parent, Set<Decl.DeclBuilder> childBuilders, String name) {
-    super(parent, childBuilders, name);
+  DeclPackage(Set<Decl.DeclBuilder> childBuilders, String name) {
+    super(null, childBuilders, name);
   }
 
   @NonNull
@@ -24,6 +24,6 @@ final class DeclPackage extends Decl {
 
   @Override
   String toStringHelper() {
-    return f_parent == null ? f_name : "." + f_name;
+    return f_name;
   }
 }

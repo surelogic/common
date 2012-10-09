@@ -774,8 +774,9 @@ public abstract class Decl implements IDecl {
      * Constructs a package builder.
      * 
      * @param name
-     *          the package name. <tt>""</tt> or <tt>null</tt> indicate the
-     *          default package. The name must be simple, such as <tt>com</tt>.
+     *          the complete package name, such as <tt>org.apache</tt> or
+     *          <tt>com.surelogic.dropsea</tt>. <tt>""</tt> or <tt>null</tt>
+     *          indicate the default package.
      */
     public PackageBuilder(String name) {
       f_name = name;
@@ -796,18 +797,30 @@ public abstract class Decl implements IDecl {
 
     @Override
     IDecl buildInternal(IDecl parent) {
+      if (parent != null)
+        throw new IllegalArgumentException(I18N.err(264, f_name));
+
       if (f_name == null || "".equals(f_name)) {
-        if (parent == null) {
-          /*
-           * We are building the default package
-           */
-          return new DeclPackage(f_childBuilders); // default package
-        } else
-          throw new IllegalArgumentException(I18N.err(264));
+        f_name = SLUtility.JAVA_DEFAULT_PACKAGE;
+      } else {
+        // check the name contains valid identifiers between dots
+        final StringBuilder b = new StringBuilder(f_name);
+        boolean done = false;
+        while (!done) {
+          final int dotIndex = b.lastIndexOf(".");
+          final String name;
+          if (dotIndex == -1) {
+            name = b.toString();
+            done = true;
+          } else {
+            name = b.substring(dotIndex + 1);
+            b.delete(dotIndex, b.length());
+          }
+          if (!SLUtility.isValidJavaIdentifier(name))
+            throw new IllegalArgumentException(I18N.err(265, name, f_name));
+        }
       }
-      if (!SLUtility.isValidJavaIdentifier(f_name))
-        throw new IllegalArgumentException(I18N.err(265, f_name));
-      return new DeclPackage(parent, f_childBuilders, f_name);
+      return new DeclPackage(f_childBuilders, f_name);
     }
   }
 
