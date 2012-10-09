@@ -798,7 +798,7 @@ public abstract class Decl implements IDecl {
     @Override
     IDecl buildInternal(IDecl parent) {
       if (parent != null)
-        throw new IllegalArgumentException(I18N.err(264, f_name));
+        throw new IllegalArgumentException(I18N.err(264, f_name, parent));
 
       if (f_name == null || "".equals(f_name)) {
         f_name = SLUtility.JAVA_DEFAULT_PACKAGE;
