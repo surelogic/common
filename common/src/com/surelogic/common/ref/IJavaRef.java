@@ -119,6 +119,29 @@ public interface IJavaRef {
   String getEclipseProjectNameOrNull();
 
   /**
+   * Gets the Java declaration that this code reference is on or within. To
+   * determine if the code reference is on or within the declaration use
+   * {@link #isOnDeclaration()}.
+   * 
+   * @return the Java declaration that this code reference is on or within.
+   * 
+   * @see IDecl
+   */
+  @NonNull
+  IDecl getDeclaration();
+
+  /**
+   * Gets if this code reference is on or within the Java declaration returned
+   * by {@link #getDeclaration()}.
+   * 
+   * @return {@code true} if this code reference is <i>on</i> the declaration
+   *         returned by {@link #getDeclaration()}, {@code false} if this code
+   *         reference is <i>within</i> the declaration returned by
+   *         {@link #getDeclaration()}.
+   */
+  boolean isOnDeclaration();
+
+  /**
    * Gets the Java package name that this refers to&mdash;nested package names
    * are separated by a <tt>"."</tt>. If the resulting package is the default
    * package, or no package, the string defined by

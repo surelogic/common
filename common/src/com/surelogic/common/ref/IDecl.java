@@ -14,6 +14,9 @@ import com.surelogic.common.SLUtility;
  * declarations in a Java program&mdash;note the lack of an ability to get the
  * children of a declaration.
  * <p>
+ * Many helpful methods to pull information from a declaration are provided in
+ * {@link DeclUtil}
+ * <p>
  * Concrete instances are constructed using the following builders:
  * <ul>
  * <li>{@link Decl.ClassBuilder}</li>
@@ -27,6 +30,8 @@ import com.surelogic.common.SLUtility;
  * <li>{@link Decl.ParameterBuilder}</li>
  * <li>{@link Decl.TypeParameterBuilder}</li>
  * </ul>
+ * 
+ * @see DeclUtil
  */
 @ThreadSafe
 public interface IDecl {

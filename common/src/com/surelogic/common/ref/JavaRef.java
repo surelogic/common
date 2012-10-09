@@ -736,4 +736,17 @@ public class JavaRef implements IJavaRef {
     b.delete(0, barIndex + 1);
     return result;
   }
+
+  @Override
+  @NonNull
+  public IDecl getDeclaration() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public boolean isOnDeclaration() {
+    // TODO Auto-generated method stub
+    return false;
+  }
 }
