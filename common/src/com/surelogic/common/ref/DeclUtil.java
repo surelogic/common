@@ -32,18 +32,7 @@ public final class DeclUtil {
     IDecl pkgDecl = getFirstAncestorOfKind(IDecl.Kind.PACKAGE, decl);
     if (pkgDecl == null)
       throw new IllegalArgumentException(I18N.err(275, decl));
-    String pkgName = pkgDecl.getName();
-    if (SLUtility.JAVA_DEFAULT_PACKAGE.equals(pkgName))
-      return pkgName;
-    final StringBuilder b = new StringBuilder(pkgDecl.getName());
-    while (true) {
-      pkgDecl = pkgDecl.getParent();
-      if (pkgDecl == null)
-        break;
-      pkgName = pkgDecl.getName();
-      b.insert(0, pkgName + ".");
-    }
-    return b.toString();
+    return pkgDecl.getName();
   }
 
   /**
