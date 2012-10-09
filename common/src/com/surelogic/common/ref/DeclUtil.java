@@ -31,7 +31,7 @@ public final class DeclUtil {
       throw new IllegalArgumentException(I18N.err(44, "decl"));
     IDecl pkgDecl = getFirstAncestorOfKind(IDecl.Kind.PACKAGE, decl);
     if (pkgDecl == null)
-      throw new IllegalArgumentException(I18N.err(275, decl));
+      throw new IllegalArgumentException(I18N.err(285, decl));
     return pkgDecl.getName();
   }
 

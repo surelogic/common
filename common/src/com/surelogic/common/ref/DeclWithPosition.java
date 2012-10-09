@@ -15,7 +15,7 @@ public abstract class DeclWithPosition extends Decl {
     super(parent, childBuilders, name);
     // see http://www.javaspecialists.eu/archive/Issue059.html
     if (position < 0 || position > 254)
-      throw new IllegalArgumentException(I18N.err(272, position));
+      throw new IllegalArgumentException(I18N.err(282, position));
     f_position = position;
   }
 

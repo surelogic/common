@@ -74,14 +74,14 @@ public class JDTUIUtility {
 
     final IType element = JDTUtility.findIType(javaRef.getEclipseProjectName(), javaRef.getPackageName(), javaRef.getTypeName());
     if (element == null) {
-      SLLogger.getLogger().warning(I18N.err(259, javaRef));
+      SLLogger.getLogger().warning(I18N.err(269, javaRef));
       return false;
     }
 
     if (!element.isBinary()) {
       // Warn if the reference is not from Java source code
       if (javaRef.getWithin() != IJavaRef.Within.JAVA_FILE) {
-        SLLogger.getLogger().warning(I18N.err(257, element, javaRef));
+        SLLogger.getLogger().warning(I18N.err(267, element, javaRef));
       }
       /*
        * Source code
@@ -126,7 +126,7 @@ public class JDTUIUtility {
        */
       // Warn if the reference is not from a JAR or class file
       if (javaRef.getWithin() == IJavaRef.Within.JAVA_FILE) {
-        SLLogger.getLogger().warning(I18N.err(258, element, javaRef));
+        SLLogger.getLogger().warning(I18N.err(268, element, javaRef));
       }
       System.out.println("TODO -- Can't handle binary yet -- need to open promises XML editor");
       return false;

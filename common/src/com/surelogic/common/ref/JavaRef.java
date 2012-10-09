@@ -16,41 +16,6 @@ import com.surelogic.common.logging.SLLogger;
 @Immutable
 public class JavaRef implements IJavaRef {
 
-  public static void main(String[] args) {
-    IJavaRef r = new Builder("org.apache/Foo.Entry.A").setCUName("Bar.java").setEclipseProjectName("AntPrj").build();
-
-    String s = r.encodeForPersistence();
-    IJavaRef r1 = getInstanceFrom(s);
-
-    System.out.println("r == r1 : " + (((JavaRef) r).f_encodedNames == ((JavaRef) r1).f_encodedNames));
-    IJavaRef r2 = new Builder(r).setOffset(45).build();
-
-    System.out.println("r :" + r);
-    System.out.println("r2:" + r2);
-    System.out.println("r == r2 : " + (((JavaRef) r).f_encodedNames == ((JavaRef) r2).f_encodedNames));
-
-    System.out.println(((JavaRef) r).getEclipseProjectNameOrNullHelper());
-    System.out.println(((JavaRef) r).getTypeNameFullyQualifiedSureLogicHelper());
-    System.out.println(((JavaRef) r).getCUNameOrNullHelper());
-    System.out.println(r.getSimpleFileName());
-    System.out.println(r.getClasspathRelativePathname());
-    System.out.println(r.toString());
-    System.out.println(r.getClasspathRelativePathname());
-    System.out.println(r.getTypeNameFullyQualifiedSureLogic());
-    System.out.println(r.getPackageName());
-    System.out.println(r.getPackageNameOrNull());
-    System.out.println(r.getPackageNameSlash());
-    System.out.println(r.getTypeName());
-    System.out.println(r.getTypeNameDollarSign());
-    System.out.println(r.getTypeNameFullyQualified());
-    System.out.println(r.getEclipseProjectName());
-    System.out.println(r.getEclipseProjectNameOrNull());
-    System.out.println(r.getSimpleFileName());
-    System.out.println(r.getClasspathRelativePathname());
-
-    System.out.println(r.encodeForPersistence());
-  }
-
   /**
    * Builder for {@link IJavaRef} instances. Copy-and-modify is supported via
    * {@link Builder#Builder(IJavaRef)}.
@@ -66,8 +31,13 @@ public class JavaRef implements IJavaRef {
    * <tr>
    * <td>{@link #setCUName(String)}</td>
    * <td><tt>.java</tt> file name in the very rare case that it is different
-   * from the type name.</td>
+   * from the type name</td>
    * <td>{@code null}</td>
+   * </tr>
+   * <tr>
+   * <td>{@link #setDeclaration(IDecl)}</td>
+   * <td>the Java declaration that this code reference is on or within</td>
+   * <td>none</td>
    * </tr>
    * <tr>
    * <td>{@link #setEclipseProjectName(String)}</td>
@@ -78,6 +48,12 @@ public class JavaRef implements IJavaRef {
    * <td>{@link #setEnclosingJavaId(String)}</td>
    * <td>a declaration path used by viewers</td>
    * <td>{@code null}</td>
+   * </tr>
+   * <tr>
+   * <td>{@link #setIsOnDeclaration(boolean)}</td>
+   * <td>flags if this code reference is on (true) or within (false) the
+   * declaration returned by {@link IJavaRef#getDeclaration()}</td>
+   * <td>{@code false} (within the declaration)</td>
    * </tr>
    * <tr>
    * <td>{@link #setJavaId(String)}</td>
@@ -111,12 +87,6 @@ public class JavaRef implements IJavaRef {
    * <td>the name given to construct this builder</td>
    * </tr>
    * <tr>
-   * <td>{@link #setTypeType(IJavaRef.TypeType)}</td>
-   * <td>the Java type this reference is within must be either a <tt>class</tt>,
-   * an <tt>enum</tt>, or an <tt>interface</tt></td>
-   * <td>{@link IJavaRef.TypeType#CLASS}</td>
-   * </tr>
-   * <tr>
    * <td>{@link #setWithin(IJavaRef.Within)}</td>
    * <td>a code reference can be within a <tt>.java</tt> file, a <tt>.class</tt>
    * file, or a <tt>.jar</tt> file</td>
@@ -130,10 +100,9 @@ public class JavaRef implements IJavaRef {
     @NonNull
     protected Within f_within = Within.JAVA_FILE;
     private String f_eclipseProjectName;
-    protected String f_typeNameFullyQualifiedSureLogic;
+    protected IDecl f_declaration;
+    protected boolean f_isOnDeclaration = false;
     private String f_cuName;
-    @NonNull
-    protected TypeType f_typeType = TypeType.CLASS;
     protected int f_lineNumber;
     protected int f_offset;
     protected int f_length;
@@ -151,34 +120,27 @@ public class JavaRef implements IJavaRef {
      *          a code location reference.
      */
     public Builder(IJavaRef copy) {
-      if (!(copy instanceof JavaRef))
-        throw new IllegalArgumentException(I18N.err(261, copy.getClass().getName(), JavaRef.class.getName()));
-      final JavaRef c = (JavaRef) copy;
-      f_within = c.f_within;
-      f_eclipseProjectName = c.getEclipseProjectNameOrNullHelper();
-      f_typeNameFullyQualifiedSureLogic = c.getTypeNameFullyQualifiedSureLogicHelper();
-      f_cuName = c.getCUNameOrNullHelper();
-      f_typeType = c.f_typeType;
-      f_lineNumber = c.f_lineNumber;
-      f_offset = c.f_offset;
-      f_length = c.f_length;
-      f_javaId = c.f_javaId;
-      f_enclosingJavaId = c.f_enclosingJavaId;
-
-      f_copyEncodedNamesAlias = c.f_encodedNames;
+      f_within = copy.getWithin();
+      f_eclipseProjectName = copy.getEclipseProjectNameOrNull();
+      f_declaration = copy.getDeclaration();
+      f_cuName = null; // TODO copy.getCUNameOrNullHelper();
+      f_lineNumber = copy.getLineNumber();
+      f_offset = copy.getOffset();
+      f_length = copy.getLength();
+      f_javaId = copy.getJavaId();
+      f_enclosingJavaId = copy.getEnclosingJavaId();
     }
 
     /**
      * Constructs a new builder for a code reference within the passed type.
      * 
-     * @param typeNameFullyQualifiedSureLogic
-     *          a type name that is valid per
-     *          {@link SLUtility#isValidTypeNameFullyQualifiedSureLogic(String)}
+     * @param declaration
+     *          a Java declaration that this code reference is on or within.
      */
-    public Builder(@NonNull String typeNameFullyQualifiedSureLogic) {
-      if (typeNameFullyQualifiedSureLogic == null)
-        throw new IllegalArgumentException(I18N.err(44, "typeNameFullyQualifiedSureLogic"));
-      f_typeNameFullyQualifiedSureLogic = typeNameFullyQualifiedSureLogic;
+    public Builder(@NonNull IDecl declaration) {
+      if (declaration == null)
+        throw new IllegalArgumentException(I18N.err(44, "declaration"));
+      f_declaration = declaration;
     }
 
     /**
@@ -222,7 +184,7 @@ public class JavaRef implements IJavaRef {
       if (SLUtility.isValidJavaIdentifier(value)) {
         f_cuName = value;
       } else {
-        SLLogger.getLogger().warning(I18N.err(256, value));
+        SLLogger.getLogger().warning(I18N.err(266, value));
       }
       return this;
     }
@@ -241,12 +203,9 @@ public class JavaRef implements IJavaRef {
      */
     public Builder setTypeName(String value) {
       if (SLUtility.isValidDotSeparatedJavaIdentifier(value)) {
-        final StringBuilder b = new StringBuilder(f_typeNameFullyQualifiedSureLogic);
-        int slashIndex = b.indexOf("/");
-        b.replace(slashIndex + 1, b.length(), value);
-        f_typeNameFullyQualifiedSureLogic = b.toString();
+        // TODO the whole IDecl needs to be modified
       } else {
-        SLLogger.getLogger().warning(I18N.err(254, value));
+        SLLogger.getLogger().warning(I18N.err(264, value));
       }
       return this;
     }
@@ -266,33 +225,11 @@ public class JavaRef implements IJavaRef {
      * @return this builder.
      */
     public Builder setPackageName(String value) {
-      final StringBuilder b = new StringBuilder(f_typeNameFullyQualifiedSureLogic);
-      int slashIndex = b.indexOf("/");
-      if (value == null)
-        value = "";
-      if ("".equals(value)) {
-        b.delete(0, slashIndex);
-      } else if (SLUtility.isValidDotSeparatedJavaIdentifier(value)) {
-        b.replace(0, slashIndex, value);
+      if (SLUtility.isValidDotSeparatedJavaIdentifier(value)) {
+        // TODO the whole IDecl needs to be modified
       } else {
-        SLLogger.getLogger().warning(I18N.err(255, value));
-        return this;
+        SLLogger.getLogger().warning(I18N.err(265, value));
       }
-      f_typeNameFullyQualifiedSureLogic = b.toString();
-      return this;
-    }
-
-    /**
-     * Sets the type of Java type this reference is within. It must be either a
-     * <tt>class</tt>, an <tt>enum</tt>, or an <tt>interface</tt>.
-     * 
-     * @param value
-     *          the type of Java type this reference is within.
-     * @return this builder.
-     */
-    public Builder setTypeType(TypeType value) {
-      if (value != null)
-        f_typeType = value;
       return this;
     }
 
@@ -305,6 +242,16 @@ public class JavaRef implements IJavaRef {
      */
     public Builder setEclipseProjectName(String value) {
       f_eclipseProjectName = value;
+      return this;
+    }
+
+    public Builder setDeclaration(IDecl value) {
+      f_declaration = value;
+      return this;
+    }
+
+    public Builder setIsOnDeclaration(boolean value) {
+      f_isOnDeclaration = value;
       return this;
     }
 
@@ -368,44 +315,16 @@ public class JavaRef implements IJavaRef {
       return this;
     }
 
-    protected final String getEncodedNames() {
-      final StringBuilder b = new StringBuilder();
-      if (f_eclipseProjectName != null)
-        b.append(f_eclipseProjectName);
-      b.append(':');
-      b.append(f_typeNameFullyQualifiedSureLogic);
-      b.append('|');
-      // only use the source CU name if it is different than the type name
-      if (f_cuName != null && f_within == Within.JAVA_FILE && cuNameReallyDifferent())
-        b.append(f_cuName);
-      // try to alias from the reference we copied, if possible
-      final String result = b.toString();
-      if (result.equals(f_copyEncodedNamesAlias))
-        return f_copyEncodedNamesAlias;
-      else
-        return result;
-    }
-
-    private boolean cuNameReallyDifferent() {
-      final StringBuilder b = new StringBuilder(f_typeNameFullyQualifiedSureLogic);
-      int slashIndex = b.indexOf("/");
-      b.delete(0, slashIndex + 1);
-      int dotIndex = b.indexOf(".");
-      if (dotIndex != -1)
-        b.delete(dotIndex, b.length());
-      return !f_cuName.equals(b.toString());
-    }
-
     /**
      * Strict builder&mdash;throws an exception if it fails.
      * 
      * @return a code reference.
      */
     public IJavaRef build() {
-      if (!SLUtility.isValidTypeNameFullyQualifiedSureLogic(f_typeNameFullyQualifiedSureLogic))
-        throw new IllegalArgumentException(I18N.err(253, f_typeNameFullyQualifiedSureLogic));
-
-      return new JavaRef(f_within, getEncodedNames(), f_typeType, f_lineNumber, f_offset, f_length, f_javaId, f_enclosingJavaId);
+      if (f_declaration == null)
+        throw new IllegalArgumentException(I18N.err(44, "declaration"));
+      return new JavaRef(f_within, f_declaration, f_isOnDeclaration, f_eclipseProjectName, f_lineNumber, f_offset, f_length,
+          f_javaId, f_enclosingJavaId);
     }
 
     /**
@@ -426,66 +345,13 @@ public class JavaRef implements IJavaRef {
   @NonNull
   private final Within f_within;
 
-  /**
-   * This encoded name string is formatted as follows:
-   * <p>
-   * <i>project-name</i><tt>:</tt><i>type-name</i><tt>|</tt><i>CU-name</i>
-   * <p>
-   * <b>Project name</b>: This is the Eclipse project name if known.
-   * <p>
-   * <b>Type name</b> The type name is mandatory and must be valid according to
-   * {@link SLUtility#isValidTypeNameFullyQualifiedSureLogic(String)}.
-   * <p>
-   * <b>Compilation Unit (.java file) name:</b> In the rare case the type name
-   * and the CU name don't match because more than one top-level type declared
-   * in a CU. The encoded string assumes <tt>.java</tt> as the file suffix and
-   * does not include it. Note that the CU name can only be different from the
-   * type name if and only if {@link #getWithin()} == {@link Within#JAVA_FILE}.
-   * <p>
-   * For example a value of <tt>":org.apache/Foo|Bar"</tt> would indicate the
-   * top-level type <tt>Foo</tt> is declared in the CU <tt>Bar.java</tt> in the
-   * package <tt>org.apache</tt>. The Eclipse project is unknown.
-   * 
-   * @see IJavaRef#getTypeNameFullyQualifiedSureLogic()
-   */
   @NonNull
-  private final String f_encodedNames;
-
-  /**
-   * This is for testing {@link Builder} correctly aliases encoded names.
-   * 
-   * @return the encoded names of this.
-   */
-  @NonNull
-  public String getEncodedNames() {
-    return f_encodedNames;
-  }
+  private final IDecl f_declaration;
+  private final boolean f_isOnDeclaration;
 
   @Nullable
-  private String getEclipseProjectNameOrNullHelper() {
-    final int colonIndex = f_encodedNames.indexOf(':');
-    if (colonIndex < 1)
-      return null;
-    else
-      return f_encodedNames.substring(0, colonIndex);
-  }
+  private final String f_eclipseProjectName;
 
-  private String getTypeNameFullyQualifiedSureLogicHelper() {
-    final int colonIndex = f_encodedNames.indexOf(':');
-    final int barIndex = f_encodedNames.indexOf('|');
-    return f_encodedNames.substring(colonIndex + 1, barIndex);
-  }
-
-  private String getCUNameOrNullHelper() {
-    final int barIndex = f_encodedNames.indexOf('|');
-    if (f_encodedNames.length() > barIndex + 1)
-      return f_encodedNames.substring(barIndex + 1);
-    else
-      return null;
-  }
-
-  @NonNull
-  private final TypeType f_typeType;
   /**
    * -1 indicates not valid.
    */
@@ -503,12 +369,13 @@ public class JavaRef implements IJavaRef {
   @Nullable
   private final String f_enclosingJavaId;
 
-  protected JavaRef(final @NonNull Within within, final @NonNull String encodedNames, final @NonNull TypeType typeType,
-      final int lineNumber, final int offset, final int length, final @Nullable String javaIdOrNull,
-      final @Nullable String enclosingJavaIdOrNull) {
+  protected JavaRef(final @NonNull Within within, final @NonNull IDecl declaration, final boolean isOnDeclaration,
+      @Nullable final String eclipseProjectName, final int lineNumber, final int offset, final int length,
+      final @Nullable String javaIdOrNull, final @Nullable String enclosingJavaIdOrNull) {
     f_within = within;
-    f_encodedNames = encodedNames;
-    f_typeType = typeType;
+    f_declaration = declaration;
+    f_isOnDeclaration = isOnDeclaration;
+    f_eclipseProjectName = eclipseProjectName;
     f_lineNumber = lineNumber > 0 && lineNumber != Integer.MAX_VALUE ? lineNumber : -1;
     f_offset = offset > 0 && offset != Integer.MAX_VALUE ? offset : -1;
     f_length = length > 0 && length != Integer.MAX_VALUE ? length : -1;
@@ -539,57 +406,31 @@ public class JavaRef implements IJavaRef {
 
   @NonNull
   public final String getEclipseProjectName() {
-    final String name = getEclipseProjectNameOrNull();
-    return name == null ? SLUtility.UNKNOWN_PROJECT : name;
+    return f_eclipseProjectName == null ? SLUtility.UNKNOWN_PROJECT : f_eclipseProjectName;
   }
 
   @Nullable
   public final String getEclipseProjectNameOrNull() {
-    final String name = getEclipseProjectNameOrNullHelper();
-    if (name == null)
-      return null;
-    else
-      return name;
+    return f_eclipseProjectName;
+  }
+
+  @NonNull
+  public IDecl getDeclaration() {
+    return f_declaration;
+  }
+
+  public boolean isOnDeclaration() {
+    return f_isOnDeclaration;
   }
 
   @NonNull
   public final String getPackageName() {
-    final String name = getPackageNameOrNull();
-    return name == null ? SLUtility.JAVA_DEFAULT_PACKAGE : name;
-  }
-
-  @Nullable
-  public final String getPackageNameOrNull() {
-    final String name = getTypeNameFullyQualifiedSureLogicHelper();
-    int slashIndex = name.indexOf('/');
-    if (slashIndex < 1)
-      return null;
-    else
-      return name.substring(0, slashIndex);
-  }
-
-  @NonNull
-  public final String getPackageNameSlash() {
-    final String name = getPackageNameOrNull();
-    return name == null ? "" : name.replaceAll("\\.", "/");
+    return DeclUtil.getPackageName(f_declaration);
   }
 
   @NonNull
   public final String getTypeName() {
-    final String name = getTypeNameFullyQualifiedSureLogicHelper();
-    int slashIndex = name.indexOf('/');
-    return name.substring(slashIndex + 1);
-  }
-
-  @NonNull
-  public final String getTypeNameDollarSign() {
-    String name = getTypeName();
-    return name.replaceAll("\\.", "\\$");
-  }
-
-  @NonNull
-  public final TypeType getTypeType() {
-    return f_typeType;
+    return DeclUtil.getTypeNameOrNull(f_declaration);
   }
 
   @NonNull
@@ -670,15 +511,20 @@ public class JavaRef implements IJavaRef {
   }
 
   public final String encodeForPersistence() {
-    /*
-     * Make sure this matches the getInstanceFrom() method below!
-     * 
-     * Also if this is output is changed in any way create a new version prefix.
-     * Also note that the getInstanceFrom() method will need to support both the
-     * old and new versions of the encoded string.
-     */
-    return ENCODE_V1 + f_encodedNames + "|" + f_within + "|" + f_typeType + "|" + f_lineNumber + "|" + f_offset + "|" + f_length
-        + "|" + (f_javaId == null ? "" : f_javaId) + "|" + (f_enclosingJavaId == null ? "" : f_javaId) + "|";
+    // /*
+    // * Make sure this matches the getInstanceFrom() method below!
+    // *
+    // * Also if this is output is changed in any way create a new version
+    // prefix.
+    // * Also note that the getInstanceFrom() method will need to support both
+    // the
+    // * old and new versions of the encoded string.
+    // */
+    // return ENCODE_V1 + f_encodedNames + "|" + f_within + "|" + f_typeType +
+    // "|" + f_lineNumber + "|" + f_offset + "|" + f_length
+    // + "|" + (f_javaId == null ? "" : f_javaId) + "|" + (f_enclosingJavaId ==
+    // null ? "" : f_javaId) + "|";
+    return null; // TODO
   }
 
   public static final String ENCODE_V1 = "V1->";
@@ -696,38 +542,41 @@ public class JavaRef implements IJavaRef {
    */
   @NonNull
   public static IJavaRef getInstanceFrom(@NonNull String encodedForPersistence) {
-    if (encodedForPersistence == null)
-      throw new IllegalArgumentException(I18N.err(44, "encodedForPersistence"));
-    if (encodedForPersistence.startsWith(ENCODE_V1)) {
-      final StringBuilder b = new StringBuilder(encodedForPersistence.substring(ENCODE_V1.length()));
-      final String eclipseProjectName = toNext(":", b);
-      final String typeNameFullyQualifiedSureLogic = toNext("|", b);
-      final String cuName = toNext("|", b);
-      final String withinStr = toNext("|", b);
-      final String typeTypeStr = toNext("|", b);
-      final String lineNumberStr = toNext("|", b);
-      final String offsetStr = toNext("|", b);
-      final String lengthStr = toNext("|", b);
-      final String javaId = toNext("|", b);
-      final String enclosingJavaId = toNext("|", b);
-
-      final Builder builder = new Builder(typeNameFullyQualifiedSureLogic);
-      builder.setWithin(Within.valueOf(withinStr));
-      builder.setTypeType(TypeType.valueOf(typeTypeStr));
-      if (!"".equals(eclipseProjectName))
-        builder.setEclipseProjectName(eclipseProjectName);
-      if (!"".equals(cuName))
-        builder.setCUName(cuName);
-      builder.setLineNumber(Integer.parseInt(lineNumberStr));
-      builder.setOffset(Integer.parseInt(offsetStr));
-      builder.setLength(Integer.parseInt(lengthStr));
-      if (!"".equals(javaId))
-        builder.setJavaId(javaId);
-      if (!"".equals(enclosingJavaId))
-        builder.setEnclosingJavaId(enclosingJavaId);
-      return builder.build();
-    } else
-      throw new IllegalArgumentException(I18N.err(260, encodedForPersistence));
+    return null; // TODO
+    // if (encodedForPersistence == null)
+    // throw new IllegalArgumentException(I18N.err(44,
+    // "encodedForPersistence"));
+    // if (encodedForPersistence.startsWith(ENCODE_V1)) {
+    // final StringBuilder b = new
+    // StringBuilder(encodedForPersistence.substring(ENCODE_V1.length()));
+    // final String eclipseProjectName = toNext(":", b);
+    // final String typeNameFullyQualifiedSureLogic = toNext("|", b);
+    // final String cuName = toNext("|", b);
+    // final String withinStr = toNext("|", b);
+    // final String typeTypeStr = toNext("|", b);
+    // final String lineNumberStr = toNext("|", b);
+    // final String offsetStr = toNext("|", b);
+    // final String lengthStr = toNext("|", b);
+    // final String javaId = toNext("|", b);
+    // final String enclosingJavaId = toNext("|", b);
+    //
+    // final Builder builder = new Builder(typeNameFullyQualifiedSureLogic);
+    // builder.setWithin(Within.valueOf(withinStr));
+    // builder.setTypeType(TypeType.valueOf(typeTypeStr));
+    // if (!"".equals(eclipseProjectName))
+    // builder.setEclipseProjectName(eclipseProjectName);
+    // if (!"".equals(cuName))
+    // builder.setCUName(cuName);
+    // builder.setLineNumber(Integer.parseInt(lineNumberStr));
+    // builder.setOffset(Integer.parseInt(offsetStr));
+    // builder.setLength(Integer.parseInt(lengthStr));
+    // if (!"".equals(javaId))
+    // builder.setJavaId(javaId);
+    // if (!"".equals(enclosingJavaId))
+    // builder.setEnclosingJavaId(enclosingJavaId);
+    // return builder.build();
+    // } else
+    // throw new IllegalArgumentException(I18N.err(270, encodedForPersistence));
   }
 
   private static String toNext(final String str, final StringBuilder b) {
@@ -735,18 +584,5 @@ public class JavaRef implements IJavaRef {
     final String result = b.substring(0, barIndex);
     b.delete(0, barIndex + 1);
     return result;
-  }
-
-  @Override
-  @NonNull
-  public IDecl getDeclaration() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  @Override
-  public boolean isOnDeclaration() {
-    // TODO Auto-generated method stub
-    return false;
   }
 }

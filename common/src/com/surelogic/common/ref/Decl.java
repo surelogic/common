@@ -140,11 +140,11 @@ public abstract class Decl implements IDecl {
         f_name = "";
       } else {
         if (!SLUtility.isValidJavaIdentifier(f_name))
-          throw new IllegalArgumentException(I18N.err(265, f_name));
+          throw new IllegalArgumentException(I18N.err(275, f_name));
       }
 
       if (parent == null)
-        throw new IllegalArgumentException(I18N.err(262, f_name));
+        throw new IllegalArgumentException(I18N.err(272, f_name));
 
       // NA is not allowed
       if (f_visibility == Visibility.NA)
@@ -155,14 +155,14 @@ public abstract class Decl implements IDecl {
         f_isStatic = false;
 
       if (f_isAbstract && f_isFinal)
-        throw new IllegalArgumentException(I18N.err(266, f_name));
+        throw new IllegalArgumentException(I18N.err(276, f_name));
 
       final Set<Integer> usedTypeParmPositions = new HashSet<Integer>();
       for (DeclBuilder b : f_childBuilders) {
         if (b instanceof TypeParameterBuilder) {
           final Integer position = Integer.valueOf(((TypeParameterBuilder) b).f_position);
           if (usedTypeParmPositions.contains(position))
-            throw new IllegalArgumentException(I18N.err(274, position));
+            throw new IllegalArgumentException(I18N.err(284, position));
           usedTypeParmPositions.add(position);
         }
       }
@@ -250,7 +250,7 @@ public abstract class Decl implements IDecl {
     @Override
     public IDecl buildInternal(IDecl parent) {
       if (parent == null)
-        throw new IllegalArgumentException(I18N.err(262, f_name));
+        throw new IllegalArgumentException(I18N.err(272, f_name));
 
       final Set<Integer> usedParmPositions = new HashSet<Integer>();
       final Set<Integer> usedTypeParmPositions = new HashSet<Integer>();
@@ -258,12 +258,12 @@ public abstract class Decl implements IDecl {
         if (b instanceof ParameterBuilder) {
           final Integer position = Integer.valueOf(((ParameterBuilder) b).f_position);
           if (usedParmPositions.contains(position))
-            throw new IllegalArgumentException(I18N.err(273, position));
+            throw new IllegalArgumentException(I18N.err(283, position));
           usedParmPositions.add(position);
         } else if (b instanceof TypeParameterBuilder) {
           final Integer position = Integer.valueOf(((TypeParameterBuilder) b).f_position);
           if (usedTypeParmPositions.contains(position))
-            throw new IllegalArgumentException(I18N.err(274, position));
+            throw new IllegalArgumentException(I18N.err(284, position));
           usedTypeParmPositions.add(position);
         }
       }
@@ -324,10 +324,10 @@ public abstract class Decl implements IDecl {
     @Override
     public IDecl buildInternal(IDecl parent) {
       if (!SLUtility.isValidJavaIdentifier(f_name))
-        throw new IllegalArgumentException(I18N.err(265, f_name));
+        throw new IllegalArgumentException(I18N.err(275, f_name));
 
       if (parent == null)
-        throw new IllegalArgumentException(I18N.err(262, f_name));
+        throw new IllegalArgumentException(I18N.err(272, f_name));
 
       // NA is not allowed
       if (f_visibility == Visibility.NA)
@@ -431,9 +431,9 @@ public abstract class Decl implements IDecl {
       if (f_typeOf == null)
         throw new IllegalArgumentException(I18N.err(44, "typeOf"));
       if (!SLUtility.isValidJavaIdentifier(f_name))
-        throw new IllegalArgumentException(I18N.err(265, f_name));
+        throw new IllegalArgumentException(I18N.err(275, f_name));
       if (parent == null)
-        throw new IllegalArgumentException(I18N.err(262, f_name));
+        throw new IllegalArgumentException(I18N.err(272, f_name));
 
       return new DeclField(parent, f_childBuilders, f_name, f_visibility, f_typeOf, f_isStatic, f_isFinal);
     }
@@ -484,7 +484,7 @@ public abstract class Decl implements IDecl {
     @Override
     public IDecl buildInternal(IDecl parent) {
       if (parent == null)
-        throw new IllegalArgumentException(I18N.err(262, f_name));
+        throw new IllegalArgumentException(I18N.err(272, f_name));
 
       return new DeclInitializer(parent, f_childBuilders, f_isStatic);
     }
@@ -559,10 +559,10 @@ public abstract class Decl implements IDecl {
     @Override
     public IDecl buildInternal(IDecl parent) {
       if (!SLUtility.isValidJavaIdentifier(f_name))
-        throw new IllegalArgumentException(I18N.err(265, f_name));
+        throw new IllegalArgumentException(I18N.err(275, f_name));
 
       if (parent == null)
-        throw new IllegalArgumentException(I18N.err(262, f_name));
+        throw new IllegalArgumentException(I18N.err(272, f_name));
 
       // NA is not allowed
       if (f_visibility == Visibility.NA)
@@ -573,7 +573,7 @@ public abstract class Decl implements IDecl {
         if (b instanceof TypeParameterBuilder) {
           final Integer position = Integer.valueOf(((TypeParameterBuilder) b).f_position);
           if (usedTypeParmPositions.contains(position))
-            throw new IllegalArgumentException(I18N.err(274, position));
+            throw new IllegalArgumentException(I18N.err(284, position));
           usedTypeParmPositions.add(position);
         }
       }
@@ -726,16 +726,16 @@ public abstract class Decl implements IDecl {
     @Override
     public IDecl buildInternal(IDecl parent) {
       if (!SLUtility.isValidJavaIdentifier(f_name))
-        throw new IllegalArgumentException(I18N.err(265, f_name));
+        throw new IllegalArgumentException(I18N.err(275, f_name));
 
       if (parent == null)
-        throw new IllegalArgumentException(I18N.err(262, f_name));
+        throw new IllegalArgumentException(I18N.err(272, f_name));
 
       if (f_isAbstract && f_isFinal)
-        throw new IllegalArgumentException(I18N.err(269, f_name));
+        throw new IllegalArgumentException(I18N.err(279, f_name));
 
       if (f_isAbstract && f_isStatic)
-        throw new IllegalArgumentException(I18N.err(270, f_name));
+        throw new IllegalArgumentException(I18N.err(280, f_name));
 
       final Set<Integer> usedParmPositions = new HashSet<Integer>();
       final Set<Integer> usedTypeParmPositions = new HashSet<Integer>();
@@ -743,12 +743,12 @@ public abstract class Decl implements IDecl {
         if (b instanceof ParameterBuilder) {
           final Integer position = Integer.valueOf(((ParameterBuilder) b).f_position);
           if (usedParmPositions.contains(position))
-            throw new IllegalArgumentException(I18N.err(273, position));
+            throw new IllegalArgumentException(I18N.err(283, position));
           usedParmPositions.add(position);
         } else if (b instanceof TypeParameterBuilder) {
           final Integer position = Integer.valueOf(((TypeParameterBuilder) b).f_position);
           if (usedTypeParmPositions.contains(position))
-            throw new IllegalArgumentException(I18N.err(274, position));
+            throw new IllegalArgumentException(I18N.err(284, position));
           usedTypeParmPositions.add(position);
         }
       }
@@ -798,27 +798,13 @@ public abstract class Decl implements IDecl {
     @Override
     IDecl buildInternal(IDecl parent) {
       if (parent != null)
-        throw new IllegalArgumentException(I18N.err(264, f_name, parent));
+        throw new IllegalArgumentException(I18N.err(274, f_name, parent));
 
       if (f_name == null || "".equals(f_name)) {
         f_name = SLUtility.JAVA_DEFAULT_PACKAGE;
       } else {
-        // check the name contains valid identifiers between dots
-        final StringBuilder b = new StringBuilder(f_name);
-        boolean done = false;
-        while (!done) {
-          final int dotIndex = b.lastIndexOf(".");
-          final String name;
-          if (dotIndex == -1) {
-            name = b.toString();
-            done = true;
-          } else {
-            name = b.substring(dotIndex + 1);
-            b.delete(dotIndex, b.length());
-          }
-          if (!SLUtility.isValidJavaIdentifier(name))
-            throw new IllegalArgumentException(I18N.err(265, name, f_name));
-        }
+        if (!SLUtility.isValidDotSeparatedJavaIdentifier(f_name))
+          throw new IllegalArgumentException(I18N.err(275, f_name));
       }
       return new DeclPackage(f_childBuilders, f_name);
     }
@@ -906,15 +892,15 @@ public abstract class Decl implements IDecl {
         f_name = "arg" + f_position;
       } else {
         if (!SLUtility.isValidJavaIdentifier(f_name))
-          throw new IllegalArgumentException(I18N.err(265, f_name));
+          throw new IllegalArgumentException(I18N.err(275, f_name));
       }
 
       if (parent == null)
-        throw new IllegalArgumentException(I18N.err(262, f_name));
+        throw new IllegalArgumentException(I18N.err(272, f_name));
 
       final Kind parentKind = parent.getKind();
       if (!(parentKind == Kind.CONSTRUCTOR || parentKind == Kind.METHOD))
-        throw new IllegalArgumentException(I18N.err(267, f_name, parentKind));
+        throw new IllegalArgumentException(I18N.err(277, f_name, parentKind));
 
       return new DeclParameter(parent, f_childBuilders, f_name, f_position, f_typeOf, f_isFinal);
     }
@@ -934,7 +920,7 @@ public abstract class Decl implements IDecl {
      * Constructs a type parameter builder.
      * 
      * @param position
-     *          the zero-based argument number of this parameter.
+     *          the zero-based argument number of this type parameter.
      * @param name
      *          the name of this type parameter.
      */
@@ -973,14 +959,14 @@ public abstract class Decl implements IDecl {
     @Override
     public IDecl buildInternal(IDecl parent) {
       if (!SLUtility.isValidJavaIdentifier(f_name))
-        throw new IllegalArgumentException(I18N.err(265, f_name));
+        throw new IllegalArgumentException(I18N.err(275, f_name));
 
       if (parent == null)
-        throw new IllegalArgumentException(I18N.err(262, f_name));
+        throw new IllegalArgumentException(I18N.err(272, f_name));
 
       final Kind parentKind = parent.getKind();
       if (!(parentKind == Kind.CLASS || parentKind == Kind.INTERFACE || parentKind == Kind.METHOD || parentKind == Kind.CONSTRUCTOR))
-        throw new IllegalArgumentException(I18N.err(263, f_name, parentKind));
+        throw new IllegalArgumentException(I18N.err(273, f_name, parentKind));
 
       return new DeclTypeParameter(parent, f_childBuilders, f_name, f_position, f_bounds);
     }
@@ -996,6 +982,51 @@ public abstract class Decl implements IDecl {
      * Only valid after the build.
      */
     IDecl f_declaration;
+
+    /**
+     * Gets the parameter builder at the passed position.
+     * 
+     * @param position
+     *          the zero-based argument number of this parameter.
+     * @return the parameter builder at the passed position.
+     * 
+     * @throws IllegalArgumentException
+     *           if no parameter builder can be found at the passed position.
+     */
+    public ParameterBuilder getParameterBuilderAt(int position) {
+      for (DeclBuilder b : f_childBuilders) {
+        if (b instanceof ParameterBuilder) {
+          final ParameterBuilder pb = (ParameterBuilder) b;
+          if (pb.f_position == position)
+            return pb;
+        }
+      }
+      throw new IllegalArgumentException(I18N.err(286, ParameterBuilder.class.getSimpleName(), position, this.getClass()
+          .getSimpleName(), f_name));
+    }
+
+    /**
+     * Gets the type parameter builder at the passed position.
+     * 
+     * @param position
+     *          the zero-based argument number of this type parameter.
+     * @return the type parameter builder at the passed position.
+     * 
+     * @throws IllegalArgumentException
+     *           if no type parameter builder can be found at the passed
+     *           position.
+     */
+    public TypeParameterBuilder getTypeParameterBuilderAt(int position) {
+      for (DeclBuilder b : f_childBuilders) {
+        if (b instanceof TypeParameterBuilder) {
+          final TypeParameterBuilder pb = (TypeParameterBuilder) b;
+          if (pb.f_position == position)
+            return pb;
+        }
+      }
+      throw new IllegalArgumentException(I18N.err(286, TypeParameterBuilder.class.getSimpleName(), position, this.getClass()
+          .getSimpleName(), f_name));
+    }
 
     /**
      * Sets the parent of this declaration. If the parent is non-null then this

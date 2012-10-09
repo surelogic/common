@@ -122,10 +122,14 @@ public interface IJavaRef {
    * Gets the Java declaration that this code reference is on or within. To
    * determine if the code reference is on or within the declaration use
    * {@link #isOnDeclaration()}.
+   * <p>
+   * Many helpful methods to pull information from a declaration are provided in
+   * {@link DeclUtil}. This type only wraps a small subset of them.
    * 
    * @return the Java declaration that this code reference is on or within.
    * 
    * @see IDecl
+   * @see DeclUtil
    */
   @NonNull
   IDecl getDeclaration();
@@ -147,38 +151,17 @@ public interface IJavaRef {
    * package, or no package, the string defined by
    * {@link SLUtility#JAVA_DEFAULT_PACKAGE} is returned.
    * <p>
+   * This method has the same effect as calling
+   * {@link DeclUtil#getPackageName(IDecl)} and passing the result of
+   * {@link #getDeclaration()}. The {@link DeclUtil} has several other helpful
+   * methods to return the package name in various forms.
+   * <p>
    * Example: <tt>java.util.concurrent.locks</tt>
    * 
    * @return The package that the source is within.
    */
   @NonNull
   String getPackageName();
-
-  /**
-   * Gets the Java package name that this refers to&mdash;nested package names
-   * are separated by a <tt>"."</tt>. If the resulting package is the default
-   * package, or no package, then {@code null} is returned.
-   * <p>
-   * Example: <tt>java.util.concurrent.locks</tt>
-   * 
-   * @return The package that the source is within, or {@code null} for the
-   *         default package.
-   */
-  @Nullable
-  String getPackageNameOrNull();
-
-  /**
-   * Gets the Java package name that this refers to&mdash;nested package names
-   * are separated by a <tt>"/"</tt>. If the resulting package is the default
-   * package, or no package, the empty string is returned.
-   * <p>
-   * Example: <tt>java/util/concurrent/locks</tt>
-   * 
-   * @return The package that the source is within, or <tt>""</tt> for the
-   *         default package.
-   */
-  @NonNull
-  String getPackageNameSlash();
 
   /**
    * Gets the Java type name that this refers to&mdash;nested types are
@@ -192,28 +175,6 @@ public interface IJavaRef {
    */
   @NonNull
   String getTypeName();
-
-  /**
-   * Gets the Java type name that this refers to&mdash;nested types are
-   * separated by a <tt>"$"</tt>. The type name must be known for a reference to
-   * be valid, so this should always return something reasonable.
-   * <p>
-   * Examples: <tt>Object</tt>, <tt>/Map$Entry</tt>,
-   * <tt>AbstractQueuedSynchronizer$ConditionObject</tt>, <tt>package-info</tt>
-   * 
-   * @return the Java type name that this refers to.
-   */
-  @NonNull
-  String getTypeNameDollarSign();
-
-  /**
-   * Gets the type of Java type that this refers to: <tt>class</tt>,
-   * <tt>enum</tt>, or <tt>interface</tt>.
-   * 
-   * @return the type of Java type that this refers to.
-   */
-  @NonNull
-  TypeType getTypeType();
 
   /**
    * Gets the fully qualified Java type name that this refers to. Both packages
