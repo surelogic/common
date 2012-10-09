@@ -182,9 +182,9 @@ public interface IDecl {
 
   /**
    * Gets the type parameters for a {@link Kind#CLASS}, {@link Kind#INTERFACE},
-   * or {@link Kind#METHOD}. If this is meaningless for the declaration, an
-   * empty array is returned. The returned set is a copy and may be safely
-   * mutated.
+   * {@link Kind#METHOD}, or {@link Kind#CONSTRUCTOR}. If this is meaningless
+   * for the declaration, an empty array is returned. The returned set is a copy
+   * and may be safely mutated.
    * 
    * @return the ordered list of type parameters for this declaration.
    */

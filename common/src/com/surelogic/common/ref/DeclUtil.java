@@ -83,6 +83,11 @@ public final class DeclUtil {
     return name == null ? "" : name.replaceAll("\\.", "/");
   }
 
+  @Nullable
+  public static String getTypeNameOrNull(@NonNull final IDecl decl) {
+    return null;
+  }
+
   /**
    * Finds the root declaration of any declaration.
    * 

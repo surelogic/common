@@ -230,18 +230,41 @@ public abstract class Decl implements IDecl {
       return this;
     }
 
+    /**
+     * Adds a type parameter to this declaration. This is a convenience method
+     * that is the same as setting the parent of the
+     * {@link TypeParameterBuilder} to this, i.e.,
+     * <tt>o.addTypeParameter(p)</tt> has the same effect as
+     * <tt>p.setParent(o)</tt>.
+     * 
+     * @param value
+     *          a type parameter builder. Ignored if {@code null}.
+     * @return this builder.
+     */
+    public ConstructorBuilder addTypeParameter(TypeParameterBuilder value) {
+      if (value != null)
+        value.setParent(this);
+      return this;
+    }
+
     @Override
     public IDecl buildInternal(IDecl parent) {
       if (parent == null)
         throw new IllegalArgumentException(I18N.err(262, f_name));
 
       final Set<Integer> usedParmPositions = new HashSet<Integer>();
+      final Set<Integer> usedTypeParmPositions = new HashSet<Integer>();
       for (DeclBuilder b : f_childBuilders) {
         if (b instanceof ParameterBuilder) {
           final Integer position = Integer.valueOf(((ParameterBuilder) b).f_position);
           if (usedParmPositions.contains(position))
             throw new IllegalArgumentException(I18N.err(273, position));
           usedParmPositions.add(position);
+        } else if (b instanceof TypeParameterBuilder) {
+          final Integer position = Integer.valueOf(((TypeParameterBuilder) b).f_position);
+          if (usedTypeParmPositions.contains(position))
+            throw new IllegalArgumentException(I18N.err(274, position));
+          usedTypeParmPositions.add(position);
         }
       }
 
@@ -943,7 +966,7 @@ public abstract class Decl implements IDecl {
         throw new IllegalArgumentException(I18N.err(262, f_name));
 
       final Kind parentKind = parent.getKind();
-      if (!(parentKind == Kind.CLASS || parentKind == Kind.INTERFACE || parentKind == Kind.METHOD))
+      if (!(parentKind == Kind.CLASS || parentKind == Kind.INTERFACE || parentKind == Kind.METHOD || parentKind == Kind.CONSTRUCTOR))
         throw new IllegalArgumentException(I18N.err(263, f_name, parentKind));
 
       return new DeclTypeParameter(parent, f_childBuilders, f_name, f_position, f_bounds);
