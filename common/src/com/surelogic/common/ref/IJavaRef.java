@@ -30,14 +30,6 @@ public interface IJavaRef {
   }
 
   /**
-   * A Java type can be either a <tt>class</tt>, an <tt>enum</tt>, or an
-   * <tt>interface</tt>.
-   */
-  enum TypeType {
-    CLASS, ENUM, INTERFACE
-  }
-
-  /**
    * Gets the type of resource that this reference is within.
    * 
    * @return the type of resource that this reference is within.
@@ -154,9 +146,9 @@ public interface IJavaRef {
    * This method has the same effect as calling
    * {@link DeclUtil#getPackageName(IDecl)} and passing the result of
    * {@link #getDeclaration()}. The {@link DeclUtil} has several other helpful
-   * methods to return the package name in various forms.
+   * methods to return names in various forms.
    * <p>
-   * Example: <tt>java.util.concurrent.locks</tt>
+   * Example: <tt>java.util.concurrent.locks</tt>, <tt>(default package)</tt>
    * 
    * @return The package that the source is within.
    */
@@ -165,56 +157,39 @@ public interface IJavaRef {
 
   /**
    * Gets the Java type name that this refers to&mdash;nested types are
-   * separated by a <tt>"."</tt>. The type name must be known for a reference to
-   * be valid, so this should always return something reasonable.
+   * separated by a <tt>"."</tt>.
    * <p>
-   * Examples: <tt>Object</tt>, <tt>/Map.Entry</tt>,
-   * <tt>AbstractQueuedSynchronizer.ConditionObject</tt>, <tt>package-info</tt>
+   * This method has the same effect as calling
+   * {@link DeclUtil#getTypeNameOrNull(IDecl)} and passing the result of
+   * {@link #getDeclaration()}. The {@link DeclUtil} has several other helpful
+   * methods to return names in various forms.
+   * <p>
+   * Examples: <tt>Object</tt>, <tt>Map.Entry</tt>,
+   * <tt>AbstractQueuedSynchronizer.ConditionObject</tt>
    * 
    * @return the Java type name that this refers to.
    */
-  @NonNull
-  String getTypeName();
+  @Nullable
+  String getTypeNameOrNull();
 
   /**
-   * Gets the fully qualified Java type name that this refers to. Both packages
-   * and nested types are separated by a <tt>"."</tt>. The type name and package
-   * must be known for a reference to be valid, so this should always return
-   * something reasonable.
+   * Java type name that this refers to. Both packages and nested types are
+   * separated by a <tt>"."</tt>. If the declaration is just a package then just
+   * the package name is returned.
    * <p>
-   * <tt>package-info</tt> files are handled as if they were a class. They can
-   * exist as a <tt>.java</tt> or <tt>.class</tt>.
+   * This method has the same effect as calling
+   * {@link DeclUtil#getTypeNameFullyQualified(IDecl)} and passing the result of
+   * {@link #getDeclaration()}. The {@link DeclUtil} has several other helpful
+   * methods to return names in various forms.
    * <p>
    * Examples: <tt>java.lang.Object</tt>, <tt>java.util.Map.Entry</tt>,
    * <tt>java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock</tt>,
-   * <tt>ClassInDefaultPkg</tt>, <tt>edu.afit.smallworld.package-info</tt>
+   * <tt>ClassInDefaultPkg</tt>
    * 
    * @return the fully qualified Java type name that this refers to.
    */
   @NonNull
   String getTypeNameFullyQualified();
-
-  /**
-   * Gets the fully qualified Java type name that this refers to in a particular
-   * SureLogic format. Nested package names are separated by <tt>"."</tt>, the
-   * package name is separated from the type name by a "/" (which must always
-   * appear&mdash;even if the type is in the default package), and nested type
-   * names are separated by <tt>"."</tt>. The type name and package must be
-   * known for a reference to be valid, so this should always return something
-   * reasonable.
-   * <p>
-   * <tt>package-info</tt> files are handled as if they were a class. They can
-   * exist as a <tt>.java</tt> or <tt>.class</tt>.
-   * <p>
-   * Examples: <tt>java.lang/Object</tt>, <tt>java.util/Map.Entry</tt>,
-   * <tt>java.util.concurrent.locks/ReentrantReadWriteLock.ReadLock</tt>,
-   * <tt>/ClassInDefaultPkg</tt>, <tt>edu.afit.smallworld/package-info</tt>
-   * 
-   * @return the fully qualified Java type name that this refers to in the
-   *         SureLogic format.
-   */
-  @NonNull
-  String getTypeNameFullyQualifiedSureLogic();
 
   /**
    * Generates the most likely simple file name that this refers to. For a full

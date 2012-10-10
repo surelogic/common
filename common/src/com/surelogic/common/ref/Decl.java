@@ -1258,4 +1258,11 @@ public abstract class Decl implements IDecl {
     b.append(")");
     return b.toString();
   }
+
+  public static IDecl getDeclForSureLogicName(String value) {
+    if (SLUtility.isValidTypeNameFullyQualifiedSureLogic(value)) {
+
+    }
+    return null;
+  }
 }

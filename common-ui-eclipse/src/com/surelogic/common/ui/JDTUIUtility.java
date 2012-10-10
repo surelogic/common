@@ -72,63 +72,70 @@ public class JDTUIUtility {
     if (javaRef == null)
       return false;
 
-    final IType element = JDTUtility.findIType(javaRef.getEclipseProjectName(), javaRef.getPackageName(), javaRef.getTypeName());
-    if (element == null) {
-      SLLogger.getLogger().warning(I18N.err(269, javaRef));
-      return false;
-    }
-
-    if (!element.isBinary()) {
-      // Warn if the reference is not from Java source code
-      if (javaRef.getWithin() != IJavaRef.Within.JAVA_FILE) {
-        SLLogger.getLogger().warning(I18N.err(267, element, javaRef));
+    final String typeName = javaRef.getTypeNameOrNull();
+    if (typeName != null) {
+      final IType element = JDTUtility.findIType(javaRef.getEclipseProjectName(), javaRef.getPackageName(), typeName);
+      if (element == null) {
+        SLLogger.getLogger().warning(I18N.err(269, javaRef));
+        return false;
       }
-      /*
-       * Source code
-       */
-      try {
-        final IEditorPart editorPart = JavaUI.openInEditor(element, false, true);
 
-        final int offset = javaRef.getOffset();
-        final int length = javaRef.getLength();
-        final int lineNumber = javaRef.getLineNumber();
-        if (offset != -1 && length != -1) {
-          /*
-           * Use offset and length if at all possible.
-           */
-          final IMarker location = ResourcesPlugin.getWorkspace().getRoot().createMarker(SLUtility.ECLIPSE_MARKER_TYPE_NAME);
-          if (location != null) {
-            location.setAttribute(IMarker.CHAR_START, offset);
-            location.setAttribute(IMarker.CHAR_END, offset + length);
-            IDE.gotoMarker(editorPart, location);
-            location.delete();
-          }
-        } else if (lineNumber != -1) {
-          /*
-           * Use line number if we must
-           */
-          final IMarker location = ResourcesPlugin.getWorkspace().getRoot().createMarker(SLUtility.ECLIPSE_MARKER_TYPE_NAME);
-          if (location != null) {
-            location.setAttribute(IMarker.LINE_NUMBER, lineNumber);
-            IDE.gotoMarker(editorPart, location);
-            location.delete();
-            return true;
-          }
+      if (!element.isBinary()) {
+        // Warn if the reference is not from Java source code
+        if (javaRef.getWithin() != IJavaRef.Within.JAVA_FILE) {
+          SLLogger.getLogger().warning(I18N.err(267, element, javaRef));
         }
-        return editorPart != null;
-      } catch (final Exception e) {
-        SLLogger.getLogger().log(Level.SEVERE, I18N.err(132, element, javaRef), e);
+        /*
+         * Source code
+         */
+        try {
+          final IEditorPart editorPart = JavaUI.openInEditor(element, false, true);
+
+          final int offset = javaRef.getOffset();
+          final int length = javaRef.getLength();
+          final int lineNumber = javaRef.getLineNumber();
+          if (offset != -1 && length != -1) {
+            /*
+             * Use offset and length if at all possible.
+             */
+            final IMarker location = ResourcesPlugin.getWorkspace().getRoot().createMarker(SLUtility.ECLIPSE_MARKER_TYPE_NAME);
+            if (location != null) {
+              location.setAttribute(IMarker.CHAR_START, offset);
+              location.setAttribute(IMarker.CHAR_END, offset + length);
+              IDE.gotoMarker(editorPart, location);
+              location.delete();
+            }
+          } else if (lineNumber != -1) {
+            /*
+             * Use line number if we must
+             */
+            final IMarker location = ResourcesPlugin.getWorkspace().getRoot().createMarker(SLUtility.ECLIPSE_MARKER_TYPE_NAME);
+            if (location != null) {
+              location.setAttribute(IMarker.LINE_NUMBER, lineNumber);
+              IDE.gotoMarker(editorPart, location);
+              location.delete();
+              return true;
+            }
+          }
+          return editorPart != null;
+        } catch (final Exception e) {
+          SLLogger.getLogger().log(Level.SEVERE, I18N.err(132, element, javaRef), e);
+        }
+        return false;
+      } else {
+        /*
+         * Binary file
+         */
+        // Warn if the reference is not from a JAR or class file
+        if (javaRef.getWithin() == IJavaRef.Within.JAVA_FILE) {
+          SLLogger.getLogger().warning(I18N.err(268, element, javaRef));
+        }
+        System.out.println("TODO -- Can't handle binary yet -- need to open promises XML editor");
+        return false;
       }
-      return false;
     } else {
-      /*
-       * Binary file
-       */
-      // Warn if the reference is not from a JAR or class file
-      if (javaRef.getWithin() == IJavaRef.Within.JAVA_FILE) {
-        SLLogger.getLogger().warning(I18N.err(268, element, javaRef));
-      }
-      System.out.println("TODO -- Can't handle binary yet -- need to open promises XML editor");
+      // package only
+      // TODO
       return false;
     }
   }

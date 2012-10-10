@@ -52,6 +52,8 @@ public interface IDecl {
   }
 
   public static final EnumSet<IDecl.Kind> TYPE_KINDS = EnumSet.of(IDecl.Kind.CLASS, IDecl.Kind.ENUM, IDecl.Kind.INTERFACE);
+  public static final EnumSet<IDecl.Kind> PKG_TYPE_KINDS = EnumSet.of(IDecl.Kind.CLASS, IDecl.Kind.ENUM, IDecl.Kind.INTERFACE,
+      IDecl.Kind.PACKAGE);
 
   /**
    * The visibility of a declaration.

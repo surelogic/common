@@ -17,20 +17,19 @@ public final class DeclUtil {
    * default package the string defined by
    * {@link SLUtility#JAVA_DEFAULT_PACKAGE} is returned.
    * <p>
-   * Example: <tt>java.util.concurrent.locks</tt>
+   * Example: <tt>java.util.concurrent.locks</tt>, <tt>(default package)</tt>
    * 
    * @return the package that the declaration is within.
    * 
    * @throws IllegalArgumentException
-   *           if <tt>decl</tt> is null or if the declaration tree does not
-   *           contain a package.
+   *           if <tt>decl</tt> is null.
    */
   @NonNull
   public static String getPackageName(@NonNull final IDecl decl) {
     if (decl == null)
       throw new IllegalArgumentException(I18N.err(44, "decl"));
-    IDecl pkgDecl = getFirstAncestorOfKind(IDecl.Kind.PACKAGE, decl);
-    if (pkgDecl == null)
+    final IDecl pkgDecl = getRoot(decl);
+    if (pkgDecl.getKind() != IDecl.Kind.PACKAGE)
       throw new IllegalArgumentException(I18N.err(285, decl));
     return pkgDecl.getName();
   }
@@ -38,7 +37,7 @@ public final class DeclUtil {
   /**
    * Gets the Java package name of the passed declaration&mdash;nested package
    * names are separated by a <tt>"."</tt>. If the resulting package is the
-   * default package, or no package, then {@code null} is returned.
+   * default package then {@code null} is returned.
    * <p>
    * Example: <tt>java.util.concurrent.locks</tt>
    * 
@@ -46,8 +45,7 @@ public final class DeclUtil {
    *         default package.
    * 
    * @throws IllegalArgumentException
-   *           if <tt>decl</tt> is null or if the declaration tree does not
-   *           contain a package.
+   *           if <tt>decl</tt> is null.
    */
   @NonNull
   public static String getPackageNameOrNull(@NonNull final IDecl decl) {
@@ -60,8 +58,30 @@ public final class DeclUtil {
 
   /**
    * Gets the Java package name of the passed declaration&mdash;nested package
+   * names are separated by a <tt>"."</tt>. If the resulting package is the
+   * default package then the empty string is returned.
+   * <p>
+   * Example: <tt>java.util.concurrent.locks</tt>
+   * 
+   * @return the package that the declaration is within, or <tt>""</tt> for the
+   *         default package.
+   * 
+   * @throws IllegalArgumentException
+   *           if <tt>decl</tt> is null.
+   */
+  @NonNull
+  public static String getPackageNameOrEmpty(@NonNull final IDecl decl) {
+    final String result = getPackageName(decl);
+    if (SLUtility.JAVA_DEFAULT_PACKAGE.equals(result))
+      return "";
+    else
+      return result;
+  }
+
+  /**
+   * Gets the Java package name of the passed declaration&mdash;nested package
    * names are separated by a <tt>"/"</tt>. If the resulting package is the
-   * default package, or no package, the empty string is returned.
+   * default package then the empty string is returned.
    * <p>
    * Example: <tt>java/util/concurrent/locks</tt>
    * 
@@ -70,8 +90,8 @@ public final class DeclUtil {
    */
   @NonNull
   public static String getPackageNameSlash(@NonNull final IDecl decl) {
-    final String name = getPackageNameOrNull(decl);
-    return name == null ? "" : name.replaceAll("\\.", "/");
+    final String name = getPackageNameOrEmpty(decl);
+    return name.replaceAll("\\.", "/");
   }
 
   /**
@@ -79,13 +99,11 @@ public final class DeclUtil {
    * separated by a <tt>"."</tt>. If the passed declaration is just for a
    * package then {@code null} is returned.
    * <p>
-   * This method does not try to build a name for anonymous types or named types
-   * declared within control flow. It starts at the first <tt>class</tt>,
-   * <tt>enum</tt>, or <tt>interface</tt> declaration that has only parents of
-   * those kinds or are a package.
+   * <i>Implementation Note:</i> This method uses
+   * {@link #getTypeNotInControlFlow(IDecl)} to get the enclosing type.
    * <p>
    * Examples: <tt>Object</tt>, <tt>/Map.Entry</tt>,
-   * <tt>AbstractQueuedSynchronizer.ConditionObject</tt>, <tt>package-info</tt>
+   * <tt>AbstractQueuedSynchronizer.ConditionObject</tt>
    * 
    * @param decl
    *          any declaration.
@@ -97,14 +115,9 @@ public final class DeclUtil {
    */
   @Nullable
   public static String getTypeNameOrNull(@NonNull final IDecl decl) {
-    final EnumSet<IDecl.Kind> pkgTypeKinds = EnumSet
-        .of(IDecl.Kind.CLASS, IDecl.Kind.ENUM, IDecl.Kind.INTERFACE, IDecl.Kind.PACKAGE);
-    IDecl typeDecl = getFirstAncestorIn(IDecl.TYPE_KINDS, decl);
+    IDecl typeDecl = getTypeNotInControlFlow(decl);
     if (typeDecl == null)
       return null; // must be a package declaration
-    while (!getAreAllAncestorsIn(pkgTypeKinds, typeDecl)) {
-      typeDecl = getFirstAncestorIn(IDecl.TYPE_KINDS, typeDecl.getParent());
-    }
     final StringBuilder b = new StringBuilder(typeDecl.getName());
     while (true) {
       typeDecl = typeDecl.getParent();
@@ -118,6 +131,34 @@ public final class DeclUtil {
 
   /**
    * Gets the Java type name of the passed declaration&mdash;nested types are
+   * separated by a <tt>"."</tt>. If the passed declaration is just for a
+   * package then the empty string is returned.
+   * <p>
+   * <i>Implementation Note:</i> This method uses
+   * {@link #getTypeNotInControlFlow(IDecl)} to get the enclosing type.
+   * <p>
+   * Examples: <tt>Object</tt>, <tt>/Map.Entry</tt>,
+   * <tt>AbstractQueuedSynchronizer.ConditionObject</tt>
+   * 
+   * @param decl
+   *          any declaration.
+   * @return the Java type name this declaration is within, or <tt>""</tt> if
+   *         none.
+   * 
+   * @throws IllegalArgumentException
+   *           if <tt>decl</tt> is null.
+   */
+  @Nullable
+  public static String getTypeNameOrEmpty(@NonNull final IDecl decl) {
+    final String typeName = getTypeNameOrNull(decl);
+    if (typeName == null)
+      return "";
+    else
+      return typeName;
+  }
+
+  /**
+   * Gets the Java type name of the passed declaration&mdash;nested types are
    * separated by a <tt>"$"</tt>. If the passed declaration is just for a
    * package then {@code null} is returned.
    * <p>
@@ -127,7 +168,7 @@ public final class DeclUtil {
    * those kinds or are a package.
    * <p>
    * Examples: <tt>Object</tt>, <tt>/Map$Entry</tt>,
-   * <tt>AbstractQueuedSynchronizer$ConditionObject</tt>, <tt>package-info</tt>
+   * <tt>AbstractQueuedSynchronizer$ConditionObject</tt>
    * 
    * @param decl
    *          any declaration.
@@ -144,6 +185,125 @@ public final class DeclUtil {
       return null;
     else
       return typeName.replaceAll("\\.", "\\$");
+  }
+
+  /**
+   * Gets the kind of the enclosing Java type declaration for the passed
+   * declaration. If the passed declaration is just a package declaration then
+   * {@link IDecl.Kind#PACKAGE} is returned. Otherwise {@link IDecl.Kind#CLASS},
+   * {@link IDecl.Kind#ENUM}, or {@link IDecl.Kind#INTERFACE} are returned
+   * depending upon the declaration.
+   * <p>
+   * <i>Implementation Note:</i> This method uses
+   * {@link #getTypeNotInControlFlow(IDecl)} to get the enclosing type.
+   * 
+   * @param decl
+   *          any declaration.
+   * @return the kind of the enclosing Java type declaration for the passed
+   *         declaration.
+   * 
+   * @throws IllegalArgumentException
+   *           if <tt>decl</tt> is null.
+   */
+  @NonNull
+  public static IDecl.Kind getTypeKind(@NonNull final IDecl decl) {
+    final IDecl typeDecl = getTypeNotInControlFlow(decl);
+    if (typeDecl == null)
+      return IDecl.Kind.PACKAGE; // must be a package declaration
+    else
+      return typeDecl.getKind();
+  }
+
+  /**
+   * Gets the enclosing Java type declaration for the passed declaration. If the
+   * passed declaration is just for a package then {@code null} is returned.
+   * <p>
+   * This method skips anonymous types or named types declared within control
+   * flow&mdash;which for some purposes makes its result to imprecise. It starts
+   * at the first <tt>class</tt>, <tt>enum</tt>, or <tt>interface</tt>
+   * declaration that has only parents of those kinds or the package.
+   * 
+   * @param decl
+   *          any declaration.
+   * @return a Java type declaration or {@code null} if one does not exist.
+   * 
+   * @throws IllegalArgumentException
+   *           if <tt>decl</tt> is null.
+   */
+  @Nullable
+  public static IDecl getTypeNotInControlFlow(@NonNull final IDecl decl) {
+    IDecl typeDecl = getFirstAncestorIn(IDecl.TYPE_KINDS, decl);
+    if (typeDecl == null)
+      return null; // must be a package declaration
+    while (!getAreAllAncestorsIn(IDecl.PKG_TYPE_KINDS, typeDecl)) {
+      typeDecl = getFirstAncestorIn(IDecl.TYPE_KINDS, typeDecl.getParent());
+    }
+    return typeDecl;
+  }
+
+  /**
+   * Gets the fully qualified Java type name of the passed declaration. Both
+   * packages and nested types are separated by a <tt>"."</tt>. If the
+   * declaration is just a package then just the package name is returned.
+   * <p>
+   * <i>Implementation Note:</i> This method uses
+   * {@link #getTypeNotInControlFlow(IDecl)} to get the enclosing type.
+   * <p>
+   * Examples: <tt>java.lang.Object</tt>, <tt>java.util.Map.Entry</tt>,
+   * <tt>java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock</tt>,
+   * <tt>ClassInDefaultPkg</tt>
+   * 
+   * @param decl
+   *          any declaration.
+   * @return the fully qualified Java type name that the passed declaration
+   *         refers to.
+   * @throws IllegalArgumentException
+   *           if <tt>decl</tt> is null.
+   */
+  @NonNull
+  public static String getTypeNameFullyQualified(@NonNull final IDecl decl) {
+    final StringBuilder b = new StringBuilder();
+    final String pkgName = getPackageNameOrNull(decl);
+    if (pkgName != null) {
+      b.append(pkgName);
+    }
+    final String typeName = getTypeNameOrNull(decl);
+    if (typeName != null) {
+      if (pkgName != null)
+        b.append('.'); // dot only if not in the default package
+      b.append(typeName);
+    }
+    return b.toString();
+  }
+
+  /**
+   * Gets the fully qualified Java type name of the passed declaration in a
+   * particular SureLogic format. Nested package names are separated by
+   * <tt>"."</tt>, the package name is separated from the type name by a "/",
+   * and nested type names are separated by <tt>"."</tt>. The "/" must always
+   * appear&mdash;even if the type is in the default package or just a package
+   * name is being returned.
+   * <p>
+   * <i>Implementation Note:</i> This method uses
+   * {@link #getTypeNotInControlFlow(IDecl)} to get the enclosing type.
+   * <p>
+   * Examples: <tt>java.lang/Object</tt>, <tt>java.util/Map.Entry</tt>,
+   * <tt>java.util.concurrent.locks/ReentrantReadWriteLock.ReadLock</tt>,
+   * <tt>/ClassInDefaultPkg</tt>
+   * 
+   * @param decl
+   *          any declaration.
+   * @return the fully qualified Java type name that the passed declaration
+   *         refers to in the SureLogic format.
+   * @throws IllegalArgumentException
+   *           if <tt>decl</tt> is null.
+   */
+  @NonNull
+  public static String getTypeNameFullyQualifiedSureLogic(@NonNull final IDecl decl) {
+    final StringBuilder b = new StringBuilder(getPackageNameOrEmpty(decl));
+    b.append('/');
+    b.append(getTypeNameOrEmpty(decl));
+    return b.toString();
   }
 
   /**

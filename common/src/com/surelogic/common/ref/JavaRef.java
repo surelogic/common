@@ -99,18 +99,14 @@ public class JavaRef implements IJavaRef {
 
     @NonNull
     protected Within f_within = Within.JAVA_FILE;
-    private String f_eclipseProjectName;
+    protected String f_eclipseProjectName;
     protected IDecl f_declaration;
     protected boolean f_isOnDeclaration = false;
-    private String f_cuName;
     protected int f_lineNumber;
     protected int f_offset;
     protected int f_length;
     protected String f_javaId;
     protected String f_enclosingJavaId;
-
-    // to try to alias of encoded names (saves memory)
-    private String f_copyEncodedNamesAlias;
 
     /**
      * Constructs a new builder that allows copy-then-modify from another code
@@ -123,7 +119,6 @@ public class JavaRef implements IJavaRef {
       f_within = copy.getWithin();
       f_eclipseProjectName = copy.getEclipseProjectNameOrNull();
       f_declaration = copy.getDeclaration();
-      f_cuName = null; // TODO copy.getCUNameOrNullHelper();
       f_lineNumber = copy.getLineNumber();
       f_offset = copy.getOffset();
       f_length = copy.getLength();
@@ -182,7 +177,7 @@ public class JavaRef implements IJavaRef {
       if (suffix != -1)
         value = value.substring(0, suffix);
       if (SLUtility.isValidJavaIdentifier(value)) {
-        f_cuName = value;
+        // TODO f_cuName = value;
       } else {
         SLLogger.getLogger().warning(I18N.err(266, value));
       }
@@ -370,12 +365,12 @@ public class JavaRef implements IJavaRef {
   private final String f_enclosingJavaId;
 
   protected JavaRef(final @NonNull Within within, final @NonNull IDecl declaration, final boolean isOnDeclaration,
-      @Nullable final String eclipseProjectName, final int lineNumber, final int offset, final int length,
+      @Nullable final String eclipseProjectNameOrNull, final int lineNumber, final int offset, final int length,
       final @Nullable String javaIdOrNull, final @Nullable String enclosingJavaIdOrNull) {
     f_within = within;
     f_declaration = declaration;
     f_isOnDeclaration = isOnDeclaration;
-    f_eclipseProjectName = eclipseProjectName;
+    f_eclipseProjectName = eclipseProjectNameOrNull;
     f_lineNumber = lineNumber > 0 && lineNumber != Integer.MAX_VALUE ? lineNumber : -1;
     f_offset = offset > 0 && offset != Integer.MAX_VALUE ? offset : -1;
     f_length = length > 0 && length != Integer.MAX_VALUE ? length : -1;
@@ -429,52 +424,44 @@ public class JavaRef implements IJavaRef {
   }
 
   @NonNull
-  public final String getTypeName() {
+  public final String getTypeNameOrNull() {
     return DeclUtil.getTypeNameOrNull(f_declaration);
   }
 
   @NonNull
   public final String getTypeNameFullyQualified() {
-    final String name = getTypeNameFullyQualifiedSureLogicHelper();
-    return name.replaceAll("/", ".");
-  }
-
-  @NonNull
-  public final String getTypeNameFullyQualifiedSureLogic() {
-    return getTypeNameFullyQualifiedSureLogicHelper();
+    return DeclUtil.getTypeNameFullyQualified(f_declaration);
   }
 
   @NonNull
   public final String getSimpleFileName() {
-    final StringBuilder b = new StringBuilder(getTypeName());
-    if (getWithin() == Within.JAVA_FILE) {
-      final String name = getCUNameOrNullHelper();
-      if (name == null) {
+    final StringBuilder b = new StringBuilder();
+    final String typeNameDollar = DeclUtil.getTypeNameDollarSignOrNull(f_declaration);
+    if (typeNameDollar == null) {
+      b.append(SLUtility.PACKAGE_INFO);
+    } else {
+      b.append(typeNameDollar);
+      if (f_within == Within.JAVA_FILE) {
         /*
          * The nested type is inside the .java file of the outermost type, if
          * any nesting.
          */
-        int dollarIndex = b.indexOf(".");
+        int dollarIndex = b.indexOf("$");
         if (dollarIndex != -1) {
           b.delete(dollarIndex, b.length());
         }
-      } else {
-        /*
-         * The type must is declared at the top-level in a different file.
-         */
-        b.setLength(0); // clear
-        b.append(name);
       }
-      b.append(".java");
-    } else {
-      b.append(".class");
     }
+    if (f_within == Within.JAVA_FILE)
+      b.append(".java");
+    else
+      b.append(".class");
     return b.toString();
   }
 
   @NonNull
   public final String getClasspathRelativePathname() {
-    final StringBuilder b = new StringBuilder(getPackageNameSlash());
+    final StringBuilder b = new StringBuilder(DeclUtil.getPackageNameSlash(f_declaration));
     b.append('/');
     b.append(getSimpleFileName());
     return b.toString();
@@ -491,18 +478,23 @@ public class JavaRef implements IJavaRef {
   }
 
   public final Long getHash() {
+    String encodedNames = getEclipseProjectName() + DeclUtil.getTypeNameFullyQualifiedSureLogic(f_declaration);
     if (f_lineNumber != -1)
-      return Long.valueOf(f_encodedNames.hashCode() + f_lineNumber);
+      return Long.valueOf(encodedNames.hashCode() + f_lineNumber);
     else
-      return Long.valueOf(f_encodedNames.hashCode());
+      return Long.valueOf(encodedNames.hashCode());
   }
 
   @Override
   public String toString() {
     final StringBuilder b = new StringBuilder("JavaRef(");
-    b.append(f_encodedNames);
+    if (f_eclipseProjectName != null) {
+      b.append(f_eclipseProjectName);
+      b.append(":");
+    }
+    b.append(DeclUtil.getTypeNameFullyQualifiedSureLogic(f_declaration));
     b.append(",within=").append(f_within);
-    b.append(",typetype=").append(f_typeType);
+    b.append(",kind=").append(DeclUtil.getTypeKind(f_declaration));
     b.append(",line=").append(f_lineNumber);
     b.append(",offset=").append(f_offset);
     b.append(",length=").append(f_length);

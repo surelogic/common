@@ -76,17 +76,15 @@ public final class SLUtility {
   /**
    * Checks if the passed string is a valid fully-qualified Java type name in a
    * particular SureLogic format. Nested package names are separated by
-   * <tt>"."</tt>, the package name is separated from the type name by a "/"
-   * (which must always appear&mdash;even if the type is in the default
-   * package), and nested type names are separated by <tt>"."</tt>.
-   * <p>
-   * <tt>package-info</tt> files are handled as if they were a class. They can
-   * exist as a <tt>.java</tt> or <tt>.class</tt>.
+   * <tt>"."</tt>, the package name is separated from the type name by a "/",
+   * and nested type names are separated by <tt>"."</tt>. The "/" must always
+   * appear&mdash;even if the type is in the default package or just a package
+   * name is being returned.
    * <p>
    * Examples that would return {@code true}: <tt>java.lang/Object</tt>,
    * <tt>java.util/Map.Entry</tt>,
    * <tt>java.util.concurrent.locks/ReentrantReadWriteLock.ReadLock</tt>,
-   * <tt>/ClassInDefaultPkg</tt>, <tt>edu.afit.smallworld/package-info</tt>
+   * <tt>/ClassInDefaultPkg</tt>, <tt>org.apache/</tt>, <tt>/</tt>
    * 
    * @param value
    *          a fully-qualified Java type name in the SureLogic format.
@@ -98,6 +96,8 @@ public final class SLUtility {
       return false;
     if (value.length() == 0)
       return false;
+    if ("/".equals(value))
+      return true;
     final int slashIndex = value.indexOf('/');
     if (slashIndex == -1)
       return false;
@@ -116,8 +116,6 @@ public final class SLUtility {
      */
     final String typePart = value.substring(slashIndex + 1);
     if ("".equals(typePart))
-      return false;
-    if (PACKAGE_INFO.equals(typePart))
       return true;
     if (!isValidDotSeparatedJavaIdentifier(typePart))
       return false;
