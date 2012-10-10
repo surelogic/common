@@ -96,6 +96,8 @@ public final class CommonImages {
   public static final String IMG_GRAY_X_LIGHT = "gray_x_light.gif";
   public static final String IMG_GRAY_X = "gray_x.gif";
   public static final String IMG_GREEN_DOT = "green_dot.gif";
+  public static final String IMG_HAPPENS_BEFORE = "happens_before.gif";
+  public static final String IMG_HAPPENS_BEFORE_NO = "happens_before_no.gif";
   public static final String IMG_HIERARCHICAL = "hierarchical.gif";
   public static final String IMG_IMPORT = "import.gif";
   public static final String IMG_INCONSISTENT_DECR = "inconsistent_decr.gif";
