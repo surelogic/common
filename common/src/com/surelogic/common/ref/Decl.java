@@ -1259,10 +1259,30 @@ public abstract class Decl implements IDecl {
     return b.toString();
   }
 
-  public static IDecl getDeclForSureLogicName(String value) {
-    if (SLUtility.isValidTypeNameFullyQualifiedSureLogic(value)) {
-
+  /**
+   * Constructs and returns a declaration from the passed string if it is a
+   * valid fully-qualified Java type name in a particular SureLogic format.
+   * <p>
+   * This method has some limitations because it works with just names. For
+   * example, it has no idea if the type names in <tt>value</tt> are
+   * <tt>class</tt>, <tt>enum</tt> , or <tt>interface</tt>
+   * declarations&mdash;they all default to <tt>class</tt>. All other
+   * declaration settings, such as visibility, also take default values.
+   * 
+   * @param value
+   *          a valid fully-qualified Java type name in a particular SureLogic
+   *          format.
+   * @return a declaration.
+   * @throws IllegalArgumentException
+   *           if {@link #isValidTypeNameFullyQualifiedSureLogic(String)} fails
+   *           for <tt>value</tt>.
+   */
+  public static IDecl getDeclForTypeNameFullyQualifiedSureLogic(String value) {
+    final PackageBuilder pb = new PackageBuilder(SLUtility.getPackageNameOrEmptyFromTypeNameFullyQualifiedSureLogic(value));
+    DeclBuilder last = pb;
+    for (String typeName : SLUtility.getTypeNamesOrEmptyFromTypeNameFullyQualifiedSureLogic(value)) {
+      last = new ClassBuilder(typeName).setParent(last);
     }
-    return null;
+    return last.build();
   }
 }
