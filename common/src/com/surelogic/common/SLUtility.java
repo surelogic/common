@@ -75,6 +75,37 @@ public final class SLUtility {
   }
 
   /**
+   * Checks if the passed string is series of <tt>"."</tt> separated valid Java
+   * identifiers.
+   * <p>
+   * Examples that would return {@code true}: <tt>java.lang</tt>,
+   * <tt>java.util</tt>, <tt>Map.Entry</tt>, <tt>java.util.concurrent.locks</tt>, <tt>ClassInDefaultPkg</tt>, <tt>edu.afit.smallworld</tt>
+   * 
+   * @param value
+   *          a series of dot-separated Java identifiers.
+   * @return {@code true} if the if the passed string is valid, {@code false}
+   *         otherwise.
+   */
+  public static boolean isValidDotSeparatedJavaIdentifier(final String value) {
+    int lastDotIndex = 0;
+    while (true) {
+      int dotIndex = value.indexOf('.', lastDotIndex);
+      if (dotIndex == -1) {
+        final String id = value.substring(lastDotIndex);
+        if (!isValidJavaIdentifier(id))
+          return false;
+        break;
+      } else {
+        String id = value.substring(lastDotIndex, dotIndex);
+        if (!isValidJavaIdentifier(id))
+          return false;
+      }
+      lastDotIndex = dotIndex + 1;
+    }
+    return true;
+  }
+
+  /**
    * Checks if the passed string is a valid fully-qualified Java type name in a
    * particular SureLogic format. Nested package names are separated by
    * <tt>"."</tt>, the package name is separated from the type name by a "/",
@@ -124,6 +155,19 @@ public final class SLUtility {
     return true;
   }
 
+  /**
+   * Gets the package name from the passed string if it is a valid
+   * fully-qualified Java type name in a particular SureLogic format.
+   * 
+   * @param value
+   *          a valid fully-qualified Java type name in a particular SureLogic
+   *          format.
+   * @return the package name or the empty string.
+   * 
+   * @throws IllegalArgumentException
+   *           if {@link #isValidTypeNameFullyQualifiedSureLogic(String)} fails
+   *           for <tt>value</tt>.
+   */
   public static String getPackageNameOrEmptyFromTypeNameFullyQualifiedSureLogic(final String value) {
     if (!isValidTypeNameFullyQualifiedSureLogic(value))
       throw new IllegalArgumentException(I18N.err(287, value));
@@ -140,6 +184,19 @@ public final class SLUtility {
       return "";
   }
 
+  /**
+   * Gets an array containing types names, in order from outer to inner, from
+   * the passed string if it is a valid fully-qualified Java type name in a
+   * particular SureLogic format.
+   * 
+   * @param value
+   *          a valid fully-qualified Java type name in a particular SureLogic
+   *          format.
+   * @return an array containing types names or an empty array.
+   * @throws IllegalArgumentException
+   *           if {@link #isValidTypeNameFullyQualifiedSureLogic(String)} fails
+   *           for <tt>value</tt>.
+   */
   public static String[] getTypeNamesOrEmptyFromTypeNameFullyQualifiedSureLogic(final String value) {
     if (!isValidTypeNameFullyQualifiedSureLogic(value))
       throw new IllegalArgumentException(I18N.err(287, value));
@@ -170,37 +227,6 @@ public final class SLUtility {
       return result.toArray(new String[result.size()]);
     } else
       return EMPTY_STRING_ARRAY;
-  }
-
-  /**
-   * Checks if the passed string is series of <tt>"."</tt> separated valid Java
-   * identifiers.
-   * <p>
-   * Examples that would return {@code true}: <tt>java.lang</tt>,
-   * <tt>java.util</tt>, <tt>Map.Entry</tt>, <tt>java.util.concurrent.locks</tt>, <tt>ClassInDefaultPkg</tt>, <tt>edu.afit.smallworld</tt>
-   * 
-   * @param value
-   *          a series of dot-separated Java identifiers.
-   * @return {@code true} if the if the passed string is valid, {@code false}
-   *         otherwise.
-   */
-  public static boolean isValidDotSeparatedJavaIdentifier(final String value) {
-    int lastDotIndex = 0;
-    while (true) {
-      int dotIndex = value.indexOf('.', lastDotIndex);
-      if (dotIndex == -1) {
-        final String id = value.substring(lastDotIndex);
-        if (!isValidJavaIdentifier(id))
-          return false;
-        break;
-      } else {
-        String id = value.substring(lastDotIndex, dotIndex);
-        if (!isValidJavaIdentifier(id))
-          return false;
-      }
-      lastDotIndex = dotIndex + 1;
-    }
-    return true;
   }
 
   /**
