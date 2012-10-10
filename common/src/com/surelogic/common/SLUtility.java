@@ -48,6 +48,7 @@ public final class SLUtility {
   public static final String ECLIPSE_MARKER_TYPE_NAME = "com.surelogic.marker";
   public static final String PLATFORM_LINE_SEPARATOR = String.format("%n");
   public static final Object[] EMPTY_OBJECT_ARRAY = new Object[0];
+  public static final String[] EMPTY_STRING_ARRAY = new String[0];
   public static final String JAVADOC_ANNOTATE_TAG = "annotate";
 
   /**
@@ -121,6 +122,54 @@ public final class SLUtility {
       return false;
 
     return true;
+  }
+
+  public static String getPackageNameOrEmptyFromTypeNameFullyQualifiedSureLogic(final String value) {
+    if (!isValidTypeNameFullyQualifiedSureLogic(value))
+      throw new IllegalArgumentException(I18N.err(287, value));
+    if ("/".equals(value))
+      return "";
+    final int slashIndex = value.indexOf('/');
+    if (slashIndex > 0) {
+      /*
+       * Package part
+       */
+      final String pkgPart = value.substring(0, slashIndex);
+      return pkgPart;
+    } else
+      return "";
+  }
+
+  public static String[] getTypeNamesOrEmptyFromTypeNameFullyQualifiedSureLogic(final String value) {
+    if (!isValidTypeNameFullyQualifiedSureLogic(value))
+      throw new IllegalArgumentException(I18N.err(287, value));
+    if ("/".equals(value))
+      return EMPTY_STRING_ARRAY;
+    final int slashIndex = value.indexOf('/');
+    if (slashIndex > 0) {
+      /*
+       * Type name
+       */
+      final String typePart = value.substring(slashIndex + 1);
+      if ("".equals(typePart))
+        return EMPTY_STRING_ARRAY;
+      List<String> result = new ArrayList<String>();
+      int lastDotIndex = 0;
+      while (true) {
+        int dotIndex = typePart.indexOf('.', lastDotIndex);
+        if (dotIndex == -1) {
+          final String id = typePart.substring(lastDotIndex);
+          result.add(id);
+          break;
+        } else {
+          String id = typePart.substring(lastDotIndex, dotIndex);
+          result.add(id);
+        }
+        lastDotIndex = dotIndex + 1;
+      }
+      return result.toArray(new String[result.size()]);
+    } else
+      return EMPTY_STRING_ARRAY;
   }
 
   /**
