@@ -404,6 +404,11 @@ public class JavaRef implements IJavaRef {
     return f_eclipseProjectName == null ? SLUtility.UNKNOWN_PROJECT : f_eclipseProjectName;
   }
 
+  @NonNull
+  public final String getEclipseProjectNameOrEmpty() {
+    return f_eclipseProjectName == null ? "" : f_eclipseProjectName;
+  }
+
   @Nullable
   public final String getEclipseProjectNameOrNull() {
     return f_eclipseProjectName;

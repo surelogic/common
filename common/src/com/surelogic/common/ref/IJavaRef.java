@@ -88,13 +88,28 @@ public interface IJavaRef {
    * returned.
    * <p>
    * Examples: <tt>PlanetBaron</tt>,
-   * <tt>org.eclipse.jdt.launching.JRE_CONTAINER</tt>
+   * <tt>org.eclipse.jdt.launching.JRE_CONTAINER</tt>,
+   * <tt>(unknown project)</tt>
    * 
    * @return the Eclipse project name or library reference that this refers to,
    *         or {@link SLUtility#UNKNOWN_PROJECT} if unknown.
    */
   @NonNull
   String getEclipseProjectName();
+
+  /**
+   * Gets the Eclipse project name or library reference (shared between
+   * projects) that this refers to. If the Eclipse project name is unknown, for
+   * any reason, the empty string is returned.
+   * <p>
+   * Examples: <tt>PlanetBaron</tt>,
+   * <tt>org.eclipse.jdt.launching.JRE_CONTAINER</tt>
+   * 
+   * @return the Eclipse project name or library reference that this refers to,
+   *         or <tt>""</tt> if unknown.
+   */
+  @NonNull
+  String getEclipseProjectNameOrEmpty();
 
   /**
    * Gets the Eclipse project name or library reference (shared between
@@ -300,9 +315,11 @@ public interface IJavaRef {
   @NonNull
   String getClasspathRelativePathname();
 
+  @Deprecated
   @Nullable
   String getJavaId();
 
+  @Deprecated
   @Nullable
   String getEnclosingJavaId();
 

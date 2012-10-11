@@ -1162,7 +1162,7 @@ public abstract class Decl implements IDecl {
   }
 
   @NonNull
-  public Visibility getVisiblity() {
+  public Visibility getVisibility() {
     return Visibility.NA;
   }
 
@@ -1284,5 +1284,87 @@ public abstract class Decl implements IDecl {
       last = new ClassBuilder(typeName).setParent(last);
     }
     return last.build();
+  }
+
+  private static final String ST = "IDecl-v1[";
+  private static final String ED = "]";
+  private static final String SEP = "|";
+  private static final String NAME = "name";
+  private static final String VISIBIILTY = "visability";
+  private static final String STATIC = "static";
+  private static final String FINAL = "final";
+  private static final String ABSTRACT = "abstract";
+
+  public static String encodeForPersistence(IDecl decl) {
+    if (decl == null)
+      throw new IllegalArgumentException(I18N.err(44, "decl"));
+    decl = DeclUtil.getRoot(decl);
+    final StringBuilder b = new StringBuilder();
+    encodeHelper(decl, b);
+    return b.toString();
+  }
+
+  /**
+   * Visibility 
+   * @param decl
+   * @param b
+   */
+  private static void encodeHelper(final IDecl decl, final StringBuilder b) {
+    if (decl == null)
+      throw new IllegalArgumentException(I18N.err(44, "decl"));
+    b.append(ST);
+    b.append(decl.getKind().toString());
+    b.append(SEP);
+    switch (decl.getKind()) {
+    case CLASS:
+      add(NAME, decl.getName(), b);
+      add(VISIBIILTY, decl.getVisibility().toString(), b);
+      add(STATIC, decl.isStatic(), b);
+      add(FINAL, decl.isFinal(), b);
+      add(ABSTRACT, decl.isAbstract(), b);
+      break;
+    case CONSTRUCTOR:
+      break;
+    case ENUM:
+      break;
+    case FIELD:
+      break;
+    case INITIALIZER:
+      break;
+    case INTERFACE:
+      break;
+    case METHOD:
+      break;
+    case PACKAGE:
+      add(NAME, decl.getName(), b);
+      break;
+    case PARAMETER:
+      break;
+    case TYPE_PARAMETER:
+      break;
+
+    }
+    boolean first = true;
+    for (final IDecl child : decl.getChildren()) {
+      if (first)
+        first = false;
+      else
+        b.append(SEP);
+      encodeHelper(child, b);
+    }
+    b.append(ED);
+  }
+
+  private static void add(String name, String value, final StringBuilder b) {
+    b.append(name).append('=').append(value).append(SEP);
+  }
+
+  private static void add(String name, boolean value, final StringBuilder b) {
+    b.append(name).append('=').append(Boolean.toString(value)).append(SEP);
+  }
+
+  public static void main(String[] args) {
+    IDecl d = getDeclForTypeNameFullyQualifiedSureLogic("edu.afit.work/Map.Entry");
+    System.out.println(encodeForPersistence(d));
   }
 }

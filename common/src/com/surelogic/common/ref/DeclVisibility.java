@@ -21,7 +21,7 @@ abstract class DeclVisibility extends Decl {
 
   @Override
   @NonNull
-  public Visibility getVisiblity() {
+  public Visibility getVisibility() {
     return f_visibility;
   }
 }

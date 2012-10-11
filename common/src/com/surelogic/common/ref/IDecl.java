@@ -135,7 +135,7 @@ public interface IDecl {
    * @return the visibility of this declaration.
    */
   @NonNull
-  Visibility getVisiblity();
+  Visibility getVisibility();
 
   /**
    * Gets if this declaration is declared to be <i>static</i>. If this is
