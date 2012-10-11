@@ -102,8 +102,8 @@ public class JavaRef implements IJavaRef {
     protected String f_eclipseProjectName;
     protected IDecl f_declaration;
     protected boolean f_isOnDeclaration = false;
-    protected int f_lineNumber;
-    protected int f_offset;
+    protected int f_lineNumber = -1;
+    protected int f_offset = -1;
     protected int f_length;
     protected String f_javaId;
     protected String f_enclosingJavaId;
