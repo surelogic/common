@@ -1,5 +1,8 @@
 package com.surelogic.common.ref;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.surelogic.NonNull;
 import com.surelogic.ValueObject;
 import com.surelogic.common.i18n.I18N;
@@ -90,5 +93,98 @@ public final class TypeRef {
   @Override
   public String toString() {
     return "TypeRef(" + f_fullyQualified + ":" + f_compact + ")";
+  }
+
+  /**
+   * Encodes this for persistence as a string. Use
+   * {@link #parseEncodedForPersistence(String)} to return the string to a
+   * {@link TypeRef}.
+   * 
+   * @return a string.
+   */
+  @NonNull
+  String encodeForPersistence() {
+    final StringBuilder b = new StringBuilder();
+    b.append(f_compact).append(',').append(f_fullyQualified);
+    return b.toString();
+  }
+
+  /**
+   * Returns the result of {@link #encodeForPersistence()} to a {@link TypeRef}.
+   * 
+   * @param value
+   *          a string.
+   * @return a type reference.
+   * 
+   * @throws IllegalArgumentException
+   *           if something goes wrong.
+   */
+  @NonNull
+  static TypeRef parseEncodedForPersistence(final String value) {
+    if (value == null)
+      throw new IllegalArgumentException(I18N.err(44, "value"));
+    final int sepIndex = value.indexOf(",");
+    if (sepIndex == -1)
+      throw new IllegalArgumentException("Not an encoded TypeRef: " + value);
+    final String compact = value.substring(0, sepIndex);
+    final String fullyQualified = value.substring(sepIndex + 1);
+    return new TypeRef(fullyQualified, compact);
+  }
+
+  /**
+   * Encodes a list of type references for persistence as a string. Use
+   * {@link #parseListEncodedForPersistence(String)} to return the string to a
+   * list of {@link TypeRef}.
+   * 
+   * @param typeRefs
+   *          a list of type references.
+   * @return a string.
+   * 
+   * @throws IllegalArgumentException
+   *           if something goes wrong.
+   */
+  @NonNull
+  static String encodeListForPersistence(List<TypeRef> typeRefs) {
+    if (typeRefs == null)
+      throw new IllegalArgumentException(I18N.err(44, "typeRefs"));
+    final StringBuilder b = new StringBuilder();
+    if (typeRefs.isEmpty())
+      b.append(";");
+    else
+      for (TypeRef ref : typeRefs) {
+        b.append(ref.encodeForPersistence());
+        b.append(";");
+      }
+    return b.toString();
+  }
+
+  /**
+   * Returns the result of {@link #encodeListForPersistence(List)} to a list of
+   * {@link TypeRef}.
+   * 
+   * @param value
+   *          a string.
+   * @return a possibly empty list of type references.
+   * 
+   * @throws IllegalArgumentException
+   *           if something goes wrong.
+   */
+  @NonNull
+  static List<TypeRef> parseListEncodedForPersistence(String value) {
+    if (value == null)
+      throw new IllegalArgumentException(I18N.err(44, "value"));
+    final List<TypeRef> result = new ArrayList<TypeRef>();
+    final StringBuilder b = new StringBuilder(value);
+    while (true) {
+      final int sepIndex = b.indexOf(";");
+      if (sepIndex == -1)
+        break;
+      final String encoded = b.substring(0, sepIndex).trim();
+      if (encoded.length() < 1)
+        break;
+      result.add(parseEncodedForPersistence(encoded));
+      b.delete(0, sepIndex + 1);
+    }
+    return result;
   }
 }

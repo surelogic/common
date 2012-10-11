@@ -14,6 +14,7 @@ import com.surelogic.NotThreadSafe;
 import com.surelogic.Nullable;
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
+import com.surelogic.common.xml.XMLUtil;
 
 @Immutable
 public abstract class Decl implements IDecl {
@@ -24,7 +25,7 @@ public abstract class Decl implements IDecl {
   @NotThreadSafe
   public static final class ClassBuilder extends DeclBuilder {
 
-    Visibility f_visibility;
+    Visibility f_visibility = Visibility.PUBLIC;
     boolean f_isStatic = false;
     boolean f_isFinal = false;
     boolean f_isAbstract = false;
@@ -47,7 +48,6 @@ public abstract class Decl implements IDecl {
      */
     public ClassBuilder(String name) {
       f_name = name;
-      f_visibility = Visibility.PUBLIC;
     }
 
     /**
@@ -177,7 +177,7 @@ public abstract class Decl implements IDecl {
   @NotThreadSafe
   public static final class ConstructorBuilder extends DeclBuilder {
 
-    Visibility f_visibility;
+    Visibility f_visibility = Visibility.PUBLIC;
 
     /**
      * Constructs a constructor builder.
@@ -185,7 +185,6 @@ public abstract class Decl implements IDecl {
      * By default the constructor has no arguments and is <tt>public</tt>.
      */
     public ConstructorBuilder() {
-      f_visibility = Visibility.PUBLIC;
     }
 
     /**
@@ -278,12 +277,10 @@ public abstract class Decl implements IDecl {
   @NotThreadSafe
   public static final class EnumBuilder extends DeclBuilder {
 
-    Visibility f_visibility;
+    Visibility f_visibility = Visibility.PUBLIC;
 
     /**
      * Constructs an enum builder.
-     * <p>
-     * If no parent is set this enum is placed in the default package.
      * <p>
      * By default the enum is <tt>public</tt>.
      * 
@@ -292,7 +289,6 @@ public abstract class Decl implements IDecl {
      */
     public EnumBuilder(String name) {
       f_name = name;
-      f_visibility = Visibility.PUBLIC;
     }
 
     /**
@@ -343,7 +339,7 @@ public abstract class Decl implements IDecl {
   @NotThreadSafe
   public static final class FieldBuilder extends DeclBuilder {
 
-    Visibility f_visibility;
+    Visibility f_visibility = Visibility.PUBLIC;
     TypeRef f_typeOf;
     boolean f_isStatic = false;
     boolean f_isFinal = false;
@@ -359,7 +355,6 @@ public abstract class Decl implements IDecl {
      */
     public FieldBuilder(String name) {
       f_name = name;
-      f_visibility = Visibility.PUBLIC;
     }
 
     /**
@@ -496,7 +491,7 @@ public abstract class Decl implements IDecl {
   @NotThreadSafe
   public static final class InterfaceBuilder extends DeclBuilder {
 
-    Visibility f_visibility;
+    Visibility f_visibility = Visibility.PUBLIC;
 
     /**
      * Constructs an interface builder.
@@ -510,7 +505,6 @@ public abstract class Decl implements IDecl {
      */
     public InterfaceBuilder(String name) {
       f_name = name;
-      f_visibility = Visibility.PUBLIC;
     }
 
     /**
@@ -588,7 +582,7 @@ public abstract class Decl implements IDecl {
   @NotThreadSafe
   public static final class MethodBuilder extends DeclBuilder {
 
-    Visibility f_visibility;
+    Visibility f_visibility = Visibility.PUBLIC;
     TypeRef f_returnTypeOf;
     boolean f_isStatic = false;
     boolean f_isFinal = false;
@@ -605,7 +599,6 @@ public abstract class Decl implements IDecl {
      */
     public MethodBuilder(String name) {
       f_name = name;
-      f_visibility = Visibility.PUBLIC;
     }
 
     /**
@@ -818,10 +811,12 @@ public abstract class Decl implements IDecl {
 
     int f_position;
     TypeRef f_typeOf;
-    boolean f_isFinal;
+    boolean f_isFinal = false;
 
     /**
      * Constructs a parameter builder.
+     * <p>
+     * By default this parameter is not <tt>final</tt>.
      * 
      * @param position
      *          the zero-based argument number of this parameter.
@@ -832,6 +827,8 @@ public abstract class Decl implements IDecl {
 
     /**
      * Constructs a parameter builder.
+     * <p>
+     * By default this parameter is not <tt>final</tt>.
      * 
      * @param position
      *          the zero-based argument number of this parameter.
@@ -914,7 +911,6 @@ public abstract class Decl implements IDecl {
 
     int f_position;
     List<TypeRef> f_bounds = new ArrayList<TypeRef>();
-    boolean f_isFinal;
 
     /**
      * Constructs a type parameter builder.
@@ -1286,15 +1282,31 @@ public abstract class Decl implements IDecl {
     return last.build();
   }
 
-  private static final String ST = "IDecl-v1[";
+  private static final String ST = "^D^v1->[";
   private static final String ED = "]";
   private static final String SEP = "|";
   private static final String NAME = "name";
-  private static final String VISIBIILTY = "visability";
+  private static final String VISIBILITY = "visibility";
   private static final String STATIC = "static";
   private static final String FINAL = "final";
   private static final String ABSTRACT = "abstract";
+  private static final String TYPE = "type";
+  private static final String POSITION = "position";
+  private static final String BOUNDS = "bounds";
 
+  /**
+   * Encodes the passed declaration for persistence as a string. Note that this
+   * string is not escaped properly for XML (see {@link XMLUtil#escape(String)}
+   * to do this).
+   * 
+   * @param decl
+   *          any declaration.
+   * @return a string.
+   * 
+   * @throws IllegalArgumentException
+   *           if <tt>decl</tt> is {@code null}.
+   */
+  @NonNull
   public static String encodeForPersistence(IDecl decl) {
     if (decl == null)
       throw new IllegalArgumentException(I18N.err(44, "decl"));
@@ -1305,9 +1317,13 @@ public abstract class Decl implements IDecl {
   }
 
   /**
-   * Visibility 
+   * Recursive call to encode a declaration and its children into the passed
+   * {@link StringBuilder}.
+   * 
    * @param decl
+   *          any declaration.
    * @param b
+   *          a mutable string.
    */
   private static void encodeHelper(final IDecl decl, final StringBuilder b) {
     if (decl == null)
@@ -1318,31 +1334,54 @@ public abstract class Decl implements IDecl {
     switch (decl.getKind()) {
     case CLASS:
       add(NAME, decl.getName(), b);
-      add(VISIBIILTY, decl.getVisibility().toString(), b);
-      add(STATIC, decl.isStatic(), b);
-      add(FINAL, decl.isFinal(), b);
-      add(ABSTRACT, decl.isAbstract(), b);
+      addV(VISIBILITY, decl.getVisibility(), b);
+      addB(STATIC, decl.isStatic(), b);
+      addB(FINAL, decl.isFinal(), b);
+      addB(ABSTRACT, decl.isAbstract(), b);
       break;
     case CONSTRUCTOR:
+      addV(VISIBILITY, decl.getVisibility(), b);
       break;
     case ENUM:
+      add(NAME, decl.getName(), b);
+      addV(VISIBILITY, decl.getVisibility(), b);
       break;
     case FIELD:
+      add(NAME, decl.getName(), b);
+      addV(VISIBILITY, decl.getVisibility(), b);
+      addB(STATIC, decl.isStatic(), b);
+      addB(FINAL, decl.isFinal(), b);
+      addT(TYPE, decl.getTypeOf(), b);
       break;
     case INITIALIZER:
+      addB(STATIC, decl.isStatic(), b);
       break;
     case INTERFACE:
+      add(NAME, decl.getName(), b);
+      addV(VISIBILITY, decl.getVisibility(), b);
       break;
     case METHOD:
+      add(NAME, decl.getName(), b);
+      addV(VISIBILITY, decl.getVisibility(), b);
+      addB(STATIC, decl.isStatic(), b);
+      addB(FINAL, decl.isFinal(), b);
+      addB(ABSTRACT, decl.isAbstract(), b);
+      addT(TYPE, decl.getTypeOf(), b);
       break;
     case PACKAGE:
       add(NAME, decl.getName(), b);
       break;
     case PARAMETER:
+      add(NAME, decl.getName(), b);
+      add(POSITION, Integer.toString(decl.getPosition()), b);
+      addB(FINAL, decl.isFinal(), b);
+      addT(TYPE, decl.getTypeOf(), b);
       break;
     case TYPE_PARAMETER:
+      add(NAME, decl.getName(), b);
+      add(POSITION, Integer.toString(decl.getPosition()), b);
+      add(BOUNDS, TypeRef.encodeListForPersistence(decl.getBounds()), b);
       break;
-
     }
     boolean first = true;
     for (final IDecl child : decl.getChildren()) {
@@ -1355,12 +1394,71 @@ public abstract class Decl implements IDecl {
     b.append(ED);
   }
 
+  /*
+   * Simple helper methods for encoding a declaration
+   */
+
   private static void add(String name, String value, final StringBuilder b) {
     b.append(name).append('=').append(value).append(SEP);
   }
 
-  private static void add(String name, boolean value, final StringBuilder b) {
-    b.append(name).append('=').append(Boolean.toString(value)).append(SEP);
+  private static void addV(String name, IDecl.Visibility value, final StringBuilder b) {
+    if (value != Visibility.PUBLIC)
+      b.append(name).append('=').append(value.toString()).append(SEP);
+  }
+
+  private static void addB(String name, boolean value, final StringBuilder b) {
+    if (value)
+      b.append(name).append('=').append(Boolean.toString(value)).append(SEP);
+  }
+
+  private static void addT(String name, TypeRef value, final StringBuilder b) {
+    if (value != null)
+      b.append(name).append('=').append(value.encodeForPersistence()).append(SEP);
+  }
+
+  /**
+   * Returns the result of {@link #encodeForPersistence(IDecl)} to a
+   * {@link IDecl}.
+   * 
+   * @param value
+   *          an encoded string.
+   * @return a declaration.
+   * 
+   * @throws IllegalArgumentException
+   *           if something goes wrong.
+   */
+  @NonNull
+  public static IDecl parseEncodedForPersistence(final String value) {
+    if (value == null)
+      throw new IllegalArgumentException(I18N.err(44, "value"));
+    return null; // TODO
+  }
+
+  /**
+   * Extracts the contents of a mutable string before the next occurrence of the
+   * passed separator string, not including the separator string from the passed
+   * mutable string.
+   * 
+   * @param separator
+   *          a string to use as a separator.
+   * @param mutableString
+   *          a mutable string.
+   * @return the contents of a mutable string before the next occurrence of the
+   *         passed separator string, not including the separator string from
+   *         the passed mutable string.
+   * 
+   * @throws IllegalArgumentException
+   *           if the separator is not found.
+   */
+  @NonNull
+  private static String toNext(final String separator, final StringBuilder mutableString) {
+    final int sepIndex = mutableString.indexOf(separator);
+    if (sepIndex == -1)
+      throw new IllegalArgumentException(separator + " not found in " + mutableString);
+    final String result = mutableString.substring(0, sepIndex);
+    mutableString.delete(0, sepIndex + 1);
+    return result;
   }
 
   public static void main(String[] args) {

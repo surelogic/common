@@ -112,12 +112,10 @@ public interface IDecl {
 
   /**
    * Gets (a) the type of this for a {@link Kind#FIELD} or
-   * {@link Kind#PARAMETER}, (b) the return type for a {@link Kind#METHOD}, or
-   * (c) the type bound for a {@link Kind#TYPE_PARAMETER}. In the case of a
-   * {@link Kind#METHOD} a return value of {@code null} indicates the return
-   * type of the method is <tt>void</tt>. In the case of a
-   * {@link Kind#TYPE_PARAMETER} a return value of {@code null} indicates no
-   * bound. If this is meaningless for the declaration {@code null} is returned.
+   * {@link Kind#PARAMETER}, or (b) the return type for a {@link Kind#METHOD}.
+   * In the case of a {@link Kind#METHOD} a return value of {@code null}
+   * indicates the return type of the method is <tt>void</tt>. If this is
+   * meaningless for the declaration {@code null} is returned.
    * 
    * @return the type of this declaration, {@link null} if none.
    */

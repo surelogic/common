@@ -104,7 +104,7 @@ public class JavaRef implements IJavaRef {
     protected boolean f_isOnDeclaration = false;
     protected int f_lineNumber = -1;
     protected int f_offset = -1;
-    protected int f_length;
+    protected int f_length = -1;
     protected String f_javaId;
     protected String f_enclosingJavaId;
 
@@ -576,10 +576,5 @@ public class JavaRef implements IJavaRef {
     // throw new IllegalArgumentException(I18N.err(270, encodedForPersistence));
   }
 
-  private static String toNext(final String str, final StringBuilder b) {
-    final int barIndex = b.indexOf(str);
-    final String result = b.substring(0, barIndex);
-    b.delete(0, barIndex + 1);
-    return result;
-  }
+
 }
