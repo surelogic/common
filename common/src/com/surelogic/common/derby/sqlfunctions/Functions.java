@@ -32,7 +32,7 @@ import com.surelogic.common.jdbc.SingleRowHandler;
 public final class Functions {
 
     private Functions() {
-        // No instaqnce
+        // No instance
     }
 
     private static class TraceResultSet implements InvocationHandler {
@@ -105,6 +105,20 @@ public final class Functions {
 
     }
 
+    enum HappensBeforeState {
+        FIRST(" "), YES("Yes"), NO("No");
+        private final String display;
+
+        HappensBeforeState(String display) {
+            this.display = display;
+        }
+
+        public String getDisplay() {
+            return display;
+        }
+
+    }
+
     private static class AccessBlock {
         final boolean isStatic;
         final long threadId;
@@ -114,10 +128,11 @@ public final class Functions {
         int writes;
         int readsUC;
         int writesUC;
-        final boolean hasHappensBefore;
+        final HappensBeforeState happensBefore;
         Access lastAccess;
 
-        AccessBlock(Access first, boolean isStatic, boolean hasHappensBefore) {
+        AccessBlock(Access first, boolean isStatic,
+                HappensBeforeState happensBefore) {
             threadId = first.threadId;
             threadName = first.threadName;
             start = first.ts;
@@ -134,14 +149,16 @@ public final class Functions {
                 }
             }
             this.isStatic = isStatic;
-            this.hasHappensBefore = hasHappensBefore;
+            this.happensBefore = happensBefore;
         }
 
         AccessBlock(Access first, boolean isStatic) {
-            this(first, isStatic, false);
+            this(first, isStatic, HappensBeforeState.FIRST);
         }
 
-        AccessBlock accumulate(PreparedStatement hbSt, ResultSet set)
+        AccessBlock accumulate(PreparedStatement hbSt,
+                PreparedStatement hbObjSourceSt,
+                PreparedStatement hbObjTargetSt, ResultSet set)
                 throws SQLException {
             while (set.next()) {
                 Access a = new Access(set, isStatic);
@@ -160,19 +177,72 @@ public final class Functions {
                     }
                 } else {
                     boolean hasHappensBefore = false;
-                    hbSt.setLong(1, lastAccess.threadId);
-                    hbSt.setLong(2, a.threadId);
-                    hbSt.setTimestamp(3, lastAccess.ts);
-                    hbSt.setTimestamp(4, a.ts);
-                    ResultSet hbSet = hbSt.executeQuery();
+                    int idx = 1;
+                    hbSt.setLong(idx++, lastAccess.threadId);
+                    hbSt.setLong(idx++, a.threadId);
+                    hbSt.setTimestamp(idx++, lastAccess.ts);
+                    hbSt.setTimestamp(idx++, a.ts);
+                    final ResultSet hbSet = hbSt.executeQuery();
                     try {
                         if (hbSet.next()) {
                             hasHappensBefore = true;
+                        } else {
+                            idx = 1;
+                            hbObjSourceSt.setLong(idx++, lastAccess.threadId);
+                            hbObjSourceSt.setTimestamp(idx++, lastAccess.ts);
+                            hbObjSourceSt.setTimestamp(idx++, a.ts);
+                            final ResultSet hbObjSourceSet = hbObjSourceSt
+                                    .executeQuery();
+                            try {
+                                idx = 1;
+                                hbObjTargetSt.setLong(idx++, a.threadId);
+                                hbObjTargetSt
+                                        .setTimestamp(idx++, lastAccess.ts);
+                                hbObjTargetSt.setTimestamp(idx++, a.ts);
+                                final ResultSet hbObjTargetSet = hbObjTargetSt
+                                        .executeQuery();
+                                try {
+                                    long targetObj = -1;
+                                    Timestamp targetTs = null;
+                                    sourceLoop: while (hbObjSourceSet.next()) {
+                                        long sourceObj = hbObjSourceSet
+                                                .getLong(1);
+                                        Timestamp sourceTs = hbObjSourceSet
+                                                .getTimestamp(2);
+                                        if (sourceObj > targetObj) {
+                                            while (hbObjTargetSet.next()) {
+                                                targetObj = hbObjTargetSet
+                                                        .getLong(1);
+                                                targetTs = hbObjTargetSet
+                                                        .getTimestamp(2);
+                                                if (targetObj == sourceObj) {
+                                                    if (sourceTs
+                                                            .before(targetTs)) {
+                                                        hasHappensBefore = true;
+                                                        break sourceLoop;
+                                                    }
+                                                } else if (sourceObj < targetObj) {
+                                                    continue sourceLoop;
+                                                }
+                                            }
+                                            // We have exhausted our inner loop,
+                                            // we may as well quit
+                                            break;
+                                        }
+                                    }
+                                } finally {
+                                    hbObjTargetSet.close();
+                                }
+                            } finally {
+                                hbObjSourceSet.close();
+                            }
                         }
                     } finally {
                         hbSet.close();
                     }
-                    return new AccessBlock(a, isStatic, hasHappensBefore);
+                    return new AccessBlock(a, isStatic,
+                            hasHappensBefore ? HappensBeforeState.YES
+                                    : HappensBeforeState.NO);
                 }
             }
             return null;
@@ -193,7 +263,7 @@ public final class Functions {
             case 6:
                 return writes;
             case 7:
-                return hasHappensBefore ? "Y" : "N";
+                return happensBefore.getDisplay();
             case 8:
                 return readsUC;
             case 9:
@@ -208,6 +278,8 @@ public final class Functions {
     private static class RollupAccessesResultSet implements InvocationHandler {
 
         final PreparedStatement hbSt;
+        final PreparedStatement hbObjSourceSt;
+        final PreparedStatement hbObjTargetSt;
         final ResultSet set;
         AccessBlock block;
         AccessBlock next;
@@ -216,6 +288,10 @@ public final class Functions {
         RollupAccessesResultSet(Connection conn, ResultSet set, boolean isStatic)
                 throws SQLException {
             hbSt = conn.prepareStatement(QB.get("Accesses.happensBefore"));
+            hbObjSourceSt = conn.prepareStatement(QB
+                    .get("Accesses.happensBeforeSourceObject"));
+            hbObjTargetSt = conn.prepareStatement(QB
+                    .get("Accesses.happensBeforeTargetObject"));
             this.set = set;
             if (set.next()) {
                 next = new AccessBlock(new Access(set, isStatic), isStatic);
@@ -239,11 +315,14 @@ public final class Functions {
                     return false;
                 }
                 block = next;
-                next = block.accumulate(hbSt, set);
+                next = block
+                        .accumulate(hbSt, hbObjSourceSt, hbObjTargetSt, set);
                 return true;
             } else if ("close".equals(methodName)) {
                 set.close();
                 hbSt.close();
+                hbObjSourceSt.close();
+                hbObjTargetSt.close();
                 return null;
             } else if (methodName.startsWith("get")) {
                 Object o = block.get((Integer) args[0]);
