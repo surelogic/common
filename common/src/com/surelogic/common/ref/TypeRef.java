@@ -110,7 +110,8 @@ public final class TypeRef {
   }
 
   /**
-   * Returns the result of {@link #encodeForPersistence()} to a {@link TypeRef}.
+   * Parses the result of {@link #encodeForPersistence()} back to a
+   * {@link TypeRef}.
    * 
    * @param value
    *          a string.
@@ -160,8 +161,8 @@ public final class TypeRef {
   }
 
   /**
-   * Returns the result of {@link #encodeListForPersistence(List)} to a list of
-   * {@link TypeRef}.
+   * Parses the result of {@link #encodeListForPersistence(List)} back to a list
+   * of {@link TypeRef}.
    * 
    * @param value
    *          a string.

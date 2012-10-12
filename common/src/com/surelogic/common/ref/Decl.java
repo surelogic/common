@@ -1423,7 +1423,7 @@ public abstract class Decl implements IDecl {
   }
 
   /**
-   * Returns the result of {@link #encodeForPersistence(IDecl)} to a
+   * Parses the result of {@link #encodeForPersistence(IDecl)} back to a
    * {@link IDecl}.
    * 
    * @param value
@@ -1447,7 +1447,8 @@ public abstract class Decl implements IDecl {
    * Recursive helper method to parse an encoded declaration.
    * 
    * @param parent
-   *          the parent of the encoded declaration to be parsed.
+   *          the parent of the encoded declaration to be parsed. {@code null}
+   *          at root.
    * @param b
    *          a mutable string.
    * @return the declaration builder selected for return. The declaration
@@ -1673,6 +1674,7 @@ public abstract class Decl implements IDecl {
    * @throws IllegalArgumentException
    *           if something goes wrong.
    */
+  @Nullable
   private static Pair<String, String> parseEqualsPair(final StringBuilder b) {
     if (b.toString().startsWith(DECL) || b.toString().startsWith(END))
       return null;
