@@ -1649,9 +1649,9 @@ public abstract class Decl implements IDecl {
       if (child != null)
         toReturnBuilder = child;
     }
-    if (!b.toString().endsWith(END))
-      throw new IllegalArgumentException("encoded declaration should end with \"]\" but does not: " + b);
-    b.deleteCharAt(b.length() - 1); // remove ]
+    if (!b.toString().startsWith(END))
+      throw new IllegalArgumentException("encoded declaration should finsh up with \"]\" but does not: " + b);
+    b.delete(0, END.length());
 
     if (toReturn)
       toReturnBuilder = thisDeclBuilder;
