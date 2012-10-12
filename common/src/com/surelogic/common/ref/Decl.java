@@ -1137,11 +1137,11 @@ public abstract class Decl implements IDecl {
   }
 
   @NonNull
-  public final Set<IDecl> getChildren() {
+  public final List<IDecl> getChildren() {
     if (f_children == null)
-      return Collections.emptySet();
+      return Collections.emptyList();
     else {
-      final Set<IDecl> result = new HashSet<IDecl>();
+      final List<IDecl> result = new ArrayList<IDecl>();
       for (IDecl decl : f_children)
         result.add(decl);
       return result;
@@ -1583,9 +1583,8 @@ public abstract class Decl implements IDecl {
         methodBuilder.setIsAbstract(Boolean.valueOf(pair.second()));
         pair = parseEqualsPair(b);
       }
-      if (isNotFor(TYPE, pair))
-        throw new IllegalArgumentException("METHOD must have a return type");
-      methodBuilder.setReturnTypeOf(TypeRef.parseEncodedForPersistence(pair.second()));
+      if (isFor(TYPE, pair))
+        methodBuilder.setReturnTypeOf(TypeRef.parseEncodedForPersistence(pair.second()));
       thisDeclBuilder = methodBuilder;
       break;
     case PACKAGE:

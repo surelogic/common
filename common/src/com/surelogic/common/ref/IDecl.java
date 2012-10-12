@@ -2,7 +2,6 @@ package com.surelogic.common.ref;
 
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Set;
 
 import com.surelogic.NonNull;
 import com.surelogic.Nullable;
@@ -72,14 +71,14 @@ public interface IDecl {
   IDecl getParent();
 
   /**
-   * Gets all child declarations of this declaration. The returned set is a copy
-   * and may be safely mutated.
+   * Gets all child declarations of this declaration. The returned list is a
+   * copy and may be safely mutated.
    * 
-   * @return the possibly empty set of declarations that have this declaration
-   *         as their parent.
+   * @return the possibly empty list of declarations that have this declaration
+   *         as their parent. The returned list will have no duplicate elements.
    */
   @NonNull
-  Set<IDecl> getChildren();
+  List<IDecl> getChildren();
 
   /**
    * Gets the kind of this declaration.
