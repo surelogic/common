@@ -24,6 +24,7 @@ public abstract class AbstractXMLReader extends NestedXMLReader {
   public static final String TYPE_ATTR = "type";
   public static final String FULL_TYPE_ATTR = "full-type";
   public static final String CATEGORY_ATTR = "category";
+  public static final String JAVA_REF = "java-ref";
 
   public static final String FILE_ATTR = "file";
   public static final String LINE_ATTR = "line";
