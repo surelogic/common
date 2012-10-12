@@ -6,7 +6,6 @@ import com.surelogic.NotThreadSafe;
 import com.surelogic.Nullable;
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
-import com.surelogic.common.logging.SLLogger;
 
 /**
  * Provides an implementation of this class that should be extended by other
@@ -153,82 +152,6 @@ public class JavaRef implements IJavaRef {
     }
 
     /**
-     * This method is used to explicitly set the name of the <tt>.java</tt>
-     * file&mdash;the compilation unit&mdash; when the file name is not based
-     * upon the type name this code refers to. This can occur when more then two
-     * top-level types are declared in the same compilation unit.
-     * <p>
-     * This setting only makes sense if we are within <tt>.java</tt> file (
-     * {@link Within#JAVA_FILE}) because that is the only time the CU name can
-     * be different from the type name. If it is set on a binary, the setting is
-     * ignored.
-     * 
-     * @param value
-     *          the name of the file. <tt>.java</tt> may suffix the name or
-     *          not&mdash;if not it will be added automatically. The name is
-     *          ignored if the simple file name (no extension) is not a valid
-     *          Java type name. A warning is logged if the value is ignored.
-     * @return this builder.
-     */
-    public Builder setCUName(String value) {
-      if (value == null)
-        return this;
-      final int suffix = value.indexOf(".java");
-      if (suffix != -1)
-        value = value.substring(0, suffix);
-      if (SLUtility.isValidJavaIdentifier(value)) {
-        // TODO f_cuName = value;
-      } else {
-        SLLogger.getLogger().warning(I18N.err(266, value));
-      }
-      return this;
-    }
-
-    /**
-     * Changes the type name this code reference refers to.
-     * <p>
-     * For example, if a builder, <tt>b</tt>, contains the full name
-     * <tt>"java.util/Map.Entry"</tt> and <tt>b.setTypeName("List")</tt> is
-     * invoked the full name will become <tt>"java.util/List"</tt>.
-     * 
-     * @param value
-     *          the new type name, ignored if not a valid Java type name. A
-     *          warning is logged if the value is ignored.
-     * @return this builder.
-     */
-    public Builder setTypeName(String value) {
-      if (SLUtility.isValidDotSeparatedJavaIdentifier(value)) {
-        // TODO the whole IDecl needs to be modified
-      } else {
-        SLLogger.getLogger().warning(I18N.err(264, value));
-      }
-      return this;
-    }
-
-    /**
-     * Changes the package type name this code reference refers to.
-     * <p>
-     * For example, if a builder, <tt>b</tt>, contains the full name
-     * <tt>"java.util/Map.Entry"</tt> and
-     * <tt>b.setPackageName("org.apache.collections")</tt> is invoked the full
-     * name will become <tt>"org.apache.collections/Map.Entry"</tt>.
-     * 
-     * @param value
-     *          the new package name, ignored if not a valid Java type name. A
-     *          warning is logged if the value is ignored. Passing {@code null}
-     *          or <tt>""</tt> changes the package to the default package.
-     * @return this builder.
-     */
-    public Builder setPackageName(String value) {
-      if (SLUtility.isValidDotSeparatedJavaIdentifier(value)) {
-        // TODO the whole IDecl needs to be modified
-      } else {
-        SLLogger.getLogger().warning(I18N.err(265, value));
-      }
-      return this;
-    }
-
-    /**
      * Sets the Eclipse project name the code reference is within.
      * 
      * @param value
@@ -240,11 +163,29 @@ public class JavaRef implements IJavaRef {
       return this;
     }
 
+    /**
+     * Sets the Java declaration that this code reference is on or within.
+     * 
+     * @param value
+     *          the Java declaration that this code reference is on or within.
+     * @return this builder.
+     */
     public Builder setDeclaration(IDecl value) {
       f_declaration = value;
       return this;
     }
 
+    /**
+     * Sets if this code reference is on or within the Java declaration set by
+     * {@link #setDeclaration(IDecl)}.
+     * 
+     * @param value
+     *          {@code true} if this code reference is <i>on</i> the declaration
+     *          set by {@link #setDeclaration(IDecl)}, {@code false} if this
+     *          code reference is <i>within</i> the declaration set by
+     *          {@link #setDeclaration(IDecl)}.
+     * @return this builder.
+     */
     public Builder setIsOnDeclaration(boolean value) {
       f_isOnDeclaration = value;
       return this;
@@ -436,40 +377,6 @@ public class JavaRef implements IJavaRef {
   @NonNull
   public final String getTypeNameFullyQualified() {
     return DeclUtil.getTypeNameFullyQualified(f_declaration);
-  }
-
-  @NonNull
-  public final String getSimpleFileName() {
-    final StringBuilder b = new StringBuilder();
-    final String typeNameDollar = DeclUtil.getTypeNameDollarSignOrNull(f_declaration);
-    if (typeNameDollar == null) {
-      b.append(SLUtility.PACKAGE_INFO);
-    } else {
-      b.append(typeNameDollar);
-      if (f_within == Within.JAVA_FILE) {
-        /*
-         * The nested type is inside the .java file of the outermost type, if
-         * any nesting.
-         */
-        int dollarIndex = b.indexOf("$");
-        if (dollarIndex != -1) {
-          b.delete(dollarIndex, b.length());
-        }
-      }
-    }
-    if (f_within == Within.JAVA_FILE)
-      b.append(".java");
-    else
-      b.append(".class");
-    return b.toString();
-  }
-
-  @NonNull
-  public final String getClasspathRelativePathname() {
-    final StringBuilder b = new StringBuilder(DeclUtil.getPackageNameSlash(f_declaration));
-    b.append('/');
-    b.append(getSimpleFileName());
-    return b.toString();
   }
 
   @Nullable

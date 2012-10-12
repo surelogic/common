@@ -7,9 +7,84 @@ import com.surelogic.Nullable;
 import com.surelogic.Utility;
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
+import com.surelogic.common.ref.IJavaRef.Within;
 
 @Utility
 public final class DeclUtil {
+
+  /**
+   * Generates the most likely simple file name that the passed declaration is
+   * within.
+   * <p>
+   * A complexity is that if this refers to a nested type in a <tt>.java</tt>
+   * file the file is named according to the outermost type name only.
+   * <p>
+   * The table below lists some examples of what this method returns.
+   * <table border=1>
+   * <tr>
+   * <th>{@link #getTypeNameFullyQualifiedSureLogic()}</th>
+   * <th>{@link #getWithin()}</th>
+   * <th>{@link #getSimpleFileName()}</th>
+   * </tr>
+   * <tr>
+   * <td>com.surelogic/Editor</td>
+   * <td>{@link Within#JAVA_FILE}</td>
+   * <td>Editor.java</td>
+   * </tr>
+   * <tr>
+   * <td>com.surelogic/Editor.Builder</td>
+   * <td>{@link Within#JAVA_FILE}</td>
+   * <td>Editor.java</td>
+   * </tr>
+   * <tr>
+   * <td>/ClassInDefaultPkg</td>
+   * <td>{@link Within#JAVA_FILE}</td>
+   * <td>ClassInDefaultPkg.java</td>
+   * </tr>
+   * <tr>
+   * <td>java.lang/Object</td>
+   * <td>{@link Within#JAR_FILE}</td>
+   * <td>Object.class</td>
+   * </tr>
+   * <tr>
+   * <td>java.util/Map.Entry</td>
+   * <td>{@link Within#JAR_FILE}</td>
+   * <td>Map$Entry.class</td>
+   * </tr>
+   * <tr>
+   * <td>org.apache/Map.Entry</td>
+   * <td>{@link Within#CLASS_FILE}</td>
+   * <td>Map$Entry.class</td>
+   * </tr>
+   * </table>
+   * 
+   * @return a generated simple file name.
+   */
+  @NonNull
+  public static String guessSimpleFileName(@NonNull final IDecl decl, @NonNull final IJavaRef.Within within) {
+    final StringBuilder b = new StringBuilder();
+    final String typeNameDollar = DeclUtil.getTypeNameDollarSignOrNull(decl);
+    if (typeNameDollar == null) {
+      b.append(SLUtility.PACKAGE_INFO);
+    } else {
+      b.append(typeNameDollar);
+      if (within == Within.JAVA_FILE) {
+        /*
+         * The nested type is inside the .java file of the outermost type, if
+         * any nesting.
+         */
+        int dollarIndex = b.indexOf("$");
+        if (dollarIndex != -1) {
+          b.delete(dollarIndex, b.length());
+        }
+      }
+    }
+    if (within == Within.JAVA_FILE)
+      b.append(".java");
+    else
+      b.append(".class");
+    return b.toString();
+  }
 
   /**
    * Gets the Java package name of the passed declaration&mdash;nested package
