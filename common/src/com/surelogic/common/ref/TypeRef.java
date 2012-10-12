@@ -123,11 +123,12 @@ public final class TypeRef {
   static TypeRef parseEncodedForPersistence(final String value) {
     if (value == null)
       throw new IllegalArgumentException(I18N.err(44, "value"));
-    final int sepIndex = value.indexOf(",");
+    final String v = value.trim();
+    final int sepIndex = v.indexOf(",");
     if (sepIndex == -1)
-      throw new IllegalArgumentException("Not an encoded TypeRef: " + value);
-    final String compact = value.substring(0, sepIndex);
-    final String fullyQualified = value.substring(sepIndex + 1);
+      throw new IllegalArgumentException("Not an encoded TypeRef: " + v);
+    final String compact = v.substring(0, sepIndex);
+    final String fullyQualified = v.substring(sepIndex + 1);
     return new TypeRef(fullyQualified, compact);
   }
 
@@ -170,11 +171,11 @@ public final class TypeRef {
    *           if something goes wrong.
    */
   @NonNull
-  static List<TypeRef> parseListEncodedForPersistence(String value) {
+  static List<TypeRef> parseListEncodedForPersistence(final String value) {
     if (value == null)
       throw new IllegalArgumentException(I18N.err(44, "value"));
     final List<TypeRef> result = new ArrayList<TypeRef>();
-    final StringBuilder b = new StringBuilder(value);
+    final StringBuilder b = new StringBuilder(value.trim());
     while (true) {
       final int sepIndex = b.indexOf(";");
       if (sepIndex == -1)

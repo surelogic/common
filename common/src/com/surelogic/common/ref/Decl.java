@@ -1282,8 +1282,9 @@ public abstract class Decl implements IDecl {
     return last.build();
   }
 
-  private static final String ST = "^D^v1->[";
-  private static final String ED = "]";
+  private static final String START = "D^v1->[";
+  private static final String START_TO_RETURN = "D^*^v1->[";
+  private static final String END = "]";
   private static final String SEP = "|";
   private static final String NAME = "name";
   private static final String VISIBILITY = "visibility";
@@ -1312,7 +1313,7 @@ public abstract class Decl implements IDecl {
       throw new IllegalArgumentException(I18N.err(44, "decl"));
     decl = DeclUtil.getRoot(decl);
     final StringBuilder b = new StringBuilder();
-    encodeHelper(decl, b);
+    encodeHelper(decl, b, decl);
     return b.toString();
   }
 
@@ -1325,10 +1326,13 @@ public abstract class Decl implements IDecl {
    * @param b
    *          a mutable string.
    */
-  private static void encodeHelper(final IDecl decl, final StringBuilder b) {
+  private static void encodeHelper(final IDecl decl, final StringBuilder b, final IDecl toReturn) {
     if (decl == null)
       throw new IllegalArgumentException(I18N.err(44, "decl"));
-    b.append(ST);
+    if (decl == toReturn)
+      b.append(START_TO_RETURN);
+    else
+      b.append(START);
     b.append(decl.getKind().toString());
     b.append(SEP);
     switch (decl.getKind()) {
@@ -1389,9 +1393,9 @@ public abstract class Decl implements IDecl {
         first = false;
       else
         b.append(SEP);
-      encodeHelper(child, b);
+      encodeHelper(child, b, toReturn);
     }
-    b.append(ED);
+    b.append(END);
   }
 
   /*
@@ -1432,7 +1436,86 @@ public abstract class Decl implements IDecl {
   public static IDecl parseEncodedForPersistence(final String value) {
     if (value == null)
       throw new IllegalArgumentException(I18N.err(44, "value"));
-    return null; // TODO
+    final StringBuilder b = new StringBuilder(value.trim());
+    final DeclBuilder builder = parseToBuilderHelper(null, b);
+    return builder.build();
+  }
+
+  /**
+   * 
+   * @param parent
+   * @param b
+   * @return the declaration builder selected for return.
+   */
+  private static DeclBuilder parseToBuilderHelper(@Nullable final DeclBuilder parent, @NonNull final StringBuilder b) {
+    boolean toReturn = false;
+    int index = b.indexOf(START_TO_RETURN);
+    if (index != -1) {
+      b.delete(0, START_TO_RETURN.length());
+      toReturn = true;
+    } else {
+      index = b.indexOf(START);
+      if (index != -1) {
+        b.delete(0, START.length());
+      } else {
+        // no encoded declaration found
+        return null;
+      }
+    }
+    final Kind kind = Kind.valueOf(toNext("|", b));
+    switch (kind) {
+    case CLASS:
+      // add(NAME, decl.getName(), b);
+      // addV(VISIBILITY, decl.getVisibility(), b);
+      // addB(STATIC, decl.isStatic(), b);
+      // addB(FINAL, decl.isFinal(), b);
+      // addB(ABSTRACT, decl.isAbstract(), b);
+      break;
+    case CONSTRUCTOR:
+      // addV(VISIBILITY, decl.getVisibility(), b);
+      break;
+    case ENUM:
+      // add(NAME, decl.getName(), b);
+      // addV(VISIBILITY, decl.getVisibility(), b);
+      break;
+    case FIELD:
+      // add(NAME, decl.getName(), b);
+      // addV(VISIBILITY, decl.getVisibility(), b);
+      // addB(STATIC, decl.isStatic(), b);
+      // addB(FINAL, decl.isFinal(), b);
+      // addT(TYPE, decl.getTypeOf(), b);
+      break;
+    case INITIALIZER:
+      // addB(STATIC, decl.isStatic(), b);
+      break;
+    case INTERFACE:
+      // add(NAME, decl.getName(), b);
+      // addV(VISIBILITY, decl.getVisibility(), b);
+      break;
+    case METHOD:
+      // add(NAME, decl.getName(), b);
+      // addV(VISIBILITY, decl.getVisibility(), b);
+      // addB(STATIC, decl.isStatic(), b);
+      // addB(FINAL, decl.isFinal(), b);
+      // addB(ABSTRACT, decl.isAbstract(), b);
+      // addT(TYPE, decl.getTypeOf(), b);
+      break;
+    case PACKAGE:
+      // add(NAME, decl.getName(), b);
+      break;
+    case PARAMETER:
+      // add(NAME, decl.getName(), b);
+      // add(POSITION, Integer.toString(decl.getPosition()), b);
+      // addB(FINAL, decl.isFinal(), b);
+      // addT(TYPE, decl.getTypeOf(), b);
+      break;
+    case TYPE_PARAMETER:
+      // add(NAME, decl.getName(), b);
+      // add(POSITION, Integer.toString(decl.getPosition()), b);
+      // add(BOUNDS, TypeRef.encodeListForPersistence(decl.getBounds()), b);
+      break;
+    }
+    return null;
   }
 
   /**
@@ -1463,6 +1546,9 @@ public abstract class Decl implements IDecl {
 
   public static void main(String[] args) {
     IDecl d = getDeclForTypeNameFullyQualifiedSureLogic("edu.afit.work/Map.Entry");
+    String s = encodeForPersistence(d);
+
+    IDecl f = parseEncodedForPersistence(s);
     System.out.println(encodeForPersistence(d));
   }
 }
