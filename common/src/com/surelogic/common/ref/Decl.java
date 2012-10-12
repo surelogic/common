@@ -12,6 +12,7 @@ import com.surelogic.Immutable;
 import com.surelogic.NonNull;
 import com.surelogic.NotThreadSafe;
 import com.surelogic.Nullable;
+import com.surelogic.common.Pair;
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.xml.XMLUtil;
@@ -1282,8 +1283,9 @@ public abstract class Decl implements IDecl {
     return last.build();
   }
 
-  private static final String START = "D^v1->[";
-  private static final String START_TO_RETURN = "D^*^v1->[";
+  private static final String DECL = "^v1^";
+  private static final String START = DECL + "[";
+  private static final String START_TO_RETURN = DECL + "->[";
   private static final String END = "]";
   private static final String SEP = "|";
   private static final String NAME = "name";
@@ -1308,12 +1310,12 @@ public abstract class Decl implements IDecl {
    *           if <tt>decl</tt> is {@code null}.
    */
   @NonNull
-  public static String encodeForPersistence(IDecl decl) {
+  public static String encodeForPersistence(final IDecl decl) {
     if (decl == null)
       throw new IllegalArgumentException(I18N.err(44, "decl"));
-    decl = DeclUtil.getRoot(decl);
+    IDecl root = DeclUtil.getRoot(decl);
     final StringBuilder b = new StringBuilder();
-    encodeHelper(decl, b, decl);
+    encodeHelper(root, b, decl);
     return b.toString();
   }
 
@@ -1373,26 +1375,25 @@ public abstract class Decl implements IDecl {
       addT(TYPE, decl.getTypeOf(), b);
       break;
     case PACKAGE:
-      add(NAME, decl.getName(), b);
+      final String pkgName = decl.getName();
+      if (!pkgName.equals(SLUtility.JAVA_DEFAULT_PACKAGE))
+        add(NAME, decl.getName(), b);
       break;
     case PARAMETER:
-      add(NAME, decl.getName(), b);
       add(POSITION, Integer.toString(decl.getPosition()), b);
+      add(NAME, decl.getName(), b);
       addB(FINAL, decl.isFinal(), b);
       addT(TYPE, decl.getTypeOf(), b);
       break;
     case TYPE_PARAMETER:
-      add(NAME, decl.getName(), b);
       add(POSITION, Integer.toString(decl.getPosition()), b);
-      add(BOUNDS, TypeRef.encodeListForPersistence(decl.getBounds()), b);
+      add(NAME, decl.getName(), b);
+      final List<TypeRef> bounds = decl.getBounds();
+      if (!bounds.isEmpty())
+        add(BOUNDS, TypeRef.encodeListForPersistence(decl.getBounds()), b);
       break;
     }
-    boolean first = true;
     for (final IDecl child : decl.getChildren()) {
-      if (first)
-        first = false;
-      else
-        b.append(SEP);
       encodeHelper(child, b, toReturn);
     }
     b.append(END);
@@ -1437,85 +1438,286 @@ public abstract class Decl implements IDecl {
     if (value == null)
       throw new IllegalArgumentException(I18N.err(44, "value"));
     final StringBuilder b = new StringBuilder(value.trim());
+    // the builder returned is the one we should build and return
     final DeclBuilder builder = parseToBuilderHelper(null, b);
     return builder.build();
   }
 
   /**
+   * Recursive helper method to parse an encoded declaration.
    * 
    * @param parent
+   *          the parent of the encoded declaration to be parsed.
    * @param b
-   * @return the declaration builder selected for return.
+   *          a mutable string.
+   * @return the declaration builder selected for return. The declaration
+   *         encoded for return is special in that it begins with
+   *         {@link #START_TO_RETURN} rather than {@link #START}.
+   * 
+   * @throws IllegalArgumentException
+   *           if something goes wrong.
    */
   private static DeclBuilder parseToBuilderHelper(@Nullable final DeclBuilder parent, @NonNull final StringBuilder b) {
     boolean toReturn = false;
-    int index = b.indexOf(START_TO_RETURN);
-    if (index != -1) {
+    if (b.toString().startsWith(START_TO_RETURN)) {
       b.delete(0, START_TO_RETURN.length());
       toReturn = true;
     } else {
-      index = b.indexOf(START);
-      if (index != -1) {
+      if (b.toString().startsWith(START)) {
         b.delete(0, START.length());
-      } else {
-        // no encoded declaration found
-        return null;
-      }
+      } else
+        throw new IllegalArgumentException("no encoded declaration found in: " + b);
     }
     final Kind kind = Kind.valueOf(toNext("|", b));
+    DeclBuilder thisDeclBuilder = null;
+    Pair<String, String> pair = null;
+    int position;
+    /*
+     * Note that the order of checking for "name=value'-pairs must match the
+     * order of output to work.
+     */
     switch (kind) {
     case CLASS:
-      // add(NAME, decl.getName(), b);
-      // addV(VISIBILITY, decl.getVisibility(), b);
-      // addB(STATIC, decl.isStatic(), b);
-      // addB(FINAL, decl.isFinal(), b);
-      // addB(ABSTRACT, decl.isAbstract(), b);
+      pair = parseEqualsPair(b);
+      if (isNotFor(NAME, pair))
+        throw new IllegalArgumentException("CLASS must have a name");
+      final ClassBuilder classBuilder = new ClassBuilder(pair.second());
+      pair = parseEqualsPair(b);
+      if (isFor(VISIBILITY, pair)) {
+        classBuilder.setVisibility(Visibility.valueOf(pair.second()));
+        pair = parseEqualsPair(b);
+      }
+      if (isFor(STATIC, pair)) {
+        classBuilder.setIsStatic(Boolean.valueOf(pair.second()));
+        pair = parseEqualsPair(b);
+      }
+      if (isFor(FINAL, pair)) {
+        classBuilder.setIsFinal(Boolean.valueOf(pair.second()));
+        pair = parseEqualsPair(b);
+      }
+      if (isFor(ABSTRACT, pair)) {
+        classBuilder.setIsAbstract(Boolean.valueOf(pair.second()));
+      }
+      thisDeclBuilder = classBuilder;
       break;
     case CONSTRUCTOR:
-      // addV(VISIBILITY, decl.getVisibility(), b);
+      final ConstructorBuilder constructorBuilder = new ConstructorBuilder();
+      pair = parseEqualsPair(b);
+      if (isFor(VISIBILITY, pair)) {
+        constructorBuilder.setVisibility(Visibility.valueOf(pair.second()));
+      }
+      thisDeclBuilder = constructorBuilder;
       break;
     case ENUM:
-      // add(NAME, decl.getName(), b);
-      // addV(VISIBILITY, decl.getVisibility(), b);
+      pair = parseEqualsPair(b);
+      if (isNotFor(NAME, pair))
+        throw new IllegalArgumentException("ENUM must have a name");
+      final EnumBuilder enumBuilder = new EnumBuilder(pair.second());
+      pair = parseEqualsPair(b);
+      if (isFor(VISIBILITY, pair)) {
+        enumBuilder.setVisibility(Visibility.valueOf(pair.second()));
+      }
+      thisDeclBuilder = enumBuilder;
       break;
     case FIELD:
-      // add(NAME, decl.getName(), b);
-      // addV(VISIBILITY, decl.getVisibility(), b);
-      // addB(STATIC, decl.isStatic(), b);
-      // addB(FINAL, decl.isFinal(), b);
-      // addT(TYPE, decl.getTypeOf(), b);
+      pair = parseEqualsPair(b);
+      if (isNotFor(NAME, pair))
+        throw new IllegalArgumentException("FIELD must have a name");
+      final FieldBuilder fieldBuilder = new FieldBuilder(pair.second());
+      pair = parseEqualsPair(b);
+      if (isFor(VISIBILITY, pair)) {
+        fieldBuilder.setVisibility(Visibility.valueOf(pair.second()));
+        pair = parseEqualsPair(b);
+      }
+      if (isFor(STATIC, pair)) {
+        fieldBuilder.setIsStatic(Boolean.valueOf(pair.second()));
+        pair = parseEqualsPair(b);
+      }
+      if (isFor(FINAL, pair)) {
+        fieldBuilder.setIsFinal(Boolean.valueOf(pair.second()));
+        pair = parseEqualsPair(b);
+      }
+      if (isNotFor(TYPE, pair))
+        throw new IllegalArgumentException("FIELD must have a type");
+      fieldBuilder.setTypeOf(TypeRef.parseEncodedForPersistence(pair.second()));
+      thisDeclBuilder = fieldBuilder;
       break;
     case INITIALIZER:
-      // addB(STATIC, decl.isStatic(), b);
+      final InitializerBuilder initializerBuilder = new InitializerBuilder();
+      pair = parseEqualsPair(b);
+      if (isFor(STATIC, pair)) {
+        initializerBuilder.setIsStatic(Boolean.valueOf(pair.second()));
+      }
+      thisDeclBuilder = initializerBuilder;
       break;
     case INTERFACE:
-      // add(NAME, decl.getName(), b);
-      // addV(VISIBILITY, decl.getVisibility(), b);
+      pair = parseEqualsPair(b);
+      if (isNotFor(NAME, pair))
+        throw new IllegalArgumentException("INTERFACE must have a name");
+      final InterfaceBuilder interfaceBuilder = new InterfaceBuilder(pair.second());
+      pair = parseEqualsPair(b);
+      if (isFor(VISIBILITY, pair)) {
+        interfaceBuilder.setVisibility(Visibility.valueOf(pair.second()));
+      }
+      thisDeclBuilder = interfaceBuilder;
       break;
     case METHOD:
-      // add(NAME, decl.getName(), b);
-      // addV(VISIBILITY, decl.getVisibility(), b);
-      // addB(STATIC, decl.isStatic(), b);
-      // addB(FINAL, decl.isFinal(), b);
-      // addB(ABSTRACT, decl.isAbstract(), b);
-      // addT(TYPE, decl.getTypeOf(), b);
+      pair = parseEqualsPair(b);
+      if (isNotFor(NAME, pair))
+        throw new IllegalArgumentException("METHOD must have a name");
+      final MethodBuilder methodBuilder = new MethodBuilder(pair.second());
+      pair = parseEqualsPair(b);
+      if (isFor(VISIBILITY, pair)) {
+        methodBuilder.setVisibility(Visibility.valueOf(pair.second()));
+        pair = parseEqualsPair(b);
+      }
+      if (isFor(STATIC, pair)) {
+        methodBuilder.setIsStatic(Boolean.valueOf(pair.second()));
+        pair = parseEqualsPair(b);
+      }
+      if (isFor(FINAL, pair)) {
+        methodBuilder.setIsFinal(Boolean.valueOf(pair.second()));
+        pair = parseEqualsPair(b);
+      }
+      if (isFor(ABSTRACT, pair)) {
+        methodBuilder.setIsAbstract(Boolean.valueOf(pair.second()));
+        pair = parseEqualsPair(b);
+      }
+      if (isNotFor(TYPE, pair))
+        throw new IllegalArgumentException("METHOD must have a return type");
+      methodBuilder.setReturnTypeOf(TypeRef.parseEncodedForPersistence(pair.second()));
+      thisDeclBuilder = methodBuilder;
       break;
     case PACKAGE:
-      // add(NAME, decl.getName(), b);
+      pair = parseEqualsPair(b);
+      if (isFor(NAME, pair))
+        thisDeclBuilder = new PackageBuilder(pair.second());
+      else
+        thisDeclBuilder = new PackageBuilder();
       break;
     case PARAMETER:
-      // add(NAME, decl.getName(), b);
-      // add(POSITION, Integer.toString(decl.getPosition()), b);
-      // addB(FINAL, decl.isFinal(), b);
-      // addT(TYPE, decl.getTypeOf(), b);
+      pair = parseEqualsPair(b);
+      if (isNotFor(POSITION, pair))
+        throw new IllegalArgumentException("PARAMETER must have a position");
+      position = Integer.parseInt(pair.second());
+      pair = parseEqualsPair(b);
+      final ParameterBuilder parameterBuilder;
+      if (isFor(NAME, pair)) {
+        parameterBuilder = new ParameterBuilder(position, pair.second());
+        pair = parseEqualsPair(b);
+      } else {
+        parameterBuilder = new ParameterBuilder(position);
+      }
+      if (isFor(FINAL, pair)) {
+        parameterBuilder.setIsFinal(Boolean.valueOf(pair.second()));
+        pair = parseEqualsPair(b);
+      }
+      if (isNotFor(TYPE, pair))
+        throw new IllegalArgumentException("PARAMETER must have a type");
+      parameterBuilder.setTypeOf(TypeRef.parseEncodedForPersistence(pair.second()));
+      thisDeclBuilder = parameterBuilder;
       break;
     case TYPE_PARAMETER:
-      // add(NAME, decl.getName(), b);
-      // add(POSITION, Integer.toString(decl.getPosition()), b);
-      // add(BOUNDS, TypeRef.encodeListForPersistence(decl.getBounds()), b);
+      pair = parseEqualsPair(b);
+      if (isNotFor(POSITION, pair))
+        throw new IllegalArgumentException("TYPE PARAMETER must have a position");
+      position = Integer.parseInt(pair.second());
+      pair = parseEqualsPair(b);
+      if (isNotFor(NAME, pair))
+        throw new IllegalArgumentException("TYPE PARAMETER must have a name");
+      final TypeParameterBuilder typeParameterBuilder = new TypeParameterBuilder(position, pair.second());
+      pair = parseEqualsPair(b);
+      if (isFor(BOUNDS, pair)) {
+        final List<TypeRef> bounds = TypeRef.parseListEncodedForPersistence(pair.second());
+        for (TypeRef value : bounds)
+          typeParameterBuilder.addBounds(value);
+      }
+      thisDeclBuilder = typeParameterBuilder;
       break;
     }
-    return null;
+    if (thisDeclBuilder == null)
+      throw new IllegalArgumentException("thisDeclBuilder should not be null -- code bug");
+    thisDeclBuilder.setParent(parent);
+
+    DeclBuilder toReturnBuilder = null;
+
+    /*
+     * parse children recursively
+     */
+    while (b.toString().startsWith(DECL)) {
+      final DeclBuilder child = parseToBuilderHelper(thisDeclBuilder, b);
+      if (child != null)
+        toReturnBuilder = child;
+    }
+    if (!b.toString().endsWith(END))
+      throw new IllegalArgumentException("encoded declaration should end with \"]\" but does not: " + b);
+    b.deleteCharAt(b.length() - 1); // remove ]
+
+    if (toReturn)
+      toReturnBuilder = thisDeclBuilder;
+
+    return toReturnBuilder;
+  }
+
+  /**
+   * Gets a name/value pair encoded as <tt>static=true|</tt> or {@code null} if
+   * the passed mutable string starts with {@link #DECL} (a new declaration) or
+   * {@link #END}.
+   * <p>
+   * The string is mutated to remove up to and including the <tt>|</tt> if a
+   * non-null result is returned. it is not modified if the result is null.
+   * 
+   * @param b
+   *          a mutable string.
+   * @return a name/value pair or {@code null}.
+   * 
+   * @throws IllegalArgumentException
+   *           if something goes wrong.
+   */
+  private static Pair<String, String> parseEqualsPair(final StringBuilder b) {
+    if (b.toString().startsWith(DECL) || b.toString().startsWith(END))
+      return null;
+    final String pair = toNext("|", b);
+    final int index = pair.indexOf('=');
+    if (index == -1)
+      throw new IllegalArgumentException("Failed to find a name=value pair (e.g., static=true) in: " + pair);
+    final String name = pair.substring(0, index);
+    final String value = pair.substring(index + 1);
+    return new Pair<String, String>(name, value);
+  }
+
+  /**
+   * Checks if the name/value pair is not a match with the given name. If this
+   * method returns {@code true} an exception is typically thrown.
+   * 
+   * @param name
+   *          a name.
+   * @param pair
+   *          a name/value pair.
+   * @return {@code true} if <tt>pair == null</tt> or <tt>name</tt> is not equal
+   *         to <tt>pair.first()</tt>, {@code false} otherwise.
+   */
+  private static boolean isNotFor(String name, Pair<String, String> pair) {
+    if (pair == null)
+      return true;
+    return (!name.equals(pair.first()));
+  }
+
+  /**
+   * Checks if the name/value pair is a match with the given name. If this
+   * method returns {@code true} <tt>pair.second()</tt> is usually read next.
+   * 
+   * @param name
+   *          a name.
+   * @param pair
+   *          a name/value pair.
+   * @return {@code true} if <tt>pair != null</tt> and <tt>name</tt> is equal to
+   *         <tt>pair.first()</tt>, {@code false} otherwise.
+   */
+  private static boolean isFor(String name, Pair<String, String> pair) {
+    if (pair == null)
+      return false;
+    return (name.equals(pair.first()));
   }
 
   /**
@@ -1542,13 +1744,5 @@ public abstract class Decl implements IDecl {
     final String result = mutableString.substring(0, sepIndex);
     mutableString.delete(0, sepIndex + 1);
     return result;
-  }
-
-  public static void main(String[] args) {
-    IDecl d = getDeclForTypeNameFullyQualifiedSureLogic("edu.afit.work/Map.Entry");
-    String s = encodeForPersistence(d);
-
-    IDecl f = parseEncodedForPersistence(s);
-    System.out.println(encodeForPersistence(d));
   }
 }
