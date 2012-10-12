@@ -1037,7 +1037,7 @@ public abstract class Decl implements IDecl {
      */
     public DeclBuilder setParent(@Nullable DeclBuilder value) {
       f_parent = value;
-      if (value != null && !f_childBuilders.contains(value))
+      if (value != null && !value.f_childBuilders.contains(this))
         value.f_childBuilders.add(this);
       return this;
     }
