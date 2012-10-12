@@ -2,7 +2,6 @@ package com.surelogic.common.ref;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import com.surelogic.NonNull;
 
@@ -11,7 +10,7 @@ public final class DeclTypeParameter extends DeclWithPosition {
   @NonNull
   private final List<TypeRef> f_bounds;
 
-  public DeclTypeParameter(IDecl parent, Set<Decl.DeclBuilder> childBuilders, String name, int position, List<TypeRef> bounds) {
+  public DeclTypeParameter(IDecl parent, List<Decl.DeclBuilder> childBuilders, String name, int position, List<TypeRef> bounds) {
     super(parent, childBuilders, name, position);
     f_bounds = bounds;
   }

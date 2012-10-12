@@ -1,6 +1,6 @@
 package com.surelogic.common.ref;
 
-import java.util.Set;
+import java.util.List;
 
 import com.surelogic.common.i18n.I18N;
 
@@ -11,7 +11,7 @@ public abstract class DeclWithPosition extends Decl {
    */
   final int f_position;
 
-  public DeclWithPosition(IDecl parent, Set<DeclBuilder> childBuilders, String name, int position) {
+  public DeclWithPosition(IDecl parent, List<DeclBuilder> childBuilders, String name, int position) {
     super(parent, childBuilders, name);
     // see http://www.javaspecialists.eu/archive/Issue059.html
     if (position < 0 || position > 254)

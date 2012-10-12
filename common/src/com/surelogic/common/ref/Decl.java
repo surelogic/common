@@ -972,7 +972,7 @@ public abstract class Decl implements IDecl {
   public static abstract class DeclBuilder {
 
     DeclBuilder f_parent;
-    final Set<DeclBuilder> f_childBuilders = new HashSet<DeclBuilder>();
+    final List<DeclBuilder> f_childBuilders = new ArrayList<DeclBuilder>();
     String f_name;
 
     /**
@@ -1037,7 +1037,7 @@ public abstract class Decl implements IDecl {
      */
     public DeclBuilder setParent(@Nullable DeclBuilder value) {
       f_parent = value;
-      if (value != null)
+      if (value != null && !f_childBuilders.contains(value))
         value.f_childBuilders.add(this);
       return this;
     }
@@ -1116,7 +1116,7 @@ public abstract class Decl implements IDecl {
    * @param name
    *          the name of this declaration.
    */
-  public Decl(IDecl parent, Set<Decl.DeclBuilder> childBuilders, String name) {
+  public Decl(IDecl parent, List<Decl.DeclBuilder> childBuilders, String name) {
     f_parent = parent;
     if (name == null)
       throw new IllegalArgumentException(I18N.err(44, "name"));

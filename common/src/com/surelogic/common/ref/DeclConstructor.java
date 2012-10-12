@@ -1,6 +1,6 @@
 package com.surelogic.common.ref;
 
-import java.util.Set;
+import java.util.List;
 
 import com.surelogic.Immutable;
 import com.surelogic.NonNull;
@@ -8,7 +8,7 @@ import com.surelogic.NonNull;
 @Immutable
 final class DeclConstructor extends DeclVisibility {
 
-  DeclConstructor(IDecl parent, Set<Decl.DeclBuilder> childBuilders, Visibility visibility) {
+  DeclConstructor(IDecl parent, List<Decl.DeclBuilder> childBuilders, Visibility visibility) {
     super(parent, childBuilders, parent.getName(), visibility);
   }
 

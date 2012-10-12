@@ -1,6 +1,6 @@
 package com.surelogic.common.ref;
 
-import java.util.Set;
+import java.util.List;
 
 import com.surelogic.Immutable;
 import com.surelogic.NonNull;
@@ -18,7 +18,7 @@ final class DeclMethod extends DeclVisibility {
   final boolean f_isFinal;
   final boolean f_isAbstract;
 
-  DeclMethod(IDecl parent, Set<Decl.DeclBuilder> childBuilders, String name, Visibility visibility, TypeRef returnTypeOf,
+  DeclMethod(IDecl parent, List<Decl.DeclBuilder> childBuilders, String name, Visibility visibility, TypeRef returnTypeOf,
       boolean isStatic, boolean isFinal, boolean isAbstract) {
     super(parent, childBuilders, name, visibility);
     f_returnTypeOf = returnTypeOf;
