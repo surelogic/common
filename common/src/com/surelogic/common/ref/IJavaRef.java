@@ -14,7 +14,7 @@ import com.surelogic.common.ref.JavaRef.Builder;
  * {@link Builder#Builder(IJavaRef)}.
  * <p>
  * Encoding into a text string (via {@link #encodeForPersistence()}) and
- * decoding back into an instance (via {@link JavaRef#getInstanceFrom(String)})
+ * decoding back into an instance (via {@link JavaRef#parseEncodedForPersistence(String)})
  * are supported, for example, to persist to and restore from an XML attribute.
  */
 @ThreadSafe
@@ -330,11 +330,11 @@ public interface IJavaRef {
    * Gets an encoded text string that represents the data in this code
    * reference. It is suitable for persistence, for example, in an XML
    * attribute. The returned string can be restored to a code reference via
-   * {@link JavaRef#getInstanceFrom(String)}.
+   * {@link JavaRef#parseEncodedForPersistence(String)}.
    * 
    * @return an encoded text string that represents the data in this code
    *         reference.
-   * @see JavaRef#getInstanceFrom(String)
+   * @see JavaRef#parseEncodedForPersistence(String)
    */
   @NonNull
   String encodeForPersistence();

@@ -508,20 +508,16 @@ public class JavaRef implements IJavaRef {
   }
 
   public final String encodeForPersistence() {
-    // /*
-    // * Make sure this matches the getInstanceFrom() method below!
-    // *
-    // * Also if this is output is changed in any way create a new version
-    // prefix.
-    // * Also note that the getInstanceFrom() method will need to support both
-    // the
-    // * old and new versions of the encoded string.
-    // */
-    // return ENCODE_V1 + f_encodedNames + "|" + f_within + "|" + f_typeType +
-    // "|" + f_lineNumber + "|" + f_offset + "|" + f_length
-    // + "|" + (f_javaId == null ? "" : f_javaId) + "|" + (f_enclosingJavaId ==
-    // null ? "" : f_javaId) + "|";
-    return null; // TODO
+    /*
+     * Make sure this matches the getInstanceFrom() method below!
+     * 
+     * Also if this is output is changed in any way create a new version prefix.
+     * Also note that the getInstanceFrom() method will need to support both the
+     * old and new versions of the encoded string.
+     */
+    return ENCODE_V1 + f_within + "|" + f_isOnDeclaration + "|" + (f_eclipseProjectName == null ? "" : f_eclipseProjectName) + "|"
+        + f_lineNumber + "|" + f_offset + "|" + f_length + "|" + (f_javaId == null ? "" : f_javaId) + "|"
+        + (f_enclosingJavaId == null ? "" : f_enclosingJavaId) + "|" + Decl.encodeForPersistence(f_declaration);
   }
 
   public static final String ENCODE_V1 = "V1->";
@@ -538,43 +534,36 @@ public class JavaRef implements IJavaRef {
    * @see IJavaRef#encodeForPersistence()
    */
   @NonNull
-  public static IJavaRef getInstanceFrom(@NonNull String encodedForPersistence) {
-    return null; // TODO
-    // if (encodedForPersistence == null)
-    // throw new IllegalArgumentException(I18N.err(44,
-    // "encodedForPersistence"));
-    // if (encodedForPersistence.startsWith(ENCODE_V1)) {
-    // final StringBuilder b = new
-    // StringBuilder(encodedForPersistence.substring(ENCODE_V1.length()));
-    // final String eclipseProjectName = toNext(":", b);
-    // final String typeNameFullyQualifiedSureLogic = toNext("|", b);
-    // final String cuName = toNext("|", b);
-    // final String withinStr = toNext("|", b);
-    // final String typeTypeStr = toNext("|", b);
-    // final String lineNumberStr = toNext("|", b);
-    // final String offsetStr = toNext("|", b);
-    // final String lengthStr = toNext("|", b);
-    // final String javaId = toNext("|", b);
-    // final String enclosingJavaId = toNext("|", b);
-    //
-    // final Builder builder = new Builder(typeNameFullyQualifiedSureLogic);
-    // builder.setWithin(Within.valueOf(withinStr));
-    // builder.setTypeType(TypeType.valueOf(typeTypeStr));
-    // if (!"".equals(eclipseProjectName))
-    // builder.setEclipseProjectName(eclipseProjectName);
-    // if (!"".equals(cuName))
-    // builder.setCUName(cuName);
-    // builder.setLineNumber(Integer.parseInt(lineNumberStr));
-    // builder.setOffset(Integer.parseInt(offsetStr));
-    // builder.setLength(Integer.parseInt(lengthStr));
-    // if (!"".equals(javaId))
-    // builder.setJavaId(javaId);
-    // if (!"".equals(enclosingJavaId))
-    // builder.setEnclosingJavaId(enclosingJavaId);
-    // return builder.build();
-    // } else
-    // throw new IllegalArgumentException(I18N.err(270, encodedForPersistence));
-  }
+  public static IJavaRef parseEncodedForPersistence(@NonNull String encodedForPersistence) {
+    if (encodedForPersistence == null)
+      throw new IllegalArgumentException(I18N.err(44, "encodedForPersistence"));
+    if (encodedForPersistence.startsWith(ENCODE_V1)) {
+      final StringBuilder b = new StringBuilder(encodedForPersistence.substring(ENCODE_V1.length()));
+      final Within within = Within.valueOf(Decl.toNext("|", b));
+      final boolean isOnDeclaration = Boolean.parseBoolean(Decl.toNext("|", b));
+      final String eclipseProjectName = Decl.toNext("|", b);
+      final String lineNumberStr = Decl.toNext("|", b);
+      final String offsetStr = Decl.toNext("|", b);
+      final String lengthStr = Decl.toNext("|", b);
+      final String javaId = Decl.toNext("|", b);
+      final String enclosingJavaId = Decl.toNext("|", b);
+      final IDecl declaration = Decl.parseEncodedForPersistence(b.toString());
 
+      final Builder builder = new Builder(declaration);
+      builder.setWithin(within);
+      builder.setIsOnDeclaration(isOnDeclaration);
+      if (!"".equals(eclipseProjectName))
+        builder.setEclipseProjectName(eclipseProjectName);
+      builder.setLineNumber(Integer.parseInt(lineNumberStr));
+      builder.setOffset(Integer.parseInt(offsetStr));
+      builder.setLength(Integer.parseInt(lengthStr));
+      if (!"".equals(javaId))
+        builder.setJavaId(javaId);
+      if (!"".equals(enclosingJavaId))
+        builder.setEnclosingJavaId(enclosingJavaId);
+      return builder.build();
+    } else
+      throw new IllegalArgumentException(I18N.err(270, encodedForPersistence));
+  }
 
 }

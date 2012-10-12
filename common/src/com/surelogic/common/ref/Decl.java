@@ -1738,7 +1738,7 @@ public abstract class Decl implements IDecl {
    *           if the separator is not found.
    */
   @NonNull
-  private static String toNext(final String separator, final StringBuilder mutableString) {
+  static String toNext(final String separator, final StringBuilder mutableString) {
     final int sepIndex = mutableString.indexOf(separator);
     if (sepIndex == -1)
       throw new IllegalArgumentException(separator + " not found in " + mutableString);
