@@ -516,8 +516,7 @@ public class JavaRef implements IJavaRef {
      * old and new versions of the encoded string.
      */
     return ENCODE_V1 + f_within + "|" + f_isOnDeclaration + "|" + (f_eclipseProjectName == null ? "" : f_eclipseProjectName) + "|"
-        + f_lineNumber + "|" + f_offset + "|" + f_length + "|" + (f_javaId == null ? "" : f_javaId) + "|"
-        + (f_enclosingJavaId == null ? "" : f_enclosingJavaId) + "|" + Decl.encodeForPersistence(f_declaration);
+        + f_lineNumber + "|" + f_offset + "|" + f_length + "|" + Decl.encodeForPersistence(f_declaration);
   }
 
   public static final String ENCODE_V1 = "V1->";
@@ -545,8 +544,6 @@ public class JavaRef implements IJavaRef {
       final String lineNumberStr = Decl.toNext("|", b);
       final String offsetStr = Decl.toNext("|", b);
       final String lengthStr = Decl.toNext("|", b);
-      final String javaId = Decl.toNext("|", b);
-      final String enclosingJavaId = Decl.toNext("|", b);
       final IDecl declaration = Decl.parseEncodedForPersistence(b.toString());
 
       final Builder builder = new Builder(declaration);
@@ -557,13 +554,8 @@ public class JavaRef implements IJavaRef {
       builder.setLineNumber(Integer.parseInt(lineNumberStr));
       builder.setOffset(Integer.parseInt(offsetStr));
       builder.setLength(Integer.parseInt(lengthStr));
-      if (!"".equals(javaId))
-        builder.setJavaId(javaId);
-      if (!"".equals(enclosingJavaId))
-        builder.setEnclosingJavaId(enclosingJavaId);
       return builder.build();
     } else
       throw new IllegalArgumentException(I18N.err(270, encodedForPersistence));
   }
-
 }
