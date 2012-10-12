@@ -50,7 +50,14 @@ public interface IDecl {
     CLASS, CONSTRUCTOR, ENUM, FIELD, INITIALIZER, INTERFACE, METHOD, PACKAGE, PARAMETER, TYPE_PARAMETER
   }
 
+  /*
+   * Some helpful enum sets
+   */
+
   public static final EnumSet<IDecl.Kind> TYPE_KINDS = EnumSet.of(IDecl.Kind.CLASS, IDecl.Kind.ENUM, IDecl.Kind.INTERFACE);
+  public static final EnumSet<IDecl.Kind> CONTROL_FLOW_KINDS = EnumSet.of(IDecl.Kind.CONSTRUCTOR, IDecl.Kind.INITIALIZER,
+      IDecl.Kind.METHOD);
+  public static final EnumSet<IDecl.Kind> CONSTRUCTOR_OR_METHOD_KINDS = EnumSet.of(IDecl.Kind.CONSTRUCTOR, IDecl.Kind.METHOD);
   public static final EnumSet<IDecl.Kind> PKG_TYPE_KINDS = EnumSet.of(IDecl.Kind.CLASS, IDecl.Kind.ENUM, IDecl.Kind.INTERFACE,
       IDecl.Kind.PACKAGE);
 
