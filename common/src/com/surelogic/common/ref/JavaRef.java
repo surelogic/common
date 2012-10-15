@@ -49,11 +49,6 @@ public class JavaRef implements IJavaRef {
    * <td>{@code null}</td>
    * </tr>
    * <tr>
-   * <td>{@link #setIsOnDeclaration(boolean)}</td>
-   * <td>flags if this code reference is on (true) or within (false) the
-   * declaration returned by {@link IJavaRef#getDeclaration()}</td>
-   * <td>{@code false} (within the declaration)</td>
-   * </tr>
    * <tr>
    * <td>{@link #setJavaId(String)}</td>
    * <td>a declaration path used by viewers</td>
@@ -79,6 +74,11 @@ public class JavaRef implements IJavaRef {
    * <td>the package name this reference is within</td>
    * <td>the name given to construct this builder</td>
    * </tr>
+   * <td>
+   * {@link #setPositionRelativeToDeclaration(IJavaRef.Position)}</td>
+   * <td>a code reference can be within or on a particular Java declaration</td>
+   * <td>{@link Position#WITHIN}</td>
+   * </tr>
    * <tr>
    * <td>{@link #setTypeName(String)}</td>
    * <td>the simple type name this reference is within, including nested
@@ -100,6 +100,7 @@ public class JavaRef implements IJavaRef {
     protected Within f_within = Within.JAVA_FILE;
     protected String f_eclipseProjectName;
     protected IDecl f_declaration;
+    protected Position f_positionRelativeToDeclaration = Position.WITHIN;
     protected boolean f_isOnDeclaration = false;
     protected int f_lineNumber = -1;
     protected int f_offset = -1;
@@ -118,6 +119,7 @@ public class JavaRef implements IJavaRef {
       f_within = copy.getWithin();
       f_eclipseProjectName = copy.getEclipseProjectNameOrNull();
       f_declaration = copy.getDeclaration();
+      f_positionRelativeToDeclaration = copy.getPositionRelativeToDeclaration();
       f_lineNumber = copy.getLineNumber();
       f_offset = copy.getOffset();
       f_length = copy.getLength();
@@ -142,7 +144,7 @@ public class JavaRef implements IJavaRef {
      * <tt>.class</tt> file, or a <tt>.jar</tt> file.
      * 
      * @param value
-     *          what this code reference is within.
+     *          what this code reference is within. Ignored if {@code null}.
      * @return this builder.
      */
     public Builder setWithin(Within value) {
@@ -176,18 +178,14 @@ public class JavaRef implements IJavaRef {
     }
 
     /**
-     * Sets if this code reference is on or within the Java declaration set by
-     * {@link #setDeclaration(IDecl)}.
      * 
      * @param value
-     *          {@code true} if this code reference is <i>on</i> the declaration
-     *          set by {@link #setDeclaration(IDecl)}, {@code false} if this
-     *          code reference is <i>within</i> the declaration set by
-     *          {@link #setDeclaration(IDecl)}.
+     *          Ignored if {@code null}.
      * @return this builder.
      */
-    public Builder setIsOnDeclaration(boolean value) {
-      f_isOnDeclaration = value;
+    public Builder setPositionRelativeToDeclaration(Position value) {
+      if (value != null)
+        f_positionRelativeToDeclaration = value;
       return this;
     }
 
@@ -259,8 +257,8 @@ public class JavaRef implements IJavaRef {
     public IJavaRef build() {
       if (f_declaration == null)
         throw new IllegalArgumentException(I18N.err(44, "declaration"));
-      return new JavaRef(f_within, f_declaration, f_isOnDeclaration, f_eclipseProjectName, f_lineNumber, f_offset, f_length,
-          f_javaId, f_enclosingJavaId);
+      return new JavaRef(f_within, f_declaration, f_positionRelativeToDeclaration, f_eclipseProjectName, f_lineNumber, f_offset,
+          f_length, f_javaId, f_enclosingJavaId);
     }
 
     /**
@@ -283,7 +281,9 @@ public class JavaRef implements IJavaRef {
 
   @NonNull
   private final IDecl f_declaration;
-  private final boolean f_isOnDeclaration;
+
+  @NonNull
+  private final Position f_positionRelativeToDeclaration;
 
   @Nullable
   private final String f_eclipseProjectName;
@@ -305,12 +305,12 @@ public class JavaRef implements IJavaRef {
   @Nullable
   private final String f_enclosingJavaId;
 
-  protected JavaRef(final @NonNull Within within, final @NonNull IDecl declaration, final boolean isOnDeclaration,
-      @Nullable final String eclipseProjectNameOrNull, final int lineNumber, final int offset, final int length,
-      final @Nullable String javaIdOrNull, final @Nullable String enclosingJavaIdOrNull) {
+  protected JavaRef(final @NonNull Within within, final @NonNull IDecl declaration,
+      @NonNull Position positionRelativeToDeclaration, @Nullable final String eclipseProjectNameOrNull, final int lineNumber,
+      final int offset, final int length, final @Nullable String javaIdOrNull, final @Nullable String enclosingJavaIdOrNull) {
     f_within = within;
     f_declaration = declaration;
-    f_isOnDeclaration = isOnDeclaration;
+    f_positionRelativeToDeclaration = positionRelativeToDeclaration;
     f_eclipseProjectName = eclipseProjectNameOrNull;
     f_lineNumber = lineNumber > 0 && lineNumber != Integer.MAX_VALUE ? lineNumber : -1;
     f_offset = offset > 0 && offset != Integer.MAX_VALUE ? offset : -1;
@@ -360,8 +360,9 @@ public class JavaRef implements IJavaRef {
     return f_declaration;
   }
 
-  public boolean isOnDeclaration() {
-    return f_isOnDeclaration;
+  @NonNull
+  public Position getPositionRelativeToDeclaration() {
+    return f_positionRelativeToDeclaration;
   }
 
   @NonNull
@@ -422,8 +423,9 @@ public class JavaRef implements IJavaRef {
      * Also note that the getInstanceFrom() method will need to support both the
      * old and new versions of the encoded string.
      */
-    return ENCODE_V1 + f_within + "|" + f_isOnDeclaration + "|" + (f_eclipseProjectName == null ? "" : f_eclipseProjectName) + "|"
-        + f_lineNumber + "|" + f_offset + "|" + f_length + "|" + Decl.encodeForPersistence(f_declaration);
+    return ENCODE_V1 + f_within + "|" + f_positionRelativeToDeclaration + "|"
+        + (f_eclipseProjectName == null ? "" : f_eclipseProjectName) + "|" + f_lineNumber + "|" + f_offset + "|" + f_length + "|"
+        + Decl.encodeForPersistence(f_declaration);
   }
 
   public static final String ENCODE_V1 = "V1->";
@@ -446,7 +448,7 @@ public class JavaRef implements IJavaRef {
     if (encodedForPersistence.startsWith(ENCODE_V1)) {
       final StringBuilder b = new StringBuilder(encodedForPersistence.substring(ENCODE_V1.length()));
       final Within within = Within.valueOf(Decl.toNext("|", b));
-      final boolean isOnDeclaration = Boolean.parseBoolean(Decl.toNext("|", b));
+      final Position positionRelativeToDeclaration = Position.valueOf(Decl.toNext("|", b));
       final String eclipseProjectName = Decl.toNext("|", b);
       final String lineNumberStr = Decl.toNext("|", b);
       final String offsetStr = Decl.toNext("|", b);
@@ -455,7 +457,7 @@ public class JavaRef implements IJavaRef {
 
       final Builder builder = new Builder(declaration);
       builder.setWithin(within);
-      builder.setIsOnDeclaration(isOnDeclaration);
+      builder.setPositionRelativeToDeclaration(positionRelativeToDeclaration);
       if (!"".equals(eclipseProjectName))
         builder.setEclipseProjectName(eclipseProjectName);
       builder.setLineNumber(Integer.parseInt(lineNumberStr));

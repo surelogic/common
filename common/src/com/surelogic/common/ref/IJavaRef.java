@@ -32,6 +32,33 @@ public interface IJavaRef {
   }
 
   /**
+   * A referenced location in Java code can be within or on a particular Java
+   * declaration.
+   */
+  enum Position {
+    /**
+     * Indicates the code reference is <i>on</i> the declaration.
+     */
+    ON,
+    /**
+     * Indicates the code reference is on the declaration's receiver. This only
+     * makes sense if the declaration is {@link Kind#METHOD} or
+     * {@link Kind#CONSTRUCTOR}.
+     */
+    ON_RECEIVER,
+    /**
+     * Indicates the code reference is on the declaration's return value. This
+     * only makes sense if the declaration is {@link Kind#METHOD} or
+     * {@link Kind#CONSTRUCTOR}.
+     */
+    ON_RETURN_VALUE,
+    /**
+     * Indicates the code reference is <i>within</i> the declaration.
+     */
+    WITHIN,
+  }
+
+  /**
    * Gets the type of resource that this reference is within.
    * 
    * @return the type of resource that this reference is within.
@@ -144,42 +171,14 @@ public interface IJavaRef {
   IDecl getDeclaration();
 
   /**
-   * Indicates where this code reference is in relation to a particular
-   * declaration.
-   */
-  enum Position {
-    /**
-     * Indicates the code reference is <i>on</i> the declaration.
-     */
-    ON,
-    /**
-     * Indicates the code reference is on the declaration's receiver. This only
-     * makes sense if the declaration is {@link Kind#METHOD} or
-     * {@link Kind#CONSTRUCTOR}.
-     */
-    ON_RECEIVER,
-    /**
-     * Indicates the code reference is on the declaration's return value. This
-     * only makes sense if the declaration is {@link Kind#METHOD} or
-     * {@link Kind#CONSTRUCTOR}.
-     */
-    ON_RETURN_VALUE,
-    /**
-     * Indicates the code reference is <i>within</i> the declaration.
-     */
-    WITHIN,
-  }
-
-  /**
-   * Gets if this code reference is on or within the Java declaration returned
-   * by {@link #getDeclaration()}.
+   * Gets the position of this code reference relative to the declaration
+   * returned by {@link #getDeclaration()}.
    * 
-   * @return {@code true} if this code reference is <i>on</i> the declaration
-   *         returned by {@link #getDeclaration()}, {@code false} if this code
-   *         reference is <i>within</i> the declaration returned by
-   *         {@link #getDeclaration()}.
+   * @return the position of this code reference relative to the declaration
+   *         returned by {@link #getDeclaration()}.
    */
-  boolean isOnDeclaration();
+  @NonNull
+  Position getPositionRelativeToDeclaration();
 
   /**
    * Gets the Java package name that this refers to&mdash;nested package names
