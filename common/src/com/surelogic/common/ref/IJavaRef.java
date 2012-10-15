@@ -28,7 +28,19 @@ public interface IJavaRef {
    * 
    */
   enum Within {
-    JAVA_FILE, CLASS_FILE, JAR_FILE
+    /**
+     * Indicates the code reference is in a <tt>.java</tt> file.
+     */
+    JAVA_FILE,
+    /**
+     * Indicates the code reference is in a <tt>.class</tt> file.
+     */
+    CLASS_FILE,
+    /**
+     * Indicates the code reference is in a <tt>.class</tt> file within a
+     * <tt>.jar</tt> file.
+     */
+    JAR_FILE
   }
 
   /**
