@@ -28,12 +28,6 @@ public class JavaRef implements IJavaRef {
    * <th>Default</th>
    * </tr>
    * <tr>
-   * <td>{@link #setCUName(String)}</td>
-   * <td><tt>.java</tt> file name in the very rare case that it is different
-   * from the type name</td>
-   * <td>{@code null}</td>
-   * </tr>
-   * <tr>
    * <td>{@link #setDeclaration(IDecl)}</td>
    * <td>the Java declaration that this code reference is on or within</td>
    * <td>none</td>
@@ -80,12 +74,6 @@ public class JavaRef implements IJavaRef {
    * <td>{@link Position#WITHIN}</td>
    * </tr>
    * <tr>
-   * <td>{@link #setTypeName(String)}</td>
-   * <td>the simple type name this reference is within, including nested
-   * types&mdash;just not the package name</td>
-   * <td>the name given to construct this builder</td>
-   * </tr>
-   * <tr>
    * <td>{@link #setWithin(IJavaRef.Within)}</td>
    * <td>a code reference can be within a <tt>.java</tt> file, a <tt>.class</tt>
    * file, or a <tt>.jar</tt> file</td>
@@ -96,17 +84,17 @@ public class JavaRef implements IJavaRef {
   @NotThreadSafe
   public static class Builder {
 
-    @NonNull
-    protected Within f_within = Within.JAVA_FILE;
-    protected String f_eclipseProjectName;
     protected IDecl f_declaration;
-    protected Position f_positionRelativeToDeclaration = Position.WITHIN;
-    protected boolean f_isOnDeclaration = false;
+    protected String f_eclipseProjectName;
+    protected String f_enclosingJavaId;
+    protected String f_javaId;
+    protected int f_length = -1;
     protected int f_lineNumber = -1;
     protected int f_offset = -1;
-    protected int f_length = -1;
-    protected String f_javaId;
-    protected String f_enclosingJavaId;
+    @NonNull
+    protected Position f_positionRelativeToDeclaration = Position.WITHIN;
+    @NonNull
+    protected Within f_within = Within.JAVA_FILE;
 
     /**
      * Constructs a new builder that allows copy-then-modify from another code
@@ -140,16 +128,14 @@ public class JavaRef implements IJavaRef {
     }
 
     /**
-     * Sets if this code reference is within a <tt>.java</tt> file, a
-     * <tt>.class</tt> file, or a <tt>.jar</tt> file.
+     * Sets the Java declaration that this code reference is on or within.
      * 
      * @param value
-     *          what this code reference is within. Ignored if {@code null}.
+     *          the Java declaration that this code reference is on or within.
      * @return this builder.
      */
-    public Builder setWithin(Within value) {
-      if (value != null)
-        f_within = value;
+    public Builder setDeclaration(IDecl value) {
+      f_declaration = value;
       return this;
     }
 
@@ -166,14 +152,26 @@ public class JavaRef implements IJavaRef {
     }
 
     /**
-     * Sets the Java declaration that this code reference is on or within.
+     * Sets a declaration path used by viewers.
      * 
      * @param value
-     *          the Java declaration that this code reference is on or within.
+     *          a declaration path used by viewers.
      * @return this builder.
      */
-    public Builder setDeclaration(IDecl value) {
-      f_declaration = value;
+    public Builder setEnclosingJavaId(String value) {
+      f_enclosingJavaId = value;
+      return this;
+    }
+
+    /**
+     * Sets a declaration path used by viewers.
+     * 
+     * @param value
+     *          a declaration path used by viewers.
+     * @return this builder.
+     */
+    public Builder setJavaId(String value) {
+      f_javaId = value;
       return this;
     }
 
@@ -186,6 +184,18 @@ public class JavaRef implements IJavaRef {
     public Builder setPositionRelativeToDeclaration(Position value) {
       if (value != null)
         f_positionRelativeToDeclaration = value;
+      return this;
+    }
+
+    /**
+     * Sets the character length of the code reference in the source file.
+     * 
+     * @param value
+     *          the character length of the code reference in the source file.
+     * @return this builder.
+     */
+    public Builder setLength(int value) {
+      f_length = value;
       return this;
     }
 
@@ -214,38 +224,16 @@ public class JavaRef implements IJavaRef {
     }
 
     /**
-     * Sets the character length of the code reference in the source file.
+     * Sets if this code reference is within a <tt>.java</tt> file, a
+     * <tt>.class</tt> file, or a <tt>.jar</tt> file.
      * 
      * @param value
-     *          the character length of the code reference in the source file.
+     *          what this code reference is within. Ignored if {@code null}.
      * @return this builder.
      */
-    public Builder setLength(int value) {
-      f_length = value;
-      return this;
-    }
-
-    /**
-     * Sets a declaration path used by viewers.
-     * 
-     * @param value
-     *          a declaration path used by viewers.
-     * @return this builder.
-     */
-    public Builder setJavaId(String value) {
-      f_javaId = value;
-      return this;
-    }
-
-    /**
-     * Sets a declaration path used by viewers.
-     * 
-     * @param value
-     *          a declaration path used by viewers.
-     * @return this builder.
-     */
-    public Builder setEnclosingJavaId(String value) {
-      f_enclosingJavaId = value;
+    public Builder setWithin(Within value) {
+      if (value != null)
+        f_within = value;
       return this;
     }
 
@@ -277,17 +265,17 @@ public class JavaRef implements IJavaRef {
   }
 
   @NonNull
-  private final Within f_within;
-
-  @NonNull
   private final IDecl f_declaration;
-
-  @NonNull
-  private final Position f_positionRelativeToDeclaration;
-
   @Nullable
   private final String f_eclipseProjectName;
-
+  @Nullable
+  private final String f_enclosingJavaId;
+  @Nullable
+  private final String f_javaId;
+  /**
+   * -1 indicates not valid.
+   */
+  private final int f_length;
   /**
    * -1 indicates not valid.
    */
@@ -296,14 +284,10 @@ public class JavaRef implements IJavaRef {
    * -1 indicates not valid.
    */
   private final int f_offset;
-  /**
-   * -1 indicates not valid.
-   */
-  private final int f_length;
-  @Nullable
-  private final String f_javaId;
-  @Nullable
-  private final String f_enclosingJavaId;
+  @NonNull
+  private final Position f_positionRelativeToDeclaration;
+  @NonNull
+  private final Within f_within;
 
   protected JavaRef(final @NonNull Within within, final @NonNull IDecl declaration,
       @NonNull Position positionRelativeToDeclaration, @Nullable final String eclipseProjectNameOrNull, final int lineNumber,
@@ -320,24 +304,8 @@ public class JavaRef implements IJavaRef {
   }
 
   @NonNull
-  public final Within getWithin() {
-    return f_within;
-  }
-
-  public final boolean isFromSource() {
-    return f_within == IJavaRef.Within.JAVA_FILE;
-  }
-
-  public final int getLineNumber() {
-    return f_lineNumber;
-  }
-
-  public final int getOffset() {
-    return f_offset;
-  }
-
-  public final int getLength() {
-    return f_length;
+  public final IDecl getDeclaration() {
+    return f_declaration;
   }
 
   @NonNull
@@ -355,36 +323,6 @@ public class JavaRef implements IJavaRef {
     return f_eclipseProjectName;
   }
 
-  @NonNull
-  public IDecl getDeclaration() {
-    return f_declaration;
-  }
-
-  @NonNull
-  public Position getPositionRelativeToDeclaration() {
-    return f_positionRelativeToDeclaration;
-  }
-
-  @NonNull
-  public final String getPackageName() {
-    return DeclUtil.getPackageName(f_declaration);
-  }
-
-  @NonNull
-  public final String getTypeNameOrNull() {
-    return DeclUtil.getTypeNameOrNull(f_declaration);
-  }
-
-  @NonNull
-  public final String getTypeNameFullyQualified() {
-    return DeclUtil.getTypeNameFullyQualified(f_declaration);
-  }
-
-  @Nullable
-  public final String getJavaId() {
-    return f_javaId;
-  }
-
   @Nullable
   public final String getEnclosingJavaId() {
     return f_enclosingJavaId;
@@ -396,6 +334,52 @@ public class JavaRef implements IJavaRef {
       return Long.valueOf(encodedNames.hashCode() + f_lineNumber);
     else
       return Long.valueOf(encodedNames.hashCode());
+  }
+
+  @Nullable
+  public final String getJavaId() {
+    return f_javaId;
+  }
+
+  public final int getLength() {
+    return f_length;
+  }
+
+  public final int getLineNumber() {
+    return f_lineNumber;
+  }
+
+  public final int getOffset() {
+    return f_offset;
+  }
+
+  @NonNull
+  public final String getPackageName() {
+    return DeclUtil.getPackageName(f_declaration);
+  }
+
+  @NonNull
+  public Position getPositionRelativeToDeclaration() {
+    return f_positionRelativeToDeclaration;
+  }
+
+  @NonNull
+  public final String getTypeNameFullyQualified() {
+    return DeclUtil.getTypeNameFullyQualified(f_declaration);
+  }
+
+  @NonNull
+  public final String getTypeNameOrNull() {
+    return DeclUtil.getTypeNameOrNull(f_declaration);
+  }
+
+  @NonNull
+  public final Within getWithin() {
+    return f_within;
+  }
+
+  public final boolean isFromSource() {
+    return f_within == IJavaRef.Within.JAVA_FILE;
   }
 
   @Override
