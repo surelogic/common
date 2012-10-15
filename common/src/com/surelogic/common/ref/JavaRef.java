@@ -28,6 +28,11 @@ public class JavaRef implements IJavaRef {
    * <th>Default</th>
    * </tr>
    * <tr>
+   * <td>{@link #setAbsolutePath(String)}</td>
+   * <td>the absolute path to the file this code reference is within</td>
+   * <td>{@code null}</td>
+   * </tr>
+   * <tr>
    * <td>{@link #setDeclaration(IDecl)}</td>
    * <td>the Java declaration that this code reference is on or within</td>
    * <td>none</td>
@@ -43,6 +48,12 @@ public class JavaRef implements IJavaRef {
    * <td>{@code null}</td>
    * </tr>
    * <tr>
+   * <tr>
+   * <td>{@link #setJarRelativePath(String)}</td>
+   * <td>the relative path within a <tt>.jar</tt> file that this code reference
+   * is within</td>
+   * <td>{@code null}</td>
+   * </tr>
    * <tr>
    * <td>{@link #setJavaId(String)}</td>
    * <td>a declaration path used by viewers</td>
@@ -63,11 +74,6 @@ public class JavaRef implements IJavaRef {
    * <td>the character offset of the code reference in the source file</td>
    * <td>-1</td>
    * </tr>
-   * <tr>
-   * <td>{@link #setPackageName(String)}</td>
-   * <td>the package name this reference is within</td>
-   * <td>the name given to construct this builder</td>
-   * </tr>
    * <td>
    * {@link #setPositionRelativeToDeclaration(IJavaRef.Position)}</td>
    * <td>a code reference can be within or on a particular Java declaration</td>
@@ -84,9 +90,11 @@ public class JavaRef implements IJavaRef {
   @NotThreadSafe
   public static class Builder {
 
+    private String f_absolutePath;
     protected IDecl f_declaration;
     protected String f_eclipseProjectName;
     protected String f_enclosingJavaId;
+    private String f_jarRelativePath;
     protected String f_javaId;
     protected int f_length = -1;
     protected int f_lineNumber = -1;
@@ -104,15 +112,17 @@ public class JavaRef implements IJavaRef {
      *          a code location reference.
      */
     public Builder(IJavaRef copy) {
-      f_within = copy.getWithin();
-      f_eclipseProjectName = copy.getEclipseProjectNameOrNull();
+      f_absolutePath = copy.getAbsolutePathOrNull();
       f_declaration = copy.getDeclaration();
-      f_positionRelativeToDeclaration = copy.getPositionRelativeToDeclaration();
+      f_eclipseProjectName = copy.getEclipseProjectNameOrNull();
+      f_enclosingJavaId = copy.getEnclosingJavaId();
+      f_jarRelativePath = copy.getJarRelativePathOrNull();
+      f_javaId = copy.getJavaId();
+      f_length = copy.getLength();
       f_lineNumber = copy.getLineNumber();
       f_offset = copy.getOffset();
-      f_length = copy.getLength();
-      f_javaId = copy.getJavaId();
-      f_enclosingJavaId = copy.getEnclosingJavaId();
+      f_positionRelativeToDeclaration = copy.getPositionRelativeToDeclaration();
+      f_within = copy.getWithin();
     }
 
     /**
@@ -125,6 +135,18 @@ public class JavaRef implements IJavaRef {
       if (declaration == null)
         throw new IllegalArgumentException(I18N.err(44, "declaration"));
       f_declaration = declaration;
+    }
+
+    /**
+     * Sets the the absolute path that this code reference is within, if known.
+     * 
+     * @param value
+     *          an absolute path.
+     * @return this builder.
+     */
+    public Builder setAbsolutePath(String value) {
+      f_absolutePath = value;
+      return this;
     }
 
     /**
@@ -158,8 +180,22 @@ public class JavaRef implements IJavaRef {
      *          a declaration path used by viewers.
      * @return this builder.
      */
+    @Deprecated
     public Builder setEnclosingJavaId(String value) {
       f_enclosingJavaId = value;
+      return this;
+    }
+
+    /**
+     * Sets the path within the <tt>.jar</tt> file that this code reference is
+     * within. if applicable.
+     * 
+     * @param value
+     *          a path within a <tt>.jar</tt> file.
+     * @return this builder.
+     */
+    public Builder setJarRelativePath(String value) {
+      f_jarRelativePath = value;
       return this;
     }
 
@@ -170,20 +206,9 @@ public class JavaRef implements IJavaRef {
      *          a declaration path used by viewers.
      * @return this builder.
      */
+    @Deprecated
     public Builder setJavaId(String value) {
       f_javaId = value;
-      return this;
-    }
-
-    /**
-     * 
-     * @param value
-     *          Ignored if {@code null}.
-     * @return this builder.
-     */
-    public Builder setPositionRelativeToDeclaration(Position value) {
-      if (value != null)
-        f_positionRelativeToDeclaration = value;
       return this;
     }
 
@@ -224,6 +249,20 @@ public class JavaRef implements IJavaRef {
     }
 
     /**
+     * Sets if this code reference is within or on a Java declaration.
+     * 
+     * @param value
+     *          a position relative to the Java declaration. Ignored if
+     *          {@code null}.
+     * @return this builder.
+     */
+    public Builder setPositionRelativeToDeclaration(Position value) {
+      if (value != null)
+        f_positionRelativeToDeclaration = value;
+      return this;
+    }
+
+    /**
      * Sets if this code reference is within a <tt>.java</tt> file, a
      * <tt>.class</tt> file, or a <tt>.jar</tt> file.
      * 
@@ -246,7 +285,7 @@ public class JavaRef implements IJavaRef {
       if (f_declaration == null)
         throw new IllegalArgumentException(I18N.err(44, "declaration"));
       return new JavaRef(f_within, f_declaration, f_positionRelativeToDeclaration, f_eclipseProjectName, f_lineNumber, f_offset,
-          f_length, f_javaId, f_enclosingJavaId);
+          f_length, f_absolutePath, f_jarRelativePath, f_javaId, f_enclosingJavaId);
     }
 
     /**
@@ -264,12 +303,16 @@ public class JavaRef implements IJavaRef {
     }
   }
 
+  @Nullable
+  private final String f_absolutePath;
   @NonNull
   private final IDecl f_declaration;
   @Nullable
   private final String f_eclipseProjectName;
   @Nullable
   private final String f_enclosingJavaId;
+  @Nullable
+  private final String f_jarRelativePath;
   @Nullable
   private final String f_javaId;
   /**
@@ -291,7 +334,8 @@ public class JavaRef implements IJavaRef {
 
   protected JavaRef(final @NonNull Within within, final @NonNull IDecl declaration,
       @NonNull Position positionRelativeToDeclaration, @Nullable final String eclipseProjectNameOrNull, final int lineNumber,
-      final int offset, final int length, final @Nullable String javaIdOrNull, final @Nullable String enclosingJavaIdOrNull) {
+      final int offset, final int length, final @Nullable String absolutePathOrNull, final @Nullable String jarRelativePathOrNull,
+      final @Nullable String javaIdOrNull, final @Nullable String enclosingJavaIdOrNull) {
     f_within = within;
     f_declaration = declaration;
     f_positionRelativeToDeclaration = positionRelativeToDeclaration;
@@ -299,8 +343,15 @@ public class JavaRef implements IJavaRef {
     f_lineNumber = lineNumber > 0 && lineNumber != Integer.MAX_VALUE ? lineNumber : -1;
     f_offset = offset > 0 && offset != Integer.MAX_VALUE ? offset : -1;
     f_length = length > 0 && length != Integer.MAX_VALUE ? length : -1;
+    f_absolutePath = absolutePathOrNull;
+    f_jarRelativePath = jarRelativePathOrNull;
     f_javaId = javaIdOrNull;
     f_enclosingJavaId = enclosingJavaIdOrNull;
+  }
+
+  @Nullable
+  public String getAbsolutePathOrNull() {
+    return f_absolutePath;
   }
 
   @NonNull
@@ -334,6 +385,11 @@ public class JavaRef implements IJavaRef {
       return Long.valueOf(encodedNames.hashCode() + f_lineNumber);
     else
       return Long.valueOf(encodedNames.hashCode());
+  }
+
+  @Nullable
+  public String getJarRelativePathOrNull() {
+    return f_jarRelativePath;
   }
 
   @Nullable

@@ -71,56 +71,46 @@ public interface IJavaRef {
   }
 
   /**
-   * Gets the type of resource that this reference is within.
+   * Gets an encoded text string that represents the data in this code
+   * reference. It is suitable for persistence, for example, in an XML
+   * attribute. The returned string can be restored to a code reference via
+   * {@link JavaRef#parseEncodedForPersistence(String)}.
    * 
-   * @return the type of resource that this reference is within.
+   * @return an encoded text string that represents the data in this code
+   *         reference.
+   * @see JavaRef#parseEncodedForPersistence(String)
    */
   @NonNull
-  Within getWithin();
+  String encodeForPersistence();
 
   /**
-   * Gets if this refers to source code. This is a convenience method defined to
-   * be the same as <tt>({@link #getWithin()} == {@link Within#JAVA_FILE})</tt>.
-   * 
-   * @return {@code true} if this refers to source code, {@code false}
-   *         otherwise.
-   */
-  boolean isFromSource();
-
-  /**
-   * Gets the line number of the code snippet this refers to, or <tt>-1</tt> if
-   * unknown.
+   * Gets the absolute path that this code reference is within, or {@code null}
+   * if none is available.
    * <p>
-   * The result is only valid if {@link #isFromSource()} is {@code true}.
+   * Note that this information was obtained at the time of the scan and this
+   * resource may not exist on the system anymore.
    * 
-   * @return the line number of the code snippet this refers to, or <tt>-1</tt>
-   *         if unknown.
+   * @return an absolute path that this code reference is within, or
+   *         {@code null} if none is available.
    */
-  int getLineNumber();
+  @Nullable
+  String getAbsolutePathOrNull();
 
   /**
-   * Returns the character offset, from the start of the file, to the start of
-   * the code snippet this refers to, or <tt>-1</tt> if unknown.
+   * Gets the Java declaration that this code reference is on or within. To
+   * determine if the code reference is on or within the declaration use
+   * {@link #isOnDeclaration()}.
    * <p>
-   * The result is only valid if {@link #isFromSource()} is {@code true}.
+   * Many helpful methods to pull information from a declaration are provided in
+   * {@link DeclUtil}. This type only wraps a small subset of them.
    * 
-   * @return the character offset, from the start of the file, to the start of
-   *         the code snippet this refers to, or <tt>-1</tt> if unknown.
-   * @see #getLength()
-   */
-  int getOffset();
-
-  /**
-   * Gets the length, in characters, of the code snippet this refers to, or
-   * <tt>-1</tt> if unknown.
-   * <p>
-   * The result is only valid if {@link #isFromSource()} is {@code true}.
+   * @return the Java declaration that this code reference is on or within.
    * 
-   * @return the length, in characters, of the code snippet this refers to, or
-   *         <tt>-1</tt> if unknown.
-   * @see #getOffset()
+   * @see IDecl
+   * @see DeclUtil
    */
-  int getLength();
+  @NonNull
+  IDecl getDeclaration();
 
   /**
    * Gets the Eclipse project name or library reference (shared between
@@ -166,31 +156,67 @@ public interface IJavaRef {
   @Nullable
   String getEclipseProjectNameOrNull();
 
-  /**
-   * Gets the Java declaration that this code reference is on or within. To
-   * determine if the code reference is on or within the declaration use
-   * {@link #isOnDeclaration()}.
-   * <p>
-   * Many helpful methods to pull information from a declaration are provided in
-   * {@link DeclUtil}. This type only wraps a small subset of them.
-   * 
-   * @return the Java declaration that this code reference is on or within.
-   * 
-   * @see IDecl
-   * @see DeclUtil
-   */
+  @Deprecated
+  @Nullable
+  String getEnclosingJavaId();
+
   @NonNull
-  IDecl getDeclaration();
+  Long getHash();
 
   /**
-   * Gets the position of this code reference relative to the declaration
-   * returned by {@link #getDeclaration()}.
+   * Gets the path within the <tt>.jar</tt> file returned by
+   * {@link #getAbsolutePathOrNull()} that this code reference is within. This
+   * method returns {@code null} if this reference is not within a
+   * {@link Within#JAR_FILE}.
+   * <p>
+   * Note that this information was obtained at the time of the scan and this
+   * resource may not exist on the system anymore.
    * 
-   * @return the position of this code reference relative to the declaration
-   *         returned by {@link #getDeclaration()}.
+   * @return the path that this code reference is within inside the the
+   *         <tt>.jar</tt> file returned by {@link #getAbsolutePathOrNull()}, or
+   *         {@code null} if not within a <tt>.jar</tt> file.
    */
-  @NonNull
-  Position getPositionRelativeToDeclaration();
+  @Nullable
+  String getJarRelativePathOrNull();
+
+  @Deprecated
+  @Nullable
+  String getJavaId();
+
+  /**
+   * Gets the length, in characters, of the code snippet this refers to, or
+   * <tt>-1</tt> if unknown.
+   * <p>
+   * The result is only valid if {@link #isFromSource()} is {@code true}.
+   * 
+   * @return the length, in characters, of the code snippet this refers to, or
+   *         <tt>-1</tt> if unknown.
+   * @see #getOffset()
+   */
+  int getLength();
+
+  /**
+   * Gets the line number of the code snippet this refers to, or <tt>-1</tt> if
+   * unknown.
+   * <p>
+   * The result is only valid if {@link #isFromSource()} is {@code true}.
+   * 
+   * @return the line number of the code snippet this refers to, or <tt>-1</tt>
+   *         if unknown.
+   */
+  int getLineNumber();
+
+  /**
+   * Returns the character offset, from the start of the file, to the start of
+   * the code snippet this refers to, or <tt>-1</tt> if unknown.
+   * <p>
+   * The result is only valid if {@link #isFromSource()} is {@code true}.
+   * 
+   * @return the character offset, from the start of the file, to the start of
+   *         the code snippet this refers to, or <tt>-1</tt> if unknown.
+   * @see #getLength()
+   */
+  int getOffset();
 
   /**
    * Gets the Java package name that this refers to&mdash;nested package names
@@ -211,21 +237,14 @@ public interface IJavaRef {
   String getPackageName();
 
   /**
-   * Gets the Java type name that this refers to&mdash;nested types are
-   * separated by a <tt>"."</tt>.
-   * <p>
-   * This method has the same effect as calling
-   * {@link DeclUtil#getTypeNameOrNull(IDecl)} and passing the result of
-   * {@link #getDeclaration()}. The {@link DeclUtil} has several other helpful
-   * methods to return names in various forms.
-   * <p>
-   * Examples: <tt>Object</tt>, <tt>Map.Entry</tt>,
-   * <tt>AbstractQueuedSynchronizer.ConditionObject</tt>
+   * Gets the position of this code reference relative to the declaration
+   * returned by {@link #getDeclaration()}.
    * 
-   * @return the Java type name that this refers to.
+   * @return the position of this code reference relative to the declaration
+   *         returned by {@link #getDeclaration()}.
    */
-  @Nullable
-  String getTypeNameOrNull();
+  @NonNull
+  Position getPositionRelativeToDeclaration();
 
   /**
    * Java type name that this refers to. Both packages and nested types are
@@ -246,27 +265,37 @@ public interface IJavaRef {
   @NonNull
   String getTypeNameFullyQualified();
 
-  @Deprecated
+  /**
+   * Gets the Java type name that this refers to&mdash;nested types are
+   * separated by a <tt>"."</tt>.
+   * <p>
+   * This method has the same effect as calling
+   * {@link DeclUtil#getTypeNameOrNull(IDecl)} and passing the result of
+   * {@link #getDeclaration()}. The {@link DeclUtil} has several other helpful
+   * methods to return names in various forms.
+   * <p>
+   * Examples: <tt>Object</tt>, <tt>Map.Entry</tt>,
+   * <tt>AbstractQueuedSynchronizer.ConditionObject</tt>
+   * 
+   * @return the Java type name that this refers to.
+   */
   @Nullable
-  String getJavaId();
-
-  @Deprecated
-  @Nullable
-  String getEnclosingJavaId();
-
-  @NonNull
-  Long getHash();
+  String getTypeNameOrNull();
 
   /**
-   * Gets an encoded text string that represents the data in this code
-   * reference. It is suitable for persistence, for example, in an XML
-   * attribute. The returned string can be restored to a code reference via
-   * {@link JavaRef#parseEncodedForPersistence(String)}.
+   * Gets the type of resource that this reference is within.
    * 
-   * @return an encoded text string that represents the data in this code
-   *         reference.
-   * @see JavaRef#parseEncodedForPersistence(String)
+   * @return the type of resource that this reference is within.
    */
   @NonNull
-  String encodeForPersistence();
+  Within getWithin();
+
+  /**
+   * Gets if this refers to source code. This is a convenience method defined to
+   * be the same as <tt>({@link #getWithin()} == {@link Within#JAVA_FILE})</tt>.
+   * 
+   * @return {@code true} if this refers to source code, {@code false}
+   *         otherwise.
+   */
+  boolean isFromSource();
 }
