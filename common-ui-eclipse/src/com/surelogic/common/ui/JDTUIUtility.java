@@ -4,6 +4,8 @@ import java.util.logging.Level;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
@@ -90,33 +92,7 @@ public class JDTUIUtility {
          */
         try {
           final IEditorPart editorPart = JavaUI.openInEditor(element, false, true);
-
-          final int offset = javaRef.getOffset();
-          final int length = javaRef.getLength();
-          final int lineNumber = javaRef.getLineNumber();
-          if (offset != -1 && length != -1) {
-            /*
-             * Use offset and length if at all possible.
-             */
-            final IMarker location = ResourcesPlugin.getWorkspace().getRoot().createMarker(SLUtility.ECLIPSE_MARKER_TYPE_NAME);
-            if (location != null) {
-              location.setAttribute(IMarker.CHAR_START, offset);
-              location.setAttribute(IMarker.CHAR_END, offset + length);
-              IDE.gotoMarker(editorPart, location);
-              location.delete();
-            }
-          } else if (lineNumber != -1) {
-            /*
-             * Use line number if we must
-             */
-            final IMarker location = ResourcesPlugin.getWorkspace().getRoot().createMarker(SLUtility.ECLIPSE_MARKER_TYPE_NAME);
-            if (location != null) {
-              location.setAttribute(IMarker.LINE_NUMBER, lineNumber);
-              IDE.gotoMarker(editorPart, location);
-              location.delete();
-              return true;
-            }
-          }
+          tryToHighlightHelper(javaRef, editorPart);
           return editorPart != null;
         } catch (final Exception e) {
           SLLogger.getLogger().log(Level.SEVERE, I18N.err(132, element, javaRef), e);
@@ -134,9 +110,64 @@ public class JDTUIUtility {
         return false;
       }
     } else {
-      // package only
-      // TODO
+      /*
+       * Package only -- look for "package-info.java"
+       */
+      final ICompilationUnit cu = JDTUtility.findPackageInfoOrNull(javaRef.getEclipseProjectName(), javaRef.getPackageName());
+      if (cu != null) {
+        try {
+          final IEditorPart editorPart = JavaUI.openInEditor(cu, false, true);
+          tryToHighlightHelper(javaRef, editorPart);
+          return editorPart != null;
+        } catch (Exception e) {
+          SLLogger.getLogger().log(Level.SEVERE, I18N.err(132, cu, javaRef), e);
+        }
+      }
       return false;
+    }
+  }
+
+  /**
+   * This method tries to use the information in <tt>javaRef</tt> to highlight a
+   * line or an offset/length pair in the passed <tt>editorPart</tt>.
+   * <p>
+   * If either argument is {@code null} it returns immediately.
+   * 
+   * @param javaRef
+   *          a java reference.
+   * @param editorPart
+   *          an editor, may be {@code null}.
+   * @throws CoreException
+   *           if anything goes wrong.
+   */
+  private static final void tryToHighlightHelper(final IJavaRef javaRef, final IEditorPart editorPart) throws CoreException {
+    if (javaRef == null || editorPart == null)
+      return;
+
+    final int offset = javaRef.getOffset();
+    final int length = javaRef.getLength();
+    final int lineNumber = javaRef.getLineNumber();
+    if (offset != -1 && length != -1) {
+      /*
+       * Use offset and length if at all possible.
+       */
+      final IMarker location = ResourcesPlugin.getWorkspace().getRoot().createMarker(SLUtility.ECLIPSE_MARKER_TYPE_NAME);
+      if (location != null) {
+        location.setAttribute(IMarker.CHAR_START, offset);
+        location.setAttribute(IMarker.CHAR_END, offset + length);
+        IDE.gotoMarker(editorPart, location);
+        location.delete();
+      }
+    } else if (lineNumber != -1) {
+      /*
+       * Use line number if we must
+       */
+      final IMarker location = ResourcesPlugin.getWorkspace().getRoot().createMarker(SLUtility.ECLIPSE_MARKER_TYPE_NAME);
+      if (location != null) {
+        location.setAttribute(IMarker.LINE_NUMBER, lineNumber);
+        IDE.gotoMarker(editorPart, location);
+        location.delete();
+      }
     }
   }
 
