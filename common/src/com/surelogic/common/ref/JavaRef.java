@@ -463,13 +463,14 @@ public class JavaRef implements IJavaRef {
      * Also note that the getInstanceFrom() method will need to support both the
      * old and new versions of the encoded string.
      */
-    return ENCODE_V1 + f_within + "|" + f_positionRelativeToDeclaration + "|"
+    return ENCODE_V2 + f_within + "|" + f_positionRelativeToDeclaration + "|"
         + (f_eclipseProjectName == null ? "" : f_eclipseProjectName) + "|" + f_lineNumber + "|" + f_offset + "|" + f_length + "|"
         + (f_absolutePath == null ? "" : f_absolutePath) + "|" + (f_jarRelativePath == null ? "" : f_jarRelativePath) + "|"
         + Decl.encodeForPersistence(f_declaration);
   }
 
   public static final String ENCODE_V1 = "V1->";
+  public static final String ENCODE_V2 = "V2->";
 
   /**
    * Constructs a code reference from a text string produced by
@@ -486,7 +487,10 @@ public class JavaRef implements IJavaRef {
   public static IJavaRef parseEncodedForPersistence(@NonNull String encodedForPersistence) {
     if (encodedForPersistence == null)
       throw new IllegalArgumentException(I18N.err(44, "encodedForPersistence"));
-    if (encodedForPersistence.startsWith(ENCODE_V1)) {
+
+    final int encodeVersion = getEncodeVersion(encodedForPersistence);
+
+    if (encodeVersion != -1) {
       final StringBuilder b = new StringBuilder(encodedForPersistence.substring(ENCODE_V1.length()));
       final Within within = Within.valueOf(Decl.toNext("|", b));
       final Position positionRelativeToDeclaration = Position.valueOf(Decl.toNext("|", b));
@@ -494,8 +498,14 @@ public class JavaRef implements IJavaRef {
       final String lineNumberStr = Decl.toNext("|", b);
       final String offsetStr = Decl.toNext("|", b);
       final String lengthStr = Decl.toNext("|", b);
-      final String absolutePath = Decl.toNext("|", b);
-      final String jarRelativePath = Decl.toNext("|", b);
+      final String absolutePath;
+      final String jarRelativePath;
+      if (encodeVersion == 2) {
+        absolutePath = Decl.toNext("|", b);
+        jarRelativePath = Decl.toNext("|", b);
+      } else {
+        absolutePath = jarRelativePath = "";
+      }
       final IDecl declaration = Decl.parseEncodedForPersistence(b.toString());
 
       final Builder builder = new Builder(declaration);
@@ -513,5 +523,22 @@ public class JavaRef implements IJavaRef {
       return builder.build();
     } else
       throw new IllegalArgumentException(I18N.err(270, encodedForPersistence));
+  }
+
+  /**
+   * Gets the encoding version used in the passed string or -1 if the string
+   * does not appear to be encoded properly.
+   * 
+   * @param encodedForPersistence
+   *          a text string produced by {@link IJavaRef#encodeForPersistence()}.
+   * @return the encoding version used in the passed string or -1 if the string
+   *         does not appear to be encoded properly.
+   */
+  private static int getEncodeVersion(@NonNull String encodedForPersistence) {
+    if (encodedForPersistence.startsWith(ENCODE_V1))
+      return 1;
+    else if (encodedForPersistence.startsWith(ENCODE_V2))
+      return 2;
+    return -1;
   }
 }

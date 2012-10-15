@@ -1678,13 +1678,7 @@ public abstract class Decl implements IDecl {
   private static Pair<String, String> parseEqualsPair(final StringBuilder b) {
     if (b.toString().startsWith(DECL) || b.toString().startsWith(END))
       return null;
-    final String pair = toNext("|", b);
-    final int index = pair.indexOf('=');
-    if (index == -1)
-      throw new IllegalArgumentException("Failed to find a name=value pair (e.g., static=true) in: " + pair);
-    final String name = pair.substring(0, index);
-    final String value = pair.substring(index + 1);
-    return new Pair<String, String>(name, value);
+    return parseEqualsPairOrFail(b);
   }
 
   /**
@@ -1745,5 +1739,31 @@ public abstract class Decl implements IDecl {
     final String result = mutableString.substring(0, sepIndex);
     mutableString.delete(0, sepIndex + 1);
     return result;
+  }
+
+  /**
+   * Gets a name/value pair encoded as <tt>static=true|</tt> or throws and
+   * exception if the <tt>=</tt> or <tt>|</tt> cannot be found.
+   * <p>
+   * The string is mutated to remove up to and including the <tt>|</tt> if a
+   * result is returned. The state of the mutable string is undefined if an
+   * exception is thrown.
+   * 
+   * @param b
+   *          a mutable string.
+   * @return a name/value pair.
+   * 
+   * @throws IllegalArgumentException
+   *           if something goes wrong.
+   */
+  @NonNull
+  static Pair<String, String> parseEqualsPairOrFail(final StringBuilder b) {
+    final String pair = toNext("|", b);
+    final int index = pair.indexOf('=');
+    if (index == -1)
+      throw new IllegalArgumentException("Failed to find a name=value pair (e.g., static=true) in: " + pair);
+    final String name = pair.substring(0, index);
+    final String value = pair.substring(index + 1);
+    return new Pair<String, String>(name, value);
   }
 }
