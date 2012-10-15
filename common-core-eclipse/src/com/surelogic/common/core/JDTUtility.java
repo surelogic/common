@@ -335,12 +335,13 @@ public final class JDTUtility {
    * 
    * @param projectName
    *          the project name the element is contained within. For example,
-   *          <code>JEdit</code>. If null, try all projects
+   *          <code>JEdit</code>. If null, or starts with
+   *          {@link SLUtility#LIBRARY_PROJECT}, try all projects
    * @param packageName
    *          the package name the element is contained within. For example,
    *          <code>com.surelogic.sierra</code>. the package name is
-   *          "(default package)" or null then the class is contained within the
-   *          default package.
+   *          {@link SLUtility#JAVA_DEFAULT_PACKAGE} or null then the class is
+   *          contained within the default package.
    * @param typeName
    *          the type name, this type may be a nested type of the form
    *          <code>Outer$Inner</code> or <code>Outer$Inner$InnerInner</code> or
@@ -355,11 +356,13 @@ public final class JDTUtility {
       final String baseTypeName = stripOffAnonymousOccurranceCount(typeName);
       final String className = baseTypeName.replace("$", ".");
 
+      final boolean searchAllPackages = projectName == null || projectName.equals(SLUtility.JAVA_DEFAULT_PACKAGE)
+          || projectName.startsWith(SLUtility.LIBRARY_PROJECT);
       final IWorkspaceRoot wsRoot = ResourcesPlugin.getWorkspace().getRoot();
       final IJavaModel model = JavaCore.create(wsRoot);
       if (model != null) {
         for (final IJavaProject project : model.getJavaProjects()) {
-          if (projectName == null || project.getElementName().equals(projectName)) {
+          if (searchAllPackages || projectName.equals(project.getElementName())) {
             String packageNameHolder = null;
             if (!(packageName == null) && !packageName.equals(SLUtility.JAVA_DEFAULT_PACKAGE)) {
               packageNameHolder = packageName;

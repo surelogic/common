@@ -41,6 +41,7 @@ public final class SLUtility {
    */
   public static final String JAVA_DEFAULT_PACKAGE = "(default package)";
   public static final String UNKNOWN_PROJECT = "(unknown project)";
+  public static final String LIBRARY_PROJECT = "(standard library)";
   public static final String PACKAGE_INFO = "package-info";
   public static final String UTF8 = "UTF8";
   public static final String YES = "Yes";

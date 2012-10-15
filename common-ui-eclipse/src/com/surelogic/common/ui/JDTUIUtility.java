@@ -106,7 +106,13 @@ public class JDTUIUtility {
         if (javaRef.getWithin() == IJavaRef.Within.JAVA_FILE) {
           SLLogger.getLogger().warning(I18N.err(268, element, javaRef));
         }
-        System.out.println("TODO -- Can't handle binary yet -- need to open promises XML editor");
+        try {
+          final IEditorPart editorPart = JavaUI.openInEditor(element, false, true);
+          tryToHighlightHelper(javaRef, editorPart);
+          return editorPart != null;
+        } catch (final Exception e) {
+          SLLogger.getLogger().log(Level.SEVERE, I18N.err(132, element, javaRef), e);
+        }
         return false;
       }
     } else {
