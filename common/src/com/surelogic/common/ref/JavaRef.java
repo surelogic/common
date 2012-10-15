@@ -88,21 +88,21 @@ public class JavaRef implements IJavaRef {
    * </table>
    */
   @NotThreadSafe
-  public static class Builder {
+  public final static class Builder {
 
     private String f_absolutePath;
-    protected IDecl f_declaration;
-    protected String f_eclipseProjectName;
-    protected String f_enclosingJavaId;
+    private IDecl f_declaration;
+    private String f_eclipseProjectName;
+    private String f_enclosingJavaId;
     private String f_jarRelativePath;
-    protected String f_javaId;
-    protected int f_length = -1;
-    protected int f_lineNumber = -1;
-    protected int f_offset = -1;
+    private String f_javaId;
+    private int f_length = -1;
+    private int f_lineNumber = -1;
+    private int f_offset = -1;
     @NonNull
-    protected Position f_positionRelativeToDeclaration = Position.WITHIN;
+    private Position f_positionRelativeToDeclaration = Position.WITHIN;
     @NonNull
-    protected Within f_within = Within.JAVA_FILE;
+    private Within f_within = Within.JAVA_FILE;
 
     /**
      * Constructs a new builder that allows copy-then-modify from another code
@@ -465,6 +465,7 @@ public class JavaRef implements IJavaRef {
      */
     return ENCODE_V1 + f_within + "|" + f_positionRelativeToDeclaration + "|"
         + (f_eclipseProjectName == null ? "" : f_eclipseProjectName) + "|" + f_lineNumber + "|" + f_offset + "|" + f_length + "|"
+        + (f_absolutePath == null ? "" : f_absolutePath) + "|" + (f_jarRelativePath == null ? "" : f_jarRelativePath) + "|"
         + Decl.encodeForPersistence(f_declaration);
   }
 
@@ -493,6 +494,8 @@ public class JavaRef implements IJavaRef {
       final String lineNumberStr = Decl.toNext("|", b);
       final String offsetStr = Decl.toNext("|", b);
       final String lengthStr = Decl.toNext("|", b);
+      final String absolutePath = Decl.toNext("|", b);
+      final String jarRelativePath = Decl.toNext("|", b);
       final IDecl declaration = Decl.parseEncodedForPersistence(b.toString());
 
       final Builder builder = new Builder(declaration);
@@ -503,6 +506,10 @@ public class JavaRef implements IJavaRef {
       builder.setLineNumber(Integer.parseInt(lineNumberStr));
       builder.setOffset(Integer.parseInt(offsetStr));
       builder.setLength(Integer.parseInt(lengthStr));
+      if (!"".equals(absolutePath))
+        builder.setAbsolutePath(absolutePath);
+      if (!"".equals(jarRelativePath))
+        builder.setJarRelativePath(jarRelativePath);
       return builder.build();
     } else
       throw new IllegalArgumentException(I18N.err(270, encodedForPersistence));
