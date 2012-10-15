@@ -40,7 +40,26 @@ public interface IDecl {
    * Indicates where a code position is in relation to a particular declaration.
    */
   enum Position {
-    ON_DECL, WITHIN_DECL
+    /**
+     * Indicates the code reference is <i>on</i> the declaration.
+     */
+    ON,
+    /**
+     * Indicates the code reference is on the declaration's receiver. This only
+     * makes sense if the declaration is {@link Kind#METHOD} or
+     * {@link Kind#CONSTRUCTOR}.
+     */
+    ON_RECEIVER,
+    /**
+     * Indicates the code reference is on the declaration's return value. This
+     * only makes sense if the declaration is {@link Kind#METHOD} or
+     * {@link Kind#CONSTRUCTOR}.
+     */
+    ON_RETURN_VALUE,
+    /**
+     * Indicates the code reference is <i>within</i> the declaration.
+     */
+    WITHIN,
   }
 
   /**
