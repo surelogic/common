@@ -4,6 +4,7 @@ import java.util.*;
 
 import org.xml.sax.Attributes;
 
+import com.surelogic.common.SLUtility;
 import com.surelogic.common.xml.Entity;
 
 public class JavaDeclInfo extends Entity implements IJavaDeclInfoClient {	
@@ -77,11 +78,9 @@ public class JavaDeclInfo extends Entity implements IJavaDeclInfoClient {
 		throw new IllegalStateException("Unexpected: "+kind);
 	}
 
-	private final String[] noStrings = new String[0];
-	
 	private String[] separateByColons(String s) {
 		if ("".equals(s)) {
-			return noStrings;
+			return SLUtility.EMPTY_STRING_ARRAY;
 		}
 		return s.split(":");
 	}

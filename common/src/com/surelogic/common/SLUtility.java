@@ -857,7 +857,7 @@ public final class SLUtility {
    */
   public static String[] separateLines(final String s) {
     if (s == null) {
-      return new String[0];
+      return SLUtility.EMPTY_STRING_ARRAY;
     }
     List<String> result = new ArrayList<String>();
 

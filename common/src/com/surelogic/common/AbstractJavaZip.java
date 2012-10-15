@@ -375,6 +375,6 @@ public abstract class AbstractJavaZip<T> {
 	protected abstract T getRoot();
 
 	public String[] getAnalyses() {
-		return new String[0];
+		return SLUtility.EMPTY_STRING_ARRAY;
 	}
 }
