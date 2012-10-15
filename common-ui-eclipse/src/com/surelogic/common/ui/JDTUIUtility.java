@@ -5,7 +5,6 @@ import java.util.logging.Level;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
@@ -74,63 +73,18 @@ public class JDTUIUtility {
     if (javaRef == null)
       return false;
 
-    final String typeName = javaRef.getTypeNameOrNull();
-    if (typeName != null) {
-      final IType element = JDTUtility.findIType(javaRef.getEclipseProjectName(), javaRef.getPackageName(), typeName);
-      if (element == null) {
-        SLLogger.getLogger().warning(I18N.err(269, javaRef));
-        return false;
-      }
-
-      if (!element.isBinary()) {
-        // Warn if the reference is not from Java source code
-        if (javaRef.getWithin() != IJavaRef.Within.JAVA_FILE) {
-          SLLogger.getLogger().warning(I18N.err(267, element, javaRef));
-        }
-        /*
-         * Source code
-         */
-        try {
-          final IEditorPart editorPart = JavaUI.openInEditor(element, false, true);
-          tryToHighlightHelper(javaRef, editorPart);
-          return editorPart != null;
-        } catch (final Exception e) {
-          SLLogger.getLogger().log(Level.SEVERE, I18N.err(132, element, javaRef), e);
-        }
-        return false;
-      } else {
-        /*
-         * Binary file
-         */
-        // Warn if the reference is not from a JAR or class file
-        if (javaRef.getWithin() == IJavaRef.Within.JAVA_FILE) {
-          SLLogger.getLogger().warning(I18N.err(268, element, javaRef));
-        }
-        try {
-          final IEditorPart editorPart = JavaUI.openInEditor(element, false, true);
-          tryToHighlightHelper(javaRef, editorPart);
-          return editorPart != null;
-        } catch (final Exception e) {
-          SLLogger.getLogger().log(Level.SEVERE, I18N.err(132, element, javaRef), e);
-        }
-        return false;
-      }
-    } else {
-      /*
-       * Package only -- look for "package-info.java"
-       */
-      final ICompilationUnit cu = JDTUtility.findPackageInfoOrNull(javaRef.getEclipseProjectName(), javaRef.getPackageName());
-      if (cu != null) {
-        try {
-          final IEditorPart editorPart = JavaUI.openInEditor(cu, false, true);
-          tryToHighlightHelper(javaRef, editorPart);
-          return editorPart != null;
-        } catch (Exception e) {
-          SLLogger.getLogger().log(Level.SEVERE, I18N.err(132, cu, javaRef), e);
-        }
-      }
+    final IJavaElement element = JDTUtility.findJavaElementOrNull(javaRef);
+    if (element == null)
       return false;
+
+    try {
+      final IEditorPart editorPart = JavaUI.openInEditor(element, false, true);
+      tryToHighlightHelper(javaRef.getOffset(), javaRef.getLength(), javaRef.getLineNumber(), editorPart);
+      return editorPart != null;
+    } catch (final Exception e) {
+      SLLogger.getLogger().log(Level.SEVERE, I18N.err(132, element, javaRef), e);
     }
+    return false;
   }
 
   /**
@@ -139,20 +93,22 @@ public class JDTUIUtility {
    * <p>
    * If either argument is {@code null} it returns immediately.
    * 
-   * @param javaRef
-   *          a java reference.
+   * @param offset
+   *          offset into the file, or -1 if none.
+   * @param lenght
+   *          length to select from the offset, or -1 if none.
+   * @param lineNumber
+   *          line number to select if offset/length are -1, or -1 if none.
    * @param editorPart
    *          an editor, may be {@code null}.
    * @throws CoreException
    *           if anything goes wrong.
    */
-  private static final void tryToHighlightHelper(final IJavaRef javaRef, final IEditorPart editorPart) throws CoreException {
-    if (javaRef == null || editorPart == null)
+  private static final void tryToHighlightHelper(final int offset, final int length, final int lineNumber,
+      final IEditorPart editorPart) throws CoreException {
+    if (editorPart == null)
       return;
 
-    final int offset = javaRef.getOffset();
-    final int length = javaRef.getLength();
-    final int lineNumber = javaRef.getLineNumber();
     if (offset != -1 && length != -1) {
       /*
        * Use offset and length if at all possible.

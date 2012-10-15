@@ -49,6 +49,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.logging.SLLogger;
+import com.surelogic.common.ref.IJavaRef;
 import com.surelogic.common.tool.ToolProperties;
 
 /**
@@ -381,6 +382,25 @@ public final class JDTUtility {
       }
     } catch (final Exception e) {
       SLLogger.getLogger().log(Level.SEVERE, I18N.err(135, packageName, typeName, projectName), e);
+    }
+    return null;
+  }
+
+  public static IJavaElement findJavaElementOrNull(final IJavaRef javaRef) {
+    if (javaRef == null)
+      return null;
+
+    // TODO THIS IS REALLY CRUDE
+
+    final String typeName = javaRef.getTypeNameOrNull();
+    if (typeName != null) {
+      final IType element = JDTUtility.findIType(javaRef.getEclipseProjectName(), javaRef.getPackageName(), typeName);
+      if (element != null)
+        return element;
+    } else {
+      final ICompilationUnit element = JDTUtility.findPackageInfoOrNull(javaRef.getEclipseProjectName(), javaRef.getPackageName());
+      if (element != null)
+        return element;
     }
     return null;
   }
