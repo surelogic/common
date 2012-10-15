@@ -4,6 +4,7 @@ import com.surelogic.NonNull;
 import com.surelogic.Nullable;
 import com.surelogic.ThreadSafe;
 import com.surelogic.common.SLUtility;
+import com.surelogic.common.ref.IDecl.Kind;
 import com.surelogic.common.ref.JavaRef.Builder;
 
 /**
@@ -141,6 +142,33 @@ public interface IJavaRef {
    */
   @NonNull
   IDecl getDeclaration();
+
+  /**
+   * Indicates where this code reference is in relation to a particular
+   * declaration.
+   */
+  enum Position {
+    /**
+     * Indicates the code reference is <i>on</i> the declaration.
+     */
+    ON,
+    /**
+     * Indicates the code reference is on the declaration's receiver. This only
+     * makes sense if the declaration is {@link Kind#METHOD} or
+     * {@link Kind#CONSTRUCTOR}.
+     */
+    ON_RECEIVER,
+    /**
+     * Indicates the code reference is on the declaration's return value. This
+     * only makes sense if the declaration is {@link Kind#METHOD} or
+     * {@link Kind#CONSTRUCTOR}.
+     */
+    ON_RETURN_VALUE,
+    /**
+     * Indicates the code reference is <i>within</i> the declaration.
+     */
+    WITHIN,
+  }
 
   /**
    * Gets if this code reference is on or within the Java declaration returned
