@@ -52,7 +52,7 @@ public interface IDecl {
   public static final EnumSet<IDecl.Kind> TYPE_KINDS = EnumSet.of(IDecl.Kind.CLASS, IDecl.Kind.ENUM, IDecl.Kind.INTERFACE);
   public static final EnumSet<IDecl.Kind> PKG_TYPE_KINDS = EnumSet.of(IDecl.Kind.CLASS, IDecl.Kind.ENUM, IDecl.Kind.INTERFACE,
       IDecl.Kind.PACKAGE);
-  public static final EnumSet<IDecl.Kind> CONTROL_FLOW_KINDS = EnumSet.of(IDecl.Kind.CONSTRUCTOR, IDecl.Kind.INITIALIZER,
+  public static final EnumSet<IDecl.Kind> HAS_CONTROL_FLOW = EnumSet.of(IDecl.Kind.CONSTRUCTOR, IDecl.Kind.INITIALIZER,
       IDecl.Kind.METHOD);
 
   public static final EnumSet<IDecl.Kind> HAS_PARAMETERS = EnumSet.of(IDecl.Kind.CONSTRUCTOR, IDecl.Kind.METHOD);
@@ -221,6 +221,10 @@ public interface IDecl {
    */
   @NonNull
   List<TypeRef> getBounds();
+
+  /*
+   * Various useful comparison methods
+   */
 
   /**
    * Checks if this declaration's attributes are the same as those of the passed
