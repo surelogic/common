@@ -46,9 +46,11 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 
+import com.surelogic.Nullable;
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.logging.SLLogger;
+import com.surelogic.common.ref.IDecl;
 import com.surelogic.common.ref.IJavaRef;
 import com.surelogic.common.tool.ToolProperties;
 
@@ -389,20 +391,66 @@ public final class JDTUtility {
   public static IJavaElement findJavaElementOrNull(final IJavaRef javaRef) {
     if (javaRef == null)
       return null;
+    final IDecl decl = javaRef.getDeclaration();
 
-    // TODO THIS IS REALLY CRUDE
-
-    final String typeName = javaRef.getTypeNameOrNull();
-    if (typeName != null) {
-      final IType element = JDTUtility.findIType(javaRef.getEclipseProjectName(), javaRef.getPackageName(), typeName);
-      if (element != null)
-        return element;
-    } else {
-      final ICompilationUnit element = JDTUtility.findPackageInfoOrNull(javaRef.getEclipseProjectName(), javaRef.getPackageName());
-      if (element != null)
-        return element;
+    try {
+      if (decl.getKind() == IDecl.Kind.PACKAGE) {
+        /*
+         * HANDLE PACKAGE
+         */
+        for (final IJavaProject prj : getProjectsToSearchByName(javaRef.getEclipseProjectNameOrNull())) {
+          for (IPackageFragmentRoot pfr : prj.getAllPackageFragmentRoots()) {
+            String pkgName = javaRef.getPackageName();
+            // "" means default package for an IPackageFragment
+            if (pkgName == null)
+              pkgName = "";
+            if (pkgName.equals(SLUtility.JAVA_DEFAULT_PACKAGE))
+              pkgName = "";
+            IPackageFragment pf = pfr.getPackageFragment(pkgName);
+            if (pf != null && pf.exists()) {
+              ICompilationUnit cu = pf.getCompilationUnit(SLUtility.PACKAGE_INFO + ".java");
+              if (cu != null && cu.exists())
+                return cu; // return package-info.java
+              else
+                return pf; // return package in model
+            }
+          }
+        }
+      } else {
+        final String typeName = javaRef.getTypeNameOrNull();
+        if (typeName != null) {
+          final IType element = JDTUtility.findIType(javaRef.getEclipseProjectName(), javaRef.getPackageName(), typeName);
+          if (element != null)
+            return element;
+        }
+      }
+    } catch (Exception e) {
+      SLLogger.getLogger().log(Level.WARNING, I18N.err(156, javaRef), e);
     }
     return null;
+  }
+
+  /**
+   * Gets a set of Java projects filtered by a name.
+   * 
+   * @param projectNameOrNull
+   *          a project name to match, or {@code null} to search all projects.
+   * @return a possibly empty set of Java projects.
+   * @throws JavaModelException
+   *           if something goes wrong.
+   */
+  private static List<IJavaProject> getProjectsToSearchByName(@Nullable final String projectNameOrNull) throws JavaModelException {
+    final List<IJavaProject> result = new ArrayList<IJavaProject>();
+    final IWorkspaceRoot wsRoot = ResourcesPlugin.getWorkspace().getRoot();
+    final IJavaModel model = JavaCore.create(wsRoot);
+    if (model != null) {
+      for (final IJavaProject project : model.getJavaProjects()) {
+        if (projectNameOrNull == null || project.getElementName().equals(projectNameOrNull)) {
+          result.add(project);
+        }
+      }
+    }
+    return result;
   }
 
   /**
