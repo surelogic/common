@@ -162,6 +162,16 @@ public interface IDecl {
   boolean isAbstract();
 
   /**
+   * Gets if this declaration does <i>not</i> appear in source code, it is an
+   * implicit declaration. If this is meaningless for the declaration,
+   * {@code false} is returned.
+   * 
+   * @return {@code true} if this declaration does <i>not</i> appear in source
+   *         code, {@code false} otherwise.
+   */
+  boolean isImplicit();
+
+  /**
    * Gets the ordered list, first to last, of the parameter declarations for a
    * {@link Kind#CONSTRUCTOR} or {@link Kind#METHOD}. If this is meaningless for
    * the declaration, an empty array is returned. The returned set is a copy and
