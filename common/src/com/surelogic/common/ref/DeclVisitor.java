@@ -2,6 +2,13 @@ package com.surelogic.common.ref;
 
 import java.util.List;
 
+/**
+ * A base visitor for declarations. Subtypes are intended to define useful
+ * behavior.
+ * 
+ * @see IDecl#acceptRootToThis(DeclVisitor)
+ * @see IDecl#acceptThisToRoot(DeclVisitor)
+ */
 public abstract class DeclVisitor {
 
   /**
@@ -67,8 +74,9 @@ public abstract class DeclVisitor {
    * @param node
    *          the node to visit where <tt>node.getKind() ==
    *          {@link IDecl.Kind#CLASS}</tt>.
-   * @return {@code true} if the type parameters of this class should be
-   *         visited, {@code false} otherwise.
+   * @return {@code true} if the type parameters of this class should be visited
+   *         (this includes calling {@link #visitTypeParameters(List)}),
+   *         {@code false} otherwise.
    */
   public boolean visitClass(IDecl node) {
     return true;
@@ -84,7 +92,8 @@ public abstract class DeclVisitor {
    *          the node to visit where <tt>node.getKind() ==
    *          {@link IDecl.Kind#INTERFACE}</tt>.
    * @return {@code true} if the type parameters of this interface should be
-   *         visited, {@code false} otherwise.
+   *         visited (this includes calling {@link #visitTypeParameters(List)}),
+   *         {@code false} otherwise.
    */
   public boolean visitInterface(IDecl node) {
     return true;
@@ -140,7 +149,9 @@ public abstract class DeclVisitor {
    *          the node to visit where <tt>node.getKind() ==
    *          {@link IDecl.Kind#METHOD}</tt>.
    * @return {@code true} if the parameters and type parameters of this method
-   *         should be visited, {@code false} otherwise.
+   *         should be visited (this includes calling
+   *         {@link #visitTypeParameters(List)} and then
+   *         {@link #visitParameters(List)}), {@code false} otherwise.
    */
   public boolean visitMethod(IDecl node) {
     return true;
@@ -156,7 +167,9 @@ public abstract class DeclVisitor {
    *          the node to visit where <tt>node.getKind() ==
    *          {@link IDecl.Kind#CONSTRUCTOR}</tt>.
    * @return {@code true} if the parameters and type parameters of this
-   *         constructor should be visited, {@code false} otherwise.
+   *         constructor should be visited (this includes calling
+   *         {@link #visitTypeParameters(List)} and then
+   *         {@link #visitParameters(List)}), {@code false} otherwise.
    */
   public boolean visitConstructor(IDecl node) {
     return true;
@@ -221,19 +234,6 @@ public abstract class DeclVisitor {
   }
 
   /**
-   * End of the visit for a package declaration.
-   * <p>
-   * The default implementation does nothing. Subclasses may reimplement.
-   * 
-   * @param node
-   *          the node to visit where <tt>node.getKind() ==
-   *          {@link IDecl.Kind#PACKAGE}</tt>.
-   */
-  public void endVisitPackage(IDecl node) {
-    // by default do nothing
-  }
-
-  /**
    * End of the visit for a possibly nested type declaration, after visiting
    * each type declaration.
    * <p>
@@ -270,45 +270,6 @@ public abstract class DeclVisitor {
    *          {@link IDecl.Kind#INTERFACE}</tt>.
    */
   public void endVisitInterface(IDecl node) {
-    // by default do nothing
-  }
-
-  /**
-   * End of the visit for an enum declaration.
-   * <p>
-   * The default implementation does nothing. Subclasses may reimplement.
-   * 
-   * @param node
-   *          the node to visit where <tt>node.getKind() ==
-   *          {@link IDecl.Kind#ENUM}</tt>.
-   */
-  public void endVisitEnum(IDecl node) {
-    // by default do nothing
-  }
-
-  /**
-   * End of the visit for a field declaration.
-   * <p>
-   * The default implementation does nothing. Subclasses may reimplement.
-   * 
-   * @param node
-   *          the node to visit where <tt>node.getKind() ==
-   *          {@link IDecl.Kind#FIELD}</tt> .
-   */
-  public void endVisitField(IDecl node) {
-    // by default do nothing
-  }
-
-  /**
-   * End of the visit for an initializer declaration.
-   * <p>
-   * The default implementation does nothing. Subclasses may reimplement.
-   * 
-   * @param node
-   *          the node to visit where <tt>node.getKind() ==
-   *          {@link IDecl.Kind#INITIALIZER}</tt> .
-   */
-  public void endVisitInitializer(IDecl node) {
     // by default do nothing
   }
 
@@ -353,19 +314,6 @@ public abstract class DeclVisitor {
   }
 
   /**
-   * End of the visit for a parameter declaration.
-   * <p>
-   * The default implementation does nothing. Subclasses may reimplement.
-   * 
-   * @param node
-   *          the node to visit where <tt>node.getKind() ==
-   *          {@link IDecl.Kind#PARAMETER}</tt>.
-   */
-  public void endVisitParameter(IDecl node) {
-    // by default do nothing
-  }
-
-  /**
    * End of the visit for a list of type parameters, after visiting each type
    * parameter.
    * <p>
@@ -376,19 +324,6 @@ public abstract class DeclVisitor {
    *          kind of all elements should be {@link IDecl.Kind#PARAMETER}.
    */
   public void endVisitTypeParameters(List<IDecl> typeParameters) {
-    // by default do nothing
-  }
-
-  /**
-   * End of the visit for a type parameter declaration.
-   * <p>
-   * The default implementation does nothing. Subclasses may reimplement.
-   * 
-   * @param node
-   *          the node to visit where <tt>node.getKind() ==
-   *          {@link IDecl.Kind#TYPE_PARAMETER}</tt> .
-   */
-  public void endVisitTypeParameter(IDecl node) {
     // by default do nothing
   }
 }

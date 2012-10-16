@@ -183,4 +183,12 @@ public final class SloppyMatchingDecl implements IDecl {
   public String toString() {
     return f_decl.toString();
   }
+
+  public void acceptThisToRoot(@NonNull DeclVisitor visitor) {
+    f_decl.acceptThisToRoot(visitor);
+  }
+
+  public void acceptRootToThis(@NonNull DeclVisitor visitor) {
+    f_decl.acceptRootToThis(visitor);
+  }
 }

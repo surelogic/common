@@ -1444,6 +1444,132 @@ public abstract class Decl implements IDecl {
       return false;
   }
 
+  public void acceptThisToRoot(@NonNull DeclVisitor visitor) {
+    LinkedList<Decl> nodes = new LinkedList<Decl>();
+    Decl addMe = this;
+    while (addMe != null) {
+      nodes.addLast(addMe);
+      addMe = (Decl) addMe.getParent();
+    }
+    // nodes has this, through ancestors, to root
+    acceptHelper(nodes, visitor, false);
+  }
+
+  public void acceptRootToThis(@NonNull DeclVisitor visitor) {
+    LinkedList<Decl> nodes = new LinkedList<Decl>();
+    Decl pushMe = this;
+    while (pushMe != null) {
+      nodes.addFirst(pushMe);
+      pushMe = (Decl) pushMe.getParent();
+    }
+    // nodes has ancestors from root to this
+    acceptHelper(nodes, visitor, true);
+  }
+
+  private void acceptHelper(@NonNull final LinkedList<Decl> nodes, @NonNull final DeclVisitor visitor, boolean fromRootToThis) {
+    while (!nodes.isEmpty()) {
+      final Decl next = nodes.pop();
+      switch (next.getKind()) {
+      case CLASS:
+      case ENUM:
+      case INTERFACE:
+        final LinkedList<IDecl> types = new LinkedList<IDecl>();
+        types.add(next);
+        while (IDecl.IS_TYPE.contains(nodes.peek().getKind())) {
+          if (fromRootToThis)
+            types.addLast(nodes.pop());
+          else
+            types.addFirst(nodes.pop());
+        }
+        if (visitor.visitTypes(new ArrayList<IDecl>(types))) {
+          for (IDecl type : types)
+            acceptHelperForNode(type, visitor);
+        }
+        visitor.endVisitTypes(new ArrayList<IDecl>(types));
+        break;
+      case CONSTRUCTOR:
+      case METHOD:
+      case FIELD:
+      case INITIALIZER:
+      case PACKAGE:
+      case PARAMETER:
+      case TYPE_PARAMETER:
+        acceptHelperForNode(next, visitor);
+        break;
+      }
+    }
+  }
+
+  private void acceptHelperForNode(@NonNull final IDecl node, @NonNull final DeclVisitor visitor) {
+    visitor.preVisit(node);
+    switch (node.getKind()) {
+    case CONSTRUCTOR:
+      if (visitor.visitConstructor(node)) {
+        acceptHelperForParameters(node, visitor);
+      }
+      visitor.endVisitConstructor(node);
+      break;
+    case CLASS:
+      if (visitor.visitClass(node)) {
+        acceptHelperForParameters(node, visitor);
+      }
+      visitor.endVisitClass(node);
+      break;
+    case ENUM:
+      visitor.visitEnum(node);
+      break;
+    case FIELD:
+      visitor.visitField(node);
+      break;
+    case INITIALIZER:
+      visitor.visitInitializer(node);
+      break;
+    case INTERFACE:
+      if (visitor.visitInterface(node)) {
+        acceptHelperForParameters(node, visitor);
+      }
+      visitor.endVisitInterface(node);
+      break;
+    case METHOD:
+      if (visitor.visitMethod(node)) {
+        acceptHelperForParameters(node, visitor);
+      }
+      visitor.endVisitMethod(node);
+      break;
+    case PACKAGE:
+      visitor.visitPackage(node);
+      break;
+    case PARAMETER:
+      visitor.visitParameter(node);
+      break;
+    case TYPE_PARAMETER:
+      visitor.visitTypeParameter(node);
+      break;
+    }
+    visitor.postVisit(node);
+  }
+
+  private void acceptHelperForParameters(@NonNull final IDecl node, @NonNull final DeclVisitor visitor) {
+    if (IDecl.HAS_TYPE_PARAMETERS.contains(node.getKind())) {
+      final List<IDecl> typePparameters = node.getTypeParameters();
+      if (visitor.visitTypeParameters(new ArrayList<IDecl>(typePparameters))) {
+        for (IDecl p : typePparameters) {
+          acceptHelperForNode(p, visitor);
+        }
+      }
+      visitor.endVisitTypeParameters(new ArrayList<IDecl>(typePparameters));
+    }
+    if (IDecl.HAS_PARAMETERS.contains(node.getKind())) {
+      final List<IDecl> parameters = node.getParameters();
+      if (visitor.visitParameters(new ArrayList<IDecl>(parameters))) {
+        for (IDecl p : parameters) {
+          acceptHelperForNode(p, visitor);
+        }
+      }
+      visitor.endVisitParameters(new ArrayList<IDecl>(parameters));
+    }
+  }
+
   @Override
   public String toString() {
     LinkedList<Decl> stack = new LinkedList<Decl>();

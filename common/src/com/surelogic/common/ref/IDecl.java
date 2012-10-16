@@ -387,4 +387,22 @@ public interface IDecl {
    * @return the hash code value for this declaration.
    */
   int hashCode();
+
+  /**
+   * Accepts on this visitor from this declaration, through its parents, to the
+   * root declaration.
+   * 
+   * @param visitor
+   *          a visitor implementation.
+   */
+  void acceptThisToRoot(@NonNull DeclVisitor visitor);
+
+  /**
+   * Accepts on this visitor from the root declaration, through this
+   * declaration's ancestors, to this declaration.
+   * 
+   * @param visitor
+   *          a visitor implementation.
+   */
+  void acceptRootToThis(@NonNull DeclVisitor visitor);
 }
