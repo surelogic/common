@@ -231,6 +231,27 @@ public final class SLUtility {
   }
 
   /**
+   * Checks if two objects are equal guarding that {@code null} checks are done
+   * properly.
+   * 
+   * @param o1
+   *          an object.
+   * @param o2
+   *          an object.
+   * @return {@code true} if the two objects are both {@code null} or
+   *         <tt>o1.equals(o2)</tt>, {@code false} otherwise.
+   */
+  public static boolean nullSafeEquals(Object o1, Object o2) {
+    if (o1 == o2)
+      return true;
+    if (o1 == null)
+      return false;
+    if (o2 == null)
+      return false;
+    return o1.equals(o2);
+  }
+
+  /**
    * The string identifier of the Flashlight client plug-in.
    */
   public static final String FLASHLIGHT_ID = "com.surelogic.flashlight.client.eclipse";

@@ -1226,6 +1226,32 @@ public abstract class Decl implements IDecl {
     return Collections.emptyList();
   }
 
+  public final boolean hasSameAttributesAs(IDecl o) {
+    if (o == null)
+      return false;
+    if (!SLUtility.nullSafeEquals(getKind(), o.getKind()))
+      return false;
+    if (!SLUtility.nullSafeEquals(getName(), o.getName()))
+      return false;
+    if (!SLUtility.nullSafeEquals(getTypeOf(), o.getTypeOf()))
+      return false;
+    if (!SLUtility.nullSafeEquals(getVisibility(), o.getVisibility()))
+      return false;
+    if (!SLUtility.nullSafeEquals(isStatic(), o.isStatic()))
+      return false;
+    if (!SLUtility.nullSafeEquals(isFinal(), o.isFinal()))
+      return false;
+    if (!SLUtility.nullSafeEquals(isAbstract(), o.isAbstract()))
+      return false;
+    if (!SLUtility.nullSafeEquals(isImplicit(), o.isImplicit()))
+      return false;
+    if (getPosition() != o.getPosition())
+      return false;
+    if (!SLUtility.nullSafeEquals(getBounds(), o.getBounds()))
+      return false;
+    return true;
+  }
+
   @Override
   public String toString() {
     LinkedList<Decl> stack = new LinkedList<Decl>();
