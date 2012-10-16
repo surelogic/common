@@ -9,7 +9,7 @@ import com.surelogic.common.SLUtility;
 
 @Immutable
 @ValueObject
-final class DeclPackage extends Decl {
+public final class DeclPackage extends Decl {
 
   DeclPackage(List<Decl.DeclBuilder> childBuilders) {
     super(null, childBuilders, SLUtility.JAVA_DEFAULT_PACKAGE);

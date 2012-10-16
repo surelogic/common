@@ -8,7 +8,7 @@ import com.surelogic.ValueObject;
 
 @Immutable
 @ValueObject
-final class DeclInitializer extends Decl {
+public final class DeclInitializer extends Decl {
 
   final boolean f_isStatic;
 

@@ -14,7 +14,7 @@ public final class DeclTypeParameter extends DeclWithPosition {
   @NonNull
   private final List<TypeRef> f_bounds;
 
-  public DeclTypeParameter(IDecl parent, List<Decl.DeclBuilder> childBuilders, String name, int position, List<TypeRef> bounds) {
+  DeclTypeParameter(IDecl parent, List<Decl.DeclBuilder> childBuilders, String name, int position, List<TypeRef> bounds) {
     super(parent, childBuilders, name, position);
     f_bounds = bounds;
   }

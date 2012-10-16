@@ -1134,7 +1134,7 @@ public abstract class Decl implements IDecl {
    * @param name
    *          the name of this declaration.
    */
-  public Decl(IDecl parent, List<Decl.DeclBuilder> childBuilders, String name) {
+  Decl(IDecl parent, List<Decl.DeclBuilder> childBuilders, String name) {
     f_parent = parent;
     if (name == null)
       throw new IllegalArgumentException(I18N.err(44, "name"));
