@@ -49,12 +49,11 @@ public interface IDecl {
    * Some helpful enum sets
    */
 
-  public static final EnumSet<IDecl.Kind> TYPE_KINDS = EnumSet.of(IDecl.Kind.CLASS, IDecl.Kind.ENUM, IDecl.Kind.INTERFACE);
-  public static final EnumSet<IDecl.Kind> PKG_TYPE_KINDS = EnumSet.of(IDecl.Kind.CLASS, IDecl.Kind.ENUM, IDecl.Kind.INTERFACE,
+  public static final EnumSet<IDecl.Kind> IS_TYPE = EnumSet.of(IDecl.Kind.CLASS, IDecl.Kind.ENUM, IDecl.Kind.INTERFACE);
+  public static final EnumSet<IDecl.Kind> IS_PKG_OR_TYPE = EnumSet.of(IDecl.Kind.CLASS, IDecl.Kind.ENUM, IDecl.Kind.INTERFACE,
       IDecl.Kind.PACKAGE);
   public static final EnumSet<IDecl.Kind> HAS_CONTROL_FLOW = EnumSet.of(IDecl.Kind.CONSTRUCTOR, IDecl.Kind.INITIALIZER,
       IDecl.Kind.METHOD);
-
   public static final EnumSet<IDecl.Kind> HAS_PARAMETERS = EnumSet.of(IDecl.Kind.CONSTRUCTOR, IDecl.Kind.METHOD);
   public static final EnumSet<IDecl.Kind> HAS_TYPE_PARAMETERS = EnumSet.of(IDecl.Kind.CLASS, IDecl.Kind.INTERFACE,
       IDecl.Kind.CONSTRUCTOR, IDecl.Kind.METHOD);
