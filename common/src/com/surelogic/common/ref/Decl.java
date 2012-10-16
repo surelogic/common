@@ -1357,7 +1357,7 @@ public abstract class Decl implements IDecl {
   }
 
   @Override
-  public int hashCode() {
+  public final int hashCode() {
     final int prime = 31;
     int result = 1;
     IDecl dThis = this;
@@ -1370,7 +1370,7 @@ public abstract class Decl implements IDecl {
   }
 
   @Override
-  public boolean equals(Object obj) {
+  public final boolean equals(Object obj) {
     if (obj instanceof IDecl)
       return isSameDeclarationAs((IDecl) obj);
     else
