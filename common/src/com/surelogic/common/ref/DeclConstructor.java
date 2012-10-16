@@ -6,10 +6,13 @@ import com.surelogic.Immutable;
 import com.surelogic.NonNull;
 
 @Immutable
-final class DeclConstructor extends DeclVisibility {
+final class DeclConstructor extends DeclVisibility implements IDeclFunction {
 
-  DeclConstructor(IDecl parent, List<Decl.DeclBuilder> childBuilders, Visibility visibility) {
+  final boolean f_isImplicit;
+
+  DeclConstructor(IDecl parent, List<Decl.DeclBuilder> childBuilders, Visibility visibility, boolean isImplicit) {
     super(parent, childBuilders, parent.getName(), visibility);
+    f_isImplicit = isImplicit;
   }
 
   @NonNull
@@ -18,7 +21,13 @@ final class DeclConstructor extends DeclVisibility {
   }
 
   @Override
+  public boolean isImplicit() {
+    return f_isImplicit;
+  }
+
+  @Override
   String toStringHelper() {
     return "#" + f_name + Decl.toStringHelperParameters(this);
   }
+
 }
