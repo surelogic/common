@@ -1253,6 +1253,66 @@ public abstract class Decl implements IDecl {
   }
 
   @Override
+  public boolean isSameSimpleDeclarationAs(IDecl o) {
+    if (hasSameAttributesAs(o)) {
+      boolean result = true;
+      result &= checkListOfIDeclsAreTheSame(getParameters(), o.getParameters());
+      result &= checkListOfIDeclsAreTheSame(getTypeParameters(), o.getTypeParameters());
+      return result;
+    } else
+      return false;
+  }
+
+  /**
+   * Checks if the two lists contain the same simple declarations. In
+   * particular, each element is checked with
+   * {@link #isSameSimpleDeclarationAs(IDecl)}.
+   * 
+   * @param l1
+   *          a list of declarations.
+   * @param l2
+   *          a list of declarations.
+   * @return {@code true} if the two lists contain the same simple declarations,
+   *         {@code false} otherwise.
+   */
+  private boolean checkListOfIDeclsAreTheSame(@NonNull List<IDecl> l1, @NonNull List<IDecl> l2) {
+    if (l1.isEmpty() && l2.isEmpty())
+      return true;
+    if (l1.size() != l2.size())
+      return false;
+    boolean result = true;
+    for (int i = 0; i < l1.size(); i++) {
+      IDecl d1 = l1.get(i);
+      IDecl d2 = l2.get(i);
+      if (d1 != null) {
+        result &= d1.isSameDeclarationAs(d2);
+      } else {
+        result &= d2 == null;
+      }
+    }
+    return result;
+  }
+
+  @Override
+  public boolean isSameDeclarationAs(IDecl o) {
+    IDecl dThis = this;
+    IDecl dO = o;
+    while (true) {
+      if (dThis.isSameSimpleDeclarationAs(dO)) {
+        dThis = dThis.getParent();
+        dO = dO.getParent();
+        if (dThis == null && dO == null)
+          return true;
+        if (dThis == null)
+          return false;
+        if (dO == null)
+          return false;
+      } else
+        return false;
+    }
+  }
+
+  @Override
   public String toString() {
     LinkedList<Decl> stack = new LinkedList<Decl>();
     Decl pushMe = this;
@@ -1357,7 +1417,7 @@ public abstract class Decl implements IDecl {
    *           if <tt>decl</tt> is {@code null}.
    */
   @NonNull
-  public static String encodeForPersistence(final IDecl decl) {
+  public static String encodeForPersistence(@NonNull final IDecl decl) {
     if (decl == null)
       throw new IllegalArgumentException(I18N.err(44, "decl"));
     IDecl root = DeclUtil.getRoot(decl);
@@ -1482,13 +1542,46 @@ public abstract class Decl implements IDecl {
    *           if something goes wrong.
    */
   @NonNull
-  public static IDecl parseEncodedForPersistence(final String value) {
+  public static IDecl parseEncodedForPersistence(@NonNull final String value) {
+    return parseEncodedForPersistenceToDeclBuilder(value).build();
+  }
+
+  /**
+   * Parses the result of {@link #encodeForPersistence(IDecl)} back to a
+   * {@link DeclBuilder}.
+   * 
+   * @param value
+   *          an encoded string.
+   * @return a declaration builder.
+   * 
+   * @throws IllegalArgumentException
+   *           if something goes wrong.
+   */
+  @NonNull
+  public static DeclBuilder parseEncodedForPersistenceToDeclBuilder(@NonNull final String value) {
     if (value == null)
       throw new IllegalArgumentException(I18N.err(44, "value"));
     final StringBuilder b = new StringBuilder(value.trim());
     // the builder returned is the one we should build and return
     final DeclBuilder builder = parseToBuilderHelper(null, b);
-    return builder.build();
+    return builder;
+  }
+
+  /**
+   * Constructs a declaration builder that would duplicate the passed
+   * declaration. This is a convenience method that has the same result as
+   * calling:
+   * <tt>parseEncodedForPersistenceToDeclBuilder(encodeForPersistence(decl))</tt>
+   * 
+   * @param decl
+   * @return a declaration builder.
+   * 
+   * @throws IllegalArgumentException
+   *           if something goes wrong.
+   */
+  @NonNull
+  public static DeclBuilder getBuilderFor(@NonNull final IDecl decl) {
+    return parseEncodedForPersistenceToDeclBuilder(encodeForPersistence(decl));
   }
 
   /**
