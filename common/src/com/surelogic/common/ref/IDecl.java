@@ -365,9 +365,9 @@ public interface IDecl {
   /**
    * Compares the specified object with this declaration for equality.
    * <p>
-   * This method uses the exact same comparison as
-   * {@link #isSameDeclarationAs(IDecl)}. In fact, the implementation of this
-   * method is
+   * Implementations returned from {@link Decl.DeclBuilder#build()} uses the
+   * exact same comparison as {@link #isSameDeclarationAs(IDecl)}. In fact, the
+   * implementation of this method is
    * 
    * <pre>
    * if (obj instanceof IDecl)
