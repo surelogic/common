@@ -267,6 +267,15 @@ public interface IDecl {
   boolean isSameSimpleDeclarationAs(IDecl o);
 
   /**
+   * Returns a hash code value for this declaration that is consistent with the
+   * equality result of {@link #isSameSimpleDeclarationAs(IDecl)}.
+   * 
+   * @return a hash code value for this declaration that is consistent with the
+   *         equality result of {@link #isSameSimpleDeclarationAs(IDecl)}.
+   */
+  int simpleDeclarationHashCode();
+
+  /**
    * Checks if this declaration is the same as the passed declaration. The
    * enclosing, or parent, declarations are considered&mdash;this method
    * compares fully-qualified declarations.

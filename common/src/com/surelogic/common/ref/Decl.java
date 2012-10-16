@@ -1264,14 +1264,7 @@ public abstract class Decl implements IDecl {
       return false;
   }
 
-  /**
-   * Computes a hash code that is consistent with the equality result of
-   * {@link #isSameSimpleDeclarationAs(IDecl)}.
-   * 
-   * @return a hash code that is consistent with the equality result of
-   *         {@link #isSameSimpleDeclarationAs(IDecl)}.
-   */
-  final int simpleDeclarationHashCode() {
+  public final int simpleDeclarationHashCode() {
     final int prime = 31;
     int result = 1;
     /*
@@ -1291,15 +1284,13 @@ public abstract class Decl implements IDecl {
      * Parameters
      */
     for (IDecl p : getParameters()) {
-      final Decl d = (Decl) p; // should always work
-      result = prime * result + ((d == null) ? 0 : d.simpleDeclarationHashCode());
+      result = prime * result + ((p == null) ? 0 : p.simpleDeclarationHashCode());
     }
     /*
      * Type parameters
      */
     for (IDecl p : getTypeParameters()) {
-      final Decl d = (Decl) p; // should always work
-      result = prime * result + ((d == null) ? 0 : d.simpleDeclarationHashCode());
+      result = prime * result + ((p == null) ? 0 : p.simpleDeclarationHashCode());
     }
 
     return result;
@@ -1362,8 +1353,7 @@ public abstract class Decl implements IDecl {
     int result = 1;
     IDecl dThis = this;
     while (dThis != null) {
-      final Decl d = (Decl) dThis; // should always work
-      result = prime * result + d.simpleDeclarationHashCode();
+      result = prime * result + dThis.simpleDeclarationHashCode();
       dThis = dThis.getParent();
     }
     return result;
