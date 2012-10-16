@@ -4,8 +4,10 @@ import java.util.List;
 
 import com.surelogic.Immutable;
 import com.surelogic.NonNull;
+import com.surelogic.ValueObject;
 
 @Immutable
+@ValueObject
 final class DeclInitializer extends Decl {
 
   final boolean f_isStatic;

@@ -4,9 +4,11 @@ import java.util.List;
 
 import com.surelogic.Immutable;
 import com.surelogic.NonNull;
+import com.surelogic.ValueObject;
 import com.surelogic.common.SLUtility;
 
 @Immutable
+@ValueObject
 final class DeclPackage extends Decl {
 
   DeclPackage(List<Decl.DeclBuilder> childBuilders) {

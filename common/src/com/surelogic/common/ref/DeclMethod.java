@@ -5,9 +5,11 @@ import java.util.List;
 import com.surelogic.Immutable;
 import com.surelogic.NonNull;
 import com.surelogic.Nullable;
+import com.surelogic.ValueObject;
 
 @Immutable
-final class DeclMethod extends DeclVisibility implements IDeclFunction {
+@ValueObject
+final class DeclMethod extends DeclVisibility {
 
   /**
    * {@code null} indicates <tt>void</tt>.

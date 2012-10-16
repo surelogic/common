@@ -4,9 +4,11 @@ import java.util.List;
 
 import com.surelogic.Immutable;
 import com.surelogic.NonNull;
+import com.surelogic.ValueObject;
 
 @Immutable
-final class DeclClass extends DeclVisibility implements IDeclType {
+@ValueObject
+final class DeclClass extends DeclVisibility {
 
   final boolean f_isStatic;
   final boolean f_isFinal;

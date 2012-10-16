@@ -12,12 +12,14 @@ import com.surelogic.Immutable;
 import com.surelogic.NonNull;
 import com.surelogic.NotThreadSafe;
 import com.surelogic.Nullable;
+import com.surelogic.ValueObject;
 import com.surelogic.common.Pair;
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.xml.XMLUtil;
 
 @Immutable
+@ValueObject
 public abstract class Decl implements IDecl {
 
   /**
@@ -1252,8 +1254,17 @@ public abstract class Decl implements IDecl {
     return true;
   }
 
-  @Override
-  public boolean isSameSimpleDeclarationAs(IDecl o) {
+  public boolean hasSameAttributesAsSloppy(IDecl o) {
+    if (o == null)
+      return false;
+    if (!SLUtility.nullSafeEquals(getKind(), o.getKind()))
+      return false;
+    if (!SLUtility.nullSafeEquals(getName(), o.getName()))
+      return false;
+    return true;
+  }
+
+  public final boolean isSameSimpleDeclarationAs(IDecl o) {
     if (hasSameAttributesAs(o)) {
       boolean result = true;
       result &= checkListOfIDeclsAreTheSame(getParameters(), o.getParameters());
@@ -1263,10 +1274,94 @@ public abstract class Decl implements IDecl {
       return false;
   }
 
+  public boolean isSameSimpleDeclarationAsSloppy(IDecl o) {
+    if (hasSameAttributesAsSloppy(o)) {
+      final List<IDecl> l1 = getParameters();
+      final List<IDecl> l2 = o.getParameters();
+      if (l1.isEmpty() && l2.isEmpty())
+        return true;
+      if (l1.size() != l2.size())
+        return false;
+      boolean result = true;
+      for (int i = 0; i < l1.size(); i++) {
+        final IDecl d1 = l1.get(i);
+        final IDecl d2 = l2.get(i);
+        if (d1 == null || d2 == null)
+          return false;
+        else {
+          final TypeRef t1 = d1.getTypeOf();
+          final TypeRef t2 = d2.getTypeOf();
+          if (t1 == null || t2 == null)
+            return false;
+          else
+            result &= t1.getCompact().equals(t1.getCompact());
+        }
+      }
+      return result;
+    } else
+      return false;
+  }
+
+  public final int simpleDeclarationHashCode() {
+    final int prime = 31;
+    int result = 1;
+    /*
+     * Attributes
+     */
+    result = prime * result + ((getKind() == null) ? 0 : getKind().hashCode());
+    result = prime * result + ((getName() == null) ? 0 : getName().hashCode());
+    result = prime * result + ((getTypeOf() == null) ? 0 : getTypeOf().hashCode());
+    result = prime * result + ((getVisibility() == null) ? 0 : getVisibility().hashCode());
+    result = prime * result + Boolean.valueOf(isStatic()).hashCode();
+    result = prime * result + Boolean.valueOf(isFinal()).hashCode();
+    result = prime * result + Boolean.valueOf(isAbstract()).hashCode();
+    result = prime * result + Boolean.valueOf(isImplicit()).hashCode();
+    result = prime * result + getPosition();
+    result = prime * result + ((getBounds() == null) ? 0 : getBounds().hashCode());
+    /*
+     * Parameters
+     */
+    for (IDecl p : getParameters()) {
+      result = prime * result + ((p == null) ? 0 : p.simpleDeclarationHashCode());
+    }
+    /*
+     * Type parameters
+     */
+    for (IDecl p : getTypeParameters()) {
+      result = prime * result + ((p == null) ? 0 : p.simpleDeclarationHashCode());
+    }
+
+    return result;
+  }
+
+  public final int simpleDeclarationHashCodeSloppy() {
+    final int prime = 31;
+    int result = 1;
+    /*
+     * Attributes
+     */
+    result = prime * result + ((getKind() == null) ? 0 : getKind().hashCode());
+    result = prime * result + ((getName() == null) ? 0 : getName().hashCode());
+    /*
+     * Parameters
+     */
+    for (IDecl p : getParameters()) {
+      if (p != null) {
+        final TypeRef t = p.getTypeOf();
+        result = prime * result + ((t == null) ? 0 : t.getCompact().hashCode());
+      }
+    }
+
+    return result;
+  }
+
   /**
    * Checks if the two lists contain the same simple declarations. In
    * particular, each element is checked with
    * {@link #isSameSimpleDeclarationAs(IDecl)}.
+   * <p>
+   * Typically the lists sent to this method are obtained from calling either
+   * {@link #getParameters()} or {@link #getTypeParameters()}.
    * 
    * @param l1
    *          a list of declarations.
@@ -1285,7 +1380,7 @@ public abstract class Decl implements IDecl {
       IDecl d1 = l1.get(i);
       IDecl d2 = l2.get(i);
       if (d1 != null) {
-        result &= d1.isSameDeclarationAs(d2);
+        result &= d1.isSameSimpleDeclarationAs(d2);
       } else {
         result &= d2 == null;
       }
@@ -1293,8 +1388,7 @@ public abstract class Decl implements IDecl {
     return result;
   }
 
-  @Override
-  public boolean isSameDeclarationAs(IDecl o) {
+  public final boolean isSameDeclarationAs(IDecl o) {
     IDecl dThis = this;
     IDecl dO = o;
     while (true) {
@@ -1310,6 +1404,44 @@ public abstract class Decl implements IDecl {
       } else
         return false;
     }
+  }
+
+  public boolean isSameDeclarationAsSloppy(IDecl o) {
+    IDecl dThis = this;
+    IDecl dO = o;
+    while (true) {
+      if (dThis.isSameSimpleDeclarationAsSloppy(dO)) {
+        dThis = dThis.getParent();
+        dO = dO.getParent();
+        if (dThis == null && dO == null)
+          return true;
+        if (dThis == null)
+          return false;
+        if (dO == null)
+          return false;
+      } else
+        return false;
+    }
+  }
+
+  @Override
+  public final int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    IDecl dThis = this;
+    while (dThis != null) {
+      result = prime * result + dThis.simpleDeclarationHashCode();
+      dThis = dThis.getParent();
+    }
+    return result;
+  }
+
+  @Override
+  public final boolean equals(Object obj) {
+    if (obj instanceof IDecl)
+      return isSameDeclarationAs((IDecl) obj);
+    else
+      return false;
   }
 
   @Override

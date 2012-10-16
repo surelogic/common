@@ -46,6 +46,7 @@ import org.eclipse.text.edits.TextEditGroup;
 import com.surelogic.common.AnnotationConstants;
 import com.surelogic.common.logging.SLLogger;
 import com.surelogic.common.ref.*;
+import com.surelogic.common.ref.IDecl.Kind;
 import com.surelogic.common.refactor.AnnotationDescription;
 
 public class PromisesAnnotationRewriter {
@@ -119,8 +120,6 @@ public class PromisesAnnotationRewriter {
 		private final Map<IDecl, List<AnnotationDescription>> targetMap;
 		private final MultiMap<IDeclType,IDecl> createMap;
 		private final TextEditGroup editGroup;
-		private IDeclFunction inMethod;
-		private IDeclType type;
 		private final boolean isAssumption;
 		private final Set<String> imports;
 
@@ -134,7 +133,11 @@ public class PromisesAnnotationRewriter {
 						: desc.getTarget();
 				if (!isAssumption && target.isImplicit()) {				
 					// We need to create the declaration before adding the annotation
-					createMap.put(target.getTypeContext(), target);
+					if (target.getKind() == Kind.CONSTRUCTOR) {					
+						createMap.put((IDeclType) target.getParent(), target);
+					} else {
+						SLLogger.getLogger().warning("Unexpected implicit decl: "+target);
+					}
 				} 
 				
 				List<AnnotationDescription> list = targetMap.get(target);
@@ -148,8 +151,15 @@ public class PromisesAnnotationRewriter {
 			this.editGroup = editGroup;
 			this.imports = new HashSet<String>();
 		}
-
+		
 		private void checkForDeclsToCreate(AbstractTypeDeclaration node) {
+			IDeclType type = EastDeclFactory.createDeclType(node);
+			rewriteNode(node, TypeDeclaration.MODIFIERS2_PROPERTY, targetMap
+					.remove(type), type);
+			checkForDeclsToCreate(node, type);
+		}
+		
+		private void checkForDeclsToCreate(AbstractTypeDeclaration node, IDeclType type) {
 			final Collection<IDecl> decls = createMap.get(type);
 			if (decls == null || decls.isEmpty()) {
 				return;
@@ -159,8 +169,8 @@ public class PromisesAnnotationRewriter {
 			final AST ast = rewrite.getAST();
 			for(IDecl decl : decls) {
 				final IDeclFunction m = (IDeclFunction) decl;
-				final String name = m.getMethod();
-				if (name.equals(node.getName().toString())) {
+				final String name = m.getName();
+				if (name.equals(type.getName())) {
 					// Creating a constructor
 					MethodDeclaration md = ast.newMethodDeclaration();
 					md.setName(ast.newSimpleName(name));
@@ -204,15 +214,15 @@ public class PromisesAnnotationRewriter {
 		private String computeScopedPromiseContents(AnnotationDescription a, IDeclFunction m) {
 			final StringBuilder sb = new StringBuilder("@");
 			sb.append(a.getAnnotation()).append('(').append(a.getContents()).append(") for ");
-			sb.append(m.getMethod()).append('(');
+			sb.append(m.getName()).append('(');
 			boolean first = true;
-			for(String param : m.getParams()) {
+			for(IDecl param : m.getParameters()) {
 				if (first) {
 					first = false;
 				} else {
 					sb.append(",");
 				}
-				sb.append(param);
+				sb.append(param.getTypeOf().getFullyQualified());
 			}
 			sb.append(')');
 			return sb.toString();
@@ -220,18 +230,12 @@ public class PromisesAnnotationRewriter {
 		
 		@Override
 		public boolean visit(final TypeDeclaration node) {
-			typeContext(node.getName().getIdentifier());
-			rewriteNode(node, TypeDeclaration.MODIFIERS2_PROPERTY, targetMap
-					.remove(type), type);
 			checkForDeclsToCreate(node);
 			return true;
 		}
 
 		@Override
 		public boolean visit(final AnnotationTypeDeclaration node) {
-			typeContext(node.getName().getIdentifier());
-			rewriteNode(node, AnnotationTypeDeclaration.MODIFIERS2_PROPERTY,
-					targetMap.remove(type), type);
 			checkForDeclsToCreate(node);
 			return true;
 		}
@@ -239,30 +243,14 @@ public class PromisesAnnotationRewriter {
 		@Override
 		public boolean visit(final AnonymousClassDeclaration node) {
 			final String name = "ANON"; // FIXME
-			typeContext(name);
 			// TODO checkForDeclsToCreate(node);
 			return true;
 		}
 
 		@Override
 		public boolean visit(final EnumDeclaration node) {
-			typeContext(node.getName().getIdentifier());
-			rewriteNode(node, EnumDeclaration.MODIFIERS2_PROPERTY, targetMap
-					.remove(type), type);
 			checkForDeclsToCreate(node);
 			return true;
-		}
-
-		private void typeContext(final String name) {
-		
-			if (type == null) {
-				type = new TypeContext(name);
-			} else if (inMethod == null) {
-				type = new TypeContext(type, name);
-			} else {
-				type = new TypeContext(inMethod, name);
-				inMethod = null;
-			}
 		}
 
 		@Override
@@ -273,7 +261,7 @@ public class PromisesAnnotationRewriter {
 			for (int i = 0; i < params.length; i++) {
 				params[i] = fromType(paramDecls[i]);
 			}
-			inMethod = new Method(type, node.getName().getIdentifier(), params, false); // TODO Should this ever be true?
+			IDeclFunction inMethod = EastDeclFactory.createDeclFunction(node);
 			//System.out.println("Looking at "+inMethod);
 			rewriteNode(node, MethodDeclaration.MODIFIERS2_PROPERTY, targetMap
 					.remove(inMethod), inMethod);
@@ -286,7 +274,7 @@ public class PromisesAnnotationRewriter {
 			int i = 0;
 			for(Object o : m.parameters()) {
 				SingleVariableDeclaration p = (SingleVariableDeclaration) o;
-				IDeclParameter inParameter = new MethodParameter(inMethod, i);				
+				IDeclParameter inParameter = EastDeclFactory.createDeclParameter(p, i);				
 				rewriteNode(p, SingleVariableDeclaration.MODIFIERS2_PROPERTY,
 						targetMap.remove(inParameter), inParameter);
 				i++;
@@ -366,7 +354,7 @@ public class PromisesAnnotationRewriter {
 			final List<AnnotationDescription> list = new ArrayList<AnnotationDescription>();
 			IDeclField f = null;
 			for (final VariableDeclarationFragment frag : fragments) {
-				f = new Field(type, frag.getName().getIdentifier());
+				f = EastDeclFactory.createDeclField(frag);
 				final List<AnnotationDescription> list2 = targetMap.remove(f);
 				if (list2 != null) {
 					list.addAll(list2);
@@ -405,42 +393,6 @@ public class PromisesAnnotationRewriter {
 				}
 			}
 			super.endVisit(node);
-		}
-
-		@Override
-		public void endVisit(final MethodDeclaration node) {
-			if (inMethod == null) {
-				SLLogger.getLoggerFor(PromisesAnnotationRewriter.class).log(
-						Level.SEVERE, "Unexpected method syntax");
-			}
-			inMethod = null;
-		}
-
-		private void endTypeContext() {
-			if (type.getMethod() != null) {
-				inMethod = type.getMethod();
-			}
-			type = type.getParent();
-		}
-
-		@Override
-		public void endVisit(final TypeDeclaration node) {
-			endTypeContext();
-		}
-
-		@Override
-		public void endVisit(final AnnotationTypeDeclaration node) {
-			endTypeContext();
-		}
-
-		@Override
-		public void endVisit(final AnonymousClassDeclaration node) {
-			endTypeContext();
-		}
-
-		@Override
-		public void endVisit(final EnumDeclaration node) {
-			endTypeContext();
 		}
 
 		Mergeable merge(final List<AnnotationDescription> descs) {

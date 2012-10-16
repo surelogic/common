@@ -6,6 +6,7 @@ import java.util.List;
 import com.surelogic.NonNull;
 import com.surelogic.Nullable;
 import com.surelogic.ThreadSafe;
+import com.surelogic.ValueObject;
 import com.surelogic.common.SLUtility;
 
 /**
@@ -34,6 +35,7 @@ import com.surelogic.common.SLUtility;
  * @see DeclUtil
  */
 @ThreadSafe
+@ValueObject
 public interface IDecl {
 
   /**
@@ -48,11 +50,14 @@ public interface IDecl {
    */
 
   public static final EnumSet<IDecl.Kind> TYPE_KINDS = EnumSet.of(IDecl.Kind.CLASS, IDecl.Kind.ENUM, IDecl.Kind.INTERFACE);
-  public static final EnumSet<IDecl.Kind> CONTROL_FLOW_KINDS = EnumSet.of(IDecl.Kind.CONSTRUCTOR, IDecl.Kind.INITIALIZER,
-      IDecl.Kind.METHOD);
-  public static final EnumSet<IDecl.Kind> CONSTRUCTOR_OR_METHOD_KINDS = EnumSet.of(IDecl.Kind.CONSTRUCTOR, IDecl.Kind.METHOD);
   public static final EnumSet<IDecl.Kind> PKG_TYPE_KINDS = EnumSet.of(IDecl.Kind.CLASS, IDecl.Kind.ENUM, IDecl.Kind.INTERFACE,
       IDecl.Kind.PACKAGE);
+  public static final EnumSet<IDecl.Kind> CONTROL_FLOW_KINDS = EnumSet.of(IDecl.Kind.CONSTRUCTOR, IDecl.Kind.INITIALIZER,
+      IDecl.Kind.METHOD);
+
+  public static final EnumSet<IDecl.Kind> HAS_PARAMETERS = EnumSet.of(IDecl.Kind.CONSTRUCTOR, IDecl.Kind.METHOD);
+  public static final EnumSet<IDecl.Kind> HAS_TYPE_PARAMETERS = EnumSet.of(IDecl.Kind.CLASS, IDecl.Kind.INTERFACE,
+      IDecl.Kind.CONSTRUCTOR, IDecl.Kind.METHOD);
 
   /**
    * The visibility of a declaration.
@@ -178,6 +183,8 @@ public interface IDecl {
    * may be safely mutated.
    * 
    * @return a possibly empty list of the formal parameter types, in order.
+   * 
+   * @see #HAS_PARAMETERS
    */
   @NonNull
   List<IDecl> getParameters();
@@ -199,6 +206,8 @@ public interface IDecl {
    * and may be safely mutated.
    * 
    * @return the ordered list of type parameters for this declaration.
+   * 
+   * @see #HAS_TYPE_PARAMETERS
    */
   @NonNull
   List<IDecl> getTypeParameters();
@@ -241,6 +250,26 @@ public interface IDecl {
   boolean hasSameAttributesAs(IDecl o);
 
   /**
+   * Checks if this declaration's attributes are the same as those of the passed
+   * declaration&mdash;allowing for a sloppy match if minor things about the
+   * declaration changed.
+   * <p>
+   * In particular, the following values are compared:
+   * <ul>
+   * <li>{@link #getKind()}</li>
+   * <li>{@link #getName()}</li>
+   * </ul>
+   * The parent and children of this declaration are <b>not</b> examined by this
+   * method.
+   * 
+   * @param o
+   *          any declaration.
+   * @return {@code true} if this declaration's attributes are sloppily the same
+   *         as those of the passed declaration, {@code false} otherwise.
+   */
+  public boolean hasSameAttributesAsSloppy(IDecl o);
+
+  /**
    * Checks if this simple declaration is the same as the passed declaration. By
    * <i>simple</i> we mean that the enclosing, or parent, declarations are not
    * considered.
@@ -258,6 +287,43 @@ public interface IDecl {
   boolean isSameSimpleDeclarationAs(IDecl o);
 
   /**
+   * Checks if this simple declaration is the same as the passed
+   * declaration&mdash;allowing for a sloppy match if minor things about the
+   * declaration changed. By <i>simple</i> we mean that the enclosing, or
+   * parent, declarations are not considered.
+   * <p>
+   * In particular, the two declarations are compared with
+   * {@link #hasSameAttributesAsSloppy(IDecl)}. If that comparison passes then
+   * the parameters, if any, are compared (by only their simple, or compact,
+   * type). If these match as well the two simple declarations are considered
+   * the same.
+   * 
+   * @param o
+   *          any declaration.
+   * @return {@code true} if this simple declaration is sloppily the same as the
+   *         passed declaration, {@code false} otherwise.
+   */
+  public boolean isSameSimpleDeclarationAsSloppy(IDecl o);
+
+  /**
+   * Returns a hash code value for this declaration that is consistent with the
+   * equality result of {@link #isSameSimpleDeclarationAs(IDecl)}.
+   * 
+   * @return a hash code value for this declaration that is consistent with the
+   *         equality result of {@link #isSameSimpleDeclarationAs(IDecl)}.
+   */
+  int simpleDeclarationHashCode();
+
+  /**
+   * Returns a hash code value for this declaration that is consistent with the
+   * equality result of {@link #isSameSimpleDeclarationAsSloppy(IDecl)}.
+   * 
+   * @return a hash code value for this declaration that is consistent with the
+   *         equality result of {@link #isSameSimpleDeclarationAsSloppy(IDecl)}.
+   */
+  int simpleDeclarationHashCodeSloppy();
+
+  /**
    * Checks if this declaration is the same as the passed declaration. The
    * enclosing, or parent, declarations are considered&mdash;this method
    * compares fully-qualified declarations.
@@ -273,4 +339,49 @@ public interface IDecl {
    *         declaration, {@code false} otherwise.
    */
   boolean isSameDeclarationAs(IDecl o);
+
+  /**
+   * Checks if this declaration is the same as the passed
+   * declaration&mdash;allowing for a sloppy match if minor things about the
+   * declaration changed. The enclosing, or parent, declarations are
+   * considered&mdash;this method compares fully-qualified declarations.
+   * <p>
+   * In particular, the two declarations are compared with
+   * {@link #isSameSimpleDeclarationAsSloppy(IDecl)}. If that comparison passes
+   * then the same check is made on the parent of this declaration against the
+   * parent of the passed declaration, and so on.
+   * 
+   * @param o
+   *          any declaration.
+   * @return {@code true} if this declaration is sloppily the same as the passed
+   *         declaration, {@code false} otherwise.
+   */
+  boolean isSameDeclarationAsSloppy(IDecl o);
+
+  /**
+   * Compares the specified object with this declaration for equality.
+   * <p>
+   * This method uses the exact same comparison as
+   * {@link #isSameDeclarationAs(IDecl)}. In fact, the implementation of this
+   * method is
+   * 
+   * <pre>
+   * if (obj instanceof IDecl)
+   *   return isSameDeclarationAs((IDecl) obj);
+   * else
+   *   return false;
+   * </pre>
+   * 
+   * @param o
+   *          object to be compared for equality with this declaration.
+   * @return {@code true} if the specified object is equal to this declaration.
+   */
+  boolean equals(Object o);
+
+  /**
+   * Returns the hash code value for this declaration.
+   * 
+   * @return the hash code value for this declaration.
+   */
+  int hashCode();
 }
