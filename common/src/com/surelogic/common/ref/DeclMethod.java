@@ -7,7 +7,7 @@ import com.surelogic.NonNull;
 import com.surelogic.Nullable;
 
 @Immutable
-final class DeclMethod extends DeclVisibility {
+final class DeclMethod extends DeclVisibility implements IDeclFunction {
 
   /**
    * {@code null} indicates <tt>void</tt>.

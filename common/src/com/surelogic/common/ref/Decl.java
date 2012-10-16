@@ -179,11 +179,13 @@ public abstract class Decl implements IDecl {
   public static final class ConstructorBuilder extends DeclBuilder {
 
     Visibility f_visibility = Visibility.PUBLIC;
+    boolean f_isImplicit = false;
 
     /**
      * Constructs a constructor builder.
      * <p>
-     * By default the constructor has no arguments and is <tt>public</tt>.
+     * By default the constructor has no arguments, is <tt>public</tt>, and is
+     * not implicit.
      */
     public ConstructorBuilder() {
     }
@@ -211,6 +213,20 @@ public abstract class Decl implements IDecl {
      */
     public ConstructorBuilder setVisibility(Visibility value) {
       f_visibility = value == null ? Visibility.PUBLIC : value;
+      return this;
+    }
+
+    /**
+     * Sets if this declaration does <i>not</i> appear in source code, it is an
+     * implicit declaration.
+     * 
+     * @param value
+     *          {@code true} if this declaration does <i>not</i> appear in
+     *          source code, {@code false} otherwise.
+     * @return this builder.
+     */
+    public ConstructorBuilder setIsImplicit(boolean value) {
+      f_isImplicit = value;
       return this;
     }
 
@@ -268,7 +284,7 @@ public abstract class Decl implements IDecl {
         }
       }
 
-      return new DeclConstructor(parent, f_childBuilders, f_visibility);
+      return new DeclConstructor(parent, f_childBuilders, f_visibility, f_isImplicit);
     }
   }
 
@@ -1175,6 +1191,10 @@ public abstract class Decl implements IDecl {
     return false;
   }
 
+  public boolean isImplicit() {
+    return false;
+  }
+
   @NonNull
   public final List<IDecl> getParameters() {
     List<IDecl> work = new ArrayList<IDecl>();
@@ -1204,6 +1224,32 @@ public abstract class Decl implements IDecl {
   @NonNull
   public List<TypeRef> getBounds() {
     return Collections.emptyList();
+  }
+
+  public final boolean hasSameAttributesAs(IDecl o) {
+    if (o == null)
+      return false;
+    if (!SLUtility.nullSafeEquals(getKind(), o.getKind()))
+      return false;
+    if (!SLUtility.nullSafeEquals(getName(), o.getName()))
+      return false;
+    if (!SLUtility.nullSafeEquals(getTypeOf(), o.getTypeOf()))
+      return false;
+    if (!SLUtility.nullSafeEquals(getVisibility(), o.getVisibility()))
+      return false;
+    if (!SLUtility.nullSafeEquals(isStatic(), o.isStatic()))
+      return false;
+    if (!SLUtility.nullSafeEquals(isFinal(), o.isFinal()))
+      return false;
+    if (!SLUtility.nullSafeEquals(isAbstract(), o.isAbstract()))
+      return false;
+    if (!SLUtility.nullSafeEquals(isImplicit(), o.isImplicit()))
+      return false;
+    if (getPosition() != o.getPosition())
+      return false;
+    if (!SLUtility.nullSafeEquals(getBounds(), o.getBounds()))
+      return false;
+    return true;
   }
 
   @Override
@@ -1293,6 +1339,7 @@ public abstract class Decl implements IDecl {
   private static final String STATIC = "static";
   private static final String FINAL = "final";
   private static final String ABSTRACT = "abstract";
+  private static final String IMPLICIT = "implicit";
   private static final String TYPE = "type";
   private static final String POSITION = "position";
   private static final String BOUNDS = "bounds";
@@ -1347,6 +1394,7 @@ public abstract class Decl implements IDecl {
       break;
     case CONSTRUCTOR:
       addV(VISIBILITY, decl.getVisibility(), b);
+      addB(IMPLICIT, decl.isImplicit(), b);
       break;
     case ENUM:
       add(NAME, decl.getName(), b);
@@ -1506,6 +1554,9 @@ public abstract class Decl implements IDecl {
       pair = parseEqualsPair(b);
       if (isFor(VISIBILITY, pair)) {
         constructorBuilder.setVisibility(Visibility.valueOf(pair.second()));
+      }
+      if (isFor(IMPLICIT, pair)) {
+        constructorBuilder.setIsImplicit(Boolean.valueOf(pair.second()));
       }
       thisDeclBuilder = constructorBuilder;
       break;

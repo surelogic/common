@@ -162,6 +162,16 @@ public interface IDecl {
   boolean isAbstract();
 
   /**
+   * Gets if this declaration does <i>not</i> appear in source code, it is an
+   * implicit declaration. If this is meaningless for the declaration,
+   * {@code false} is returned.
+   * 
+   * @return {@code true} if this declaration does <i>not</i> appear in source
+   *         code, {@code false} otherwise.
+   */
+  boolean isImplicit();
+
+  /**
    * Gets the ordered list, first to last, of the parameter declarations for a
    * {@link Kind#CONSTRUCTOR} or {@link Kind#METHOD}. If this is meaningless for
    * the declaration, an empty array is returned. The returned set is a copy and
@@ -202,4 +212,29 @@ public interface IDecl {
    */
   @NonNull
   List<TypeRef> getBounds();
+
+  /**
+   * Checks if this declaration's attributes are the same as those of the passed
+   * declaration. In particular, the following values are compared:
+   * <ul>
+   * <li>{@link #getKind()}</li>
+   * <li>{@link #getName()}</li>
+   * <li>{@link #getTypeOf()}</li>
+   * <li>{@link #getVisibility()}</li>
+   * <li>{@link #isStatic()}</li>
+   * <li>{@link #isFinal()}</li>
+   * <li>{@link #isAbstract()}</li>
+   * <li>{@link #isImplicit()}</li>
+   * <li>{@link #getPosition()}</li>
+   * <li>{@link #getBounds()}</li>
+   * </ul>
+   * The parent and children of this declaration are <b>not</b> examined by this
+   * method.
+   * 
+   * @param o
+   *          any node.
+   * @return {@code true} if this declaration's attributes are the same as those
+   *         of the passed declaration, {@code false} otherwise.
+   */
+  boolean hasSameAttributesAs(IDecl o);
 }

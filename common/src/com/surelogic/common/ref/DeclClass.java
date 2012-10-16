@@ -6,7 +6,7 @@ import com.surelogic.Immutable;
 import com.surelogic.NonNull;
 
 @Immutable
-final class DeclClass extends DeclVisibility {
+final class DeclClass extends DeclVisibility implements IDeclType {
 
   final boolean f_isStatic;
   final boolean f_isFinal;

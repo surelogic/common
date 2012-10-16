@@ -8,7 +8,7 @@ import com.surelogic.Nullable;
 import com.surelogic.common.i18n.I18N;
 
 @Immutable
-final class DeclParameter extends DeclWithPosition {
+final class DeclParameter extends DeclWithPosition implements IDeclParameter {
 
   @NonNull
   final TypeRef f_typeOf;

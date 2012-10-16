@@ -8,7 +8,7 @@ import com.surelogic.Nullable;
 import com.surelogic.common.i18n.I18N;
 
 @Immutable
-final class DeclField extends DeclVisibility {
+final class DeclField extends DeclVisibility implements IDeclField {
 
   @NonNull
   final TypeRef f_typeOf;

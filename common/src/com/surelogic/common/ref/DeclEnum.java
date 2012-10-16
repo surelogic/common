@@ -6,7 +6,7 @@ import com.surelogic.Immutable;
 import com.surelogic.NonNull;
 
 @Immutable
-public final class DeclEnum extends DeclVisibility {
+public final class DeclEnum extends DeclVisibility implements IDeclType {
 
   DeclEnum(IDecl parent, List<Decl.DeclBuilder> childBuilders, String name, Visibility visibility) {
     super(parent, childBuilders, name, visibility);

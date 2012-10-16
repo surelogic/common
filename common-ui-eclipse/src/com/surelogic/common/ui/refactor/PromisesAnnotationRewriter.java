@@ -45,12 +45,8 @@ import org.eclipse.text.edits.TextEditGroup;
 
 import com.surelogic.common.AnnotationConstants;
 import com.surelogic.common.logging.SLLogger;
+import com.surelogic.common.ref.*;
 import com.surelogic.common.refactor.AnnotationDescription;
-import com.surelogic.common.refactor.Field;
-import com.surelogic.common.refactor.IJavaDeclaration;
-import com.surelogic.common.refactor.Method;
-import com.surelogic.common.refactor.MethodParameter;
-import com.surelogic.common.refactor.TypeContext;
 
 public class PromisesAnnotationRewriter {
 
@@ -120,21 +116,21 @@ public class PromisesAnnotationRewriter {
 	}
 
 	private class AnnotationVisitor extends ASTVisitor {
-		private final Map<IJavaDeclaration, List<AnnotationDescription>> targetMap;
-		private final MultiMap<TypeContext,IJavaDeclaration> createMap;
+		private final Map<IDecl, List<AnnotationDescription>> targetMap;
+		private final MultiMap<IDeclType,IDecl> createMap;
 		private final TextEditGroup editGroup;
-		private Method inMethod;
-		private TypeContext type;
+		private IDeclFunction inMethod;
+		private IDeclType type;
 		private final boolean isAssumption;
 		private final Set<String> imports;
 
 		public AnnotationVisitor(final Collection<AnnotationDescription> descs,
 				final TextEditGroup editGroup, final boolean isAssumption) {
-			targetMap = new HashMap<IJavaDeclaration, List<AnnotationDescription>>();
-			createMap = new MultiHashMap<TypeContext, IJavaDeclaration>();
+			targetMap = new HashMap<IDecl, List<AnnotationDescription>>();
+			createMap = new MultiHashMap<IDeclType, IDecl>();
 			
 			for (final AnnotationDescription desc : descs) {
-				final IJavaDeclaration target = isAssumption ? desc.getAssumptionTarget()
+				final IDecl target = isAssumption ? desc.getAssumptionTarget()
 						: desc.getTarget();
 				if (!isAssumption && target.isImplicit()) {				
 					// We need to create the declaration before adding the annotation
@@ -154,15 +150,15 @@ public class PromisesAnnotationRewriter {
 		}
 
 		private void checkForDeclsToCreate(AbstractTypeDeclaration node) {
-			final Collection<IJavaDeclaration> decls = createMap.get(type);
+			final Collection<IDecl> decls = createMap.get(type);
 			if (decls == null || decls.isEmpty()) {
 				return;
 			}
 			final List<BodyDeclaration> toAdd = new ArrayList<BodyDeclaration>();
 			final List<AnnotationDescription> scopedPromises = new ArrayList<AnnotationDescription>();
 			final AST ast = rewrite.getAST();
-			for(IJavaDeclaration decl : decls) {
-				final Method m = (Method) decl;
+			for(IDecl decl : decls) {
+				final IDeclFunction m = (IDeclFunction) decl;
 				final String name = m.getMethod();
 				if (name.equals(node.getName().toString())) {
 					// Creating a constructor
@@ -205,7 +201,7 @@ public class PromisesAnnotationRewriter {
 			}
 		}
 		
-		private String computeScopedPromiseContents(AnnotationDescription a, Method m) {
+		private String computeScopedPromiseContents(AnnotationDescription a, IDeclFunction m) {
 			final StringBuilder sb = new StringBuilder("@");
 			sb.append(a.getAnnotation()).append('(').append(a.getContents()).append(") for ");
 			sb.append(m.getMethod()).append('(');
@@ -290,7 +286,7 @@ public class PromisesAnnotationRewriter {
 			int i = 0;
 			for(Object o : m.parameters()) {
 				SingleVariableDeclaration p = (SingleVariableDeclaration) o;
-				MethodParameter inParameter = new MethodParameter(inMethod, i);				
+				IDeclParameter inParameter = new MethodParameter(inMethod, i);				
 				rewriteNode(p, SingleVariableDeclaration.MODIFIERS2_PROPERTY,
 						targetMap.remove(inParameter), inParameter);
 				i++;
@@ -307,7 +303,7 @@ public class PromisesAnnotationRewriter {
 		private void rewriteNode(final ASTNode node,
 				final ChildListPropertyDescriptor prop,
 				final List<AnnotationDescription> list,
-				final IJavaDeclaration target) {
+				final IDecl target) {
 			if (list != null) {
 				Collections.sort(list);
 				Collections.reverse(list);
@@ -341,7 +337,7 @@ public class PromisesAnnotationRewriter {
 		@SuppressWarnings("unchecked")
 		private void mergeAnnotations(final AST ast,
 				final List<AnnotationDescription> ann, final ListRewrite lrw,
-				final IJavaDeclaration target) {
+				final IDecl target) {
 			final List<ASTNode> nodes = lrw.getRewrittenList();
 			final Mergeable m = merge(ann);
 			for (final ASTNode aNode : nodes) {
@@ -368,7 +364,7 @@ public class PromisesAnnotationRewriter {
 					.fragments();
 			// Handle when we have more than one field in the same declaration
 			final List<AnnotationDescription> list = new ArrayList<AnnotationDescription>();
-			Field f = null;
+			IDeclField f = null;
 			for (final VariableDeclarationFragment frag : fragments) {
 				f = new Field(type, frag.getName().getIdentifier());
 				final List<AnnotationDescription> list2 = targetMap.remove(f);
@@ -521,7 +517,7 @@ public class PromisesAnnotationRewriter {
 		}
 
 		public Annotation merge(final AST ast, final Annotation cur,
-				final IJavaDeclaration target, final Set<String> imports) {
+				final IDecl target, final Set<String> imports) {
 			final Set<String> existing = new HashSet<String>();
 			if (cur != null) {
 				extractExistingAnnos(cur, existing);
@@ -580,7 +576,7 @@ public class PromisesAnnotationRewriter {
 		}
 
 		public Annotation merge(final AST ast, final Annotation a,
-				final IJavaDeclaration target, final Set<String> imports) {
+				final IDecl target, final Set<String> imports) {
 			addImport(name, imports);
 			final TreeSet<String> contents = new TreeSet<String>();
 			for (final AnnotationDescription desc : newAnnotations) {
@@ -668,7 +664,7 @@ public class PromisesAnnotationRewriter {
 		}
 
 		public Annotation merge(final AST ast, final Annotation cur,
-				final IJavaDeclaration target, final Set<String> imports) {
+				final IDecl target, final Set<String> imports) {
 			final Set<String> newContents = new HashSet<String>();
 			for (final AnnotationDescription desc : newAnnotations) {
 				newContents.add(desc.getContents());
@@ -736,7 +732,7 @@ public class PromisesAnnotationRewriter {
 		 *            necessary.
 		 * @return
 		 */
-		Annotation merge(AST ast, Annotation a, IJavaDeclaration target,
+		Annotation merge(AST ast, Annotation a, IDecl target,
 				Set<String> imports);
 
 	}
