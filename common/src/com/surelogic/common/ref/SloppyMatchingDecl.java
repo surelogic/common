@@ -9,7 +9,9 @@ import com.surelogic.common.i18n.I18N;
 
 /**
  * A wrapper for an {@link IDecl} that uses sloppy matching for its
- * {@link #equals(Object)} and {@link #hashCode()} implementations.
+ * {@link #equals(Object)} and {@link #hashCode()}
+ * implementations&mdash;allowing for a sloppy match if minor things about the
+ * declaration changed..
  * <p>
  * Equality tests are done using {@link IDecl#isSameDeclarationAsSloppy(IDecl)}
  * and the hash code value is built up with
