@@ -215,7 +215,9 @@ public interface IDecl {
 
   /**
    * Checks if this declaration's attributes are the same as those of the passed
-   * declaration. In particular, the following values are compared:
+   * declaration.
+   * <p>
+   * In particular, the following values are compared:
    * <ul>
    * <li>{@link #getKind()}</li>
    * <li>{@link #getName()}</li>
@@ -232,9 +234,43 @@ public interface IDecl {
    * method.
    * 
    * @param o
-   *          any node.
+   *          any declaration.
    * @return {@code true} if this declaration's attributes are the same as those
    *         of the passed declaration, {@code false} otherwise.
    */
   boolean hasSameAttributesAs(IDecl o);
+
+  /**
+   * Checks if this simple declaration is the same as the passed declaration. By
+   * <i>simple</i> we mean that the enclosing, or parent, declarations are not
+   * considered.
+   * <p>
+   * In particular, the two declarations are compared with
+   * {@link #hasSameAttributesAs(IDecl)}. If that comparison passes then the
+   * parameters, if any, and type parameters, if any, are compared. If these
+   * match as well the two simple declarations are considered the same.
+   * 
+   * @param o
+   *          any declaration.
+   * @return {@code true} if this simple declaration is the same as the passed
+   *         declaration, {@code false} otherwise.
+   */
+  boolean isSameSimpleDeclarationAs(IDecl o);
+
+  /**
+   * Checks if this declaration is the same as the passed declaration. The
+   * enclosing, or parent, declarations are considered&mdash;this method
+   * compares fully-qualified declarations.
+   * <p>
+   * In particular, the two declarations are compared with
+   * {@link #isSameSimpleDeclarationAs(IDecl)}. If that comparison passes then
+   * the same check is made on the parent of this declaration against the parent
+   * of the passed declaration, and so on.
+   * 
+   * @param o
+   *          any declaration.
+   * @return {@code true} if this declaration is the same as the passed
+   *         declaration, {@code false} otherwise.
+   */
+  boolean isSameDeclarationAs(IDecl o);
 }
