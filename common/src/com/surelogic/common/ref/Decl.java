@@ -12,12 +12,14 @@ import com.surelogic.Immutable;
 import com.surelogic.NonNull;
 import com.surelogic.NotThreadSafe;
 import com.surelogic.Nullable;
+import com.surelogic.ValueObject;
 import com.surelogic.common.Pair;
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.xml.XMLUtil;
 
 @Immutable
+@ValueObject
 public abstract class Decl implements IDecl {
 
   /**
@@ -1252,8 +1254,7 @@ public abstract class Decl implements IDecl {
     return true;
   }
 
-  @Override
-  public boolean isSameSimpleDeclarationAs(IDecl o) {
+  public final boolean isSameSimpleDeclarationAs(IDecl o) {
     if (hasSameAttributesAs(o)) {
       boolean result = true;
       result &= checkListOfIDeclsAreTheSame(getParameters(), o.getParameters());
@@ -1264,9 +1265,53 @@ public abstract class Decl implements IDecl {
   }
 
   /**
+   * Computes a hash code that is consistent with the equality result of
+   * {@link #isSameSimpleDeclarationAs(IDecl)}.
+   * 
+   * @return a hash code that is consistent with the equality result of
+   *         {@link #isSameSimpleDeclarationAs(IDecl)}.
+   */
+  final int simpleDeclarationHashCode() {
+    final int prime = 31;
+    int result = 1;
+    /*
+     * Attributes
+     */
+    result = prime * result + ((getKind() == null) ? 0 : getKind().hashCode());
+    result = prime * result + ((getName() == null) ? 0 : getName().hashCode());
+    result = prime * result + ((getTypeOf() == null) ? 0 : getTypeOf().hashCode());
+    result = prime * result + ((getVisibility() == null) ? 0 : getVisibility().hashCode());
+    result = prime * result + Boolean.valueOf(isStatic()).hashCode();
+    result = prime * result + Boolean.valueOf(isFinal()).hashCode();
+    result = prime * result + Boolean.valueOf(isAbstract()).hashCode();
+    result = prime * result + Boolean.valueOf(isImplicit()).hashCode();
+    result = prime * result + getPosition();
+    result = prime * result + ((getBounds() == null) ? 0 : getBounds().hashCode());
+    /*
+     * Parameters
+     */
+    for (IDecl p : getParameters()) {
+      final Decl d = (Decl) p; // should always work
+      result = prime * result + ((d == null) ? 0 : d.simpleDeclarationHashCode());
+    }
+    /*
+     * Type parameters
+     */
+    for (IDecl p : getTypeParameters()) {
+      final Decl d = (Decl) p; // should always work
+      result = prime * result + ((d == null) ? 0 : d.simpleDeclarationHashCode());
+    }
+
+    return result;
+  }
+
+  /**
    * Checks if the two lists contain the same simple declarations. In
    * particular, each element is checked with
    * {@link #isSameSimpleDeclarationAs(IDecl)}.
+   * <p>
+   * Typically the lists sent to this method are obtained from calling either
+   * {@link #getParameters()} or {@link #getTypeParameters()}.
    * 
    * @param l1
    *          a list of declarations.
@@ -1285,7 +1330,7 @@ public abstract class Decl implements IDecl {
       IDecl d1 = l1.get(i);
       IDecl d2 = l2.get(i);
       if (d1 != null) {
-        result &= d1.isSameDeclarationAs(d2);
+        result &= d1.isSameSimpleDeclarationAs(d2);
       } else {
         result &= d2 == null;
       }
@@ -1293,8 +1338,7 @@ public abstract class Decl implements IDecl {
     return result;
   }
 
-  @Override
-  public boolean isSameDeclarationAs(IDecl o) {
+  public final boolean isSameDeclarationAs(IDecl o) {
     IDecl dThis = this;
     IDecl dO = o;
     while (true) {
@@ -1310,6 +1354,27 @@ public abstract class Decl implements IDecl {
       } else
         return false;
     }
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    IDecl dThis = this;
+    while (dThis != null) {
+      final Decl d = (Decl) dThis; // should always work
+      result = prime * result + d.simpleDeclarationHashCode();
+      dThis = dThis.getParent();
+    }
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (obj instanceof IDecl)
+      return isSameDeclarationAs((IDecl) obj);
+    else
+      return false;
   }
 
   @Override

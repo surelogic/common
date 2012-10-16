@@ -5,9 +5,11 @@ import java.util.List;
 import com.surelogic.Immutable;
 import com.surelogic.NonNull;
 import com.surelogic.Nullable;
+import com.surelogic.ValueObject;
 import com.surelogic.common.i18n.I18N;
 
 @Immutable
+@ValueObject
 final class DeclParameter extends DeclWithPosition {
 
   @NonNull

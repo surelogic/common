@@ -6,6 +6,7 @@ import java.util.List;
 import com.surelogic.NonNull;
 import com.surelogic.Nullable;
 import com.surelogic.ThreadSafe;
+import com.surelogic.ValueObject;
 import com.surelogic.common.SLUtility;
 
 /**
@@ -34,6 +35,7 @@ import com.surelogic.common.SLUtility;
  * @see DeclUtil
  */
 @ThreadSafe
+@ValueObject
 public interface IDecl {
 
   /**
@@ -48,11 +50,14 @@ public interface IDecl {
    */
 
   public static final EnumSet<IDecl.Kind> TYPE_KINDS = EnumSet.of(IDecl.Kind.CLASS, IDecl.Kind.ENUM, IDecl.Kind.INTERFACE);
-  public static final EnumSet<IDecl.Kind> CONTROL_FLOW_KINDS = EnumSet.of(IDecl.Kind.CONSTRUCTOR, IDecl.Kind.INITIALIZER,
-      IDecl.Kind.METHOD);
-  public static final EnumSet<IDecl.Kind> CONSTRUCTOR_OR_METHOD_KINDS = EnumSet.of(IDecl.Kind.CONSTRUCTOR, IDecl.Kind.METHOD);
   public static final EnumSet<IDecl.Kind> PKG_TYPE_KINDS = EnumSet.of(IDecl.Kind.CLASS, IDecl.Kind.ENUM, IDecl.Kind.INTERFACE,
       IDecl.Kind.PACKAGE);
+  public static final EnumSet<IDecl.Kind> CONTROL_FLOW_KINDS = EnumSet.of(IDecl.Kind.CONSTRUCTOR, IDecl.Kind.INITIALIZER,
+      IDecl.Kind.METHOD);
+
+  public static final EnumSet<IDecl.Kind> HAS_PARAMETERS = EnumSet.of(IDecl.Kind.CONSTRUCTOR, IDecl.Kind.METHOD);
+  public static final EnumSet<IDecl.Kind> HAS_TYPE_PARAMETERS = EnumSet.of(IDecl.Kind.CLASS, IDecl.Kind.INTERFACE,
+      IDecl.Kind.CONSTRUCTOR, IDecl.Kind.METHOD);
 
   /**
    * The visibility of a declaration.
@@ -178,6 +183,8 @@ public interface IDecl {
    * may be safely mutated.
    * 
    * @return a possibly empty list of the formal parameter types, in order.
+   * 
+   * @see #HAS_PARAMETERS
    */
   @NonNull
   List<IDecl> getParameters();
@@ -199,6 +206,8 @@ public interface IDecl {
    * and may be safely mutated.
    * 
    * @return the ordered list of type parameters for this declaration.
+   * 
+   * @see #HAS_TYPE_PARAMETERS
    */
   @NonNull
   List<IDecl> getTypeParameters();
@@ -273,4 +282,31 @@ public interface IDecl {
    *         declaration, {@code false} otherwise.
    */
   boolean isSameDeclarationAs(IDecl o);
+
+  /**
+   * Compares the specified object with this declaration for equality.
+   * <p>
+   * This method uses the exact same comparison as
+   * {@link #isSameDeclarationAs(IDecl)}. In fact, the implementation of this
+   * method is
+   * 
+   * <pre>
+   * if (obj instanceof IDecl)
+   *   return isSameDeclarationAs((IDecl) obj);
+   * else
+   *   return false;
+   * </pre>
+   * 
+   * @param o
+   *          object to be compared for equality with this declaration.
+   * @return {@code true} if the specified object is equal to this declaration.
+   */
+  boolean equals(Object o);
+
+  /**
+   * Returns the hash code value for this declaration.
+   * 
+   * @return the hash code value for this declaration.
+   */
+  int hashCode();
 }

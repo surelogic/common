@@ -4,8 +4,10 @@ import java.util.List;
 
 import com.surelogic.Immutable;
 import com.surelogic.NonNull;
+import com.surelogic.ValueObject;
 
 @Immutable
+@ValueObject
 final class DeclInterface extends DeclVisibility {
 
   DeclInterface(IDecl parent, List<Decl.DeclBuilder> childBuilders, String name, Visibility visibility) {
