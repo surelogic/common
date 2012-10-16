@@ -2,7 +2,7 @@ package com.surelogic.common.ref;
 
 import java.util.List;
 
-public abstract class IDeclVisitor {
+public abstract class DeclVisitor {
 
   /**
    * Visits the passed declaration prior to the type-specific visit.
