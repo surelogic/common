@@ -1574,6 +1574,7 @@ public abstract class Decl implements IDecl {
    * <tt>parseEncodedForPersistenceToDeclBuilder(encodeForPersistence(decl))</tt>
    * 
    * @param decl
+   *          a declaration.
    * @return a declaration builder.
    * 
    * @throws IllegalArgumentException
