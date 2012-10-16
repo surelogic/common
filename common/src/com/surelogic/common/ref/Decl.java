@@ -1254,11 +1254,49 @@ public abstract class Decl implements IDecl {
     return true;
   }
 
+  public boolean hasSameAttributesAsSloppy(IDecl o) {
+    if (o == null)
+      return false;
+    if (!SLUtility.nullSafeEquals(getKind(), o.getKind()))
+      return false;
+    if (!SLUtility.nullSafeEquals(getName(), o.getName()))
+      return false;
+    return true;
+  }
+
   public final boolean isSameSimpleDeclarationAs(IDecl o) {
     if (hasSameAttributesAs(o)) {
       boolean result = true;
       result &= checkListOfIDeclsAreTheSame(getParameters(), o.getParameters());
       result &= checkListOfIDeclsAreTheSame(getTypeParameters(), o.getTypeParameters());
+      return result;
+    } else
+      return false;
+  }
+
+  public boolean isSameSimpleDeclarationAsSloppy(IDecl o) {
+    if (hasSameAttributesAsSloppy(o)) {
+      final List<IDecl> l1 = getParameters();
+      final List<IDecl> l2 = o.getParameters();
+      if (l1.isEmpty() && l2.isEmpty())
+        return true;
+      if (l1.size() != l2.size())
+        return false;
+      boolean result = true;
+      for (int i = 0; i < l1.size(); i++) {
+        final IDecl d1 = l1.get(i);
+        final IDecl d2 = l2.get(i);
+        if (d1 == null || d2 == null)
+          return false;
+        else {
+          final TypeRef t1 = d1.getTypeOf();
+          final TypeRef t2 = d2.getTypeOf();
+          if (t1 == null || t2 == null)
+            return false;
+          else
+            result &= t1.getCompact().equals(t1.getCompact());
+        }
+      }
       return result;
     } else
       return false;
@@ -1291,6 +1329,27 @@ public abstract class Decl implements IDecl {
      */
     for (IDecl p : getTypeParameters()) {
       result = prime * result + ((p == null) ? 0 : p.simpleDeclarationHashCode());
+    }
+
+    return result;
+  }
+
+  public final int simpleDeclarationHashCodeSloppy() {
+    final int prime = 31;
+    int result = 1;
+    /*
+     * Attributes
+     */
+    result = prime * result + ((getKind() == null) ? 0 : getKind().hashCode());
+    result = prime * result + ((getName() == null) ? 0 : getName().hashCode());
+    /*
+     * Parameters
+     */
+    for (IDecl p : getParameters()) {
+      if (p != null) {
+        final TypeRef t = p.getTypeOf();
+        result = prime * result + ((t == null) ? 0 : t.getCompact().hashCode());
+      }
     }
 
     return result;
@@ -1334,6 +1393,24 @@ public abstract class Decl implements IDecl {
     IDecl dO = o;
     while (true) {
       if (dThis.isSameSimpleDeclarationAs(dO)) {
+        dThis = dThis.getParent();
+        dO = dO.getParent();
+        if (dThis == null && dO == null)
+          return true;
+        if (dThis == null)
+          return false;
+        if (dO == null)
+          return false;
+      } else
+        return false;
+    }
+  }
+
+  public boolean isSameDeclarationAsSloppy(IDecl o) {
+    IDecl dThis = this;
+    IDecl dO = o;
+    while (true) {
+      if (dThis.isSameSimpleDeclarationAsSloppy(dO)) {
         dThis = dThis.getParent();
         dO = dO.getParent();
         if (dThis == null && dO == null)
