@@ -307,11 +307,11 @@ public final class DeclUtil {
    */
   @Nullable
   public static IDecl getTypeNotInControlFlow(@NonNull final IDecl decl) {
-    IDecl typeDecl = getFirstAncestorIn(IDecl.TYPE_KINDS, decl);
+    IDecl typeDecl = getFirstAncestorIn(IDecl.IS_TYPE, decl);
     if (typeDecl == null)
       return null; // must be a package declaration
-    while (!getAreAllAncestorsIn(IDecl.PKG_TYPE_KINDS, typeDecl)) {
-      typeDecl = getFirstAncestorIn(IDecl.TYPE_KINDS, typeDecl.getParent());
+    while (!getAreAllAncestorsIn(IDecl.IS_PKG_OR_TYPE, typeDecl)) {
+      typeDecl = getFirstAncestorIn(IDecl.IS_TYPE, typeDecl.getParent());
     }
     return typeDecl;
   }
