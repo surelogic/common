@@ -7,7 +7,7 @@ import com.surelogic.ValueObject;
 
 @Immutable
 @ValueObject
-public abstract class DeclType extends DeclVisibility {
+public abstract class DeclType extends DeclVisibility implements IDeclType {
   DeclType(IDecl parent, List<DeclBuilder> childBuilders, String name, Visibility visibility) {
     super(parent, childBuilders, name, visibility);
   }

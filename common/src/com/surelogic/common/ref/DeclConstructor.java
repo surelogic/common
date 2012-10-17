@@ -8,7 +8,7 @@ import com.surelogic.ValueObject;
 
 @Immutable
 @ValueObject
-public final class DeclConstructor extends DeclVisibility {
+public final class DeclConstructor extends DeclVisibility implements IDeclFunction {
 
   final boolean f_isImplicit;
 
