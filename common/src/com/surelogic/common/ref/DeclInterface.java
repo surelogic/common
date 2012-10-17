@@ -8,7 +8,7 @@ import com.surelogic.ValueObject;
 
 @Immutable
 @ValueObject
-public final class DeclInterface extends DeclType {
+final class DeclInterface extends DeclVisibility implements IDeclType {
 
   DeclInterface(IDecl parent, List<Decl.DeclBuilder> childBuilders, String name, Visibility visibility) {
     super(parent, childBuilders, name, visibility);

@@ -10,7 +10,7 @@ import com.surelogic.common.i18n.I18N;
 
 @Immutable
 @ValueObject
-public final class DeclParameter extends DeclWithPosition implements IDeclParameter {
+final class DeclParameter extends DeclWithPosition implements IDeclParameter {
 
   @NonNull
   final TypeRef f_typeOf;

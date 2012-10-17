@@ -9,7 +9,7 @@ import com.surelogic.ValueObject;
 
 @Immutable
 @ValueObject
-public final class DeclMethod extends DeclVisibility implements IDeclFunction {
+final class DeclMethod extends DeclVisibility implements IDeclFunction {
 
   /**
    * {@code null} indicates <tt>void</tt>.

@@ -8,7 +8,7 @@ import com.surelogic.ValueObject;
 
 @Immutable
 @ValueObject
-public final class DeclClass extends DeclType {
+final class DeclClass extends DeclVisibility implements IDeclType {
 
   final boolean f_isStatic;
   final boolean f_isFinal;

@@ -8,7 +8,7 @@ import com.surelogic.ValueObject;
 
 @Immutable
 @ValueObject
-public final class DeclEnum extends DeclType {
+final class DeclEnum extends DeclVisibility implements IDeclType {
 
   DeclEnum(IDecl parent, List<Decl.DeclBuilder> childBuilders, String name, Visibility visibility) {
     super(parent, childBuilders, name, visibility);

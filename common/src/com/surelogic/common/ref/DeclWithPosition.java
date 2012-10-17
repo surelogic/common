@@ -8,7 +8,7 @@ import com.surelogic.common.i18n.I18N;
 
 @Immutable
 @ValueObject
-public abstract class DeclWithPosition extends Decl {
+abstract class DeclWithPosition extends Decl {
 
   /**
    * Between 0 and 254.
