@@ -812,20 +812,33 @@ public final class DeclUtil {
     return true;
   }
 
-  public static String getSignature(IDeclFunction func, boolean useTypeForConstructor) {
+  private enum FuncUnparse {
+	  USE_NEW, USE_TYPE, ONLY_PARAMS
+  }
+  
+  private static String getSignature(IDeclFunction func, FuncUnparse kind, boolean fullyQualifyParameters) {
 	  if (func == null) {
 		  throw new IllegalArgumentException(I18N.err(44, "decl"));
 	  }
-	  String name = func.getName();
-	  if (name == null) {
-		  if (useTypeForConstructor) {
-			  name = func.getParent().getName();
-		  } else {
-			  name = "new";
-		  }
+	  if (kind == null) {
+		  throw new IllegalArgumentException(I18N.err(44, "kind"));
 	  }
-	  final StringBuilder sb = new StringBuilder(name);
-	  sb.append('(');
+	  final StringBuilder sb;
+	  if (kind == FuncUnparse.ONLY_PARAMS) {
+		  sb = new StringBuilder();
+	  } else {
+		  String name = func.getName();
+		  if (name == null) {
+			  if (kind == FuncUnparse.USE_TYPE) {
+				  name = func.getParent().getName();
+			  } else {
+				  name = "new";
+			  }
+		  }
+		  sb = new StringBuilder(name);
+		  sb.append('(');
+	  }
+	  
 	  boolean first = true;
 	  for(IDeclParameter p : func.getParameters()) {
 		  if (first) {
@@ -833,9 +846,24 @@ public final class DeclUtil {
 		  } else {
 			  sb.append(", ");
 		  }
-		  sb.append(p.getTypeOf().getCompact());
+		  final TypeRef t = p.getTypeOf();
+		  sb.append(fullyQualifyParameters ?
+				  t.getFullyQualified() : t.getCompact());
 	  }
-	  sb.append(')');
+	  if (kind != FuncUnparse.ONLY_PARAMS) {
+		  sb.append(')');
+	  }
 	  return sb.toString();
+  }
+  
+  /**
+   * As it would appear in source code
+   */
+  public static String getSignature(IDeclFunction func) {
+	  return getSignature(func, FuncUnparse.USE_TYPE, false);
+  }
+  
+  public static String getParametersFullyQualified(IDeclFunction func) {
+	  return getSignature(func, FuncUnparse.ONLY_PARAMS, true);
   }
 }
