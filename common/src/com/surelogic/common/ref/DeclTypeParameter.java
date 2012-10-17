@@ -9,7 +9,7 @@ import com.surelogic.ValueObject;
 
 @Immutable
 @ValueObject
-final class DeclTypeParameter extends DeclWithPosition {
+final class DeclTypeParameter extends DeclWithPosition implements IDeclTypeParameter {
 
   @NonNull
   private final List<TypeRef> f_bounds;

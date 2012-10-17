@@ -44,7 +44,7 @@ public abstract class DeclVisitor {
    *          the node to visit where <tt>node.getKind() ==
    *          {@link IDecl.Kind#PACKAGE}</tt>.
    */
-  public void visitPackage(IDecl node) {
+  public void visitPackage(IDeclPackage node) {
     // by default do nothing
   }
 
@@ -61,7 +61,7 @@ public abstract class DeclVisitor {
    * @return {@code true} if the individual types passed in <tt>types</tt>
    *         should be visited, {@code false} otherwise.
    */
-  public boolean visitTypes(List<IDecl> types) {
+  public boolean visitTypes(List<IDeclType> types) {
     return true;
   }
 
@@ -78,7 +78,7 @@ public abstract class DeclVisitor {
    *         (this includes calling {@link #visitTypeParameters(List)}),
    *         {@code false} otherwise.
    */
-  public boolean visitClass(IDecl node) {
+  public boolean visitClass(IDeclType node) {
     return true;
   }
 
@@ -95,7 +95,7 @@ public abstract class DeclVisitor {
    *         visited (this includes calling {@link #visitTypeParameters(List)}),
    *         {@code false} otherwise.
    */
-  public boolean visitInterface(IDecl node) {
+  public boolean visitInterface(IDeclType node) {
     return true;
   }
 
@@ -109,7 +109,7 @@ public abstract class DeclVisitor {
    *          the node to visit where <tt>node.getKind() ==
    *          {@link IDecl.Kind#ENUM}</tt>.
    */
-  public void visitEnum(IDecl node) {
+  public void visitEnum(IDeclType node) {
     // by default do nothing
   }
 
@@ -122,7 +122,7 @@ public abstract class DeclVisitor {
    *          the node to visit where <tt>node.getKind() ==
    *          {@link IDecl.Kind#FIELD}</tt> .
    */
-  public void visitField(IDecl node) {
+  public void visitField(IDeclField node) {
     // by default do nothing
   }
 
@@ -153,7 +153,7 @@ public abstract class DeclVisitor {
    *         {@link #visitTypeParameters(List)} and then
    *         {@link #visitParameters(List)}), {@code false} otherwise.
    */
-  public boolean visitMethod(IDecl node) {
+  public boolean visitMethod(IDeclFunction node) {
     return true;
   }
 
@@ -171,7 +171,7 @@ public abstract class DeclVisitor {
    *         {@link #visitTypeParameters(List)} and then
    *         {@link #visitParameters(List)}), {@code false} otherwise.
    */
-  public boolean visitConstructor(IDecl node) {
+  public boolean visitConstructor(IDeclFunction node) {
     return true;
   }
 
@@ -187,7 +187,7 @@ public abstract class DeclVisitor {
    * @return {@code true} if the individual parameters passed in
    *         <tt>parameters</tt> should be visited, {@code false} otherwise.
    */
-  public boolean visitParameters(List<IDecl> parameters) {
+  public boolean visitParameters(List<IDeclParameter> parameters) {
     return true;
   }
 
@@ -205,7 +205,7 @@ public abstract class DeclVisitor {
    *          is being made because the parameter is part of a parameter list
    *          for a method or constructor.
    */
-  public void visitParameter(IDecl node, boolean partOfDecl) {
+  public void visitParameter(IDeclParameter node, boolean partOfDecl) {
     // by default do nothing
   }
 
@@ -221,7 +221,7 @@ public abstract class DeclVisitor {
    * @return {@code true} if the individual type parameters passed in
    *         <tt>typeParameters</tt> should be visited, {@code false} otherwise.
    */
-  public boolean visitTypeParameters(List<IDecl> typeParameters) {
+  public boolean visitTypeParameters(List<IDeclTypeParameter> typeParameters) {
     return true;
   }
 
@@ -239,7 +239,7 @@ public abstract class DeclVisitor {
    *          if this call is being made because the parameter is part of a type
    *          parameter list for a class, interface, method, or constructor.
    */
-  public void visitTypeParameter(IDecl node, boolean partOfDecl) {
+  public void visitTypeParameter(IDeclTypeParameter node, boolean partOfDecl) {
     // by default do nothing
   }
 
@@ -253,7 +253,7 @@ public abstract class DeclVisitor {
    *          a non-empty list of types, ordered innermost to outermost. The
    *          kind of all elements should be contained in {@link IDecl#IS_TYPE}.
    */
-  public void endVisitTypes(List<IDecl> types) {
+  public void endVisitTypes(List<IDeclType> types) {
     // by default do nothing
   }
 
@@ -266,7 +266,7 @@ public abstract class DeclVisitor {
    *          the node to visit where <tt>node.getKind() ==
    *          {@link IDecl.Kind#CLASS}</tt>.
    */
-  public void endVisitClass(IDecl node) {
+  public void endVisitClass(IDeclType node) {
     // by default do nothing
   }
 
@@ -279,7 +279,7 @@ public abstract class DeclVisitor {
    *          the node to visit where <tt>node.getKind() ==
    *          {@link IDecl.Kind#INTERFACE}</tt>.
    */
-  public void endVisitInterface(IDecl node) {
+  public void endVisitInterface(IDeclType node) {
     // by default do nothing
   }
 
@@ -292,7 +292,7 @@ public abstract class DeclVisitor {
    *          the node to visit where <tt>node.getKind() ==
    *          {@link IDecl.Kind#METHOD}</tt>.
    */
-  public void endVisitMethod(IDecl node) {
+  public void endVisitMethod(IDeclFunction node) {
     // by default do nothing
   }
 
@@ -305,7 +305,7 @@ public abstract class DeclVisitor {
    *          the node to visit where <tt>node.getKind() ==
    *          {@link IDecl.Kind#CONSTRUCTOR}</tt>.
    */
-  public void endVisitConstructor(IDecl node) {
+  public void endVisitConstructor(IDeclFunction node) {
     // by default do nothing
   }
 
@@ -319,7 +319,7 @@ public abstract class DeclVisitor {
    *          a possibly empty list of parameters, ordered by position. The kind
    *          of all elements should be {@link IDecl.Kind#PARAMETER}.
    */
-  public void endVisitParameters(List<IDecl> parameters) {
+  public void endVisitParameters(List<IDeclParameter> parameters) {
     // by default do nothing
   }
 
@@ -333,7 +333,7 @@ public abstract class DeclVisitor {
    *          a possibly empty list of type parameters, ordered by position. The
    *          kind of all elements should be {@link IDecl.Kind#PARAMETER}.
    */
-  public void endVisitTypeParameters(List<IDecl> typeParameters) {
+  public void endVisitTypeParameters(List<IDeclTypeParameter> typeParameters) {
     // by default do nothing
   }
 }

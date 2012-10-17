@@ -1198,11 +1198,11 @@ public abstract class Decl implements IDecl {
   }
 
   @NonNull
-  public final List<IDecl> getParameters() {
-    List<IDecl> work = new ArrayList<IDecl>();
+  public final List<IDeclParameter> getParameters() {
+    List<IDeclParameter> work = new ArrayList<IDeclParameter>();
     for (IDecl decl : getChildren()) {
-      if (decl instanceof DeclParameter)
-        work.add(decl);
+      if (decl instanceof IDeclParameter)
+        work.add((IDeclParameter) decl);
     }
     Collections.sort(work, f_byPosition);
     return work;
@@ -1213,11 +1213,11 @@ public abstract class Decl implements IDecl {
   }
 
   @NonNull
-  public final List<IDecl> getTypeParameters() {
-    List<IDecl> work = new ArrayList<IDecl>();
+  public final List<IDeclTypeParameter> getTypeParameters() {
+    List<IDeclTypeParameter> work = new ArrayList<IDeclTypeParameter>();
     for (IDecl decl : getChildren()) {
       if (decl instanceof DeclTypeParameter)
-        work.add(decl);
+        work.add((IDeclTypeParameter) decl);
     }
     Collections.sort(work, f_byPosition);
     return work;
@@ -1276,8 +1276,8 @@ public abstract class Decl implements IDecl {
 
   public boolean isSameSimpleDeclarationAsSloppy(IDecl o) {
     if (hasSameAttributesAsSloppy(o)) {
-      final List<IDecl> l1 = getParameters();
-      final List<IDecl> l2 = o.getParameters();
+      final List<IDeclParameter> l1 = getParameters();
+      final List<IDeclParameter> l2 = o.getParameters();
       if (l1.isEmpty() && l2.isEmpty())
         return true;
       if (l1.size() != l2.size())
@@ -1321,13 +1321,13 @@ public abstract class Decl implements IDecl {
     /*
      * Parameters
      */
-    for (IDecl p : getParameters()) {
+    for (IDeclParameter p : getParameters()) {
       result = prime * result + ((p == null) ? 0 : p.simpleDeclarationHashCode());
     }
     /*
      * Type parameters
      */
-    for (IDecl p : getTypeParameters()) {
+    for (IDeclTypeParameter p : getTypeParameters()) {
       result = prime * result + ((p == null) ? 0 : p.simpleDeclarationHashCode());
     }
 
@@ -1370,7 +1370,7 @@ public abstract class Decl implements IDecl {
    * @return {@code true} if the two lists contain the same simple declarations,
    *         {@code false} otherwise.
    */
-  private boolean checkListOfIDeclsAreTheSame(@NonNull List<IDecl> l1, @NonNull List<IDecl> l2) {
+  private <T extends IDecl> boolean checkListOfIDeclsAreTheSame(@NonNull List<T> l1, @NonNull List<T> l2) {
     if (l1.isEmpty() && l2.isEmpty())
       return true;
     if (l1.size() != l2.size())
@@ -1473,19 +1473,19 @@ public abstract class Decl implements IDecl {
       case CLASS:
       case ENUM:
       case INTERFACE:
-        final LinkedList<IDecl> types = new LinkedList<IDecl>();
-        types.add(next);
-        while (!nodes.isEmpty() && IDecl.IS_TYPE.contains(nodes.peek().getKind())) {
+        final LinkedList<IDeclType> types = new LinkedList<IDeclType>();
+        types.add((IDeclType) next);
+        while (!nodes.isEmpty() && nodes.peek() instanceof IDeclType) {
           if (fromRootToThis)
-            types.addLast(nodes.pop());
+            types.addLast((IDeclType) nodes.pop());
           else
-            types.addFirst(nodes.pop());
+            types.addFirst((IDeclType) nodes.pop());
         }
-        if (visitor.visitTypes(new ArrayList<IDecl>(types))) {
+        if (visitor.visitTypes(new ArrayList<IDeclType>(types))) {
           for (IDecl type : types)
             acceptHelperForNode(type, visitor, true);
         }
-        visitor.endVisitTypes(new ArrayList<IDecl>(types));
+        visitor.endVisitTypes(new ArrayList<IDeclType>(types));
         break;
       case CONSTRUCTOR:
       case METHOD:
@@ -1504,46 +1504,46 @@ public abstract class Decl implements IDecl {
     visitor.preVisit(node);
     switch (node.getKind()) {
     case CONSTRUCTOR:
-      if (visitor.visitConstructor(node)) {
+      if (visitor.visitConstructor((IDeclFunction) node)) {
         acceptHelperForParameters(node, visitor);
       }
-      visitor.endVisitConstructor(node);
+      visitor.endVisitConstructor((IDeclFunction) node);
       break;
     case CLASS:
-      if (visitor.visitClass(node)) {
+      if (visitor.visitClass((IDeclType) node)) {
         acceptHelperForParameters(node, visitor);
       }
-      visitor.endVisitClass(node);
+      visitor.endVisitClass((IDeclType) node);
       break;
     case ENUM:
-      visitor.visitEnum(node);
+      visitor.visitEnum((IDeclType) node);
       break;
     case FIELD:
-      visitor.visitField(node);
+      visitor.visitField((IDeclField) node);
       break;
     case INITIALIZER:
       visitor.visitInitializer(node);
       break;
     case INTERFACE:
-      if (visitor.visitInterface(node)) {
+      if (visitor.visitInterface((IDeclType) node)) {
         acceptHelperForParameters(node, visitor);
       }
-      visitor.endVisitInterface(node);
+      visitor.endVisitInterface((IDeclType) node);
       break;
     case METHOD:
-      if (visitor.visitMethod(node)) {
+      if (visitor.visitMethod((IDeclFunction) node)) {
         acceptHelperForParameters(node, visitor);
       }
-      visitor.endVisitMethod(node);
+      visitor.endVisitMethod((IDeclFunction) node);
       break;
     case PACKAGE:
-      visitor.visitPackage(node);
+      visitor.visitPackage((IDeclPackage) node);
       break;
     case PARAMETER:
-      visitor.visitParameter(node, partOfDeclIfParam);
+      visitor.visitParameter((IDeclParameter) node, partOfDeclIfParam);
       break;
     case TYPE_PARAMETER:
-      visitor.visitTypeParameter(node, partOfDeclIfParam);
+      visitor.visitTypeParameter((IDeclTypeParameter) node, partOfDeclIfParam);
       break;
     }
     visitor.postVisit(node);
@@ -1551,22 +1551,22 @@ public abstract class Decl implements IDecl {
 
   private void acceptHelperForParameters(@NonNull final IDecl node, @NonNull final DeclVisitor visitor) {
     if (IDecl.HAS_TYPE_PARAMETERS.contains(node.getKind())) {
-      final List<IDecl> typePparameters = node.getTypeParameters();
-      if (visitor.visitTypeParameters(new ArrayList<IDecl>(typePparameters))) {
-        for (IDecl p : typePparameters) {
+      final List<IDeclTypeParameter> typePparameters = node.getTypeParameters();
+      if (visitor.visitTypeParameters(new ArrayList<IDeclTypeParameter>(typePparameters))) {
+        for (IDeclTypeParameter p : typePparameters) {
           acceptHelperForNode(p, visitor, false);
         }
       }
-      visitor.endVisitTypeParameters(new ArrayList<IDecl>(typePparameters));
+      visitor.endVisitTypeParameters(new ArrayList<IDeclTypeParameter>(typePparameters));
     }
     if (IDecl.HAS_PARAMETERS.contains(node.getKind())) {
-      final List<IDecl> parameters = node.getParameters();
-      if (visitor.visitParameters(new ArrayList<IDecl>(parameters))) {
+      final List<IDeclParameter> parameters = node.getParameters();
+      if (visitor.visitParameters(new ArrayList<IDeclParameter>(parameters))) {
         for (IDecl p : parameters) {
           acceptHelperForNode(p, visitor, false);
         }
       }
-      visitor.endVisitParameters(new ArrayList<IDecl>(parameters));
+      visitor.endVisitParameters(new ArrayList<IDeclParameter>(parameters));
     }
   }
 
@@ -1588,13 +1588,13 @@ public abstract class Decl implements IDecl {
   abstract String toStringHelper();
 
   protected static String toStringHelperTypeParameters(IDecl decl) {
-    List<IDecl> params = decl.getTypeParameters();
+    List<IDeclTypeParameter> params = decl.getTypeParameters();
     if (params.isEmpty())
       return "";
 
     final StringBuilder b = new StringBuilder("<");
     boolean first = true;
-    for (IDecl param : params) {
+    for (IDeclTypeParameter param : params) {
       if (first)
         first = false;
       else
@@ -1606,10 +1606,10 @@ public abstract class Decl implements IDecl {
   }
 
   protected static String toStringHelperParameters(IDecl decl) {
-    List<IDecl> params = decl.getParameters();
+    List<IDeclParameter> params = decl.getParameters();
     final StringBuilder b = new StringBuilder("(");
     boolean first = true;
-    for (IDecl param : params) {
+    for (IDeclParameter param : params) {
       if (first)
         first = false;
       else

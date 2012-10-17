@@ -191,7 +191,7 @@ public interface IDecl {
    * @see #HAS_PARAMETERS
    */
   @NonNull
-  List<IDecl> getParameters();
+  List<IDeclParameter> getParameters();
 
   /**
    * Gets the zero-based position number of a parameter declaration&mdash;this
@@ -214,7 +214,7 @@ public interface IDecl {
    * @see #HAS_TYPE_PARAMETERS
    */
   @NonNull
-  List<IDecl> getTypeParameters();
+  List<IDeclTypeParameter> getTypeParameters();
 
   /**
    * Gets the bounds for {@link Kind#TYPE_PARAMETER}. If this is meaningless for
