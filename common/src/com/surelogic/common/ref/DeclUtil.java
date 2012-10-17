@@ -321,9 +321,6 @@ public final class DeclUtil {
    * packages and nested types are separated by a <tt>"."</tt>. If the
    * declaration is just a package then just the package name is returned.
    * <p>
-   * <i>Implementation Note:</i> This method uses
-   * {@link #getTypeNotInControlFlow(IDecl)} to get the enclosing type.
-   * <p>
    * Examples: <tt>java.lang.Object</tt>, <tt>java.util.Map.Entry</tt>,
    * <tt>java.util.concurrent.locks.ReentrantReadWriteLock.ReadLock</tt>,
    * <tt>ClassInDefaultPkg</tt>
@@ -352,15 +349,48 @@ public final class DeclUtil {
   }
 
   /**
+   * Gets the fully qualified Java type name of the passed declaration&mdash;but
+   * only includes the outermost enclosing type (no nested types). Both packages
+   * and nested types are separated by a <tt>"."</tt>. If the declaration is
+   * just a package then just the package name is returned.
+   * <p>
+   * Examples: <tt>java.lang.Object</tt>, <tt>java.util.Map</tt>,
+   * <tt>java.util.concurrent.locks.ReentrantReadWriteLock</tt>,
+   * <tt>ClassInDefaultPkg</tt>
+   * 
+   * @param decl
+   *          any declaration.
+   * @return the fully qualified Java type name that the passed declaration
+   *         refers to.
+   * @throws IllegalArgumentException
+   *           if <tt>decl</tt> is null.
+   */
+  @NonNull
+  public static String getTypeNameFullyQualifiedOutermostTypeNameOnly(@NonNull final IDecl decl) {
+    final StringBuilder b = new StringBuilder();
+    final String pkgName = getPackageNameOrNull(decl);
+    if (pkgName != null) {
+      b.append(pkgName);
+    }
+    IDecl outerType = getLastAncestorIn(IDecl.IS_TYPE, decl);
+    if (outerType != null) {
+      final String typeName = outerType.getName();
+      if (typeName != null) {
+        if (pkgName != null)
+          b.append('.'); // dot only if not in the default package
+        b.append(typeName);
+      }
+    }
+    return b.toString();
+  }
+
+  /**
    * Gets the fully qualified Java type name of the passed declaration in a
    * particular SureLogic format. Nested package names are separated by
    * <tt>"."</tt>, the package name is separated from the type name by a "/",
    * and nested type names are separated by <tt>"."</tt>. The "/" must always
    * appear&mdash;even if the type is in the default package or just a package
    * name is being returned.
-   * <p>
-   * <i>Implementation Note:</i> This method uses
-   * {@link #getTypeNotInControlFlow(IDecl)} to get the enclosing type.
    * <p>
    * Examples: <tt>java.lang/Object</tt>, <tt>java.util/Map.Entry</tt>,
    * <tt>java.util.concurrent.locks/ReentrantReadWriteLock.ReadLock</tt>,
@@ -782,11 +812,19 @@ public final class DeclUtil {
     return true;
   }
 
-  public static String getSignature(IDeclFunction func) {
+  public static String getSignature(IDeclFunction func, boolean useTypeForConstructor) {
 	  if (func == null) {
 		  throw new IllegalArgumentException(I18N.err(44, "decl"));
 	  }
-	  final StringBuilder sb = new StringBuilder(func.getName());
+	  String name = func.getName();
+	  if (name == null) {
+		  if (useTypeForConstructor) {
+			  name = func.getParent().getName();
+		  } else {
+			  name = "new";
+		  }
+	  }
+	  final StringBuilder sb = new StringBuilder(name);
 	  sb.append('(');
 	  boolean first = true;
 	  for(IDeclParameter p : func.getParameters()) {
