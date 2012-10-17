@@ -93,7 +93,6 @@ public class JavaRef implements IJavaRef {
     private String f_absolutePath;
     private IDecl f_declaration;
     private String f_eclipseProjectName;
-    private String f_enclosingJavaId;
     private String f_jarRelativePath;
     private String f_javaId;
     private int f_length = -1;
@@ -115,7 +114,6 @@ public class JavaRef implements IJavaRef {
       f_absolutePath = copy.getAbsolutePathOrNull();
       f_declaration = copy.getDeclaration();
       f_eclipseProjectName = copy.getEclipseProjectNameOrNull();
-      f_enclosingJavaId = copy.getEnclosingJavaId();
       f_jarRelativePath = copy.getJarRelativePathOrNull();
       f_javaId = copy.getJavaId();
       f_length = copy.getLength();
@@ -170,19 +168,6 @@ public class JavaRef implements IJavaRef {
      */
     public Builder setEclipseProjectName(String value) {
       f_eclipseProjectName = value;
-      return this;
-    }
-
-    /**
-     * Sets a declaration path used by viewers.
-     * 
-     * @param value
-     *          a declaration path used by viewers.
-     * @return this builder.
-     */
-    @Deprecated
-    public Builder setEnclosingJavaId(String value) {
-      f_enclosingJavaId = value;
       return this;
     }
 
@@ -285,7 +270,7 @@ public class JavaRef implements IJavaRef {
       if (f_declaration == null)
         throw new IllegalArgumentException(I18N.err(44, "declaration"));
       return new JavaRef(f_within, f_declaration, f_positionRelativeToDeclaration, f_eclipseProjectName, f_lineNumber, f_offset,
-          f_length, f_absolutePath, f_jarRelativePath, f_javaId, f_enclosingJavaId);
+          f_length, f_absolutePath, f_jarRelativePath, f_javaId);
     }
 
     /**
@@ -310,8 +295,6 @@ public class JavaRef implements IJavaRef {
   @Nullable
   private final String f_eclipseProjectName;
   @Nullable
-  private final String f_enclosingJavaId;
-  @Nullable
   private final String f_jarRelativePath;
   @Nullable
   private final String f_javaId;
@@ -335,7 +318,7 @@ public class JavaRef implements IJavaRef {
   protected JavaRef(final @NonNull Within within, final @NonNull IDecl declaration,
       @NonNull Position positionRelativeToDeclaration, @Nullable final String eclipseProjectNameOrNull, final int lineNumber,
       final int offset, final int length, final @Nullable String absolutePathOrNull, final @Nullable String jarRelativePathOrNull,
-      final @Nullable String javaIdOrNull, final @Nullable String enclosingJavaIdOrNull) {
+      final @Nullable String javaIdOrNull) {
     f_within = within;
     f_declaration = declaration;
     f_positionRelativeToDeclaration = positionRelativeToDeclaration;
@@ -346,7 +329,6 @@ public class JavaRef implements IJavaRef {
     f_absolutePath = absolutePathOrNull;
     f_jarRelativePath = jarRelativePathOrNull;
     f_javaId = javaIdOrNull;
-    f_enclosingJavaId = enclosingJavaIdOrNull;
   }
 
   @Nullable
@@ -372,11 +354,6 @@ public class JavaRef implements IJavaRef {
   @Nullable
   public final String getEclipseProjectNameOrNull() {
     return f_eclipseProjectName;
-  }
-
-  @Nullable
-  public final String getEnclosingJavaId() {
-    return f_enclosingJavaId;
   }
 
   public final Long getHash() {

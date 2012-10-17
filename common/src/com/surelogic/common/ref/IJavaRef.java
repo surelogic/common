@@ -156,10 +156,6 @@ public interface IJavaRef {
   @Nullable
   String getEclipseProjectNameOrNull();
 
-  @Deprecated
-  @Nullable
-  String getEnclosingJavaId();
-
   @NonNull
   Long getHash();
 

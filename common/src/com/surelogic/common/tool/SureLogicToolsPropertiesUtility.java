@@ -19,7 +19,6 @@ import com.surelogic.common.logging.SLLogger;
  */
 @Utility
 public class SureLogicToolsPropertiesUtility {
-  private static final long serialVersionUID = 1L;
 
   public static final String PROPS_FILE = "surelogic-tools.properties";
 
@@ -38,7 +37,6 @@ public class SureLogicToolsPropertiesUtility {
   @Nullable
   public static Properties readFileOrNull(File properties) {
     if (properties.exists() && properties.isFile()) {
-      System.out.println("FOUND " + properties.getAbsolutePath());
       final Properties props = new Properties();
       try {
         InputStream is = new FileInputStream(properties);
@@ -49,7 +47,6 @@ public class SureLogicToolsPropertiesUtility {
       }
       return props;
     } else {
-      System.out.println("NOT FOUND " + properties.getAbsolutePath());
       return null;
     }
   }
@@ -121,7 +118,37 @@ public class SureLogicToolsPropertiesUtility {
         if (packageName == null)
           packageName = "";
 
-        System.out.println("matches(" + absoluteOrRelativePath + " | " + packageName);
+        /*
+         * Are they both null/blank? no match
+         */
+        if ("".equals(absoluteOrRelativePath) && "".equals(packageName))
+          return false;
+
+        /*
+         * Filter by package name pattern
+         */
+        for (Pattern p : packagePatterns) {
+          if (p.matcher(packageName).matches()) {
+            return true;
+          }
+        }
+
+        /*
+         * Filter by source folder.
+         * 
+         * We do this heuristically by generating a sub path that we match in
+         * the full path using the source folder and the package name.
+         * 
+         * We fix up the strings if they are using DOS/Windows pathnames.
+         */
+        final String pathToCheck = absoluteOrRelativePath.replace('\\', '/');
+        final String pkgPath = packageName.equals(SLUtility.JAVA_DEFAULT_PACKAGE) ? "" : packageName.replace('.', '/');
+        for (String srcFolderFrag : exSourceFolders) {
+          String frag = srcFolderFrag.replace('\\', '/');
+          frag = frag.endsWith("/") ? frag + pkgPath : frag + "/" + pkgPath;
+          if (pathToCheck.contains(frag))
+            return true;
+        }
         return false;
       }
     };
