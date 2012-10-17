@@ -1483,7 +1483,7 @@ public abstract class Decl implements IDecl {
         }
         if (visitor.visitTypes(new ArrayList<IDecl>(types))) {
           for (IDecl type : types)
-            acceptHelperForNode(type, visitor);
+            acceptHelperForNode(type, visitor, true);
         }
         visitor.endVisitTypes(new ArrayList<IDecl>(types));
         break;
@@ -1494,13 +1494,13 @@ public abstract class Decl implements IDecl {
       case PACKAGE:
       case PARAMETER:
       case TYPE_PARAMETER:
-        acceptHelperForNode(next, visitor);
+        acceptHelperForNode(next, visitor, true);
         break;
       }
     }
   }
 
-  private void acceptHelperForNode(@NonNull final IDecl node, @NonNull final DeclVisitor visitor) {
+  private void acceptHelperForNode(@NonNull final IDecl node, @NonNull final DeclVisitor visitor, boolean partOfDeclIfParam) {
     visitor.preVisit(node);
     switch (node.getKind()) {
     case CONSTRUCTOR:
@@ -1540,10 +1540,10 @@ public abstract class Decl implements IDecl {
       visitor.visitPackage(node);
       break;
     case PARAMETER:
-      visitor.visitParameter(node);
+      visitor.visitParameter(node, partOfDeclIfParam);
       break;
     case TYPE_PARAMETER:
-      visitor.visitTypeParameter(node);
+      visitor.visitTypeParameter(node, partOfDeclIfParam);
       break;
     }
     visitor.postVisit(node);
@@ -1554,7 +1554,7 @@ public abstract class Decl implements IDecl {
       final List<IDecl> typePparameters = node.getTypeParameters();
       if (visitor.visitTypeParameters(new ArrayList<IDecl>(typePparameters))) {
         for (IDecl p : typePparameters) {
-          acceptHelperForNode(p, visitor);
+          acceptHelperForNode(p, visitor, false);
         }
       }
       visitor.endVisitTypeParameters(new ArrayList<IDecl>(typePparameters));
@@ -1563,7 +1563,7 @@ public abstract class Decl implements IDecl {
       final List<IDecl> parameters = node.getParameters();
       if (visitor.visitParameters(new ArrayList<IDecl>(parameters))) {
         for (IDecl p : parameters) {
-          acceptHelperForNode(p, visitor);
+          acceptHelperForNode(p, visitor, false);
         }
       }
       visitor.endVisitParameters(new ArrayList<IDecl>(parameters));

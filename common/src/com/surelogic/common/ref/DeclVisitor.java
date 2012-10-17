@@ -199,8 +199,13 @@ public abstract class DeclVisitor {
    * @param node
    *          the node to visit where <tt>node.getKind() ==
    *          {@link IDecl.Kind#PARAMETER}</tt>.
+   * @param partOfDecl
+   *          {@code true} if this call is being made because this parameter is
+   *          part of the declaration being visited, {@code false} if this call
+   *          is being made because the parameter is part of a parameter list
+   *          for a method or constructor.
    */
-  public void visitParameter(IDecl node) {
+  public void visitParameter(IDecl node, boolean partOfDecl) {
     // by default do nothing
   }
 
@@ -227,9 +232,14 @@ public abstract class DeclVisitor {
    * 
    * @param node
    *          the node to visit where <tt>node.getKind() ==
-   *          {@link IDecl.Kind#TYPE_PARAMETER}</tt> .
+   *          {@link IDecl.Kind#TYPE_PARAMETER}</tt>.
+   * @param partOfDecl
+   *          {@code true} if this call is being made because this type
+   *          parameter is part of the declaration being visited, {@code false}
+   *          if this call is being made because the parameter is part of a type
+   *          parameter list for a class, interface, method, or constructor.
    */
-  public void visitTypeParameter(IDecl node) {
+  public void visitTypeParameter(IDecl node, boolean partOfDecl) {
     // by default do nothing
   }
 
