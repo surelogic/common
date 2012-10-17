@@ -80,17 +80,4 @@ public class ToolProperties extends Properties {
     }
     return excludePatterns;
   }
-
-  public static String[] convertPkgsToRelativePaths(String[] pkgs) {
-    if (pkgs == null || pkgs.length == 0) {
-      return SLUtility.EMPTY_STRING_ARRAY;
-    }
-    final String[] paths = new String[pkgs.length];
-    int i = 0;
-    for (String p : pkgs) {
-      paths[i] = p.replace('.', '/').replaceAll("\\*", "**"); // +"/*.java";
-      i++;
-    }
-    return paths;
-  }
 }
