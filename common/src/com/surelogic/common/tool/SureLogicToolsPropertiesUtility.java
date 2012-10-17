@@ -18,7 +18,7 @@ import com.surelogic.common.logging.SLLogger;
  * Properties shared among the various SureLogic tools.
  */
 @Utility
-public class ToolProperties {
+public class SureLogicToolsPropertiesUtility {
   private static final long serialVersionUID = 1L;
 
   public static final String PROPS_FILE = "surelogic-tools.properties";

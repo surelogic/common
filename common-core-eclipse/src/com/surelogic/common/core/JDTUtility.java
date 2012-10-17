@@ -52,7 +52,7 @@ import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.logging.SLLogger;
 import com.surelogic.common.ref.IDecl;
 import com.surelogic.common.ref.IJavaRef;
-import com.surelogic.common.tool.ToolProperties;
+import com.surelogic.common.tool.SureLogicToolsPropertiesUtility;
 
 /**
  * A collection of useful JDT spells.
@@ -1209,7 +1209,7 @@ public final class JDTUtility {
       i++;
     }
 
-    final Pattern[] excludePatterns = ToolProperties.makePackageMatchers(excludedPkgs);
+    final Pattern[] excludePatterns = SureLogicToolsPropertiesUtility.makePackageMatchers(excludedPkgs);
     return new CompUnitFilter() {
       public boolean matches(ICompilationUnit icu) throws JavaModelException {
         for (IPackageDeclaration pd : icu.getPackageDeclarations()) {
