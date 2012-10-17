@@ -1,7 +1,6 @@
 package com.surelogic.common.ui.refactor;
 
 import java.util.*;
-import java.util.logging.Level;
 
 import org.apache.commons.collections15.*;
 import org.apache.commons.collections15.multimap.MultiHashMap;
@@ -48,6 +47,7 @@ import com.surelogic.common.logging.SLLogger;
 import com.surelogic.common.ref.*;
 import com.surelogic.common.ref.IDecl.Kind;
 import com.surelogic.common.refactor.AnnotationDescription;
+import com.surelogic.common.refactor.ScopedPromiseUtil;
 
 public class PromisesAnnotationRewriter {
 
@@ -477,9 +477,7 @@ public class PromisesAnnotationRewriter {
 			for (final AnnotationDescription desc : newAnnotations) {
 				addImport(ASSUME, imports);
 				existing.add(String
-						.format("%s for %s in %s", desc.toString(), desc
-								.getTarget().forSyntax(), desc.getCU()
-								.getPackage()));
+						.format("%s for %s", desc.toString(), ScopedPromiseUtil.getForSyntax(desc.getTarget())));
 			}
 			final List<String> sortedAnns = new ArrayList<String>(existing);
 			Collections.sort(sortedAnns);
