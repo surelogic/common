@@ -1475,7 +1475,7 @@ public abstract class Decl implements IDecl {
       case INTERFACE:
         final LinkedList<IDecl> types = new LinkedList<IDecl>();
         types.add(next);
-        while (IDecl.IS_TYPE.contains(nodes.peek().getKind())) {
+        while (!nodes.isEmpty() && IDecl.IS_TYPE.contains(nodes.peek().getKind())) {
           if (fromRootToThis)
             types.addLast(nodes.pop());
           else
