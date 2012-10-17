@@ -38,7 +38,6 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaModel;
 import org.eclipse.jdt.core.IJavaModelMarker;
 import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.IPackageDeclaration;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IParent;
@@ -52,7 +51,6 @@ import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.logging.SLLogger;
 import com.surelogic.common.ref.IDecl;
 import com.surelogic.common.ref.IJavaRef;
-import com.surelogic.common.tool.SureLogicToolsPropertiesUtility;
 
 /**
  * A collection of useful JDT spells.
@@ -1191,45 +1189,6 @@ public final class JDTUtility {
         System.out.println("Ignoring: " + res);
       }
     }
-  }
-
-  public interface CompUnitFilter {
-    boolean matches(ICompilationUnit icu) throws JavaModelException;
-  }
-
-  public static CompUnitFilter getFilter(IProject p, String[] excludedPaths, String[] excludedPkgs) {
-    final Set<String> unique = new HashSet<String>();
-    for (String path : excludedPaths) {
-      unique.add(path);
-    }
-    final IPath[] excludePaths = new IPath[unique.size()];
-    int i = 0;
-    for (String path : unique) {
-      excludePaths[i] = p.getFullPath().append(path);
-      i++;
-    }
-
-    final Pattern[] excludePatterns = SureLogicToolsPropertiesUtility.makePackageMatchers(excludedPkgs);
-    return new CompUnitFilter() {
-      public boolean matches(ICompilationUnit icu) throws JavaModelException {
-        for (IPackageDeclaration pd : icu.getPackageDeclarations()) {
-          final String pkg = pd.getElementName();
-          for (Pattern p : excludePatterns) {
-            if (p.matcher(pkg).matches()) {
-              System.out.println("Excluding: " + icu.getHandleIdentifier());
-              return true;
-            }
-          }
-        }
-        for (IPath p : excludePaths) {
-          if (p.isPrefixOf(icu.getPath())) {
-            System.out.println("Excluding due to " + p + ": " + icu.getHandleIdentifier());
-            return true;
-          }
-        }
-        return false;
-      }
-    };
   }
 
   /**
