@@ -3,10 +3,6 @@ package com.surelogic.common.ui.refactor;
 import org.eclipse.jdt.core.dom.*;
 
 import com.surelogic.common.ref.*;
-import com.surelogic.common.ref.Decl.ClassBuilder;
-import com.surelogic.common.ref.Decl.DeclBuilder;
-import com.surelogic.common.ref.Decl.InterfaceBuilder;
-import com.surelogic.common.ref.Decl.ParameterBuilder;
 import com.surelogic.common.ref.Decl.*;
 
 /**
@@ -24,18 +20,21 @@ public class EastDeclFactory {
 	}
 	
 	public static IDeclField createDeclField(VariableDeclarationFragment frag) {
-		return (IDeclField) makeBuilder(frag);
+		return (IDeclField) makeBuilder(frag).build();
 	}
 
 	public static IDeclParameter createDeclParameter(SingleVariableDeclaration p, int i) {
-		return (IDeclParameter) makeBuilder(p);
+		return (IDeclParameter) makeBuilder(p).build();
 	}
 
 	public static IDeclFunction createDeclFunction(MethodDeclaration node) {
-		return (IDeclFunction) makeBuilder(node);
+		return (IDeclFunction) makeBuilder(node).build();
 	}	
 	
 	private static DeclBuilder makeBuilder(ASTNode n) {
+		if (n == null) {
+			return null;
+		}
 		DeclBuilder parent = makeBuilder(n.getParent());
 		DeclBuilder me;
 		int position = 0;
@@ -90,6 +89,11 @@ public class EastDeclFactory {
 			return parent;
 		}
 		if (parent != null) {
+			me.setParent(parent);
+		} else if (n instanceof AbstractTypeDeclaration) { 
+			// me with no parent
+			CompilationUnit cu = (CompilationUnit) n.getParent();
+			parent = makePackageBuilder(cu.getPackage());
 			me.setParent(parent);
 		}
 		return me;
