@@ -781,4 +781,23 @@ public final class DeclUtil {
     }
     return true;
   }
+
+  public static String getSignature(IDeclFunction func) {
+	  if (func == null) {
+		  throw new IllegalArgumentException(I18N.err(44, "decl"));
+	  }
+	  final StringBuilder sb = new StringBuilder(func.getName());
+	  sb.append('(');
+	  boolean first = true;
+	  for(IDeclParameter p : func.getParameters()) {
+		  if (first) {
+			  first = false;
+		  } else {
+			  sb.append(", ");
+		  }
+		  sb.append(p.getTypeOf().getCompact());
+	  }
+	  sb.append(')');
+	  return sb.toString();
+  }
 }
