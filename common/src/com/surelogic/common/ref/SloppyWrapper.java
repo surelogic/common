@@ -70,10 +70,15 @@ public final class SloppyWrapper<T extends IDecl> {
    * @return {@code true} if the specified object is sloppily equal to this
    *         declaration.
    */
+  @SuppressWarnings("unchecked")
   @Override
   public boolean equals(Object obj) {
-    if (obj instanceof IDecl)
+	if (obj instanceof SloppyWrapper) {
+	  return f_decl.isSameDeclarationAsSloppy(((SloppyWrapper) obj).getDecl());
+	}
+	else if (obj instanceof IDecl) {
       return f_decl.isSameDeclarationAsSloppy((IDecl) obj);
+    }
     else
       return false;
   }
