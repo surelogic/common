@@ -152,10 +152,14 @@ public class PromisesAnnotationRewriter {
 			this.imports = new HashSet<String>();
 		}
 		
+		private List<AnnotationDescription> findTargets(IDecl decl) {
+			SloppyWrapper<IDecl> key = SloppyWrapper.getInstance(decl);
+			return targetMap.get(key);
+		}
+		
 		private void checkForDeclsToCreate(AbstractTypeDeclaration node) {
 			IDeclType type = EastDeclFactory.createDeclType(node);
-			rewriteNode(node, TypeDeclaration.MODIFIERS2_PROPERTY, targetMap
-					.remove(type), type);
+			rewriteNode(node, TypeDeclaration.MODIFIERS2_PROPERTY, findTargets(type), type);
 			checkForDeclsToCreate(node, type);
 		}
 		
@@ -189,11 +193,11 @@ public class PromisesAnnotationRewriter {
 					toAdd.add(md);
 					
 					// Add annotations to the newly created method
-					List<AnnotationDescription> annos = targetMap.remove(decl);
+					List<AnnotationDescription> annos = findTargets(decl);
 					rewriteNode(md, md.getModifiersProperty(), annos, decl);
 				} else {	
 					// Convert annos on the implicit method into a scoped promise on the enclosing type
-					final List<AnnotationDescription> annos = targetMap.remove(decl);					
+					final List<AnnotationDescription> annos = findTargets(decl);					
 					for(AnnotationDescription a : annos) {
 						final String contents = computeScopedPromiseContents(a, m);
 						AnnotationDescription a2 = new AnnotationDescription("Promise", contents, decl);
@@ -263,8 +267,7 @@ public class PromisesAnnotationRewriter {
 			}
 			IDeclFunction inMethod = EastDeclFactory.createDeclFunction(node);
 			//System.out.println("Looking at "+inMethod);
-			rewriteNode(node, MethodDeclaration.MODIFIERS2_PROPERTY, targetMap
-					.remove(inMethod), inMethod);
+			rewriteNode(node, MethodDeclaration.MODIFIERS2_PROPERTY, findTargets(inMethod), inMethod);
 			
 			handleParameters(node);
 			return true;
@@ -276,7 +279,7 @@ public class PromisesAnnotationRewriter {
 				SingleVariableDeclaration p = (SingleVariableDeclaration) o;
 				IDeclParameter inParameter = EastDeclFactory.createDeclParameter(p, i);				
 				rewriteNode(p, SingleVariableDeclaration.MODIFIERS2_PROPERTY,
-						targetMap.remove(inParameter), inParameter);
+						findTargets(inParameter), inParameter);
 				i++;
 			}
 		}
@@ -292,7 +295,7 @@ public class PromisesAnnotationRewriter {
 				final ChildListPropertyDescriptor prop,
 				final List<AnnotationDescription> list,
 				final IDecl target) {
-			if (list != null) {
+			if (list != null && !list.isEmpty()) {
 				Collections.sort(list);
 				Collections.reverse(list);
 				final List<List<AnnotationDescription>> anns = new ArrayList<List<AnnotationDescription>>();
@@ -355,7 +358,7 @@ public class PromisesAnnotationRewriter {
 			IDeclField f = null;
 			for (final VariableDeclarationFragment frag : fragments) {
 				f = EastDeclFactory.createDeclField(frag);
-				final List<AnnotationDescription> list2 = targetMap.remove(f);
+				final List<AnnotationDescription> list2 = findTargets(f);
 				if (list2 != null) {
 					list.addAll(list2);
 				}
