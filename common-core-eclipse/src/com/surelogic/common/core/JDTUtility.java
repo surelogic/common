@@ -1197,9 +1197,9 @@ public final class JDTUtility {
     boolean matches(ICompilationUnit icu) throws JavaModelException;
   }
 
-  public static CompUnitFilter getFilter(IProject p, String[] paths, String[] pkgs) {
+  public static CompUnitFilter getFilter(IProject p, String[] excludedPaths, String[] excludedPkgs) {
     final Set<String> unique = new HashSet<String>();
-    for (String path : paths) {
+    for (String path : excludedPaths) {
       unique.add(path);
     }
     final IPath[] excludePaths = new IPath[unique.size()];
@@ -1209,19 +1209,11 @@ public final class JDTUtility {
       i++;
     }
 
-    /*
-     * for(String pkg : pkgs) { if (pkg.contains("rendering")) {
-     * System.out.println("Got package pattern: "+pkg); } }
-     */
-    final Pattern[] excludePatterns = ToolProperties.makePackageMatchers(pkgs);
+    final Pattern[] excludePatterns = ToolProperties.makePackageMatchers(excludedPkgs);
     return new CompUnitFilter() {
       public boolean matches(ICompilationUnit icu) throws JavaModelException {
         for (IPackageDeclaration pd : icu.getPackageDeclarations()) {
           final String pkg = pd.getElementName();
-          /*
-           * if (pkg.contains("rendering")) {
-           * System.out.println("Got package: "+pkg); }
-           */
           for (Pattern p : excludePatterns) {
             if (p.matcher(pkg).matches()) {
               System.out.println("Excluding: " + icu.getHandleIdentifier());
