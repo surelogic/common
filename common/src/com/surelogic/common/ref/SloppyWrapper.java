@@ -60,18 +60,12 @@ public final class SloppyWrapper<T extends IDecl> {
    * Compares the specified object with this declaration for equality.
    * <p>
    * This method uses the exact same comparison as
-   * {@link #isSameDeclarationAsSloppy(IDecl)}. In fact, the implementation of
-   * this method is
-   * 
-   * <pre>
-   * if (obj instanceof IDecl)
-   *   return isSameDeclarationAsSloppy((IDecl) obj);
-   * else
-   *   return false;
-   * </pre>
+   * {@link #isSameDeclarationAsSloppy(IDecl)}.
    * 
    * @param o
-   *          object to be compared for equality with this declaration.
+   *          object to be compared for equality with this declaration. Should
+   *          be either an {@link SloppyWrapper} instance or an {@link IDecl}
+   *          instance&mdash;both are handled correctly.
    * @return {@code true} if the specified object is sloppily equal to this
    *         declaration.
    */
