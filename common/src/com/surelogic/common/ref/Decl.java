@@ -1345,7 +1345,7 @@ public abstract class Decl implements IDecl {
     /*
      * Parameters
      */
-    for (IDecl p : getParameters()) {
+    for (IDeclParameter p : getParameters()) {
       if (p != null) {
         final TypeRef t = p.getTypeOf();
         result = prime * result + ((t == null) ? 0 : t.getCompact().hashCode());
@@ -1562,7 +1562,7 @@ public abstract class Decl implements IDecl {
     if (IDecl.HAS_PARAMETERS.contains(node.getKind())) {
       final List<IDeclParameter> parameters = node.getParameters();
       if (visitor.visitParameters(new ArrayList<IDeclParameter>(parameters))) {
-        for (IDecl p : parameters) {
+        for (IDeclParameter p : parameters) {
           acceptHelperForNode(p, visitor, false);
         }
       }

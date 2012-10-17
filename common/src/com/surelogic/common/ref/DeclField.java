@@ -10,7 +10,7 @@ import com.surelogic.common.i18n.I18N;
 
 @Immutable
 @ValueObject
-public final class DeclField extends DeclVisibility implements IDeclField {
+final class DeclField extends DeclVisibility implements IDeclField {
 
   @NonNull
   final TypeRef f_typeOf;
