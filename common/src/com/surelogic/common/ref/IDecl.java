@@ -16,7 +16,12 @@ import com.surelogic.common.SLUtility;
  * children of a declaration.
  * <p>
  * Many helpful methods to pull information from a declaration are provided in
- * {@link DeclUtil}
+ * {@link DeclUtil}.
+ * <p>
+ * It is also possible to extend {@link DeclVisitor} and use either
+ * {@link #acceptRootToThis(DeclVisitor)} or
+ * {@link #acceptThisToRoot(DeclVisitor)} to perform useful traversals of a
+ * complex declaration.
  * <p>
  * Concrete instances are constructed using the following builders:
  * <ul>
@@ -391,6 +396,9 @@ public interface IDecl {
   /**
    * Accepts on this visitor from this declaration, through its parents, to the
    * root declaration.
+   * <p>
+   * Despite the fact that this proceeds from inner to outer, parameters and
+   * type parameters are visited in their position order.
    * 
    * @param visitor
    *          a visitor implementation.
