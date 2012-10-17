@@ -117,16 +117,16 @@ public class PromisesAnnotationRewriter {
 	}
 
 	private class AnnotationVisitor extends ASTVisitor {
-		private final Map<IDecl, List<AnnotationDescription>> targetMap;
-		private final MultiMap<IDeclType,IDecl> createMap;
+		private final Map<SloppyWrapper<IDecl>, List<AnnotationDescription>> targetMap;
+		private final MultiMap<SloppyWrapper<IDeclType>,IDecl> createMap;
 		private final TextEditGroup editGroup;
 		private final boolean isAssumption;
 		private final Set<String> imports;
 
 		public AnnotationVisitor(final Collection<AnnotationDescription> descs,
 				final TextEditGroup editGroup, final boolean isAssumption) {
-			targetMap = new HashMap<IDecl, List<AnnotationDescription>>();
-			createMap = new MultiHashMap<IDeclType, IDecl>();
+			targetMap = new HashMap<SloppyWrapper<IDecl>, List<AnnotationDescription>>();
+			createMap = new MultiHashMap<SloppyWrapper<IDeclType>, IDecl>();
 			
 			for (final AnnotationDescription desc : descs) {
 				final IDecl target = isAssumption ? desc.getAssumptionTarget()
@@ -134,16 +134,16 @@ public class PromisesAnnotationRewriter {
 				if (!isAssumption && target.isImplicit()) {				
 					// We need to create the declaration before adding the annotation
 					if (target.getKind() == Kind.CONSTRUCTOR) {					
-						createMap.put((IDeclType) target.getParent(), target);
+						createMap.put(SloppyWrapper.getInstance((IDeclType) target.getParent()), target);
 					} else {
 						SLLogger.getLogger().warning("Unexpected implicit decl: "+target);
 					}
 				} 
-				
-				List<AnnotationDescription> list = targetMap.get(target);
+				SloppyWrapper<IDecl> wrapper = SloppyWrapper.getInstance(target);
+				List<AnnotationDescription> list = targetMap.get(wrapper);
 				if (list == null) {
 					list = new ArrayList<AnnotationDescription>();
-					targetMap.put(target, list);
+					targetMap.put(wrapper, list);
 				}
 				list.add(desc);
 			}
