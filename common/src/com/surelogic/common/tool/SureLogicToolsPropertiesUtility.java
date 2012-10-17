@@ -96,6 +96,37 @@ public class SureLogicToolsPropertiesUtility {
     return getListProperty(props, SCAN_EXCLUDE_SOURCE_PACKAGE);
   }
 
+  private static final SureLogicToolsFilter f_null = new SureLogicToolsFilter() {
+    public boolean matches(@NonNull String absoluteOrRelativePath, @NonNull String packageName) {
+      return false;
+    }
+  };
+
+  public static SureLogicToolsFilter getFilterFor(String[] excludedSourceFolders, String[] excludedPackagePatterns) {
+    if (excludedSourceFolders == null)
+      excludedSourceFolders = SLUtility.EMPTY_STRING_ARRAY;
+    if (excludedPackagePatterns == null)
+      excludedPackagePatterns = SLUtility.EMPTY_STRING_ARRAY;
+    if (excludedSourceFolders.length == 0 && excludedPackagePatterns.length == 0)
+      return f_null;
+
+    final String[] exSourceFolders = excludedSourceFolders;
+    final Pattern[] packagePatterns = makePackageMatchers(excludedPackagePatterns);
+    return new SureLogicToolsFilter() {
+
+      @Override
+      public boolean matches(@NonNull String absoluteOrRelativePath, @NonNull String packageName) {
+        if (absoluteOrRelativePath == null)
+          absoluteOrRelativePath = "";
+        if (packageName == null)
+          packageName = "";
+
+        System.out.println("matches(" + absoluteOrRelativePath + " | " + packageName);
+        return false;
+      }
+    };
+  }
+
   public static Pattern[] makePackageMatchers(String[] patterns) {
     final Pattern[] excludePatterns = new Pattern[patterns.length];
     int i = 0;
