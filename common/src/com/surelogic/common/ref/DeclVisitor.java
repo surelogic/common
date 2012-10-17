@@ -12,6 +12,30 @@ import java.util.List;
 public abstract class DeclVisitor {
 
   /**
+   * Called at the start of a visit.
+   * <p>
+   * The default implementation does nothing. Subclasses may reimplement.
+   * 
+   * @param beingVisited
+   *          the actual declaration being visited.
+   */
+  public void start(IDecl beingVisited) {
+    // by default do nothing
+  }
+
+  /**
+   * Called at the end of a visit.
+   * <p>
+   * The default implementation does nothing. Subclasses may reimplement.
+   * 
+   * @param wasVisited
+   *          the actual declaration that was visited.
+   */
+  public void finish(IDecl wasVisited) {
+    // by default do nothing
+  }
+
+  /**
    * Visits the passed declaration prior to the type-specific visit.
    * <p>
    * The default implementation does nothing. Subclasses may reimplement.

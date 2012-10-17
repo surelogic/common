@@ -1452,7 +1452,9 @@ public abstract class Decl implements IDecl {
       addMe = (Decl) addMe.getParent();
     }
     // nodes has this, through ancestors, to root
+    visitor.start(this);
     acceptHelper(nodes, visitor, false);
+    visitor.finish(this);
   }
 
   public void acceptRootToThis(@NonNull DeclVisitor visitor) {
@@ -1463,7 +1465,9 @@ public abstract class Decl implements IDecl {
       pushMe = (Decl) pushMe.getParent();
     }
     // nodes has ancestors from root to this
+    visitor.start(this);
     acceptHelper(nodes, visitor, true);
+    visitor.finish(this);
   }
 
   private void acceptHelper(@NonNull final LinkedList<Decl> nodes, @NonNull final DeclVisitor visitor, boolean fromRootToThis) {
