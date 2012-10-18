@@ -1,8 +1,9 @@
 package com.surelogic.common.ref;
 
+import com.surelogic.Immutable;
 import com.surelogic.NonNull;
 import com.surelogic.Nullable;
-import com.surelogic.ThreadSafe;
+import com.surelogic.ValueObject;
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.ref.IDecl.Kind;
 import com.surelogic.common.ref.JavaRef.Builder;
@@ -19,7 +20,8 @@ import com.surelogic.common.ref.JavaRef.Builder;
  * {@link JavaRef#parseEncodedForPersistence(String)}) are supported, for
  * example, to persist to and restore from an XML attribute.
  */
-@ThreadSafe
+@Immutable
+@ValueObject
 public interface IJavaRef {
 
   /**
@@ -155,9 +157,6 @@ public interface IJavaRef {
    */
   @Nullable
   String getEclipseProjectNameOrNull();
-
-  @NonNull
-  long getHash();
 
   /**
    * Gets the path within the <tt>.jar</tt> file returned by
@@ -467,4 +466,20 @@ public interface IJavaRef {
    *         otherwise.
    */
   boolean isFromSource();
+
+  /**
+   * Compares the specified object with this reference for equality.
+   * 
+   * @param o
+   *          object to be compared for equality with this reference.
+   * @return {@code true} if the specified object is equal to this reference.
+   */
+  boolean equals(Object o);
+
+  /**
+   * Returns the hash code value for this reference.
+   * 
+   * @return the hash code value for this reference.
+   */
+  int hashCode();
 }

@@ -4,6 +4,7 @@ import com.surelogic.Immutable;
 import com.surelogic.NonNull;
 import com.surelogic.NotThreadSafe;
 import com.surelogic.Nullable;
+import com.surelogic.ValueObject;
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
 
@@ -13,6 +14,7 @@ import com.surelogic.common.i18n.I18N;
  * {@link Builder} and the type should be extended.
  */
 @Immutable
+@ValueObject
 public class JavaRef implements IJavaRef {
 
   /**
@@ -296,6 +298,7 @@ public class JavaRef implements IJavaRef {
   private final String f_eclipseProjectName;
   @Nullable
   private final String f_jarRelativePath;
+  // TODO REMOVE JAVAID THIS!!!
   @Nullable
   private final String f_javaId;
   /**
@@ -354,14 +357,6 @@ public class JavaRef implements IJavaRef {
   @Nullable
   public final String getEclipseProjectNameOrNull() {
     return f_eclipseProjectName;
-  }
-
-  public final long getHash() {
-    String encodedNames = getEclipseProjectName() + DeclUtil.getTypeNameFullyQualifiedSureLogic(f_declaration);
-    if (f_lineNumber != -1)
-      return encodedNames.hashCode() + f_lineNumber;
-    else
-      return encodedNames.hashCode();
   }
 
   @Nullable
@@ -446,18 +441,75 @@ public class JavaRef implements IJavaRef {
   }
 
   @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((f_absolutePath == null) ? 0 : f_absolutePath.hashCode());
+    result = prime * result + ((f_declaration == null) ? 0 : f_declaration.hashCode());
+    result = prime * result + ((f_eclipseProjectName == null) ? 0 : f_eclipseProjectName.hashCode());
+    result = prime * result + ((f_jarRelativePath == null) ? 0 : f_jarRelativePath.hashCode());
+    result = prime * result + f_length;
+    result = prime * result + f_lineNumber;
+    result = prime * result + f_offset;
+    result = prime * result + ((f_positionRelativeToDeclaration == null) ? 0 : f_positionRelativeToDeclaration.hashCode());
+    result = prime * result + ((f_within == null) ? 0 : f_within.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (obj == null)
+      return false;
+    if (!(obj instanceof JavaRef))
+      return false;
+    JavaRef other = (JavaRef) obj;
+    if (f_absolutePath == null) {
+      if (other.f_absolutePath != null)
+        return false;
+    } else if (!f_absolutePath.equals(other.f_absolutePath))
+      return false;
+    if (f_declaration == null) {
+      if (other.f_declaration != null)
+        return false;
+    } else if (!f_declaration.equals(other.f_declaration))
+      return false;
+    if (f_eclipseProjectName == null) {
+      if (other.f_eclipseProjectName != null)
+        return false;
+    } else if (!f_eclipseProjectName.equals(other.f_eclipseProjectName))
+      return false;
+    if (f_jarRelativePath == null) {
+      if (other.f_jarRelativePath != null)
+        return false;
+    } else if (!f_jarRelativePath.equals(other.f_jarRelativePath))
+      return false;
+    if (f_length != other.f_length)
+      return false;
+    if (f_lineNumber != other.f_lineNumber)
+      return false;
+    if (f_offset != other.f_offset)
+      return false;
+    if (f_positionRelativeToDeclaration != other.f_positionRelativeToDeclaration)
+      return false;
+    if (f_within != other.f_within)
+      return false;
+    return true;
+  }
+
+  @Override
   public String toString() {
     final StringBuilder b = new StringBuilder("JavaRef(");
-    if (f_eclipseProjectName != null) {
-      b.append(f_eclipseProjectName);
-      b.append(":");
-    }
-    b.append(DeclUtil.getTypeNameFullyQualifiedSureLogic(f_declaration));
+    b.append("projectName=").append(f_eclipseProjectName);
     b.append(",within=").append(f_within);
-    b.append(",kind=").append(DeclUtil.getTypeKind(f_declaration));
     b.append(",line=").append(f_lineNumber);
     b.append(",offset=").append(f_offset);
     b.append(",length=").append(f_length);
+    b.append(",positionRelativeToDeclaration=").append(f_positionRelativeToDeclaration);
+    b.append(",declaration=").append(f_declaration);
+    b.append(",absolutePath=").append(f_absolutePath);
+    b.append(",jarRelativePath=").append(f_jarRelativePath);
     b.append(")");
     return b.toString();
   }

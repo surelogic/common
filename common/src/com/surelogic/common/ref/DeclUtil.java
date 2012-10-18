@@ -311,7 +311,8 @@ public final class DeclUtil {
   /**
    * Gets the kind of the enclosing Java type declaration for the passed
    * declaration. If the passed declaration is just a package declaration then
-   * {@link IDecl.Kind#PACKAGE} is returned. Otherwise {@link IDecl.Kind#CLASS},
+   * {@link IDecl.Kind#PACKAGE} is returned. Otherwise
+   * {@link IDecl.Kind#ANNOTATION}, {@link IDecl.Kind#CLASS},
    * {@link IDecl.Kind#ENUM}, or {@link IDecl.Kind#INTERFACE} are returned
    * depending upon the declaration.
    * <p>
