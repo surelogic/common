@@ -16,25 +16,30 @@ public final class DeclUtil {
    * Generates the most likely simple file name that the passed declaration is
    * within.
    * <p>
-   * A complexity is that if this refers to a nested type in a <tt>.java</tt>
-   * file the file is named according to the outermost type name only.
+   * A complexity is that if the passed declaration refers to a nested type in a
+   * <tt>.java</tt> file, the simple file name matches the outermost declared
+   * type name only. This, however, is not always correct because more than one
+   * top-level type can be declared within a Java compilation unit. From the
+   * declaration information only this is impossible to determine (a
+   * {@link IJavaRef} uses the actual path to the compilation unit to overcome
+   * this difficulty, see {@link IJavaRef#getSimpleFileName()}).
    * <p>
    * The table below lists some examples of what this method returns.
    * <table border=1>
    * <tr>
-   * <th>{@link #getTypeNameFullyQualifiedSureLogic()}</th>
-   * <th>{@link #getWithin()}</th>
-   * <th>{@link #getSimpleFileName()}</th>
+   * <th><tt>getTypeNameFullyQualifiedSureLogic(decl)</tt></th>
+   * <th><tt>within</tt></th>
+   * <th>return value</th>
    * </tr>
    * <tr>
-   * <td>com.surelogic/Editor</td>
+   * <td>java.lang/Object</td>
    * <td>{@link Within#JAVA_FILE}</td>
-   * <td>Editor.java</td>
+   * <td>Object.java</td>
    * </tr>
    * <tr>
-   * <td>com.surelogic/Editor.Builder</td>
+   * <td>org.apache/Map.Entry</td>
    * <td>{@link Within#JAVA_FILE}</td>
-   * <td>Editor.java</td>
+   * <td>Map.java</td>
    * </tr>
    * <tr>
    * <td>/ClassInDefaultPkg</td>
@@ -42,26 +47,67 @@ public final class DeclUtil {
    * <td>ClassInDefaultPkg.java</td>
    * </tr>
    * <tr>
-   * <td>java.lang/Object</td>
-   * <td>{@link Within#JAR_FILE}</td>
-   * <td>Object.class</td>
+   * <td>org.apache</td>
+   * <td>{@link Within#JAVA_FILE}</td>
+   * <td>package-info.java</td>
    * </tr>
    * <tr>
-   * <td>java.util/Map.Entry</td>
-   * <td>{@link Within#JAR_FILE}</td>
-   * <td>Map$Entry.class</td>
+   * <td>java.lang/Object</td>
+   * <td>{@link Within#CLASS_FILE}</td>
+   * <td>Object.class</td>
    * </tr>
    * <tr>
    * <td>org.apache/Map.Entry</td>
    * <td>{@link Within#CLASS_FILE}</td>
    * <td>Map$Entry.class</td>
    * </tr>
+   * <tr>
+   * <td>/ClassInDefaultPkg</td>
+   * <td>{@link Within#CLASS_FILE}</td>
+   * <td>ClassInDefaultPkg.class</td>
+   * </tr>
+   * <tr>
+   * <td>org.apache</td>
+   * <td>{@link Within#CLASS_FILE}</td>
+   * <td>package-info.class</td>
+   * </tr>
+   * <tr>
+   * <td>java.lang/Object</td>
+   * <td>{@link Within#JAR_FILE}</td>
+   * <td>Object.class</td>
+   * </tr>
+   * <tr>
+   * <td>org.apache/Map.Entry</td>
+   * <td>{@link Within#JAR_FILE}</td>
+   * <td>Map$Entry.class</td>
+   * </tr>
+   * <tr>
+   * <td>/ClassInDefaultPkg</td>
+   * <td>{@link Within#JAR_FILE}</td>
+   * <td>ClassInDefaultPkg.class</td>
+   * </tr>
+   * <tr>
+   * <td>org.apache</td>
+   * <td>{@link Within#JAR_FILE}</td>
+   * <td>package-info.class</td>
+   * </tr>
    * </table>
    * 
+   * @param decl
+   *          a Java declaration.
+   * @param within
+   *          what the passed declaration is from&mdash;a Java declaration can
+   *          be from a <tt>.java</tt> file, a <tt>.class</tt> file, or a
+   *          <tt>.jar</tt> file
    * @return a generated simple file name.
    */
   @NonNull
   public static String guessSimpleFileName(@NonNull final IDecl decl, @NonNull final IJavaRef.Within within) {
+    if (decl == null)
+      throw new IllegalArgumentException(I18N.err(44, "decl"));
+    if (within == null)
+      throw new IllegalArgumentException(I18N.err(44, "within"));
+
     final StringBuilder b = new StringBuilder();
     final String typeNameDollar = DeclUtil.getTypeNameDollarSignOrNull(decl);
     if (typeNameDollar == null) {
@@ -813,57 +859,56 @@ public final class DeclUtil {
   }
 
   private enum FuncUnparse {
-	  USE_NEW, USE_TYPE, ONLY_PARAMS
+    USE_NEW, USE_TYPE, ONLY_PARAMS
   }
-  
+
   private static String getSignature(IDeclFunction func, FuncUnparse kind, boolean fullyQualifyParameters) {
-	  if (func == null) {
-		  throw new IllegalArgumentException(I18N.err(44, "decl"));
-	  }
-	  if (kind == null) {
-		  throw new IllegalArgumentException(I18N.err(44, "kind"));
-	  }
-	  final StringBuilder sb;
-	  if (kind == FuncUnparse.ONLY_PARAMS) {
-		  sb = new StringBuilder();
-	  } else {
-		  String name = func.getName();
-		  if (name == null) {
-			  if (kind == FuncUnparse.USE_TYPE) {
-				  name = func.getParent().getName();
-			  } else {
-				  name = "new";
-			  }
-		  }
-		  sb = new StringBuilder(name);
-		  sb.append('(');
-	  }
-	  
-	  boolean first = true;
-	  for(IDeclParameter p : func.getParameters()) {
-		  if (first) {
-			  first = false;
-		  } else {
-			  sb.append(", ");
-		  }
-		  final TypeRef t = p.getTypeOf();
-		  sb.append(fullyQualifyParameters ?
-				  t.getFullyQualified() : t.getCompact());
-	  }
-	  if (kind != FuncUnparse.ONLY_PARAMS) {
-		  sb.append(')');
-	  }
-	  return sb.toString();
+    if (func == null) {
+      throw new IllegalArgumentException(I18N.err(44, "decl"));
+    }
+    if (kind == null) {
+      throw new IllegalArgumentException(I18N.err(44, "kind"));
+    }
+    final StringBuilder sb;
+    if (kind == FuncUnparse.ONLY_PARAMS) {
+      sb = new StringBuilder();
+    } else {
+      String name = func.getName();
+      if (name == null) {
+        if (kind == FuncUnparse.USE_TYPE) {
+          name = func.getParent().getName();
+        } else {
+          name = "new";
+        }
+      }
+      sb = new StringBuilder(name);
+      sb.append('(');
+    }
+
+    boolean first = true;
+    for (IDeclParameter p : func.getParameters()) {
+      if (first) {
+        first = false;
+      } else {
+        sb.append(", ");
+      }
+      final TypeRef t = p.getTypeOf();
+      sb.append(fullyQualifyParameters ? t.getFullyQualified() : t.getCompact());
+    }
+    if (kind != FuncUnparse.ONLY_PARAMS) {
+      sb.append(')');
+    }
+    return sb.toString();
   }
-  
+
   /**
    * As it would appear in source code
    */
   public static String getSignature(IDeclFunction func) {
-	  return getSignature(func, FuncUnparse.USE_TYPE, false);
+    return getSignature(func, FuncUnparse.USE_TYPE, false);
   }
-  
+
   public static String getParametersFullyQualified(IDeclFunction func) {
-	  return getSignature(func, FuncUnparse.ONLY_PARAMS, true);
+    return getSignature(func, FuncUnparse.ONLY_PARAMS, true);
   }
 }

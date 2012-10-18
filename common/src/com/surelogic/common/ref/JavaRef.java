@@ -397,6 +397,36 @@ public class JavaRef implements IJavaRef {
   }
 
   @NonNull
+  public final String getSimpleFileName() {
+    if (f_within == Within.JAVA_FILE && f_absolutePath != null) {
+      final int dotIndex = f_absolutePath.lastIndexOf('.');
+      if (dotIndex != -1) {
+        final String extension = f_absolutePath.substring(dotIndex);
+        if (".java".equals(extension)) {
+          final String pathFixed = f_absolutePath.replace('\\', '/');
+          final int sepIndex = pathFixed.lastIndexOf('/');
+          if (sepIndex == -1)
+            return pathFixed;
+          else
+            return pathFixed.substring(sepIndex + 1);
+        }
+      }
+    }
+    // no path, a bad path, or not a .java file -- just guess
+    return DeclUtil.guessSimpleFileName(getDeclaration(), f_within);
+  }
+
+  @NonNull
+  public final String getSimpleFileNameWithNoExtension() {
+    final String fileNameWithExtension = getSimpleFileName();
+    final int dotIndex = fileNameWithExtension.lastIndexOf('.');
+    if (dotIndex != -1) {
+      return fileNameWithExtension.substring(0, dotIndex);
+    }
+    return fileNameWithExtension;
+  }
+
+  @NonNull
   public final String getTypeNameFullyQualified() {
     return DeclUtil.getTypeNameFullyQualified(f_declaration);
   }
@@ -446,8 +476,8 @@ public class JavaRef implements IJavaRef {
         + Decl.encodeForPersistence(f_declaration);
   }
 
-  public static final String ENCODE_V1 = "V1->";
-  public static final String ENCODE_V2 = "V2->";
+  private static final String ENCODE_V1 = "V1->";
+  private static final String ENCODE_V2 = "V2->";
 
   /**
    * Constructs a code reference from a text string produced by

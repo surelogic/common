@@ -28,8 +28,8 @@ public abstract class AbstractXMLReader extends NestedXMLReader {
 
   public static final String FILE_ATTR = "file";
   public static final String LINE_ATTR = "line";
-  public static final String HASH_ATTR = "hash";
-  public static final String CONTEXT_ATTR = "context";
+  public static final String FAST_TREE_HASH_ATTR = "fAST-tree-hash";
+  public static final String FAST_CONTEXT_HASH_ATTR = "fAST-context-hash";
   public static final String JAVA_ID_ATTR = "java-id";
   public static final String WITHIN_DECL_ATTR = "within-decl";
 
