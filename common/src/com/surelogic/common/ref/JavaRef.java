@@ -356,12 +356,12 @@ public class JavaRef implements IJavaRef {
     return f_eclipseProjectName;
   }
 
-  public final Long getHash() {
+  public final long getHash() {
     String encodedNames = getEclipseProjectName() + DeclUtil.getTypeNameFullyQualifiedSureLogic(f_declaration);
     if (f_lineNumber != -1)
-      return Long.valueOf(encodedNames.hashCode() + f_lineNumber);
+      return encodedNames.hashCode() + f_lineNumber;
     else
-      return Long.valueOf(encodedNames.hashCode());
+      return encodedNames.hashCode();
   }
 
   @Nullable

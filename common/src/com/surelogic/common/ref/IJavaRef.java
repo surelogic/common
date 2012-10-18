@@ -157,7 +157,7 @@ public interface IJavaRef {
   String getEclipseProjectNameOrNull();
 
   @NonNull
-  Long getHash();
+  long getHash();
 
   /**
    * Gets the path within the <tt>.jar</tt> file returned by
