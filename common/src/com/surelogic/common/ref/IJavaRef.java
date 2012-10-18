@@ -174,10 +174,6 @@ public interface IJavaRef {
   @Nullable
   String getJarRelativePathOrNull();
 
-  @Deprecated
-  @Nullable
-  String getJavaId();
-
   /**
    * Gets the length, in characters, of the code snippet this refers to, or
    * <tt>-1</tt> if unknown.
