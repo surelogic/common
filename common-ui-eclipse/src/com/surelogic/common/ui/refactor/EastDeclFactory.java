@@ -167,7 +167,7 @@ public class EastDeclFactory {
 	}
 	
 	private static DeclBuilder makeAnnotationTypeBuilder(AnnotationTypeDeclaration n) {
-		return new InterfaceBuilder(n.getName().getIdentifier());
+		return new AnnotationBuilder(n.getName().getIdentifier());
 	}
 
 	private static DeclBuilder makeAnonTypeBuilder(AnonymousClassDeclaration n) {		
