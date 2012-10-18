@@ -124,10 +124,22 @@ public abstract class DeclVisitor {
   }
 
   /**
+   * Visits an annotation declaration.
+   * <p>
+   * The default implementation does nothing. Subclasses may reimplement.
+   * 
+   * @param node
+   *          the node to visit where <tt>node.getKind() ==
+   *          {@link IDecl.Kind#ANNOTATION}</tt>.
+   */
+  public void visitAnnotation(IDeclType node) {
+    // by default do nothing
+  }
+
+  /**
    * Visits an enum declaration.
    * <p>
-   * The default implementation does nothing but return {@code true}. Subclasses
-   * may reimplement.
+   * The default implementation does nothing. Subclasses may reimplement.
    * 
    * @param node
    *          the node to visit where <tt>node.getKind() ==

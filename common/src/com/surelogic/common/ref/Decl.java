@@ -23,6 +23,68 @@ import com.surelogic.common.xml.XMLUtil;
 public abstract class Decl implements IDecl {
 
   /**
+   * Constructs annotation {@link IDecl} instances.
+   */
+  @NotThreadSafe
+  public static final class AnnotationBuilder extends DeclBuilder {
+
+    Visibility f_visibility = Visibility.PUBLIC;
+
+    /**
+     * Constructs an an annotation declaration builder.
+     * <p>
+     * By default the annotation is <tt>public</tt>.
+     * 
+     * @param name
+     *          the simple annotation name, such as <tt>Deprecated</tt>.
+     */
+    public AnnotationBuilder(String name) {
+      f_name = name;
+    }
+
+    /**
+     * Sets the parent of this declaration.
+     * 
+     * @param value
+     *          the parent of this declaration.
+     * @return this builder.
+     */
+    @Override
+    public AnnotationBuilder setParent(DeclBuilder value) {
+      super.setParent(value);
+      return this;
+    }
+
+    /**
+     * Sets the visibility of this declaration.
+     * 
+     * @param value
+     *          the visibility. If {@code null} then the visibility is changed
+     *          to {@link Visibility#PUBLIC}.
+     * @return this builder.
+     */
+    public AnnotationBuilder setVisibility(Visibility value) {
+      f_visibility = value == null ? Visibility.PUBLIC : value;
+      return this;
+    }
+
+    @Override
+    public IDecl buildInternal(IDecl parent) {
+      if (!SLUtility.isValidJavaIdentifier(f_name))
+        throw new IllegalArgumentException(I18N.err(275, f_name));
+
+      if (parent == null)
+        throw new IllegalArgumentException(I18N.err(272, f_name));
+
+      // NA is not allowed
+      if (f_visibility == Visibility.NA)
+        f_visibility = Visibility.PUBLIC;
+
+      return new DeclAnnotation(parent, f_childBuilders, f_name, f_visibility);
+    }
+  }
+
+  /**
    * Constructs class {@link IDecl} instances.
    */
   @NotThreadSafe
@@ -34,7 +96,7 @@ public abstract class Decl implements IDecl {
     boolean f_isAbstract = false;
 
     /**
-     * Constructs a class builder.
+     * Constructs a class declaration builder.
      * <p>
      * By default the class is <tt>public</tt>, not <tt>static</tt>, not
      * <tt>final</tt>, and not <tt>abstract</tt>.
@@ -184,7 +246,7 @@ public abstract class Decl implements IDecl {
     boolean f_isImplicit = false;
 
     /**
-     * Constructs a constructor builder.
+     * Constructs a constructor declaration builder.
      * <p>
      * By default the constructor has no arguments, is <tt>public</tt>, and is
      * not implicit.
@@ -299,7 +361,7 @@ public abstract class Decl implements IDecl {
     Visibility f_visibility = Visibility.PUBLIC;
 
     /**
-     * Constructs an enum builder.
+     * Constructs an enum declaration builder.
      * <p>
      * By default the enum is <tt>public</tt>.
      * 
@@ -364,13 +426,13 @@ public abstract class Decl implements IDecl {
     boolean f_isFinal = false;
 
     /**
-     * Constructs a field builder.
+     * Constructs a field declaration builder.
      * <p>
      * By default the field is <tt>public</tt>, not <tt>static</tt>, and not
      * <tt>final</tt>.
      * 
      * @param name
-     *          the field name.
+     *          the field name, such as <tt>f_myField</tt>.
      */
     public FieldBuilder(String name) {
       f_name = name;
@@ -462,7 +524,7 @@ public abstract class Decl implements IDecl {
     boolean f_isStatic = false;
 
     /**
-     * Constructs an initializer builder.
+     * Constructs an initializer declaration builder.
      * <p>
      * By default the initializer is not <tt>static</tt>.
      */
@@ -513,9 +575,7 @@ public abstract class Decl implements IDecl {
     Visibility f_visibility = Visibility.PUBLIC;
 
     /**
-     * Constructs an interface builder.
-     * <p>
-     * If no parent is set this interface is placed in the default package.
+     * Constructs an interface declaration builder.
      * <p>
      * By default the interface is <tt>public</tt>.
      * 
@@ -608,13 +668,13 @@ public abstract class Decl implements IDecl {
     boolean f_isAbstract = false;
 
     /**
-     * Constructs a method builder.
+     * Constructs a method declaration builder.
      * <p>
      * By default the method has no arguments. It is <tt>public</tt>, not
      * <tt>static</tt>, not <tt>final</tt>, and not <tt>abstract</tt>.
      * 
      * @param name
-     *          the method name.
+     *          the method name, such as <tt>processStuff</tt>.
      */
     public MethodBuilder(String name) {
       f_name = name;
@@ -783,7 +843,7 @@ public abstract class Decl implements IDecl {
     }
 
     /**
-     * Constructs a package builder.
+     * Constructs a package declaration builder.
      * 
      * @param name
      *          the complete package name, such as <tt>org.apache</tt> or
@@ -833,7 +893,7 @@ public abstract class Decl implements IDecl {
     boolean f_isFinal = false;
 
     /**
-     * Constructs a parameter builder.
+     * Constructs a parameter declaration builder.
      * <p>
      * By default this parameter is not <tt>final</tt>.
      * 
@@ -852,7 +912,8 @@ public abstract class Decl implements IDecl {
      * @param position
      *          the zero-based argument number of this parameter.
      * @param name
-     *          the formal parameter name (this is optional, use
+     *          the formal parameter name, such as <tt>position</tt> (this is
+     *          optional, use
      *          {@link Decl.ParameterBuilder#ParameterBuilder(int)} if it is
      *          unknown).
      */
@@ -932,12 +993,12 @@ public abstract class Decl implements IDecl {
     List<TypeRef> f_bounds = new ArrayList<TypeRef>();
 
     /**
-     * Constructs a type parameter builder.
+     * Constructs a type parameter declaration builder.
      * 
      * @param position
      *          the zero-based argument number of this type parameter.
      * @param name
-     *          the name of this type parameter.
+     *          the name of this type parameter, such as <tt>E</tt>.
      */
     public TypeParameterBuilder(int position, String name) {
       f_position = position;
@@ -1474,6 +1535,7 @@ public abstract class Decl implements IDecl {
     while (!nodes.isEmpty()) {
       final Decl next = nodes.pop();
       switch (next.getKind()) {
+      case ANNOTATION:
       case CLASS:
       case ENUM:
       case INTERFACE:
@@ -1507,6 +1569,9 @@ public abstract class Decl implements IDecl {
   private void acceptHelperForNode(@NonNull final IDecl node, @NonNull final DeclVisitor visitor, boolean partOfDeclIfParam) {
     visitor.preVisit(node);
     switch (node.getKind()) {
+    case ANNOTATION:
+      visitor.visitAnnotation((IDeclType) node);
+      break;
     case CONSTRUCTOR:
       if (visitor.visitConstructor((IDeclFunction) node)) {
         acceptHelperForParameters(node, visitor);
@@ -1707,6 +1772,10 @@ public abstract class Decl implements IDecl {
     b.append(decl.getKind().toString());
     b.append(SEP);
     switch (decl.getKind()) {
+    case ANNOTATION:
+      add(NAME, decl.getName(), b);
+      addV(VISIBILITY, decl.getVisibility(), b);
+      break;
     case CLASS:
       add(NAME, decl.getName(), b);
       addV(VISIBILITY, decl.getVisibility(), b);
@@ -1882,6 +1951,17 @@ public abstract class Decl implements IDecl {
      * order of output to work.
      */
     switch (kind) {
+    case ANNOTATION:
+      pair = parseEqualsPair(b);
+      if (isNotFor(NAME, pair))
+        throw new IllegalArgumentException("ANNOTATION must have a name");
+      final AnnotationBuilder annotationBuilder = new AnnotationBuilder(pair.second());
+      pair = parseEqualsPair(b);
+      if (isFor(VISIBILITY, pair)) {
+        annotationBuilder.setVisibility(Visibility.valueOf(pair.second()));
+      }
+      thisDeclBuilder = annotationBuilder;
+      break;
     case CLASS:
       pair = parseEqualsPair(b);
       if (isNotFor(NAME, pair))

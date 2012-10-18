@@ -25,6 +25,7 @@ import com.surelogic.common.SLUtility;
  * <p>
  * Concrete instances are constructed using the following builders:
  * <ul>
+ * <li>{@link Decl.AnnotationBuilder}</li>
  * <li>{@link Decl.ClassBuilder}</li>
  * <li>{@link Decl.ConstructorBuilder}</li>
  * <li>{@link Decl.EnumBuilder}</li>
@@ -47,16 +48,17 @@ public interface IDecl {
    * The kind of declaration.
    */
   enum Kind {
-    CLASS, CONSTRUCTOR, ENUM, FIELD, INITIALIZER, INTERFACE, METHOD, PACKAGE, PARAMETER, TYPE_PARAMETER
+    ANNOTATION, CLASS, CONSTRUCTOR, ENUM, FIELD, INITIALIZER, INTERFACE, METHOD, PACKAGE, PARAMETER, TYPE_PARAMETER
   }
 
   /*
    * Some helpful enum sets
    */
 
-  public static final EnumSet<IDecl.Kind> IS_TYPE = EnumSet.of(IDecl.Kind.CLASS, IDecl.Kind.ENUM, IDecl.Kind.INTERFACE);
-  public static final EnumSet<IDecl.Kind> IS_PKG_OR_TYPE = EnumSet.of(IDecl.Kind.CLASS, IDecl.Kind.ENUM, IDecl.Kind.INTERFACE,
-      IDecl.Kind.PACKAGE);
+  public static final EnumSet<IDecl.Kind> IS_TYPE = EnumSet.of(IDecl.Kind.ANNOTATION, IDecl.Kind.CLASS, IDecl.Kind.ENUM,
+      IDecl.Kind.INTERFACE);
+  public static final EnumSet<IDecl.Kind> IS_PKG_OR_TYPE = EnumSet.of(IDecl.Kind.ANNOTATION, IDecl.Kind.CLASS, IDecl.Kind.ENUM,
+      IDecl.Kind.INTERFACE, IDecl.Kind.PACKAGE);
   public static final EnumSet<IDecl.Kind> HAS_CONTROL_FLOW = EnumSet.of(IDecl.Kind.CONSTRUCTOR, IDecl.Kind.INITIALIZER,
       IDecl.Kind.METHOD);
   public static final EnumSet<IDecl.Kind> HAS_PARAMETERS = EnumSet.of(IDecl.Kind.CONSTRUCTOR, IDecl.Kind.METHOD);
