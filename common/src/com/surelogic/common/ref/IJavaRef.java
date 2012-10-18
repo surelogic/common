@@ -243,27 +243,174 @@ public interface IJavaRef {
   Position getPositionRelativeToDeclaration();
 
   /**
-   * Gets the simple file name of this code reference.
+   * Gets the simple file name of this code reference. It uses the absolute path
+   * that this code reference is within or, if none is available, generates the
+   * most likely simple file name using this code reference's declaration.
+   * <p>
+   * A complexity is that if the passed declaration refers to a nested type in a
+   * <tt>.java</tt> file, the simple file name matches the outermost declared
+   * type name only. This, however, is not always correct because more than one
+   * top-level type can be declared within a Java compilation unit. From the
+   * declaration information only this is impossible to determine (a
+   * {@link IJavaRef} uses the actual path to the compilation unit to overcome
+   * this difficulty, see {@link IJavaRef#getSimpleFileName()}).
+   * <p>
+   * The table below lists some examples of what this method returns. The
+   * absolute path value is only shown if it is interesting, in the sense that
+   * it changes the behavior of this method.
+   * <table border=1>
+   * <tr>
+   * <th>DeclUtil.getTypeNameFullyQualifiedSureLogic(this.getDeclaration())</th>
+   * <th>{@link #getWithin()}</th>
+   * <th>{@link #getAbsolutePathOrNull()}</th>
+   * <th>return value</th>
+   * </tr>
+   * <tr>
+   * <td>java.lang/Object</td>
+   * <td>{@link Within#JAVA_FILE}</td>
+   * <td>&nbsp;</td>
+   * <td>Object.java</td>
+   * </tr>
+   * <tr>
+   * <td>org.apache/Map.Entry</td>
+   * <td>{@link Within#JAVA_FILE}</td>
+   * <td>&nbsp;</td>
+   * <td>Map.java</td>
+   * </tr>
+   * <tr>
+   * <td>util.concurrent.misc/ThreadedExecutorRNG</td>
+   * <td>{@link Within#JAVA_FILE}</td>
+   * <td>C:\Windows\src&#92;util\concurrent\misc\SynchronizationTimer.java</td>
+   * <td>SynchronizationTimer.java</td>
+   * </tr>
+   * <tr>
+   * <td>EDU.oswego.cs.dl.util.concurrent.misc/ThreadedExecutorRNG</td>
+   * <td>{@link Within#JAVA_FILE}</td>
+   * <td>/usr/linux/src/util/concurrent/misc/SynchronizationTimer.java</td>
+   * <td>SynchronizationTimer.java</td>
+   * </tr>
+   * <tr>
+   * <td>/ClassInDefaultPkg</td>
+   * <td>{@link Within#JAVA_FILE}</td>
+   * <td>&nbsp;</td>
+   * <td>ClassInDefaultPkg.java</td>
+   * </tr>
+   * <tr>
+   * <td>org.apache</td>
+   * <td>{@link Within#JAVA_FILE}</td>
+   * <td>&nbsp;</td>
+   * <td>package-info.java</td>
+   * </tr>
+   * <tr>
+   * <td>java.lang/Object</td>
+   * <td>{@link Within#CLASS_FILE}</td>
+   * <td>&nbsp;</td>
+   * <td>Object.class</td>
+   * </tr>
+   * <tr>
+   * <td>org.apache/Map.Entry</td>
+   * <td>{@link Within#CLASS_FILE}</td>
+   * <td>&nbsp;</td>
+   * <td>Map$Entry.class</td>
+   * </tr>
+   * <tr>
+   * <td>util.concurrent.misc/ThreadedExecutorRNG</td>
+   * <td>{@link Within#CLASS_FILE}</td>
+   * <td>C:\Windows\src&#92;util\concurrent\misc\SynchronizationTimer.java</td>
+   * <td>ThreadedExecutorRNG.class</td>
+   * </tr>
+   * <tr>
+   * <td>EDU.oswego.cs.dl.util.concurrent.misc/ThreadedExecutorRNG</td>
+   * <td>{@link Within#CLASS_FILE}</td>
+   * <td>/usr/linux/src/util/concurrent/misc/SynchronizationTimer.java</td>
+   * <td>ThreadedExecutorRNG.class</td>
+   * </tr>
+   * <tr>
+   * <td>/ClassInDefaultPkg</td>
+   * <td>{@link Within#CLASS_FILE}</td>
+   * <td>&nbsp;</td>
+   * <td>ClassInDefaultPkg.class</td>
+   * </tr>
+   * <tr>
+   * <td>org.apache</td>
+   * <td>{@link Within#CLASS_FILE}</td>
+   * <td>&nbsp;</td>
+   * <td>package-info.class</td>
+   * </tr>
+   * <tr>
+   * <td>java.lang/Object</td>
+   * <td>{@link Within#JAR_FILE}</td>
+   * <td>&nbsp;</td>
+   * <td>Object.class</td>
+   * </tr>
+   * <tr>
+   * <td>org.apache/Map.Entry</td>
+   * <td>{@link Within#JAR_FILE}</td>
+   * <td>&nbsp;</td>
+   * <td>Map$Entry.class</td>
+   * </tr>
+   * <tr>
+   * <td>util.concurrent.misc/ThreadedExecutorRNG</td>
+   * <td>{@link Within#JAR_FILE}</td>
+   * <td>C:\Windows\src&#92;util\concurrent\misc\SynchronizationTimer.java</td>
+   * <td>ThreadedExecutorRNG.class</td>
+   * </tr>
+   * <tr>
+   * <td>EDU.oswego.cs.dl.util.concurrent.misc/ThreadedExecutorRNG</td>
+   * <td>{@link Within#JAR_FILE}</td>
+   * <td>/usr/linux/src/util/concurrent/misc/SynchronizationTimer.java</td>
+   * <td>ThreadedExecutorRNG.class</td>
+   * </tr>
+   * <tr>
+   * <td>/ClassInDefaultPkg</td>
+   * <td>{@link Within#JAR_FILE}</td>
+   * <td>&nbsp;</td>
+   * <td>ClassInDefaultPkg.class</td>
+   * </tr>
+   * <tr>
+   * <td>org.apache</td>
+   * <td>{@link Within#JAR_FILE}</td>
+   * <td>&nbsp;</td>
+   * <td>package-info.class</td>
+   * </tr>
+   * </table>
    * 
-   * TODO
-   * 
-   * package case needs to be discussed package-info
-   * 
-   * use of declaration if no paths
-   * 
-   * @return
+   * @return the simple file name of this code reference.
    */
   @NonNull
   String getSimpleFileName();
 
   /**
-   * Gets the simple file name with no .java or .class on it.
+   * Gets the simple file name of this code reference with no extension. It
+   * simply removes <tt>.java</tt> or <tt>.class</tt> from the result of calling
+   * {@link #getSimpleFileName()}.
+   * <p>
+   * The table below lists some examples of what this method returns.
+   * <table border=1>
+   * <tr>
+   * <th>{@link #getSimpleFileName()}</th>
+   * <th>return value</th>
+   * </tr>
+   * <tr>
+   * <td>Object.java</td>
+   * <td>Object</td>
+   * </tr>
+   * <tr>
+   * <td>SynchronizationTimer.java</td>
+   * <td>SynchronizationTimer</td>
+   * </tr>
+   * <tr>
+   * <td>Map$Entry.class</td>
+   * <td>Map$Entry</td>
+   * </tr>
+   * <tr>
+   * <td>package-info.class</td>
+   * <td>package-info</td>
+   * </tr>
+   * </table>
    * 
-   * TODO
-   * 
-   * use of declaration if no paths
-   * 
-   * @return
+   * @return the simple file name of this code reference with no extension,
+   *         i.e., no <tt>.java</tt> or <tt>.class</tt> suffix.
    */
   @NonNull
   String getSimpleFileNameWithNoExtension();
