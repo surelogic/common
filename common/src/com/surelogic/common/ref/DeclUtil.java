@@ -22,9 +22,9 @@ public final class DeclUtil {
    * The table below lists some examples of what this method returns.
    * <table border=1>
    * <tr>
-   * <th>{@link #getTypeNameFullyQualifiedSureLogic()}</th>
-   * <th>{@link #getWithin()}</th>
-   * <th>{@link #getSimpleFileName()}</th>
+   * <th><tt>getTypeNameFullyQualifiedSureLogic(decl)</tt></th>
+   * <th><tt>within</tt></th>
+   * <th>return value</th>
    * </tr>
    * <tr>
    * <td>com.surelogic/Editor</td>
@@ -813,57 +813,56 @@ public final class DeclUtil {
   }
 
   private enum FuncUnparse {
-	  USE_NEW, USE_TYPE, ONLY_PARAMS
+    USE_NEW, USE_TYPE, ONLY_PARAMS
   }
-  
+
   private static String getSignature(IDeclFunction func, FuncUnparse kind, boolean fullyQualifyParameters) {
-	  if (func == null) {
-		  throw new IllegalArgumentException(I18N.err(44, "decl"));
-	  }
-	  if (kind == null) {
-		  throw new IllegalArgumentException(I18N.err(44, "kind"));
-	  }
-	  final StringBuilder sb;
-	  if (kind == FuncUnparse.ONLY_PARAMS) {
-		  sb = new StringBuilder();
-	  } else {
-		  String name = func.getName();
-		  if (name == null) {
-			  if (kind == FuncUnparse.USE_TYPE) {
-				  name = func.getParent().getName();
-			  } else {
-				  name = "new";
-			  }
-		  }
-		  sb = new StringBuilder(name);
-		  sb.append('(');
-	  }
-	  
-	  boolean first = true;
-	  for(IDeclParameter p : func.getParameters()) {
-		  if (first) {
-			  first = false;
-		  } else {
-			  sb.append(", ");
-		  }
-		  final TypeRef t = p.getTypeOf();
-		  sb.append(fullyQualifyParameters ?
-				  t.getFullyQualified() : t.getCompact());
-	  }
-	  if (kind != FuncUnparse.ONLY_PARAMS) {
-		  sb.append(')');
-	  }
-	  return sb.toString();
+    if (func == null) {
+      throw new IllegalArgumentException(I18N.err(44, "decl"));
+    }
+    if (kind == null) {
+      throw new IllegalArgumentException(I18N.err(44, "kind"));
+    }
+    final StringBuilder sb;
+    if (kind == FuncUnparse.ONLY_PARAMS) {
+      sb = new StringBuilder();
+    } else {
+      String name = func.getName();
+      if (name == null) {
+        if (kind == FuncUnparse.USE_TYPE) {
+          name = func.getParent().getName();
+        } else {
+          name = "new";
+        }
+      }
+      sb = new StringBuilder(name);
+      sb.append('(');
+    }
+
+    boolean first = true;
+    for (IDeclParameter p : func.getParameters()) {
+      if (first) {
+        first = false;
+      } else {
+        sb.append(", ");
+      }
+      final TypeRef t = p.getTypeOf();
+      sb.append(fullyQualifyParameters ? t.getFullyQualified() : t.getCompact());
+    }
+    if (kind != FuncUnparse.ONLY_PARAMS) {
+      sb.append(')');
+    }
+    return sb.toString();
   }
-  
+
   /**
    * As it would appear in source code
    */
   public static String getSignature(IDeclFunction func) {
-	  return getSignature(func, FuncUnparse.USE_TYPE, false);
+    return getSignature(func, FuncUnparse.USE_TYPE, false);
   }
-  
+
   public static String getParametersFullyQualified(IDeclFunction func) {
-	  return getSignature(func, FuncUnparse.ONLY_PARAMS, true);
+    return getSignature(func, FuncUnparse.ONLY_PARAMS, true);
   }
 }

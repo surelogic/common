@@ -243,6 +243,32 @@ public interface IJavaRef {
   Position getPositionRelativeToDeclaration();
 
   /**
+   * Gets the simple file name of this code reference.
+   * 
+   * TODO
+   * 
+   * package case needs to be discussed package-info
+   * 
+   * use of declaration if no paths
+   * 
+   * @return
+   */
+  @NonNull
+  String getSimpleFileName();
+
+  /**
+   * Gets the simple file name with no .java or .class on it.
+   * 
+   * TODO
+   * 
+   * use of declaration if no paths
+   * 
+   * @return
+   */
+  @NonNull
+  String getSimpleFileNameWithNoExtension();
+
+  /**
    * Java type name that this refers to. Both packages and nested types are
    * separated by a <tt>"."</tt>. If the declaration is just a package then just
    * the package name is returned.
