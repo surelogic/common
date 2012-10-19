@@ -928,30 +928,6 @@ public final class SLUtility {
   }
 
   /**
-   * This encodes whitespace, identified via
-   * {@link Character#isWhitespace(char)}, into an XML Unicode escape sequence,
-   * for example a space becomes <tt>&amp;#20;</tt> and a newline becomes
-   * <tt>&amp;#a;</tt>.
-   * <p>
-   * This is intended to allow encoding into an attribute
-   * 
-   * @param s
-   *          a string.
-   * @return a string with all whitespace encoded.
-   */
-  public static String encodeWhitespaceForXML(final String s) {
-    StringBuilder result = new StringBuilder();
-    char[] foo = s.toCharArray();
-    for (int i = 0; i < foo.length; i++) {
-      if (Character.isWhitespace(foo[i])) {
-        result.append("&#").append(Integer.toHexString(foo[i])).append(';');
-      } else
-        result.append(foo[i]);
-    }
-    return result.toString();
-  }
-
-  /**
    * Sends a string to a URL and returns the response. If anything goes wrong an
    * exception is thrown.
    * 

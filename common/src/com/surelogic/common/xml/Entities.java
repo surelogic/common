@@ -1,7 +1,9 @@
 package com.surelogic.common.xml;
 
-import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.surelogic.Nullable;
 import com.surelogic.common.CharBuffer;
 
 /**
@@ -10,353 +12,229 @@ import com.surelogic.common.CharBuffer;
  */
 public final class Entities {
 
-	private static final Entities E;
-	private static final Entities ASCII_CONTROL = new Entities(false);
-		
-	static {
-		E = new Entities(true);
-		E.defineStandardXML();
-		
-		// U+0009, U+000A, U+000D: these are the only C0 controls accepted in XML 1.0
-		//RestrictedChar	   ::=   	[#x1-#x8] | [#xB-#xC] | [#xE-#x1F] | [#x7F-#x84] | [#x86-#x9F]		
-		for(int i=0; i<9;i++) {			
-			ASCII_CONTROL.define("\\"+i, String.valueOf((char) i));
-		}
-		ASCII_CONTROL.define("\\b", "\u000b");
-		ASCII_CONTROL.define("\\c", "\u000c");
-		for(int i=14; i<32;i++) {			
-			ASCII_CONTROL.define("\\"+Integer.toHexString(i), String.valueOf((char) i));
-		}
-		for(int i=0x7F; i<=0x84;i++) {			
-			ASCII_CONTROL.define("\\"+Integer.toHexString(i), String.valueOf((char) i));
-		}
-		for(int i=0x86; i<=0x9F;i++) {			
-			ASCII_CONTROL.define("\\"+Integer.toHexString(i), String.valueOf((char) i));
-		}
-		for(int i=0xD800; i<0xE000;i++) {			
-			ASCII_CONTROL.define("\\"+Integer.toHexString(i), String.valueOf((char) i));
-		}
-		ASCII_CONTROL.define("\\fffe", String.valueOf((char) 0xfffe));
-		ASCII_CONTROL.define("\\ffff", String.valueOf((char) 0xffff));
-		ASCII_CONTROL.generateCharMap();
-	}
+  public static final class Holder {
+    /*
+     * Holds instances for use by callers
+     */
+    public static final Entities DEFAULT = new Entities();
+    public static final Entities DEFAULT_PLUS_WHITESPACE = new Entities().setEscapeWhitespace(true);
+  }
 
-	private final boolean wrapForXML;
-	
-	private Entities(boolean wrap) {
-		wrapForXML = wrap;
-	}
-	
-	private void generateCharMap() {
-		for(Tuple t : f_NameValue) {
-			if (t instanceof CharValueTuple) {
-				CharValueTuple cvt = (CharValueTuple) t; 				
-				//System.out.println("Mapping "+((int) cvt.f_value)+" to "+cvt.f_name);
-				f_map.put(Integer.valueOf((int) cvt.f_value), cvt.f_name);				
-			}
-		}
-		checkCharMap();
-	}
-	
-	private void checkCharMap() {
-		for(Tuple t : f_NameValue) {
-			if (t instanceof CharValueTuple) {
-				CharValueTuple cvt = (CharValueTuple) t; 		
-				String mapped = f_map.get(Integer.valueOf(cvt.f_value));
-				if (mapped == null) {
-					System.out.println("Couldn't find mapping for "+cvt.f_name);
-				}
-			}
-		}
-	}
+  public static void start(final String name, final StringBuilder b) {
+    start(name, b, 0);
+  }
 
-	public static void start(final String name, final StringBuilder b) {
-		start(name, b, 0);
-	}
-	
-	public static void start(final String name, final StringBuilder b, int indent) {
-		indent(b, indent);
-		b.append('<').append(name);
-	}
+  public static void start(final String name, final StringBuilder b, int indent) {
+    indent(b, indent);
+    b.append('<').append(name);
+  }
 
-	public static void indent(final StringBuilder b, int indent) {
-		for(int i=0; i<indent; i++) {
-			b.append(XMLConstants.INDENT);
-		}
-	}
-	
-	public static void newLine(final StringBuilder b, int indent) {
-		b.append('\n');
-		indent(b, indent);
-	}
-	
-	public static void closeStart(StringBuilder b, boolean end) {	
-		closeStart(b, end, true);
-	}
-	
-	public static void closeStart(StringBuilder b, boolean end, boolean newline) {		
-		b.append(end ? "/>" : ">");
-		if (newline) {
-			b.append('\n');
-		}
-	}
-	
-	/**
-	 * Helper to create <name\>enclosedText</name>
-	 */
-	public static void createTag(String name, String enclosedText,
-			StringBuilder b) {
-		b.append('<').append(name).append('>');
-		addEscaped(enclosedText, b);
-		end(name, b, 0);
-	}
+  public static void indent(final StringBuilder b, int indent) {
+    for (int i = 0; i < indent; i++) {
+      b.append(XMLConstants.INDENT);
+    }
+  }
 
-	public static void end(String name, StringBuilder b, int indent) {
-		if (indent > 0) {
-			indent(b, indent);
-		}
-		b.append("</").append(name).append(">\n");
-	}
-	
-	/**
-	 * Helper to avoid having to escape non-string values.
-	 */
-	private static void add(final String name, final String value,
-			final StringBuilder b) {
-		b.append(' ').append(name).append("=\"");
-		b.append(value);
-		b.append('\"');
-	}
+  public static void newLine(final StringBuilder b, int indent) {
+    b.append('\n');
+    indent(b, indent);
+  }
 
-	public static void addAttribute(final String name, final String value,
-			final StringBuilder b) {
-		if (value == null) {
-			return;
-		}
-		add(name, E.escape(value), b);
-	}
+  public static void closeStart(StringBuilder b, boolean end) {
+    closeStart(b, end, true);
+  }
 
-	public static void addAttribute(final String name, final boolean value,
-			final StringBuilder b) {
-		add(name, Boolean.toString(value), b);
-	}
+  public static void closeStart(StringBuilder b, boolean end, boolean newline) {
+    b.append(end ? "/>" : ">");
+    if (newline) {
+      b.append('\n');
+    }
+  }
 
-	public static void addAttribute(final String name, final int value,
-			final StringBuilder b) {
-		add(name, Integer.toString(value), b);
-	}
+  /**
+   * Helper to create <name\>enclosedText</name>
+   */
+  public static void createTag(String name, String enclosedText, StringBuilder b) {
+    b.append('<').append(name).append('>');
+    addEscaped(enclosedText, b);
+    end(name, b, 0);
+  }
 
-	public static void addAttribute(final String name, final long value,
-			final StringBuilder b) {
-		add(name, Long.toString(value), b);
-	}
+  public static void end(String name, StringBuilder b, int indent) {
+    if (indent > 0) {
+      indent(b, indent);
+    }
+    b.append("</").append(name).append(">\n");
+  }
 
-	public static void addEscaped(final String value, final StringBuilder b) {
-		b.append(E.escape(value));
-	}
+  /**
+   * Helper to avoid having to escape non-string values.
+   */
+  private static void add(final String name, final String value, final StringBuilder b) {
+    b.append(' ').append(name).append("=\"");
+    b.append(value);
+    b.append('\"');
+  }
 
-	public static CharBuffer addEscaped(final String value, final CharBuffer b) {
-		b.append(E.escape(value));
-		return b;
-	}
+  public static void addAttribute(final String name, final String value, final StringBuilder b) {
+    addAttribute(name, value, null, b);
+  }
 
-	public static String trimInternal(final String value) {
-		return value.replaceAll("\\s+", " ");
-	}
+  public static void addAttribute(final String name, final String value, @Nullable Entities useToEscape, final StringBuilder b) {
+    if (value == null)
+      return;
+    if (useToEscape == null)
+      useToEscape = Holder.DEFAULT;
+    add(name, useToEscape.escape(value), b);
+  }
 
-	/**
-	 * A private type to store names and values that we want escaped.
-	 */
-	private abstract static class Tuple {
-		final String f_name;
-		final boolean wrapForXML;
-		
-		Tuple(boolean wrapForXML, final String name) {
-			this.wrapForXML = wrapForXML;
-			f_name = name;
-		}
+  public static void addAttribute(final String name, final boolean value, final StringBuilder b) {
+    add(name, Boolean.toString(value), b);
+  }
 
-		/**
-		 * Does the value appear in the given string, beginning at the given
-		 * index?
-		 */
-		public abstract boolean testFor(String input, int idx);
+  public static void addAttribute(final String name, final int value, final StringBuilder b) {
+    add(name, Integer.toString(value), b);
+  }
 
-		/**
-		 * Get the length of the value.
-		 */
-		public abstract int getValueLength();
+  public static void addAttribute(final String name, final long value, final StringBuilder b) {
+    add(name, Long.toString(value), b);
+  }
 
-		/**
-		 * Get the value.
-		 */
-		public final void appendName(StringBuilder sb) {
-			if (wrapForXML) {
-				sb.append('&');
-			} 
-			sb.append(f_name);
-			if (wrapForXML) {
-				sb.append(';');
-			}
-		}
-	}
+  public static void addEscaped(final String value, final StringBuilder b) {
+    b.append(Holder.DEFAULT.escape(value));
+  }
 
-	private static final class CharValueTuple extends Tuple {
-		final char f_value;
+  public static CharBuffer addEscaped(final String value, final CharBuffer b) {
+    b.append(Holder.DEFAULT.escape(value));
+    return b;
+  }
 
-		CharValueTuple(boolean wrapForXML, final String name, final String value) {
-			super(wrapForXML, name);
-			if (value.length() != 1) {
-				throw new IllegalArgumentException(
-						"Value must have length of 1");
-			}
-			f_value = value.charAt(0);
-		}
+  public static String trimInternal(final String value) {
+    return value.replaceAll("\\s+", " ");
+  }
 
-		@Override
-		public boolean testFor(final String input, final int idx) {
-			return input.charAt(idx) == f_value;
-		}
+  private static final class EscapePair {
+    /**
+     * The character to be escaped.
+     */
+    char value;
+    /**
+     * Call {@link #getEscapeValue()} don't use this field directly because it
+     * may be {@code null} if we are to simply generate a Unicode escape value.
+     */
+    String escapeValueOrNullForUnicode;
 
-		@Override
-		public int getValueLength() {
-			return 1;
-		}
-	}
+    EscapePair(char value, String escapeValueOrNullForUnicode) {
+      this.value = value;
+      this.escapeValueOrNullForUnicode = escapeValueOrNullForUnicode;
+    }
 
-	private static final class StringValueTuple extends Tuple {
-		final String f_value;
+    String getEscapeValue() {
+      if (escapeValueOrNullForUnicode != null)
+        return escapeValueOrNullForUnicode;
+      else
+        return getUnicodeEscapeFor(value);
+    }
+  }
 
-		StringValueTuple(boolean wrapForXML, final String name, final String value) {
-			super(wrapForXML, name);
-			f_value = value;
-		}
+  /**
+   * Escapes defined by this.
+   */
+  private final CopyOnWriteArrayList<EscapePair> f_escapes = new CopyOnWriteArrayList<Entities.EscapePair>();
+  /**
+   * {@code true} indicates that whitespace should be escaped.
+   */
+  private final AtomicBoolean f_escapeWhitespace = new AtomicBoolean(false);
 
-		@Override
-		public boolean testFor(final String input, final int idx) {
-			return input.substring(idx).startsWith(f_value);
-		}
+  public Entities() {
+    define('&', "&amp;");
+    define('\'', "&apos;");
+    define('>', "&gt;");
+    define('<', "&lt;");
+    define('\"', "&quot;");
+  }
 
-		@Override
-		public int getValueLength() {
-			return f_value.length();
-		}
-	}
+  public String escape(final String value) {
+    StringBuilder b = new StringBuilder(value);
+    int charIndex = 0;
+    while (charIndex < b.length()) {
+      char c = b.charAt(charIndex);
+      final String escapeValue = getEscapeValueOrNullFor(c);
+      if (escapeValue != null) {
+        b.replace(charIndex, charIndex + 1, escapeValue);
+        charIndex = charIndex + escapeValue.length(); // skip what we added
+      } else {
+        charIndex++; // next char
+      }
+    }
+    return b.toString();
+  }
 
-	private final List<Tuple> f_NameValue = new ArrayList<Tuple>();
-	private final Map<String,String> f_ValueName = new HashMap<String, String>();
-	private Map<Integer,String> f_map = new HashMap<Integer,String>();
+  private String getEscapeValueOrNullFor(char value) {
+    for (EscapePair p : f_escapes) {
+      if (p.value == value) {
+        return p.getEscapeValue();
+      }
+    }
+    if (f_escapeWhitespace.get() && Character.isWhitespace(value)) {
+      return getUnicodeEscapeFor(value);
+    }
+    /*
+     * Always escape invalid XML characters
+     */
+    if (XMLChar.isInvalid(value)) {
+      return getUnicodeEscapeFor(value);
+    }
+    return null;
+  }
 
+  private static String getUnicodeEscapeFor(char value) {
+    return "&#x" + Integer.toHexString(value) + ";";
+  }
 
-	public static String unescape(String c) {
-		for(Map.Entry<String, String> e : E.f_ValueName.entrySet()) {
-			c = c.replace(e.getKey(), e.getValue());
-		}
-		return c;
-	}
-	
-	public String escape(final String text) {
-		// Allocate space for original text plus 5 single-character entities
-		final StringBuilder sb = new StringBuilder(text.length() + 10);
-		int copyFromIdx = 0;
-		int testForIdx = 0;
-		while (testForIdx < text.length()) {
-			boolean found = false;
-			for (final Tuple t : f_NameValue) {
-				if (t.testFor(text, testForIdx)) {
-					// Copy test segment that is free of escapes
-					if (copyFromIdx < testForIdx) {
-						sb.append(text.substring(copyFromIdx, testForIdx));
-					}
-					// process escape
-					t.appendName(sb);
-					testForIdx += t.getValueLength();
-					copyFromIdx = testForIdx;
-					// Found the escape at this position, so stop looping over
-					// escapes
-					found = true;
-					break;
-				}
-			}
-			if (!found) {
-				// No escapes match at the current position
-				testForIdx += 1;
-			}
-		}
-		// copy remaining text
-		sb.append(text.substring(copyFromIdx));
-		return sb.toString();
-	}
+  /**
+   * Defines a new character entity. For example, the default quotation is
+   * defined as:
+   * 
+   * <pre>
+   * Entities e = ...
+   * e.define('\&quot;', &quot;quot&quot;);
+   * </pre>
+   * 
+   * @param value
+   *          a character.
+   * @param escapeValueOrNullForUnicode
+   *          the name for the character entity.
+   * @return this set of entities.
+   */
+  public Entities define(char value, String escapeValueOrNullForUnicode) {
+    // check if this value has an escape, if so just update it
+    for (EscapePair p : f_escapes) {
+      if (p.value == value) {
+        p.escapeValueOrNullForUnicode = escapeValueOrNullForUnicode;
+        return this;
+      }
+    }
+    final EscapePair p = new EscapePair(value, escapeValueOrNullForUnicode);
+    f_escapes.add(p);
+    return this;
+  }
 
-	/**
-	 * Defines a new character entity. For example, the default quotation is
-	 * defined as:
-	 * 
-	 * <pre>
-	 * Entities e = ...
-	 * e.define(&quot;quot&quot;, &quot;\&quot;&quot;);
-	 * </pre>
-	 * 
-	 * @param name
-	 *            the name for the character entity.
-	 * @param value
-	 *            the value for the character entity.
-	 */
-	public void define(final String name, final String value) {
-		assert name != null;
-		assert value != null;
-		final Tuple tuple = value.length() == 1 ? new CharValueTuple(wrapForXML, name,
-				value) : new StringValueTuple(wrapForXML, name, value);
-		f_NameValue.add(tuple);
-		f_ValueName.put('&'+name+';', value);
-	}
-
-	/**
-	 * Defines the five standard XML predefined character entities: &, ', >, <,
-	 * ".
-	 */
-	public void defineStandardXML() {
-		define("amp", "&");
-		define("apos", "'");
-		define("gt", ">");
-		define("lt", "<");
-		define("quot", "\"");
-	}
-	
-	public static String escapeControlChars(String text) {
-		return ASCII_CONTROL.convertChars(text);
-		/*
-		try {
-			String rv = ASCII_CONTROL.escape(text);		
-			return rv;
-		} catch(Throwable t) {
-			t.printStackTrace();
-		}
-		return null;
-		*/
-	}
-	
-	String convertChars(String text) {
-		//checkCharMap();
-		
-		final int len = text.length();
-		StringBuilder sb = new StringBuilder(len);
-		for(int i=0; i<len; i++) {
-			final char ch = text.charAt(i);
-			String mapped = f_map.get(Integer.valueOf(ch));
-			if (mapped != null) {
-				sb.append(mapped);
-			} else {
-				/*
-				if (ch == 0) {
-					System.out.println("Leaving in zero");
-					sb.append("\\0");
-				} else {
-				*/
-					sb.append(ch);
-				//}
-			}
-		}
-		return sb.toString();
-	}
+  /**
+   * Sets if this set of entities should escape whitespace characters into a
+   * Unicode escape.
+   * <p>
+   * For example a space becomes <tt>&amp;#x20;</tt> and a newline becomes
+   * <tt>&amp;#xa;</tt>.
+   * <p>
+   * This is intended to allow encoding a string into an attribute.
+   * 
+   * @param newValue
+   *          {code true} if whitespace characters should be escaped.
+   * @return this set of entities.
+   */
+  public Entities setEscapeWhitespace(boolean newValue) {
+    f_escapeWhitespace.set(newValue);
+    return this;
+  }
 }
