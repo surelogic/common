@@ -1,15 +1,23 @@
 package com.surelogic.common.xml;
 
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.ArrayList;
 
+import com.surelogic.InRegion;
 import com.surelogic.Nullable;
+import com.surelogic.Region;
+import com.surelogic.RegionLock;
+import com.surelogic.RequiresLock;
+import com.surelogic.ThreadSafe;
+import com.surelogic.UniqueInRegion;
 import com.surelogic.common.CharBuffer;
 
 /**
  * Manages a table of entities for XML. This class can be used to help escape
  * strings that are output in XML format.
  */
+@ThreadSafe
+@Region("EntitiesState")
+@RegionLock("EntitiesLock is this protects EntitiesState")
 public final class Entities {
 
   public static final class Holder {
@@ -140,11 +148,13 @@ public final class Entities {
   /**
    * Escapes defined by this.
    */
-  private final CopyOnWriteArrayList<EscapePair> f_escapes = new CopyOnWriteArrayList<Entities.EscapePair>();
+  @UniqueInRegion("EntitiesState")
+  private final ArrayList<EscapePair> f_escapes = new ArrayList<EscapePair>();
   /**
    * {@code true} indicates that whitespace should be escaped.
    */
-  private final AtomicBoolean f_escapeWhitespace = new AtomicBoolean(false);
+  @InRegion("EntitiesState")
+  private boolean f_escapeWhitespace = false;
 
   public Entities() {
     define('&', "&amp;");
@@ -156,27 +166,30 @@ public final class Entities {
 
   public String escape(final String value) {
     StringBuilder b = new StringBuilder(value);
-    int charIndex = 0;
-    while (charIndex < b.length()) {
-      char c = b.charAt(charIndex);
-      final String escapeValue = getEscapeValueOrNullFor(c);
-      if (escapeValue != null) {
-        b.replace(charIndex, charIndex + 1, escapeValue);
-        charIndex = charIndex + escapeValue.length(); // skip what we added
-      } else {
-        charIndex++; // next char
+    synchronized (this) {
+      int charIndex = 0;
+      while (charIndex < b.length()) {
+        char c = b.charAt(charIndex);
+        final String escapeValue = getEscapeValueOrNullFor(c);
+        if (escapeValue != null) {
+          b.replace(charIndex, charIndex + 1, escapeValue);
+          charIndex = charIndex + escapeValue.length(); // skip what we added
+        } else {
+          charIndex++; // next char
+        }
       }
     }
     return b.toString();
   }
 
+  @RequiresLock("EntitiesLock")
   private String getEscapeValueOrNullFor(char value) {
     for (EscapePair p : f_escapes) {
       if (p.value == value) {
         return p.getEscapeValue();
       }
     }
-    if (f_escapeWhitespace.get() && Character.isWhitespace(value)) {
+    if (f_escapeWhitespace && Character.isWhitespace(value)) {
       return getUnicodeEscapeFor(value);
     }
     /*
@@ -209,14 +222,16 @@ public final class Entities {
    */
   public Entities define(char value, String escapeValueOrNullForUnicode) {
     // check if this value has an escape, if so just update it
-    for (EscapePair p : f_escapes) {
-      if (p.value == value) {
-        p.escapeValueOrNullForUnicode = escapeValueOrNullForUnicode;
-        return this;
+    synchronized (this) {
+      for (EscapePair p : f_escapes) {
+        if (p.value == value) {
+          p.escapeValueOrNullForUnicode = escapeValueOrNullForUnicode;
+          return this;
+        }
       }
+      final EscapePair p = new EscapePair(value, escapeValueOrNullForUnicode);
+      f_escapes.add(p);
     }
-    final EscapePair p = new EscapePair(value, escapeValueOrNullForUnicode);
-    f_escapes.add(p);
     return this;
   }
 
@@ -234,7 +249,9 @@ public final class Entities {
    * @return this set of entities.
    */
   public Entities setEscapeWhitespace(boolean newValue) {
-    f_escapeWhitespace.set(newValue);
+    synchronized (this) {
+      f_escapeWhitespace = newValue;
+    }
     return this;
   }
 }
