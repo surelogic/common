@@ -94,6 +94,7 @@ public abstract class Decl implements IDecl {
     boolean f_isStatic = false;
     boolean f_isFinal = false;
     boolean f_isAbstract = false;
+    int f_anonymousDeclPosition;
 
     /**
      * Constructs a class declaration builder.
@@ -197,12 +198,30 @@ public abstract class Decl implements IDecl {
       return this;
     }
 
+    /**
+     * Sets the zero-based position of an anonymous class declaration within the
+     * immediate enclosing declaration. This only applies to anonymous class
+     * declarations and is otherwise ignored.
+     * 
+     * @param value
+     *          the zero-based position of an anonymous class declaration within
+     *          the immediate enclosing declaration.
+     * @return this builder.
+     */
+    public ClassBuilder setAnonymousDeclPosition(int value) {
+      f_anonymousDeclPosition = value;
+      return this;
+    }
+
     @Override
     public IDecl buildInternal(IDecl parent) {
+      int anonymousDeclPosition = 0;
       // anonymous classes
       if (f_visibility == Visibility.ANONYMOUS) {
         f_isStatic = false;
         f_name = "";
+        if (f_anonymousDeclPosition >= 0)
+          anonymousDeclPosition = f_anonymousDeclPosition;
       } else {
         if (!SLUtility.isValidJavaIdentifier(f_name))
           throw new IllegalArgumentException(I18N.err(275, f_name));
@@ -232,7 +251,8 @@ public abstract class Decl implements IDecl {
         }
       }
 
-      return new DeclClass(parent, f_childBuilders, f_name, f_visibility, f_isStatic, f_isFinal, f_isAbstract);
+      return new DeclClass(parent, f_childBuilders, f_name, f_visibility, f_isStatic, f_isFinal, f_isAbstract,
+          anonymousDeclPosition);
     }
   }
 
@@ -1782,6 +1802,8 @@ public abstract class Decl implements IDecl {
       addB(STATIC, decl.isStatic(), b);
       addB(FINAL, decl.isFinal(), b);
       addB(ABSTRACT, decl.isAbstract(), b);
+      if (decl.getVisibility() == Visibility.ANONYMOUS && decl.getPosition() > 0)
+        add(POSITION, Integer.toString(decl.getPosition()), b);
       break;
     case CONSTRUCTOR:
       addV(VISIBILITY, decl.getVisibility(), b);
@@ -1982,6 +2004,9 @@ public abstract class Decl implements IDecl {
       }
       if (isFor(ABSTRACT, pair)) {
         classBuilder.setIsAbstract(Boolean.valueOf(pair.second()));
+      }
+      if (isFor(POSITION, pair)) {
+        classBuilder.setAnonymousDeclPosition(Integer.parseInt(pair.second()));
       }
       thisDeclBuilder = classBuilder;
       break;

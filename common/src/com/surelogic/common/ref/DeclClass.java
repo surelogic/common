@@ -13,13 +13,15 @@ final class DeclClass extends DeclVisibility implements IDeclType {
   final boolean f_isStatic;
   final boolean f_isFinal;
   final boolean f_isAbstract;
+  final int f_anonymousDeclPosition;
 
   DeclClass(IDecl parent, List<Decl.DeclBuilder> childBuilders, String name, Visibility visibility, boolean isStatic,
-      boolean isFinal, boolean isAbstract) {
+      boolean isFinal, boolean isAbstract, int anonymousDeclPosition) {
     super(parent, childBuilders, name, visibility);
     f_isStatic = isStatic;
     f_isFinal = isFinal;
     f_isAbstract = isAbstract;
+    f_anonymousDeclPosition = anonymousDeclPosition;
   }
 
   @NonNull
@@ -40,6 +42,11 @@ final class DeclClass extends DeclVisibility implements IDeclType {
   @Override
   public boolean isAbstract() {
     return f_isAbstract;
+  }
+
+  @Override
+  public int getPosition() {
+    return f_anonymousDeclPosition;
   }
 
   @Override

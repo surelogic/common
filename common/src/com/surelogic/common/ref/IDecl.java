@@ -197,11 +197,15 @@ public interface IDecl {
 
   /**
    * Gets the zero-based position number of a parameter declaration&mdash;this
-   * information is only meaningful for {@link Kind#PARAMETER} and
-   * {@link Kind#TYPE_PARAMETER}. If this is meaningless for the declaration, -1
-   * is returned.
+   * information is only meaningful for {@link Kind#PARAMETER},
+   * {@link Kind#TYPE_PARAMETER}. For anonymous classes, {@link Kind#CLASS} with
+   * {@link Visibility#ANONYMOUS}, this value indicates the zero-based position
+   * of an anonymous class declaration within the immediate enclosing
+   * declaration. If this is meaningless for the declaration, -1 is returned.
    * 
-   * @return the zero-based position number of this parameter, or -1.
+   * @return the zero-based position number of this parameter or the zero-based
+   *         position of this anonymous class within the immediate enclosing
+   *         declaration, or -1.
    */
   int getPosition();
 
