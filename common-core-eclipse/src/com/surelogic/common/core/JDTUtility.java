@@ -30,26 +30,42 @@ import org.eclipse.core.runtime.IProduct;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IAccessRule;
+import org.eclipse.jdt.core.IClassFile;
 import org.eclipse.jdt.core.IClasspathAttribute;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.IField;
+import org.eclipse.jdt.core.IInitializer;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaModel;
 import org.eclipse.jdt.core.IJavaModelMarker;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.ILocalVariable;
+import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IParent;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.ITypeParameter;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.Signature;
 
+import com.surelogic.NonNull;
 import com.surelogic.Nullable;
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.logging.SLLogger;
+import com.surelogic.common.ref.DeclVisitor;
 import com.surelogic.common.ref.IDecl;
+import com.surelogic.common.ref.IDeclField;
+import com.surelogic.common.ref.IDeclFunction;
+import com.surelogic.common.ref.IDeclPackage;
+import com.surelogic.common.ref.IDeclParameter;
+import com.surelogic.common.ref.IDeclType;
+import com.surelogic.common.ref.IDeclTypeParameter;
 import com.surelogic.common.ref.IJavaRef;
 
 /**
@@ -357,13 +373,12 @@ public final class JDTUtility {
       final String baseTypeName = stripOffAnonymousOccurranceCount(typeName);
       final String className = baseTypeName.replace("$", ".");
 
-      final boolean searchAllPackages = projectName == null || projectName.equals(SLUtility.JAVA_DEFAULT_PACKAGE)
-          || projectName.startsWith(SLUtility.LIBRARY_PROJECT);
+      final boolean searchAllProjects = projectName == null || projectName.startsWith(SLUtility.LIBRARY_PROJECT);
       final IWorkspaceRoot wsRoot = ResourcesPlugin.getWorkspace().getRoot();
       final IJavaModel model = JavaCore.create(wsRoot);
       if (model != null) {
         for (final IJavaProject project : model.getJavaProjects()) {
-          if (searchAllPackages || projectName.equals(project.getElementName())) {
+          if (searchAllProjects || projectName.equals(project.getElementName())) {
             String packageNameHolder = null;
             if (!(packageName == null) && !packageName.equals(SLUtility.JAVA_DEFAULT_PACKAGE)) {
               packageNameHolder = packageName;
@@ -389,43 +404,353 @@ public final class JDTUtility {
   public static IJavaElement findJavaElementOrNull(final IJavaRef javaRef) {
     if (javaRef == null)
       return null;
-    final IDecl decl = javaRef.getDeclaration();
 
+  //  System.out.println("findJavaElementOrNull(" + javaRef + ")");
+
+    final IDecl decl = javaRef.getDeclaration();
+    String projectName = javaRef.getEclipseProjectNameOrNull();
+    final boolean searchAllProjects = projectName == null || projectName.startsWith(SLUtility.LIBRARY_PROJECT);
+    if (searchAllProjects)
+
+      projectName = null;
     try {
-      if (decl.getKind() == IDecl.Kind.PACKAGE) {
-        /*
-         * HANDLE PACKAGE
-         */
-        for (final IJavaProject prj : getProjectsToSearchByName(javaRef.getEclipseProjectNameOrNull())) {
-          for (IPackageFragmentRoot pfr : prj.getAllPackageFragmentRoots()) {
-            String pkgName = javaRef.getPackageName();
-            // "" means default package for an IPackageFragment
-            if (pkgName == null)
-              pkgName = "";
-            if (pkgName.equals(SLUtility.JAVA_DEFAULT_PACKAGE))
-              pkgName = "";
-            IPackageFragment pf = pfr.getPackageFragment(pkgName);
-            if (pf != null && pf.exists()) {
-              ICompilationUnit cu = pf.getCompilationUnit(SLUtility.PACKAGE_INFO + ".java");
-              if (cu != null && cu.exists())
-                return cu; // return package-info.java
-              else
-                return pf; // return package in model
-            }
+      double confidence = 0;
+      IJavaElement best = null;
+      List<IPackageFragment> pkgs = null;
+      for (final IJavaProject prj : getProjectsToSearchByName(projectName)) {
+        JavaElementMatcher matcher = new JavaElementMatcher(prj);
+        decl.acceptRootToThis(matcher);
+        final IJavaElement matcherResult = matcher.getResult();
+        if (matcherResult != prj) {
+          final double matcherConfidence = matcher.getConfidence();
+          if (matcherConfidence > confidence) {
+            best = matcherResult;
+            confidence = matcherConfidence;
+            pkgs = matcher.getPackageFragments();
           }
         }
-      } else {
-        final String typeName = javaRef.getTypeNameOrNull();
-        if (typeName != null) {
-          final IType element = JDTUtility.findIType(javaRef.getEclipseProjectName(), javaRef.getPackageName(), typeName);
-          if (element != null)
-            return element;
+      }
+      if (best == null)
+        return null;
+      /*
+       * Special case for package-info files (a better answer).
+       */
+      if (decl.getKind() == IDecl.Kind.PACKAGE && best instanceof IPackageFragment) {
+        for (IPackageFragment pkg : pkgs) {
+          final ICompilationUnit cu = pkg.getCompilationUnit(SLUtility.PACKAGE_INFO + ".java");
+          if (cu != null && cu.exists())
+            return cu; // return package-info.java
+          final IClassFile cf = pkg.getClassFile(SLUtility.PACKAGE_INFO + ".class");
+          if (cf != null && cf.exists())
+            return cf; // return package-info.class
         }
       }
+     // System.out.println(" found (" + confidence + ") -> " + best);
+      return best;
     } catch (Exception e) {
       SLLogger.getLogger().log(Level.WARNING, I18N.err(156, javaRef), e);
     }
     return null;
+  }
+
+  /**
+   * This class matches up an {@link IDecl} to a corresponding
+   * {@link IJavaElement}, whenever possible.
+   * <p>
+   * Always use {@link IDecl#acceptRootToThis(DeclVisitor)} for this visitor.
+   */
+  private static class JavaElementMatcher extends DeclVisitor {
+
+    @NonNull
+    IJavaElement current;
+    /**
+     * Count of things we found.
+     */
+    int foundCount = 0;
+    /**
+     * Count of things we looked for.
+     */
+    int lookedForCount = 0;
+    /**
+     * We need this because the package can be under multiple package fragment
+     * roots.
+     */
+    @NonNull
+    List<IPackageFragment> packageMatches = new ArrayList<IPackageFragment>();
+
+    public JavaElementMatcher(IJavaProject projectToSearch) {
+      current = projectToSearch;
+    }
+
+    /**
+     * Gets the result&mdash;an Eclipse Java element.
+     * <p>
+     * If the result is a {@link IPackageFragment} use
+     * {@link #getPackageFragments()} to get all matches to examine (this method
+     * returns the last found). There can be more than one location in an
+     * Eclipse project where the package exists (e.g., a src and test source
+     * folder that have the same packages).
+     * 
+     * @return an Eclipse Java element.
+     */
+    IJavaElement getResult() {
+      return current;
+    }
+
+    /**
+     * A list of all package fragments found. There can be more than one
+     * location in an Eclipse project where the package exists (e.g., a src and
+     * test source folder that have the same packages).
+     * 
+     * @return a list of package fragments.
+     */
+    List<IPackageFragment> getPackageFragments() {
+      return packageMatches;
+    }
+
+    /**
+     * A numerical confidence about the result of this search. Greater is
+     * better.
+     * <p>
+     * It is better to test that the {@link #getResult()} ==
+     * <tt>projectToSearch</tt> (passed to
+     * {@link #JavaElementMatcher(IJavaProject)}) than to check if this method
+     * returns 0
+     * 
+     * @return a numerical confidence about the result of this search. Greater
+     *         is better.
+     */
+    double getConfidence() {
+      return (double) foundCount / (double) lookedForCount;
+    }
+
+    @Override
+    public void visitPackage(IDeclPackage node) {
+      lookedForCount++;
+      boolean found = false;
+      for (IJavaElement je : getChildren(current)) {
+        if (je instanceof IPackageFragment) {
+          if (node.getName().equals(je.getElementName())) {
+            packageMatches.add((IPackageFragment) je);
+            current = je; // the last found
+            found = true;
+          }
+        }
+      }
+      if (found)
+        foundCount++;
+    }
+
+    @Override
+    public boolean visitTypes(List<IDeclType> types) {
+      for (IDeclType type : types) {
+        lookedForCount++;
+        if (current.getElementType() == IJavaElement.PACKAGE_FRAGMENT) {
+          // we have to look in all packages found for a top-level type
+          for (IPackageFragment pkg : packageMatches) {
+            if (matchType(type, pkg)) {
+              foundCount++;
+              continue;
+            }
+          }
+        } else {
+          if (matchType(type, current))
+            foundCount++;
+        }
+      }
+      return false;
+    }
+
+    boolean matchType(IDeclType node, IJavaElement parent) {
+      for (IJavaElement ije : getChildren(parent)) {
+        if (ije instanceof IType) {
+          final IType it = (IType) ije;
+          try {
+            if (it.isAnonymous() && node.getKind() == IDecl.Kind.CLASS && node.getVisibility() == IDecl.Visibility.ANONYMOUS) {
+              // this may not be right if more than one anonymous class exists
+              current = it;
+              return true;
+            }
+            if (it.isClass() && node.getKind() == IDecl.Kind.CLASS || it.isInterface() && node.getKind() == IDecl.Kind.INTERFACE
+                || it.isEnum() && node.getKind() == IDecl.Kind.ENUM || it.isAnnotation() && node.getKind() == IDecl.Kind.ANNOTATION) {
+              if (node.getName().equals(it.getElementName())) {
+                current = it;
+                return true;
+              }
+            }
+          } catch (JavaModelException ex) {
+            SLLogger.getLogger().log(Level.WARNING, I18N.err(290, node), ex);
+          }
+        }
+      }
+      return false; // no match found
+    }
+
+    @Override
+    public void visitField(IDeclField node) {
+      lookedForCount++;
+      for (IJavaElement je : getChildren(current)) {
+        if (je.getElementType() == IJavaElement.FIELD) {
+          if (node.getName().equals(je.getElementName())) {
+            foundCount++;
+            current = je;
+            return;
+          }
+        }
+      }
+    }
+
+    @Override
+    public void visitInitializer(IDecl node) {
+      lookedForCount++;
+      for (IJavaElement ije : getChildren(current)) {
+        if (ije instanceof IInitializer) {
+          final IInitializer init = (IInitializer) ije;
+          try {
+            boolean isStatic = Flags.isStatic(init.getFlags());
+            if (node.isStatic() == isStatic) {
+              foundCount++;
+              current = init;
+              return;
+            }
+          } catch (JavaModelException ex) {
+            SLLogger.getLogger().log(Level.WARNING, I18N.err(290, node), ex);
+          }
+        }
+      }
+    }
+
+    @Override
+    public boolean visitMethod(IDeclFunction node) {
+      lookedForCount++;
+      for (IJavaElement ije : getChildren(current)) {
+        if (ije instanceof IMethod) {
+          final IMethod im = (IMethod) ije;
+          if (node.getName().equals(im.getElementName())) {
+            final String[] paramTypes = im.getParameterTypes();
+            final List<IDeclParameter> nodeParams = node.getParameters();
+            if (nodeParams.size() == paramTypes.length) {
+              boolean matches = true;
+              for (int i = 0; i < paramTypes.length; i++) {
+                final String eclipseTypeSig = paramTypes[i];
+                final String imType = Signature.getSignatureSimpleName(eclipseTypeSig);
+                // heuristic match (not exact with arrays at the very least)
+                if (!nodeParams.get(i).getTypeOf().getFullyQualified().contains(imType)) {
+                  matches = false;
+                  break;
+                }
+              }
+              if (matches) {
+                foundCount++;
+                current = im;
+                return false;
+              }
+            }
+          }
+        }
+      }
+      return false;
+    }
+
+    @Override
+    public boolean visitConstructor(IDeclFunction node) {
+      lookedForCount++;
+      for (IJavaElement ije : getChildren(current)) {
+        if (ije instanceof IMethod) {
+          final IMethod im = (IMethod) ije;
+          try {
+            final ILocalVariable[] imParams = im.getParameters();
+            final List<IDeclParameter> nodeParams = node.getParameters();
+            if (nodeParams.size() == imParams.length) {
+              boolean matches = true;
+              for (int i = 0; i < imParams.length; i++) {
+                final String eclipseTypeSig = imParams[i].getTypeSignature();
+                final String imType = Signature.getSignatureSimpleName(eclipseTypeSig);
+                // heuristic match (not exact with arrays at the very least)
+                if (!nodeParams.get(i).getTypeOf().getFullyQualified().contains(imType)) {
+                  matches = false;
+                  break;
+                }
+              }
+              if (matches) {
+                foundCount++;
+                current = im;
+                return false;
+              }
+            }
+          } catch (JavaModelException ex) {
+            SLLogger.getLogger().log(Level.WARNING, I18N.err(290, node), ex);
+          }
+        }
+      }
+      return false;
+    }
+
+    @Override
+    public void visitParameter(IDeclParameter node, boolean partOfDecl) {
+      if (!partOfDecl)
+        return;
+      try {
+        lookedForCount++;
+        if (current instanceof IMethod) {
+          ILocalVariable[] params = ((IMethod) current).getParameters();
+          if (params.length > node.getPosition()) {
+            foundCount++;
+            current = params[node.getPosition()];
+            return;
+          }
+        }
+      } catch (JavaModelException ex) {
+        SLLogger.getLogger().log(Level.WARNING, I18N.err(290, node), ex);
+      }
+    }
+
+    @Override
+    public void visitTypeParameter(IDeclTypeParameter node, boolean partOfDecl) {
+      if (!partOfDecl)
+        return;
+      try {
+        lookedForCount++;
+        ITypeParameter[] typeParams = null;
+        if (current instanceof IType) {
+          typeParams = ((IType) current).getTypeParameters();
+        }
+        if (current instanceof IMethod) {
+          typeParams = ((IMethod) current).getTypeParameters();
+        }
+        if (typeParams == null)
+          return;
+        if (typeParams.length > node.getPosition()) {
+          foundCount++;
+          current = typeParams[node.getPosition()];
+          return;
+        }
+      } catch (JavaModelException ex) {
+        SLLogger.getLogger().log(Level.WARNING, I18N.err(290, node), ex);
+      }
+    }
+
+    List<IJavaElement> getChildren(IJavaElement e) {
+      List<IJavaElement> result = new ArrayList<IJavaElement>();
+      try {
+        if (e instanceof IParent) {
+          for (IJavaElement child : ((IParent) e).getChildren()) {
+            if (instanceOfInterestingType(child))
+              result.add(child);
+            else
+              result.addAll(getChildren(child));
+          }
+        }
+      } catch (JavaModelException ex) {
+        SLLogger.getLogger().log(Level.WARNING, I18N.err(290, e), ex);
+      }
+      return result;
+    }
+
+    boolean instanceOfInterestingType(IJavaElement e) {
+      return e instanceof IPackageFragment || e instanceof IType || e instanceof IField || e instanceof IMethod
+          || e instanceof IInitializer;
+    }
   }
 
   /**
@@ -449,51 +774,6 @@ public final class JDTUtility {
       }
     }
     return result;
-  }
-
-  /**
-   * Gets the <tt>package-info.java</tt> file within the passed project and
-   * package.
-   * 
-   * @param projectName
-   *          the project name the element is contained within. For example,
-   *          <code>JEdit</code>. If null, try all projects
-   * @param packageName
-   *          the package name the element is contained within. For example,
-   *          <code>com.surelogic.sierra</code>. the package name is
-   *          "(default package)" or null then the class is contained within the
-   *          default package.
-   * @return the compilation unit for the <tt>package-info.java</tt> file within
-   *         the passed project or null.
-   */
-  public static ICompilationUnit findPackageInfoOrNull(final String projectName, final String packageName) {
-    try {
-      final IWorkspaceRoot wsRoot = ResourcesPlugin.getWorkspace().getRoot();
-      final IJavaModel model = JavaCore.create(wsRoot);
-      if (model != null) {
-        for (final IJavaProject project : model.getJavaProjects()) {
-          if (projectName == null || project.getElementName().equals(projectName)) {
-            for (IPackageFragmentRoot pfr : project.getAllPackageFragmentRoots()) {
-              String pkgName = packageName;
-              if (pkgName == null)
-                pkgName = "";
-              if (pkgName.equals(SLUtility.JAVA_DEFAULT_PACKAGE))
-                pkgName = "";
-              IPackageFragment pf = pfr.getPackageFragment(pkgName);
-              if (pf != null && pf.exists()) {
-                ICompilationUnit cu = pf.getCompilationUnit(SLUtility.PACKAGE_INFO + ".java");
-                if (cu != null && cu.exists())
-                  return cu;
-              }
-            }
-          }
-        }
-      }
-    } catch (final Exception e) {
-      SLLogger.getLogger().log(Level.SEVERE,
-          "Exception thrown trying to find package-info.java in " + projectName + " for package " + packageName, e);
-    }
-    return null;
   }
 
   private static final Pattern ANON = Pattern.compile("\\$\\d+");
