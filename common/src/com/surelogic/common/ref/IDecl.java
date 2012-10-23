@@ -64,6 +64,7 @@ public interface IDecl {
   public static final EnumSet<IDecl.Kind> HAS_PARAMETERS = EnumSet.of(IDecl.Kind.CONSTRUCTOR, IDecl.Kind.METHOD);
   public static final EnumSet<IDecl.Kind> HAS_TYPE_PARAMETERS = EnumSet.of(IDecl.Kind.CLASS, IDecl.Kind.INTERFACE,
       IDecl.Kind.CONSTRUCTOR, IDecl.Kind.METHOD);
+  public static final EnumSet<IDecl.Kind> IS_PARAMETER = EnumSet.of(IDecl.Kind.PARAMETER, IDecl.Kind.TYPE_PARAMETER);
 
   /**
    * The visibility of a declaration.

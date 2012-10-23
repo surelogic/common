@@ -14,11 +14,14 @@ import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.ide.IDE;
 
+import com.surelogic.NonNull;
+import com.surelogic.common.Pair;
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.core.JDTUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.i18n.JavaSourceReference;
 import com.surelogic.common.logging.SLLogger;
+import com.surelogic.common.ref.IDecl;
 import com.surelogic.common.ref.IJavaRef;
 
 public class JDTUIUtility {
@@ -73,14 +76,17 @@ public class JDTUIUtility {
     if (javaRef == null)
       return false;
 
-    final IJavaElement element = JDTUtility.findJavaElementOrNull(javaRef);
+    final Pair<IJavaElement, Double> pair = JDTUtility.findJavaElement(javaRef);
+    final IJavaElement element = pair.first();
     if (element == null)
       return false;
 
     try {
       final IEditorPart editorPart = JavaUI.openInEditor(element, false, true);
-      tryToHighlightHelper(javaRef.getOffset(), javaRef.getLength(), javaRef.getLineNumber(), editorPart);
-      return editorPart != null;
+      if (editorPart == null)
+        return false;
+      tryToHighlightHelper(javaRef, element, pair.second(), editorPart);
+      return true;
     } catch (final Exception e) {
       SLLogger.getLogger().log(Level.SEVERE, I18N.err(132, element, javaRef), e);
     }
@@ -88,26 +94,43 @@ public class JDTUIUtility {
   }
 
   /**
-   * This method tries to use the information in <tt>javaRef</tt> to highlight a
-   * line or an offset/length pair in the passed <tt>editorPart</tt>.
-   * <p>
-   * If either argument is {@code null} it returns immediately.
+   * This method tries to use a bunch of information in to heuristically
+   * highlight what is selected in the passed <tt>editorPart</tt>.
    * 
-   * @param offset
-   *          offset into the file, or -1 if none.
-   * @param lenght
-   *          length to select from the offset, or -1 if none.
-   * @param lineNumber
-   *          line number to select if offset/length are -1, or -1 if none.
+   * @param javaRef
+   *          a Java code reference.
+   * @param element
+   *          the Java declaration we are on or within.
+   * @param confidenceOfElement
+   *          how good the element is [1,0] where higher is better.
    * @param editorPart
-   *          an editor, may be {@code null}.
+   *          an Eclipse Java editor.
    * @throws CoreException
    *           if anything goes wrong.
    */
-  private static final void tryToHighlightHelper(final int offset, final int length, final int lineNumber,
-      final IEditorPart editorPart) throws CoreException {
-    if (editorPart == null)
+  private static final void tryToHighlightHelper(@NonNull final IJavaRef javaRef, @NonNull final IJavaElement element,
+      double confidenceOfElement, @NonNull final IEditorPart editorPart) throws CoreException {
+    /*
+     * The line numbers in class files often suck (could be old) and, at least
+     * for JSure, we are almost always pointing directly to a declaration. So,
+     * if we have a good match ignore the line/offset-length data.
+     */
+    boolean inClassFile = JDTUtility.getEnclosingIClassFileOrNull(element) != null;
+    if (inClassFile && confidenceOfElement > 0.9)
       return;
+    /*
+     * For parameters and type parameters the whole line tends to get
+     * highlighted (not just the parameter) this examines the lookup and ignores
+     * the line/offset-length data if we got a decent match in the Eclipse
+     * model.
+     */
+    if (IDecl.IS_PARAMETER.contains(javaRef.getDeclaration().getKind()) && confidenceOfElement > 0.9) {
+      return;
+    }
+
+    final int offset = javaRef.getOffset();
+    final int length = javaRef.getLength();
+    final int lineNumber = javaRef.getLineNumber();
 
     if (offset != -1 && length != -1) {
       /*

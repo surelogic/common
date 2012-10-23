@@ -56,6 +56,7 @@ import org.eclipse.jdt.core.Signature;
 
 import com.surelogic.NonNull;
 import com.surelogic.Nullable;
+import com.surelogic.common.Pair;
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.logging.SLLogger;
@@ -348,6 +349,42 @@ public final class JDTUtility {
   }
 
   /**
+   * Gets the enclosing {@link ICompilationUnit} of the passed Java element.
+   * 
+   * @param e
+   *          a Java element.
+   * @return a {@link ICompilationUnit}, or {@code null} if the Java element is
+   *         not in a <tt>.java</tt> file.
+   */
+  @Nullable
+  public static ICompilationUnit getEnclosingICompilationUnitOrNull(IJavaElement e) {
+    while (e != null) {
+      if (e instanceof ICompilationUnit)
+        return (ICompilationUnit) e;
+      e = e.getParent();
+    }
+    return null;
+  }
+
+  /**
+   * Gets the enclosing {@link IClassFile} of the passed Java element.
+   * 
+   * @param e
+   *          a Java element.
+   * @return a {@link IClassFile}, or {@code null} if the Java element is not in
+   *         a <tt>.class</tt> file.
+   */
+  @Nullable
+  public static IClassFile getEnclosingIClassFileOrNull(IJavaElement e) {
+    while (e != null) {
+      if (e instanceof IClassFile)
+        return (IClassFile) e;
+      e = e.getParent();
+    }
+    return null;
+  }
+
+  /**
    * Gets the {@link IType} element associated with the passed information or
    * {@code null} if it cannot be found.
    * 
@@ -402,18 +439,47 @@ public final class JDTUtility {
     return null;
   }
 
+  /**
+   * Tries to find the corresponding {@link IJavaElement} to the passed
+   * {@link IJavaRef}.
+   * 
+   * @param javaRef
+   *          a Java code reference.
+   * @return the corresponding {@link IJavaElement} or {@code null} if none can
+   *         be found.
+   * 
+   * @see #findJavaElement(IJavaRef)
+   */
+  @Nullable
   public static IJavaElement findJavaElementOrNull(final IJavaRef javaRef) {
-    if (javaRef == null)
-      return null;
+    return findJavaElement(javaRef).first();
+  }
 
+  /**
+   * Tries to find the corresponding {@link IJavaElement} to the passed
+   * {@link IJavaRef}. The Eclipse Java element is returned if it can be found,
+   * and a confidence from 1 to 0 is found, where 1 indicates a perfect match
+   * and 0 indicates no match.
+   * 
+   * @param javaRef
+   *          a Java code reference.
+   * @return a pair: (first) the corresponding {@link IJavaElement} or
+   *         {@code null}, (second) the confidence of the match [1,0] where
+   *         higher is better.
+   */
+  @NonNull
+  public static Pair<IJavaElement, Double> findJavaElement(final IJavaRef javaRef) {
+    if (javaRef == null)
+      return new Pair<IJavaElement, Double>(null, Double.valueOf(0));
     // System.out.println("findJavaElementOrNull(" + javaRef + ")");
 
     final IDecl decl = javaRef.getDeclaration();
+
     String projectName = javaRef.getEclipseProjectNameOrNull();
     final boolean searchAllProjects = projectName == null || projectName.startsWith(SLUtility.LIBRARY_PROJECT);
     if (searchAllProjects)
-
       projectName = null;
+
     try {
       double confidence = 0;
       IJavaElement best = null;
@@ -432,7 +498,7 @@ public final class JDTUtility {
         }
       }
       if (best == null)
-        return null;
+        return new Pair<IJavaElement, Double>(null, Double.valueOf(0));
       /*
        * Special case for package-info files (a better answer).
        */
@@ -440,18 +506,18 @@ public final class JDTUtility {
         for (IPackageFragment pkg : pkgs) {
           final ICompilationUnit cu = pkg.getCompilationUnit(SLUtility.PACKAGE_INFO + ".java");
           if (cu != null && cu.exists())
-            return cu; // return package-info.java
+            return new Pair<IJavaElement, Double>(cu, Double.valueOf(1)); // package-info.java
           final IClassFile cf = pkg.getClassFile(SLUtility.PACKAGE_INFO + ".class");
           if (cf != null && cf.exists())
-            return cf; // return package-info.class
+            return new Pair<IJavaElement, Double>(cf, Double.valueOf(1)); // package-info.class
         }
       }
       // System.out.println(" found (" + confidence + ") -> " + best);
-      return best;
+      return new Pair<IJavaElement, Double>(best, Double.valueOf(confidence));
     } catch (Exception e) {
       SLLogger.getLogger().log(Level.WARNING, I18N.err(156, javaRef), e);
     }
-    return null;
+    return new Pair<IJavaElement, Double>(null, Double.valueOf(0));
   }
 
   /**
