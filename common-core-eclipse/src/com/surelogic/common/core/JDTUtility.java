@@ -1,6 +1,7 @@
 package com.surelogic.common.core;
 
 import java.io.File;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -405,7 +406,7 @@ public final class JDTUtility {
     if (javaRef == null)
       return null;
 
-  //  System.out.println("findJavaElementOrNull(" + javaRef + ")");
+    // System.out.println("findJavaElementOrNull(" + javaRef + ")");
 
     final IDecl decl = javaRef.getDeclaration();
     String projectName = javaRef.getEclipseProjectNameOrNull();
@@ -445,7 +446,7 @@ public final class JDTUtility {
             return cf; // return package-info.class
         }
       }
-     // System.out.println(" found (" + confidence + ") -> " + best);
+      // System.out.println(" found (" + confidence + ") -> " + best);
       return best;
     } catch (Exception e) {
       SLLogger.getLogger().log(Level.WARNING, I18N.err(156, javaRef), e);
@@ -526,11 +527,13 @@ public final class JDTUtility {
 
     @Override
     public void visitPackage(IDeclPackage node) {
+      // for a IPackageFragment the default package is ""
+      String nodePkgName = node.getName().equals(SLUtility.JAVA_DEFAULT_PACKAGE) ? "" : node.getName();
       lookedForCount++;
       boolean found = false;
       for (IJavaElement je : getChildren(current)) {
         if (je instanceof IPackageFragment) {
-          if (node.getName().equals(je.getElementName())) {
+          if (nodePkgName.equals(je.getElementName())) {
             packageMatches.add((IPackageFragment) je);
             current = je; // the last found
             found = true;
@@ -658,28 +661,24 @@ public final class JDTUtility {
       for (IJavaElement ije : getChildren(current)) {
         if (ije instanceof IMethod) {
           final IMethod im = (IMethod) ije;
-          try {
-            final ILocalVariable[] imParams = im.getParameters();
-            final List<IDeclParameter> nodeParams = node.getParameters();
-            if (nodeParams.size() == imParams.length) {
-              boolean matches = true;
-              for (int i = 0; i < imParams.length; i++) {
-                final String eclipseTypeSig = imParams[i].getTypeSignature();
-                final String imType = Signature.getSignatureSimpleName(eclipseTypeSig);
-                // heuristic match (not exact with arrays at the very least)
-                if (!nodeParams.get(i).getTypeOf().getFullyQualified().contains(imType)) {
-                  matches = false;
-                  break;
-                }
-              }
-              if (matches) {
-                foundCount++;
-                current = im;
-                return false;
+          final String[] paramTypes = im.getParameterTypes();
+          final List<IDeclParameter> nodeParams = node.getParameters();
+          if (nodeParams.size() == paramTypes.length) {
+            boolean matches = true;
+            for (int i = 0; i < paramTypes.length; i++) {
+              final String eclipseTypeSig = paramTypes[i];
+              final String imType = Signature.getSignatureSimpleName(eclipseTypeSig);
+              // heuristic match (not exact with arrays at the very least)
+              if (!nodeParams.get(i).getTypeOf().getFullyQualified().contains(imType)) {
+                matches = false;
+                break;
               }
             }
-          } catch (JavaModelException ex) {
-            SLLogger.getLogger().log(Level.WARNING, I18N.err(290, node), ex);
+            if (matches) {
+              foundCount++;
+              current = im;
+              return false;
+            }
           }
         }
       }
@@ -690,19 +689,41 @@ public final class JDTUtility {
     public void visitParameter(IDeclParameter node, boolean partOfDecl) {
       if (!partOfDecl)
         return;
-      try {
-        lookedForCount++;
-        if (current instanceof IMethod) {
-          ILocalVariable[] params = ((IMethod) current).getParameters();
-          if (params.length > node.getPosition()) {
-            foundCount++;
-            current = params[node.getPosition()];
-            return;
-          }
+      lookedForCount++;
+      if (current instanceof IMethod) {
+        ILocalVariable[] params = getParameters((IMethod) current);
+        if (params.length > node.getPosition()) {
+          foundCount++;
+          current = params[node.getPosition()];
+          return;
         }
-      } catch (JavaModelException ex) {
-        SLLogger.getLogger().log(Level.WARNING, I18N.err(290, node), ex);
       }
+    }
+
+    /**
+     * <b>Remove this method when we support Eclipse 3.7 and above.</b>
+     * <p>
+     * This is a hack to get the parameters of the passed method. The
+     * <tt>getParameters()</tt> method was not added to Eclipse until the 3.7
+     * release.
+     * 
+     * @param m
+     *          an Eclipse Java model method
+     * @return the method's parameters, or an empty array if none or the method
+     *         call doesn't exist in the Eclipse we are running within.
+     */
+    private ILocalVariable[] getParameters(IMethod m) {
+      ILocalVariable[] result = new ILocalVariable[0];
+      try {
+        Class<?> c = Class.forName("org.eclipse.jdt.core.IMethod");
+        if (c.isInstance(m)) {
+          Method gp = c.getDeclaredMethod("getParameters");
+          result = (ILocalVariable[]) gp.invoke(m);
+        }
+      } catch (Exception probablyInEclipseLessThan37) {
+        // ignore
+      }
+      return result;
     }
 
     @Override
