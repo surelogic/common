@@ -298,7 +298,7 @@ public class JavaRef implements IJavaRef {
     f_positionRelativeToDeclaration = positionRelativeToDeclaration;
     f_eclipseProjectName = eclipseProjectNameOrNull;
     f_lineNumber = lineNumber > 0 && lineNumber != Integer.MAX_VALUE ? lineNumber : -1;
-    f_offset = offset > 0 && offset != Integer.MAX_VALUE ? offset : -1;
+    f_offset = offset >= 0 && offset != Integer.MAX_VALUE ? offset : -1;
     f_length = length > 0 && length != Integer.MAX_VALUE ? length : -1;
     f_absolutePath = absolutePathOrNull;
     f_jarRelativePath = jarRelativePathOrNull;
