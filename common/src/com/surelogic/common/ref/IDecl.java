@@ -106,8 +106,7 @@ public interface IDecl {
    * The name returned for the default package is
    * {@link SLUtility#JAVA_DEFAULT_PACKAGE}.
    * <p>
-   * The name returned for an anonymous class is the number, starting at one,
-   * indicating its order of occurrence in the class.
+   * The name returned for an anonymous class is the empty string.
    * <p>
    * The name returned for a parameter is its formal name, if known, or
    * <tt>arg</tt><i>n</i>, where <i>n</i> is the number, starting at zero,
@@ -198,7 +197,9 @@ public interface IDecl {
   /**
    * Gets the zero-based position number of a parameter declaration&mdash;this
    * information is only meaningful for {@link Kind#PARAMETER},
-   * {@link Kind#TYPE_PARAMETER}. For anonymous classes, {@link Kind#CLASS} with
+   * {@link Kind#TYPE_PARAMETER}
+   * <p>
+   * For anonymous classes, indicated by {@link Kind#CLASS} with
    * {@link Visibility#ANONYMOUS}, this value indicates the zero-based position
    * of an anonymous class declaration within the immediate enclosing
    * declaration. If this is meaningless for the declaration, -1 is returned.
