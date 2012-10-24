@@ -1661,7 +1661,7 @@ public abstract class Decl implements IDecl {
 
   @Override
   public String toString() {
-    return DeclUtil.toString(this);
+    return this.getClass().getSimpleName() + "[" + DeclUtil.toString(this) + "]";
   }
 
   /**
