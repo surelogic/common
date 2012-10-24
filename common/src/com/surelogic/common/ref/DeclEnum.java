@@ -18,9 +18,4 @@ final class DeclEnum extends DeclVisibility implements IDeclType {
   public Kind getKind() {
     return Kind.ENUM;
   }
-
-  @Override
-  String toStringHelper() {
-    return "." + f_name;
-  }
 }

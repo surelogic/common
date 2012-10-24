@@ -184,8 +184,8 @@ public abstract class DeclVisitor {
    * @param node
    *          the node to visit where <tt>node.getKind() ==
    *          {@link IDecl.Kind#METHOD}</tt>.
-   * @return {@code true} if the parameters and type parameters of this method
-   *         should be visited (this includes calling
+   * @return {@code true} if the type parameters and parameters of this method
+   *         should be visited, in that order (this includes calling
    *         {@link #visitTypeParameters(List)} and then
    *         {@link #visitParameters(List)}), {@code false} otherwise.
    */
@@ -202,8 +202,8 @@ public abstract class DeclVisitor {
    * @param node
    *          the node to visit where <tt>node.getKind() ==
    *          {@link IDecl.Kind#CONSTRUCTOR}</tt>.
-   * @return {@code true} if the parameters and type parameters of this
-   *         constructor should be visited (this includes calling
+   * @return {@code true} if the type parameters and parameters of this
+   *         constructor should be visited, in that order (this includes calling
    *         {@link #visitTypeParameters(List)} and then
    *         {@link #visitParameters(List)}), {@code false} otherwise.
    */

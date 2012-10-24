@@ -21,7 +21,6 @@ import com.surelogic.common.core.JDTUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.i18n.JavaSourceReference;
 import com.surelogic.common.logging.SLLogger;
-import com.surelogic.common.ref.IDecl;
 import com.surelogic.common.ref.IJavaRef;
 
 public class JDTUIUtility {
@@ -118,15 +117,6 @@ public class JDTUIUtility {
     boolean inClassFile = JDTUtility.getEnclosingIClassFileOrNull(element) != null;
     if (inClassFile && confidenceOfElement > 0.9)
       return;
-    /*
-     * For parameters and type parameters the whole line tends to get
-     * highlighted (not just the parameter) this examines the lookup and ignores
-     * the line/offset-length data if we got a decent match in the Eclipse
-     * model.
-     */
-    if (IDecl.IS_PARAMETER.contains(javaRef.getDeclaration().getKind()) && confidenceOfElement > 0.9) {
-      return;
-    }
 
     final int offset = javaRef.getOffset();
     final int length = javaRef.getLength();

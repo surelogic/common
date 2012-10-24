@@ -1661,52 +1661,7 @@ public abstract class Decl implements IDecl {
 
   @Override
   public String toString() {
-    LinkedList<Decl> stack = new LinkedList<Decl>();
-    Decl pushMe = this;
-    while (pushMe != null) {
-      stack.addFirst(pushMe);
-      pushMe = (Decl) pushMe.getParent();
-    }
-    final StringBuilder b = new StringBuilder();
-    for (final Decl decl : stack) {
-      b.append(decl.toStringHelper());
-    }
-    return b.toString();
-  }
-
-  abstract String toStringHelper();
-
-  protected static String toStringHelperTypeParameters(IDecl decl) {
-    List<IDeclTypeParameter> params = decl.getTypeParameters();
-    if (params.isEmpty())
-      return "";
-
-    final StringBuilder b = new StringBuilder("<");
-    boolean first = true;
-    for (IDeclTypeParameter param : params) {
-      if (first)
-        first = false;
-      else
-        b.append(",");
-      b.append(((Decl) param).toStringHelper());
-    }
-    b.append(">");
-    return b.toString();
-  }
-
-  protected static String toStringHelperParameters(IDecl decl) {
-    List<IDeclParameter> params = decl.getParameters();
-    final StringBuilder b = new StringBuilder("(");
-    boolean first = true;
-    for (IDeclParameter param : params) {
-      if (first)
-        first = false;
-      else
-        b.append(",");
-      b.append(((Decl) param).toStringHelper());
-    }
-    b.append(")");
-    return b.toString();
+    return this.getClass().getSimpleName() + "[" + DeclUtil.toString(this) + "]";
   }
 
   /**

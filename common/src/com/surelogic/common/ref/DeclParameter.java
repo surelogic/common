@@ -39,9 +39,4 @@ final class DeclParameter extends DeclWithPosition implements IDeclParameter {
   public boolean isFinal() {
     return f_isFinal;
   }
-
-  @Override
-  String toStringHelper() {
-    return f_name + ":" + f_typeOf.getFullyQualified();
-  }
 }

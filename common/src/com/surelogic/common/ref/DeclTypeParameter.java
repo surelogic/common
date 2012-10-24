@@ -29,22 +29,4 @@ final class DeclTypeParameter extends DeclWithPosition implements IDeclTypeParam
   public List<TypeRef> getBounds() {
     return new ArrayList<TypeRef>(f_bounds);
   }
-
-  @Override
-  String toStringHelper() {
-    final StringBuilder b = new StringBuilder();
-    b.append(f_name);
-    if (f_bounds.size() > 0) {
-      b.append(" extends ");
-      boolean firstBound = true;
-      for (TypeRef bound : f_bounds) {
-        if (firstBound)
-          firstBound = false;
-        else
-          b.append(" & ");
-        b.append(bound.getFullyQualified());
-      }
-    }
-    return b.toString();
-  }
 }

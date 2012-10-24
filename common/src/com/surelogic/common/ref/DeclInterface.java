@@ -18,9 +18,4 @@ final class DeclInterface extends DeclVisibility implements IDeclType {
   public Kind getKind() {
     return Kind.INTERFACE;
   }
-
-  @Override
-  String toStringHelper() {
-    return "." + f_name + Decl.toStringHelperTypeParameters(this);
-  }
 }

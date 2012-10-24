@@ -471,7 +471,7 @@ public final class JDTUtility {
   public static Pair<IJavaElement, Double> findJavaElement(final IJavaRef javaRef) {
     if (javaRef == null)
       return new Pair<IJavaElement, Double>(null, Double.valueOf(0));
-    // System.out.println("findJavaElementOrNull(" + javaRef + ")");
+    System.out.println("findJavaElementOrNull(" + javaRef + ")");
 
     final IDecl decl = javaRef.getDeclaration();
 
@@ -512,7 +512,7 @@ public final class JDTUtility {
             return new Pair<IJavaElement, Double>(cf, Double.valueOf(1)); // package-info.class
         }
       }
-      // System.out.println(" found (" + confidence + ") -> " + best);
+      System.out.println(" found (" + confidence + ") -> " + best);
       return new Pair<IJavaElement, Double>(best, Double.valueOf(confidence));
     } catch (Exception e) {
       SLLogger.getLogger().log(Level.WARNING, I18N.err(156, javaRef), e);
@@ -631,14 +631,18 @@ public final class JDTUtility {
     }
 
     boolean matchType(IDeclType node, IJavaElement parent) {
+      int anonymousDeclCount = 0;
       for (IJavaElement ije : getChildren(parent)) {
         if (ije instanceof IType) {
           final IType it = (IType) ije;
           try {
             if (it.isAnonymous() && node.getKind() == IDecl.Kind.CLASS && node.getVisibility() == IDecl.Visibility.ANONYMOUS) {
-              // this may not be right if more than one anonymous class exists
-              current = it;
-              return true;
+              if (node.getPosition() == anonymousDeclCount) {
+                current = it;
+                return true;
+              }
+              anonymousDeclCount++;
+              continue;
             }
             if (it.isClass() && node.getKind() == IDecl.Kind.CLASS || it.isInterface() && node.getKind() == IDecl.Kind.INTERFACE
                 || it.isEnum() && node.getKind() == IDecl.Kind.ENUM || it.isAnnotation() && node.getKind() == IDecl.Kind.ANNOTATION) {

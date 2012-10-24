@@ -465,7 +465,8 @@ public class JavaRef implements IJavaRef {
 
   @Override
   public String toString() {
-    final StringBuilder b = new StringBuilder("JavaRef(");
+    final StringBuilder b = new StringBuilder(this.getClass().getSimpleName());
+    b.append('[');
     b.append("projectName=").append(f_eclipseProjectName);
     b.append(",within=").append(f_within);
     b.append(",line=").append(f_lineNumber);
@@ -475,7 +476,7 @@ public class JavaRef implements IJavaRef {
     b.append(",declaration=").append(f_declaration);
     b.append(",absolutePath=").append(f_absolutePath);
     b.append(",jarRelativePath=").append(f_jarRelativePath);
-    b.append(")");
+    b.append(']');
     return b.toString();
   }
 

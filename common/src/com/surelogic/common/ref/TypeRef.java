@@ -92,7 +92,12 @@ public final class TypeRef {
 
   @Override
   public String toString() {
-    return "TypeRef(" + f_fullyQualified + ":" + f_compact + ")";
+    final StringBuilder b = new StringBuilder(this.getClass().getSimpleName());
+    b.append('[');
+    b.append('\u00ab').append(getCompact()).append('\u00bb');
+    b.append(getFullyQualified());
+    b.append(']');
+    return b.toString();
   }
 
   /**

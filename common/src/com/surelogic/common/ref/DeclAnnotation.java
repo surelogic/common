@@ -18,9 +18,4 @@ final class DeclAnnotation extends DeclVisibility implements IDeclType {
   public Kind getKind() {
     return Kind.ANNOTATION;
   }
-
-  @Override
-  String toStringHelper() {
-    return "." + f_name + Decl.toStringHelperTypeParameters(this);
-  }
 }
