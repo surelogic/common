@@ -48,12 +48,4 @@ final class DeclClass extends DeclVisibility implements IDeclType {
   public int getPosition() {
     return f_anonymousDeclPosition;
   }
-
-  @Override
-  String toStringHelper() {
-    if (f_visibility == Visibility.ANONYMOUS)
-      return ".(anonymous class)" + Decl.toStringHelperTypeParameters(this);
-    else
-      return "." + f_name + Decl.toStringHelperTypeParameters(this);
-  }
 }

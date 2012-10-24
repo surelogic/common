@@ -173,8 +173,8 @@ public interface IDecl {
   boolean isAbstract();
 
   /**
-   * Gets if this declaration does <i>not</i> appear in source code, it is an
-   * implicit declaration. If this is meaningless for the declaration,
+   * Gets if this constructor declaration does <i>not</i> appear in source code,
+   * it is an implicit declaration. If this is meaningless for the declaration,
    * {@code false} is returned.
    * 
    * @return {@code true} if this declaration does <i>not</i> appear in source

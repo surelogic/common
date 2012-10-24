@@ -23,9 +23,4 @@ final class DeclPackage extends Decl implements IDeclPackage {
   public Kind getKind() {
     return Kind.PACKAGE;
   }
-
-  @Override
-  String toStringHelper() {
-    return f_name;
-  }
 }

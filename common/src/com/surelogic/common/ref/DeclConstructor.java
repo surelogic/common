@@ -26,10 +26,4 @@ final class DeclConstructor extends DeclVisibility implements IDeclFunction {
   public boolean isImplicit() {
     return f_isImplicit;
   }
-
-  @Override
-  String toStringHelper() {
-    return "#" + f_name + Decl.toStringHelperParameters(this);
-  }
-
 }

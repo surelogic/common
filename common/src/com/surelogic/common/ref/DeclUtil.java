@@ -1,6 +1,7 @@
 package com.surelogic.common.ref;
 
 import java.util.EnumSet;
+import java.util.List;
 
 import com.surelogic.NonNull;
 import com.surelogic.Nullable;
@@ -456,6 +457,216 @@ public final class DeclUtil {
     b.append('/');
     b.append(getTypeNameOrEmpty(decl));
     return b.toString();
+  }
+
+  @NonNull
+  public static String toString(@NonNull final IDecl decl) {
+    final class ToStringVisitor extends DeclVisitor {
+      final StringBuilder b = new StringBuilder();
+
+      @Override
+      public boolean visitClass(IDeclType node) {
+        b.append('.');
+        if (node.getVisibility() == IDecl.Visibility.ANONYMOUS)
+          b.append("(anonymous " + node.getPosition() + ")");
+        else {
+          b.append('\u00ab').append(node.getVisibility().toString().toLowerCase()).append(' ');
+          if (node.isStatic())
+            b.append("static ");
+          if (node.isAbstract())
+            b.append("abstract ");
+          if (node.isFinal())
+            b.append("final ");
+          b.append("class\u00bb");
+          b.append(node.getName());
+        }
+        return true;
+      }
+
+      @Override
+      public boolean visitInterface(IDeclType node) {
+        b.append('.');
+        b.append('\u00ab').append(node.getVisibility().toString().toLowerCase()).append(" interface\u00bb");
+        b.append(node.getName());
+        return true;
+      }
+
+      @Override
+      public void visitAnnotation(IDeclType node) {
+        b.append('.');
+        b.append('\u00ab').append(node.getVisibility().toString().toLowerCase()).append(" annotation\u00bb");
+        b.append(node.getName());
+      }
+
+      @Override
+      public void visitEnum(IDeclType node) {
+        b.append('.');
+        b.append('\u00ab').append(node.getVisibility().toString().toLowerCase()).append(" enum\u00bb");
+        b.append(node.getName());
+      }
+
+      @Override
+      public void visitField(IDeclField node) {
+        b.append('.');
+        b.append('\u00ab').append(node.getVisibility().toString().toLowerCase()).append(' ');
+        if (node.isStatic())
+          b.append("static ");
+        if (node.isFinal())
+          b.append("final ");
+        b.append(node.getTypeOf().getCompact()).append('\u00bb');
+        b.append(node.getName());
+      }
+
+      @Override
+      public void visitInitializer(IDecl node) {
+        b.append('.');
+        b.append('(');
+        if (node.isStatic()) {
+          b.append("static ");
+        }
+        b.append("initializer)");
+      }
+
+      @Override
+      public boolean visitMethod(IDeclFunction node) {
+        b.append('.');
+        b.append('\u00ab').append(node.getVisibility().toString().toLowerCase()).append(' ');
+        if (node.isStatic())
+          b.append("static ");
+        if (node.isAbstract())
+          b.append("abstract ");
+        if (node.isFinal())
+          b.append("final ");
+        final List<IDeclTypeParameter> typeParameters = node.getTypeParameters();
+        if (!typeParameters.isEmpty()) {
+          visitTypeParameters(typeParameters);
+          b.append(' ');
+        }
+        if (node.getTypeOf() == null)
+          b.append("void");
+        else
+          b.append(node.getTypeOf().getCompact());
+        b.append('\u00bb');
+        b.append(node.getName());
+        final List<IDeclParameter> parameters = node.getParameters();
+        if (parameters.isEmpty())
+          b.append("()");
+        else
+          visitParameters(parameters);
+        return false;
+      }
+
+      @Override
+      public boolean visitConstructor(IDeclFunction node) {
+        b.append('.');
+        b.append('\u00ab').append(node.getVisibility().toString().toLowerCase()).append(' ');
+        if (node.isImplicit())
+          b.append("implicit ");
+        final List<IDeclTypeParameter> typeParameters = node.getTypeParameters();
+        if (!typeParameters.isEmpty()) {
+          visitTypeParameters(typeParameters);
+          b.append(' ');
+        }
+        b.append("constructor\u00bb");
+        b.append(node.getName());
+        final List<IDeclParameter> parameters = node.getParameters();
+        if (parameters.isEmpty())
+          b.append("()");
+        else
+          visitParameters(parameters);
+        return false;
+      }
+
+      @Override
+      public boolean visitParameters(List<IDeclParameter> parameters) {
+        if (!parameters.isEmpty()) {
+          b.append('(');
+          boolean first = true;
+          for (IDeclParameter parameter : parameters) {
+            if (first)
+              first = false;
+            else
+              b.append(", ");
+            outputParameter(parameter);
+          }
+          b.append(')');
+        }
+        return false;
+      }
+
+      private void outputParameter(IDeclParameter parameter) {
+        if (parameter.isFinal())
+          b.append("final ");
+        b.append(parameter.getTypeOf().getCompact()).append(' ');
+        b.append(parameter.getName());
+      }
+
+      @Override
+      public void visitParameter(IDeclParameter node, boolean partOfDecl) {
+        if (partOfDecl) {
+          b.append("(parameter ").append(node.getPosition());
+          b.append(" \u00ab");
+          outputParameter(node);
+          b.append("\u00bb)");
+        }
+      }
+
+      @Override
+      public boolean visitTypeParameters(List<IDeclTypeParameter> typeParameters) {
+        if (!typeParameters.isEmpty()) {
+          b.append('<');
+          boolean first = true;
+          for (IDeclTypeParameter typeParameter : typeParameters) {
+            if (first)
+              first = false;
+            else
+              b.append(", ");
+            outputTypeParameter(typeParameter);
+          }
+          b.append('>');
+        }
+        return false;
+      }
+
+      private void outputTypeParameter(IDeclTypeParameter typeParameter) {
+        b.append(typeParameter.getName());
+        final List<TypeRef> bounds = typeParameter.getBounds();
+        if (!bounds.isEmpty()) {
+          b.append(" extends ");
+          boolean first = true;
+          for (TypeRef tr : bounds) {
+            if (first)
+              first = false;
+            else
+              b.append(" & ");
+            b.append(tr.getCompact());
+          }
+        }
+      }
+
+      @Override
+      public void visitTypeParameter(IDeclTypeParameter node, boolean partOfDecl) {
+        if (partOfDecl) {
+          b.append("(type parameter ").append(node.getPosition());
+          b.append(" \u00ab");
+          outputTypeParameter(node);
+          b.append("\u00bb)");
+        }
+      }
+
+      @Override
+      public void visitPackage(IDeclPackage node) {
+        b.append(node.getName());
+      }
+
+      @Override
+      public String toString() {
+        return b.toString();
+      }
+    }
+    final ToStringVisitor v = new ToStringVisitor();
+    decl.acceptRootToThis(v);
+    return v.toString();
   }
 
   /**

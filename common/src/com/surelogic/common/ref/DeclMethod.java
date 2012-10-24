@@ -54,16 +54,4 @@ final class DeclMethod extends DeclVisibility implements IDeclFunction {
   public boolean isAbstract() {
     return f_isAbstract;
   }
-
-  @Override
-  String toStringHelper() {
-    final StringBuilder b = new StringBuilder("#");
-    b.append(f_name);
-    b.append(Decl.toStringHelperParameters(this));
-    if (f_returnTypeOf != null) {
-      b.append(":");
-      b.append(f_returnTypeOf.getFullyQualified());
-    }
-    return b.toString();
-  }
 }
