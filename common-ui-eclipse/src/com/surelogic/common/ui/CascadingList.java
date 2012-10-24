@@ -26,7 +26,6 @@ import org.jdesktop.core.animation.timing.Animator;
 import org.jdesktop.core.animation.timing.Interpolator;
 import org.jdesktop.core.animation.timing.TimingSource;
 import org.jdesktop.core.animation.timing.TimingTargetAdapter;
-import org.jdesktop.core.animation.timing.interpolators.AccelerationInterpolator;
 import org.jdesktop.core.animation.timing.interpolators.SplineInterpolator;
 import org.jdesktop.swt.animation.timing.sources.SWTTimingSource;
 
@@ -501,7 +500,6 @@ public class CascadingList extends ScrolledComposite {
 
   private int f_xPosStartOfLast = 0;
 
-  private TimingSource f_timingSource = null;
   private Animator f_animator = null;
   private final Interpolator f_interpolator = new SplineInterpolator(0.82, 0.18, 0.18, 0.82);
 
@@ -537,10 +535,7 @@ public class CascadingList extends ScrolledComposite {
 
     @Override
     public void end(Animator source) {
-      final TimingSource ts = f_timingSource;
-      f_timingSource = null;
-      if (ts != null)
-        ts.dispose();
+      source.getTimingSource().dispose();
     }
   }
 
@@ -562,11 +557,9 @@ public class CascadingList extends ScrolledComposite {
       final int pixelsToMove = (f_xPosStartOfLast - originX);
       if (pixelsToMove <= 0)
         return;
-      if (f_timingSource == null) {
-        f_timingSource = new SWTTimingSource(this.getDisplay());
-        f_timingSource.init();
-      }
-      f_animator = new Animator.Builder(f_timingSource).setDuration(getDuration(pixelsToMove), TimeUnit.MILLISECONDS)
+      final TimingSource ts = new SWTTimingSource(this.getDisplay());
+      ts.init();
+      f_animator = new Animator.Builder(ts).setDuration(getDuration(pixelsToMove), TimeUnit.MILLISECONDS)
           .addTarget(new CLTimingTarget(originX, f_xPosStartOfLast)).setInterpolator(f_interpolator).build();
       f_animator.start();
     }
@@ -589,11 +582,9 @@ public class CascadingList extends ScrolledComposite {
     final int pixelsToMove = Math.abs(xPosStartOfColumn - originX);
     if (pixelsToMove <= 0)
       return;
-    if (f_timingSource == null) {
-      f_timingSource = new SWTTimingSource(this.getDisplay());
-      f_timingSource.init();
-    }
-    f_animator = new Animator.Builder(f_timingSource).setDuration(getDuration(pixelsToMove), TimeUnit.MILLISECONDS)
+    final TimingSource ts = new SWTTimingSource(this.getDisplay());
+    ts.init();
+    f_animator = new Animator.Builder(ts).setDuration(getDuration(pixelsToMove), TimeUnit.MILLISECONDS)
         .addTarget(new CLTimingTarget(originX, xPosStartOfColumn)).setInterpolator(f_interpolator).build();
     f_animator.start();
   }
@@ -605,7 +596,7 @@ public class CascadingList extends ScrolledComposite {
       pixelsToMove *= 1.5;
     else if (pixelsToMove < 800)
       pixelsToMove *= 1.25;
-    final int duration = (int) ((double) pixelsToMove * 0.8);
+    final int duration = (int) ((double) pixelsToMove * 0.6);
     return duration;
   }
 }
