@@ -641,6 +641,8 @@ public final class JDTUtility {
                 current = it;
                 return true;
               }
+              anonymousDeclCount++;
+              continue;
             }
             if (it.isClass() && node.getKind() == IDecl.Kind.CLASS || it.isInterface() && node.getKind() == IDecl.Kind.INTERFACE
                 || it.isEnum() && node.getKind() == IDecl.Kind.ENUM || it.isAnnotation() && node.getKind() == IDecl.Kind.ANNOTATION) {
