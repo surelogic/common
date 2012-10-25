@@ -44,12 +44,7 @@ public class CascadingList extends ScrolledComposite {
 
   private final Listener f_resizeAction = new Listener() {
     public void handleEvent(Event event) {
-      /*
-       * This action is the same regardless if the overall control size changed
-       * or just the size of one of the column contents.
-       */
-      rememberColumnViewportOrigins();
-      fixupSizeOfContents();
+      fixupSize();
     }
   };
 
@@ -320,6 +315,20 @@ public class CascadingList extends ScrolledComposite {
     emptyAfterHelper(columnIndex);
     fixupSizeOfContents();
     notifyObservers();
+  }
+
+  /**
+   * This method should not normally need to be called, however, there are some
+   * SWT bugs that so we do not get resize notifications from all controls
+   * (tables on Mac OS X).
+   * <p>
+   * This methosd fixes up the sizes of the contents and shows the scrollbars
+   * properly. This action is the same regardless if the overall control size
+   * changed or just the size of one of the column contents.
+   */
+  public void fixupSize() {
+    rememberColumnViewportOrigins();
+    fixupSizeOfContents();
   }
 
   public void emptyFrom(int columnIndex) {
