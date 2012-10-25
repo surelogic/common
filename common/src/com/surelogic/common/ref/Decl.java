@@ -1335,7 +1335,7 @@ public abstract class Decl implements IDecl {
     return true;
   }
 
-  public boolean hasSameAttributesAsSloppy(IDecl o) {
+  public final boolean hasSameAttributesAsSloppy(IDecl o) {
     if (o == null)
       return false;
     if (!SLUtility.nullSafeEquals(getKind(), o.getKind()))
@@ -1355,8 +1355,8 @@ public abstract class Decl implements IDecl {
       return false;
   }
 
-  public boolean isSameSimpleDeclarationAsSloppy(IDecl o) {
-    if (hasSameAttributesAsSloppy(o)) {
+  public final boolean isSameSimpleDeclarationAsSloppy(IDecl o, boolean checkAttributes) {
+    if (!checkAttributes || hasSameAttributesAsSloppy(o)) {
       final List<IDeclParameter> l1 = getParameters();
       final List<IDeclParameter> l2 = o.getParameters();
       if (l1.isEmpty() && l2.isEmpty())
@@ -1491,7 +1491,7 @@ public abstract class Decl implements IDecl {
     IDecl dThis = this;
     IDecl dO = o;
     while (true) {
-      if (dThis.isSameSimpleDeclarationAsSloppy(dO)) {
+      if (dThis.isSameSimpleDeclarationAsSloppy(dO, true)) {
         dThis = dThis.getParent();
         dO = dO.getParent();
         if (dThis == null && dO == null)

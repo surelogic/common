@@ -309,17 +309,18 @@ public interface IDecl {
    * parent, declarations are not considered.
    * <p>
    * In particular, the two declarations are compared with
-   * {@link #hasSameAttributesAsSloppy(IDecl)}. If that comparison passes then
-   * the parameters, if any, are compared (by only their simple, or compact,
-   * type). If these match as well the two simple declarations are considered
-   * the same.
+   * {@link #hasSameAttributesAsSloppy(IDecl)} if <tt>checkAttributes</tt> is
+   * {@code true}. If that comparison passes, or is skipped because
+   * <tt>checkAttributes</tt> was {@code false}, then the parameters, if any,
+   * are compared (by only their simple, or compact, type). If these match as
+   * well the two simple declarations are considered the same.
    * 
    * @param o
    *          any declaration.
    * @return {@code true} if this simple declaration is sloppily the same as the
    *         passed declaration, {@code false} otherwise.
    */
-  public boolean isSameSimpleDeclarationAsSloppy(IDecl o);
+  public boolean isSameSimpleDeclarationAsSloppy(IDecl o, boolean checkAttributes);
 
   /**
    * Returns a hash code value for this declaration that is consistent with the

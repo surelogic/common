@@ -507,14 +507,12 @@ public class CascadingList extends ScrolledComposite {
 
     final int f_sX;
     final int f_tX;
-    final int f_delta;
     final boolean f_rightAnimation;
 
     CLTimingTarget(int startingXPos, int targetXPos) {
       f_sX = startingXPos;
       f_tX = targetXPos;
-      f_delta = f_tX - f_sX;
-      f_rightAnimation = f_delta > 0;
+      f_rightAnimation = (f_tX - f_sX) > 0;
     }
 
     @Override
@@ -526,7 +524,7 @@ public class CascadingList extends ScrolledComposite {
       /*
        * Within the SWT thread.
        */
-      int x = f_sX + (int) ((float) f_delta * fraction);
+      int x = f_sX + (int) ((float) (f_tX - f_sX) * fraction);
       final Point origin = getOrigin();
       if ((f_rightAnimation && origin.x < x) || (!f_rightAnimation && origin.x > x)) {
         setOrigin(x, origin.y);
@@ -559,7 +557,7 @@ public class CascadingList extends ScrolledComposite {
         return;
       final TimingSource ts = new SWTTimingSource(this.getDisplay());
       ts.init();
-      f_animator = new Animator.Builder(ts).setDuration(getDuration(pixelsToMove), TimeUnit.MILLISECONDS)
+      f_animator = new Animator.Builder(ts).setDuration(getDurationInMillis(pixelsToMove), TimeUnit.MILLISECONDS)
           .addTarget(new CLTimingTarget(originX, f_xPosStartOfLast)).setInterpolator(f_interpolator).build();
       f_animator.start();
     }
@@ -584,17 +582,17 @@ public class CascadingList extends ScrolledComposite {
       return;
     final TimingSource ts = new SWTTimingSource(this.getDisplay());
     ts.init();
-    f_animator = new Animator.Builder(ts).setDuration(getDuration(pixelsToMove), TimeUnit.MILLISECONDS)
+    f_animator = new Animator.Builder(ts).setDuration(getDurationInMillis(pixelsToMove), TimeUnit.MILLISECONDS)
         .addTarget(new CLTimingTarget(originX, xPosStartOfColumn)).setInterpolator(f_interpolator).build();
     f_animator.start();
   }
 
-  private int getDuration(int pixelsToMove) {
-    if (pixelsToMove < 400)
+  private int getDurationInMillis(int pixelsToMove) {
+    if (pixelsToMove < 300)
       pixelsToMove *= 2;
-    else if (pixelsToMove < 600)
+    else if (pixelsToMove < 500)
       pixelsToMove *= 1.5;
-    else if (pixelsToMove < 800)
+    else if (pixelsToMove < 1000)
       pixelsToMove *= 1.25;
     final int duration = (int) ((double) pixelsToMove * 0.6);
     return duration;
