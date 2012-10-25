@@ -35,6 +35,7 @@ public final class SloppyWrapper<T extends IDecl> {
    * 
    * @return an {@link IDecl} instance.
    */
+  @NonNull
   public T getDecl() {
     return f_decl;
   }
