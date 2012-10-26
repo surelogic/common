@@ -11,10 +11,12 @@ public class RegressionUtility {
 	public static final String JSURE_LOG_SUFFIX = ".log.xml";
 	public static final String JSURE_SNAPSHOT_SUFFIX = ".sea.xml";
 	public static final String JSURE_SNAPSHOT_DIFF_SUFFIX = ".sea.diffs.xml";
+	public static final String JSURE_SNAPSHOT_DIR_SUFFIX = ".sea";
 
 	public static final String ORACLE = "oracle";
 	public static final String ORACLE_JAVAC = "oracleJavac";
 	public static final String ORACLE_SNAPSHOT = "snapshotOracle";
+	public static final String ORACLE_SCAN_DIR = "oracleDir";
 	
 	public static class Filter implements FilenameFilter {
 		private final String prefix, suffix;
@@ -42,8 +44,9 @@ public class RegressionUtility {
 	};
 	private static final Filter javacOracleFilter = new Filter(ORACLE_JAVAC, JSURE_SNAPSHOT_SUFFIX);
 	public static final Filter snapshotOracleFilter = new Filter(ORACLE_SNAPSHOT, JSURE_SNAPSHOT_SUFFIX);
+	public static final Filter oracleScanDirFilter = new Filter(ORACLE_SCAN_DIR, JSURE_SNAPSHOT_DIR_SUFFIX);
 	private static final Filter[] oracleFilters = {
-		snapshotOracleFilter, javacOracleFilter, xmlOracleFilter
+		oracleScanDirFilter, snapshotOracleFilter, javacOracleFilter, xmlOracleFilter
 	};
 	
 	public static File findOracle(String projectPath) {
