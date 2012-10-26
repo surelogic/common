@@ -58,6 +58,7 @@ public final class CommonImages {
   public static final String IMG_CONSOLE = "console.gif";
   public static final String IMG_DEFAULT_I = "default_i.gif";
   public static final String IMG_DEFAULT_S = "default_s.gif";
+  public static final String IMG_DELTA_DECR = "delta_decr.gif";
   public static final String IMG_DOWN = "down.gif";
   public static final String IMG_DRUM_EXPLORER = "drum_explorer.gif";
   public static final String IMG_DRUM_GRAY = "drum_gray.gif";
