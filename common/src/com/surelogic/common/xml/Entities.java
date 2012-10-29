@@ -196,7 +196,7 @@ public final class Entities {
      * Always escape invalid XML characters
      */
     if (XMLChar.isInvalid(value)) {
-      return getUnicodeEscapeFor(value);
+      return "";
     }
     return null;
   }
