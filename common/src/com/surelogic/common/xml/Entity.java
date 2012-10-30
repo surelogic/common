@@ -4,6 +4,9 @@ import java.util.*;
 
 import org.xml.sax.Attributes;
 
+import com.surelogic.common.ref.IJavaRef;
+import com.surelogic.common.ref.JavaRef;
+
 public class Entity {
 	protected static final Map<String,String> interned = Collections.synchronizedMap(new HashMap<String, String>());
 	public static String internString(String v) {
@@ -193,6 +196,10 @@ public class Entity {
 
 	public boolean hasRefs() {
 		return !refs.isEmpty();
+	}
+	
+	public IJavaRef parsePersistedRef(String encode) {
+		return JavaRef.parseEncodedForPersistence(encode);
 	}
 }
 
