@@ -30,7 +30,6 @@ public final class CommonImages {
   public static final String IMG_ANNOTATION_ERROR = "annotation_error.gif";
   public static final String IMG_ANNOTATION_ERROR_PROPOSED = "annotation_error_proposed.gif";
   public static final String IMG_ANNOTATION_PROPOSED = "annotation_proposed.gif";
-  public static final String IMG_ANNOTATION_SCAN_EXPLORER = "annotation_scan_explorer.gif";
   public static final String IMG_ARROW_DOWN = "arrow_down.gif";
   public static final String IMG_ARROW_RIGHT = "arrow_right.gif";
   public static final String IMG_ASSUME_DECR = "assume_decr.gif";
@@ -113,6 +112,7 @@ public final class CommonImages {
   public static final String IMG_JETTY_LOG = "jetty_log.gif";
   public static final String IMG_JSURE_COMP_UNIT = "jsure_comp_unit.gif";
   public static final String IMG_JSURE_DRUM = "jsure_drum.gif";
+  public static final String IMG_JSURE_EXPLORER = "jsure_explorer.gif";
   public static final String IMG_JSURE_FINDER = "jsure_finder.gif";
   public static final String IMG_JSURE_FINDER_DOT = "jsure_finder_dot.gif";
   public static final String IMG_JSURE_GRAPH = "jsure_graph.gif";
@@ -147,9 +147,6 @@ public final class CommonImages {
   public static final String IMG_PRIVATE_I = "private_i.gif";
   public static final String IMG_PRIVATE_S = "private_s.gif";
   public static final String IMG_PROJECT = "project.gif";
-  public static final String IMG_PROMISE = "promise.gif";
-  public static final String IMG_PROMISE_CONSISTENT = "promise_consistent.gif";
-  public static final String IMG_PROMISE_INCONSISTENT = "promise_inconsistent.gif";
   public static final String IMG_PROTECTED_I = "protected_i.gif";
   public static final String IMG_PROTECTED_S = "protected_s.gif";
   public static final String IMG_PUBLIC_I = "public_i.gif";
