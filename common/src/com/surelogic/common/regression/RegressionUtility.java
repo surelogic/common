@@ -45,7 +45,16 @@ public class RegressionUtility {
 	};
 	private static final Filter javacOracleFilter = new Filter(ORACLE_JAVAC, JSURE_SNAPSHOT_SUFFIX);
 	public static final Filter snapshotOracleFilter = new Filter(ORACLE_SNAPSHOT, JSURE_SNAPSHOT_SUFFIX);
-	public static final Filter oracleScanDirFilter = new Filter(ORACLE_SCAN_DIR, "");
+	public static final Filter oracleScanDirFilter = new Filter(ORACLE_SCAN_DIR, "") {
+		public boolean accept(File dir, String name) {
+			// Also accept a directory starting with the project name
+			if (name.startsWith(dir.getName()+' ')) {
+				return true;
+			}
+			return super.accept(dir, name);
+		}
+	};
+	
 	private static final Filter[] oracleFilters = {
 		oracleScanDirFilter, snapshotOracleFilter, javacOracleFilter, xmlOracleFilter
 	};
