@@ -56,6 +56,7 @@ import org.eclipse.jdt.core.Signature;
 
 import com.surelogic.NonNull;
 import com.surelogic.Nullable;
+import com.surelogic.Utility;
 import com.surelogic.common.Pair;
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
@@ -73,6 +74,7 @@ import com.surelogic.common.ref.IJavaRef;
 /**
  * A collection of useful JDT spells.
  */
+@Utility
 public final class JDTUtility {
 
   /**

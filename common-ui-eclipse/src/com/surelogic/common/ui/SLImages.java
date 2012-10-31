@@ -5,6 +5,10 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.DecorationOverlayIcon;
 import org.eclipse.jface.viewers.IDecoration;
@@ -17,12 +21,14 @@ import com.surelogic.NonNull;
 import com.surelogic.Nullable;
 import com.surelogic.Utility;
 import com.surelogic.common.CommonImages;
+import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
 
 /**
  * A utility to manage and share images used by SureLogic plug-ins. It handles
  * both simple and decorated images. Most calls manage disposal and caching of
- * images so client code can be simpler.
+ * images so client code can be simpler. Public calls that are not managed have
+ * the suffix <tt>Unmanaged</tt>
  * <p>
  * All image name refer to names in {@link CommonImages}. Pass one of the
  * <tt>SharedImages.IMG_*</tt> or <tt>DECR_*</tt> constants declared in that
@@ -52,6 +58,7 @@ public final class SLImages {
    * <li>
    * {@link #getImageDecoratedCacheKey(Image, ImageDescriptor[], Point, boolean)}
    * </li>
+   * <li>{@link #getImageResizeCacheKey(Image, Point)}</li>
    * </ul>
    * <p>
    * The keys can have {@link #GRAY} on them to indicate the image is grayscale.
@@ -103,30 +110,51 @@ public final class SLImages {
 
   @NonNull
   private static String getNameCacheKey(@NonNull String imageName, boolean grayscale) {
-    final String key = imageName + (grayscale ? ":" + GRAY : "");
+    final String key = imageName + (grayscale ? ":" + GRAY : "") + "->named";
     return key;
   }
 
   @NonNull
   private static String getNameDecoratedCacheKey(@NonNull String imageName, @NonNull ImageDescriptor[] overlaysArray,
-      @NonNull Point size, boolean grayscale) {
+      boolean grayscale) {
     final int prime = 31;
     int intHash = 1;
     for (ImageDescriptor id : overlaysArray)
       intHash = prime * intHash + ((id == null) ? 0 : id.hashCode());
-    final String key = imageName + ":" + Integer.toHexString(intHash) + "(" + size.x + "," + size.y + ")" + (grayscale ? GRAY : "");
+    final String key = imageName + ":" + Integer.toHexString(intHash) + (grayscale ? ":" + GRAY : "") + "->name-decorated";
     return key;
   }
 
   @NonNull
   private static String getImageDecoratedCacheKey(@NonNull Image baseImage, @NonNull ImageDescriptor[] overlaysArray,
-      @NonNull Point size, boolean grayscale) {
+      @Nullable Point size, boolean grayscale) {
+    if (size == null)
+      size = new Point(baseImage.getBounds().width, baseImage.getBounds().height);
     final int prime = 31;
     int intHash = 1;
     intHash = prime * intHash + ((baseImage == null) ? 0 : baseImage.hashCode());
     for (ImageDescriptor id : overlaysArray)
       intHash = prime * intHash + ((id == null) ? 0 : id.hashCode());
-    final String key = Integer.toHexString(intHash) + "(" + size.x + "," + size.y + ")" + (grayscale ? GRAY : "");
+    final String key = Integer.toHexString(intHash) + "(" + size.x + "," + size.y + ")" + (grayscale ? GRAY : "")
+        + "->image-decorated";
+    return key;
+  }
+
+  @NonNull
+  private static String getImageResizeCacheKey(@NonNull Image baseImage, @NonNull Point size) {
+    final int prime = 31;
+    int intHash = 1;
+    intHash = prime * intHash + ((baseImage == null) ? 0 : baseImage.hashCode());
+    final String key = Integer.toHexString(intHash) + "(" + size.x + "," + size.y + ")->image-resize";
+    return key;
+  }
+
+  @NonNull
+  private static String getImageIndentCacheKey(@NonNull Image baseImage, int pixelsFromRight, int pixelsFromTop) {
+    final int prime = 31;
+    int intHash = 1;
+    intHash = prime * intHash + ((baseImage == null) ? 0 : baseImage.hashCode());
+    final String key = Integer.toHexString(intHash) + "(" + pixelsFromRight + "," + pixelsFromTop + ")->image-indent";
     return key;
   }
 
@@ -306,7 +334,7 @@ public final class SLImages {
     if (baseImageWidth != size.x)
       pixelsFromRight = (int) (((double) (size.x - baseImageWidth)) / 2.0);
     final boolean indentImage = pixelsFromRight > 0;
-    final Image base = indentImage ? SLImages.indentImage(baseImage, pixelsFromRight, 0) : baseImage;
+    final Image base = indentImage ? SLImages.indentImageUnmanaged(baseImage, pixelsFromRight, 0) : baseImage;
     final DecorationOverlayIcon doi = new DecorationOverlayIcon(base, overlaysArray, size);
     final Image result = doi.createImage();
     if (indentImage)
@@ -534,7 +562,7 @@ public final class SLImages {
   @Nullable
   public static Image getDecoratedImage(@NonNull String imageName, @NonNull ImageDescriptor[] overlaysArray, @Nullable Point size,
       boolean grayscale) {
-    final String key = getNameDecoratedCacheKey(imageName, overlaysArray, size, grayscale);
+    final String key = getNameDecoratedCacheKey(imageName, overlaysArray, grayscale);
     Image result = CACHEKEY_TO_IMAGE.get(key);
     if (result == null) {
       final Image baseImage = getImage(imageName, false);
@@ -697,8 +725,48 @@ public final class SLImages {
    *           if something goes wrong.
    */
   @NonNull
-  public static Image toGray(@NonNull final Image image) {
+  private static Image toGray(@NonNull final Image image) {
     return new Image(Display.getCurrent(), image, SWT.IMAGE_GRAY);
+  }
+
+  /**
+   * Returns the shared image that is indented <tt>indentX</tt> pixels from the
+   * left-hand side and <tt>indentY</tt> pixels from the top. The returned
+   * image's size is expanded to perfectly fit the indented image..
+   * <p>
+   * Note that clients <b>must not</b> dispose the image returned by this method
+   * <p>
+   * if both <tt>indentX</tt> and <tt>indentY</tt> are zero or less an exact
+   * copy of the passed image is returned.
+   * 
+   * @param baseImage
+   *          an image.
+   * @param pixelsFromRight
+   *          the nonnegative number of pixels to indent in the <i>x</i>
+   *          direction from the left-hand side of the image.
+   * @param pixelsFromTop
+   *          the nonnegative number of pixels to indent in the <i>y</i>
+   *          direction from the top of the image.
+   * @return an image that is managed by this utility, please do not call
+   *         {@link Image#dispose()} on it, or {@code null} if
+   *         <tt>imageName</tt> could not be found.
+   * 
+   * @throws Exception
+   *           if something goes wrong.
+   */
+  @NonNull
+  public static Image indentImage(@NonNull final Image baseImage, int pixelsFromRight, int pixelsFromTop) {
+    if (baseImage == null)
+      throw new IllegalArgumentException(I18N.err(44, "baseImage"));
+
+    final String key = getImageIndentCacheKey(baseImage, pixelsFromRight, pixelsFromTop);
+    Image result = CACHEKEY_TO_IMAGE.get(key);
+    if (result == null) {
+      result = indentImageUnmanaged(baseImage, pixelsFromRight, pixelsFromTop);
+      if (result != null)
+        addToImageCache(key, result);
+    }
+    return result;
   }
 
   /**
@@ -723,7 +791,10 @@ public final class SLImages {
    *           if something goes wrong.
    */
   @NonNull
-  public static Image indentImage(@NonNull final Image baseImage, int pixelsFromRight, int pixelsFromTop) {
+  public static Image indentImageUnmanaged(@NonNull final Image baseImage, int pixelsFromRight, int pixelsFromTop) {
+    if (baseImage == null)
+      throw new IllegalArgumentException(I18N.err(44, "baseImage"));
+
     if (pixelsFromRight < 1 && pixelsFromTop < 1)
       return new Image(Display.getCurrent(), baseImage, SWT.IMAGE_COPY);
     if (pixelsFromRight < 1)
@@ -732,10 +803,45 @@ public final class SLImages {
       pixelsFromTop = 0;
 
     final Point size = new Point(baseImage.getBounds().width + pixelsFromRight, baseImage.getBounds().height + pixelsFromTop);
-    final ImageDescriptor id = getImageDescroptorFor(baseImage);
+    final ImageDescriptor id = getImageDescriptorFor(baseImage);
     final DecorationOverlayIcon doi = new DecorationOverlayIcon(getImage(CommonImages.IMG_TRANSPARENT_PIXEL),
         new ImageDescriptor[] { null, null, null, id, null }, size);
     final Image result = doi.createImage();
+    return result;
+  }
+
+  /**
+   * Returns the shared image that is a resized copy, at least what will fit, of
+   * the passed image with the passed size.
+   * <p>
+   * Note that clients <b>must not</b> dispose the image returned by this
+   * method.
+   * 
+   * @param baseImage
+   *          an image.
+   * @param size
+   *          size of the new image. If this exactly matches the size of the
+   *          passed image then an exact copy of the passed image is returned.
+   * @return an image that is managed by this utility, please do not call
+   *         {@link Image#dispose()} on it, or {@code null} if
+   *         <tt>imageName</tt> could not be found.
+   * 
+   * @throws Exception
+   *           if something goes wrong.
+   */
+  public static Image resizeImage(@NonNull final Image baseImage, @NonNull final Point size) {
+    if (baseImage == null)
+      throw new IllegalArgumentException(I18N.err(44, "baseImage"));
+    if (size == null)
+      throw new IllegalArgumentException(I18N.err(44, "size"));
+
+    final String key = getImageResizeCacheKey(baseImage, size);
+    Image result = CACHEKEY_TO_IMAGE.get(key);
+    if (result == null) {
+      result = resizeImageUnmanaged(baseImage, size);
+      if (result != null)
+        addToImageCache(key, result);
+    }
     return result;
   }
 
@@ -754,7 +860,12 @@ public final class SLImages {
    *           if something goes wrong.
    */
   @NonNull
-  public static Image resizeImage(@NonNull final Image baseImage, final Point size) {
+  public static Image resizeImageUnmanaged(@NonNull final Image baseImage, @NonNull final Point size) {
+    if (baseImage == null)
+      throw new IllegalArgumentException(I18N.err(44, "baseImage"));
+    if (size == null)
+      throw new IllegalArgumentException(I18N.err(44, "size"));
+
     if (baseImage.getBounds().width == size.x && baseImage.getBounds().height == size.y)
       return new Image(Display.getCurrent(), baseImage, SWT.IMAGE_COPY);
     final DecorationOverlayIcon doi = new DecorationOverlayIcon(baseImage, new ImageDescriptor[] { null, null, null, null, null },
@@ -777,19 +888,49 @@ public final class SLImages {
    * @see ImageDescriptor#createFromImage(Image)
    */
   @NonNull
-  public static ImageDescriptor getImageDescroptorFor(@NonNull final Image image) {
+  public static ImageDescriptor getImageDescriptorFor(@NonNull final Image image) {
     return ImageDescriptor.createFromImage(image);
   }
 
   /**
    * Gets a copy of the image cache managed by this utility. This method is
-   * primarly intended for tesing and debug views.
+   * primarily intended for testing and debug views.
    * 
    * @return a copy of the image cache managed by this utility.
    */
   @NonNull
   public static HashMap<String, Image> getCopyOfImageCache() {
     return new HashMap<String, Image>(CACHEKEY_TO_IMAGE);
+  }
 
+  @NonNull
+  public static Image getImageForProject(@Nullable String projectName, @Nullable Point size) {
+    final Image base = getImage(CommonImages.IMG_PROJECT);
+    if (base == null)
+      throw new IllegalStateException("CommonImages.IMG_PROJECT does not exist");
+    if (projectName != null && !projectName.startsWith(SLUtility.LIBRARY_PROJECT)) {
+      try {
+        final IWorkspace ws = ResourcesPlugin.getWorkspace();
+        final IWorkspaceRoot wsRoot = ws.getRoot();
+        final IProject project = wsRoot.getProject(projectName);
+        if (project != null && project.exists()) {
+          if (project.hasNature(SLUtility.ANDROID_NATURE)) {
+            return getDecoratedImage(base, new ImageDescriptor[] { null, getImageDescriptor(CommonImages.DECR_ANDROID), null, null,
+                null }, size);
+          } else if (project.hasNature(SLUtility.JAVA_NATURE)) {
+            return getDecoratedImage(base, new ImageDescriptor[] { null, getImageDescriptor(CommonImages.DECR_JAVA), null, null,
+                null }, size);
+          }
+        }
+      } catch (Exception ignore) {
+        // just return the base project image
+      }
+    }
+    return base;
+  }
+
+  @NonNull
+  public static Image getImageForProject(@Nullable String projectName) {
+    return getImageForProject(projectName, null);
   }
 }
