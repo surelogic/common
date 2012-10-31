@@ -5,9 +5,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.widgets.Display;
 
+import com.surelogic.NonNull;
 import com.surelogic.Utility;
 import com.surelogic.common.CommonImages;
 
@@ -85,6 +88,53 @@ public final class SLImages {
         return result;
       }
     }
+    return result;
+  }
+
+  /**
+   * Constructs a new grayscale image (that must be disposed) from the passed
+   * image. The returned image is the same size as the passed image.
+   * 
+   * @param image
+   *          an image.
+   * @return a grayscale version of <tt>image</tt>. The caller is responsible
+   *         for disposing this image.
+   */
+  @NonNull
+  public static Image toGray(@NonNull final Image image) {
+    return new Image(image.getDevice(), image, SWT.IMAGE_GRAY);
+  }
+
+  /**
+   * Constructs a new image indented <tt>pixelsToIndent</tt>. The returned
+   * image's width is expanded <tt>pixelsToIndent</tt>.
+   * 
+   * @param baseImage
+   *          an image.
+   * @param pixelsToIndent
+   *          the number of pixels to indent in the <i>x</i> direction. This
+   *          value must be greater than zero or an exact copy of the passed
+   *          image is returned.
+   * @return a new image. The caller is responsible for disposing this image.
+   */
+  @NonNull
+  public static Image indentImage(@NonNull final Image baseImage, final int pixelsToIndent) {
+    if (pixelsToIndent < 1)
+      return new Image(baseImage.getDevice(), baseImage.getImageData(), baseImage.getImageData().getTransparencyMask());
+    final ImageData data = baseImage.getImageData();
+    final ImageData mask = data.getTransparencyMask();
+    final ImageData newData = new ImageData(data.width + pixelsToIndent, data.height, data.depth, data.palette);
+    final ImageData newMask = new ImageData(data.width + pixelsToIndent, data.height, data.depth, mask.palette);
+    for (int y = 0; y < newData.height; y++) {
+      for (int x = 0; x < newData.width; x++) {
+        final int xOld = x - pixelsToIndent;
+        if (xOld >= 0) {
+          newData.setPixel(x, y, data.getPixel(xOld, y));
+          newMask.setPixel(x, y, mask.getPixel(xOld, y));
+        }
+      }
+    }
+    final Image result = new Image(baseImage.getDevice(), newData, newMask);
     return result;
   }
 
