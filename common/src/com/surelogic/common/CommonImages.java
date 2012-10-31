@@ -226,6 +226,7 @@ public final class CommonImages {
   public static final String IMG_TRAFFIC_LIGHT_GREEN = "traffic_light_green.png";
   public static final String IMG_TRAFFIC_LIGHT_RED = "traffic_light_red.png";
   public static final String IMG_TRAFFIC_LIGHT_YELLOW = "traffic_light_yellow.png";
+  public static final String IMG_TRANSPARENT_PIXEL = "transparent_pixel.png";
   public static final String IMG_UNKNOWN = "unknown.gif";
   public static final String IMG_UP = "up.gif";
   public static final String IMG_VERIFICATION_RESULT = "verification_result.gif";
