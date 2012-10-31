@@ -60,36 +60,33 @@ public class RegressionUtility {
 	};
 	
 	public static File findOracle(String projectPath) {
-		String xmlOracle = null;
-		File xmlLocation = null;
+		final File project = new File(projectPath);
+		File xmlOracle = null;
 		for(Filter f : oracleFilters) {
-			String tempOracle = RegressionUtility.getOracleName(projectPath, f);
-			File tempLocation = new File(tempOracle);
+			File tempOracle = RegressionUtility.getOracleName(project, f);
 			System.out.println("Looking for " + tempOracle);
 
-			final boolean noOracleYet = xmlLocation == null || !xmlLocation.exists();
+			final boolean noOracleYet = xmlOracle == null || !xmlOracle.exists();
 			boolean replace;
 			if (noOracleYet) {
 				replace = true;
 			} else {
 				System.out.println("Checking for newer oracle");
-				replace = tempLocation.exists() && RegressionUtility.isNewer(tempOracle, xmlOracle);
+				replace = tempOracle.exists() && RegressionUtility.isNewer(project, tempOracle, xmlOracle);
 			}
 			if (replace) {
 				xmlOracle = tempOracle;
-				xmlLocation = tempLocation;
 			}
 			System.out.println("Using " + xmlOracle);
 		}
-		assert (xmlLocation.exists());
-		return xmlLocation;
+		assert (xmlOracle.exists());
+		return xmlOracle;
 	}
 	
-	public static String getOracleName(String projectPath, Filter filter) {
-		File path = new File(projectPath);
+	public static File getOracleName(File path, Filter filter) {
 		File[] files = path.listFiles(filter);
 		if (files == null) {
-			return projectPath; // No oracle to look at
+			return path; // No oracle to look at
 		}
 		File file = null;
 		for (File zip : files) {
@@ -104,13 +101,12 @@ public class RegressionUtility {
 				file = zip;
 			}
 		}
-		return (file != null) ? file.getAbsolutePath() : 
-			projectPath + File.separator + filter.getDefault();
+		return (file != null) ? file : new File(path, filter.getDefault());
 	}
 	
-	public static boolean isNewer(String oracle1, String oracle2) {
-		Date date1 = getDate(oracle1);
-		Date date2 = getDate(oracle2);
+	public static boolean isNewer(File project, File oracle1, File oracle2) {
+		Date date1 = getDate(project, oracle1);
+		Date date2 = getDate(project, oracle2);
 		if (date1 == null) {
 			return false;
 		}
@@ -124,11 +120,13 @@ public class RegressionUtility {
 		return rv;
 	}
 
-	private static Date getDate(String oracle) {
-		if (oracle.startsWith(ORACLE_SCAN_DIR)) {
+	private static Date getDate(File project, File oracleFile) {
+		final String oracle = oracleFile.getName();
+		if (oracle.startsWith(ORACLE_SCAN_DIR) || oracle.startsWith(project.getName())) {
 			return extractDateFromName(oracle);
 		}
 		// Start with last segment
+		
 		for (int i = oracle.lastIndexOf(File.separatorChar) + 1; i < oracle.length(); i++) {
 			if (Character.isDigit(oracle.charAt(i))) {
 				//return oracle.substring(i);
@@ -172,12 +170,13 @@ public class RegressionUtility {
 
 		// There should be at least 3 segments: label date time
 		final String[] name = dirName.split(" ");
-		if (name.length < 3)
+		final int num = name.length;
+		if (num < 3)
 			return null;
 		try {
 			// try to parse the date and time (the last two segments)
-			return SLUtility.fromStringHMS(name[name.length - 2] + ' '
-					+ (name[name.length - 1].replace('-', ':')));
+			final String time = name[num-2]+' '+name[num-1].replace('-', ':');
+			return SLUtility.fromStringHMS(time);
 		} catch (Exception e) {
 			return null;
 		}
