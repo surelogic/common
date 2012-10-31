@@ -908,7 +908,8 @@ public final class SLImages {
     final Image base = getImage(CommonImages.IMG_PROJECT);
     if (base == null)
       throw new IllegalStateException("CommonImages.IMG_PROJECT does not exist");
-    if (projectName != null && !projectName.startsWith(SLUtility.LIBRARY_PROJECT)) {
+    if (SLUtility.isNotEmptyOrNull(projectName) && !projectName.startsWith(SLUtility.LIBRARY_PROJECT)
+        && !projectName.startsWith(SLUtility.UNKNOWN_PROJECT)) {
       try {
         final IWorkspace ws = ResourcesPlugin.getWorkspace();
         final IWorkspaceRoot wsRoot = ws.getRoot();
