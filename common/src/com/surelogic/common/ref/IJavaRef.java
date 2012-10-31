@@ -115,13 +115,13 @@ public interface IJavaRef {
   IDecl getDeclaration();
 
   /**
-   * Gets the Eclipse project name or library reference (shared between
-   * projects) that this refers to. If the Eclipse project name is unknown, for
-   * any reason, the string defined by {@link SLUtility#UNKNOWN_PROJECT} is
-   * returned.
+   * Gets the Eclipse project name that this refers to. If the reference is to a
+   * shared library between Eclipse projects then
+   * {@link SLUtility#LIBRARY_PROJECT} is returned. If the Eclipse project name
+   * is unknown, for any reason, the string defined by
+   * {@link SLUtility#UNKNOWN_PROJECT} is returned.
    * <p>
-   * Examples: <tt>PlanetBaron</tt>,
-   * <tt>org.eclipse.jdt.launching.JRE_CONTAINER</tt>,
+   * Examples: <tt>PlanetBaron</tt>, <tt>(standard library)</tt>,
    * <tt>(unknown project)</tt>
    * 
    * @return the Eclipse project name or library reference that this refers to,
@@ -131,12 +131,12 @@ public interface IJavaRef {
   String getEclipseProjectName();
 
   /**
-   * Gets the Eclipse project name or library reference (shared between
-   * projects) that this refers to. If the Eclipse project name is unknown, for
-   * any reason, the empty string is returned.
+   * Gets the Eclipse project name that this refers to. If the reference is to a
+   * shared library between Eclipse projects then
+   * {@link SLUtility#LIBRARY_PROJECT} is returned. If the Eclipse project name
+   * is unknown, for any reason, the empty string is returned.
    * <p>
-   * Examples: <tt>PlanetBaron</tt>,
-   * <tt>org.eclipse.jdt.launching.JRE_CONTAINER</tt>
+   * Examples: <tt>PlanetBaron</tt>, <tt>(standard library)</tt>
    * 
    * @return the Eclipse project name or library reference that this refers to,
    *         or <tt>""</tt> if unknown.
@@ -145,18 +145,32 @@ public interface IJavaRef {
   String getEclipseProjectNameOrEmpty();
 
   /**
-   * Gets the Eclipse project name or library reference (shared between
-   * projects) that this refers to. If the Eclipse project name is unknown, for
-   * any reason, then {@code null} is returned.
+   * Gets the Eclipse project name that this refers to. If the reference is to a
+   * shared library between Eclipse projects then
+   * {@link SLUtility#LIBRARY_PROJECT} is returned. If the Eclipse project name
+   * is unknown, for any reason, then {@code null} is returned.
    * <p>
-   * Examples: <tt>PlanetBaron</tt>,
-   * <tt>org.eclipse.jdt.launching.JRE_CONTAINER</tt>
+   * Examples: <tt>PlanetBaron</tt>, <tt>(standard library)</tt>
    * 
    * @return the Eclipse project name or library reference that this refers to,
    *         or {@code null} if unknown.
    */
   @Nullable
   String getEclipseProjectNameOrNull();
+
+  /**
+   * Gets the Eclipse project name that this refers to. If the reference is to a
+   * shared library between Eclipse projects then {@code null} is returned. If
+   * the Eclipse project name is unknown, for any reason, then {@code null} is
+   * returned.
+   * <p>
+   * Examples: <tt>PlanetBaron</tt>
+   * 
+   * @return the Eclipse project name, or {@code null} if a shared library or
+   *         unknown.
+   */
+  @Nullable
+  String getRealEclipseProjectNameOrNull();
 
   /**
    * Gets the path within the <tt>.jar</tt> file returned by

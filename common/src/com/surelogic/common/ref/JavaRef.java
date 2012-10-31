@@ -157,7 +157,10 @@ public class JavaRef implements IJavaRef {
      * @return this builder.
      */
     public Builder setEclipseProjectName(String value) {
-      f_eclipseProjectName = value;
+      if (value != null && value.startsWith(SLUtility.LIBRARY_PROJECT))
+        f_eclipseProjectName = SLUtility.LIBRARY_PROJECT;
+      else
+        f_eclipseProjectName = value;
       return this;
     }
 
@@ -326,6 +329,15 @@ public class JavaRef implements IJavaRef {
 
   @Nullable
   public final String getEclipseProjectNameOrNull() {
+    return f_eclipseProjectName;
+  }
+
+  @Nullable
+  public String getRealEclipseProjectNameOrNull() {
+    if (f_eclipseProjectName == null)
+      return null;
+    if (f_eclipseProjectName.startsWith(SLUtility.LIBRARY_PROJECT))
+      return null;
     return f_eclipseProjectName;
   }
 

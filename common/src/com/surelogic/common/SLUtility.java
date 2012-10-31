@@ -56,6 +56,22 @@ public final class SLUtility {
   public static final String ANDROID_NATURE = "com.android.ide.eclipse.adt.AndroidNature";
 
   /**
+   * Checks if a string is both non-null and not the empty string.
+   * 
+   * @param value
+   *          a string.
+   * @return {@code true} if the passed string is both non-null and not the
+   *         empty string.
+   */
+  public static boolean isNotEmptyOrNull(String value) {
+    if (value == null)
+      return false;
+    if ("".equals(value))
+      return false;
+    return true;
+  }
+
+  /**
    * Checks if the passed string is a valid Java identifier. Handles UNICODE
    * names.
    * 
