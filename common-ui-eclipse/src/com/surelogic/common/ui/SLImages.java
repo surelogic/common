@@ -23,6 +23,7 @@ import com.surelogic.Utility;
 import com.surelogic.common.CommonImages;
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
+import com.surelogic.common.ref.IJavaRef;
 
 /**
  * A utility to manage and share images used by SureLogic plug-ins. It handles
@@ -933,5 +934,28 @@ public final class SLImages {
   @NonNull
   public static Image getImageForProject(@Nullable String projectName) {
     return getImageForProject(projectName, null);
+  }
+
+  @NonNull
+  public static Image getImageForProject(@Nullable IJavaRef javaRef, @Nullable Point size) {
+    final String projectName = javaRef == null ? null : javaRef.getRealEclipseProjectNameOrNull();
+    return getImageForProject(projectName, size);
+  }
+
+  @NonNull
+  public static Image getImageForProject(@Nullable IJavaRef javaRef) {
+    return getImageForProject(javaRef, null);
+  }
+
+  @NonNull
+  public static Image getImageForAndroidProject() {
+    return getDecoratedImage(getImage(CommonImages.IMG_PROJECT), new ImageDescriptor[] { null,
+        getImageDescriptor(CommonImages.DECR_ANDROID), null, null, null });
+  }
+
+  @NonNull
+  public static Image getImageForJavaProject() {
+    return getDecoratedImage(getImage(CommonImages.IMG_PROJECT), new ImageDescriptor[] { null,
+        getImageDescriptor(CommonImages.DECR_JAVA), null, null, null });
   }
 }
