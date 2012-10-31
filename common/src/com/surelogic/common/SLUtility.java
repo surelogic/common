@@ -52,6 +52,9 @@ public final class SLUtility {
   public static final String[] EMPTY_STRING_ARRAY = new String[0];
   public static final String JAVADOC_ANNOTATE_TAG = "annotate";
 
+  public static final String JAVA_NATURE = "org.eclipse.jdt.core.javanature";
+  public static final String ANDROID_NATURE = "com.android.ide.eclipse.adt.AndroidNature";
+
   /**
    * Checks if the passed string is a valid Java identifier. Handles UNICODE
    * names.

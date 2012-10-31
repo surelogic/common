@@ -22,6 +22,7 @@ public final class CommonImages {
    * Symbolic decorator names
    */
   public static final String DECR_ABSTRACT = "decr/abstract.gif";
+  public static final String DECR_ANDROID = "decr/android.png";
   public static final String DECR_ANNOTATION = "decr/annotation.gif";
   public static final String DECR_ASSUME = "decr/assume.gif";
   public static final String DECR_BUGLINK = "decr/buglink.gif";
