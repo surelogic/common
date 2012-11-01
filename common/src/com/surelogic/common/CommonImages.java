@@ -156,6 +156,7 @@ public final class CommonImages {
   public static final String IMG_JSURE_VERIFY = "jsure_verify.gif";
   public static final String IMG_LEFT_ARROW_SMALL = "left_arrow_small.gif";
   public static final String IMG_LEFT = "left.gif";
+  public static final String IMG_LIBRARY = "library.gif";
   public static final String IMG_LICENSE_GRAY = "license_gray.gif";
   public static final String IMG_LICENSE_NO_SEAL = "license_no_seal.gif";
   public static final String IMG_LICENSE_NO_SEAL_GRAY = "license_no_seal_gray.gif";
@@ -174,6 +175,7 @@ public final class CommonImages {
   public static final String IMG_PACKAGE = "package.gif";
   public static final String IMG_PAGE_BLUE = "page_blue.gif";
   public static final String IMG_PAGE_ORANGE = "page_orange.gif";
+  public static final String IMG_PARAMETER = "parameter.gif";
   public static final String IMG_PLUS_VOUCH = "plus_vouch.gif";
   public static final String IMG_PLUS = "plus.gif";
   public static final String IMG_PMD_FINDING = "pmd_finding.gif";
@@ -228,6 +230,7 @@ public final class CommonImages {
   public static final String IMG_TRAFFIC_LIGHT_RED = "traffic_light_red.png";
   public static final String IMG_TRAFFIC_LIGHT_YELLOW = "traffic_light_yellow.png";
   public static final String IMG_TRANSPARENT_PIXEL = "transparent_pixel.png";
+  public static final String IMG_TYPE_PARAMETER = "type_parameter.gif";
   public static final String IMG_UNKNOWN = "unknown.gif";
   public static final String IMG_UP = "up.gif";
   public static final String IMG_VERIFICATION_RESULT = "verification_result.gif";

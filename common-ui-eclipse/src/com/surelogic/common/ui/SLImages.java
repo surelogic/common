@@ -905,46 +905,34 @@ public final class SLImages {
   }
 
   @NonNull
-  public static Image getImageForProject(@Nullable String projectName, @Nullable Point size) {
-    final Image base = getImage(CommonImages.IMG_PROJECT);
-    if (base == null)
-      throw new IllegalStateException("CommonImages.IMG_PROJECT does not exist");
-    if (SLUtility.isNotEmptyOrNull(projectName) && !projectName.startsWith(SLUtility.LIBRARY_PROJECT)
-        && !projectName.startsWith(SLUtility.UNKNOWN_PROJECT)) {
-      try {
-        final IWorkspace ws = ResourcesPlugin.getWorkspace();
-        final IWorkspaceRoot wsRoot = ws.getRoot();
-        final IProject project = wsRoot.getProject(projectName);
-        if (project != null && project.exists()) {
-          if (project.hasNature(SLUtility.ANDROID_NATURE)) {
-            return getDecoratedImage(base, new ImageDescriptor[] { null, getImageDescriptor(CommonImages.DECR_ANDROID), null, null,
-                null }, size);
-          } else if (project.hasNature(SLUtility.JAVA_NATURE)) {
-            return getDecoratedImage(base, new ImageDescriptor[] { null, getImageDescriptor(CommonImages.DECR_JAVA), null, null,
-                null }, size);
+  public static Image getImageForProject(@Nullable String projectName) {
+    if (SLUtility.isNotEmptyOrNull(projectName) && !projectName.startsWith(SLUtility.UNKNOWN_PROJECT)) {
+      if (projectName.startsWith(SLUtility.LIBRARY_PROJECT)) {
+        return getImage(CommonImages.IMG_LIBRARY);
+      } else {
+        try {
+          final IWorkspace ws = ResourcesPlugin.getWorkspace();
+          final IWorkspaceRoot wsRoot = ws.getRoot();
+          final IProject project = wsRoot.getProject(projectName);
+          if (project != null && project.exists()) {
+            if (project.hasNature(SLUtility.ANDROID_NATURE)) {
+              return getImageForAndroidProject();
+            } else if (project.hasNature(SLUtility.JAVA_NATURE)) {
+              return getImageForJavaProject();
+            }
           }
+        } catch (Exception ignore) {
+          // just return the base project image
         }
-      } catch (Exception ignore) {
-        // just return the base project image
       }
     }
-    return base;
-  }
-
-  @NonNull
-  public static Image getImageForProject(@Nullable String projectName) {
-    return getImageForProject(projectName, null);
-  }
-
-  @NonNull
-  public static Image getImageForProject(@Nullable IJavaRef javaRef, @Nullable Point size) {
-    final String projectName = javaRef == null ? null : javaRef.getRealEclipseProjectNameOrNull();
-    return getImageForProject(projectName, size);
+    return getImage(CommonImages.IMG_PROJECT);
   }
 
   @NonNull
   public static Image getImageForProject(@Nullable IJavaRef javaRef) {
-    return getImageForProject(javaRef, null);
+    final String projectName = javaRef == null ? null : javaRef.getEclipseProjectNameOrNull();
+    return getImageForProject(projectName);
   }
 
   @NonNull
