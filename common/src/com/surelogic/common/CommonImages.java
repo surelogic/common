@@ -29,10 +29,13 @@ public final class CommonImages {
   public static final String DECR_CONSISTENT = "decr/consistent.gif";
   public static final String DECR_CONSTRUCTOR = "decr/constructor.gif";
   public static final String DECR_DELTA = "decr/delta.gif";
+  public static final String DECR_FINAL = "decr/final.gif";
   public static final String DECR_INCONSISTENT = "decr/inconsistent.gif";
   public static final String DECR_INFO = "decr/info.gif";
   public static final String DECR_JAVA = "decr/java.gif";
   public static final String DECR_REDDOT = "decr/reddot.gif";
+  public static final String DECR_STATIC_ABSTRACT = "decr/static_abstract.gif";
+  public static final String DECR_STATIC_FINAL = "decr/static_final.gif";
   public static final String DECR_STATIC = "decr/static.gif";
   public static final String DECR_TEAM_SERVER = "decr/team_server.gif";
   public static final String DECR_TRUSTED = "decr/trusted.gif";
@@ -45,6 +48,7 @@ public final class CommonImages {
   public static final String IMG_ALPHA_SORT = "alpha_sort.gif";
   public static final String IMG_ANALYSIS_RESULT = "analysis_result.gif";
   public static final String IMG_ANNOTATION_ABDUCTIVE = "annotation_abductive.gif";
+  public static final String IMG_ANNOTATION_DEFAULT = "annotation_default.gif";
   public static final String IMG_ANNOTATION_DELTA = "annotation_delta.gif";
   public static final String IMG_ANNOTATION_ERROR = "annotation_error.gif";
   public static final String IMG_ANNOTATION_ERROR_PROPOSED = "annotation_error_proposed.gif";

@@ -23,6 +23,7 @@ import com.surelogic.Utility;
 import com.surelogic.common.CommonImages;
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
+import com.surelogic.common.ref.IDecl;
 import com.surelogic.common.ref.IJavaRef;
 
 /**
@@ -335,7 +336,7 @@ public final class SLImages {
     if (baseImageWidth != size.x)
       pixelsFromRight = (int) (((double) (size.x - baseImageWidth)) / 2.0);
     final boolean indentImage = pixelsFromRight > 0;
-    final Image base = indentImage ? SLImages.indentImageUnmanaged(baseImage, pixelsFromRight, 0) : baseImage;
+    final Image base = indentImage ? indentImageUnmanaged(baseImage, pixelsFromRight, 0) : baseImage;
     final DecorationOverlayIcon doi = new DecorationOverlayIcon(base, overlaysArray, size);
     final Image result = doi.createImage();
     if (indentImage)
@@ -894,16 +895,38 @@ public final class SLImages {
   }
 
   /**
-   * Gets a copy of the image cache managed by this utility. This method is
-   * primarily intended for testing and debug views.
+   * Gets an image for Android projects.
    * 
-   * @return a copy of the image cache managed by this utility.
+   * @return an image for Android projects.
    */
   @NonNull
-  public static HashMap<String, Image> getCopyOfImageCache() {
-    return new HashMap<String, Image>(CACHEKEY_TO_IMAGE);
+  public static Image getImageForAndroidProject() {
+    return getDecoratedImage(CommonImages.IMG_PROJECT, new ImageDescriptor[] { null, getImageDescriptor(CommonImages.DECR_ANDROID),
+        null, null, null });
   }
 
+  /**
+   * Gets an image for Java projects.
+   * 
+   * @return an image for Java projects.
+   */
+  @NonNull
+  public static Image getImageForJavaProject() {
+    return getDecoratedImage(CommonImages.IMG_PROJECT, new ImageDescriptor[] { null, getImageDescriptor(CommonImages.DECR_JAVA),
+        null, null, null });
+  }
+
+  /**
+   * Gets the best image for the passed project name. This method tries to see
+   * if the project has an Android or Java nature and decorate the project icon
+   * appropriately. If the project is the standard library then the Eclipse
+   * library image is returned. A normal project image is returned if nothing
+   * can be determined about the passed project name.
+   * 
+   * @param projectName
+   *          a project name or {@code null}.
+   * @return the best icon for the passed project name.
+   */
   @NonNull
   public static Image getImageForProject(@Nullable String projectName) {
     if (SLUtility.isNotEmptyOrNull(projectName) && !projectName.startsWith(SLUtility.UNKNOWN_PROJECT)) {
@@ -929,6 +952,21 @@ public final class SLImages {
     return getImage(CommonImages.IMG_PROJECT);
   }
 
+  /**
+   * Gets the best image for the project name, if know, that the passed Java
+   * code reference is within. This method tries to see if the project has an
+   * Android or Java nature and decorate the project icon appropriately. If the
+   * project is the standard library then the Eclipse library image is returned.
+   * A normal project image is returned if nothing can be determined about the
+   * passed project name.
+   * 
+   * @param javaRef
+   *          a Java code reference to call
+   *          {@link IJavaRef#getEclipseProjectNameOrNull()} to obtain the
+   *          project name or {@code null}.
+   * @return the best icon for the project the passed Java code reference is
+   *         within.
+   */
   @NonNull
   public static Image getImageForProject(@Nullable IJavaRef javaRef) {
     final String projectName = javaRef == null ? null : javaRef.getEclipseProjectNameOrNull();
@@ -936,14 +974,152 @@ public final class SLImages {
   }
 
   @NonNull
-  public static Image getImageForAndroidProject() {
-    return getDecoratedImage(getImage(CommonImages.IMG_PROJECT), new ImageDescriptor[] { null,
-        getImageDescriptor(CommonImages.DECR_ANDROID), null, null, null });
+  public static Image getImageFor(@Nullable IDecl decl) {
+    switch (decl.getKind()) {
+    case ANNOTATION: {
+      String imageName = CommonImages.IMG_ANNOTATION;
+      switch (decl.getVisibility()) {
+      case DEFAULT:
+        imageName = CommonImages.IMG_ANNOTATION_DEFAULT;
+      case PRIVATE:
+        imageName = CommonImages.IMG_ANNOTATION_PRIVATE;
+      case PROTECTED:
+        imageName = CommonImages.IMG_ANNOTATION_PROTECTED;
+      default:
+      }
+      return getImage(imageName);
+    }
+    case CLASS: {
+      String imageName = CommonImages.IMG_CLASS;
+      switch (decl.getVisibility()) {
+      case DEFAULT:
+      case ANONYMOUS: // this is how Eclipse does it
+        imageName = CommonImages.IMG_CLASS_DEFAULT;
+      case PRIVATE:
+        imageName = CommonImages.IMG_CLASS_PRIVATE;
+      case PROTECTED:
+        imageName = CommonImages.IMG_CLASS_PROTECTED;
+      default:
+      }
+      String topRight = null;
+      if (decl.isStatic() && decl.isAbstract())
+        topRight = CommonImages.DECR_STATIC_ABSTRACT;
+      else if (decl.isStatic() && decl.isFinal())
+        topRight = CommonImages.DECR_STATIC_FINAL;
+      else if (decl.isStatic())
+        topRight = CommonImages.DECR_STATIC;
+      else if (decl.isFinal())
+        topRight = CommonImages.DECR_FINAL;
+      else if (decl.isAbstract())
+        topRight = CommonImages.DECR_ABSTRACT;
+      if (topRight == null)
+        return getImage(imageName);
+      else
+        return getDecoratedImage(imageName, new ImageDescriptor[] { null, getImageDescriptor(topRight), null, null, null });
+    }
+    case CONSTRUCTOR:
+    case METHOD: {
+      String imageName = CommonImages.IMG_METHOD;
+      switch (decl.getVisibility()) {
+      case DEFAULT:
+        imageName = CommonImages.IMG_METHOD_DEFAULT;
+      case PRIVATE:
+        imageName = CommonImages.IMG_METHOD_PRIVATE;
+      case PROTECTED:
+        imageName = CommonImages.IMG_METHOD_PROTECTED;
+      default:
+      }
+      String topRight = null;
+      if (decl.isStatic() && decl.isFinal())
+        topRight = CommonImages.DECR_STATIC_FINAL;
+      else if (decl.isStatic())
+        topRight = CommonImages.DECR_STATIC;
+      else if (decl.isFinal())
+        topRight = CommonImages.DECR_FINAL;
+      else if (decl.isAbstract())
+        topRight = CommonImages.DECR_ABSTRACT;
+      if (decl.getKind() == IDecl.Kind.CONSTRUCTOR)
+        topRight = CommonImages.DECR_CONSTRUCTOR;
+      boolean greyscale = decl.isImplicit();
+      if (topRight == null)
+        return getImage(imageName, greyscale);
+      else
+        return getDecoratedImage(imageName, new ImageDescriptor[] { null, getImageDescriptor(topRight), null, null, null }, null,
+            greyscale);
+    }
+    case ENUM: {
+      String imageName = CommonImages.IMG_ENUM;
+      switch (decl.getVisibility()) {
+      case DEFAULT:
+        imageName = CommonImages.IMG_ENUM_DEFAULT;
+      case PRIVATE:
+        imageName = CommonImages.IMG_ENUM_PRIVATE;
+      case PROTECTED:
+        imageName = CommonImages.IMG_ENUM_PROTECTED;
+      default:
+      }
+      return getImage(imageName);
+    }
+    case FIELD: {
+      String imageName = CommonImages.IMG_FIELD_PUBLIC;
+      switch (decl.getVisibility()) {
+      case DEFAULT:
+        imageName = CommonImages.IMG_FIELD_DEFAULT;
+      case PRIVATE:
+        imageName = CommonImages.IMG_FIELD_PRIVATE;
+      case PROTECTED:
+        imageName = CommonImages.IMG_FIELD_PROTECTED;
+      default:
+      }
+      String topRight = null;
+      if (decl.isStatic() && decl.isFinal())
+        topRight = CommonImages.DECR_STATIC_FINAL;
+      else if (decl.isStatic())
+        topRight = CommonImages.DECR_STATIC;
+      else if (decl.isFinal())
+        topRight = CommonImages.DECR_FINAL;
+      if (topRight == null)
+        return getImage(imageName);
+      else
+        return getDecoratedImage(imageName, new ImageDescriptor[] { null, getImageDescriptor(topRight), null, null, null });
+    }
+    case INITIALIZER:
+      if (decl.isStatic())
+        return getImage(CommonImages.IMG_METHOD_PRIVATE);
+      else
+        return getDecoratedImage(CommonImages.IMG_METHOD_PRIVATE, new ImageDescriptor[] { null,
+            getImageDescriptor(CommonImages.DECR_STATIC), null, null, null });
+    case INTERFACE: {
+      String imageName = CommonImages.IMG_INTERFACE;
+      switch (decl.getVisibility()) {
+      case DEFAULT:
+        imageName = CommonImages.IMG_INTERFACE_DEFAULT;
+      case PRIVATE:
+        imageName = CommonImages.IMG_INTERFACE_PRIVATE;
+      case PROTECTED:
+        imageName = CommonImages.IMG_INTERFACE_PROTECTED;
+      default:
+      }
+      return getImage(imageName);
+    }
+    case PACKAGE:
+      return getImage(CommonImages.IMG_UNKNOWN);
+    case PARAMETER:
+      return getImage(CommonImages.IMG_PARAMETER);
+    case TYPE_PARAMETER:
+      return getImage(CommonImages.IMG_TYPE_PARAMETER);
+    }
+    return getImage(CommonImages.IMG_UNKNOWN);
   }
 
+  /**
+   * Gets a copy of the image cache managed by this utility. This method is
+   * primarily intended for testing and debug views.
+   * 
+   * @return a copy of the image cache managed by this utility.
+   */
   @NonNull
-  public static Image getImageForJavaProject() {
-    return getDecoratedImage(getImage(CommonImages.IMG_PROJECT), new ImageDescriptor[] { null,
-        getImageDescriptor(CommonImages.DECR_JAVA), null, null, null });
+  public static HashMap<String, Image> getCopyOfImageCache() {
+    return new HashMap<String, Image>(CACHEKEY_TO_IMAGE);
   }
 }
