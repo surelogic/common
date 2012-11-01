@@ -61,9 +61,10 @@ public final class SLImages {
    * {@link #getImageDecoratedCacheKey(Image, ImageDescriptor[], Point, boolean)}
    * </li>
    * <li>{@link #getImageResizeCacheKey(Image, Point)}</li>
+   * <li>{@link #getImageIndentCacheKey(Image, int, int)}</li>
+   * <li>{@link #getImageToGrayCacheKey(Image)}</li>
    * </ul>
    * <p>
-   * The keys can have {@link #GRAY} on them to indicate the image is grayscale.
    */
   private static final Map<String, Image> CACHEKEY_TO_IMAGE = new HashMap<String, Image>();
 
@@ -101,18 +102,13 @@ public final class SLImages {
     }
   }
 
-  /**
-   * Used in cache keys.
-   */
-  private static final String GRAY = "gray";
-
   /*
-   * Key creation methods
+   * Key creation methods for the various types of images we cache
    */
 
   @NonNull
   private static String getNameCacheKey(@NonNull String imageName, boolean grayscale) {
-    final String key = imageName + (grayscale ? ":" + GRAY : "") + "->named";
+    final String key = imageName + (grayscale ? ":gray" : "") + "->named";
     return key;
   }
 
@@ -123,7 +119,7 @@ public final class SLImages {
     int intHash = 1;
     for (ImageDescriptor id : overlaysArray)
       intHash = prime * intHash + ((id == null) ? 0 : id.hashCode());
-    final String key = imageName + ":" + Integer.toHexString(intHash) + (grayscale ? ":" + GRAY : "") + "->name-decorated";
+    final String key = imageName + ":" + Integer.toHexString(intHash) + (grayscale ? ":gray" : "") + "->name-decorated";
     return key;
   }
 
@@ -137,7 +133,7 @@ public final class SLImages {
     intHash = prime * intHash + ((baseImage == null) ? 0 : baseImage.hashCode());
     for (ImageDescriptor id : overlaysArray)
       intHash = prime * intHash + ((id == null) ? 0 : id.hashCode());
-    final String key = Integer.toHexString(intHash) + "(" + size.x + "," + size.y + ")" + (grayscale ? GRAY : "")
+    final String key = Integer.toHexString(intHash) + "(" + size.x + "," + size.y + ")" + (grayscale ? "gray" : "")
         + "->image-decorated";
     return key;
   }
@@ -157,6 +153,15 @@ public final class SLImages {
     int intHash = 1;
     intHash = prime * intHash + ((baseImage == null) ? 0 : baseImage.hashCode());
     final String key = Integer.toHexString(intHash) + "(" + pixelsFromRight + "," + pixelsFromTop + ")->image-indent";
+    return key;
+  }
+
+  @NonNull
+  private static String getImageToGrayCacheKey(@NonNull Image baseImage) {
+    final int prime = 31;
+    int intHash = 1;
+    intHash = prime * intHash + ((baseImage == null) ? 0 : baseImage.hashCode());
+    final String key = Integer.toHexString(intHash) + "gray" + "->image-gray";
     return key;
   }
 
@@ -287,6 +292,33 @@ public final class SLImages {
   @Nullable
   public static Image getGrayscaleImage(final String imageName) {
     return getImage(imageName, true);
+  }
+
+  /**
+   * Returns a shared grayscale image derived from the passed image.
+   * <p>
+   * Note that clients <b>must not</b> dispose the image returned by this
+   * method.
+   * 
+   * @param baseImage
+   *          the base image.
+   * @return an image that is managed by this utility, please do not call
+   *         {@link Image#dispose()} on it, or {@code null} if
+   *         <tt>imageName</tt> could not be found.
+   */
+  @Nullable
+  public static Image getGrayscaleImage(@NonNull Image baseImage) {
+    if (baseImage == null) {
+      return null;
+    }
+    final String key = getImageToGrayCacheKey(baseImage);
+    Image result = CACHEKEY_TO_IMAGE.get(key);
+    if (result == null) {
+      result = toGray(baseImage);
+      if (result != null)
+        addToImageCache(key, result);
+    }
+    return result;
   }
 
   /**
