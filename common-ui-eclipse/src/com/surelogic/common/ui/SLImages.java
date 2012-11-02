@@ -1051,7 +1051,6 @@ public final class SLImages {
     }
     case CONSTRUCTOR:
     case METHOD: {
-      System.out.println("getting image for METHOD");
       String imageName = CommonImages.IMG_METHOD_PUBLIC;
       switch (decl.getVisibility()) {
       case DEFAULT:
