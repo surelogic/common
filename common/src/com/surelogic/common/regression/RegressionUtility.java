@@ -59,8 +59,7 @@ public class RegressionUtility {
 		oracleScanDirFilter, snapshotOracleFilter, javacOracleFilter, xmlOracleFilter
 	};
 	
-	public static File findOracle(String projectPath) {
-		final File project = new File(projectPath);
+	public static File findOracle(final File project) {
 		File xmlOracle = null;
 		for(Filter f : oracleFilters) {
 			File tempOracle = RegressionUtility.getOracleName(project, f);
