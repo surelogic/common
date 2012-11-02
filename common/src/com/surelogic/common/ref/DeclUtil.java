@@ -1025,6 +1025,16 @@ public final class DeclUtil {
     return true;
   }
 
+  /**
+   * Gets a string about the passed declaration very similar to what Eclipse
+   * uses in the Java outline.
+   * 
+   * @param decl
+   *          any declaration.
+   * @return string about the passed declaration very similar to what Eclipse
+   *         uses in the Java outline. Returns {@code null} only if the passed
+   *         declaration is {@code null}.
+   */
   @Nullable
   public static String getEclipseJavaOutlineLikeLabel(@Nullable final IDecl decl) {
     if (decl == null)
@@ -1063,7 +1073,7 @@ public final class DeclUtil {
     case TYPE_PARAMETER:
       return toStringTypeParameterHelper((IDeclTypeParameter) decl);
     }
-    return null;
+    throw new IllegalStateException("(bug) no label could be generated for: " + decl);
   }
 
   /**
@@ -1092,11 +1102,30 @@ public final class DeclUtil {
    * @return a string representation of the parameter list for the passed
    *         declaration.
    */
-  public static String getParametersFullyQualified(IDeclFunction decl) {
+  public static String getParametersFullyQualifiedOf(IDeclFunction decl) {
     return toStringParametersHelper(decl.getParameters(), true, false, false);
   }
 
-  private static String toStringParametersHelper(List<IDeclParameter> parameters, boolean useFullyQualifiedTypes,
+  /**
+   * Helper to create a string representing the passed list of parameters.
+   * <p>
+   * Examples: <tt>(final Object foo, String bar)</tt>,
+   * <tt>(java.lang.Object)</tt>, </tt>()</tt>.
+   * 
+   * @param parameters
+   *          the list of parameters.
+   * @param useFullyQualifiedTypes
+   *          {@code true} if fully-qualified type names should be output (e.g.,
+   *          <tt>java.lang.Object</tt>), {@code false} for simple type names
+   *          should be output (e.g., <tt>Object</tt>).
+   * @param showFormalNames
+   *          {@code true} if formal parameter names should be output.
+   * @param showFinal
+   *          {@code true} if <tt>final</tt> should be output if the parameter
+   *          is final.
+   * @return a string representing the passed list of parameters.
+   */
+  public static String toStringParametersHelper(@NonNull List<IDeclParameter> parameters, boolean useFullyQualifiedTypes,
       boolean showFormalNames, boolean showFinal) {
     final StringBuilder b = new StringBuilder();
     if (!parameters.isEmpty()) {
@@ -1114,7 +1143,26 @@ public final class DeclUtil {
     return b.toString();
   }
 
-  private static String toStringParameterHelper(IDeclParameter parameter, boolean useFullyQualifiedType, boolean showFormalName,
+  /**
+   * Helper to create a string representing the passed parameter declaration.
+   * <p>
+   * Examples: <tt>final foo Object</tt>, <tt>Object</tt>,
+   * <tt>java.lang.Object</tt>
+   * 
+   * @param parameter
+   *          a parameter declaration.
+   * @param useFullyQualifiedType
+   *          {@code true} if the fully-qualified type name should be output
+   *          (e.g., <tt>java.lang.Object</tt>), {@code false} if the simple
+   *          type name should be output (e.g., <tt>Object</tt>).
+   * @param showFormalName
+   *          {@code true} if the formal parameter name should be output.
+   * @param showFinal
+   *          {@code true} if <tt>final</tt> should be output if the parameter
+   *          is final.
+   * @return a string representing the passed parameter declaration.
+   */
+  public static String toStringParameterHelper(IDeclParameter parameter, boolean useFullyQualifiedType, boolean showFormalName,
       boolean showFinal) {
     final StringBuilder b = new StringBuilder();
     if (parameter.isFinal() && showFinal)
@@ -1130,7 +1178,18 @@ public final class DeclUtil {
     return b.toString();
   }
 
-  private static String toStringTypeParametersHelper(List<IDeclTypeParameter> typeParameters) {
+  /**
+   * Helper to create a string representing the passed list of type parameters.
+   * <p>
+   * Examples: <tt>&lt;E&gt;</tt>,
+   * <tt>&lt;E extends Runnable &amp; List&lt;Object&gt;, T&gt;</tt>,
+   * </tt>&lt;&gt;</tt>.
+   * 
+   * @param typeParameters
+   *          the list of type parameters.
+   * @return a string representing the passed list of type parameters.
+   */
+  public static String toStringTypeParametersHelper(List<IDeclTypeParameter> typeParameters) {
     final StringBuilder b = new StringBuilder();
     if (!typeParameters.isEmpty()) {
       b.append('<');
@@ -1147,6 +1206,16 @@ public final class DeclUtil {
     return b.toString();
   }
 
+  /**
+   * Helper to create a string representing the passed type parameter
+   * declaration.
+   * <p>
+   * Examples: <tt>E</tt>, <tt>T extends Runnable &amp; List&lt;Object&gt;</tt>
+   * 
+   * @param typeParameter
+   *          a type parameter declaration.
+   * @return a string representing the passed type parameter declaration.
+   */
   private static String toStringTypeParameterHelper(IDeclTypeParameter typeParameter) {
     final StringBuilder b = new StringBuilder();
     b.append(typeParameter.getName());
