@@ -67,6 +67,8 @@ public final class CommonImages {
   public static final String IMG_ASTERISK_ORANGE_50 = "asterisk_orange_50.gif";
   public static final String IMG_ASTERISK_ORANGE_75 = "asterisk_orange_75.gif";
   public static final String IMG_CATEGORY = "category.gif";
+  public static final String IMG_CHANGELOG_OLD_SCAN_ONLY = "changelog_old_scan_only.gif";
+  public static final String IMG_CHANGELOG_ONLY = "changelog_only.gif";
   public static final String IMG_CHANGELOG = "changelog.gif";
   public static final String IMG_CHOICE_ITEM = "choice_item.gif";
   public static final String IMG_CHOICE = "choice.gif";
