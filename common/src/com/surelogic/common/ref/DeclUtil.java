@@ -1128,18 +1128,16 @@ public final class DeclUtil {
   public static String toStringParametersHelper(@NonNull List<IDeclParameter> parameters, boolean useFullyQualifiedTypes,
       boolean showFormalNames, boolean showFinal) {
     final StringBuilder b = new StringBuilder();
-    if (!parameters.isEmpty()) {
-      b.append('(');
-      boolean first = true;
-      for (IDeclParameter parameter : parameters) {
-        if (first)
-          first = false;
-        else
-          b.append(", ");
-        b.append(toStringParameterHelper(parameter, useFullyQualifiedTypes, showFormalNames, showFinal));
-      }
-      b.append(')');
+    b.append('(');
+    boolean first = true;
+    for (IDeclParameter parameter : parameters) {
+      if (first)
+        first = false;
+      else
+        b.append(", ");
+      b.append(toStringParameterHelper(parameter, useFullyQualifiedTypes, showFormalNames, showFinal));
     }
+    b.append(')');
     return b.toString();
   }
 
