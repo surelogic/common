@@ -1081,12 +1081,12 @@ public final class SLImages {
         topRight = CommonImages.DECR_ABSTRACT;
       if (decl.getKind() == IDecl.Kind.CONSTRUCTOR)
         topRight = CommonImages.DECR_CONSTRUCTOR;
-      String underlay = decl.isImplicit() ? CommonImages.IMG_IMPLICIT : null;
-      if (topRight == null && underlay == null)
+      String topLeft = decl.isImplicit() ? CommonImages.DECR_IMPLICIT : null;
+      if (topRight == null && topLeft == null)
         return getImage(imageName);
       else
-        return getDecoratedImage(imageName, new ImageDescriptor[] { null, getImageDescriptor(topRight), null, null,
-            getImageDescriptor(underlay) });
+        return getDecoratedImage(imageName, new ImageDescriptor[] { getImageDescriptor(topLeft), getImageDescriptor(topRight),
+            null, null, null });
     }
     case ENUM: {
       String imageName = CommonImages.IMG_ENUM;
