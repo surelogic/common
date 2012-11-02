@@ -579,26 +579,8 @@ public final class DeclUtil {
 
       @Override
       public boolean visitParameters(List<IDeclParameter> parameters) {
-        if (!parameters.isEmpty()) {
-          b.append('(');
-          boolean first = true;
-          for (IDeclParameter parameter : parameters) {
-            if (first)
-              first = false;
-            else
-              b.append(", ");
-            outputParameter(parameter);
-          }
-          b.append(')');
-        }
+        b.append(toStringParametersHelper(parameters, false, true, true));
         return false;
-      }
-
-      private void outputParameter(IDeclParameter parameter) {
-        if (parameter.isFinal())
-          b.append("final ");
-        b.append(parameter.getTypeOf().getCompact()).append(' ');
-        b.append(parameter.getName());
       }
 
       @Override
@@ -606,42 +588,15 @@ public final class DeclUtil {
         if (partOfDecl) {
           b.append("(parameter ").append(node.getPosition());
           b.append(" \u00ab");
-          outputParameter(node);
+          b.append(toStringParameterHelper(node, false, true, true));
           b.append("\u00bb)");
         }
       }
 
       @Override
       public boolean visitTypeParameters(List<IDeclTypeParameter> typeParameters) {
-        if (!typeParameters.isEmpty()) {
-          b.append('<');
-          boolean first = true;
-          for (IDeclTypeParameter typeParameter : typeParameters) {
-            if (first)
-              first = false;
-            else
-              b.append(", ");
-            outputTypeParameter(typeParameter);
-          }
-          b.append('>');
-        }
+        b.append(toStringTypeParametersHelper(typeParameters));
         return false;
-      }
-
-      private void outputTypeParameter(IDeclTypeParameter typeParameter) {
-        b.append(typeParameter.getName());
-        final List<TypeRef> bounds = typeParameter.getBounds();
-        if (!bounds.isEmpty()) {
-          b.append(" extends ");
-          boolean first = true;
-          for (TypeRef tr : bounds) {
-            if (first)
-              first = false;
-            else
-              b.append(" & ");
-            b.append(tr.getCompact());
-          }
-        }
       }
 
       @Override
@@ -649,7 +604,7 @@ public final class DeclUtil {
         if (partOfDecl) {
           b.append("(type parameter ").append(node.getPosition());
           b.append(" \u00ab");
-          outputTypeParameter(node);
+          b.append(toStringTypeParameterHelper(node));
           b.append("\u00bb)");
         }
       }
@@ -1070,57 +1025,143 @@ public final class DeclUtil {
     return true;
   }
 
-  private enum FuncUnparse {
-    USE_NEW, USE_TYPE, ONLY_PARAMS
-  }
-
-  private static String getSignature(IDeclFunction func, FuncUnparse kind, boolean fullyQualifyParameters) {
-    if (func == null) {
-      throw new IllegalArgumentException(I18N.err(44, "decl"));
-    }
-    if (kind == null) {
-      throw new IllegalArgumentException(I18N.err(44, "kind"));
-    }
-    final StringBuilder sb;
-    if (kind == FuncUnparse.ONLY_PARAMS) {
-      sb = new StringBuilder();
-    } else {
-      String name = func.getName();
-      if (name == null) {
-        if (kind == FuncUnparse.USE_TYPE) {
-          name = func.getParent().getName();
-        } else {
-          name = "new";
-        }
+  @Nullable
+  public static String getEclipseJavaOutlineLikeLabel(@Nullable final IDecl decl) {
+    if (decl == null)
+      return null;
+    switch (decl.getKind()) {
+    case PACKAGE:
+      return decl.getName();
+    case ANNOTATION:
+    case CLASS:
+    case INTERFACE:
+    case ENUM:
+      if (decl.getVisibility() == IDecl.Visibility.ANONYMOUS) {
+        return "new " + decl.getTypeOf().getCompact() + "() {...}";
+      } else
+        return decl.getName() + toStringTypeParametersHelper(decl.getTypeParameters());
+    case INITIALIZER:
+      return "{...}";
+    case CONSTRUCTOR:
+    case METHOD: {
+      final StringBuilder b = new StringBuilder();
+      b.append(decl.getName());
+      b.append(toStringParametersHelper(decl.getParameters(), false, false, false));
+      if (!decl.getTypeParameters().isEmpty()) {
+        b.append(' ');
+        b.append(toStringTypeParametersHelper(decl.getTypeParameters()));
       }
-      sb = new StringBuilder(name);
-      sb.append('(');
-    }
-
-    boolean first = true;
-    for (IDeclParameter p : func.getParameters()) {
-      if (first) {
-        first = false;
-      } else {
-        sb.append(", ");
+      if (decl.getKind() == IDecl.Kind.METHOD) {
+        b.append(" : ");
+        b.append(decl.getTypeOf() == null ? "void" : decl.getTypeOf().getCompact());
       }
-      final TypeRef t = p.getTypeOf();
-      sb.append(fullyQualifyParameters ? t.getFullyQualified() : t.getCompact());
+      return b.toString();
     }
-    if (kind != FuncUnparse.ONLY_PARAMS) {
-      sb.append(')');
+    case FIELD:
+    case PARAMETER:
+      return decl.getName() + " : " + decl.getTypeOf().getCompact();
+    case TYPE_PARAMETER:
+      return toStringTypeParameterHelper((IDeclTypeParameter) decl);
     }
-    return sb.toString();
+    return null;
   }
 
   /**
-   * As it would appear in source code
+   * Gets a string representation of the method or constructor declaration with
+   * no return type.
+   * <p>
+   * Examples: <tt>Foo(Object, String)</tt> <tt>Object()</tt>
+   * 
+   * @param decl
+   *          a method or constructor declaration.
+   * @return a string representation of the method or constructor declaration
+   *         with no return type.
    */
-  public static String getSignature(IDeclFunction func) {
-    return getSignature(func, FuncUnparse.USE_TYPE, false);
+  public static String getSimpleSignature(IDeclFunction decl) {
+    return decl.getName() + toStringParametersHelper(decl.getParameters(), false, false, false);
   }
 
-  public static String getParametersFullyQualified(IDeclFunction func) {
-    return getSignature(func, FuncUnparse.ONLY_PARAMS, true);
+  /**
+   * Gets a string representation of the parameter list for the passed method or
+   * constructor deceleration.
+   * <p>
+   * Examples: <tt>(java.lang.Object, java.lang.String)</tt>, <tt>()</tt>
+   * 
+   * @param decl
+   *          a method or constructor declaration.
+   * @return a string representation of the parameter list for the passed
+   *         declaration.
+   */
+  public static String getParametersFullyQualified(IDeclFunction decl) {
+    return toStringParametersHelper(decl.getParameters(), true, false, false);
+  }
+
+  private static String toStringParametersHelper(List<IDeclParameter> parameters, boolean useFullyQualifiedTypes,
+      boolean showFormalNames, boolean showFinal) {
+    final StringBuilder b = new StringBuilder();
+    if (!parameters.isEmpty()) {
+      b.append('(');
+      boolean first = true;
+      for (IDeclParameter parameter : parameters) {
+        if (first)
+          first = false;
+        else
+          b.append(", ");
+        b.append(toStringParameterHelper(parameter, useFullyQualifiedTypes, showFormalNames, showFinal));
+      }
+      b.append(')');
+    }
+    return b.toString();
+  }
+
+  private static String toStringParameterHelper(IDeclParameter parameter, boolean useFullyQualifiedType, boolean showFormalName,
+      boolean showFinal) {
+    final StringBuilder b = new StringBuilder();
+    if (parameter.isFinal() && showFinal)
+      b.append("final ");
+    if (useFullyQualifiedType)
+      b.append(parameter.getTypeOf().getFullyQualified());
+    else
+      b.append(parameter.getTypeOf().getCompact());
+    if (showFormalName) {
+      b.append(' ');
+      b.append(parameter.getName());
+    }
+    return b.toString();
+  }
+
+  private static String toStringTypeParametersHelper(List<IDeclTypeParameter> typeParameters) {
+    final StringBuilder b = new StringBuilder();
+    if (!typeParameters.isEmpty()) {
+      b.append('<');
+      boolean first = true;
+      for (IDeclTypeParameter typeParameter : typeParameters) {
+        if (first)
+          first = false;
+        else
+          b.append(", ");
+        b.append(toStringTypeParameterHelper(typeParameter));
+      }
+      b.append('>');
+    }
+    return b.toString();
+  }
+
+  private static String toStringTypeParameterHelper(IDeclTypeParameter typeParameter) {
+    final StringBuilder b = new StringBuilder();
+    b.append(typeParameter.getName());
+    final List<TypeRef> bounds = typeParameter.getBounds();
+    if (!bounds.isEmpty()) {
+      b.append(" extends ");
+      boolean first = true;
+      for (TypeRef tr : bounds) {
+        if (first)
+          first = false;
+        else
+          b.append(" & ");
+        b.append(tr.getCompact());
+      }
+    }
+    return b.toString();
   }
 }

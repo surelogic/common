@@ -95,6 +95,7 @@ public abstract class Decl implements IDecl {
     boolean f_isFinal = false;
     boolean f_isAbstract = false;
     int f_anonymousDeclPosition;
+    TypeRef f_anonymousType;
 
     /**
      * Constructs a class declaration builder.
@@ -213,15 +214,34 @@ public abstract class Decl implements IDecl {
       return this;
     }
 
+    /**
+     * Sets the type of the anonymous expression of this class. If this value is
+     * set for a named class it is ignored. If this value is not set for
+     * anonymous class then <tt>java.lang.Object</tt> is used as a default.
+     * 
+     * @param value
+     *          a type of this method.
+     * @return this builder.
+     */
+    public ClassBuilder setTypeOfAnonymousDecl(TypeRef value) {
+      f_anonymousType = value;
+      return this;
+    }
+
     @Override
     public IDecl buildInternal(IDecl parent) {
       int anonymousDeclPosition = 0;
+      TypeRef anonymousType = null;
       // anonymous classes
       if (f_visibility == Visibility.ANONYMOUS) {
         f_isStatic = false;
         f_name = "";
         if (f_anonymousDeclPosition >= 0)
           anonymousDeclPosition = f_anonymousDeclPosition;
+        if (f_anonymousType != null)
+          anonymousType = f_anonymousType;
+        else
+          anonymousType = new TypeRef("java.lang.Object", "Object");
       } else {
         if (!SLUtility.isValidJavaIdentifier(f_name))
           throw new IllegalArgumentException(I18N.err(275, f_name));
@@ -252,7 +272,7 @@ public abstract class Decl implements IDecl {
       }
 
       return new DeclClass(parent, f_childBuilders, f_name, f_visibility, f_isStatic, f_isFinal, f_isAbstract,
-          anonymousDeclPosition);
+          anonymousDeclPosition, anonymousType);
     }
   }
 

@@ -109,6 +109,9 @@ public interface IDecl {
    * <p>
    * The name returned for an anonymous class is the empty string.
    * <p>
+   * The name returned for a constructor is the simple name of its enclosing
+   * type.
+   * <p>
    * The name returned for a parameter is its formal name, if known, or
    * <tt>arg</tt><i>n</i>, where <i>n</i> is the number, starting at zero,
    * indicating its order of occurrence in the list of parameters.
@@ -124,7 +127,8 @@ public interface IDecl {
    * Gets (a) the type of this for a {@link Kind#FIELD} or
    * {@link Kind#PARAMETER}, or (b) the return type for a {@link Kind#METHOD}.
    * In the case of a {@link Kind#METHOD} a return value of {@code null}
-   * indicates the return type of the method is <tt>void</tt>. If this is
+   * indicates the return type of the method is <tt>void</tt>. For an anonymous
+   * class this returns the type of the anonymous class expression. If this is
    * meaningless for the declaration {@code null} is returned.
    * 
    * @return the type of this declaration, {@link null} if none.
