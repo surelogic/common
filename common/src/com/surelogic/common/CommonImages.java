@@ -170,7 +170,7 @@ public final class CommonImages {
   public static final String IMG_METHOD_DEFAULT = "method_default.gif";
   public static final String IMG_METHOD_PRIVATE = "method_private.gif";
   public static final String IMG_METHOD_PROTECTED = "method_protected.gif";
-  public static final String IMG_METHOD = "method.gif";
+  public static final String IMG_METHOD_PUBLIC = "method_public.gif";
   public static final String IMG_OPEN_XML_TYPE = "open_xml_type.gif";
   public static final String IMG_ONLINE_DOWN = "online_down.png";
   public static final String IMG_ONLINE_FILLER = "online_filler.png";
