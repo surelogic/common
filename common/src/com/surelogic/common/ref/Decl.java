@@ -1779,6 +1779,8 @@ public abstract class Decl implements IDecl {
       addB(ABSTRACT, decl.isAbstract(), b);
       if (decl.getVisibility() == Visibility.ANONYMOUS && decl.getPosition() > 0)
         add(POSITION, Integer.toString(decl.getPosition()), b);
+      if (decl.getVisibility() == Visibility.ANONYMOUS && decl.getTypeOf() != null)
+        addT(TYPE, decl.getTypeOf(), b);
       break;
     case CONSTRUCTOR:
       addV(VISIBILITY, decl.getVisibility(), b);
@@ -1982,6 +1984,9 @@ public abstract class Decl implements IDecl {
       }
       if (isFor(POSITION, pair)) {
         classBuilder.setAnonymousDeclPosition(Integer.parseInt(pair.second()));
+      }
+      if (isFor(TYPE, pair)) {
+        classBuilder.setTypeOfAnonymousDecl(TypeRef.parseEncodedForPersistence(pair.second()));
       }
       thisDeclBuilder = classBuilder;
       break;
