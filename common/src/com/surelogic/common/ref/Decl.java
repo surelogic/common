@@ -706,6 +706,7 @@ public abstract class Decl implements IDecl {
     boolean f_isStatic = false;
     boolean f_isFinal = false;
     boolean f_isAbstract = false;
+    boolean f_isImplicit = false;
 
     /**
      * Constructs a method declaration builder.
@@ -743,6 +744,20 @@ public abstract class Decl implements IDecl {
      */
     public MethodBuilder setVisibility(Visibility value) {
       f_visibility = value == null ? Visibility.PUBLIC : value;
+      return this;
+    }
+
+    /**
+     * Sets if this declaration does <i>not</i> appear in source code, it is an
+     * implicit declaration.
+     * 
+     * @param value
+     *          {@code true} if this declaration does <i>not</i> appear in
+     *          source code, {@code false} otherwise.
+     * @return this builder.
+     */
+    public MethodBuilder setIsImplicit(boolean value) {
+      f_isImplicit = value;
       return this;
     }
 
@@ -865,7 +880,8 @@ public abstract class Decl implements IDecl {
         }
       }
 
-      return new DeclMethod(parent, f_childBuilders, f_name, f_visibility, f_returnTypeOf, f_isStatic, f_isFinal, f_isAbstract);
+      return new DeclMethod(parent, f_childBuilders, f_name, f_visibility, f_returnTypeOf, f_isStatic, f_isFinal, f_isAbstract,
+          f_isImplicit);
     }
   }
 
@@ -1810,6 +1826,7 @@ public abstract class Decl implements IDecl {
       addB(STATIC, decl.isStatic(), b);
       addB(FINAL, decl.isFinal(), b);
       addB(ABSTRACT, decl.isAbstract(), b);
+      addB(IMPLICIT, decl.isImplicit(), b);
       addT(TYPE, decl.getTypeOf(), b);
       break;
     case PACKAGE:
@@ -2075,6 +2092,9 @@ public abstract class Decl implements IDecl {
       if (isFor(ABSTRACT, pair)) {
         methodBuilder.setIsAbstract(Boolean.valueOf(pair.second()));
         pair = parseEqualsPair(b);
+      }
+      if (isFor(IMPLICIT, pair)) {
+        methodBuilder.setIsImplicit(Boolean.valueOf(pair.second()));
       }
       if (isFor(TYPE, pair))
         methodBuilder.setReturnTypeOf(TypeRef.parseEncodedForPersistence(pair.second()));

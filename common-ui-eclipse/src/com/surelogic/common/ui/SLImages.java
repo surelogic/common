@@ -1013,10 +1013,13 @@ public final class SLImages {
       switch (decl.getVisibility()) {
       case DEFAULT:
         imageName = CommonImages.IMG_ANNOTATION_DEFAULT;
+        break;
       case PRIVATE:
         imageName = CommonImages.IMG_ANNOTATION_PRIVATE;
+        break;
       case PROTECTED:
         imageName = CommonImages.IMG_ANNOTATION_PROTECTED;
+        break;
       default:
       }
       return getImage(imageName);
@@ -1027,10 +1030,13 @@ public final class SLImages {
       case DEFAULT:
       case ANONYMOUS: // this is how Eclipse does it
         imageName = CommonImages.IMG_CLASS_DEFAULT;
+        break;
       case PRIVATE:
         imageName = CommonImages.IMG_CLASS_PRIVATE;
+        break;
       case PROTECTED:
         imageName = CommonImages.IMG_CLASS_PROTECTED;
+        break;
       default:
       }
       String topRight = null;
@@ -1055,10 +1061,13 @@ public final class SLImages {
       switch (decl.getVisibility()) {
       case DEFAULT:
         imageName = CommonImages.IMG_METHOD_DEFAULT;
+        break;
       case PRIVATE:
         imageName = CommonImages.IMG_METHOD_PRIVATE;
+        break;
       case PROTECTED:
         imageName = CommonImages.IMG_METHOD_PROTECTED;
+        break;
       default:
       }
       String topRight = null;
@@ -1084,10 +1093,13 @@ public final class SLImages {
       switch (decl.getVisibility()) {
       case DEFAULT:
         imageName = CommonImages.IMG_ENUM_DEFAULT;
+        break;
       case PRIVATE:
         imageName = CommonImages.IMG_ENUM_PRIVATE;
+        break;
       case PROTECTED:
         imageName = CommonImages.IMG_ENUM_PROTECTED;
+        break;
       default:
       }
       return getImage(imageName);
@@ -1097,10 +1109,13 @@ public final class SLImages {
       switch (decl.getVisibility()) {
       case DEFAULT:
         imageName = CommonImages.IMG_FIELD_DEFAULT;
+        break;
       case PRIVATE:
         imageName = CommonImages.IMG_FIELD_PRIVATE;
+        break;
       case PROTECTED:
         imageName = CommonImages.IMG_FIELD_PROTECTED;
+        break;
       default:
       }
       String topRight = null;
@@ -1126,10 +1141,13 @@ public final class SLImages {
       switch (decl.getVisibility()) {
       case DEFAULT:
         imageName = CommonImages.IMG_INTERFACE_DEFAULT;
+        break;
       case PRIVATE:
         imageName = CommonImages.IMG_INTERFACE_PRIVATE;
+        break;
       case PROTECTED:
         imageName = CommonImages.IMG_INTERFACE_PROTECTED;
+        break;
       default:
       }
       return getImage(imageName);

@@ -19,14 +19,16 @@ final class DeclMethod extends DeclVisibility implements IDeclFunction {
   final boolean f_isStatic;
   final boolean f_isFinal;
   final boolean f_isAbstract;
+  final boolean f_isImplicit;
 
   DeclMethod(IDecl parent, List<Decl.DeclBuilder> childBuilders, String name, Visibility visibility, TypeRef returnTypeOf,
-      boolean isStatic, boolean isFinal, boolean isAbstract) {
+      boolean isStatic, boolean isFinal, boolean isAbstract, boolean isImplicit) {
     super(parent, childBuilders, name, visibility);
     f_returnTypeOf = returnTypeOf;
     f_isStatic = isStatic;
     f_isFinal = isFinal;
     f_isAbstract = isAbstract;
+    f_isImplicit = isImplicit;
   }
 
   @NonNull
@@ -53,5 +55,10 @@ final class DeclMethod extends DeclVisibility implements IDeclFunction {
   @Override
   public boolean isAbstract() {
     return f_isAbstract;
+  }
+
+  @Override
+  public boolean isImplicit() {
+    return f_isImplicit;
   }
 }
