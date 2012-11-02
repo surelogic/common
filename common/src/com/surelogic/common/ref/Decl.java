@@ -1998,9 +1998,11 @@ public abstract class Decl implements IDecl {
       }
       if (isFor(ABSTRACT, pair)) {
         classBuilder.setIsAbstract(Boolean.valueOf(pair.second()));
+        pair = parseEqualsPair(b);
       }
       if (isFor(POSITION, pair)) {
         classBuilder.setAnonymousDeclPosition(Integer.parseInt(pair.second()));
+        pair = parseEqualsPair(b);
       }
       if (isFor(TYPE, pair)) {
         classBuilder.setTypeOfAnonymousDecl(TypeRef.parseEncodedForPersistence(pair.second()));
@@ -2012,6 +2014,7 @@ public abstract class Decl implements IDecl {
       pair = parseEqualsPair(b);
       if (isFor(VISIBILITY, pair)) {
         constructorBuilder.setVisibility(Visibility.valueOf(pair.second()));
+        pair = parseEqualsPair(b);
       }
       if (isFor(IMPLICIT, pair)) {
         constructorBuilder.setIsImplicit(Boolean.valueOf(pair.second()));
@@ -2095,6 +2098,7 @@ public abstract class Decl implements IDecl {
       }
       if (isFor(IMPLICIT, pair)) {
         methodBuilder.setIsImplicit(Boolean.valueOf(pair.second()));
+        pair = parseEqualsPair(b);
       }
       if (isFor(TYPE, pair))
         methodBuilder.setReturnTypeOf(TypeRef.parseEncodedForPersistence(pair.second()));

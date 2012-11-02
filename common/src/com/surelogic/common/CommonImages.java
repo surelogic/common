@@ -133,6 +133,7 @@ public final class CommonImages {
   public static final String IMG_HAPPENS_BEFORE_NO = "happens_before_no.gif";
   public static final String IMG_HAPPENS_BEFORE = "happens_before.gif";
   public static final String IMG_HIERARCHICAL = "hierarchical.gif";
+  public static final String IMG_IMPLICIT = "implicit.gif";
   public static final String IMG_IMPORT = "import.gif";
   public static final String IMG_INFO = "info.gif";
   public static final String IMG_INTERFACE_DEFAULT = "interface_default.gif";
