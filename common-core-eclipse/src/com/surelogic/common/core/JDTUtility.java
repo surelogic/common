@@ -473,7 +473,7 @@ public final class JDTUtility {
   public static Pair<IJavaElement, Double> findJavaElement(final IJavaRef javaRef) {
     if (javaRef == null)
       return new Pair<IJavaElement, Double>(null, Double.valueOf(0));
-    System.out.println("findJavaElementOrNull(" + javaRef + ")");
+    // System.out.println("findJavaElementOrNull(" + javaRef + ")");
 
     final IDecl decl = javaRef.getDeclaration();
 
