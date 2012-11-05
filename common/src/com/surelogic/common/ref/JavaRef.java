@@ -5,6 +5,7 @@ import com.surelogic.NonNull;
 import com.surelogic.NotThreadSafe;
 import com.surelogic.Nullable;
 import com.surelogic.ValueObject;
+import com.surelogic.common.Pair;
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
 
@@ -69,7 +70,7 @@ public class JavaRef implements IJavaRef {
    * <td>
    * {@link #setPositionRelativeToDeclaration(IJavaRef.Position)}</td>
    * <td>a code reference can be within or on a particular Java declaration</td>
-   * <td>{@link Position#WITHIN}</td>
+   * <td>{@link Position#WITHIN_DECL}</td>
    * </tr>
    * <tr>
    * <td>{@link #setWithin(IJavaRef.Within)}</td>
@@ -90,7 +91,7 @@ public class JavaRef implements IJavaRef {
     private int f_lineNumber = -1;
     private int f_offset = -1;
     @NonNull
-    private Position f_positionRelativeToDeclaration = Position.WITHIN;
+    private Position f_positionRelativeToDeclaration = Position.WITHIN_DECL;
     @NonNull
     private Within f_within = Within.JAVA_FILE;
 
@@ -500,7 +501,7 @@ public class JavaRef implements IJavaRef {
      * Also note that the getInstanceFrom() method will need to support both the
      * old and new versions of the encoded string.
      */
-    return ENCODE_V2 + f_within + "|" + f_positionRelativeToDeclaration + "|"
+    return ENCODE_V3 + f_within + "|" + f_positionRelativeToDeclaration + "|"
         + (f_eclipseProjectName == null ? "" : f_eclipseProjectName) + "|" + f_lineNumber + "|" + f_offset + "|" + f_length + "|"
         + (f_absolutePath == null ? "" : f_absolutePath) + "|" + (f_jarRelativePath == null ? "" : f_jarRelativePath) + "|"
         + Decl.encodeForPersistence(f_declaration);
@@ -508,6 +509,7 @@ public class JavaRef implements IJavaRef {
 
   private static final String ENCODE_V1 = "V1->";
   private static final String ENCODE_V2 = "V2->";
+  private static final String ENCODE_V3 = "V3->";
 
   /**
    * Constructs a code reference from a text string produced by
@@ -525,23 +527,31 @@ public class JavaRef implements IJavaRef {
     if (encodedForPersistence == null)
       throw new IllegalArgumentException(I18N.err(44, "encodedForPersistence"));
 
-    final int encodeVersion = getEncodeVersion(encodedForPersistence);
+    final Pair<Integer, String> versionAndString = getEncodeVersion(encodedForPersistence);
+    final int encodeVersion = versionAndString.first();
 
     if (encodeVersion != -1) {
-      final StringBuilder b = new StringBuilder(encodedForPersistence.substring(ENCODE_V1.length()));
+      final StringBuilder b = new StringBuilder(versionAndString.second());
       final Within within = Within.valueOf(Decl.toNext("|", b));
-      final Position positionRelativeToDeclaration = Position.valueOf(Decl.toNext("|", b));
+      String position = Decl.toNext("|", b);
+      if (encodeVersion < 3) {
+        if ("ON".equals(position))
+          position = "ON_DECL";
+        if ("WITHIN".equals(position))
+          position = "WITHIN_DECL";
+      }
+      final Position positionRelativeToDeclaration = Position.valueOf(position);
       final String eclipseProjectName = Decl.toNext("|", b);
       final String lineNumberStr = Decl.toNext("|", b);
       final String offsetStr = Decl.toNext("|", b);
       final String lengthStr = Decl.toNext("|", b);
       final String absolutePath;
       final String jarRelativePath;
-      if (encodeVersion == 2) {
+      if (encodeVersion < 2) {
+        absolutePath = jarRelativePath = "";
+      } else {
         absolutePath = Decl.toNext("|", b);
         jarRelativePath = Decl.toNext("|", b);
-      } else {
-        absolutePath = jarRelativePath = "";
       }
       final IDecl declaration = Decl.parseEncodedForPersistence(b.toString());
 
@@ -564,18 +574,22 @@ public class JavaRef implements IJavaRef {
 
   /**
    * Gets the encoding version used in the passed string or -1 if the string
-   * does not appear to be encoded properly.
+   * does not appear to be encoded properly. The string with the version
+   * information stripped off is also returned.
    * 
    * @param encodedForPersistence
    *          a text string produced by {@link IJavaRef#encodeForPersistence()}.
-   * @return the encoding version used in the passed string or -1 if the string
-   *         does not appear to be encoded properly.
+   * @return a pair consisting of (a) the encoding version used in the passed
+   *         string or -1 if the string does not appear to be encoded properly,
+   *         and (b) the string with the version information stripped off.
    */
-  private static int getEncodeVersion(@NonNull String encodedForPersistence) {
+  private static Pair<Integer, String> getEncodeVersion(@NonNull String encodedForPersistence) {
     if (encodedForPersistence.startsWith(ENCODE_V1))
-      return 1;
+      return new Pair<Integer, String>(1, encodedForPersistence.substring(ENCODE_V1.length()));
     else if (encodedForPersistence.startsWith(ENCODE_V2))
-      return 2;
-    return -1;
+      return new Pair<Integer, String>(2, encodedForPersistence.substring(ENCODE_V2.length()));
+    else if (encodedForPersistence.startsWith(ENCODE_V3))
+      return new Pair<Integer, String>(3, encodedForPersistence.substring(ENCODE_V3.length()));
+    return new Pair<Integer, String>(-1, encodedForPersistence);
   }
 }

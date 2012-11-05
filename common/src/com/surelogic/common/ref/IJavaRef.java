@@ -48,28 +48,35 @@ public interface IJavaRef {
   /**
    * A referenced location in Java code can be within or on a particular Java
    * declaration.
+   * <p>
+   * Note that the <tt>ON</tt> values only apply to annotations.
    */
   enum Position {
     /**
-     * Indicates the code reference is <i>on</i> the declaration.
+     * Indicates the code reference is <i>on</i> the declaration. <b>Only
+     * applicable to annotations/promises</b>.
      */
-    ON,
+    ON_DECL,
     /**
      * Indicates the code reference is on the declaration's receiver. This only
      * makes sense if the declaration is {@link Kind#METHOD} or
-     * {@link Kind#CONSTRUCTOR}.
+     * {@link Kind#CONSTRUCTOR}. <b>Only applicable to annotations/promises</b>.
      */
     ON_RECEIVER,
     /**
      * Indicates the code reference is on the declaration's return value. This
      * only makes sense if the declaration is {@link Kind#METHOD} or
-     * {@link Kind#CONSTRUCTOR}.
+     * {@link Kind#CONSTRUCTOR}. <b>Only applicable to annotations/promises</b>.
      */
     ON_RETURN_VALUE,
     /**
+     * Indicates the code reference is the declaration.
+     */
+    IS_DECL,
+    /**
      * Indicates the code reference is <i>within</i> the declaration.
      */
-    WITHIN,
+    WITHIN_DECL,
   }
 
   /**
