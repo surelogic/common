@@ -14,6 +14,7 @@ public abstract class AbstractXMLReader extends NestedXMLReader {
   public static final String MODELING_PROBLEM_DROP = "modeling-problem-drop";
   public static final String CU_DROP = "cu-drop";
   public static final String PROJECTS_DROP = "projects-drop";
+  public static final String METRIC_DROP = "metric-drop";
 
   public static final String DEPONENT = "deponent";
   public static final String MESSAGE = "message";
@@ -83,6 +84,8 @@ public abstract class AbstractXMLReader extends NestedXMLReader {
   public static final String VOUCHED = "vouched";
   public static final String CONSISTENT = "consistent";
   public static final String FOLDER_LOGIC_OPERATOR = "folder-logic-operator";
+
+  public static final String METRIC = "metric";
 
   /**
    * @param l
