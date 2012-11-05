@@ -1155,7 +1155,11 @@ public final class SLImages {
     case PACKAGE:
       return getImage(CommonImages.IMG_PACKAGE);
     case PARAMETER:
-      return getImage(CommonImages.IMG_PARAMETER);
+      if (decl.isFinal())
+        return getDecoratedImage(CommonImages.IMG_PARAMETER, new ImageDescriptor[] { null,
+            getImageDescriptor(CommonImages.DECR_FINAL), null, null, null });
+      else
+        return getImage(CommonImages.IMG_PARAMETER);
     case TYPE_PARAMETER:
       return getImage(CommonImages.IMG_TYPE_PARAMETER);
     }
