@@ -40,8 +40,9 @@ public final class CommonImages {
   public static final String DECR_STATIC = "decr/static.gif";
   public static final String DECR_TEAM_SERVER = "decr/team_server.gif";
   public static final String DECR_TRUSTED = "decr/trusted.gif";
-  public static final String DECR_WARNING = "decr/warning.gif";
+  public static final String DECR_UNUSED = "decr/unused.gif";
   public static final String DECR_VIRTUAL = "decr/virtual.gif";
+  public static final String DECR_WARNING = "decr/warning.gif";
 
   /*
    * Symbolic image names

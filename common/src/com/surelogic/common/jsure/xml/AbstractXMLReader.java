@@ -84,6 +84,7 @@ public abstract class AbstractXMLReader extends NestedXMLReader {
   public static final String VOUCHED = "vouched";
   public static final String CONSISTENT = "consistent";
   public static final String FOLDER_LOGIC_OPERATOR = "folder-logic-operator";
+  public static final String USED_BY_PROOF = "used-by-proof";
 
   public static final String METRIC = "metric";
   public static final String METRIC_INFO = "metric-info";
