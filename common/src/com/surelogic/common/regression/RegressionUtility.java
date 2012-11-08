@@ -89,8 +89,10 @@ public class RegressionUtility {
 		}
 		File file = null;
 		for (File zip : files) {
-			if (file == null) {
+			if (file == null || isNewer(path, zip, file)) {
 				file = zip;
+			}
+		    /*
 			} else if (zip.getName().length() > file.getName().length()) {
 				// Intended for comparing 3.2.4 to 070221
 				file = zip;
@@ -99,6 +101,7 @@ public class RegressionUtility {
 				// Intended for comparing 070107 to 070221
 				file = zip;
 			}
+			*/
 		}
 		return (file != null) ? file : new File(path, filter.getDefault());
 	}
