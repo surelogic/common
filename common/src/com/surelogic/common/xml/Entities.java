@@ -10,6 +10,7 @@ import com.surelogic.RequiresLock;
 import com.surelogic.ThreadSafe;
 import com.surelogic.UniqueInRegion;
 import com.surelogic.common.CharBuffer;
+import com.surelogic.common.SLUtility;
 
 /**
  * Manages a table of entities for XML. This class can be used to help escape
@@ -39,7 +40,7 @@ public final class Entities {
 
   public static void indent(final StringBuilder b, int indent) {
     for (int i = 0; i < indent; i++) {
-      b.append(XMLConstants.INDENT);
+      b.append(SLUtility.INDENT);
     }
   }
 

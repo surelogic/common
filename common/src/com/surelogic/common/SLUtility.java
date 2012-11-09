@@ -44,6 +44,13 @@ public final class SLUtility {
   public static final String LIBRARY_PROJECT = "(standard library)";
   public static final String PACKAGE_INFO = "package-info";
   public static final String UTF8 = "UTF8";
+  public static final String ENCODING = "UTF-8";
+  public static final String AMPERSAND = "&amp;";
+  public static final String APOSTROPHE = "&apos;";
+  public static final String DOUBLE_QUOTE = "&quot;";
+  public static final String GREATER_THAN = "&gt;";
+  public static final String LESS_THAN = "&lt;";
+  public static final String INDENT = "  ";
   public static final String YES = "Yes";
   public static final String NO = "No";
   public static final String ECLIPSE_MARKER_TYPE_NAME = "com.surelogic.marker";
