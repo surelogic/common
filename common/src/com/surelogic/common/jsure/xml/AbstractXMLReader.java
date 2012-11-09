@@ -69,8 +69,6 @@ public abstract class AbstractXMLReader extends NestedXMLReader {
   public static final String REPLACED_CONTENTS = "replaced-contents";
   public static final String ORIGIN = "origin";
   public static final String JAVA_ANNOTATION = "java-annotation";
-  public static final String FROM_PROJECT = "from-project";
-  public static final String TARGET_PROJECT = "target-project";
   public static final String FROM_INFO = "from-info";
   public static final String TARGET_INFO = "target-info";
   public static final String FROM_REF = "from-ref";
