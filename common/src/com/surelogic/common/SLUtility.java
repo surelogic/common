@@ -28,6 +28,7 @@ import java.util.Random;
 import org.apache.commons.lang3.SystemUtils;
 
 import com.surelogic.NonNull;
+import com.surelogic.Nullable;
 import com.surelogic.common.i18n.I18N;
 
 /**
@@ -1046,6 +1047,48 @@ public final class SLUtility {
     for (final String s : list) {
       b.append(String.format(ENCODED_FORMAT, s.length(), s));
     }
+    return b.toString();
+  }
+
+  /**
+   * Creates a directory name for a scan or run using the project names and a
+   * timestamp.
+   * <p>
+   * For example <tt>encodeToolDirectoryName("core project", true, now)</tt>
+   * would produce <tt>core_project_ETC_2012-11-05_13:57:12</tt> if <i>now</i>
+   * is <i>2012-11-05 13:57:12</i>.
+   * 
+   * @param firstProjectNameOrNull
+   *          the first alphabetical project name involved. If {@code null} then
+   *          <tt>"unknown_project"</tt> is used.
+   * @param moreProjects
+   *          {@code true} if more than one project was involved, {@code false}
+   *          if only one project or unknown.
+   * @param timestamp
+   *          when the scan or run occurred.
+   * @return a directory name for a scan or run.
+   * @throws IllegalArgumentException
+   *           if <tt>timestamp</tt> is null.
+   */
+  @NonNull
+  public static String encodeToolDirectoryName(@Nullable String firstProjectNameOrNull, boolean moreProjects,
+      @NonNull Date timestamp) {
+    if (timestamp == null)
+      throw new IllegalArgumentException(I18N.err(44, "timestamp"));
+
+    final StringBuilder b = new StringBuilder();
+    if (firstProjectNameOrNull == null)
+      firstProjectNameOrNull = "unknown_project";
+    firstProjectNameOrNull = firstProjectNameOrNull.replace(' ', '_');
+    if (firstProjectNameOrNull.length() > 20)
+      firstProjectNameOrNull = firstProjectNameOrNull.substring(0, 20);
+    b.append(firstProjectNameOrNull);
+    if (moreProjects)
+      b.append("_ETC");
+    b.append('_');
+    String timeString = toStringHMS(timestamp);
+    timeString = timeString.replace(' ', '_');
+    b.append(timeString);
     return b.toString();
   }
 
