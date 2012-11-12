@@ -16,6 +16,7 @@ import com.surelogic.common.FileUtility;
 import com.surelogic.common.SLUtility;
 
 public class RegressionUtility {
+  private static final boolean debug = false;
   public static final String JSURE_LOG_SUFFIX = ".log.xml";
   public static final String JSURE_SNAPSHOT_SUFFIX = ".sea.xml";
   public static final String JSURE_SNAPSHOT_DIFF_SUFFIX = ".sea.diffs.xml";
@@ -67,20 +68,25 @@ public class RegressionUtility {
     File xmlOracle = null;
     for (Filter f : oracleFilters) {
       File tempOracle = RegressionUtility.getOracleName(project, f);
-      System.out.println("Looking for " + tempOracle);
-
+      if (debug) {
+    	  System.out.println("Looking for " + tempOracle);
+      }
       final boolean noOracleYet = xmlOracle == null || !xmlOracle.exists();
       boolean replace;
       if (noOracleYet) {
         replace = true;
       } else {
-        System.out.println("Checking for newer oracle");
+    	if (debug) {
+    		System.out.println("Checking for newer oracle");
+    	}
         replace = tempOracle.exists() && RegressionUtility.isNewer(project, tempOracle, xmlOracle);
       }
       if (replace) {
         xmlOracle = tempOracle;
       }
-      System.out.println("Using " + xmlOracle);
+      if (debug) {
+    	  System.out.println("Using " + xmlOracle);
+      }
     }
     assert (xmlOracle.exists());
     return xmlOracle;
@@ -117,9 +123,9 @@ public class RegressionUtility {
       return true;
     }
     boolean rv = date1.compareTo(date2) > 0;
-    // if (XUtil.testing) {
-    System.out.println(date1 + " ?= " + date2 + " => " + (rv ? "first" : "second"));
-    // }
+    if (debug) {
+    	System.out.println(date1 + " ?= " + date2 + " => " + (rv ? "first" : "second"));
+    }
     return rv;
   }
 
