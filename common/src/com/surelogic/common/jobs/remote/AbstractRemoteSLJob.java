@@ -13,7 +13,8 @@ import com.surelogic.common.jobs.*;
 import com.surelogic.common.logging.*;
 
 public abstract class AbstractRemoteSLJob {	
-	public static final String LOG_SUFFIX = ".log.txt";
+	public static final String LOG_NAME = "log.txt";
+	public static final String LOG_SUFFIX = "."+LOG_NAME;
 	private static final String CANCEL = "##" + Local.CANCEL;
 	private InputStream in;
 	protected PrintStream out;
