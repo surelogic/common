@@ -34,6 +34,7 @@ public final class CommonImages {
   public static final String DECR_INCONSISTENT = "decr/inconsistent.gif";
   public static final String DECR_INFO = "decr/info.gif";
   public static final String DECR_JAVA = "decr/java.gif";
+  public static final String DECR_RECURSIVE = "decr/recursive.gif";
   public static final String DECR_REDDOT = "decr/reddot.gif";
   public static final String DECR_STATIC_ABSTRACT = "decr/static_abstract.gif";
   public static final String DECR_STATIC_FINAL = "decr/static_final.gif";
@@ -160,6 +161,7 @@ public final class CommonImages {
   public static final String IMG_JSURE_MODEL_PROBLEMS = "jsure_model_problems.gif";
   public static final String IMG_JSURE_QUICK_REF_ICON = "jsure_quick_ref_icon.gif";
   public static final String IMG_JSURE_QUICK_REF = "jsure_quick_ref.png";
+  public static final String IMG_JSURE_RE_VERIFY = "jsure_re_verify.gif";
   public static final String IMG_JSURE_VERIFY = "jsure_verify.gif";
   public static final String IMG_LEFT_ARROW_SMALL = "left_arrow_small.gif";
   public static final String IMG_LEFT = "left.gif";
