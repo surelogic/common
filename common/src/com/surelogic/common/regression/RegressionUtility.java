@@ -22,7 +22,6 @@ public class RegressionUtility {
   public static final String JSURE_SNAPSHOT_DIFF_SUFFIX = ".sea.diffs.xml";
 
   public static final String ORACLE = "oracle";
-  public static final String ORACLE_JAVAC = "oracleJavac";
   public static final String ORACLE_SNAPSHOT = "snapshotOracle";
   public static final String ORACLE_SCAN_DIR_PREFIX = "oracle";
 
@@ -44,13 +43,6 @@ public class RegressionUtility {
   }
 
   public static final Filter logOracleFilter = new Filter(ORACLE, JSURE_LOG_SUFFIX);
-  private static final Filter xmlOracleFilter = new Filter(ORACLE, JSURE_SNAPSHOT_SUFFIX) {
-    @Override
-    public boolean accept(File dir, String name) {
-      return !name.startsWith(ORACLE_JAVAC) && super.accept(dir, name);
-    }
-  };
-  private static final Filter javacOracleFilter = new Filter(ORACLE_JAVAC, JSURE_SNAPSHOT_SUFFIX);
   public static final Filter snapshotOracleFilter = new Filter(ORACLE_SNAPSHOT, JSURE_SNAPSHOT_SUFFIX);
   public static final Filter oracleScanDirFilter = new Filter(ORACLE_SCAN_DIR_PREFIX, "") {
     public boolean accept(File dir, String name) {
@@ -62,7 +54,7 @@ public class RegressionUtility {
     }
   };
 
-  private static final Filter[] oracleFilters = { oracleScanDirFilter, snapshotOracleFilter, javacOracleFilter, xmlOracleFilter };
+  private static final Filter[] oracleFilters = { oracleScanDirFilter, snapshotOracleFilter, };
 
   public static File findOracle(final File project) {
     File xmlOracle = null;
