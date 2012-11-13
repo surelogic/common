@@ -315,6 +315,21 @@ public final class SLUtility {
     return (int) result;
   }
 
+  private final static ThreadLocal<SimpleDateFormat> tl_dir_format = new ThreadLocal<SimpleDateFormat>() {
+    @Override
+    protected SimpleDateFormat initialValue() {
+      return new SimpleDateFormat("-yyyy.MM.dd-'at'-HH.mm.ss.SSS");
+    }
+  };
+
+  public static String toStringForDir(final Date date) {
+    return tl_dir_format.get().format(date);
+  }
+
+  public static Date fromStringForDir(final String dateStr) throws ParseException {
+    return tl_dir_format.get().parse(dateStr);
+  }
+
   private final static ThreadLocal<SimpleDateFormat> tl_day_format = new ThreadLocal<SimpleDateFormat>() {
     @Override
     protected SimpleDateFormat initialValue() {
@@ -1051,16 +1066,17 @@ public final class SLUtility {
   }
 
   /**
-   * Creates a directory name for a scan or run using the project names and a
+   * Creates a directory name for a scan using the project names and a
    * timestamp.
    * <p>
-   * For example <tt>encodeToolDirectoryName("core project", true, now)</tt>
-   * would produce <tt>core_project_ETC_2012-11-05_13:57:12</tt> if <i>now</i>
-   * is <i>2012-11-05 13:57:12</i>.
+   * For example <tt>encodeScanDirectoryName("core project", true, now)</tt>
+   * would produce <tt>core_project-ETC-2012.11.12-at-18.19.38.815</tt> if
+   * <i>now</i> is <i>2012.11.12 18:19:38 815ms</i>.
    * 
    * @param firstProjectNameOrNull
    *          the first alphabetical project name involved. If {@code null} then
-   *          <tt>"unknown_project"</tt> is used.
+   *          <tt>"unknown_project"</tt> is used. Any spaces in the passed name
+   *          are converted to <tt>_</tt> characters.
    * @param moreProjects
    *          {@code true} if more than one project was involved, {@code false}
    *          if only one project or unknown.
@@ -1071,7 +1087,7 @@ public final class SLUtility {
    *           if <tt>timestamp</tt> is null.
    */
   @NonNull
-  public static String encodeToolDirectoryName(@Nullable String firstProjectNameOrNull, boolean moreProjects,
+  public static String encodeScanDirectoryName(@Nullable String firstProjectNameOrNull, boolean moreProjects,
       @NonNull Date timestamp) {
     if (timestamp == null)
       throw new IllegalArgumentException(I18N.err(44, "timestamp"));
@@ -1084,10 +1100,8 @@ public final class SLUtility {
       firstProjectNameOrNull = firstProjectNameOrNull.substring(0, 20);
     b.append(firstProjectNameOrNull);
     if (moreProjects)
-      b.append("_ETC");
-    b.append('_');
-    String timeString = toStringHMS(timestamp);
-    timeString = timeString.replace(' ', '_');
+      b.append("-ETC");
+    String timeString = toStringForDir(timestamp);
     b.append(timeString);
     return b.toString();
   }
