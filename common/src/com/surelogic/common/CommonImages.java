@@ -158,11 +158,8 @@ public final class CommonImages {
   public static final String IMG_JSURE_LOGO = "jsure_logo.gif";
   public static final String IMG_JSURE_MODEL_PROBLEMS_EXIST = "jsure_model_problems_exist.gif";
   public static final String IMG_JSURE_MODEL_PROBLEMS = "jsure_model_problems.gif";
-  public static final String IMG_JSURE_NO_VERIFY_GRAY = "jsure_no_verify_gray.gif";
-  public static final String IMG_JSURE_NO_VERIFY = "jsure_no_verify.gif";
   public static final String IMG_JSURE_QUICK_REF_ICON = "jsure_quick_ref_icon.gif";
   public static final String IMG_JSURE_QUICK_REF = "jsure_quick_ref.png";
-  public static final String IMG_JSURE_VERIFY_GRAY = "jsure_verify_gray.gif";
   public static final String IMG_JSURE_VERIFY = "jsure_verify.gif";
   public static final String IMG_LEFT_ARROW_SMALL = "left_arrow_small.gif";
   public static final String IMG_LEFT = "left.gif";
