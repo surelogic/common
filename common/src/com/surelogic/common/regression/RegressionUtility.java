@@ -24,7 +24,7 @@ public class RegressionUtility {
   public static final String ORACLE = "oracle";
   public static final String ORACLE_JAVAC = "oracleJavac";
   public static final String ORACLE_SNAPSHOT = "snapshotOracle";
-  public static final String ORACLE_SCAN_DIR = "oracleDir";
+  public static final String ORACLE_SCAN_DIR_PREFIX = "oracle";
 
   public static class Filter implements FilenameFilter {
     private final String prefix, suffix;
@@ -52,7 +52,7 @@ public class RegressionUtility {
   };
   private static final Filter javacOracleFilter = new Filter(ORACLE_JAVAC, JSURE_SNAPSHOT_SUFFIX);
   public static final Filter snapshotOracleFilter = new Filter(ORACLE_SNAPSHOT, JSURE_SNAPSHOT_SUFFIX);
-  public static final Filter oracleScanDirFilter = new Filter(ORACLE_SCAN_DIR, "") {
+  public static final Filter oracleScanDirFilter = new Filter(ORACLE_SCAN_DIR_PREFIX, "") {
     public boolean accept(File dir, String name) {
       // Also accept a directory starting with the project name
       if (name.startsWith(dir.getName() + ' ')) {
@@ -69,23 +69,23 @@ public class RegressionUtility {
     for (Filter f : oracleFilters) {
       File tempOracle = RegressionUtility.getOracleName(project, f);
       if (debug) {
-    	  System.out.println("Looking for " + tempOracle);
+        System.out.println("Looking for " + tempOracle);
       }
       final boolean noOracleYet = xmlOracle == null || !xmlOracle.exists();
       boolean replace;
       if (noOracleYet) {
         replace = true;
       } else {
-    	if (debug) {
-    		System.out.println("Checking for newer oracle");
-    	}
+        if (debug) {
+          System.out.println("Checking for newer oracle");
+        }
         replace = tempOracle.exists() && RegressionUtility.isNewer(project, tempOracle, xmlOracle);
       }
       if (replace) {
         xmlOracle = tempOracle;
       }
       if (debug) {
-    	  System.out.println("Using " + xmlOracle);
+        System.out.println("Using " + xmlOracle);
       }
     }
     assert (xmlOracle.exists());
@@ -124,15 +124,22 @@ public class RegressionUtility {
     }
     boolean rv = date1.compareTo(date2) > 0;
     if (debug) {
-    	System.out.println(date1 + " ?= " + date2 + " => " + (rv ? "first" : "second"));
+      System.out.println(date1 + " ?= " + date2 + " => " + (rv ? "first" : "second"));
     }
     return rv;
   }
 
   private static Date getDate(File project, File oracleFile) {
     final String oracle = oracleFile.getName();
-    if (oracle.startsWith(ORACLE_SCAN_DIR) || oracle.startsWith(project.getName())) {
-      return extractDateFromName(oracle);
+    if (oracle.startsWith(ORACLE_SCAN_DIR_PREFIX) || oracle.startsWith(project.getName())) {
+      Date result = SLUtility.getDateFromScanDirectoryNameOrNull(oracle);
+      if (result == null) {
+        // try old scheme
+        // GET RID OF WHEN ALL REGRESSIONS UPDATED
+        // OLD OLD OLD
+        result = extractDateFromName(oracle);
+      }
+      return result;
     }
     // Start with last segment
 
@@ -151,18 +158,6 @@ public class RegressionUtility {
     return null;
   }
 
-  public static String computeOracleName(Date scanDate) {
-    return computeScanName(ORACLE_SCAN_DIR, scanDate);
-    // DateFormat format = new SimpleDateFormat("yyyyMMdd");
-    // return ORACLE_SCAN_DIR + format.format(date) + JSURE_SNAPSHOT_DIR_SUFFIX;
-  }
-
-  public static String computeScanName(String label, Date scanDate) {
-    final String time = SLUtility.toStringHMS(scanDate);
-    final String name = label + ' ' + time.replace(':', '-');
-    return name;
-  }
-
   public static Set<String> readLinesAsSet(File lines) throws IOException {
     final Set<String> cus = new HashSet<String>();
     final BufferedReader br = new BufferedReader(new FileReader(lines));
@@ -177,6 +172,13 @@ public class RegressionUtility {
     return cus;
   }
 
+  /**
+   * REMOVE WHEN REGRESSION TESTS CONVERTED TO USE NEW DIRECTORY SCHEME OLD OLD
+   * OLD OLD OLD
+   * 
+   * @param dirName
+   * @return
+   */
   public static Date extractDateFromName(String dirName) {
     if (dirName == null)
       return null;

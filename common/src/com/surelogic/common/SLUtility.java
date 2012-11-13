@@ -1070,7 +1070,7 @@ public final class SLUtility {
    * timestamp.
    * <p>
    * For example <tt>encodeScanDirectoryName("core project", true, now)</tt>
-   * would produce <tt>core_project-ETC-2012.11.12-at-18.19.38.815</tt> if
+   * would produce <tt>core_project-etc-2012.11.12-at-18.19.38.815</tt> if
    * <i>now</i> is <i>2012.11.12 18:19:38 815ms</i>.
    * 
    * @param firstProjectNameOrNull
@@ -1087,8 +1087,7 @@ public final class SLUtility {
    *           if <tt>timestamp</tt> is null.
    */
   @NonNull
-  public static String encodeScanDirectoryName(@Nullable String firstProjectNameOrNull, boolean moreProjects,
-      @NonNull Date timestamp) {
+  public static String getScanDirectoryName(@Nullable String firstProjectNameOrNull, boolean moreProjects, @NonNull Date timestamp) {
     if (timestamp == null)
       throw new IllegalArgumentException(I18N.err(44, "timestamp"));
 
@@ -1100,10 +1099,34 @@ public final class SLUtility {
       firstProjectNameOrNull = firstProjectNameOrNull.substring(0, 20);
     b.append(firstProjectNameOrNull);
     if (moreProjects)
-      b.append("-ETC");
+      b.append("-etc");
     String timeString = toStringForDir(timestamp);
     b.append(timeString);
     return b.toString();
+  }
+
+  public static Date getDateFromScanDirectoryNameOrNull(@Nullable String scanDirectoryName) {
+    if (scanDirectoryName == null)
+      return null;
+    // right string 27
+    final int length = scanDirectoryName.length();
+    if (length < 28)
+      return null;
+    String timePart = scanDirectoryName.substring(length - 27);
+    try {
+      final Date result = fromStringForDir(timePart);
+      return result;
+    } catch (ParseException ignore) {
+      // ignore
+    }
+    return null;
+  }
+
+  public static void main(String[] args) {
+    String s = getScanDirectoryName("f", false, new Date());
+    Date d = getDateFromScanDirectoryNameOrNull(s);
+    System.out.println(s);
+    System.out.println(d);
   }
 
   private SLUtility() {
