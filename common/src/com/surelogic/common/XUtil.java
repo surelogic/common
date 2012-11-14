@@ -7,13 +7,21 @@ package com.surelogic.common;
  * 
  * <pre>
  * -DSureLogicX=on
+ * -DrunJSureInMemory=true
  * </pre>
  * 
  * on the Java command line or as a VM argument within Eclipse.
  */
 public final class XUtil {
+	/**
+	 * When running regression tests
+	 */
 	public static final String testingProp = "dc.testing";
 	public static final String ignoreProposalsProp = "jsure.test.ignore.proposals";
+	
+	/**
+	 * To load all classes from known jars
+	 */
 	public static final String LOAD_ALL_LIBS = "SureLogic.loadAllLibs";
 
 	private static final String f_updateScript = System
@@ -24,6 +32,9 @@ public final class XUtil {
 		}
 	}
 
+	/**
+	 * When running regression tests
+	 */
 	public static final boolean testing = System.getProperty(testingProp,
 			"false").equals("true");
 	public static final boolean testingWorkspace = System.getProperty(
@@ -31,6 +42,9 @@ public final class XUtil {
 	public static final boolean ignoreProposals = System.getProperty(
 			ignoreProposalsProp, "false").equals("true");
 
+	/**
+	 * To load all classes from known jars
+	 */
 	public static final boolean loadAllLibs = System.getProperty(LOAD_ALL_LIBS,
 			"false").equals("true");
 
@@ -40,8 +54,12 @@ public final class XUtil {
 	public static final boolean debug = System.getProperty("SureLogicDebug",
 			"false").equals("true");
 
-	public static final boolean profile = System.getProperty(
-			"SureLogicProfile", "false").equals("true");
+	/**
+	 * For 
+	 */
+	public static final boolean runJSureInMemory = 
+		System.getProperty("runJSureInMemory", "false").equals("true") ||
+		System.getProperty("SureLogicProfile", "false").equals("true");
 
 	private static final boolean f_useDeveloperMode = System
 			.getProperty("SureLogicDev") != null;

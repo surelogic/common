@@ -43,7 +43,8 @@ import com.surelogic.common.logging.SLLogger;
 import com.surelogic.common.ui.EclipseUIUtility;
 
 public abstract class AbstractHistoricalSourceView extends ViewPart {
-
+	public static final String OLD = "(old)";
+	
 	// FIX replace with SourceViewer?
 	private StyledText f_source;
 	private JavaSyntaxHighlighter f_highlighter;

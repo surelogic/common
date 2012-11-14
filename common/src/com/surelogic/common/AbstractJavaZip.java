@@ -7,7 +7,7 @@ import java.util.logging.Logger;
 import java.util.zip.*;
 
 import com.surelogic.common.logging.SLLogger;
-import com.surelogic.common.tool.ToolProperties;
+import com.surelogic.common.tool.SureLogicToolsPropertiesUtility;
 import com.surelogic.common.xml.XMLUtil;
 
 public abstract class AbstractJavaZip<T> {
@@ -55,7 +55,7 @@ public abstract class AbstractJavaZip<T> {
 	}
 	
 	public static final String[] CONFIG_FILES = {
-		".project", ".classpath", ToolProperties.PROPS_FILE
+		".project", ".classpath", SureLogicToolsPropertiesUtility.PROPS_FILE
 	};
 	
 	public void generateSourceZipContents(final ZipOutputStream out,
@@ -375,6 +375,6 @@ public abstract class AbstractJavaZip<T> {
 	protected abstract T getRoot();
 
 	public String[] getAnalyses() {
-		return new String[0];
+		return SLUtility.EMPTY_STRING_ARRAY;
 	}
 }

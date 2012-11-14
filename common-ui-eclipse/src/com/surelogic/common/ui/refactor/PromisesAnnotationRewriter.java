@@ -1,7 +1,6 @@
 package com.surelogic.common.ui.refactor;
 
 import java.util.*;
-import java.util.logging.Level;
 
 import org.apache.commons.collections15.*;
 import org.apache.commons.collections15.multimap.MultiHashMap;
@@ -45,12 +44,10 @@ import org.eclipse.text.edits.TextEditGroup;
 
 import com.surelogic.common.AnnotationConstants;
 import com.surelogic.common.logging.SLLogger;
+import com.surelogic.common.ref.*;
+import com.surelogic.common.ref.IDecl.Kind;
 import com.surelogic.common.refactor.AnnotationDescription;
-import com.surelogic.common.refactor.Field;
-import com.surelogic.common.refactor.IJavaDeclaration;
-import com.surelogic.common.refactor.Method;
-import com.surelogic.common.refactor.MethodParameter;
-import com.surelogic.common.refactor.TypeContext;
+import com.surelogic.common.refactor.ScopedPromiseUtil;
 
 public class PromisesAnnotationRewriter {
 
@@ -120,31 +117,33 @@ public class PromisesAnnotationRewriter {
 	}
 
 	private class AnnotationVisitor extends ASTVisitor {
-		private final Map<IJavaDeclaration, List<AnnotationDescription>> targetMap;
-		private final MultiMap<TypeContext,IJavaDeclaration> createMap;
+		private final Map<SloppyWrapper<IDecl>, List<AnnotationDescription>> targetMap;
+		private final MultiMap<SloppyWrapper<IDeclType>,IDecl> createMap;
 		private final TextEditGroup editGroup;
-		private Method inMethod;
-		private TypeContext type;
 		private final boolean isAssumption;
 		private final Set<String> imports;
 
 		public AnnotationVisitor(final Collection<AnnotationDescription> descs,
 				final TextEditGroup editGroup, final boolean isAssumption) {
-			targetMap = new HashMap<IJavaDeclaration, List<AnnotationDescription>>();
-			createMap = new MultiHashMap<TypeContext, IJavaDeclaration>();
+			targetMap = new HashMap<SloppyWrapper<IDecl>, List<AnnotationDescription>>();
+			createMap = new MultiHashMap<SloppyWrapper<IDeclType>, IDecl>();
 			
 			for (final AnnotationDescription desc : descs) {
-				final IJavaDeclaration target = isAssumption ? desc.getAssumptionTarget()
+				final IDecl target = isAssumption ? desc.getAssumptionTarget()
 						: desc.getTarget();
 				if (!isAssumption && target.isImplicit()) {				
 					// We need to create the declaration before adding the annotation
-					createMap.put(target.getTypeContext(), target);
+					if (target.getKind() == Kind.CONSTRUCTOR) {					
+						createMap.put(SloppyWrapper.getInstance((IDeclType) target.getParent()), target);
+					} else {
+						SLLogger.getLogger().warning("Unexpected implicit decl: "+target);
+					}
 				} 
-				
-				List<AnnotationDescription> list = targetMap.get(target);
+				SloppyWrapper<IDecl> wrapper = SloppyWrapper.getInstance(target);
+				List<AnnotationDescription> list = targetMap.get(wrapper);
 				if (list == null) {
 					list = new ArrayList<AnnotationDescription>();
-					targetMap.put(target, list);
+					targetMap.put(wrapper, list);
 				}
 				list.add(desc);
 			}
@@ -152,19 +151,30 @@ public class PromisesAnnotationRewriter {
 			this.editGroup = editGroup;
 			this.imports = new HashSet<String>();
 		}
-
+		
+		private List<AnnotationDescription> findTargets(IDecl decl) {
+			SloppyWrapper<IDecl> key = SloppyWrapper.getInstance(decl);
+			return targetMap.get(key);
+		}
+		
 		private void checkForDeclsToCreate(AbstractTypeDeclaration node) {
-			final Collection<IJavaDeclaration> decls = createMap.get(type);
+			IDeclType type = EastDeclFactory.createDeclType(node);
+			rewriteNode(node, TypeDeclaration.MODIFIERS2_PROPERTY, findTargets(type), type);
+			checkForDeclsToCreate(node, type);
+		}
+		
+		private void checkForDeclsToCreate(AbstractTypeDeclaration node, IDeclType type) {
+			final Collection<IDecl> decls = createMap.get(type);
 			if (decls == null || decls.isEmpty()) {
 				return;
 			}
 			final List<BodyDeclaration> toAdd = new ArrayList<BodyDeclaration>();
 			final List<AnnotationDescription> scopedPromises = new ArrayList<AnnotationDescription>();
 			final AST ast = rewrite.getAST();
-			for(IJavaDeclaration decl : decls) {
-				final Method m = (Method) decl;
-				final String name = m.getMethod();
-				if (name.equals(node.getName().toString())) {
+			for(IDecl decl : decls) {
+				final IDeclFunction m = (IDeclFunction) decl;
+				final String name = m.getName();
+				if (name.equals(type.getName())) {
 					// Creating a constructor
 					MethodDeclaration md = ast.newMethodDeclaration();
 					md.setName(ast.newSimpleName(name));
@@ -183,11 +193,11 @@ public class PromisesAnnotationRewriter {
 					toAdd.add(md);
 					
 					// Add annotations to the newly created method
-					List<AnnotationDescription> annos = targetMap.remove(decl);
+					List<AnnotationDescription> annos = findTargets(decl);
 					rewriteNode(md, md.getModifiersProperty(), annos, decl);
 				} else {	
 					// Convert annos on the implicit method into a scoped promise on the enclosing type
-					final List<AnnotationDescription> annos = targetMap.remove(decl);					
+					final List<AnnotationDescription> annos = findTargets(decl);					
 					for(AnnotationDescription a : annos) {
 						final String contents = computeScopedPromiseContents(a, m);
 						AnnotationDescription a2 = new AnnotationDescription("Promise", contents, decl);
@@ -205,18 +215,18 @@ public class PromisesAnnotationRewriter {
 			}
 		}
 		
-		private String computeScopedPromiseContents(AnnotationDescription a, Method m) {
+		private String computeScopedPromiseContents(AnnotationDescription a, IDeclFunction m) {
 			final StringBuilder sb = new StringBuilder("@");
 			sb.append(a.getAnnotation()).append('(').append(a.getContents()).append(") for ");
-			sb.append(m.getMethod()).append('(');
+			sb.append(m.getName()).append('(');
 			boolean first = true;
-			for(String param : m.getParams()) {
+			for(IDecl param : m.getParameters()) {
 				if (first) {
 					first = false;
 				} else {
 					sb.append(",");
 				}
-				sb.append(param);
+				sb.append(param.getTypeOf().getFullyQualified());
 			}
 			sb.append(')');
 			return sb.toString();
@@ -224,18 +234,12 @@ public class PromisesAnnotationRewriter {
 		
 		@Override
 		public boolean visit(final TypeDeclaration node) {
-			typeContext(node.getName().getIdentifier());
-			rewriteNode(node, TypeDeclaration.MODIFIERS2_PROPERTY, targetMap
-					.remove(type), type);
 			checkForDeclsToCreate(node);
 			return true;
 		}
 
 		@Override
 		public boolean visit(final AnnotationTypeDeclaration node) {
-			typeContext(node.getName().getIdentifier());
-			rewriteNode(node, AnnotationTypeDeclaration.MODIFIERS2_PROPERTY,
-					targetMap.remove(type), type);
 			checkForDeclsToCreate(node);
 			return true;
 		}
@@ -243,30 +247,14 @@ public class PromisesAnnotationRewriter {
 		@Override
 		public boolean visit(final AnonymousClassDeclaration node) {
 			final String name = "ANON"; // FIXME
-			typeContext(name);
 			// TODO checkForDeclsToCreate(node);
 			return true;
 		}
 
 		@Override
 		public boolean visit(final EnumDeclaration node) {
-			typeContext(node.getName().getIdentifier());
-			rewriteNode(node, EnumDeclaration.MODIFIERS2_PROPERTY, targetMap
-					.remove(type), type);
 			checkForDeclsToCreate(node);
 			return true;
-		}
-
-		private void typeContext(final String name) {
-		
-			if (type == null) {
-				type = new TypeContext(name);
-			} else if (inMethod == null) {
-				type = new TypeContext(type, name);
-			} else {
-				type = new TypeContext(inMethod, name);
-				inMethod = null;
-			}
 		}
 
 		@Override
@@ -277,10 +265,9 @@ public class PromisesAnnotationRewriter {
 			for (int i = 0; i < params.length; i++) {
 				params[i] = fromType(paramDecls[i]);
 			}
-			inMethod = new Method(type, node.getName().getIdentifier(), params, false); // TODO Should this ever be true?
+			IDeclFunction inMethod = EastDeclFactory.createDeclFunction(node);
 			//System.out.println("Looking at "+inMethod);
-			rewriteNode(node, MethodDeclaration.MODIFIERS2_PROPERTY, targetMap
-					.remove(inMethod), inMethod);
+			rewriteNode(node, MethodDeclaration.MODIFIERS2_PROPERTY, findTargets(inMethod), inMethod);
 			
 			handleParameters(node);
 			return true;
@@ -290,9 +277,9 @@ public class PromisesAnnotationRewriter {
 			int i = 0;
 			for(Object o : m.parameters()) {
 				SingleVariableDeclaration p = (SingleVariableDeclaration) o;
-				MethodParameter inParameter = new MethodParameter(inMethod, i);				
+				IDeclParameter inParameter = EastDeclFactory.createDeclParameter(p, i);				
 				rewriteNode(p, SingleVariableDeclaration.MODIFIERS2_PROPERTY,
-						targetMap.remove(inParameter), inParameter);
+						findTargets(inParameter), inParameter);
 				i++;
 			}
 		}
@@ -307,8 +294,8 @@ public class PromisesAnnotationRewriter {
 		private void rewriteNode(final ASTNode node,
 				final ChildListPropertyDescriptor prop,
 				final List<AnnotationDescription> list,
-				final IJavaDeclaration target) {
-			if (list != null) {
+				final IDecl target) {
+			if (list != null && !list.isEmpty()) {
 				Collections.sort(list);
 				Collections.reverse(list);
 				final List<List<AnnotationDescription>> anns = new ArrayList<List<AnnotationDescription>>();
@@ -341,7 +328,7 @@ public class PromisesAnnotationRewriter {
 		@SuppressWarnings("unchecked")
 		private void mergeAnnotations(final AST ast,
 				final List<AnnotationDescription> ann, final ListRewrite lrw,
-				final IJavaDeclaration target) {
+				final IDecl target) {
 			final List<ASTNode> nodes = lrw.getRewrittenList();
 			final Mergeable m = merge(ann);
 			for (final ASTNode aNode : nodes) {
@@ -368,10 +355,10 @@ public class PromisesAnnotationRewriter {
 					.fragments();
 			// Handle when we have more than one field in the same declaration
 			final List<AnnotationDescription> list = new ArrayList<AnnotationDescription>();
-			Field f = null;
+			IDeclField f = null;
 			for (final VariableDeclarationFragment frag : fragments) {
-				f = new Field(type, frag.getName().getIdentifier());
-				final List<AnnotationDescription> list2 = targetMap.remove(f);
+				f = EastDeclFactory.createDeclField(frag);
+				final List<AnnotationDescription> list2 = findTargets(f);
 				if (list2 != null) {
 					list.addAll(list2);
 				}
@@ -409,42 +396,6 @@ public class PromisesAnnotationRewriter {
 				}
 			}
 			super.endVisit(node);
-		}
-
-		@Override
-		public void endVisit(final MethodDeclaration node) {
-			if (inMethod == null) {
-				SLLogger.getLoggerFor(PromisesAnnotationRewriter.class).log(
-						Level.SEVERE, "Unexpected method syntax");
-			}
-			inMethod = null;
-		}
-
-		private void endTypeContext() {
-			if (type.getMethod() != null) {
-				inMethod = type.getMethod();
-			}
-			type = type.getParent();
-		}
-
-		@Override
-		public void endVisit(final TypeDeclaration node) {
-			endTypeContext();
-		}
-
-		@Override
-		public void endVisit(final AnnotationTypeDeclaration node) {
-			endTypeContext();
-		}
-
-		@Override
-		public void endVisit(final AnonymousClassDeclaration node) {
-			endTypeContext();
-		}
-
-		@Override
-		public void endVisit(final EnumDeclaration node) {
-			endTypeContext();
 		}
 
 		Mergeable merge(final List<AnnotationDescription> descs) {
@@ -521,7 +472,7 @@ public class PromisesAnnotationRewriter {
 		}
 
 		public Annotation merge(final AST ast, final Annotation cur,
-				final IJavaDeclaration target, final Set<String> imports) {
+				final IDecl target, final Set<String> imports) {
 			final Set<String> existing = new HashSet<String>();
 			if (cur != null) {
 				extractExistingAnnos(cur, existing);
@@ -529,9 +480,7 @@ public class PromisesAnnotationRewriter {
 			for (final AnnotationDescription desc : newAnnotations) {
 				addImport(ASSUME, imports);
 				existing.add(String
-						.format("%s for %s in %s", desc.toString(), desc
-								.getTarget().forSyntax(), desc.getCU()
-								.getPackage()));
+						.format("%s for %s", desc.toString(), ScopedPromiseUtil.getForSyntax(desc.getTarget())));
 			}
 			final List<String> sortedAnns = new ArrayList<String>(existing);
 			Collections.sort(sortedAnns);
@@ -580,7 +529,7 @@ public class PromisesAnnotationRewriter {
 		}
 
 		public Annotation merge(final AST ast, final Annotation a,
-				final IJavaDeclaration target, final Set<String> imports) {
+				final IDecl target, final Set<String> imports) {
 			addImport(name, imports);
 			final TreeSet<String> contents = new TreeSet<String>();
 			for (final AnnotationDescription desc : newAnnotations) {
@@ -668,7 +617,7 @@ public class PromisesAnnotationRewriter {
 		}
 
 		public Annotation merge(final AST ast, final Annotation cur,
-				final IJavaDeclaration target, final Set<String> imports) {
+				final IDecl target, final Set<String> imports) {
 			final Set<String> newContents = new HashSet<String>();
 			for (final AnnotationDescription desc : newAnnotations) {
 				newContents.add(desc.getContents());
@@ -736,7 +685,7 @@ public class PromisesAnnotationRewriter {
 		 *            necessary.
 		 * @return
 		 */
-		Annotation merge(AST ast, Annotation a, IJavaDeclaration target,
+		Annotation merge(AST ast, Annotation a, IDecl target,
 				Set<String> imports);
 
 	}
