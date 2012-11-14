@@ -1122,6 +1122,14 @@ public final class SLUtility {
     return null;
   }
 
+  public static <T> List<T> list(T... elements) {
+	  List<T> l = new ArrayList<T>();
+	  for(T e : elements) {
+		  l.add(e);
+	  }
+	  return l;
+  }
+  
   private SLUtility() {
     // no instances
   }
