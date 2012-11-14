@@ -1122,13 +1122,6 @@ public final class SLUtility {
     return null;
   }
 
-  public static void main(String[] args) {
-    String s = getScanDirectoryName("f", false, new Date());
-    Date d = getDateFromScanDirectoryNameOrNull(s);
-    System.out.println(s);
-    System.out.println(d);
-  }
-
   private SLUtility() {
     // no instances
   }
