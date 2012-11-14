@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -25,6 +26,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Enumeration;
 import java.util.logging.Level;
+import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -510,6 +512,16 @@ public final class FileUtility {
     return false;
   }
 
+  public static boolean uncompressToCopy(File compressed, File to) {
+	  try {
+		return copy(compressed.getAbsolutePath(), new GZIPInputStream(new FileInputStream(compressed)), to);
+	} catch (IOException e) {
+	      SLLogger.getLogger().log(Level.SEVERE, I18N.err(112, compressed.getAbsolutePath(), 
+	    		                                               to.getAbsolutePath()), e);
+	}
+	return false;
+  }
+  
   /**
    * Gets the contents of a text file and returns it as a string. If anything
    * goes wrong then the default value passed is returned instead of the
