@@ -171,6 +171,7 @@ public class RegressionUtility {
    * @param dirName
    * @return
    */
+  @Deprecated
   public static Date extractDateFromName(String dirName) {
     if (dirName == null)
       return null;
