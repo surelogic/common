@@ -61,19 +61,6 @@ public final class XUtil {
 		System.getProperty("runJSureInMemory", "false").equals("true") ||
 		System.getProperty("SureLogicProfile", "false").equals("true");
 
-	private static final boolean f_useDeveloperMode = System
-			.getProperty("SureLogicDev") != null;
-
-	/**
-	 * Indicates if developer functionality is enabled.
-	 * 
-	 * @return <code>true</code> if developer functionality is enabled,
-	 *         <code>false</code> otherwise.
-	 */
-	public static boolean useDeveloperMode() {
-		return f_useDeveloperMode;
-	}
-
 	private static final boolean f_useExperimental = System
 			.getProperty("SureLogicX") != null;
 
