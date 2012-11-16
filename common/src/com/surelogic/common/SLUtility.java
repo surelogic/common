@@ -1145,8 +1145,8 @@ public final class SLUtility {
 
   /**
    * Passed subsequent lines of a Java compilation unit this method can help
-   * track if, at the end of the line, the program text is within a Java
-   * slash-star comment block.
+   * track if, at the end of the passed line, the program text is within a Java
+   * slash-star comment block or not.
    * <p>
    * Note that this method does not consider slash-slash to the end-of-line
    * comments.
@@ -1167,15 +1167,15 @@ public final class SLUtility {
 
   private static boolean updateSlashStarCommentStateHelper(boolean inASlashStarComment, final StringBuilder b) {
     if (inASlashStarComment) {
-      final int index = b.indexOf(SLASH_STAR_COMMENT_END);
-      if (index != -1) {
-        b.delete(0, index + SLASH_STAR_COMMENT_END.length());
+      final int endIndex = b.indexOf(SLASH_STAR_COMMENT_END);
+      if (endIndex != -1) {
+        b.delete(0, endIndex + SLASH_STAR_COMMENT_END.length());
         return updateSlashStarCommentStateHelper(!inASlashStarComment, b);
       }
     } else {
-      final int index = b.indexOf(SLASH_STAR_COMMENT_START);
-      if (index != -1) {
-        b.delete(0, index + SLASH_STAR_COMMENT_START.length());
+      final int startIndex = b.indexOf(SLASH_STAR_COMMENT_START);
+      if (startIndex != -1) {
+        b.delete(0, startIndex + SLASH_STAR_COMMENT_START.length());
         return updateSlashStarCommentStateHelper(!inASlashStarComment, b);
       }
     }
