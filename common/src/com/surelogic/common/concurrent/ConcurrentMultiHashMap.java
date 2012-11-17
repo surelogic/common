@@ -12,7 +12,7 @@ import org.apache.commons.collections15.MultiMap;
  * 
  * @author Edwin
  */
-public final class ConcurrentMultiHashMap<K,V> implements MultiMap<K,V> {
+public class ConcurrentMultiHashMap<K,V> implements MultiMap<K,V> {
 	private final ConcurrentMap<K,Collection<V>> map = new ConcurrentHashMap<K,Collection<V>>();
 
 	private Collection<V> getOrEmpty(Object key) {
@@ -66,13 +66,20 @@ public final class ConcurrentMultiHashMap<K,V> implements MultiMap<K,V> {
 	private Collection<V> ensureCollection(K key) {
 		Collection<V> values = map.get(key);
 		if (values == null) {
-			values = new Vector<V>(1);
+			values = newCollection();
 			Collection<V> tempValues = map.putIfAbsent(key, values);
 			if (tempValues != null) {
 				values = tempValues;
 			}
 		}
 		return values;
+	}
+	
+	/**
+	 * Can be overridden to change how it responded to duplicates
+	 */
+	protected Collection<V> newCollection() {
+		return new Vector<V>(1);
 	}
 	
 	public V put(K key, V value) {
