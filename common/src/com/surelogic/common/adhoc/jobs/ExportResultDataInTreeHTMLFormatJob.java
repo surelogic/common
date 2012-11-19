@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.PrintWriter;
 
 import com.surelogic.common.FileUtility;
+import com.surelogic.common.SLUtility;
 import com.surelogic.common.adhoc.AdHocQueryResultSqlData;
 import com.surelogic.common.adhoc.model.Cell;
 import com.surelogic.common.xml.Entities;
@@ -22,7 +23,7 @@ public class ExportResultDataInTreeHTMLFormatJob extends
 			final AdHocQueryResultSqlData data, final File file) {
 		super(data, file);
 		final int lastTreeIndex = data.getModel().getLastTreeIndex();
-		f_treeState = lastTreeIndex == -1 ? new String[0] : new String[data
+		f_treeState = lastTreeIndex == -1 ? SLUtility.EMPTY_STRING_ARRAY : new String[data
 				.getModel().getLastTreeIndex()];
 		f_hasTable = !data.getModel().isPureTree();
 		addImage("arrow_down.gif");

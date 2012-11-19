@@ -4,9 +4,11 @@ import java.io.*;
 import java.util.*;
 import java.util.logging.*;
 
+import org.apache.commons.lang3.SystemUtils;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.types.*;
 
+import com.surelogic.common.CommonJVMPrefs;
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.XUtil;
 import com.surelogic.common.jobs.*;
@@ -427,10 +429,26 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 				cmdj.setMaxmemory("1024m");
 			}
 		}
-		if (SLUtility.is64bit) {
-			cmdj.createVmArgument().setValue("-XX:MaxPermSize=256m");
+		final Properties prefs = CommonJVMPrefs.getJvmPrefs();
+		final String vmArgs = prefs.getProperty(CommonJVMPrefs.VMARGS);
+		if (vmArgs != null) {
+			for(String arg : vmArgs.split(" ")) {
+				cmdj.createVmArgument().setValue(arg);
+			}
 		} else {
-			cmdj.createVmArgument().setValue("-XX:MaxPermSize=128m");
+			if (SLUtility.is64bit) {
+				cmdj.createVmArgument().setValue("-XX:MaxPermSize=256m");
+			} else {
+				cmdj.createVmArgument().setValue("-XX:MaxPermSize=128m");
+			}				
+			cmdj.createVmArgument().setValue("-verbosegc");
+		}
+		if (SLUtility.is64bit && SystemUtils.JAVA_VENDOR.contains("Sun")) {
+		    // TODO do I need to check if I'm running in 64-bit mode?
+		    cmdj.createVmArgument().setValue("-XX:+UseCompressedOops");
+		}	
+		if (XUtil.useExperimental) {
+			cmdj.createVmArgument().setValue("-DSureLogicX=true");
 		}
 		/*
 		if (false) {

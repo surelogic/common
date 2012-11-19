@@ -2,6 +2,8 @@ package com.surelogic.common.refactor;
 
 import java.util.*;
 
+import com.surelogic.common.ref.IDecl;
+
 /**
  * Describes an annotation that should be placed at a given target.
  */
@@ -10,19 +12,19 @@ public class AnnotationDescription implements Comparable<AnnotationDescription> 
 	private final String annotation;
 	private final String contents;
 	private final String replacedContents;
-	private final IJavaDeclaration target;
-	private final IJavaDeclaration assumptionTarget;
+	private final IDecl target;
+	private final IDecl assumptionTarget;
 	private final CU cu;
 	private final CU assumptionCU;
 
 	public AnnotationDescription(final String annotation,
-			final String contents, final IJavaDeclaration target) {
+			final String contents, final IDecl target) {
 		this(annotation, contents, null, target, null, null, null);
 	}
 
 	public AnnotationDescription(final String annotation,
-			final String contents, final String replaced, final IJavaDeclaration target,
-			final IJavaDeclaration assumptionTarget, final CU cu,
+			final String contents, final String replaced, final IDecl target,
+			final IDecl assumptionTarget, final CU cu,
 			final CU assumptionCU) {
 		if (annotation == null) {
 			throw new IllegalArgumentException(
@@ -41,11 +43,11 @@ public class AnnotationDescription implements Comparable<AnnotationDescription> 
 		this.assumptionCU = assumptionCU;
 	}
 
-	public IJavaDeclaration getTarget() {
+	public IDecl getTarget() {
 		return target;
 	}
 
-	public IJavaDeclaration getAssumptionTarget() {
+	public IDecl getAssumptionTarget() {
 		return assumptionTarget;
 	}
 
@@ -155,12 +157,8 @@ public class AnnotationDescription implements Comparable<AnnotationDescription> 
 			if (cu == null) {
 				throw new IllegalArgumentException();
 			}
-			final int lastSeparator = cu.lastIndexOf('/');
-			if (lastSeparator >= 0) {
-				this.cu = cu.substring(lastSeparator+1);
-			} else {
-				this.cu = cu;
-			}
+			// the simple file name -- like TimingSource.java
+			this.cu = cu;
 			this.pakkage = pakkage;
 		}
 

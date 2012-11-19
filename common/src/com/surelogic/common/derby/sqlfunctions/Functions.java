@@ -32,7 +32,7 @@ import com.surelogic.common.jdbc.SingleRowHandler;
 public final class Functions {
 
     private Functions() {
-        // No instaqnce
+        // No instance
     }
 
     private static class TraceResultSet implements InvocationHandler {
@@ -105,22 +105,38 @@ public final class Functions {
 
     }
 
+    enum HappensBeforeState {
+        FIRST(" "), YES("Yes"), NO("No");
+        private final String display;
+
+        HappensBeforeState(String display) {
+            this.display = display;
+        }
+
+        public String getDisplay() {
+            return display;
+        }
+
+    }
+
     private static class AccessBlock {
         final boolean isStatic;
         final long threadId;
         final String threadName;
         final Timestamp start;
-        Timestamp end;
         int reads;
         int writes;
         int readsUC;
         int writesUC;
+        final HappensBeforeState happensBefore;
+        Access lastAccess;
 
-        AccessBlock(Access first, boolean isStatic) {
+        AccessBlock(Access first, boolean isStatic,
+                HappensBeforeState happensBefore) {
             threadId = first.threadId;
             threadName = first.threadName;
             start = first.ts;
-            end = first.ts;
+            lastAccess = first;
             if (first.isRead) {
                 reads++;
                 if (first.underConstruction) {
@@ -132,15 +148,22 @@ public final class Functions {
                     writesUC++;
                 }
             }
-
             this.isStatic = isStatic;
+            this.happensBefore = happensBefore;
         }
 
-        AccessBlock accumulate(ResultSet set) throws SQLException {
+        AccessBlock(Access first, boolean isStatic) {
+            this(first, isStatic, HappensBeforeState.FIRST);
+        }
+
+        AccessBlock accumulate(PreparedStatement hbSt,
+                PreparedStatement hbObjSourceSt,
+                PreparedStatement hbObjTargetSt, ResultSet set)
+                throws SQLException {
             while (set.next()) {
                 Access a = new Access(set, isStatic);
                 if (a.threadId == threadId) {
-                    end = a.ts;
+                    lastAccess = a;
                     if (a.isRead) {
                         reads++;
                         if (a.underConstruction) {
@@ -153,7 +176,73 @@ public final class Functions {
                         }
                     }
                 } else {
-                    return new AccessBlock(a, isStatic);
+                    boolean hasHappensBefore = false;
+                    int idx = 1;
+                    hbSt.setLong(idx++, lastAccess.threadId);
+                    hbSt.setLong(idx++, a.threadId);
+                    hbSt.setTimestamp(idx++, lastAccess.ts);
+                    hbSt.setTimestamp(idx++, a.ts);
+                    final ResultSet hbSet = hbSt.executeQuery();
+                    try {
+                        if (hbSet.next()) {
+                            hasHappensBefore = true;
+                        } else {
+                            idx = 1;
+                            hbObjSourceSt.setLong(idx++, lastAccess.threadId);
+                            hbObjSourceSt.setTimestamp(idx++, lastAccess.ts);
+                            hbObjSourceSt.setTimestamp(idx++, a.ts);
+                            final ResultSet hbObjSourceSet = hbObjSourceSt
+                                    .executeQuery();
+                            try {
+                                idx = 1;
+                                hbObjTargetSt.setLong(idx++, a.threadId);
+                                hbObjTargetSt
+                                        .setTimestamp(idx++, lastAccess.ts);
+                                hbObjTargetSt.setTimestamp(idx++, a.ts);
+                                final ResultSet hbObjTargetSet = hbObjTargetSt
+                                        .executeQuery();
+                                try {
+                                    long targetObj = -1;
+                                    Timestamp targetTs = null;
+                                    sourceLoop: while (hbObjSourceSet.next()) {
+                                        long sourceObj = hbObjSourceSet
+                                                .getLong(1);
+                                        Timestamp sourceTs = hbObjSourceSet
+                                                .getTimestamp(2);
+                                        if (sourceObj > targetObj) {
+                                            while (hbObjTargetSet.next()) {
+                                                targetObj = hbObjTargetSet
+                                                        .getLong(1);
+                                                targetTs = hbObjTargetSet
+                                                        .getTimestamp(2);
+                                                if (targetObj == sourceObj) {
+                                                    if (sourceTs
+                                                            .before(targetTs)) {
+                                                        hasHappensBefore = true;
+                                                        break sourceLoop;
+                                                    }
+                                                } else if (sourceObj < targetObj) {
+                                                    continue sourceLoop;
+                                                }
+                                            }
+                                            // We have exhausted our inner loop,
+                                            // we may as well quit
+                                            break;
+                                        }
+                                    }
+                                } finally {
+                                    hbObjTargetSet.close();
+                                }
+                            } finally {
+                                hbObjSourceSet.close();
+                            }
+                        }
+                    } finally {
+                        hbSet.close();
+                    }
+                    return new AccessBlock(a, isStatic,
+                            hasHappensBefore ? HappensBeforeState.YES
+                                    : HappensBeforeState.NO);
                 }
             }
             return null;
@@ -168,14 +257,16 @@ public final class Functions {
             case 3:
                 return start;
             case 4:
-                return end;
+                return lastAccess.ts;
             case 5:
                 return reads;
             case 6:
                 return writes;
             case 7:
-                return readsUC;
+                return happensBefore.getDisplay();
             case 8:
+                return readsUC;
+            case 9:
                 return writesUC;
             default:
                 throw new IllegalArgumentException(i
@@ -186,25 +277,33 @@ public final class Functions {
 
     private static class RollupAccessesResultSet implements InvocationHandler {
 
-        ResultSet set;
+        final PreparedStatement hbSt;
+        final PreparedStatement hbObjSourceSt;
+        final PreparedStatement hbObjTargetSt;
+        final ResultSet set;
         AccessBlock block;
         AccessBlock next;
         boolean wasNull;
 
-        RollupAccessesResultSet(ResultSet set, boolean isStatic)
+        RollupAccessesResultSet(Connection conn, ResultSet set, boolean isStatic)
                 throws SQLException {
+            hbSt = conn.prepareStatement(QB.get("Accesses.happensBefore"));
+            hbObjSourceSt = conn.prepareStatement(QB
+                    .get("Accesses.happensBeforeSourceObject"));
+            hbObjTargetSt = conn.prepareStatement(QB
+                    .get("Accesses.happensBeforeTargetObject"));
             this.set = set;
             if (set.next()) {
                 next = new AccessBlock(new Access(set, isStatic), isStatic);
             }
         }
 
-        static ResultSet create(ResultSet set, boolean isStatic)
+        static ResultSet create(Connection conn, ResultSet set, boolean isStatic)
                 throws IllegalArgumentException, SQLException {
             return (ResultSet) Proxy.newProxyInstance(
                     ResultSet.class.getClassLoader(),
                     new Class[] { ResultSet.class },
-                    new RollupAccessesResultSet(set, isStatic));
+                    new RollupAccessesResultSet(conn, set, isStatic));
         }
 
         @Override
@@ -216,10 +315,14 @@ public final class Functions {
                     return false;
                 }
                 block = next;
-                next = block.accumulate(set);
+                next = block
+                        .accumulate(hbSt, hbObjSourceSt, hbObjTargetSt, set);
                 return true;
             } else if ("close".equals(methodName)) {
                 set.close();
+                hbSt.close();
+                hbObjSourceSt.close();
+                hbObjTargetSt.close();
                 return null;
             } else if (methodName.startsWith("get")) {
                 Object o = block.get((Integer) args[0]);
@@ -235,12 +338,15 @@ public final class Functions {
 
     public static ResultSet staticAccessSummary(long fieldId) {
         try {
+            // We can't use the framework code here, because we have to leave
+            // the result sets open when we return from this block.
             Connection conn = DefaultConnection.getInstance()
                     .readOnlyConnection();
             PreparedStatement st = conn.prepareStatement(QB
                     .get("Accesses.selectByField"));
             st.setLong(1, fieldId);
-            return RollupAccessesResultSet.create(st.executeQuery(), true);
+            return RollupAccessesResultSet
+                    .create(conn, st.executeQuery(), true);
         } catch (SQLException e) {
             throw new IllegalStateException(e);
         }
@@ -249,13 +355,16 @@ public final class Functions {
     public static ResultSet accessSummary(long fieldId, long receiverId)
             throws SQLException {
         try {
+            // We can't use the framework code here, because we have to leave
+            // the result sets open when we return from this block.
             Connection conn = DefaultConnection.getInstance()
                     .readOnlyConnection();
             PreparedStatement st = conn.prepareStatement(QB
                     .get("Accesses.selectByFieldAndReceiver"));
             st.setLong(1, fieldId);
             st.setLong(2, receiverId);
-            return RollupAccessesResultSet.create(st.executeQuery(), false);
+            return RollupAccessesResultSet.create(conn, st.executeQuery(),
+                    false);
         } catch (SQLException e) {
             throw new IllegalStateException(e);
         }

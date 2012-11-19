@@ -1,5 +1,6 @@
 package com.surelogic.common.jobs.remote;
 
+import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
 
 public class RemoteSLJobException extends RuntimeException {
@@ -18,7 +19,7 @@ public class RemoteSLJobException extends RuntimeException {
     super(t);
 	this.label = label;
     this.number = number;
-    this.args = new Object[0];
+    this.args = SLUtility.EMPTY_OBJECT_ARRAY;
   }
   
   public int getErrorNum() {
