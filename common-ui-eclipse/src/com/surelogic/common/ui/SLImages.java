@@ -9,6 +9,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.DecorationOverlayIcon;
 import org.eclipse.jface.viewers.IDecoration;
@@ -969,17 +970,56 @@ public final class SLImages {
           final IWorkspace ws = ResourcesPlugin.getWorkspace();
           final IWorkspaceRoot wsRoot = ws.getRoot();
           final IProject project = wsRoot.getProject(projectName);
-          if (project != null && project.exists()) {
-            if (project.hasNature(SLUtility.ANDROID_NATURE)) {
-              return getImageForAndroidProject();
-            } else if (project.hasNature(SLUtility.JAVA_NATURE)) {
-              return getImageForJavaProject();
-            }
-          }
+          return getImageForProject(project);
         } catch (Exception ignore) {
           // just return the base project image
         }
       }
+    }
+    return getImage(CommonImages.IMG_PROJECT);
+  }
+
+  /**
+   * Gets the best image for the passed Eclipse Java project. This method tries
+   * to see if the project has an Android or Java nature and decorate the
+   * project icon appropriately. If the project is the standard library then the
+   * Eclipse library image is returned. A normal project image is returned if
+   * nothing can be determined about the passed project name.
+   * 
+   * @param project
+   *          an Eclipse Java project or {@code null}.
+   * @return the best icon for the passed project name.
+   */
+  @NonNull
+  public static Image getImageForProject(@Nullable IJavaProject project) {
+    if (project == null)
+      return getImage(CommonImages.IMG_LIBRARY);
+    return getImageForProject(project.getProject());
+  }
+
+  /**
+   * Gets the best image for the passed Eclipse project. This method tries to
+   * see if the project has an Android or Java nature and decorate the project
+   * icon appropriately. If the project is the standard library then the Eclipse
+   * library image is returned. A normal project image is returned if nothing
+   * can be determined about the passed project name.
+   * 
+   * @param project
+   *          an Eclipse project or {@code null}.
+   * @return the best icon for the passed project name.
+   */
+  @NonNull
+  public static Image getImageForProject(@Nullable IProject project) {
+    try {
+      if (project != null && project.exists()) {
+        if (project.hasNature(SLUtility.ANDROID_NATURE)) {
+          return getImageForAndroidProject();
+        } else if (project.hasNature(SLUtility.JAVA_NATURE)) {
+          return getImageForJavaProject();
+        }
+      }
+    } catch (Exception ignore) {
+      // just return the base project image
     }
     return getImage(CommonImages.IMG_PROJECT);
   }
