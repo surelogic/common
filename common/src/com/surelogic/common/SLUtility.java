@@ -60,6 +60,9 @@ public final class SLUtility {
   public static final String[] EMPTY_STRING_ARRAY = new String[0];
   public static final String JAVADOC_ANNOTATE_TAG = "annotate";
 
+  public static final String SLASH_STAR_COMMENT_START = "/*";
+  public static final String SLASH_STAR_COMMENT_END = "*/";
+
   public static final String JAVA_NATURE = "org.eclipse.jdt.core.javanature";
   public static final String ANDROID_NATURE = "com.android.ide.eclipse.adt.AndroidNature";
 
@@ -1105,6 +1108,16 @@ public final class SLUtility {
     return b.toString();
   }
 
+  /**
+   * Reads a date from a scan directory name created, and in the format
+   * described, by {@link #getScanDirectoryName(String, boolean, Date)}.
+   * 
+   * @param scanDirectoryName
+   *          a directory name, such as
+   *          <tt>core_project-etc-2012.11.12-at-18.19.38.815</tt>.
+   * @return a date, or {@code null} if none can be read.
+   */
+  @Nullable
   public static Date getDateFromScanDirectoryNameOrNull(@Nullable String scanDirectoryName) {
     if (scanDirectoryName == null)
       return null;
@@ -1122,11 +1135,51 @@ public final class SLUtility {
     return null;
   }
 
-  public static void main(String[] args) {
-    String s = getScanDirectoryName("f", false, new Date());
-    Date d = getDateFromScanDirectoryNameOrNull(s);
-    System.out.println(s);
-    System.out.println(d);
+  public static <T> List<T> list(T... elements) {
+    List<T> l = new ArrayList<T>();
+    for (T e : elements) {
+      l.add(e);
+    }
+    return l;
+  }
+
+  /**
+   * Passed subsequent lines of a Java compilation unit this method can help
+   * track if, at the end of the passed line, the program text is within a Java
+   * slash-star comment block or not.
+   * <p>
+   * Note that this method does not consider slash-slash to the end-of-line
+   * comments.
+   * 
+   * @param inASlashStarComment
+   *          {@code true} if the previous line ended with the program text
+   *          still in a slash-star comment block.
+   * @param line
+   *          the Java line of code.
+   * @return {@code true} if the passed line ended with the program text still
+   *         in slash-star comment block, {@code false} if not in a slash-star
+   *         comment block.
+   */
+  public static boolean getSlashStarCommentState(boolean inASlashStarComment, String line) {
+    StringBuilder b = new StringBuilder(line);
+    return updateSlashStarCommentStateHelper(inASlashStarComment, b);
+  }
+
+  private static boolean updateSlashStarCommentStateHelper(boolean inASlashStarComment, final StringBuilder b) {
+    if (inASlashStarComment) {
+      final int endIndex = b.indexOf(SLASH_STAR_COMMENT_END);
+      if (endIndex != -1) {
+        b.delete(0, endIndex + SLASH_STAR_COMMENT_END.length());
+        return updateSlashStarCommentStateHelper(!inASlashStarComment, b);
+      }
+    } else {
+      final int startIndex = b.indexOf(SLASH_STAR_COMMENT_START);
+      if (startIndex != -1) {
+        b.delete(0, startIndex + SLASH_STAR_COMMENT_START.length());
+        return updateSlashStarCommentStateHelper(!inASlashStarComment, b);
+      }
+    }
+    return inASlashStarComment;
   }
 
   private SLUtility() {

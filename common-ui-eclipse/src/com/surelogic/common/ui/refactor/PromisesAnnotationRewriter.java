@@ -164,7 +164,8 @@ public class PromisesAnnotationRewriter {
 		}
 		
 		private void checkForDeclsToCreate(AbstractTypeDeclaration node, IDeclType type) {
-			final Collection<IDecl> decls = createMap.get(type);
+			final SloppyWrapper<IDecl> wrapper = SloppyWrapper.getInstance((IDecl) type);
+			final Collection<IDecl> decls = createMap.get(wrapper);
 			if (decls == null || decls.isEmpty()) {
 				return;
 			}
