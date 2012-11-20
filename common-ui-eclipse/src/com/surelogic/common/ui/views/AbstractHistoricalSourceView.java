@@ -27,6 +27,8 @@ import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 import org.eclipse.jface.resource.JFaceResources;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.layout.GridData;
@@ -54,8 +56,37 @@ public abstract class AbstractHistoricalSourceView extends ViewPart {
 	private Label f_sourceLabel;
 	private Date f_sourceCopyTime = null;
 
+	/**
+	 * Internal class for informing this window when fonts change.
+	 */
+	private class FontChangeListener implements IPropertyChangeListener {
+		public void propertyChange(PropertyChangeEvent event) {
+			if (f_source != null) {
+				f_source.setFont(JFaceResources.getTextFont());
+			}
+		}
+	}
+
+	/**
+	 * Internal font change listener.
+	 */
+	private FontChangeListener fontChangeListener;
+
+	@Override
+	public void dispose() {
+		// stop listening for font changes
+		if (fontChangeListener != null) {
+			JFaceResources.getFontRegistry().removeListener(fontChangeListener);
+			fontChangeListener = null;
+		}
+		super.dispose();
+	}
+	
 	@Override
 	public void createPartControl(final Composite parent) {
+		fontChangeListener = new FontChangeListener();
+		JFaceResources.getFontRegistry().addListener(fontChangeListener);
+		
 		GridLayout gl = new GridLayout();
 		gl.horizontalSpacing = gl.verticalSpacing = 0;
 		gl.marginHeight = gl.marginWidth = 0;

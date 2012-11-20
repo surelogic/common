@@ -129,20 +129,22 @@ public final class Functions {
         int readsUC;
         int writesUC;
         final HappensBeforeState happensBefore;
-        Access lastAccess;
+        Timestamp lastAccess;
+        Timestamp lastWrite;
 
         AccessBlock(Access first, boolean isStatic,
                 HappensBeforeState happensBefore) {
             threadId = first.threadId;
             threadName = first.threadName;
             start = first.ts;
-            lastAccess = first;
+            lastAccess = first.ts;
             if (first.isRead) {
                 reads++;
                 if (first.underConstruction) {
                     readsUC++;
                 }
             } else {
+                lastWrite = first.ts;
                 writes++;
                 if (first.underConstruction) {
                     writesUC++;
@@ -163,13 +165,14 @@ public final class Functions {
             while (set.next()) {
                 Access a = new Access(set, isStatic);
                 if (a.threadId == threadId) {
-                    lastAccess = a;
+                    lastAccess = a.ts;
                     if (a.isRead) {
                         reads++;
                         if (a.underConstruction) {
                             readsUC++;
                         }
                     } else {
+                        lastWrite = a.ts;
                         writes++;
                         if (a.underConstruction) {
                             writesUC++;
@@ -178,26 +181,28 @@ public final class Functions {
                 } else {
                     boolean hasHappensBefore = false;
                     int idx = 1;
-                    hbSt.setLong(idx++, lastAccess.threadId);
+                    hbSt.setLong(idx++, threadId);
                     hbSt.setLong(idx++, a.threadId);
-                    hbSt.setTimestamp(idx++, lastAccess.ts);
+                    hbSt.setTimestamp(idx++, lastWrite);
                     hbSt.setTimestamp(idx++, a.ts);
                     final ResultSet hbSet = hbSt.executeQuery();
                     try {
-                        if (hbSet.next()) {
+                        // If there is an explicit happens-before, or if no
+                        // writes have ever happened we are good
+                        if (hbSet.next() || lastWrite == null) {
                             hasHappensBefore = true;
                         } else {
+                            // Otherwise we look for more happens-before events
                             idx = 1;
-                            hbObjSourceSt.setLong(idx++, lastAccess.threadId);
-                            hbObjSourceSt.setTimestamp(idx++, lastAccess.ts);
+                            hbObjSourceSt.setLong(idx++, threadId);
+                            hbObjSourceSt.setTimestamp(idx++, lastWrite);
                             hbObjSourceSt.setTimestamp(idx++, a.ts);
                             final ResultSet hbObjSourceSet = hbObjSourceSt
                                     .executeQuery();
                             try {
                                 idx = 1;
                                 hbObjTargetSt.setLong(idx++, a.threadId);
-                                hbObjTargetSt
-                                        .setTimestamp(idx++, lastAccess.ts);
+                                hbObjTargetSt.setTimestamp(idx++, lastWrite);
                                 hbObjTargetSt.setTimestamp(idx++, a.ts);
                                 final ResultSet hbObjTargetSet = hbObjTargetSt
                                         .executeQuery();
@@ -257,7 +262,7 @@ public final class Functions {
             case 3:
                 return start;
             case 4:
-                return lastAccess.ts;
+                return lastAccess;
             case 5:
                 return reads;
             case 6:
