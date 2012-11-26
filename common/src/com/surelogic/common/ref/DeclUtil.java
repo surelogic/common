@@ -1245,7 +1245,7 @@ public final class DeclUtil {
    *         the same.
    */
   @Nullable
-  static String aliasIfPossible(@Nullable String value) {
+  public static String aliasIfPossible(@Nullable String value) {
     if (value == null)
       return null;
     final StringCache stringCache = f_stringCache.get();
