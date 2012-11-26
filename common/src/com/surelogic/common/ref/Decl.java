@@ -1255,7 +1255,7 @@ public abstract class Decl implements IDecl {
     f_parent = parent;
     if (name == null)
       throw new IllegalArgumentException(I18N.err(44, "name"));
-    f_name = name;
+    f_name = DeclUtil.aliasIfPossible(name);
     final List<IDecl> children = new ArrayList<IDecl>();
     for (Decl.DeclBuilder childBuilder : childBuilders) {
       children.add(childBuilder.buildHelper(this));

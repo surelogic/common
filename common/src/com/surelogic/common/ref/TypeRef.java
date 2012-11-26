@@ -27,10 +27,10 @@ public final class TypeRef {
   public TypeRef(final String fullyQualified, final String compact) {
     if (fullyQualified == null)
       throw new IllegalArgumentException(I18N.err(44, "fullyQualified"));
-    f_fullyQualified = fullyQualified;
+    f_fullyQualified = DeclUtil.aliasIfPossible(fullyQualified);
     if (compact == null)
       throw new IllegalArgumentException(I18N.err(44, "compact"));
-    f_compact = compact;
+    f_compact = DeclUtil.aliasIfPossible(compact);
   }
 
   /**

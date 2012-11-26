@@ -1234,6 +1234,16 @@ public final class DeclUtil {
     return b.toString();
   }
 
+  /**
+   * This call tries to share, via an alias, strings if the string has been
+   * previously passed to this method. It will never change the contents of the
+   * string.
+   * 
+   * @param value
+   *          a string
+   * @return the same string, but perhaps aliased with other strings that are
+   *         the same.
+   */
   @Nullable
   static String aliasIfPossible(@Nullable String value) {
     if (value == null)
