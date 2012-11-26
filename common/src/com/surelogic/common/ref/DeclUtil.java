@@ -1231,4 +1231,11 @@ public final class DeclUtil {
     }
     return b.toString();
   }
+
+  @Nullable
+  static String aliasIfPossible(@Nullable String value) {
+    if (value == null)
+      return null;
+    return value;
+  }
 }
