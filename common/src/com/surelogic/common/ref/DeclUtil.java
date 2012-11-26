@@ -2,11 +2,13 @@ package com.surelogic.common.ref;
 
 import java.util.EnumSet;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import com.surelogic.NonNull;
 import com.surelogic.Nullable;
 import com.surelogic.Utility;
 import com.surelogic.common.SLUtility;
+import com.surelogic.common.StringCache;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.ref.IJavaRef.Within;
 
@@ -1236,6 +1238,17 @@ public final class DeclUtil {
   static String aliasIfPossible(@Nullable String value) {
     if (value == null)
       return null;
-    return value;
+    final StringCache stringCache = f_stringCache.get();
+    if (stringCache == null)
+      return value;
+    else
+      return stringCache.aliasIfPossible(value);
+  }
+
+  @Nullable
+  private static final AtomicReference<StringCache> f_stringCache = new AtomicReference<StringCache>();
+
+  public static void setStringCache(@Nullable StringCache value) {
+    f_stringCache.set(value);
   }
 }
