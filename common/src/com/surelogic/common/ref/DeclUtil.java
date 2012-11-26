@@ -1248,6 +1248,24 @@ public final class DeclUtil {
   @Nullable
   private static final AtomicReference<StringCache> f_stringCache = new AtomicReference<StringCache>();
 
+  /**
+   * Sets a string cache to help alias common strings. If <tt>o</tt> is a
+   * {@link StringCache} instance then use
+   * 
+   * <pre>
+   * DeclUtil.setStringCache(o);
+   * </pre>
+   * 
+   * to use the string cache. To clear a string cache when, for instance, a
+   * snapshot load is completed, use
+   * 
+   * <pre>
+   * DeclUtil.setStringCache(null);
+   * </pre>
+   * 
+   * @param value
+   *          the string cache.
+   */
   public static void setStringCache(@Nullable StringCache value) {
     f_stringCache.set(value);
   }
