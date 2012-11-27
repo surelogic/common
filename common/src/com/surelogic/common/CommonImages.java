@@ -52,6 +52,7 @@ public final class CommonImages {
    */
   public static final String IMG_ALPHA_SORT = "alpha_sort.gif";
   public static final String IMG_ANALYSIS_RESULT = "analysis_result.gif";
+  public static final String IMG_ANDROID_APP = "android_app.gif";
   public static final String IMG_ANNOTATION_ABDUCTIVE = "annotation_abductive.gif";
   public static final String IMG_ANNOTATION_DEFAULT = "annotation_default.gif";
   public static final String IMG_ANNOTATION_DELTA = "annotation_delta.gif";
@@ -121,7 +122,6 @@ public final class CommonImages {
   public static final String IMG_FILE = "file.gif";
   public static final String IMG_FILTER = "filter.gif";
   public static final String IMG_FINDBUGS_FINDING = "findbugs_finding.gif";
-  public static final String IMG_FL_APP = "fl_app.gif";
   public static final String IMG_FL_COMP_UNIT = "fl_comp_unit.gif";
   public static final String IMG_FL_LOGO = "fl_logo.gif";
   public static final String IMG_FL_PAGE = "fl_page.gif";
@@ -145,6 +145,7 @@ public final class CommonImages {
   public static final String IMG_INTERFACE = "interface.gif";
   public static final String IMG_JAR_SAVEAS = "jar_saveas.gif";
   public static final String IMG_JAR = "jar.gif";
+  public static final String IMG_JAVA_APP = "java_app.gif";
   public static final String IMG_JAVA_COMP_UNIT = "java_comp_unit.gif";
   public static final String IMG_JAVA_DECLS_TREE = "java_decls_tree.gif";
   public static final String IMG_JAVA_SORT = "java_sort.gif";
