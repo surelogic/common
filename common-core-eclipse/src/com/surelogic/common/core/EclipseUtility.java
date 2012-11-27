@@ -430,9 +430,13 @@ public class EclipseUtility {
 					continue;
 				}
 				final Bundle bundle = Platform.getBundle(id);
-				if (bundle == null && !optional.contains(id)) {
-					throw new IllegalArgumentException("Couldn't find bundle "
-							+ id + " required for " + b.getSymbolicName());
+				if (bundle == null) {
+					if (!optional.contains(id)) {
+						throw new IllegalArgumentException("Couldn't find bundle "
+								+ id + " required for " + b.getSymbolicName());
+					} else {
+						continue;
+					}
 				}
 				getDependencies(bundle, checked);
 			}
