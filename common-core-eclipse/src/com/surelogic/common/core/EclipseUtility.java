@@ -395,6 +395,9 @@ public class EclipseUtility {
 	 */
 	@SuppressWarnings("unchecked")
 	private static Set<String> getDependencies(Bundle b, Set<String> checked) {
+		if (b == null) {
+			return checked;
+		}
 		checked.add(b.getSymbolicName());
 
 		Dictionary<String, String> d = b.getHeaders();
