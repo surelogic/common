@@ -126,7 +126,6 @@ public final class CommonImages {
   public static final String IMG_FL_LOGO = "fl_logo.gif";
   public static final String IMG_FL_PAGE = "fl_page.gif";
   public static final String IMG_FL_PREP_DATA = "fl_prep_data.gif";
-  public static final String IMG_FL_RUN_OBJ = "fl_run_obj.gif";
   public static final String IMG_FL_RUN_VIEW = "fl_run_view.gif";
   public static final String IMG_FLASHLIGHT_OVERVIEW_BANNER = "flashlight_overview_banner.png";
   public static final String IMG_FOLDER = "folder.gif";
