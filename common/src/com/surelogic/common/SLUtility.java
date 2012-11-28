@@ -59,6 +59,9 @@ public final class SLUtility {
   public static final Object[] EMPTY_OBJECT_ARRAY = new Object[0];
   public static final String[] EMPTY_STRING_ARRAY = new String[0];
   public static final String JAVADOC_ANNOTATE_TAG = "annotate";
+  
+  public static final String OBJECT = "Object";
+  public static final String JAVA_LANG_OBJECT = "java.lang.Object";
 
   public static final String SLASH_STAR_COMMENT_START = "/*";
   public static final String SLASH_STAR_COMMENT_END = "*/";

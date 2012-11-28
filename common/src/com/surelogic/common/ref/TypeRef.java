@@ -5,10 +5,13 @@ import java.util.List;
 
 import com.surelogic.NonNull;
 import com.surelogic.ValueObject;
+import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
 
 @ValueObject
 public final class TypeRef {
+
+  public static final TypeRef JAVA_LANG_OBJECT = new TypeRef(SLUtility.JAVA_LANG_OBJECT, SLUtility.OBJECT);
 
   private final String f_fullyQualified;
   private final String f_compact;
