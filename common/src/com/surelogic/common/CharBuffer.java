@@ -1,6 +1,7 @@
 package com.surelogic.common;
 
 import java.io.PrintWriter;
+import com.surelogic.Starts;
 
 public class CharBuffer implements CharSequence {
 	char[] buf = new char[64];
@@ -14,14 +15,17 @@ public class CharBuffer implements CharSequence {
 		}
 	}
 	
+	@Starts("nothing")
 	public char charAt(int index) {
 		return buf[index];
 	}
 
+	@Starts("nothing")
 	public int length() {
 		return size;
 	}
 
+	@Starts("nothing")
 	public CharSequence subSequence(int start, int end) {
 		throw new UnsupportedOperationException();
 	}

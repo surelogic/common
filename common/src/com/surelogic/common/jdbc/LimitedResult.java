@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import com.surelogic.Starts;
 
 /**
  * Represents a list of results, and indicates whether or not it is the complete
@@ -35,27 +36,32 @@ public class LimitedResult<T> implements List<T> {
         return fullCount;
     }
 
-    @Override
+    @Starts("nothing")
+	@Override
     public int size() {
         return result.size();
     }
 
-    @Override
+    @Starts("nothing")
+	@Override
     public boolean isEmpty() {
         return result.isEmpty();
     }
 
-    @Override
+    @Starts("nothing")
+	@Override
     public boolean contains(final Object o) {
         return result.contains(o);
     }
 
-    @Override
+    @Starts("nothing")
+	@Override
     public Iterator<T> iterator() {
         return result.iterator();
     }
 
-    @Override
+    @Starts("nothing")
+	@Override
     public Object[] toArray() {
         return result.toArray();
     }
@@ -70,12 +76,14 @@ public class LimitedResult<T> implements List<T> {
         return result.add(e);
     }
 
-    @Override
+    @Starts("nothing")
+	@Override
     public boolean remove(final Object o) {
         return result.remove(o);
     }
 
-    @Override
+    @Starts("nothing")
+	@Override
     public boolean containsAll(final Collection<?> c) {
         return result.containsAll(c);
     }
@@ -90,32 +98,38 @@ public class LimitedResult<T> implements List<T> {
         return result.addAll(index, c);
     }
 
-    @Override
+    @Starts("nothing")
+	@Override
     public boolean removeAll(final Collection<?> c) {
         return result.removeAll(c);
     }
 
-    @Override
+    @Starts("nothing")
+	@Override
     public boolean retainAll(final Collection<?> c) {
         return result.retainAll(c);
     }
 
-    @Override
+    @Starts("nothing")
+	@Override
     public void clear() {
         result.clear();
     }
 
-    @Override
+    @Starts("nothing")
+	@Override
     public boolean equals(final Object o) {
         return result.equals(o);
     }
 
-    @Override
+    @Starts("nothing")
+	@Override
     public int hashCode() {
         return result.hashCode();
     }
 
-    @Override
+    @Starts("nothing")
+	@Override
     public T get(final int index) {
         return result.get(index);
     }
@@ -130,32 +144,38 @@ public class LimitedResult<T> implements List<T> {
         result.add(index, element);
     }
 
-    @Override
+    @Starts("nothing")
+	@Override
     public T remove(final int index) {
         return result.remove(index);
     }
 
-    @Override
+    @Starts("nothing")
+	@Override
     public int indexOf(final Object o) {
         return result.indexOf(o);
     }
 
-    @Override
+    @Starts("nothing")
+	@Override
     public int lastIndexOf(final Object o) {
         return result.lastIndexOf(o);
     }
 
-    @Override
+    @Starts("nothing")
+	@Override
     public ListIterator<T> listIterator() {
         return result.listIterator();
     }
 
-    @Override
+    @Starts("nothing")
+	@Override
     public ListIterator<T> listIterator(final int index) {
         return result.listIterator(index);
     }
 
-    @Override
+    @Starts("nothing")
+	@Override
     public List<T> subList(final int fromIndex, final int toIndex) {
         return result.subList(fromIndex, toIndex);
     }

@@ -2,6 +2,7 @@ package com.surelogic.common.jobs.remote;
 
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
+import com.surelogic.Starts;
 
 public class RemoteSLJobException extends RuntimeException {
   private static final long serialVersionUID = 1L;
@@ -36,7 +37,8 @@ public class RemoteSLJobException extends RuntimeException {
     return I18N.err(number, args2);
   }
   
-  @Override
+  @Starts("nothing")
+@Override
   public String getMessage() {
 	  return getToolMessage(label);
   }

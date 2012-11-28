@@ -1,5 +1,9 @@
 package com.surelogic.common.jdbc;
 
+import com.surelogic.Starts;
+import com.surelogic.Borrowed;
+import com.surelogic.RegionEffects;
+
 /**
  * An exception that indicates that the version of the database schema is newer
  * than the version that the code expects. This exception helps us to support
@@ -28,6 +32,9 @@ public final class FutureDatabaseException extends Exception {
 		f_schemaVersion = schemaVersion;
 	}
 
+	@RegionEffects("reads Instance")
+	@Borrowed("this")
+	@Starts("nothing")
 	@Override
 	public String getMessage() {
 		return "Code version: " + f_codeVersion + ", Schema version: "
