@@ -30,6 +30,7 @@ public final class CommonImages {
   public static final String DECR_CONSTRUCTOR = "decr/constructor.gif";
   public static final String DECR_DELTA = "decr/delta.gif";
   public static final String DECR_FINAL = "decr/final.gif";
+  public static final String DECR_FLASHLIGHT = "decr/flashlight.gif";
   public static final String DECR_IMPLICIT = "decr/implicit.gif";
   public static final String DECR_INCONSISTENT = "decr/inconsistent.gif";
   public static final String DECR_INFO = "decr/info.gif";
@@ -124,7 +125,6 @@ public final class CommonImages {
   public static final String IMG_FINDBUGS_FINDING = "findbugs_finding.gif";
   public static final String IMG_FL_COMP_UNIT = "fl_comp_unit.gif";
   public static final String IMG_FL_LOGO = "fl_logo.gif";
-  public static final String IMG_FL_PAGE = "fl_page.gif";
   public static final String IMG_FL_PREP_DATA = "fl_prep_data.gif";
   public static final String IMG_FL_RUN_VIEW = "fl_run_view.gif";
   public static final String IMG_FLASHLIGHT_OVERVIEW_BANNER = "flashlight_overview_banner.png";

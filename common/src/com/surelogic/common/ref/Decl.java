@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -241,7 +242,7 @@ public abstract class Decl implements IDecl {
         if (f_anonymousType != null)
           anonymousType = f_anonymousType;
         else
-          anonymousType = new TypeRef("java.lang.Object", "Object");
+          anonymousType = TypeRef.JAVA_LANG_OBJECT;
       } else {
         if (!SLUtility.isValidJavaIdentifier(f_name))
           throw new IllegalArgumentException(I18N.err(275, f_name));
@@ -1099,6 +1100,16 @@ public abstract class Decl implements IDecl {
       final Kind parentKind = parent.getKind();
       if (!(parentKind == Kind.CLASS || parentKind == Kind.INTERFACE || parentKind == Kind.METHOD || parentKind == Kind.CONSTRUCTOR))
         throw new IllegalArgumentException(I18N.err(273, f_name, parentKind));
+
+      /*
+       * Remove java.lang.Object as a bound this is silly and confuses the user
+       * interface. A lot of code seems to add this by default.
+       */
+      for (Iterator<TypeRef> iterator = f_bounds.iterator(); iterator.hasNext();) {
+        final TypeRef bound = iterator.next();
+        if (TypeRef.JAVA_LANG_OBJECT.equals(bound))
+          iterator.remove();
+      }
 
       return new DeclTypeParameter(parent, f_childBuilders, f_name, f_position, f_bounds);
     }
