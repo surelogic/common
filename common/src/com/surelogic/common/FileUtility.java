@@ -450,8 +450,9 @@ public final class FileUtility {
     }
   }
 
-  private static final byte[] noBytes = new byte[0];
-
+  public static final byte[] noBytes = new byte[0];
+  public static final File[] noFiles = new File[0];
+  
   /**
    * @return the MD5 hash of the copied data
    */

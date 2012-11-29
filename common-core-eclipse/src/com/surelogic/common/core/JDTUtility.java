@@ -76,7 +76,10 @@ import com.surelogic.common.ref.IJavaRef;
  */
 @Utility
 public final class JDTUtility {
-
+  public static final ILocalVariable[] NO_LOCAL_VARS = new ILocalVariable[0];
+  public static final IAccessRule[] NO_RULES = new IAccessRule[0];
+  public static final IClasspathAttribute[] NO_ATTRIBUTES = new IClasspathAttribute[0];
+  
   /**
    * Adds an entry to the classpath of the passed Eclipse Java project. The
    * entry is placed as the last entry in the project's classpath.
@@ -103,7 +106,7 @@ public final class JDTUtility {
       for (IClasspathEntry e : orig) {
         entries.add(e);
       }
-      entries.add(JavaCore.newLibraryEntry(path, null, null, new IAccessRule[0], new IClasspathAttribute[0], false));
+      entries.add(JavaCore.newLibraryEntry(path, null, null, NO_RULES, NO_ATTRIBUTES, false));
 
       javaProject.setRawClasspath(entries.toArray(new IClasspathEntry[entries.size()]), null);
       return true;
@@ -785,7 +788,7 @@ public final class JDTUtility {
      *         call doesn't exist in the Eclipse we are running within.
      */
     private ILocalVariable[] getParameters(IMethod m) {
-      ILocalVariable[] result = new ILocalVariable[0];
+      ILocalVariable[] result = NO_LOCAL_VARS;
       try {
         Class<?> c = Class.forName("org.eclipse.jdt.core.IMethod");
         if (c.isInstance(m)) {
