@@ -30,6 +30,7 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import com.surelogic.NonNull;
 import com.surelogic.Utility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.logging.SLLogger;
@@ -390,6 +391,7 @@ public final class FileUtility {
    *          a size in bytes.
    * @return the human readable string.
    */
+  @NonNull
   public static String bytesToHumanReadableString(final long bytes) {
     final String[] labels = { "Bytes", "KB", "MB", "GB" };
     int labelIndex = 0;
@@ -452,7 +454,7 @@ public final class FileUtility {
 
   public static final byte[] noBytes = new byte[0];
   public static final File[] noFiles = new File[0];
-  
+
   /**
    * @return the MD5 hash of the copied data
    */
@@ -514,15 +516,14 @@ public final class FileUtility {
   }
 
   public static boolean uncompressToCopy(File compressed, File to) {
-	  try {
-		return copy(compressed.getAbsolutePath(), new GZIPInputStream(new FileInputStream(compressed)), to);
-	} catch (IOException e) {
-	      SLLogger.getLogger().log(Level.SEVERE, I18N.err(112, compressed.getAbsolutePath(), 
-	    		                                               to.getAbsolutePath()), e);
-	}
-	return false;
+    try {
+      return copy(compressed.getAbsolutePath(), new GZIPInputStream(new FileInputStream(compressed)), to);
+    } catch (IOException e) {
+      SLLogger.getLogger().log(Level.SEVERE, I18N.err(112, compressed.getAbsolutePath(), to.getAbsolutePath()), e);
+    }
+    return false;
   }
-  
+
   /**
    * Gets the contents of a text file and returns it as a string. If anything
    * goes wrong then the default value passed is returned instead of the
