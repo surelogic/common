@@ -15,6 +15,7 @@ import com.surelogic.common.i18n.I18N;
  */
 @Region("static LoggerState")
 @RegionLock("Lock is class protects LoggerState")
+@ThreadSafe
 public class SLLogger {
 
 	public static final String SL_LOGGING_PROPERTY = "SLLoggingLevel";
