@@ -242,24 +242,22 @@ public abstract class AbstractHistoricalSourceView extends ViewPart {
         IWorkbenchPage.VIEW_CREATE);
     // System.out.println("View = "+view);
     if (view != null) {
-      ISourceZipFileHandles sources = view.findSources(run);
-      if (sources != null) {
-        final boolean loaded = view.showSourceFile(sources, pkg == null || pkg.length() == 0 ? type : pkg + '.' + type);
-        // System.out.println("Loading "+type+": "+loaded);
-        if (loaded) {
-          /*
-           * The line numbers passed to this method are typically 1 based
-           * relative to the first line of the content. We need to change this
-           * to be 0 based.
-           */
-          if (lineNumber > 0) {
-            lineNumber--;
-          }
-          if (lineNumber < 0) {
-            lineNumber = 0;
-          }
-          view.showAndSelectLine(lineNumber);
+      final ISourceZipFileHandles sources = view.findSources(run);
+      final boolean loaded = view.showSourceFile(sources, pkg == null || pkg.length() == 0 ? type : pkg + '.' + type);
+      // System.out.println("Loading "+type+": "+loaded);
+      if (loaded) {
+        /*
+         * The line numbers passed to this method are typically 1 based relative
+         * to the first line of the content. We need to change this to be 0
+         * based.
+         */
+        if (lineNumber > 0) {
+          lineNumber--;
         }
+        if (lineNumber < 0) {
+          lineNumber = 0;
+        }
+        view.showAndSelectLine(lineNumber);
       }
     }
   }
@@ -269,13 +267,11 @@ public abstract class AbstractHistoricalSourceView extends ViewPart {
     final AbstractHistoricalSourceView view = (AbstractHistoricalSourceView) EclipseUIUtility.showView(viewClass.getName(), null,
         IWorkbenchPage.VIEW_CREATE);
     if (view != null) {
-      ISourceZipFileHandles sources = view.findSources(run);
-      if (sources != null) {
-        final boolean loaded = view.showSourceFile(sources, pkg == null ? type : pkg + '.' + type);
-        if (loaded) {
-          final int lineNumber = computeLineFromMethod(view.f_source.getText(), type, method);
-          view.showAndSelectLine(lineNumber);
-        }
+      final ISourceZipFileHandles sources = view.findSources(run);
+      final boolean loaded = view.showSourceFile(sources, pkg == null ? type : pkg + '.' + type);
+      if (loaded) {
+        final int lineNumber = computeLineFromMethod(view.f_source.getText(), type, method);
+        view.showAndSelectLine(lineNumber);
       }
     }
   }
@@ -285,13 +281,11 @@ public abstract class AbstractHistoricalSourceView extends ViewPart {
     final AbstractHistoricalSourceView view = (AbstractHistoricalSourceView) EclipseUIUtility.showView(viewClass.getName(), null,
         IWorkbenchPage.VIEW_CREATE);
     if (view != null) {
-      ISourceZipFileHandles sources = view.findSources(run);
-      if (sources != null) {
-        final boolean loaded = view.showSourceFile(sources, pkg == null ? type : pkg + '.' + type);
-        if (loaded) {
-          final int lineNumber = computeLineFromField(view.f_source.getText(), type, field);
-          view.showAndSelectLine(lineNumber);
-        }
+      final ISourceZipFileHandles sources = view.findSources(run);
+      final boolean loaded = view.showSourceFile(sources, pkg == null ? type : pkg + '.' + type);
+      if (loaded) {
+        final int lineNumber = computeLineFromField(view.f_source.getText(), type, field);
+        view.showAndSelectLine(lineNumber);
       }
     }
   }
