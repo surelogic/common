@@ -11,7 +11,7 @@ public class LibResources {
 	 * If you change this you <i>must</i> add the current name to the
 	 * {@code PROMISES_JAR_OLD_VERSIONS} array.
 	 */
-	public static final String PROMISES_JAR = "promises-4.3.4.jar";
+	public static final String PROMISES_JAR = "promises-4.4.0.jar";
 
 	/**
 	 * Holds the names of the old library files that may need to be upgraded to
@@ -21,7 +21,7 @@ public class LibResources {
 			"promises-3.0.0.jar", "promises-3.1.0.jar", "promises-3.2.0.jar",
 			"promises-3.2.1.jar", "promises-3.2.2.jar", "promises-4.0.0.jar",
 			"promises-4.0.1.jar", "promises-4.0.2.jar", "promises-4.3.0.jar",
-			"promises-4.3.1.jar", "promises-4.3.3.jar" };
+			"promises-4.3.1.jar", "promises-4.3.3.jar", "promises-4.3.4.jar" };
 
 	public static final String PATH = "/lib/runtime/";
 	public static final String PROMISES_JAR_PATHNAME = PATH + PROMISES_JAR;
