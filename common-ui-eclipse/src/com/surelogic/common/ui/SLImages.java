@@ -1162,10 +1162,14 @@ public final class SLImages {
       String topRight = null;
       if (decl.isStatic() && decl.isFinal())
         topRight = CommonImages.DECR_STATIC_FINAL;
+      if (decl.isStatic() && decl.isVolatile())
+        topRight = CommonImages.DECR_STATIC_VOLATILE;
       else if (decl.isStatic())
         topRight = CommonImages.DECR_STATIC;
       else if (decl.isFinal())
         topRight = CommonImages.DECR_FINAL;
+      else if (decl.isVolatile())
+        topRight = CommonImages.DECR_VOLATILE;
       if (topRight == null)
         return getImage(imageName);
       else

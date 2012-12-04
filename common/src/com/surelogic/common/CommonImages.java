@@ -39,6 +39,7 @@ public final class CommonImages {
   public static final String DECR_REDDOT = "decr/reddot.gif";
   public static final String DECR_STATIC_ABSTRACT = "decr/static_abstract.gif";
   public static final String DECR_STATIC_FINAL = "decr/static_final.gif";
+  public static final String DECR_STATIC_VOLATILE = "decr/static_volatile.gif";
   public static final String DECR_STATIC = "decr/static.gif";
   public static final String DECR_TEAM_SERVER = "decr/team_server.gif";
   public static final String DECR_TRUSTED = "decr/trusted.gif";
@@ -46,6 +47,7 @@ public final class CommonImages {
   public static final String DECR_UNUSED_INCONSISTENT = "decr/unused_inconsistent.gif";
   public static final String DECR_UNUSED = "decr/unused.gif";
   public static final String DECR_VIRTUAL = "decr/virtual.gif";
+  public static final String DECR_VOLATILE = "decr/volatile.gif";
   public static final String DECR_WARNING = "decr/warning.gif";
 
   /*
