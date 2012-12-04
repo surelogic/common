@@ -1207,10 +1207,14 @@ public final class SLImages {
     return getImage(CommonImages.IMG_UNKNOWN);
   }
 
-  @NonNull
-  public static Image getImageForEncodedDecl(@Nullable String encoded) {
-    final IDecl decl = new AdHocDecl(encoded);
-    return getImageFor(decl);
+  @Nullable
+  public static Image getImageForAdHocQuery(@Nullable String encoded) {
+    if (encoded == null || !encoded.startsWith("@"))
+      return getImage(encoded);
+    else {
+      final IDecl decl = new AdHocDecl(encoded);
+      return getImageFor(decl);
+    }
   }
 
   /**
