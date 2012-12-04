@@ -16,15 +16,17 @@ final class DeclField extends DeclVisibility implements IDeclField {
   final TypeRef f_typeOf;
   final boolean f_isStatic;
   final boolean f_isFinal;
+  final boolean f_isVolatile;
 
   DeclField(IDecl parent, List<Decl.DeclBuilder> childBuilders, String name, Visibility visibility, TypeRef typeOf,
-      boolean isStatic, boolean isFinal) {
+      boolean isStatic, boolean isFinal, boolean isVolatile) {
     super(parent, childBuilders, name, visibility);
     if (typeOf == null)
       throw new IllegalArgumentException(I18N.err(44, "typeOf"));
     f_typeOf = typeOf;
     f_isStatic = isStatic;
     f_isFinal = isFinal;
+    f_isVolatile = isVolatile;
   }
 
   @NonNull
@@ -46,5 +48,10 @@ final class DeclField extends DeclVisibility implements IDeclField {
   @Override
   public boolean isFinal() {
     return f_isFinal;
+  }
+
+  @Override
+  public boolean isVolatile() {
+    return f_isVolatile;
   }
 }

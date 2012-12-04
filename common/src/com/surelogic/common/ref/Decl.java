@@ -465,12 +465,13 @@ public abstract class Decl implements IDecl {
     TypeRef f_typeOf;
     boolean f_isStatic = false;
     boolean f_isFinal = false;
+    boolean f_isVolatile = false;
 
     /**
      * Constructs a field declaration builder.
      * <p>
-     * By default the field is <tt>public</tt>, not <tt>static</tt>, and not
-     * <tt>final</tt>.
+     * By default the field is <tt>public</tt>, not <tt>static</tt>, not
+     * <tt>final</tt>, and not <tt>volatile</tt>.
      * 
      * @param name
      *          the field name, such as <tt>f_myField</tt>.
@@ -543,6 +544,19 @@ public abstract class Decl implements IDecl {
       return this;
     }
 
+    /**
+     * Sets if this declaration is declared to be <i>volatile</i>.
+     * 
+     * @param value
+     *          {@code true} if this declaration is declared to be
+     *          <i>volatile</i>, {@code false} otherwise.
+     * @return this builder.
+     */
+    public FieldBuilder setIsVolatile(boolean value) {
+      f_isVolatile = value;
+      return this;
+    }
+
     @Override
     public IDecl buildInternal(IDecl parent) {
       if (f_typeOf == null)
@@ -552,7 +566,7 @@ public abstract class Decl implements IDecl {
       if (parent == null)
         throw new IllegalArgumentException(I18N.err(272, f_name));
 
-      return new DeclField(parent, f_childBuilders, f_name, f_visibility, f_typeOf, f_isStatic, f_isFinal);
+      return new DeclField(parent, f_childBuilders, f_name, f_visibility, f_typeOf, f_isStatic, f_isFinal, f_isVolatile);
     }
   }
 
@@ -1325,6 +1339,10 @@ public abstract class Decl implements IDecl {
     return false;
   }
 
+  public boolean isVolatile() {
+    return false;
+  }
+
   @NonNull
   public final List<IDeclParameter> getParameters() {
     List<IDeclParameter> work = new ArrayList<IDeclParameter>();
@@ -1749,6 +1767,7 @@ public abstract class Decl implements IDecl {
   private static final String FINAL = "final";
   private static final String ABSTRACT = "abstract";
   private static final String IMPLICIT = "implicit";
+  private static final String VOLATILE = "volatile";
   private static final String TYPE = "type";
   private static final String POSITION = "position";
   private static final String BOUNDS = "bounds";
@@ -1822,6 +1841,7 @@ public abstract class Decl implements IDecl {
       addV(VISIBILITY, decl.getVisibility(), b);
       addB(STATIC, decl.isStatic(), b);
       addB(FINAL, decl.isFinal(), b);
+      addB(VOLATILE, decl.isVolatile(), b);
       addT(TYPE, decl.getTypeOf(), b);
       break;
     case INITIALIZER:
@@ -2059,6 +2079,10 @@ public abstract class Decl implements IDecl {
       }
       if (isFor(FINAL, pair)) {
         fieldBuilder.setIsFinal(Boolean.valueOf(pair.second()));
+        pair = parseEqualsPair(b);
+      }
+      if (isFor(VOLATILE, pair)) {
+        fieldBuilder.setIsVolatile(Boolean.valueOf(pair.second()));
         pair = parseEqualsPair(b);
       }
       if (isNotFor(TYPE, pair))

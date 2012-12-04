@@ -187,6 +187,16 @@ public interface IDecl {
   boolean isImplicit();
 
   /**
+   * Gets if this declaration is declared to be <i>volatile</i>. This only
+   * applies to field declarations. If this is meaningless for the declaration,
+   * {@code false} is returned.
+   * 
+   * @return {@code true} if this declaration is declared to be <i>volatile</i>,
+   *         {@code false} otherwise.
+   */
+  boolean isVolatile();
+
+  /**
    * Gets the ordered list, first to last, of the parameter declarations for a
    * {@link Kind#CONSTRUCTOR} or {@link Kind#METHOD}. If this is meaningless for
    * the declaration, an empty array is returned. The returned set is a copy and

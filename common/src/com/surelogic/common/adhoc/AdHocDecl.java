@@ -26,6 +26,7 @@ import com.surelogic.common.ref.TypeRef;
  * <li>{@link IDecl#isFinal()}</li>
  * <li>{@link IDecl#isImplicit()}</li>
  * <li>{@link IDecl#isStatic()}</li>
+ * <li>{@link IDecl#isVolatile()}</li>
  * </ul>
  */
 public final class AdHocDecl implements IDecl {
@@ -38,6 +39,7 @@ public final class AdHocDecl implements IDecl {
   private final boolean f_isFinal;
   private final boolean f_isImplicit;
   private final boolean f_isStatic;
+  private final boolean f_isVolatile;
 
   /**
    * Constructs an instance using the passed encoded string. The encoded string
@@ -66,6 +68,7 @@ public final class AdHocDecl implements IDecl {
       f_isFinal = false;
       f_isImplicit = false;
       f_isStatic = false;
+      f_isVolatile = false;
     } else {
       // Declaration type
       final String dt = b.substring(0, 2);
@@ -100,6 +103,7 @@ public final class AdHocDecl implements IDecl {
         f_isFinal = false;
         f_isImplicit = false;
         f_isStatic = false;
+        f_isVolatile = false;
       } else {
         // Visibility
         final String vs = b.substring(1, 3);
@@ -123,6 +127,7 @@ public final class AdHocDecl implements IDecl {
           f_isFinal = false;
           f_isImplicit = false;
           f_isStatic = false;
+          f_isVolatile = false;
         } else {
           // Modifiers
           final String mods = b.substring(1);
@@ -130,6 +135,7 @@ public final class AdHocDecl implements IDecl {
           f_isFinal = mods.contains("F") || mods.contains("f");
           f_isImplicit = mods.contains("I") || mods.contains("i");
           f_isStatic = mods.contains("S") || mods.contains("s");
+          f_isVolatile = mods.contains("V") || mods.contains("v");
         }
       }
     }
@@ -179,6 +185,10 @@ public final class AdHocDecl implements IDecl {
 
   public boolean isImplicit() {
     return f_isImplicit;
+  }
+
+  public boolean isVolatile() {
+    return f_isVolatile;
   }
 
   @NonNull
