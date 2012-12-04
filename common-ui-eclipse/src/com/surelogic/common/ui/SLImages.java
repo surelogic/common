@@ -23,6 +23,7 @@ import com.surelogic.Nullable;
 import com.surelogic.Utility;
 import com.surelogic.common.CommonImages;
 import com.surelogic.common.SLUtility;
+import com.surelogic.common.adhoc.AdHocDecl;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.ref.IDecl;
 import com.surelogic.common.ref.IJavaRef;
@@ -1204,6 +1205,12 @@ public final class SLImages {
       return getImage(CommonImages.IMG_TYPE_PARAMETER);
     }
     return getImage(CommonImages.IMG_UNKNOWN);
+  }
+
+  @NonNull
+  public static Image getImageForEncodedDecl(@Nullable String encoded) {
+    final IDecl decl = new AdHocDecl(encoded);
+    return getImageFor(decl);
   }
 
   /**
