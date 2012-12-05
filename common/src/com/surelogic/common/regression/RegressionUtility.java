@@ -14,9 +14,10 @@ import java.util.Set;
 
 import com.surelogic.common.FileUtility;
 import com.surelogic.common.SLUtility;
+import com.surelogic.common.XUtil;
 
 public class RegressionUtility {
-  private static final boolean debug = false;
+  private static final boolean debug = XUtil.testing;
   public static final String JSURE_LOG_SUFFIX = ".log.xml";
   public static final String JSURE_SNAPSHOT_SUFFIX = ".sea.xml";
   public static final String JSURE_SNAPSHOT_DIFF_SUFFIX = ".sea.diffs.xml";
@@ -47,7 +48,11 @@ public class RegressionUtility {
   public static final Filter oracleScanDirFilter = new Filter(ORACLE_SCAN_DIR_PREFIX, "") {
     public boolean accept(File dir, String name) {
       // Also accept a directory starting with the project name
-      if (name.startsWith(dir.getName() + ' ')) {
+      final String dirName = SLUtility.getTruncatedProjectName(dir.getName());
+      if (name.startsWith(dirName + '-')) {
+    	return true;
+      }
+      if (name.startsWith(dir.getName() + ' ')) { // Old format
         return true;
       }
       return super.accept(dir, name);
