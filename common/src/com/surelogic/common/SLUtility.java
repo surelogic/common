@@ -1098,12 +1098,7 @@ public final class SLUtility {
       throw new IllegalArgumentException(I18N.err(44, "timestamp"));
 
     final StringBuilder b = new StringBuilder();
-    if (firstProjectNameOrNull == null)
-      firstProjectNameOrNull = "unknown_project";
-    firstProjectNameOrNull = firstProjectNameOrNull.replace(' ', '_');
-    if (firstProjectNameOrNull.length() > 20)
-      firstProjectNameOrNull = firstProjectNameOrNull.substring(0, 20);
-    b.append(firstProjectNameOrNull);
+    b.append(getTruncatedProjectName(firstProjectNameOrNull));
     if (moreProjects)
       b.append("-etc");
     String timeString = toStringForDir(timestamp);
@@ -1111,6 +1106,18 @@ public final class SLUtility {
     return b.toString();
   }
 
+  @NonNull 
+  public static String getTruncatedProjectName(@Nullable String firstProjectNameOrNull) {
+	  if (firstProjectNameOrNull == null) {
+	      firstProjectNameOrNull = "unknown_project";
+	  }
+	  firstProjectNameOrNull = firstProjectNameOrNull.replace(' ', '_');
+	  if (firstProjectNameOrNull.length() > 20) {
+		  firstProjectNameOrNull = firstProjectNameOrNull.substring(0, 20);
+	  }
+	  return firstProjectNameOrNull;
+  }
+  
   /**
    * Reads a date from a scan directory name created, and in the format
    * described, by {@link #getScanDirectoryName(String, boolean, Date)}.
