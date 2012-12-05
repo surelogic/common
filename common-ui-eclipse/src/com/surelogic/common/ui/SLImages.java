@@ -14,6 +14,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.DecorationOverlayIcon;
 import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Display;
@@ -146,6 +147,15 @@ public final class SLImages {
     int intHash = 1;
     intHash = prime * intHash + ((baseImage == null) ? 0 : baseImage.hashCode());
     final String key = Integer.toHexString(intHash) + "(" + size.x + "," + size.y + ")->image-resize";
+    return key;
+  }
+
+  @NonNull
+  private static String getImageScaleCacheKey(@NonNull Image baseImage, @NonNull Point size) {
+    final int prime = 31;
+    int intHash = 1;
+    intHash = prime * intHash + ((baseImage == null) ? 0 : baseImage.hashCode());
+    final String key = Integer.toHexString(intHash) + "(" + size.x + "," + size.y + ")->image-scale";
     return key;
   }
 
@@ -882,6 +892,41 @@ public final class SLImages {
   }
 
   /**
+   * Returns the shared image that is a scaled copy of the passed image with the
+   * passed size.
+   * <p>
+   * Note that clients <b>must not</b> dispose the image returned by this
+   * method.
+   * 
+   * @param baseImage
+   *          an image.
+   * @param size
+   *          size of the new image. If this exactly matches the size of the
+   *          passed image then an exact copy of the passed image is returned.
+   * @return an image that is managed by this utility, please do not call
+   *         {@link Image#dispose()} on it, or {@code null} if
+   *         <tt>imageName</tt> could not be found.
+   * 
+   * @throws Exception
+   *           if something goes wrong.
+   */
+  public static Image scaleImage(@NonNull final Image baseImage, @NonNull final Point size) {
+    if (baseImage == null)
+      throw new IllegalArgumentException(I18N.err(44, "baseImage"));
+    if (size == null)
+      throw new IllegalArgumentException(I18N.err(44, "size"));
+
+    final String key = getImageScaleCacheKey(baseImage, size);
+    Image result = CACHEKEY_TO_IMAGE.get(key);
+    if (result == null) {
+      result = scaleImageUnmanaged(baseImage, size);
+      if (result != null)
+        addToImageCache(key, result);
+    }
+    return result;
+  }
+
+  /**
    * Constructs a new image of the passed size coping the contents, at least
    * what will fit, of the passed base image to the new image.
    * 
@@ -907,6 +952,35 @@ public final class SLImages {
     final DecorationOverlayIcon doi = new DecorationOverlayIcon(baseImage, new ImageDescriptor[] { null, null, null, null, null },
         size);
     final Image result = doi.createImage();
+    return result;
+  }
+
+  /**
+   * Constructs a new image of the passed size scaling the contents of the base
+   * image.
+   * 
+   * @param baseImage
+   *          an image.
+   * @param size
+   *          size of the new image. If this exactly matches the size of the
+   *          passed image then an exact copy of the passed image is returned.
+   * @return a new image. The caller is responsible for disposing this image.
+   * 
+   * @throws Exception
+   *           if something goes wrong.
+   */
+  @NonNull
+  public static Image scaleImageUnmanaged(@NonNull final Image baseImage, @NonNull final Point size) {
+    if (baseImage == null)
+      throw new IllegalArgumentException(I18N.err(44, "baseImage"));
+    if (size == null)
+      throw new IllegalArgumentException(I18N.err(44, "size"));
+
+    final Image result = new Image(Display.getCurrent(), size.x, size.y);
+    final GC gc = new GC(result);
+    gc.drawImage(baseImage, 0, 0, baseImage.getBounds().width, baseImage.getBounds().height, 0, 0, result.getBounds().width,
+        result.getBounds().height);
+    gc.dispose();
     return result;
   }
 
