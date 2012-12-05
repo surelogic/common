@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.SystemUtils;
 
@@ -59,7 +60,7 @@ public final class SLUtility {
   public static final Object[] EMPTY_OBJECT_ARRAY = new Object[0];
   public static final String[] EMPTY_STRING_ARRAY = new String[0];
   public static final String JAVADOC_ANNOTATE_TAG = "annotate";
-  
+
   public static final String OBJECT = "Object";
   public static final String JAVA_LANG_OBJECT = "java.lang.Object";
 
@@ -398,6 +399,94 @@ public final class SLUtility {
 
   public static String toStringHumanWithCommas(final int i) {
     return String.format("%,d", i);
+  }
+
+  public static String toStringHumanWithCommas(final long l) {
+    return String.format("%,d", l);
+  }
+
+  /**
+   * This converts a time into a human readable string in days, hours, minutes
+   * and seconds. It is useful for user interface display or logging of
+   * durations.
+   * 
+   * @param duration
+   *          a length of time.
+   * @param unit
+   *          the time unit for the passed duration.
+   * @return a human readable string in days, hours, minutes and seconds.
+   */
+  public static String toStringDurationS(long duration, TimeUnit unit) {
+    return toStringDuration(duration, unit, false);
+  }
+
+  /**
+   * This converts a time into a human readable string in days, hours, minutes,
+   * seconds, and milliseconds. It is useful for user interface display or
+   * logging of durations.
+   * 
+   * @param duration
+   *          a length of time.
+   * @param unit
+   *          the time unit for the passed duration.
+   * @return a human readable string in days, hours, minutes seconds, and
+   *         milliseconds.
+   */
+  public static String toStringDurationMS(long duration, TimeUnit unit) {
+    return toStringDuration(duration, unit, true);
+  }
+
+  private static String toStringDuration(long duration, TimeUnit unit, boolean showMS) {
+    final StringBuilder b = new StringBuilder();
+    final long days = unit.toDays(duration);
+    if (days > 0) {
+      b.append(days).append(" day");
+      if (days > 1)
+        b.append("s");
+      duration -= unit.convert(days, TimeUnit.DAYS);
+    }
+    if (duration > 0) {
+      final long hours = unit.toHours(duration);
+      if (hours > 0) {
+        b.append(" ").append(hours).append(" hour");
+        if (hours > 1)
+          b.append("s");
+        duration -= unit.convert(hours, TimeUnit.HOURS);
+      }
+    }
+    if (duration > 0) {
+      final long minutes = unit.toMinutes(duration);
+      if (minutes > 0) {
+        b.append(" ").append(minutes).append(" minute");
+        if (minutes > 1)
+          b.append("s");
+        duration -= unit.convert(minutes, TimeUnit.MINUTES);
+      }
+    }
+    if (duration > 0) {
+      final long seconds = unit.toSeconds(duration);
+      if (seconds > 0) {
+        b.append(" ").append(seconds).append(" second");
+        if (seconds > 1)
+          b.append("s");
+        duration -= unit.convert(seconds, TimeUnit.SECONDS);
+      }
+    }
+    if (showMS) {
+      if (duration > 0) {
+        final long millis = unit.toMillis(duration);
+        if (millis > 0) {
+          b.append(" ").append(millis).append(" ms");
+        }
+      }
+      if (b.length() == 0)
+        b.append("under one millisecond");
+    } else {
+      if (b.length() == 0)
+        b.append("under one second");
+    }
+
+    return b.toString().trim();
   }
 
   public static long byteToMByte(final long value) {
