@@ -50,6 +50,20 @@ public final class EclipseColorUtility {
     return f_diffHighlightColorObsolete;
   }
 
+  private static Color f_runControlBackgroundColor;
+
+  public static Color getRunControlBackgroundColor() {
+    if (f_runControlBackgroundColor == null) {
+      f_runControlBackgroundColor = new Color(Display.getCurrent(), 93, 118, 148);
+      Display.getCurrent().disposeExec(new Runnable() {
+        public void run() {
+          f_runControlBackgroundColor.dispose();
+        }
+      });
+    }
+    return f_runControlBackgroundColor;
+  }
+
   private EclipseColorUtility() {
     // no instances
   }
