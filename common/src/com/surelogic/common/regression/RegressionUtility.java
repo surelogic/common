@@ -128,7 +128,9 @@ public class RegressionUtility {
 
   private static Date getDate(File project, File oracleFile) {
     final String oracle = oracleFile.getName();
-    if (oracle.startsWith(ORACLE_SCAN_DIR_PREFIX) || oracle.startsWith(project.getName())) {
+    if (oracle.startsWith(ORACLE_SCAN_DIR_PREFIX) ||
+    	oracle.startsWith(SLUtility.getTruncatedProjectName(project.getName())+'-') ||
+    	oracle.startsWith(project.getName())) {
       Date result = SLUtility.getDateFromScanDirectoryNameOrNull(oracle);
       if (result == null) {
         // try old scheme
