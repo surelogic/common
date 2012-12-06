@@ -785,12 +785,13 @@ public final class AdornedTreeTableModel {
       } else {
         for (int colI = 0; colI < columnCount; colI++) {
           if (values[colI] != null) {
-            final Cell c = f_rows[leaf.getRowIndex()][colI];
-            final String rowValue = c.getText();
+            final String rowValue = f_rows[leaf.getRowIndex()][colI].getText();
             if (!values[colI].equals(rowValue)) {
               values[colI] = null;
             }
-            final String imgValue = c.getImageSymbolicName();
+          }
+          if (imgValues[colI] != null) {
+            final String imgValue = f_rows[leaf.getRowIndex()][colI].getImageSymbolicName();
             if (!imgValues[colI].equals(imgValue)) {
               imgValues[colI] = null;
             }
