@@ -471,7 +471,7 @@ public final class AdornedTreeTableModel {
 
   private static final int NOT_FOUND = -1;
   private static final String BREAK = "__";
-  private static final String IMG_VARIABLE_SUFFIX = "(Image)";
+  private static final String IMG_VARIABLE_SUFFIX = " (Image)";
 
   private AdornedTreeTableModel(final Cell[][] rows, final String[] columnLabels, final Justification[] columnJustification,
       final boolean[] isColumnVisible, final int lastTreeIndex, final int lastTreeIndexInitiallyVisible, final TreeCell[] treePart,
