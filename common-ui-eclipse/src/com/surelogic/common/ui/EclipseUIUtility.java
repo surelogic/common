@@ -272,6 +272,8 @@ public final class EclipseUIUtility {
    * 
    * @param job
    *          code to run on the user-interface thread or {@code null}
+   * 
+   * @see #nowOrAsyncExec(Runnable)
    */
   public static void asyncExec(@Nullable Runnable job) {
     if (job != null)
@@ -291,6 +293,36 @@ public final class EclipseUIUtility {
   public static void disposeExec(@Nullable Runnable job) {
     if (job != null)
       getDisplay().disposeExec(job);
+  }
+
+  /**
+   * Causes the run() method of the runnable to be invoked by the user-interface
+   * thread now if this method is invoked in the context of the SWT UI thread or
+   * at the next reasonable opportunity via {@link #asyncExec(Runnable)}.
+   * Specifying {@code null} as the runnable causes this method to simply
+   * return.
+   * 
+   * @param job
+   *          code to run on the user-interface thread or {@code null}
+   */
+  public static void nowOrAsyncExec(@Nullable Runnable job) {
+    if (job != null) {
+      if (isUIThread())
+        job.run();
+      else
+        asyncExec(job);
+    }
+  }
+
+  /**
+   * Gets if this call was invoked from the SWT UI thread.
+   * 
+   * @return {@code true} if this call was invoked from the SWT UI thread,
+   *         {@code false} otherwise.
+   */
+  public static boolean isUIThread() {
+    Object uiThread = getDisplay().getThread();
+    return (Thread.currentThread() == uiThread);
   }
 
   /**
