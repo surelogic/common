@@ -92,8 +92,10 @@ public final class FileUtility {
    * Gets if the passed file or any file within the passed directory, or the
    * directory itself, has been modified within the given period of time.
    * <p>
-   * For example, <tt>anythingModifiedSince(foo, 1, TimeUnit.SECONDS)</tt> would
-   * check if the foo file has been modified within the last second.
+   * For example, <tt>anythingModifiedInTheLast(foo, 1, TimeUnit.SECONDS)</tt>
+   * would check if the foo file has been modified within the last second.
+   * <p>
+   * If a directory is passed, only its immediate contents are examined.
    * 
    * @param fileOrDirectory
    *          a file or directory on the disk.
@@ -108,7 +110,7 @@ public final class FileUtility {
    *           if any argument is {@code null}, or the passed file or directory
    *           doesn't exist.
    */
-  public static boolean anythingModifiedSince(final File fileOrDirectory, long period, TimeUnit unit) {
+  public static boolean anythingModifiedInTheLast(final File fileOrDirectory, long period, TimeUnit unit) {
     if (fileOrDirectory == null)
       throw new IllegalArgumentException(I18N.err(44, "fileOrDirectory"));
     if (unit == null)
