@@ -17,6 +17,7 @@ import com.surelogic.common.core.preferences.CommonCorePreferencesUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.serviceability.Message;
 import com.surelogic.common.serviceability.MessageWithLog;
+import com.surelogic.common.ui.EclipseUIUtility;
 
 public class SendServiceMessageCollectInformationPage extends WizardPage {
 
@@ -139,7 +140,7 @@ public class SendServiceMessageCollectInformationPage extends WizardPage {
 		/*
 		 * We have to run this a bit later so that the OK button is created.
 		 */
-		emailText.getDisplay().asyncExec(updatePageComplete);
+		EclipseUIUtility.asyncExec(updatePageComplete);
 
 		setTitle(I18N.msg(f_data.propPfx() + "msg.title"));
 		setMessage(I18N.msg(f_data.propPfx() + "msg"),

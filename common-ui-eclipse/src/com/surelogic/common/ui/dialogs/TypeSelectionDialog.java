@@ -49,6 +49,7 @@ import org.eclipse.ui.dialogs.SelectionDialog;
 
 import com.surelogic.common.CommonImages;
 import com.surelogic.common.logging.SLLogger;
+import com.surelogic.common.ui.EclipseUIUtility;
 import com.surelogic.common.ui.SLImages;
 
 /**
@@ -305,7 +306,7 @@ public class TypeSelectionDialog extends SelectionDialog {
         final SearchRequestor requestor = new SearchRequestor() {
           @Override
           public void beginReporting() {
-            getShell().getDisplay().asyncExec(new Runnable() {
+            EclipseUIUtility.asyncExec(new Runnable() {
               public void run() {
                 progressBar.setEnabled(true);
                 if (cancelButton != null) cancelButton.setEnabled(true);
@@ -317,7 +318,7 @@ public class TypeSelectionDialog extends SelectionDialog {
           
           @Override
           public void endReporting() {
-            getShell().getDisplay().asyncExec(new Runnable() {
+            EclipseUIUtility.asyncExec(new Runnable() {
               public void run() {
                 progressBar.setMaximum(1);
                 progressBar.setSelection(0);
@@ -337,7 +338,7 @@ public class TypeSelectionDialog extends SelectionDialog {
           
           @Override
           public void acceptSearchMatch(final SearchMatch match) throws CoreException {
-            getShell().getDisplay().asyncExec(new Runnable() {
+            EclipseUIUtility.asyncExec(new Runnable() {
               public void run() {
                 final IType element = (IType) match.getElement();
                 types.add(element);
@@ -407,7 +408,7 @@ public class TypeSelectionDialog extends SelectionDialog {
     public MyProgressMonitor() { super(); }
     
     public void beginTask(final String name, final int totalWork) {
-      getShell().getDisplay().asyncExec(new Runnable() {
+      EclipseUIUtility.asyncExec(new Runnable() {
         public void run() {
           progressBar.setMaximum(totalWork);
         }
@@ -415,7 +416,7 @@ public class TypeSelectionDialog extends SelectionDialog {
     }
     
     public void internalWorked(final double work) {
-      getShell().getDisplay().asyncExec(new Runnable() {
+      EclipseUIUtility.asyncExec(new Runnable() {
         public void run() {
           progressBar.setSelection(currentWork += work);
         }

@@ -94,7 +94,7 @@ public final class SLImages {
   private static void registerDisposeExecIfNeeded() {
     if (f_needToRegisterDisposeExec) {
       f_needToRegisterDisposeExec = false;
-      Display.getCurrent().disposeExec(new Runnable() {
+      EclipseUIUtility.disposeExec(new Runnable() {
         public void run() {
           for (Image image : CACHEKEY_TO_IMAGE.values()) {
             image.dispose();
@@ -772,7 +772,7 @@ public final class SLImages {
    */
   @NonNull
   private static Image toGray(@NonNull final Image image) {
-    return new Image(Display.getCurrent(), image, SWT.IMAGE_GRAY);
+    return new Image(EclipseUIUtility.getDisplay(), image, SWT.IMAGE_GRAY);
   }
 
   /**
@@ -842,7 +842,7 @@ public final class SLImages {
       throw new IllegalArgumentException(I18N.err(44, "baseImage"));
 
     if (pixelsFromRight < 1 && pixelsFromTop < 1)
-      return new Image(Display.getCurrent(), baseImage, SWT.IMAGE_COPY);
+      return new Image(EclipseUIUtility.getDisplay(), baseImage, SWT.IMAGE_COPY);
     if (pixelsFromRight < 1)
       pixelsFromRight = 0;
     if (pixelsFromTop < 1)
@@ -948,7 +948,7 @@ public final class SLImages {
       throw new IllegalArgumentException(I18N.err(44, "size"));
 
     if (baseImage.getBounds().width == size.x && baseImage.getBounds().height == size.y)
-      return new Image(Display.getCurrent(), baseImage, SWT.IMAGE_COPY);
+      return new Image(EclipseUIUtility.getDisplay(), baseImage, SWT.IMAGE_COPY);
     final DecorationOverlayIcon doi = new DecorationOverlayIcon(baseImage, new ImageDescriptor[] { null, null, null, null, null },
         size);
     final Image result = doi.createImage();
@@ -976,7 +976,7 @@ public final class SLImages {
     if (size == null)
       throw new IllegalArgumentException(I18N.err(44, "size"));
 
-    final Image result = new Image(Display.getCurrent(), size.x, size.y);
+    final Image result = new Image(EclipseUIUtility.getDisplay(), size.x, size.y);
     final GC gc = new GC(result);
     gc.drawImage(baseImage, 0, 0, baseImage.getBounds().width, baseImage.getBounds().height, 0, 0, result.getBounds().width,
         result.getBounds().height);
