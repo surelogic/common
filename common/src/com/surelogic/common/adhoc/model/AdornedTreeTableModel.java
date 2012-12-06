@@ -244,7 +244,7 @@ public final class AdornedTreeTableModel {
           } else {
             // Do we need to null out the image name because the
             // text is blank?
-            if (!adornedColumnAnnotationInfo[colI].getShowIconWhenEmpty()) {
+            if (!adornedColumnAnnotationInfo[adornedColI].getShowIconWhenEmpty()) {
               if (cellText == null || "".equals(cellText)) {
                 cellImageSymbolicName = null;
               }
