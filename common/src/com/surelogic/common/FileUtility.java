@@ -25,6 +25,7 @@ import java.nio.channels.FileChannel;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Enumeration;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
@@ -86,6 +87,49 @@ public final class FileUtility {
    * Name of the IR persistence directory under the JSure data directory
    */
   public static final String IR_PATH_FRAGMENT = "ir";
+
+  /**
+   * Gets if the passed file or any file within the passed directory, or the
+   * directory itself, has been modified within the given period of time.
+   * <p>
+   * For example, <tt>anythingModifiedSince(foo, 1, TimeUnit.SECONDS)</tt> would
+   * check if the foo file has been modified within the last second.
+   * 
+   * @param fileOrDirectory
+   *          a file or directory on the disk.
+   * @param period
+   *          the period of time to go back to when checking for changes. The
+   *          minimum value is 1 ms.
+   * @param unit
+   *          the time unit of period parameter.
+   * @return {@code true} if something has been modified within the given period
+   *         of time, {@code false} otherwise.
+   * @throws IllegalArgumentException
+   *           if any argument is {@code null}, or the passed file or directory
+   *           doesn't exist.
+   */
+  public static boolean anythingModifiedSince(final File fileOrDirectory, long period, TimeUnit unit) {
+    if (fileOrDirectory == null)
+      throw new IllegalArgumentException(I18N.err(44, "fileOrDirectory"));
+    if (unit == null)
+      throw new IllegalArgumentException(I18N.err(44, "unit"));
+    if (!fileOrDirectory.exists())
+      throw new IllegalArgumentException(I18N.err(74, fileOrDirectory.getAbsolutePath()));
+
+    long periodMS = TimeUnit.MILLISECONDS.convert(period, unit);
+    if (periodMS < 1)
+      periodMS = 1;
+    final long currentTS = System.currentTimeMillis();
+    final boolean fileOrDirectoryModified = currentTS - fileOrDirectory.lastModified() < periodMS;
+    if (!fileOrDirectoryModified && fileOrDirectory.isDirectory()) {
+      for (File child : fileOrDirectory.listFiles()) {
+        final boolean childModified = currentTS - child.lastModified() < periodMS;
+        if (childModified)
+          return true;
+      }
+    }
+    return fileOrDirectoryModified;
+  }
 
   /**
    * Tries to create the specified directory in the file system unless it
