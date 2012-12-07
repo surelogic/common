@@ -27,6 +27,7 @@ public class RemoteSLJobException extends RuntimeException {
     return number;
   }
 
+  @Starts("nothing")
   public String getToolMessage(String name) {
     if (args == null || args.length == 0) {
       return I18N.err(number, name);
