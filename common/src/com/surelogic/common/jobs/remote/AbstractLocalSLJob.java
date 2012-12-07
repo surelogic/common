@@ -8,6 +8,7 @@ import org.apache.commons.lang3.SystemUtils;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.types.*;
 
+import com.surelogic.*;
 import com.surelogic.common.CommonJVMPrefs;
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.XUtil;
@@ -19,6 +20,8 @@ import com.surelogic.common.logging.SLLogger;
  * 
  * @author Edwin
  */
+@Region("LocalState")
+@RegionLock("LocalLock is this protects LocalState")
 public abstract class AbstractLocalSLJob extends AbstractSLJob {
     protected static final Logger LOG = SLLogger.getLogger();
 	private static final int FIRST_LINES = 3;
@@ -29,9 +32,10 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 	protected final int memorySize;
 	private final int port; // <=0 if just using System.in/out
 	protected final SLStatus.Builder status   = new SLStatus.Builder();
-	private Stack<SubSLProgressMonitor> tasks = new Stack<SubSLProgressMonitor>();
+	private final Stack<SubSLProgressMonitor> tasks = new Stack<SubSLProgressMonitor>();
 	private SLProgressMonitor topMonitor;
 	private Process remoteVM;
+	@InRegion("LocalState")
 	private Thread handlerThread; // Only if using a port
 	
 	protected AbstractLocalSLJob(String name, int work, ILocalConfig config) {
@@ -191,7 +195,7 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 	public void reportException(Exception e) {
 		status.addChild(SLStatus.createErrorStatus(e));		
 	}
-	
+		
 	public SLStatus run(final SLProgressMonitor topMonitor) {
 		try {
 			this.topMonitor = topMonitor;
