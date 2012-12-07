@@ -2,13 +2,7 @@ package com.surelogic.common.xml;
 
 import java.util.ArrayList;
 
-import com.surelogic.InRegion;
-import com.surelogic.Nullable;
-import com.surelogic.Region;
-import com.surelogic.RegionLock;
-import com.surelogic.RequiresLock;
-import com.surelogic.ThreadSafe;
-import com.surelogic.UniqueInRegion;
+import com.surelogic.*;
 import com.surelogic.common.CharBuffer;
 import com.surelogic.common.SLUtility;
 
@@ -122,16 +116,17 @@ public final class Entities {
     return value.replaceAll("\\s+", " ");
   }
 
+  @Containable
   private static final class EscapePair {
     /**
      * The character to be escaped.
      */
-    char value;
+	final char value;
     /**
      * Call {@link #getEscapeValue()} don't use this field directly because it
      * may be {@code null} if we are to simply generate a Unicode escape value.
      */
-    String escapeValueOrNullForUnicode;
+	String escapeValueOrNullForUnicode;
 
     EscapePair(char value, String escapeValueOrNullForUnicode) {
       this.value = value;
@@ -157,6 +152,7 @@ public final class Entities {
   @InRegion("EntitiesState")
   private boolean f_escapeWhitespace = false;
 
+  @Unique("return")
   public Entities() {
     define('&', "&amp;");
     define('\'', "&apos;");
