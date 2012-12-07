@@ -14,7 +14,10 @@ import com.surelogic.common.ref.IJavaRef.Within;
 
 @Utility
 public final class DeclUtil {
-
+  private DeclUtil() { 
+	  // To prevent instantiation
+  }
+	  
   /**
    * Generates the most likely simple file name that the passed declaration is
    * within.
