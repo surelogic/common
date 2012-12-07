@@ -238,6 +238,7 @@ public final class CommonImages {
   public static final String IMG_SORT_DOWN = "sort_down.gif";
   public static final String IMG_SORT_UP = "sort_up.gif";
   public static final String IMG_SUGGESTIONS_WARNINGS = "suggestions_warnings.gif";
+  public static final String IMG_THREAD = "thread.gif";
   public static final String IMG_TIMEOUT_X = "timeout_x.gif";
   public static final String IMG_TRAFFIC_LIGHT_GREEN = "traffic_light_green.png";
   public static final String IMG_TRAFFIC_LIGHT_RED = "traffic_light_red.png";
