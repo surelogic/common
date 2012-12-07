@@ -15,10 +15,10 @@ import com.surelogic.Utility;
  */
 @Utility
 public final class CommonImages {
-  private CommonImages() { 
-	  // To prevent instantiation
+  private CommonImages() {
+    // To prevent instantiation
   }
-	
+
   public static final String PATH = "/lib/images/";
 
   /*
@@ -97,6 +97,7 @@ public final class CommonImages {
   public static final String IMG_COMMENT = "comment.gif";
   public static final String IMG_CONSOLE = "console.gif";
   public static final String IMG_CPU = "cpu.gif";
+  public static final String IMG_CPU_SUBDUED = "cpu_subdued.gif";
   public static final String IMG_DOWN = "down.gif";
   public static final String IMG_DRUM_EXPLORER = "drum_explorer.gif";
   public static final String IMG_DRUM_GRAY = "drum_gray.gif";
