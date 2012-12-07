@@ -15,7 +15,10 @@ import com.surelogic.Utility;
  */
 @Utility
 public final class CommonImages {
-
+  private CommonImages() { 
+	  // To prevent instantiation
+  }
+	
   public static final String PATH = "/lib/images/";
 
   /*

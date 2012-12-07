@@ -19,7 +19,10 @@ import com.surelogic.common.logging.SLLogger;
  */
 @Utility
 public class SureLogicToolsPropertiesUtility {
-
+  private SureLogicToolsPropertiesUtility() {
+	  // To prevent instantiation
+  }
+	
   public static final String PROPS_FILE = "surelogic-tools.properties";
 
   public static final String SCAN_EXCLUDE_SOURCE_FOLDER = "scan.exclude.source.folder";
