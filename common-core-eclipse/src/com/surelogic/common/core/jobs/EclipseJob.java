@@ -3,11 +3,13 @@ package com.surelogic.common.core.jobs;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.jobs.IJobManager;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.jobs.AggregateSLJob;
@@ -99,6 +101,7 @@ public final class EclipseJob {
       throw new IllegalArgumentException(I18N.err(44, "job"));
     }
     final Job eclipseJob = new SLDatabaseJobWrapper(job, accessKeys);
+    eclipseJob.addJobChangeListener(new SLJobChangeAdapter(job));
     eclipseJob.setUser(user);
     eclipseJob.setSystem(system);
     eclipseJob.schedule(delay);
@@ -132,6 +135,7 @@ public final class EclipseJob {
         return SLDatabaseJobWrapper.run(job, monitor);
       }
     };
+    eclipseJob.addJobChangeListener(new SLJobChangeAdapter(job));
     eclipseJob.setUser(user);
     eclipseJob.setSystem(system);
     eclipseJob.schedule(delay);
@@ -200,6 +204,7 @@ public final class EclipseJob {
       throw new IllegalArgumentException(I18N.err(44, "job"));
     }
     final Job eclipseJob = new SLJobWrapper(job);
+    eclipseJob.addJobChangeListener(new SLJobChangeAdapter(job));
     eclipseJob.setUser(user);
     eclipseJob.setSystem(system);
     eclipseJob.schedule(delay);
@@ -219,21 +224,7 @@ public final class EclipseJob {
     if (type == null) {
       return false;
     }
-    final IJobManager manager = Job.getJobManager();
-    for (final Job job : manager.find(null)) {
-      final SLJob slJob;
-      if (job instanceof SLDatabaseJobWrapper) {
-        slJob = ((SLDatabaseJobWrapper) job).getWrappedJob();
-      } else if (job instanceof SLJobWrapper) {
-        slJob = ((SLJobWrapper) job).getWrappedJob();
-      } else {
-        slJob = null;
-      }
-      if (slJob != null) {
-        return checkIsActiveThroughAggregateJob(slJob, type);
-      }
-    }
-    return false;
+    return !getActiveJobsOfType(type).isEmpty();
   }
 
   public <T extends SLJob> List<T> getActiveJobsOfType(final Class<T> type) {
@@ -241,51 +232,32 @@ public final class EclipseJob {
       return Collections.emptyList();
     }
     final List<T> result = new ArrayList<T>();
-    final IJobManager manager = Job.getJobManager();
-    for (final Job job : manager.find(null)) {
-      final SLJob slJob;
-      if (job instanceof SLDatabaseJobWrapper) {
-        slJob = ((SLDatabaseJobWrapper) job).getWrappedJob();
-      } else if (job instanceof SLJobWrapper) {
-        slJob = ((SLJobWrapper) job).getWrappedJob();
-      } else {
-        slJob = null;
-      }
-      if (slJob != null) {
-        getThroughAggregateJob(slJob, type, result);
-      }
+    for (SLJob jobInEclipse : f_jobsPassedToEclipse) {
+      System.out.println("Job in eclipse: " + jobInEclipse.getName());
+      getThroughAggregateJobByType(jobInEclipse, type, result);
+    }
+    System.out.println("--- getActiveJobsOfType:" + (result.isEmpty() ? " nothing" : ""));
+    for (SLJob job : result) {
+      System.out.println("      found " + job.getName());
     }
     return result;
   }
 
-  /**
-   * Helper method to find an active {@link SLJob} of the passed type through
-   * {@link AggregateSLJob} instances.
-   * 
-   * @param job
-   *          the @link SLJob} that might be an {@link AggregateSLJob} instance.
-   * @param type
-   *          of {@link SLJob} to search for.
-   * @return {@code true} if an {@link SLJob} is active of the passed type,
-   *         {@code false} otherwise.
-   */
-  private boolean checkIsActiveThroughAggregateJob(final SLJob job, final Class<? extends SLJob> type) {
-    if (job instanceof AggregateSLJob) {
-      for (final SLJob subJob : ((AggregateSLJob) job).getAggregatedJobs()) {
-        if (checkIsActiveThroughAggregateJob(subJob, type)) {
-          return true;
-        }
-      }
-      return false;
-    } else {
-      return type.isInstance(job);
+  public List<SLJob> getActiveJobsWithName(final String name) {
+    if (name == null) {
+      return Collections.emptyList();
     }
+    final List<SLJob> result = new ArrayList<SLJob>();
+    for (SLJob jobInEclipse : f_jobsPassedToEclipse) {
+      getThroughAggregateJobByName(jobInEclipse, name, result);
+    }
+    return result;
   }
 
-  private <T extends SLJob> void getThroughAggregateJob(final SLJob job, final Class<T> type, List<T> mutableResult) {
+  private <T extends SLJob> void getThroughAggregateJobByType(final SLJob job, final Class<T> type, List<T> mutableResult) {
     if (job instanceof AggregateSLJob) {
       for (final SLJob subJob : ((AggregateSLJob) job).getAggregatedJobs()) {
-        getThroughAggregateJob(subJob, type, mutableResult);
+        getThroughAggregateJobByType(subJob, type, mutableResult);
       }
     } else {
       if (type.isInstance(job)) {
@@ -293,6 +265,48 @@ public final class EclipseJob {
         T jobOfInterest = (T) job;
         mutableResult.add(jobOfInterest);
       }
+    }
+  }
+
+  private void getThroughAggregateJobByName(final SLJob job, final String name, List<SLJob> mutableResult) {
+    if (job instanceof AggregateSLJob) {
+      for (final SLJob subJob : ((AggregateSLJob) job).getAggregatedJobs()) {
+        getThroughAggregateJobByName(subJob, name, mutableResult);
+      }
+    } else {
+      if (name.equals(job.getName()))
+        mutableResult.add(job);
+    }
+  }
+
+  static final CopyOnWriteArraySet<SLJob> f_jobsPassedToEclipse = new CopyOnWriteArraySet<SLJob>();
+
+  /**
+   * An Eclipse job change adapter that updates the set of jobs passed to
+   * Eclipse.
+   * <p>
+   * Sadly, Eclipse wraps their own jobs several times so it is not possible to
+   * pull an SLJob out of an Eclipse job (well at least without reflection
+   * dependent upon the internals of Eclipse).
+   */
+  final class SLJobChangeAdapter extends JobChangeAdapter {
+
+    final SLJob f_job;
+
+    SLJobChangeAdapter(SLJob job) {
+      if (job == null)
+        throw new IllegalArgumentException(I18N.err(44, "job"));
+      f_job = job;
+    }
+
+    @Override
+    public void done(IJobChangeEvent event) {
+      f_jobsPassedToEclipse.remove(f_job);
+    }
+
+    @Override
+    public void scheduled(IJobChangeEvent event) {
+      f_jobsPassedToEclipse.add(f_job);
     }
   }
 }
