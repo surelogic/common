@@ -3,11 +3,13 @@ package com.surelogic.common.ref;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.surelogic.Immutable;
 import com.surelogic.NonNull;
 import com.surelogic.ValueObject;
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
 
+@Immutable
 @ValueObject
 public final class TypeRef {
 

@@ -1,6 +1,7 @@
 package com.surelogic.common.ref;
 
 import com.surelogic.Immutable;
+import com.surelogic.ValueObject;
 
 /**
  * Interface for declaration instances where {@link #getKind()} is one of the
@@ -13,6 +14,7 @@ import com.surelogic.Immutable;
  * </ul>
  */
 @Immutable
+@ValueObject
 public interface IDeclType extends IDecl {
   // marker interface
 }

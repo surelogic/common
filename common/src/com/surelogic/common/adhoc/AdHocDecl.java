@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.surelogic.NonNull;
 import com.surelogic.Nullable;
+import com.surelogic.ValueObject;
 import com.surelogic.common.ref.DeclVisitor;
 import com.surelogic.common.ref.IDecl;
 import com.surelogic.common.ref.IDeclParameter;
@@ -29,6 +30,7 @@ import com.surelogic.common.ref.TypeRef;
  * <li>{@link IDecl#isVolatile()}</li>
  * </ul>
  */
+@ValueObject
 public final class AdHocDecl implements IDecl {
 
   @NonNull

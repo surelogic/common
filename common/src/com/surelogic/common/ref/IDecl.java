@@ -6,6 +6,7 @@ import java.util.List;
 import com.surelogic.Immutable;
 import com.surelogic.NonNull;
 import com.surelogic.Nullable;
+import com.surelogic.Part;
 import com.surelogic.ValueObject;
 import com.surelogic.common.SLUtility;
 
@@ -40,7 +41,7 @@ import com.surelogic.common.SLUtility;
  * 
  * @see DeclUtil
  */
-@Immutable
+@Immutable(appliesTo=Part.Instance)
 @ValueObject
 public interface IDecl {
 
@@ -69,6 +70,7 @@ public interface IDecl {
   /**
    * The visibility of a declaration.
    */
+  @Immutable
   enum Visibility {
     ANONYMOUS, DEFAULT, PRIVATE, PROTECTED, PUBLIC, NA
   }

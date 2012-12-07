@@ -29,6 +29,7 @@ public interface IJavaRef {
    * <tt>.class</tt> file, or a <tt>.jar</tt> file.
    * 
    */
+  @Immutable
   enum Within {
     /**
      * Indicates the code reference is in a <tt>.java</tt> file.
@@ -51,6 +52,7 @@ public interface IJavaRef {
    * <p>
    * Note that the <tt>ON</tt> values only apply to annotations.
    */
+  @Immutable
   enum Position {
     /**
      * Indicates the code reference is <i>on</i> the declaration. <b>Only
