@@ -10,7 +10,7 @@ public class SortedProperties extends Properties {
 
 	@Starts("nothing")
 	@Override
-	public Set<Object> keySet(){
+	public synchronized Set<Object> keySet(){
 		return Collections.unmodifiableSet(new TreeSet<Object>(super.keySet()));
 	}
 	@Starts("nothing")
