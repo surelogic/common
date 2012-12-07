@@ -24,7 +24,9 @@ import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Collections;
 import java.util.Enumeration;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.zip.GZIPInputStream;
@@ -111,12 +113,46 @@ public final class FileUtility {
    *           doesn't exist.
    */
   public static boolean anythingModifiedInTheLast(final File fileOrDirectory, long period, TimeUnit unit) {
+    return anythingModifiedInTheLast(fileOrDirectory, period, unit, null);
+  }
+
+  /**
+   * Gets if the passed file or any file within the passed directory, or the
+   * directory itself, has been modified within the given period of time.
+   * <p>
+   * For example, <tt>anythingModifiedInTheLast(foo, 1, TimeUnit.SECONDS)</tt>
+   * would check if the foo file has been modified within the last second.
+   * <p>
+   * If a directory is passed, only its immediate contents are examined.
+   * 
+   * @param fileOrDirectory
+   *          a file or directory on the disk.
+   * @param period
+   *          the period of time to go back to when checking for changes. The
+   *          minimum value is 1 ms.
+   * @param unit
+   *          the time unit of period parameter.
+   * @param simpleFileNamesToIgnore
+   *          a set of simple file names to ignore, or {@code null} if none.
+   *          This parameter is only considered if the examined {@link File} is
+   *          a directory.
+   * @return {@code true} if something has been modified within the given period
+   *         of time, {@code false} otherwise.
+   * @throws IllegalArgumentException
+   *           if any argument is {@code null}, or the passed file or directory
+   *           doesn't exist.
+   */
+  public static boolean anythingModifiedInTheLast(final File fileOrDirectory, long period, TimeUnit unit,
+      Set<String> simpleFileNamesToIgnore) {
     if (fileOrDirectory == null)
       throw new IllegalArgumentException(I18N.err(44, "fileOrDirectory"));
     if (unit == null)
       throw new IllegalArgumentException(I18N.err(44, "unit"));
     if (!fileOrDirectory.exists())
       throw new IllegalArgumentException(I18N.err(74, fileOrDirectory.getAbsolutePath()));
+
+    if (simpleFileNamesToIgnore == null)
+      simpleFileNamesToIgnore = Collections.emptySet();
 
     long periodMS = TimeUnit.MILLISECONDS.convert(period, unit);
     if (periodMS < 1)
@@ -125,9 +161,11 @@ public final class FileUtility {
     final boolean fileOrDirectoryModified = currentTS - fileOrDirectory.lastModified() < periodMS;
     if (!fileOrDirectoryModified && fileOrDirectory.isDirectory()) {
       for (File child : fileOrDirectory.listFiles()) {
-        final boolean childModified = currentTS - child.lastModified() < periodMS;
-        if (childModified)
-          return true;
+        if (!simpleFileNamesToIgnore.contains(child.getName())) {
+          final boolean childModified = currentTS - child.lastModified() < periodMS;
+          if (childModified)
+            return true;
+        }
       }
     }
     return fileOrDirectoryModified;
