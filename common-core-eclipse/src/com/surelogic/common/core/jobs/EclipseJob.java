@@ -11,9 +11,12 @@ import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 
+import com.surelogic.NonNull;
+import com.surelogic.common.core.logging.SLEclipseStatusUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.jobs.AggregateSLJob;
 import com.surelogic.common.jobs.SLJob;
+import com.surelogic.common.jobs.SLStatus;
 
 /**
  * A singleton to submit jobs within Eclipse.
@@ -31,108 +34,34 @@ public final class EclipseJob {
   }
 
   /**
-   * Schedules a database job.
-   * 
-   * @param job
-   *          the job that uses the database.
-   * @throws IllegalArgumentException
-   *           if {@code job==null}.
+   * Schedule a job that locks the workspace
    */
-  public void scheduleDb(final SLJob job) {
-    schedule(job, false, false);
+  public void scheduleWorkspace(@NonNull final SLJob job) {
+    scheduleWorkspace(job, false, false, 0);
   }
 
-  /**
-   * Schedules a database job.
-   * 
-   * @param job
-   *          the job that uses the database.
-   * @param delay
-   *          a time delay in milliseconds before the job should run
-   * @throws IllegalArgumentException
-   *           if {@code job==null}.
-   */
-  public void scheduleDb(final SLJob job, final long delay) {
-    schedule(job, false, false, delay);
-  }
-
-  /**
-   * Schedules a database job.
-   * 
-   * @param job
-   *          the job that uses the database.
-   * @param user
-   *          sets whether or not this job has been directly initiated by a UI
-   *          end user.
-   * @param system
-   *          sets whether or not this job is a system job. System jobs are
-   *          typically not revealed to users in any UI presentation of jobs.
-   * @param accessKeys
-   *          a list of access keys to particular databases. Jobs with the same
-   *          access keys will proceed in serial order.
-   * @throws IllegalArgumentException
-   *           if {@code job==null}.
-   */
-  public void scheduleDb(final SLJob job, final boolean user, final boolean system, final String... accessKeys) {
-    scheduleDb(job, user, system, 0, accessKeys);
-  }
-
-  /**
-   * Schedules a database job.
-   * 
-   * @param job
-   *          the job that uses the database.
-   * @param user
-   *          sets whether or not this job has been directly initiated by a UI
-   *          end user.
-   * @param system
-   *          sets whether or not this job is a system job. System jobs are
-   *          typically not revealed to users in any UI presentation of jobs.
-   * @param delay
-   *          a time delay in milliseconds before the job should run
-   * @param accessKeys
-   *          a list of access keys to particular databases. Jobs with the same
-   *          access keys will proceed in serial order.
-   * @throws IllegalArgumentException
-   *           if {@code job==null}.
-   */
-  public void scheduleDb(final SLJob job, final boolean user, final boolean system, final long delay, final String... accessKeys) {
-    if (job == null) {
-      throw new IllegalArgumentException(I18N.err(44, "job"));
-    }
-    final Job eclipseJob = new SLDatabaseJobWrapper(job, accessKeys);
-    eclipseJob.addJobChangeListener(new SLJobChangeAdapter(job));
-    eclipseJob.setUser(user);
-    eclipseJob.setSystem(system);
-    eclipseJob.schedule(delay);
-  }
-
-  public void scheduleWorkspace(final SLJob job) {
-    scheduleWorkspace(job, false, false);
-  }
-
-  public void scheduleWorkspace(final SLJob job, final long delay) {
+  public void scheduleWorkspace(@NonNull final SLJob job, final long delay) {
     scheduleWorkspace(job, false, false, delay);
   }
 
   /**
    * Schedule a job that locks the workspace
    */
-  public void scheduleWorkspace(final SLJob job, final boolean user, final boolean system) {
+  public void scheduleWorkspace(@NonNull final SLJob job, final boolean user, final boolean system) {
     scheduleWorkspace(job, user, system, 0);
   }
 
   /**
    * Schedule a job that locks the workspace
    */
-  public void scheduleWorkspace(final SLJob job, final boolean user, final boolean system, final long delay) {
-    if (job == null) {
+  public void scheduleWorkspace(@NonNull final SLJob job, final boolean user, final boolean system, final long delay) {
+    if (job == null)
       throw new IllegalArgumentException(I18N.err(44, "job"));
-    }
+
     final Job eclipseJob = new WorkspaceLockingJob(job.getName()) {
       @Override
       public IStatus runInWorkspace(final IProgressMonitor monitor) {
-        return SLDatabaseJobWrapper.run(job, monitor);
+        return workspaceRunHelper(job, monitor);
       }
     };
     eclipseJob.addJobChangeListener(new SLJobChangeAdapter(job));
@@ -141,32 +70,45 @@ public final class EclipseJob {
     eclipseJob.schedule(delay);
   }
 
-  /**
-   * Schedules a job.
-   * 
-   * @param job
-   *          the job.
-   * @throws IllegalArgumentException
-   *           if {@code job==null}.
-   */
-  public void schedule(final SLJob job) {
-    schedule(job, false, false);
+  private final IStatus workspaceRunHelper(SLJob job, IProgressMonitor monitor) {
+    final SLStatus status = job.run(new SLProgressMonitorWrapper(monitor, job.getName()));
+    return SLEclipseStatusUtility.convert(status);
   }
 
   /**
-   * Schedules a job.
+   * Schedules a job with an optional set of access keys.
    * 
    * @param job
    *          the job.
+   * @param accessKeys
+   *          a list of access keys to particular resources, such as a database.
+   *          Jobs with the same access keys will proceed in serial order. If no
+   *          access keys are passed no serialization rule will be setup.
    * @throws IllegalArgumentException
    *           if {@code job==null}.
    */
-  public void schedule(final SLJob job, final long delay) {
-    schedule(job, false, false, delay);
+  public void schedule(@NonNull final SLJob job, final String... accessKeys) {
+    schedule(job, false, false, 0, accessKeys);
   }
 
   /**
-   * Schedules a job.
+   * Schedules a job with an optional set of access keys.
+   * 
+   * @param job
+   *          the job.
+   * @param accessKeys
+   *          a list of access keys to particular resources, such as a database.
+   *          Jobs with the same access keys will proceed in serial order. If no
+   *          access keys are passed no serialization rule will be setup.
+   * @throws IllegalArgumentException
+   *           if {@code job==null}.
+   */
+  public void schedule(@NonNull final SLJob job, final long delay, final String... accessKeys) {
+    schedule(job, false, false, delay, accessKeys);
+  }
+
+  /**
+   * Schedules a job with an optional set of access keys.
    * 
    * @param job
    *          the job.
@@ -176,15 +118,19 @@ public final class EclipseJob {
    * @param system
    *          sets whether or not this job is a system job. System jobs are
    *          typically not revealed to users in any UI presentation of jobs.
+   * @param accessKeys
+   *          a list of access keys to particular resources, such as a database.
+   *          Jobs with the same access keys will proceed in serial order. If no
+   *          access keys are passed no serialization rule will be setup.
    * @throws IllegalArgumentException
    *           if {@code job==null}.
    */
-  public void schedule(final SLJob job, final boolean user, final boolean system) {
-    schedule(job, user, system, 0);
+  public void schedule(@NonNull final SLJob job, final boolean user, final boolean system, final String... accessKeys) {
+    schedule(job, user, system, 0, accessKeys);
   }
 
   /**
-   * Schedules a job.
+   * Schedules a job with an optional set of access keys.
    * 
    * @param job
    *          the job.
@@ -196,14 +142,19 @@ public final class EclipseJob {
    *          typically not revealed to users in any UI presentation of jobs.
    * @param delay
    *          a time delay in milliseconds before the job should run
+   * @param accessKeys
+   *          a list of access keys to particular resources, such as a database.
+   *          Jobs with the same access keys will proceed in serial order. If no
+   *          access keys are passed no serialization rule will be setup.
    * @throws IllegalArgumentException
    *           if {@code job==null}.
    */
-  public void schedule(final SLJob job, final boolean user, final boolean system, final long delay) {
-    if (job == null) {
+  public void schedule(@NonNull final SLJob job, final boolean user, final boolean system, final long delay,
+      final String... accessKeys) {
+    if (job == null)
       throw new IllegalArgumentException(I18N.err(44, "job"));
-    }
-    final Job eclipseJob = new SLJobWrapper(job);
+
+    final Job eclipseJob = new SLJobWrapper(job, accessKeys);
     eclipseJob.addJobChangeListener(new SLJobChangeAdapter(job));
     eclipseJob.setUser(user);
     eclipseJob.setSystem(system);
