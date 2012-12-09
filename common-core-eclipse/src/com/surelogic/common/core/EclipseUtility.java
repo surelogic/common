@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -33,6 +34,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
@@ -43,8 +45,10 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.IJobManager;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.framework.Bundle;
@@ -54,7 +58,13 @@ import com.surelogic.NonNull;
 import com.surelogic.Utility;
 import com.surelogic.common.FileUtility;
 import com.surelogic.common.SLUtility;
+import com.surelogic.common.core.jobs.EclipseAccessKeysJob;
+import com.surelogic.common.core.jobs.SLProgressMonitorWrapper;
+import com.surelogic.common.core.logging.SLEclipseStatusUtility;
 import com.surelogic.common.i18n.I18N;
+import com.surelogic.common.jobs.AggregateSLJob;
+import com.surelogic.common.jobs.SLJob;
+import com.surelogic.common.jobs.SLStatus;
 import com.surelogic.common.license.SLLicenseProduct;
 import com.surelogic.common.license.SLLicenseUtility;
 import com.surelogic.common.logging.SLLogger;
@@ -888,6 +898,214 @@ public class EclipseUtility {
    */
   public static boolean bundleExists(final String id) {
     return Platform.getBundle(id) != null;
+  }
+
+  /**
+   * Wraps an IDE independent job with an optional set of access keys so that it
+   * can scheduled within the Eclipse jobs system. Jobs with the same access
+   * keys will proceed in serial order.
+   * 
+   * @param job
+   *          the IDE independent job.
+   * @param accessKeys
+   *          a list of access keys to particular resources, such as a database.
+   *          Jobs with the same access keys will proceed in serial order. May
+   *          be empty. If no access keys are passed no serialization rule will
+   *          be setup.
+   * 
+   * @return an Eclipse job that can be submitted.
+   * 
+   * @throws IllegalArgumentException
+   *           if job is {@code null}.
+   */
+  @NonNull
+  public static Job toEclipseJob(@NonNull final SLJob job, String... accessKeys) {
+    if (job == null)
+      throw new IllegalArgumentException(I18N.err(44, "job"));
+    final Job result = new EclipseAccessKeysJob(job.getName(), accessKeys) {
+      protected IStatus run(IProgressMonitor monitor) {
+        final SLStatus status = job.run(new SLProgressMonitorWrapper(monitor, job.getName()));
+        return SLEclipseStatusUtility.convert(status);
+      }
+    };
+    result.addJobChangeListener(new SLJobChangeAdapter(job));
+    return result;
+  }
+
+  /**
+   * Wraps an IDE independent job with an Eclipse workspace resource so that it
+   * can scheduled within the Eclipse jobs system. Jobs with the same workspace
+   * resource keys will proceed in serial order.
+   * 
+   * @param job
+   *          the IDE independent job.
+   * @param resource
+   *          a workspace resource. Workspace jobs with the same resource will
+   *          proceed in serial order.
+   * @return an Eclipse workspace job that can be submitted.
+   * 
+   * @throws IllegalArgumentException
+   *           if job or resource is {@code null}.
+   */
+  @NonNull
+  public static WorkspaceJob toWorkspaceJob(@NonNull final SLJob job, @NonNull final IResource resource) {
+    if (job == null)
+      throw new IllegalArgumentException(I18N.err(44, "job"));
+    if (resource == null)
+      throw new IllegalArgumentException(I18N.err(44, "resource"));
+    final WorkspaceJob result = new WorkspaceJob(job.getName()) {
+      public IStatus runInWorkspace(IProgressMonitor monitor) {
+        final SLStatus status = job.run(new SLProgressMonitorWrapper(monitor, job.getName()));
+        return SLEclipseStatusUtility.convert(status);
+      }
+    };
+    result.setRule(resource);
+    result.addJobChangeListener(new SLJobChangeAdapter(job));
+    return result;
+  }
+
+  /**
+   * Wraps an IDE independent job with the Eclipse workspace root. No other
+   * workspace resource jobs will run at the same time as this one.
+   * 
+   * @param job
+   *          the IDE independent job.
+   * @return an Eclipse workspace job that can be submitted.
+   * 
+   * @throws IllegalArgumentException
+   *           if job is {@code null}.
+   */
+  @NonNull
+  public static WorkspaceJob toEntireWorkspaceJob(@NonNull final SLJob job) {
+    final IWorkspaceRoot workspace = ResourcesPlugin.getWorkspace().getRoot();
+    final WorkspaceJob result = toWorkspaceJob(job, workspace);
+    return result;
+  }
+
+  /**
+   * Checks if there is an active {@link SLJob} of the passed type being managed
+   * by Eclipse. This method will go through any wrappers and
+   * {@link AggregateSLJob} instances to find the job.
+   * 
+   * @param type
+   *          of {@link SLJob} to search for.
+   * @return {@code true} if an {@link SLJob} is active of the passed type,
+   *         {@code false} otherwise.
+   */
+  public static boolean isActiveOfType(final Class<? extends SLJob> type) {
+    if (type == null) {
+      return false;
+    }
+    return !getActiveJobsOfType(type).isEmpty();
+  }
+
+  /**
+   * Gets all active {@link SLJob} instances of the passed type being managed by
+   * Eclipse. This method will go through any wrappers and
+   * {@link AggregateSLJob} instances to find the job.
+   * 
+   * @param type
+   *          a type of {@link SLJob}.
+   * @return all active {@link SLJob} instances of the passed type. May be
+   *         empty.
+   */
+  @NonNull
+  public static <T extends SLJob> List<T> getActiveJobsOfType(final Class<T> type) {
+    if (type == null) {
+      return Collections.emptyList();
+    }
+    final List<T> result = new ArrayList<T>();
+    for (SLJob jobInEclipse : f_jobsPassedToEclipse) {
+      System.out.println("Job in eclipse: " + jobInEclipse.getName());
+      getThroughAggregateJobByTypeHelper(jobInEclipse, type, result);
+    }
+    System.out.println("--- getActiveJobsOfType:" + (result.isEmpty() ? " nothing" : ""));
+    for (SLJob job : result) {
+      System.out.println("      found " + job.getName());
+    }
+    return result;
+  }
+
+  private static <T extends SLJob> void getThroughAggregateJobByTypeHelper(final SLJob job, final Class<T> type,
+      List<T> mutableResult) {
+    if (job instanceof AggregateSLJob) {
+      for (final SLJob subJob : ((AggregateSLJob) job).getAggregatedJobs()) {
+        getThroughAggregateJobByTypeHelper(subJob, type, mutableResult);
+      }
+    } else {
+      if (type.isInstance(job)) {
+        @SuppressWarnings("unchecked")
+        T jobOfInterest = (T) job;
+        mutableResult.add(jobOfInterest);
+      }
+    }
+  }
+
+  /**
+   * Gets all active {@link SLJob} instances with the passed name being managed
+   * by Eclipse. This method will go through any wrappers and
+   * {@link AggregateSLJob} instances to find the job.
+   * 
+   * @param name
+   *          a job name.
+   * @return all active {@link SLJob} instances with the passed name. May be
+   *         empty.
+   */
+  public static List<SLJob> getActiveJobsWithName(final String name) {
+    if (name == null) {
+      return Collections.emptyList();
+    }
+    final List<SLJob> result = new ArrayList<SLJob>();
+    for (SLJob jobInEclipse : f_jobsPassedToEclipse) {
+      getThroughAggregateJobByNameHelper(jobInEclipse, name, result);
+    }
+    return result;
+  }
+
+  private static void getThroughAggregateJobByNameHelper(final SLJob job, final String name, List<SLJob> mutableResult) {
+    if (job instanceof AggregateSLJob) {
+      for (final SLJob subJob : ((AggregateSLJob) job).getAggregatedJobs()) {
+        getThroughAggregateJobByNameHelper(subJob, name, mutableResult);
+      }
+    } else {
+      if (name.equals(job.getName()))
+        mutableResult.add(job);
+    }
+  }
+
+  /**
+   * Tracks {@link SLJob} instances wrapped to Eclipse jobs. The
+   * {@link SLJobChangeAdapter} manages the contents of this list.
+   */
+  static final CopyOnWriteArraySet<SLJob> f_jobsPassedToEclipse = new CopyOnWriteArraySet<SLJob>();
+
+  /**
+   * An Eclipse job change adapter that updates the set of jobs passed to
+   * Eclipse.
+   * <p>
+   * Sadly, Eclipse wraps their own jobs several times so it is not possible to
+   * pull an SLJob out of an Eclipse job (well at least without reflection
+   * dependent upon the internals of Eclipse).
+   */
+  final static class SLJobChangeAdapter extends JobChangeAdapter {
+
+    final SLJob f_job;
+
+    SLJobChangeAdapter(SLJob job) {
+      if (job == null)
+        throw new IllegalArgumentException(I18N.err(44, "job"));
+      f_job = job;
+    }
+
+    @Override
+    public void done(IJobChangeEvent event) {
+      f_jobsPassedToEclipse.remove(f_job);
+    }
+
+    @Override
+    public void scheduled(IJobChangeEvent event) {
+      f_jobsPassedToEclipse.add(f_job);
+    }
   }
 
   private EclipseUtility() {

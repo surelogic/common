@@ -8,7 +8,7 @@ import com.surelogic.common.core.logging.SLEclipseStatusUtility;
 import com.surelogic.common.export.ITableExporter;
 import com.surelogic.common.i18n.I18N;
 
-public final class TableExportJob extends AbstractEclipseAccessKeysJob {
+public final class TableExportJob extends EclipseAccessKeysJob {
 
   private final ITableExporter f_exporter;
 

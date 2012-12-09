@@ -1,10 +1,12 @@
 package com.surelogic.common.core.adhoc;
 
+import org.eclipse.core.runtime.jobs.Job;
+
 import com.surelogic.common.adhoc.AdHocQueryFullyBound;
 import com.surelogic.common.adhoc.AdHocQueryResultSqlData;
 import com.surelogic.common.adhoc.jobs.CancellableAdHocQueryJob;
 import com.surelogic.common.adhoc.jobs.CancellableAdHocQueryMonitorJob;
-import com.surelogic.common.core.jobs.EclipseJob;
+import com.surelogic.common.core.EclipseUtility;
 
 /**
  * A utility for queries in Eclipse.
@@ -24,10 +26,13 @@ public final class EclipseQueryUtility {
       throw new IllegalArgumentException(
           "Parent may not be null.  Call scheduleQuery(AdHocQueryFullyBound boundQuery, String accessKey) instead if there is now parent query");
     }
-    final CancellableAdHocQueryJob job = new CancellableAdHocQueryJob(boundQuery, parent);
-    final CancellableAdHocQueryMonitorJob monJob = new CancellableAdHocQueryMonitorJob(job);
-    EclipseJob.getInstance().schedule(job, false, true, parent.getAccessKeys());
-    EclipseJob.getInstance().schedule(monJob, true, false);
+    final CancellableAdHocQueryJob query = new CancellableAdHocQueryJob(boundQuery, parent);
+    final Job job = EclipseUtility.toEclipseJob(query, parent.getAccessKeys());
+    job.setSystem(true);
+    final Job monJob = EclipseUtility.toEclipseJob(new CancellableAdHocQueryMonitorJob(query));
+    monJob.setUser(true);
+    job.schedule();
+    monJob.schedule();
   }
 
   /**
@@ -40,10 +45,13 @@ public final class EclipseQueryUtility {
    *          key will be run at a time.
    */
   public static void scheduleQuery(final AdHocQueryFullyBound boundQuery, final String... accessKeys) {
-    final CancellableAdHocQueryJob job = new CancellableAdHocQueryJob(boundQuery, accessKeys);
-    final CancellableAdHocQueryMonitorJob monJob = new CancellableAdHocQueryMonitorJob(job);
-    EclipseJob.getInstance().schedule(job, false, true, accessKeys);
-    EclipseJob.getInstance().schedule(monJob, true, false);
+    final CancellableAdHocQueryJob query = new CancellableAdHocQueryJob(boundQuery, accessKeys);
+    final Job job = EclipseUtility.toEclipseJob(query, accessKeys);
+    job.setSystem(true);
+    final Job monJob = EclipseUtility.toEclipseJob(new CancellableAdHocQueryMonitorJob(query));
+    monJob.setUser(true);
+    job.schedule();
+    monJob.schedule();
   }
 
   private EclipseQueryUtility() {

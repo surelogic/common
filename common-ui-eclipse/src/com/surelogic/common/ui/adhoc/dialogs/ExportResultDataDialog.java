@@ -2,6 +2,7 @@ package com.surelogic.common.ui.adhoc.dialogs;
 
 import java.io.File;
 
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -24,7 +25,7 @@ import com.surelogic.common.adhoc.jobs.ExportResultDataInCSVFormatJob;
 import com.surelogic.common.adhoc.jobs.ExportResultDataInTableHTMLFormatJob;
 import com.surelogic.common.adhoc.jobs.ExportResultDataInTreeHTMLFormatJob;
 import com.surelogic.common.adhoc.jobs.ExportResultDataJob;
-import com.surelogic.common.core.jobs.EclipseJob;
+import com.surelogic.common.core.EclipseUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.ui.EclipseUIUtility;
 import com.surelogic.common.ui.SLImages;
@@ -164,7 +165,9 @@ public final class ExportResultDataDialog extends Dialog {
 			} else {
 				job = new ExportResultDataInTreeHTMLFormatJob(data, exportfile);
 			}
-			EclipseJob.getInstance().schedule(job);
+			final Job eJob = EclipseUtility.toEclipseJob(job);
+			eJob.setUser(true);
+			eJob.schedule();
 		}
 		super.okPressed();
 	}

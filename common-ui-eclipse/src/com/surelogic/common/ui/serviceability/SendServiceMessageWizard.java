@@ -3,14 +3,15 @@ package com.surelogic.common.ui.serviceability;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
 
 import com.surelogic.common.CommonImages;
+import com.surelogic.common.core.EclipseUtility;
 import com.surelogic.common.core.JDTUtility;
-import com.surelogic.common.core.jobs.EclipseJob;
 import com.surelogic.common.core.logging.SLEclipseStatusUtility;
 import com.surelogic.common.core.preferences.CommonCorePreferencesUtility;
 import com.surelogic.common.i18n.I18N;
@@ -203,8 +204,9 @@ public class SendServiceMessageWizard extends Wizard {
 		/*
 		 * We do this here because code in 'common' can't start jobs.
 		 */
-		final SLJob job = msg.getReadInLogContentsJob();
-		EclipseJob.getInstance().schedule(job, false, true);
+	  final Job job = EclipseUtility.toEclipseJob(msg.getReadInLogContentsJob());
+	  job.setSystem(true);
+	  job.schedule();
 	}
 
 	private static void openHelper(Shell shell, Message message,

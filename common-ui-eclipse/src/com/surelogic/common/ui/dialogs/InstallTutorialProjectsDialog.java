@@ -8,6 +8,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -27,7 +28,6 @@ import org.eclipse.ui.progress.UIJob;
 
 import com.surelogic.common.CommonImages;
 import com.surelogic.common.core.EclipseUtility;
-import com.surelogic.common.core.jobs.EclipseJob;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.jobs.AbstractSLJob;
 import com.surelogic.common.jobs.SLJob;
@@ -227,7 +227,9 @@ public class InstallTutorialProjectsDialog extends TitleAreaDialog {
 				return SLStatus.OK_STATUS;
 			}
 		};
-		EclipseJob.getInstance().schedule(job);
+		final Job eJob = EclipseUtility.toEclipseJob(job);
+		eJob.setUser(true);
+		eJob.schedule();
 		super.okPressed();
 	}
 

@@ -9,7 +9,7 @@ import com.surelogic.NonNull;
  * resources, such as a database. Jobs with the same access keys will proceed in
  * serial order.
  */
-public abstract class AbstractEclipseAccessKeysJob extends Job {
+public abstract class EclipseAccessKeysJob extends Job {
 
   /**
    * Constructs a job with an optional set of access keys. Jobs with the same
@@ -22,9 +22,9 @@ public abstract class AbstractEclipseAccessKeysJob extends Job {
    *          Jobs with the same access keys will proceed in serial order. If no
    *          access keys are passed no serialization rule will be setup.
    */
-  protected AbstractEclipseAccessKeysJob(@NonNull String name, String... accessKeys) {
+  public EclipseAccessKeysJob(@NonNull String name, String... accessKeys) {
     super(name);
-    if (accessKeys.length > 0)
+    if (accessKeys != null && accessKeys.length > 0)
       setRule(KeywordAccessRule.getInstance(accessKeys));
   }
 }
