@@ -986,6 +986,8 @@ public class EclipseUtility {
    * Checks if there is an active {@link SLJob} of the passed type being managed
    * by Eclipse. This method will go through any wrappers and
    * {@link AggregateSLJob} instances to find the job.
+   * <p>
+   * Note that this method only finds {@link SLJob} instances.
    * 
    * @param type
    *          of {@link SLJob} to search for.
@@ -1003,6 +1005,8 @@ public class EclipseUtility {
    * Gets all active {@link SLJob} instances of the passed type being managed by
    * Eclipse. This method will go through any wrappers and
    * {@link AggregateSLJob} instances to find the job.
+   * <p>
+   * Note that this method only returns {@link SLJob} instances.
    * 
    * @param type
    *          a type of {@link SLJob}.
@@ -1016,12 +1020,7 @@ public class EclipseUtility {
     }
     final List<T> result = new ArrayList<T>();
     for (SLJob jobInEclipse : f_jobsPassedToEclipse) {
-      System.out.println("Job in eclipse: " + jobInEclipse.getName());
       getThroughAggregateJobByTypeHelper(jobInEclipse, type, result);
-    }
-    System.out.println("--- getActiveJobsOfType:" + (result.isEmpty() ? " nothing" : ""));
-    for (SLJob job : result) {
-      System.out.println("      found " + job.getName());
     }
     return result;
   }
@@ -1045,6 +1044,8 @@ public class EclipseUtility {
    * Gets all active {@link SLJob} instances with the passed name being managed
    * by Eclipse. This method will go through any wrappers and
    * {@link AggregateSLJob} instances to find the job.
+   * <p>
+   * Note that this method only returns {@link SLJob} instances.
    * 
    * @param name
    *          a job name.
