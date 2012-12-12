@@ -165,6 +165,7 @@ public class SendServiceMessageWizard extends Wizard {
 			msg = sfm.getMessageTypeString() + " : " + status.getMessage();
 		}
 		sfm.setMessage(msg);
+		sfm.setSummary(sfm.getMessageTypeString());
 		sfm.setDescription(status.toString());
 		startJobToReadInLog(sfm);
 		openHelper(null, sfm, CommonImages.IMG_JSURE_LOGO);
