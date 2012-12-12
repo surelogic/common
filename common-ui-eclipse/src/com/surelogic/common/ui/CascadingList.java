@@ -539,11 +539,6 @@ public class CascadingList extends ScrolledComposite {
         setOrigin(x, origin.y);
       }
     }
-
-    @Override
-    public void end(Animator source) {
-      source.getTimingSource().dispose();
-    }
   }
 
   private void animateStartOfLastColumn() {
@@ -567,7 +562,8 @@ public class CascadingList extends ScrolledComposite {
       final TimingSource ts = new SWTTimingSource(this.getDisplay());
       ts.init();
       f_animator = new Animator.Builder(ts).setDuration(getDurationInMillis(pixelsToMove), TimeUnit.MILLISECONDS)
-          .addTarget(new CLTimingTarget(originX, f_xPosStartOfLast)).setInterpolator(f_interpolator).build();
+          .addTarget(new CLTimingTarget(originX, f_xPosStartOfLast)).setInterpolator(f_interpolator).setDisposeTimingSource(true)
+          .build();
       f_animator.start();
     }
   }
@@ -592,7 +588,8 @@ public class CascadingList extends ScrolledComposite {
     final TimingSource ts = new SWTTimingSource(this.getDisplay());
     ts.init();
     f_animator = new Animator.Builder(ts).setDuration(getDurationInMillis(pixelsToMove), TimeUnit.MILLISECONDS)
-        .addTarget(new CLTimingTarget(originX, xPosStartOfColumn)).setInterpolator(f_interpolator).build();
+        .addTarget(new CLTimingTarget(originX, xPosStartOfColumn)).setInterpolator(f_interpolator).setDisposeTimingSource(true)
+        .build();
     f_animator.start();
   }
 
