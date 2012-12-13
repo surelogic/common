@@ -576,27 +576,6 @@ public class EclipseUtility {
   }
 
   /**
-   * Checks if any active job is assignment-compatible with the passed type.
-   * 
-   * @param type
-   *          a type of job.
-   * @return {@code true} if any active job is assignment-compatible with the
-   *         passed type, {@code false} otherwise.
-   */
-  public static boolean isActiveJobOfType(final Class<? extends Job> type) {
-    if (type == null) {
-      return false;
-    }
-    final IJobManager manager = Job.getJobManager();
-    for (final Job job : manager.find(null)) {
-      if (type.isInstance(job)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  /**
    * Counts the number of active jobs that are assignment-compatible with the
    * passed type.
    * 
@@ -605,12 +584,12 @@ public class EclipseUtility {
    * @return the count of active jobs that are assignment-compatible with the
    *         passed type.
    */
-  public static int getActiveJobCountOfType(final Class<? extends Job> type) {
+  public static int getActiveJobCountWithName(final String name) {
     int result = 0;
-    if (type != null) {
+    if (name != null) {
       final IJobManager manager = Job.getJobManager();
       for (final Job job : manager.find(null)) {
-        if (type.isInstance(job)) {
+        if (name.equals(job.getName())) {
           result++;
         }
       }
