@@ -53,7 +53,7 @@ public final class EclipseColorUtility {
 
   public static Color getRunControlBackgroundColor() {
     if (f_runControlBackgroundColor == null) {
-      f_runControlBackgroundColor = new Color(EclipseUIUtility.getDisplay(), 93, 118, 148);
+      f_runControlBackgroundColor = new Color(EclipseUIUtility.getDisplay(), 137, 157, 181);
       EclipseUIUtility.disposeExec(new Runnable() {
         public void run() {
           f_runControlBackgroundColor.dispose();
