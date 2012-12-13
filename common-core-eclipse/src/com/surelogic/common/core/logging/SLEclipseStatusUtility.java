@@ -485,8 +485,9 @@ public final class SLEclipseStatusUtility {
 	 */
 	private static IStatus createStatus(final int severity, final int code,
 			final String message, final Throwable exception) {
-		return new Status(severity, Activator.getDefault().getPlugInId(), code,
-				message, exception);
+		return new Status(severity,
+				Activator.getDefault() == null ? "(unknown)" : Activator.getDefault().getPlugInId(), 
+				code, message, exception);
 	}
 
 	private SLEclipseStatusUtility() {
