@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -1195,18 +1196,18 @@ public final class SLUtility {
     return b.toString();
   }
 
-  @NonNull 
+  @NonNull
   public static String getTruncatedProjectName(@Nullable String firstProjectNameOrNull) {
-	  if (firstProjectNameOrNull == null) {
-	      firstProjectNameOrNull = "unknown_project";
-	  }
-	  firstProjectNameOrNull = firstProjectNameOrNull.replace(' ', '_');
-	  if (firstProjectNameOrNull.length() > 20) {
-		  firstProjectNameOrNull = firstProjectNameOrNull.substring(0, 20);
-	  }
-	  return firstProjectNameOrNull;
+    if (firstProjectNameOrNull == null) {
+      firstProjectNameOrNull = "unknown_project";
+    }
+    firstProjectNameOrNull = firstProjectNameOrNull.replace(' ', '_');
+    if (firstProjectNameOrNull.length() > 20) {
+      firstProjectNameOrNull = firstProjectNameOrNull.substring(0, 20);
+    }
+    return firstProjectNameOrNull;
   }
-  
+
   /**
    * Reads a date from a scan directory name created, and in the format
    * described, by {@link #getScanDirectoryName(String, boolean, Date)}.
@@ -1279,6 +1280,26 @@ public final class SLUtility {
       }
     }
     return inASlashStarComment;
+  }
+
+  /**
+   * Gets the stack trace from an exception and returns it as a string.
+   * 
+   * @param t
+   *          the exception.
+   * @return the stack trace.
+   * @throws IllegalArgumentException
+   *           if the passed exception is {code null}.
+   */
+  public static String getStackTrace(Throwable t) {
+    if (t == null)
+      throw new IllegalArgumentException(I18N.err(44, "t"));
+    final StringWriter sw = new StringWriter();
+    final PrintWriter pw = new PrintWriter(sw, true);
+    t.printStackTrace(pw);
+    pw.flush();
+    sw.flush();
+    return sw.toString();
   }
 
   private SLUtility() {

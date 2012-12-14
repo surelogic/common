@@ -8,6 +8,7 @@ import java.net.URLConnection;
 
 import com.surelogic.Utility;
 import com.surelogic.common.i18n.I18N;
+import com.surelogic.common.jobs.AbstractSLJob;
 import com.surelogic.common.jobs.SLJob;
 import com.surelogic.common.jobs.SLProgressMonitor;
 import com.surelogic.common.jobs.SLStatus;
@@ -28,11 +29,7 @@ public final class ServiceUtility {
 	}
 
 	public static SLJob sendToSureLogic(final String msg, final Runnable after) {
-		return new SLJob() {
-
-			public String getName() {
-				return "Sending a servicability message to SureLogic";
-			}
+		return new AbstractSLJob("Sending a servicability message to SureLogic") {
 
 			public SLStatus run(final SLProgressMonitor monitor) {
 				monitor.begin();
