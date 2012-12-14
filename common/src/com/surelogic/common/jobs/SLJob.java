@@ -1,5 +1,9 @@
 package com.surelogic.common.jobs;
 
+import java.util.Collection;
+
+import com.surelogic.NonNull;
+
 /**
  * Interface implemented by IDE independent jobs. The monitoring and returned
  * status of these jobs is independent of any particular IDE.
@@ -47,4 +51,12 @@ public interface SLJob {
    *         observer.
    */
   boolean removeObserver(SLProgressMonitorObserver observer);
+
+  /**
+   * Gets the collection of progress monitor observers.
+   * 
+   * @return the collection of progress monitor observers.
+   */
+  @NonNull
+  Collection<SLProgressMonitorObserver> getObservers();
 }

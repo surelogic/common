@@ -1,7 +1,10 @@
 package com.surelogic.common.jobs;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import com.surelogic.NonNull;
 import com.surelogic.ThreadSafe;
 
 /**
@@ -39,6 +42,11 @@ public abstract class AbstractSLJob implements SLJob {
       return f_observers.remove(observer);
     else
       return false;
+  }
+
+  @NonNull
+  public Collection<SLProgressMonitorObserver> getObservers() {
+    return new ArrayList<SLProgressMonitorObserver>(f_observers);
   }
 
   /**

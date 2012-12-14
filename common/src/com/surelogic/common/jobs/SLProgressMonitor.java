@@ -1,7 +1,5 @@
 package com.surelogic.common.jobs;
 
-import com.surelogic.ThreadSafe;
-
 /**
  * An IDE independent interface for job progress monitoring. Similar to the
  * Eclipse {@code IProgressMonitor} interface.
@@ -65,7 +63,6 @@ import com.surelogic.ThreadSafe;
  * <p>
  * Clients may implement this interface.
  */
-@ThreadSafe
 public interface SLProgressMonitor {
 
   /**

@@ -903,7 +903,7 @@ public class EclipseUtility {
       throw new IllegalArgumentException(I18N.err(44, "job"));
     final Job result = new EclipseAccessKeysJob(job.getName(), accessKeys) {
       protected IStatus run(IProgressMonitor monitor) {
-        final SLStatus status = job.run(new SLProgressMonitorWrapper(monitor, job.getName()));
+        final SLStatus status = job.run(new SLProgressMonitorWrapper(monitor, job.getName(), job.getObservers()));
         return SLEclipseStatusUtility.convert(status);
       }
     };
@@ -934,7 +934,7 @@ public class EclipseUtility {
       throw new IllegalArgumentException(I18N.err(44, "resource"));
     final WorkspaceJob result = new WorkspaceJob(job.getName()) {
       public IStatus runInWorkspace(IProgressMonitor monitor) {
-        final SLStatus status = job.run(new SLProgressMonitorWrapper(monitor, job.getName()));
+        final SLStatus status = job.run(new SLProgressMonitorWrapper(monitor, job.getName(), job.getObservers()));
         return SLEclipseStatusUtility.convert(status);
       }
     };
