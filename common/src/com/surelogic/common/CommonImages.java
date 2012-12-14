@@ -154,6 +154,7 @@ public final class CommonImages {
   public static final String IMG_JAR_SAVEAS = "jar_saveas.gif";
   public static final String IMG_JAR = "jar.gif";
   public static final String IMG_JAVA_APP = "java_app.gif";
+  public static final String IMG_JAVA_CLASS_FILE = "java_class_file.gif";
   public static final String IMG_JAVA_COMP_UNIT = "java_comp_unit.gif";
   public static final String IMG_JAVA_DECLS_TREE = "java_decls_tree.gif";
   public static final String IMG_JAVA_SORT = "java_sort.gif";
