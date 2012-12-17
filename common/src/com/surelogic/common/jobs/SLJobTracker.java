@@ -14,7 +14,7 @@ import com.surelogic.common.i18n.I18N;
  * remembers the progress on the job correctly if it was constructed prior to
  * the job being scheduled.
  */
-public final class SLJobProgressTracker {
+public final class SLJobTracker {
 
   public final int NOT_STARTED = -100;
   public final int UNKNOWN = -1;
@@ -29,7 +29,7 @@ public final class SLJobProgressTracker {
     }
   };
 
-  public SLJobProgressTracker(@NonNull @Borrowed final SLJob job) {
+  public SLJobTracker(@NonNull @Borrowed final SLJob job) {
     if (job == null)
       throw new IllegalArgumentException(I18N.err(44, "job"));
 
