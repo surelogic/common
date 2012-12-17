@@ -2,10 +2,12 @@ package com.surelogic.common.jobs;
 
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Level;
 
 import com.surelogic.Borrowed;
 import com.surelogic.NonNull;
 import com.surelogic.common.i18n.I18N;
+import com.surelogic.common.logging.SLLogger;
 
 /**
  * An object that can act a a hub for job progress notifications. This object
@@ -22,7 +24,15 @@ public final class SLJobTracker {
   final AtomicInteger f_percentage = new AtomicInteger(NOT_STARTED);
 
   final SLProgressMonitorObserver f_monitor = new SLProgressMonitorObserver() {
-    public void notifyPercentComplete(final int percentage) {
+    public void notifyPercentComplete(int percentage) {
+      if (percentage < 0) {
+        SLLogger.getLogger().log(Level.WARNING, I18N.err(297, percentage, 0));
+        percentage = 0;
+      }
+      if (percentage > 100) {
+        SLLogger.getLogger().log(Level.WARNING, I18N.err(297, percentage, 100));
+        percentage = 100;
+      }
       f_percentage.set(percentage);
       for (SLProgressMonitorObserver o : f_observers)
         o.notifyPercentComplete(percentage);
@@ -52,5 +62,9 @@ public final class SLJobTracker {
       return f_observers.remove(observer);
     else
       return false;
+  }
+
+  public final void clearObservers() {
+    f_observers.clear();
   }
 }
