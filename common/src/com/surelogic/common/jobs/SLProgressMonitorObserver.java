@@ -19,7 +19,7 @@ public interface SLProgressMonitorObserver {
    * @param percentage
    *          an integer <tt>[0, 100]</tt> indicating the percent complete of
    *          the work. A value of <tt>0</tt> indicates started. A value of
-   *          <tt>-1</tt> indicates started but with unknown amount of
+   *          <tt>-1</tt> indicates started but with an indeterminate amount of
    *          work&mdash;the only other call will be <tt>100</tt> when finished.
    *          A value of <tt>100</tt> indicates finished.
    */

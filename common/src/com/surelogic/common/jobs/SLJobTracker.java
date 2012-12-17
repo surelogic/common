@@ -19,13 +19,13 @@ import com.surelogic.common.logging.SLLogger;
 public final class SLJobTracker {
 
   public final int NOT_STARTED = -100;
-  public final int UNKNOWN = -1;
+  public final int INDETERMINATE = -1;
 
   final AtomicInteger f_percentage = new AtomicInteger(NOT_STARTED);
 
   final SLProgressMonitorObserver f_monitor = new SLProgressMonitorObserver() {
     public void notifyPercentComplete(int percentage) {
-      if (percentage < 0) {
+      if (percentage < -1) { // -1 is indeterminate
         SLLogger.getLogger().log(Level.WARNING, I18N.err(297, percentage, 0));
         percentage = 0;
       }
@@ -44,6 +44,10 @@ public final class SLJobTracker {
       throw new IllegalArgumentException(I18N.err(44, "job"));
 
     job.addObserver(f_monitor);
+  }
+
+  public boolean isStarted() {
+    return f_percentage.get() != NOT_STARTED;
   }
 
   public int getPercentage() {
