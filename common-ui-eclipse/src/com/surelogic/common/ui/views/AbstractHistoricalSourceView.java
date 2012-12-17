@@ -220,7 +220,7 @@ public abstract class AbstractHistoricalSourceView extends ViewPart {
     f_source.setText(sb.toString());
     f_source.setStyleRanges(f_highlighter.computeRanges(f_source.getText()));
 
-    String sourceInfo = path + (f_sourceCopyTime == null ? "" : " at " + SLUtility.toStringHMS(f_sourceCopyTime));
+    String sourceInfo = path + (f_sourceCopyTime == null ? "" : " at " + SLUtility.toStringDayHMS(f_sourceCopyTime));
     f_sourceLabel.setText(sourceInfo);
   }
 

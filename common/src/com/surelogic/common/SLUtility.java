@@ -368,19 +368,34 @@ public final class SLUtility {
     return tl_human_day_format.get().parse(dateStr);
   }
 
-  private final static ThreadLocal<SimpleDateFormat> tl_hms_format = new ThreadLocal<SimpleDateFormat>() {
+  private final static ThreadLocal<SimpleDateFormat> tl_day_hms_format = new ThreadLocal<SimpleDateFormat>() {
     @Override
     protected SimpleDateFormat initialValue() {
       return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
     }
   };
 
-  public static String toStringHMS(final Date date) {
-    return tl_hms_format.get().format(date);
+  public static String toStringDayHMS(final Date date) {
+    return tl_day_hms_format.get().format(date);
   }
 
-  public static Date fromStringHMS(final String dateStr) throws ParseException {
-    return tl_hms_format.get().parse(dateStr);
+  public static Date fromStringDayHMS(final String dateStr) throws ParseException {
+    return tl_day_hms_format.get().parse(dateStr);
+  }
+
+  private final static ThreadLocal<SimpleDateFormat> tl_no_day_hms_format = new ThreadLocal<SimpleDateFormat>() {
+    @Override
+    protected SimpleDateFormat initialValue() {
+      return new SimpleDateFormat("HH:mm:ss");
+    }
+  };
+
+  public static String toStringNoDayHMS(final Date date) {
+    return tl_no_day_hms_format.get().format(date);
+  }
+
+  public static Date fromStringNoDayHMS(final String dateStr) throws ParseException {
+    return tl_no_day_hms_format.get().parse(dateStr);
   }
 
   public static Timestamp getWall(final Timestamp start, final long startNS, final long timeNS) {

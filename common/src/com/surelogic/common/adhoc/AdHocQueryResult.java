@@ -178,11 +178,11 @@ public abstract class AdHocQueryResult {
 	@Override
 	public String toString() {
 		return f_query.getQuery().getDescription() + " at "
-				+ SLUtility.toStringHMS(f_timeQueryWasRun);
+				+ SLUtility.toStringDayHMS(f_timeQueryWasRun);
 	}
 
 	public String toLinkString() {
 		return "<A HREF=\"edit\">" + f_query.getQuery().getDescription()
-				+ "</A> at " + SLUtility.toStringHMS(f_timeQueryWasRun);
+				+ "</A> at " + SLUtility.toStringDayHMS(f_timeQueryWasRun);
 	}
 }

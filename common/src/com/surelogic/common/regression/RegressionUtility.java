@@ -191,7 +191,7 @@ public class RegressionUtility {
     try {
       // try to parse the date and time (the last two segments)
       final String time = name[num - 2] + ' ' + name[num - 1].replace('-', ':');
-      return SLUtility.fromStringHMS(time);
+      return SLUtility.fromStringDayHMS(time);
     } catch (Exception e) {
       return null;
     }

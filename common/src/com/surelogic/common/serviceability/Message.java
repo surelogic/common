@@ -134,7 +134,7 @@ public abstract class Message {
 		final String lf = SLUtility.PLATFORM_LINE_SEPARATOR;
 
 		b.append("   Date: ");
-		b.append(SLUtility.toStringHMS(new Date()));
+		b.append(SLUtility.toStringDayHMS(new Date()));
 		b.append(lf);
 		b.append("Subject: ");
 		b.append(f_product);
