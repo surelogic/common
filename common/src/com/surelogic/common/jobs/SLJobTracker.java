@@ -50,6 +50,10 @@ public final class SLJobTracker {
     return f_percentage.get();
   }
 
+  public boolean isFinished() {
+    return f_percentage.get() == 100;
+  }
+
   final CopyOnWriteArrayList<SLProgressMonitorObserver> f_observers = new CopyOnWriteArrayList<SLProgressMonitorObserver>();
 
   public final void addObserver(final SLProgressMonitorObserver observer) {
