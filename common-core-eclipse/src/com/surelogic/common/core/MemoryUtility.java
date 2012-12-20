@@ -26,7 +26,7 @@ public class MemoryUtility {
     if (maxMemorySizeCache > 0)
       return maxMemorySizeCache;
 
-    int phys = computePhysMemorySizeInMb(); // could be -1
+    final int phys = computePhysMemorySizeInMb(); // could be -1
     // Try max we want to support
     final int max = Math.min(MAX_SIZE, phys);
     if (runJava(max)) {
@@ -36,8 +36,8 @@ public class MemoryUtility {
       return max;
     }
     // This doesn't work right on 64-bit JVMs
-    phys = SLUtility.getCurrentMaxMemorySizeInMb();
-    final int mm = computeMaxMemorySizeInMb(phys, max);
+    final int thisProcess = SLUtility.getCurrentMaxMemorySizeInMb();
+    final int mm = computeMaxMemorySizeInMb(thisProcess, max);
     System.out.println("Physical memory " + SLUtility.toStringHumanWithCommas(phys) + " MB, computed "
         + SLUtility.toStringHumanWithCommas(mm) + " MB");
     f_maxMemorySize.set(mm);

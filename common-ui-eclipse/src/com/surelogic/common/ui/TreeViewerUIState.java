@@ -305,33 +305,40 @@ public final class TreeViewerUIState {
      * Restore the expanded nodes in the tree (as best we can).
      */
     for (LinkedList<String> path : f_expandedPaths) {
-      restorePathsHelper(new restoreExpandedNodes(), treeViewer, tcp, lp, path, null, null, matchSuffix);
+      restorePathsHelper(f_restoreExpandedNodes, treeViewer, tcp, lp, path, null, null, matchSuffix);
     }
 
     /*
      * Restore the selections in the tree.
      */
     for (LinkedList<String> path : f_selectedPaths) {
-      restorePathsHelper(new restoreSelectedNodes(), treeViewer, tcp, lp, path, null, null, matchSuffix);
+      restorePathsHelper(f_restoreSelectedNodes, treeViewer, tcp, lp, path, null, null, matchSuffix);
     }
   }
 
   private interface MatchCallback {
-    void onMatch(TreeViewer treeViewer, Object element, List<Object> treePath);
+    void onMatch(TreeViewer treeViewer, TreePath treePath);
   }
 
-  private static class restoreExpandedNodes implements MatchCallback {
-    public void onMatch(TreeViewer treeViewer, Object element, List<Object> treePath) {
-      treeViewer.setExpandedState(element, true);
+  private static final MatchCallback f_restoreExpandedNodes = new MatchCallback() {
+    public void onMatch(TreeViewer treeViewer, TreePath treePath) {
+      treeViewer.setExpandedState(treePath, true);
     }
-  }
+  };
 
-  private static class restoreSelectedNodes implements MatchCallback {
-    public void onMatch(TreeViewer treeViewer, Object element, List<Object> treePath) {
-      final ISelection selection = new TreeSelection(new TreePath(treePath.toArray()));
+  private static final MatchCallback f_restoreSelectedNodes = new MatchCallback() {
+    public void onMatch(TreeViewer treeViewer, TreePath treePath) {
+      final List<TreePath> result = new ArrayList<TreePath>();
+      result.add(treePath);
+      // Handle multi-select by merging this selection with the existing one
+      final ITreeSelection existing = (ITreeSelection) treeViewer.getSelection();
+      if (existing != null)
+        for (TreePath tp : existing.getPaths())
+          result.add(tp);
+      final ISelection selection = new TreeSelection(result.toArray(new TreePath[result.size()]));
       treeViewer.setSelection(selection);
     }
-  }
+  };
 
   private boolean match(String oldMessage, String newMessage, boolean matchSuffix) {
     if (oldMessage == null || newMessage == null)
@@ -376,7 +383,8 @@ public final class TreeViewerUIState {
       if (match(message, newMessage, matchSuffix)) {
         treePath.add(element);
         if (path.isEmpty()) {
-          callback.onMatch(treeViewer, element, treePath);
+          final TreePath tp = new TreePath(treePath.toArray());
+          callback.onMatch(treeViewer, tp);
         } else {
           restorePathsHelper(callback, treeViewer, tcp, lp, path, element, treePath, matchSuffix);
         }
@@ -512,31 +520,28 @@ public final class TreeViewerUIState {
       final PrintWriter pw = new PrintWriter(location);
       try {
         pw.println("<?xml version='1.0' encoding='" + SLUtility.ENCODING + "' standalone='yes'?>");
-        pw.println("<" + TOP + ">");
 
+        final StringBuilder b = new StringBuilder();
+
+        Entities.startAndCloseTag(TOP, b, false);
         for (List<String> path : f_expandedPaths) {
-          pw.println("  <" + EXPANDED_PATH + ">");
+          Entities.startAndCloseTag(EXPANDED_PATH, b, 1, false);
           for (String s : path) {
-            final StringBuilder b = new StringBuilder("    ");
-            Entities.createTag(ELEMENT, s, b);
-            pw.println(b.toString());
+            Entities.createTag(ELEMENT, s, b, 2);
           }
-          pw.println("  </" + EXPANDED_PATH + ">");
+          Entities.end(EXPANDED_PATH, b, 1);
         }
 
         for (List<String> path : f_selectedPaths) {
-          pw.println("  <" + SELECTED_PATH + ">");
+          Entities.startAndCloseTag(SELECTED_PATH, b, 1, false);
           for (String s : path) {
-            final StringBuilder b = new StringBuilder("    ");
-            Entities.createTag(ELEMENT, s, b);
-            pw.println(b.toString());
+            Entities.createTag(ELEMENT, s, b, 2);
           }
-          pw.println("  </" + SELECTED_PATH + ">");
+          Entities.end(SELECTED_PATH, b, 1);
         }
 
-        pw.println("</" + TOP + ">");
-        pw.close();
-
+        Entities.end(TOP, b);
+        pw.print(b.toString());
       } finally {
         pw.close();
       }

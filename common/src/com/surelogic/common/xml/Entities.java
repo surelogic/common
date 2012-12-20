@@ -23,6 +23,15 @@ public final class Entities {
     public static final Entities DEFAULT_PLUS_WHITESPACE = new Entities().setEscapeWhitespace(true);
   }
 
+  public static void startAndCloseTag(final String name, final StringBuilder b, boolean end) {
+    startAndCloseTag(name, b, 0, end);
+  }
+
+  public static void startAndCloseTag(final String name, final StringBuilder b, int indent, boolean end) {
+    start(name, b, indent);
+    closeStart(b, end);
+  }
+
   public static void start(final String name, final StringBuilder b) {
     start(name, b, 0);
   }
@@ -58,8 +67,20 @@ public final class Entities {
    * Helper to create <name\>enclosedText</name>
    */
   public static void createTag(String name, String enclosedText, StringBuilder b) {
+    createTag(name, enclosedText, b, 0);
+  }
+
+  /**
+   * Helper to create <name\>enclosedText</name>
+   */
+  public static void createTag(String name, String enclosedText, StringBuilder b, int indent) {
+    indent(b, indent);
     b.append('<').append(name).append('>');
     addEscaped(enclosedText, b);
+    end(name, b, 0);
+  }
+
+  public static void end(String name, StringBuilder b) {
     end(name, b, 0);
   }
 
@@ -121,12 +142,12 @@ public final class Entities {
     /**
      * The character to be escaped.
      */
-	final char value;
+    final char value;
     /**
      * Call {@link #getEscapeValue()} don't use this field directly because it
      * may be {@code null} if we are to simply generate a Unicode escape value.
      */
-	String escapeValueOrNullForUnicode;
+    String escapeValueOrNullForUnicode;
 
     EscapePair(char value, String escapeValueOrNullForUnicode) {
       this.value = value;
