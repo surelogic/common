@@ -9,6 +9,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 import javax.xml.parsers.SAXParser;
@@ -54,6 +55,8 @@ import com.surelogic.common.xml.Entities;
  * thread.</i>
  */
 public final class TreeViewerUIState {
+
+  private static final long TIMEOUT = TimeUnit.NANOSECONDS.convert(3, TimeUnit.SECONDS);
 
   private static final String KEY = TreeViewerUIState.class.getName();
 
@@ -285,6 +288,9 @@ public final class TreeViewerUIState {
   public final void restoreViewState(final TreeViewer treeViewer, boolean matchSuffix) {
     if (isEmpty())
       return;
+
+    final long start = System.nanoTime();
+
     /*
      * We need the content provider...return if we can't find one.
      */
@@ -306,6 +312,8 @@ public final class TreeViewerUIState {
      */
     for (LinkedList<String> path : f_expandedPaths) {
       restorePathsHelper(f_restoreExpandedNodes, treeViewer, tcp, lp, path, null, null, matchSuffix);
+      if (shouldTimeout(tcp, start))
+        return;
     }
 
     /*
@@ -313,6 +321,8 @@ public final class TreeViewerUIState {
      */
     for (LinkedList<String> path : f_selectedPaths) {
       restorePathsHelper(f_restoreSelectedNodes, treeViewer, tcp, lp, path, null, null, matchSuffix);
+      if (shouldTimeout(tcp, start))
+        return;
     }
   }
 
@@ -390,6 +400,25 @@ public final class TreeViewerUIState {
         }
       }
     }
+  }
+
+  /**
+   * Used to guard checks on the timeout to every ten or so calls. Okay to roll
+   * over, etc.
+   */
+  private int f_timeoutCheckCounter = 0;
+
+  private boolean shouldTimeout(ITreeContentProvider tcp, long start) {
+    f_timeoutCheckCounter++;
+    if (f_timeoutCheckCounter % 10 == 0) {
+      final long duration = System.nanoTime() - start;
+      if (duration > TIMEOUT) {
+        SLLogger.getLogger().log(Level.WARNING,
+            I18N.err(302, tcp.getClass().getSimpleName(), SLUtility.toStringDurationMS(duration, TimeUnit.NANOSECONDS)));
+        return true;
+      }
+    }
+    return false;
   }
 
   @Override
