@@ -34,7 +34,8 @@ public class MemoryUtility {
     final int phys = computePhysMemorySizeInMb();
     if (phys > 0) {
       if (runJava(phys)) {
-        System.out.println("Using physical memory " + SLUtility.toStringHumanWithCommas(phys) + " MB");
+        System.out.println("Using physical memory " + SLUtility.toStringHumanWithCommas(phys)
+            + " MB as result of MemoryUtility.computeMaxMemorySizeInMb()");
         f_maxMemorySize.set(phys);
         return phys;
       }
@@ -45,8 +46,8 @@ public class MemoryUtility {
      */
     final int thisProcess = SLUtility.getCurrentMaxMemorySizeInMb();
     final int mm = computeMaxMemorySizeInMb(thisProcess, MAX_SIZE);
-    System.out.println("Process memory " + SLUtility.toStringHumanWithCommas(thisProcess) + " MB, using computed "
-        + SLUtility.toStringHumanWithCommas(mm) + " MB");
+    System.out.println("Process memory " + SLUtility.toStringHumanWithCommas(thisProcess) + " MB, but using computed "
+        + SLUtility.toStringHumanWithCommas(mm) + " MB as result of MemoryUtility.computeMaxMemorySizeInMb()");
     f_maxMemorySize.set(mm);
     return mm;
   }
