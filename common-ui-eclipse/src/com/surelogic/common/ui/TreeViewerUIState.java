@@ -183,6 +183,16 @@ public final class TreeViewerUIState {
   }
 
   /**
+   * Gets if this instance is empty of any user interface state.
+   * 
+   * @return {@code true} if this instance is empty of any user interface state,
+   *         {@code false} otherwise.
+   */
+  public boolean isEmpty() {
+    return f_expandedPaths.isEmpty() && f_selectedPaths.isEmpty();
+  }
+
+  /**
    * Constructs a new instance that saves the passed tree viewer's user
    * interface state. This includes what nodes are expanded and what nodes are
    * selected The viewer is <i>not</i> aliased into this object.
@@ -262,6 +272,8 @@ public final class TreeViewerUIState {
    *          old and new labels must match exactly.
    */
   public final void restoreViewState(final TreeViewer treeViewer, boolean matchSuffix) {
+    if (isEmpty())
+      return;
     /*
      * We need the content provider...return if we can't find one.
      */

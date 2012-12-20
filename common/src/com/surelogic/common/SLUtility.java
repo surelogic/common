@@ -73,6 +73,9 @@ public final class SLUtility {
   public static final String JAVA_NATURE = "org.eclipse.jdt.core.javanature";
   public static final String ANDROID_NATURE = "com.android.ide.eclipse.adt.AndroidNature";
 
+  public static final String VIEW_PERSISTENCE_PREFIX = "view_state_";
+  public static final String DOT_XML = ".xml";
+
   /**
    * Checks if a string is both non-null and not the empty string.
    * 
