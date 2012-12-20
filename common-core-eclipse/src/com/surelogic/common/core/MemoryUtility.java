@@ -26,19 +26,26 @@ public class MemoryUtility {
     if (maxMemorySizeCache > 0)
       return maxMemorySizeCache;
 
-    final int phys = computePhysMemorySizeInMb(); // could be -1
-    // Try max we want to support
-    final int max = Math.min(MAX_SIZE, phys);
-    if (runJava(max)) {
-      System.out.println("Physical memory " + SLUtility.toStringHumanWithCommas(phys) + " MB, computed "
-          + SLUtility.toStringHumanWithCommas(max) + " MB");
-      f_maxMemorySize.set(max);
-      return max;
+    /*
+     * Check for physical memory using JDK 6 call via reflection.
+     * 
+     * If this call isn't available -1 will be returned.
+     */
+    final int phys = computePhysMemorySizeInMb();
+    if (phys > 0) {
+      if (runJava(phys)) {
+        System.out.println("Using physical memory " + SLUtility.toStringHumanWithCommas(phys) + " MB");
+        f_maxMemorySize.set(phys);
+        return phys;
+      }
     }
-    // This doesn't work right on 64-bit JVMs
+    /**
+     * This doesn't work right on 64-bit JVMs because they take any amount of
+     * memory and will always return max -- the code above avoids this.
+     */
     final int thisProcess = SLUtility.getCurrentMaxMemorySizeInMb();
-    final int mm = computeMaxMemorySizeInMb(thisProcess, max);
-    System.out.println("Physical memory " + SLUtility.toStringHumanWithCommas(phys) + " MB, computed "
+    final int mm = computeMaxMemorySizeInMb(thisProcess, MAX_SIZE);
+    System.out.println("Process memory " + SLUtility.toStringHumanWithCommas(thisProcess) + " MB, using computed "
         + SLUtility.toStringHumanWithCommas(mm) + " MB");
     f_maxMemorySize.set(mm);
     return mm;
