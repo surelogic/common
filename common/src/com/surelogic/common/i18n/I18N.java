@@ -178,7 +178,7 @@ public final class I18N {
    * </pre>
    * 
    * The key for the result message in the <tt>SureLogicResults.properties</tt>
-   * file is <i>nnnnn</i>. For example, <tt>I18N.res(456, "inconsistent")</tt>
+   * file is <i>result.nnnnn</i>. For example, <tt>I18N.res(456, "inconsistent")</tt>
    * would result in the string <tt>"A inconsistent result."</tt> if the
    * definition
    * 
@@ -205,6 +205,66 @@ public final class I18N {
   }
 
   /**
+   * Gets the string defined for the given modeling problem number from the i18 resource
+   * bundle. The key for the result message in the
+   * <tt>SureLogicResults.properties</tt> file is <i>problem.nnnnn</i>. For
+   * example, <tt>I18N.res(2001)</tt> would result in the string
+   * <tt>"A singular problem."</tt> if the definition
+   * 
+   * <pre>
+   * problem.02001=A singular problem.
+   * </pre>
+   * 
+   * is contained in the <tt>SureLogicResults.properties</tt> file. If the key
+   * is not defined in the file an exception is thrown.
+   * 
+   * @param number
+   *          the modeling problem message number.
+   * @return the modeling problem message for the given number.
+   * @throws MissingResourceException
+   *           if the computed key is not found.
+   * @see #mpc(int)
+   */
+  public static String mp(final int number) {
+    return getString(RESULTS, "problem.%05d", number);
+  }
+
+  /**
+   * Gets and formats the string defined for the given modeling problem number from the
+   * i18 resource bundle. Calling this method is equivalent to calling
+   * 
+   * <pre>
+   * String.format(I18N.mp(number), args).
+   * </pre>
+   * 
+   * The key for the modeling problem message in the <tt>SureLogicResults.properties</tt>
+   * file is <i>problem.nnnnn</i>. For example, <tt>I18N.res(456, "inconsistent")</tt>
+   * would result in the string <tt>"A inconsistent result."</tt> if the
+   * definition
+   * 
+   * <pre>
+   * problem.00456=A %s result.
+   * </pre>
+   * 
+   * is contained in the <tt>SureLogicResults.properties</tt> file. If the key
+   * is not defined in the file an exception is thrown.
+   * 
+   * @param number
+   *          the modeling problem message number.
+   * @param args
+   *          the variable arguments to format the resulting modeling problem message
+   *          with.
+   * @return the formatted modeling problem message for the given number.
+   * @throws MissingResourceException
+   *           if the computed key is not found.
+   * @see String#format(String, Object...)
+   * @see #mpc(int, Object...)
+   */
+  public static String mp(final int number, Object... args) {
+    return String.format(I18N.mp(number), args);
+  }
+
+  /**
    * Returns a canonical version of the analysis result. For example,
    * {@code I18N.resc(2001)} will return <tt>"(2001)"</tt>.
    * <p>
@@ -223,7 +283,7 @@ public final class I18N {
 
   /**
    * Returns a canonical version of the analysis result. For example,
-   * {@code I18N.resc(2001, "foo", 5)} will return <tt>"(2001,foo,5)"</tt>. *
+   * {@code I18N.resc(2001, "foo", 5)} will return <tt>"(2001,foo,5)"</tt>. 
    * <p>
    * Throws an exception if a call to {@code I18N.res} is not legal for the
    * passed result message number.
@@ -238,6 +298,49 @@ public final class I18N {
    */
   public static String resc(final int number, Object... args) {
     res(number, args); // toss result, but ensure the call works
+    final StringBuilder b = new StringBuilder();
+    b.append('(').append(number);
+    for (Object o : args) {
+      b.append(',').append(o);
+    }
+    b.append(')');
+    return b.toString();
+  }
+
+  /**
+   * Returns a canonical version of the analysis modeling problem. For example,
+   * {@code I18N.mpc(2001)} will return <tt>"(2001)"</tt>.
+   * <p>
+   * Throws an exception if a call to {@code I18N.mp} is not legal for the
+   * passed modeling problem message number.
+   * 
+   * @param number
+   *          the modeling problem message number.
+   * @return a canonical version of the analysis modeling problem.
+   * @see #res(int)
+   */
+  public static String mpc(final int number) {
+    mp(number); // toss result, but ensure the call works
+    return "(" + number + ")";
+  }
+
+  /**
+   * Returns a canonical version of the analysis modeling problem. For example,
+   * {@code I18N.mpc(2001, "foo", 5)} will return <tt>"(2001,foo,5)"</tt>. 
+   * <p>
+   * Throws an exception if a call to {@code I18N.mp} is not legal for the
+   * passed modeling problem message number.
+   * 
+   * @param number
+   *          the modeling problem message number.
+   * @param args
+   *          the variable arguments to format the resulting modeling problem message
+   *          with.
+   * @return a canonical version of the analysis modeling problem.
+   * @see #res(int, Object...)
+   */
+  public static String mpc(final int number, Object... args) {
+    mp(number, args); // toss result, but ensure the call works
     final StringBuilder b = new StringBuilder();
     b.append('(').append(number);
     for (Object o : args) {
