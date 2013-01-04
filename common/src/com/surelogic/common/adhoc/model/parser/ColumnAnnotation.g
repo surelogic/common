@@ -111,7 +111,7 @@ onPart
 	;
 	
 replaceValuePart
-	: 'replace-values-with' replace=QUOTED_STRING { f_column.setCountReplaceValuesWith($replace.text); }
+	: 'replace-value-with' replace=QUOTED_STRING { f_column.setCountReplaceValueWith($replace.text); }
 	;
 
 suffixPart

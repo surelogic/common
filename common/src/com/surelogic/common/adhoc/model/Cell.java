@@ -28,7 +28,7 @@ public class Cell {
 	/**
 	 * The text to be displayed in this cell.
 	 */
-	private final String f_text;
+	private String f_text;
 
 	/**
 	 * Gets the text to be displayed in this cell.
@@ -37,6 +37,13 @@ public class Cell {
 	 */
 	public String getText() {
 		return f_text;
+	}
+	
+	 /**
+   * Should only be called from {@link AdornedTreeTableModel}.
+   */
+	void setText(String value) {
+	  f_text = value;
 	}
 
 	/**

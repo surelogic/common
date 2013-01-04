@@ -182,17 +182,17 @@ public final class ColumnAnnotation {
     f_countPartialRows = value;
   }
   
-  private String f_countReplaceValuesWith = null;
+  private String f_countReplaceValueWith = null;
 
-  public String getCountReplaceValues() {
-    return f_countReplaceValuesWith;
+  public String getCountReplaceValueWith() {
+    return f_countReplaceValueWith;
   }
 
   /**
    * Do not call this method. It should only be called by the parser.
    */
-  public void setCountReplaceValuesWith(final String value) {
-    f_countReplaceValuesWith = stripSingleQuotes(value);
+  public void setCountReplaceValueWith(final String value) {
+    f_countReplaceValueWith = stripSingleQuotes(value);
   }
 
   private boolean f_maxPartialRows = false;

@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.logging.Level;
 
 import com.surelogic.common.Justification;
+import com.surelogic.common.Pair;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.logging.SLLogger;
 
@@ -271,14 +272,8 @@ public final class AdornedTreeTableModel {
       if (isPureTree) {
         modelTreePartColumnLabel = makeSlashedTreeLabel(adornedColumnLabels);
       } else {
-        /*
-         * This copy could be done as a Arrays.copyRange in Java 6.
-         */
         final int treeColumnLabelSize = lastTreeIndex + 1;
-        final String[] treeColumnLabels = new String[treeColumnLabelSize];
-        for (int labelI = 0; labelI < treeColumnLabelSize; labelI++) {
-          treeColumnLabels[labelI] = adornedColumnLabels[labelI];
-        }
+        final String[] treeColumnLabels = Arrays.copyOfRange(adornedColumnLabels, 0, treeColumnLabelSize);
         modelTreePartColumnLabel = makeSlashedTreeLabel(treeColumnLabels);
       }
     } else {
@@ -359,6 +354,7 @@ public final class AdornedTreeTableModel {
 
   private static void addNonLeafColumnSummaries(final List<NonLeafTreeCell> nonLeafCells,
       final ColumnAnnotation[] adornedColumnAnnotationInfo, final int lastTreeIndex, final Cell[][] adornedRows) {
+    final Set<Pair<Cell, String>> cellsToReplaceText = new HashSet<Pair<Cell, String>>();
     for (final NonLeafTreeCell cell : nonLeafCells) {
       for (int colI = lastTreeIndex; colI < adornedColumnAnnotationInfo.length; colI++) {
         final ColumnAnnotation info = adornedColumnAnnotationInfo[colI];
@@ -400,16 +396,21 @@ public final class AdornedTreeTableModel {
              */
             if (info.onSetContains(cell.filledColumnCount())) {
               final boolean distinct = info.countDistinct();
+              final String replaceValueWith = info.getCountReplaceValueWith();
               final Set<String> distinctFound = new HashSet<String>();
               int countTotal = 0;
               for (final LeafTreeCell leaf : cell.getLeaves()) {
+                final Cell adornedCell = adornedRows[leaf.getRowIndex()][colI];
                 if (distinct) {
-                  final String contents = adornedRows[leaf.getRowIndex()][colI].getText();
+                  final String contents = adornedCell.getText();
                   if (distinctFound.add(contents)) {
                     countTotal++;
                   }
                 } else {
                   countTotal++;
+                }
+                if (replaceValueWith != null) {
+                  cellsToReplaceText.add(new Pair<Cell, String>(adornedCell, replaceValueWith));
                 }
               }
               final NonLeafColumnSummary columnSummary = new NonLeafColumnSummary(colI, Integer.toString(countTotal)
@@ -420,6 +421,8 @@ public final class AdornedTreeTableModel {
         }
       }
     }
+    for (final Pair<Cell, String> pair : cellsToReplaceText)
+      pair.first().setText(pair.second());
   }
 
   /**
