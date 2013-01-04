@@ -181,18 +181,18 @@ public final class ColumnAnnotation {
   public void setCountPartialRows(final boolean value) {
     f_countPartialRows = value;
   }
+  
+  private String f_countReplaceValuesWith = null;
 
-  private boolean f_countReplaceValuesWithOne = false;
-
-  public boolean countReplaceValuesWithOne() {
-    return f_countReplaceValuesWithOne;
+  public String getCountReplaceValues() {
+    return f_countReplaceValuesWith;
   }
 
   /**
    * Do not call this method. It should only be called by the parser.
    */
-  public void setReplaceReplaceValuesWithOne(final boolean value) {
-    f_countReplaceValuesWithOne = value;
+  public void setCountReplaceValuesWith(final String value) {
+    f_countReplaceValuesWith = stripSingleQuotes(value);
   }
 
   private boolean f_maxPartialRows = false;

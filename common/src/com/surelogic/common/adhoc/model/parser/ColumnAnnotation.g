@@ -93,8 +93,7 @@ justSpec
 	;
 
 countSpec
-	: 'count' { f_column.setCountPartialRows(true); } distinctPart? onPart? suffixPart?
-	| 'count-replace-values-with-one' { f_column.setCountPartialRows(true); f_column.setReplaceReplaceValuesWithOne(true); } distinctPart? onPart? suffixPart?
+	: 'count' { f_column.setCountPartialRows(true); } distinctPart? replaceValuePart? onPart? suffixPart?
 	;
 
 sumSpec : 'sum' { f_column.setSumPartialRows(true); } onPart? suffixPart?
@@ -107,7 +106,12 @@ distinctPart
 	: 'distinct' { f_column.setCountDistinct(true); }
 	;
 
-onPart	: 'on' i=INT { f_column.addToOnSet($i.text); } (',' i=INT { f_column.addToOnSet($i.text); } )*
+onPart
+	: 'on' i=INT { f_column.addToOnSet($i.text); } (',' i=INT { f_column.addToOnSet($i.text); } )*
+	;
+	
+replaceValuePart
+	: 'replace-values-with' replace=QUOTED_STRING { f_column.setCountReplaceValuesWith($replace.text); }
 	;
 
 suffixPart
