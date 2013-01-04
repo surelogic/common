@@ -94,6 +94,7 @@ justSpec
 
 countSpec
 	: 'count' { f_column.setCountPartialRows(true); } distinctPart? onPart? suffixPart?
+	| 'count-replace-values-with-one' { f_column.setCountPartialRows(true); f_column.setReplaceReplaceValuesWithOne(true); } distinctPart? onPart? suffixPart?
 	;
 
 sumSpec : 'sum' { f_column.setSumPartialRows(true); } onPart? suffixPart?
