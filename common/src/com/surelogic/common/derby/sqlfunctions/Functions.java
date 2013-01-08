@@ -7,7 +7,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.Iterator;
 import java.util.List;
 
@@ -84,25 +83,6 @@ public final class Functions {
     public static ResultSet stackTrace(final long traceId) {
         return TraceResultSet.create(DefaultConnection.getInstance()
                 .withDefault(Trace.stackTrace(traceId)));
-    }
-
-    static class Access {
-        // A.INTHREAD, THO.THREADNAME , A.TS, A.RW
-        final long threadId;
-        final String threadName;
-        final Timestamp ts;
-        final boolean isRead;
-        final boolean underConstruction;
-
-        Access(ResultSet set, boolean isStatic) throws SQLException {
-            int idx = 1;
-            threadId = set.getLong(idx++);
-            threadName = set.getString(idx++);
-            ts = set.getTimestamp(idx++);
-            isRead = set.getString(idx++).equals("R");
-            underConstruction = !isStatic && set.getString(idx++).equals("Y");
-        }
-
     }
 
     enum HappensBeforeState {

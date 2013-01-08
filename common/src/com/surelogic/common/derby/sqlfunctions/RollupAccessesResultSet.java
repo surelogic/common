@@ -9,7 +9,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 
-import com.surelogic.common.derby.sqlfunctions.Functions.Access;
 import com.surelogic.common.derby.sqlfunctions.Functions.HappensBeforeState;
 import com.surelogic.common.jdbc.QB;
 
@@ -115,10 +114,15 @@ class RollupAccessesResultSet implements InvocationHandler {
         int writesUC;
 
         Timestamp lastAccess;
+
+        // This is the last write visible across ALL accesses of this field, not
+        // just this thread.
         Timestamp lastWrite;
+        long lastWriteThread;
 
         AccessBlock(Access first, boolean isStatic,
-                HappensBeforeState happensBefore) {
+                HappensBeforeState happensBefore, Timestamp lastWrite,
+                long lastWriteThread) {
             threadId = first.threadId;
             threadName = first.threadName;
             start = first.ts;
@@ -128,24 +132,27 @@ class RollupAccessesResultSet implements InvocationHandler {
                 if (first.underConstruction) {
                     readsUC++;
                 }
+                this.lastWrite = lastWrite;
+                this.lastWriteThread = lastWriteThread;
             } else {
-                lastWrite = first.ts;
                 writes++;
                 if (first.underConstruction) {
                     writesUC++;
                 }
+                this.lastWrite = first.ts;
+                this.lastWriteThread = first.threadId;
             }
             this.isStatic = isStatic;
             this.happensBefore = happensBefore;
         }
 
         AccessBlock(Access first, boolean isStatic) {
-            this(first, isStatic, HappensBeforeState.FIRST);
+            this(first, isStatic, HappensBeforeState.FIRST, null, -1);
         }
 
         private boolean happensBeforeThread(Access a) throws SQLException {
             int idx = 1;
-            hbSt.setLong(idx++, threadId);
+            hbSt.setLong(idx++, lastWriteThread);
             hbSt.setLong(idx++, a.threadId);
             hbSt.setTimestamp(idx++, lastWrite);
             hbSt.setTimestamp(idx++, a.ts);
@@ -159,7 +166,7 @@ class RollupAccessesResultSet implements InvocationHandler {
 
         private boolean happensBeforeCollection(Access a) throws SQLException {
             int idx = 1;
-            hbCollSourceSt.setLong(idx++, threadId);
+            hbCollSourceSt.setLong(idx++, lastWriteThread);
             hbCollSourceSt.setTimestamp(idx++, lastWrite);
             hbCollSourceSt.setTimestamp(idx++, a.ts);
             final ResultSet hbCollSourceSet = hbObjSourceSt.executeQuery();
@@ -208,7 +215,7 @@ class RollupAccessesResultSet implements InvocationHandler {
 
         private boolean happensBeforeObject(Access a) throws SQLException {
             int idx = 1;
-            hbObjSourceSt.setLong(idx++, threadId);
+            hbObjSourceSt.setLong(idx++, lastWriteThread);
             hbObjSourceSt.setTimestamp(idx++, lastWrite);
             hbObjSourceSt.setTimestamp(idx++, a.ts);
             final ResultSet hbObjSourceSet = hbObjSourceSt.executeQuery();
@@ -262,6 +269,7 @@ class RollupAccessesResultSet implements InvocationHandler {
                         }
                     } else {
                         lastWrite = a.ts;
+                        lastWriteThread = a.threadId;
                         writes++;
                         if (a.underConstruction) {
                             writesUC++;
@@ -274,7 +282,8 @@ class RollupAccessesResultSet implements InvocationHandler {
 
                     return new AccessBlock(a, isStatic,
                             hasHappensBefore ? HappensBeforeState.YES
-                                    : HappensBeforeState.NO);
+                                    : HappensBeforeState.NO, lastWrite,
+                            lastWriteThread);
                 }
             }
             return null;
@@ -306,4 +315,24 @@ class RollupAccessesResultSet implements InvocationHandler {
             }
         }
     }
+
+    static class Access {
+        // A.INTHREAD, THO.THREADNAME , A.TS, A.RW
+        final long threadId;
+        final String threadName;
+        final Timestamp ts;
+        final boolean isRead;
+        final boolean underConstruction;
+
+        Access(ResultSet set, boolean isStatic) throws SQLException {
+            int idx = 1;
+            threadId = set.getLong(idx++);
+            threadName = set.getString(idx++);
+            ts = set.getTimestamp(idx++);
+            isRead = set.getString(idx++).equals("R");
+            underConstruction = !isStatic && set.getString(idx++).equals("Y");
+        }
+
+    }
+
 }
