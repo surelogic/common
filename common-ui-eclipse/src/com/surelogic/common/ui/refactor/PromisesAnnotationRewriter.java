@@ -444,6 +444,9 @@ public class PromisesAnnotationRewriter {
 						}
 					}
 				}
+			} else if (e == null) {
+				// Marker annotation
+				handleExistingAnno(null, contents);
 			}
 		}
 
