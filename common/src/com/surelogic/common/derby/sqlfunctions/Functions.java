@@ -19,6 +19,7 @@ import com.surelogic.common.jdbc.ResultHandler;
 import com.surelogic.common.jdbc.Row;
 import com.surelogic.common.jdbc.RowHandler;
 import com.surelogic.common.jdbc.SingleRowHandler;
+import com.surelogic.flashlight.common.RollupAccessesResultSet;
 
 /**
  * Some useful functions used in the Flashlight tool. This class should be
@@ -83,20 +84,6 @@ public final class Functions {
     public static ResultSet stackTrace(final long traceId) {
         return TraceResultSet.create(DefaultConnection.getInstance()
                 .withDefault(Trace.stackTrace(traceId)));
-    }
-
-    enum HappensBeforeState {
-        FIRST(" "), YES("Yes"), NO("No");
-        private final String display;
-
-        HappensBeforeState(String display) {
-            this.display = display;
-        }
-
-        public String getDisplay() {
-            return display;
-        }
-
     }
 
     public static ResultSet staticAccessSummary(long fieldId) {
