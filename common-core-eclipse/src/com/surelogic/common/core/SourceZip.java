@@ -16,6 +16,7 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 
 import com.surelogic.common.AbstractJavaZip;
+import com.surelogic.common.SLUtility;
 import com.surelogic.common.logging.SLLogger;
 
 public class SourceZip extends AbstractJavaZip<IResource> {
@@ -146,6 +147,12 @@ public class SourceZip extends AbstractJavaZip<IResource> {
 			final ICompilationUnit icu = JavaCore
 					.createCompilationUnitFrom(file);
 			if ((icu != null) && (icu.getJavaProject().isOnClasspath(icu))) {
+				// Check if legal
+				final String name = icu.getElementName();
+				final String prefix = name.substring(0, name.length() - 5);
+			    if (!SLUtility.PACKAGE_INFO.equals(prefix) && !SLUtility.isValidJavaIdentifier(prefix)) {
+			    	return null;
+				}
 				try {
 					final IPackageDeclaration[] pkgDecls = icu
 							.getPackageDeclarations();
