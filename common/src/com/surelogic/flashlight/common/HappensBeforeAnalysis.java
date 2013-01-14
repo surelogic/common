@@ -10,16 +10,19 @@ import com.surelogic.common.jdbc.QB;
 
 public class HappensBeforeAnalysis {
 
-    final PreparedStatement hbSt;
-    final PreparedStatement hbVolWriteSt;
-    final PreparedStatement hbVolReadSt;
-    final PreparedStatement hbObjSourceSt;
-    final PreparedStatement hbObjTargetSt;
-    final PreparedStatement hbCollSourceSt;
-    final PreparedStatement hbCollTargetSt;
+    private final PreparedStatement hbSt;
+    private final PreparedStatement hbVolWriteSt;
+    private final PreparedStatement hbVolReadSt;
+    private final PreparedStatement hbObjSourceSt;
+    private final PreparedStatement hbObjTargetSt;
+    private final PreparedStatement hbCollSourceSt;
+    private final PreparedStatement hbCollTargetSt;
+    private final PreparedStatement isVolatileSt;
 
     HappensBeforeAnalysis(Connection conn) throws SQLException {
         hbSt = conn.prepareStatement(QB.get("Accesses.happensBefore"));
+        isVolatileSt = conn
+                .prepareStatement(QB.get("Accesses.isFieldVolatile"));
         hbVolReadSt = conn.prepareStatement(QB
                 .get("Accesses.happensBeforeVolatileRead"));
         hbVolWriteSt = conn.prepareStatement(QB
@@ -73,7 +76,17 @@ public class HappensBeforeAnalysis {
                             targetTs = hbVolReadSet.getTimestamp(2);
                             if (sourceField == targetField
                                     && sourceTs.before(targetTs)) {
-                                return true;
+                                isVolatileSt.setLong(1, sourceField);
+                                ResultSet isVolatileSet = isVolatileSt
+                                        .executeQuery();
+                                try {
+                                    isVolatileSet.next();
+                                    if (isVolatileSet.getString(1).equals("Y")) {
+                                        return true;
+                                    }
+                                } finally {
+                                    isVolatileSet.close();
+                                }
                             } else if (sourceField <= targetField) {
                                 continue sourceLoop;
                             }
