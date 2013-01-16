@@ -18,11 +18,13 @@ public class HappensBeforeAnalysis {
     private final PreparedStatement hbCollSourceSt;
     private final PreparedStatement hbCollTargetSt;
     private final PreparedStatement isVolatileSt;
+    private final PreparedStatement isFinalSt;
 
     HappensBeforeAnalysis(Connection conn) throws SQLException {
         hbSt = conn.prepareStatement(QB.get("Accesses.happensBefore"));
         isVolatileSt = conn
                 .prepareStatement(QB.get("Accesses.isFieldVolatile"));
+        isFinalSt = conn.prepareStatement(QB.get("Accesses.isFieldFinal"));
         hbVolReadSt = conn.prepareStatement(QB
                 .get("Accesses.happensBeforeVolatileRead"));
         hbVolWriteSt = conn.prepareStatement(QB
@@ -45,6 +47,17 @@ public class HappensBeforeAnalysis {
         hbCollTargetSt.close();
         hbVolReadSt.close();
         hbVolWriteSt.close();
+    }
+
+    public boolean happensBeforeFinal(long fieldId) throws SQLException {
+        isFinalSt.setLong(1, fieldId);
+        ResultSet set = isFinalSt.executeQuery();
+        try {
+            set.next();
+            return set.getString(1).equals("Y");
+        } finally {
+            set.close();
+        }
     }
 
     public boolean happensBeforeVolatile(Timestamp write, long writeThread,

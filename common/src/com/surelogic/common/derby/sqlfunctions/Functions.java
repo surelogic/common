@@ -4,7 +4,6 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Iterator;
@@ -12,7 +11,6 @@ import java.util.List;
 
 import com.surelogic.common.jdbc.DBQuery;
 import com.surelogic.common.jdbc.DefaultConnection;
-import com.surelogic.common.jdbc.QB;
 import com.surelogic.common.jdbc.Query;
 import com.surelogic.common.jdbc.Result;
 import com.surelogic.common.jdbc.ResultHandler;
@@ -92,11 +90,7 @@ public final class Functions {
             // the result sets open when we return from this block.
             Connection conn = DefaultConnection.getInstance()
                     .readOnlyConnection();
-            PreparedStatement st = conn.prepareStatement(QB
-                    .get("Accesses.selectByField"));
-            st.setLong(1, fieldId);
-            return RollupAccessesResultSet
-                    .create(conn, st.executeQuery(), true);
+            return RollupAccessesResultSet.create(conn, fieldId);
         } catch (SQLException e) {
             throw new IllegalStateException(e);
         }
@@ -109,12 +103,7 @@ public final class Functions {
             // the result sets open when we return from this block.
             Connection conn = DefaultConnection.getInstance()
                     .readOnlyConnection();
-            PreparedStatement st = conn.prepareStatement(QB
-                    .get("Accesses.selectByFieldAndReceiver"));
-            st.setLong(1, fieldId);
-            st.setLong(2, receiverId);
-            return RollupAccessesResultSet.create(conn, st.executeQuery(),
-                    false);
+            return RollupAccessesResultSet.create(conn, fieldId, receiverId);
         } catch (SQLException e) {
             throw new IllegalStateException(e);
         }

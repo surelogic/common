@@ -4,11 +4,13 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 
 import com.surelogic.common.derby.sqlfunctions.Functions;
+import com.surelogic.common.jdbc.QB;
 
 /**
  * An implementation of ResultSet for use with
@@ -28,33 +30,37 @@ public class RollupAccessesResultSet implements InvocationHandler {
     private AccessBlock next;
     private boolean wasNull;
 
-    RollupAccessesResultSet(Connection conn, ResultSet set, boolean isStatic)
-            throws SQLException {
+    RollupAccessesResultSet(Connection conn, ResultSet set, boolean isStatic,
+            long fieldId) throws SQLException {
         this.set = set;
-        if (set.next()) {
-            next = new AccessBlock(new Access(set, isStatic), isStatic);
-        }
         hb = new HappensBeforeAnalysis(conn);
+        if (set.next()) {
+            next = new AccessBlock(new Access(set, isStatic), isStatic,
+                    hb.happensBeforeFinal(fieldId));
+        }
     }
 
-    /**
-     * 
-     * @param conn
-     * @param set
-     *            a result set consisting of all accesses of this field, with
-     *            the columns being INTHREAD, THREADNAME, TS, RW, and
-     *            UNDERCONSTRUCTION for non-static fields
-     * @param isStatic
-     *            whether or not the field is static
-     * @return
-     * @throws IllegalArgumentException
-     * @throws SQLException
-     */
-    public static ResultSet create(Connection conn, ResultSet set,
-            boolean isStatic) throws IllegalArgumentException, SQLException {
+    public static ResultSet create(Connection conn, long fieldId,
+            long receiverId) throws SQLException {
+        PreparedStatement st = conn.prepareStatement(QB
+                .get("Accesses.selectByFieldAndReceiver"));
+        st.setLong(1, fieldId);
+        st.setLong(2, receiverId);
         return (ResultSet) Proxy.newProxyInstance(ResultSet.class
                 .getClassLoader(), new Class[] { ResultSet.class },
-                new RollupAccessesResultSet(conn, set, isStatic));
+                new RollupAccessesResultSet(conn, st.executeQuery(), false,
+                        fieldId));
+    }
+
+    public static ResultSet create(Connection conn, long fieldId)
+            throws SQLException {
+        PreparedStatement st = conn.prepareStatement(QB
+                .get("Accesses.selectByField"));
+        st.setLong(1, fieldId);
+        return (ResultSet) Proxy.newProxyInstance(ResultSet.class
+                .getClassLoader(), new Class[] { ResultSet.class },
+                new RollupAccessesResultSet(conn, st.executeQuery(), true,
+                        fieldId));
     }
 
     @Override
@@ -84,6 +90,7 @@ public class RollupAccessesResultSet implements InvocationHandler {
 
     private class AccessBlock {
         final boolean isStatic;
+        final boolean isFinal;
 
         final HappensBeforeState happensBefore;
         final long threadId;
@@ -102,7 +109,7 @@ public class RollupAccessesResultSet implements InvocationHandler {
         Timestamp lastWrite;
         long lastWriteThread;
 
-        AccessBlock(Access first, boolean isStatic,
+        AccessBlock(Access first, boolean isStatic, boolean isFinal,
                 HappensBeforeState happensBefore, Timestamp lastWrite,
                 long lastWriteThread) {
             threadId = first.threadId;
@@ -125,11 +132,12 @@ public class RollupAccessesResultSet implements InvocationHandler {
                 this.lastWriteThread = first.threadId;
             }
             this.isStatic = isStatic;
+            this.isFinal = isFinal;
             this.happensBefore = happensBefore;
         }
 
-        AccessBlock(Access first, boolean isStatic) {
-            this(first, isStatic, HappensBeforeState.FIRST, null, -1);
+        AccessBlock(Access first, boolean isStatic, boolean isFinal) {
+            this(first, isStatic, isFinal, HappensBeforeState.FIRST, null, -1);
         }
 
         AccessBlock accumulate() throws SQLException {
@@ -153,10 +161,9 @@ public class RollupAccessesResultSet implements InvocationHandler {
                 } else {
                     boolean hasHappensBefore = hb.hasHappensBefore(lastWrite,
                             lastWriteThread, a.ts, a.threadId);
-                    return new AccessBlock(a, isStatic,
-                            hasHappensBefore ? HappensBeforeState.YES
-                                    : HappensBeforeState.NO, lastWrite,
-                            lastWriteThread);
+                    return new AccessBlock(a, isStatic, isFinal, isFinal
+                            || hasHappensBefore ? HappensBeforeState.YES
+                            : HappensBeforeState.NO, lastWrite, lastWriteThread);
                 }
             }
             return null;
