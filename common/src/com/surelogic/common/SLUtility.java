@@ -692,6 +692,8 @@ public final class SLUtility {
     return code.toString();
   }
 
+  private static final String hs = "0123456789abcdef";
+  
   /**
    * Returns a hex string corresponding to the passed byte.
    * 
@@ -700,7 +702,6 @@ public final class SLUtility {
    * @return a hex string two characters long.
    */
   public static String toHexString(final byte b) {
-    final String hs = "0123456789abcdef";
     final StringBuilder hex = new StringBuilder();
     hex.append(hs.charAt((b & 0xF0) >> 4)).append(hs.charAt((b & 0x0F)));
     return hex.toString();
@@ -1321,7 +1322,7 @@ public final class SLUtility {
     sw.flush();
     return sw.toString();
   }
-
+  
   private SLUtility() {
     // no instances
   }
