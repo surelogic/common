@@ -48,7 +48,7 @@ public abstract class AbstractJavaZip<T> {
 			out.putNextEntry(new ZipEntry(FILE_HASHES));
 			pw = new PrintWriter(out);
 			for(Map.Entry<String,FileInfo> e : fileInfo.entrySet()) {
-				pw.println(e.getKey()+"="+e.getValue().hash);
+				pw.println(e.getKey()+"="+SLUtility.toHexString(e.getValue().hash));
 			}
 			out.closeEntry();
 		}
