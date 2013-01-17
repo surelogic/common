@@ -2,6 +2,7 @@ package com.surelogic.common;
 
 import javax.management.*;
 
+import com.surelogic.ReferenceObject;
 import com.surelogic.common.logging.SLLogger;
 
 import java.lang.management.*;
@@ -25,6 +26,7 @@ public enum MemoryWarningSystem {
   private final Collection<Listener> listeners =
       new CopyOnWriteArrayList<Listener>();
 
+  @ReferenceObject
   public interface Listener {
     public void memoryUsageLow(long usedMemory, long maxMemory);
   }
