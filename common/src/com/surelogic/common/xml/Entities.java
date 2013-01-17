@@ -137,7 +137,8 @@ public final class Entities {
     return value.replaceAll("\\s+", " ");
   }
 
-  @Containable
+  @ThreadSafe
+  @RegionLock("EscapeLock is this protects escapeValueOrNullForUnicode")
   private static final class EscapePair {
     /**
      * The character to be escaped.
@@ -149,12 +150,17 @@ public final class Entities {
      */
     String escapeValueOrNullForUnicode;
 
+    @Unique("return")
     EscapePair(char value, String escapeValueOrNullForUnicode) {
       this.value = value;
       this.escapeValueOrNullForUnicode = escapeValueOrNullForUnicode;
     }
 
-    String getEscapeValue() {
+    synchronized void setEscape(String esc) {
+    	escapeValueOrNullForUnicode = esc;
+    }
+    
+    synchronized String getEscapeValue() {
       if (escapeValueOrNullForUnicode != null)
         return escapeValueOrNullForUnicode;
       else
@@ -243,7 +249,7 @@ public final class Entities {
     synchronized (this) {
       for (EscapePair p : f_escapes) {
         if (p.value == value) {
-          p.escapeValueOrNullForUnicode = escapeValueOrNullForUnicode;
+          p.setEscape(escapeValueOrNullForUnicode);
           return this;
         }
       }
