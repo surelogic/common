@@ -2,12 +2,15 @@ package com.surelogic.common;
 
 import java.util.concurrent.*;
 
+import com.surelogic.Vouch;
+
 /**
  * Hardcoded to check once per second
  * 
  * @author Edwin
  */
 public class PeriodicUtility {
+	@Vouch("ThreadSafe")
 	private static final CopyOnWriteArraySet<Runnable> handlers = 
 		new CopyOnWriteArraySet<Runnable>();
 	
