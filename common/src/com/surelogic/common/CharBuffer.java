@@ -2,8 +2,12 @@ package com.surelogic.common;
 
 import java.io.PrintWriter;
 import com.surelogic.Starts;
+import com.surelogic.RegionEffects;
+import com.surelogic.Unique;
+import com.surelogic.Borrowed;
 
 public class CharBuffer implements CharSequence {
+	@Unique
 	char[] buf = new char[64];
 	int size = 0;
 	
@@ -15,16 +19,23 @@ public class CharBuffer implements CharSequence {
 		}
 	}
 	
+	@Borrowed("this")
+	@RegionEffects("reads Instance")
 	@Starts("nothing")
 	public char charAt(int index) {
 		return buf[index];
 	}
 
+	@Borrowed("this")
+	@RegionEffects("reads Instance")
 	@Starts("nothing")
 	public int length() {
 		return size;
 	}
 
+	@Borrowed("this")
+	@RegionEffects("reads Instance")
+	@Unique("return")
 	@Starts("nothing")
 	public CharSequence subSequence(int start, int end) {
 		throw new UnsupportedOperationException();
