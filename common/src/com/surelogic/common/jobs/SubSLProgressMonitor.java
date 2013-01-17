@@ -3,6 +3,7 @@ package com.surelogic.common.jobs;
 import java.util.NoSuchElementException;
 import java.util.logging.Level;
 
+import com.surelogic.*;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.logging.SLLogger;
 
@@ -38,6 +39,7 @@ import com.surelogic.common.logging.SLLogger;
  * a task that is normally invoked as a main task could be used as a subtask of
  * some higher task.
  */
+@ReferenceObject
 public final class SubSLProgressMonitor implements SLProgressMonitor {
 
 	/**

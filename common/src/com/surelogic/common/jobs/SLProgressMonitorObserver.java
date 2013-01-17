@@ -1,11 +1,14 @@
 package com.surelogic.common.jobs;
 
+import com.surelogic.ReferenceObject;
+
 /**
  * An observer of {@link SLJob} progress.
  * 
  * @see SLJob#addObserver(SLProgressMonitorObserver)
  * @see SLJob#removeObserver(SLProgressMonitorObserver)
  */
+@ReferenceObject
 public interface SLProgressMonitorObserver {
 
   /**

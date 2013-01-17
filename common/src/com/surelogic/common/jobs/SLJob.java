@@ -3,6 +3,7 @@ package com.surelogic.common.jobs;
 import java.util.Collection;
 
 import com.surelogic.NonNull;
+import com.surelogic.ReferenceObject;
 
 /**
  * Interface implemented by IDE independent jobs. The monitoring and returned
@@ -12,6 +13,7 @@ import com.surelogic.NonNull;
  * implement this interface directly. In particular that class implements
  * progress monitor observers and job naming.
  */
+@ReferenceObject
 public interface SLJob {
 
   /**

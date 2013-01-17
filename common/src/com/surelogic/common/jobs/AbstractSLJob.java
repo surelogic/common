@@ -5,12 +5,14 @@ import java.util.Collection;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import com.surelogic.NonNull;
+import com.surelogic.ReferenceObject;
 import com.surelogic.ThreadSafe;
 
 /**
  * An abstract implementation of {@link SLJob} that provides the job name via
  * its constructor and supports the invocation of subtasks.
  */
+@ReferenceObject
 @ThreadSafe(implementationOnly = true)
 public abstract class AbstractSLJob implements SLJob {
 
