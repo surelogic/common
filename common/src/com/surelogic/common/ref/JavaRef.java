@@ -493,6 +493,7 @@ public class JavaRef implements IJavaRef {
     return b.toString();
   }
 
+  @NonNull
   public final String encodeForPersistence() {
     /*
      * Make sure this matches the getInstanceFrom() method below!
