@@ -48,6 +48,7 @@ public interface IDecl {
   /**
    * The kind of declaration.
    */
+  @Immutable
   enum Kind {
     ANNOTATION, CLASS, CONSTRUCTOR, ENUM, FIELD, INITIALIZER, INTERFACE, METHOD, PACKAGE, PARAMETER, TYPE_PARAMETER
   }
