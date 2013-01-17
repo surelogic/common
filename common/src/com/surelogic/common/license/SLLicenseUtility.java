@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
+import com.surelogic.*;
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.jobs.SLJob;
@@ -45,6 +46,7 @@ public final class SLLicenseUtility {
 		f_observers.remove(observer);
 	}
 
+	@Vouch("ThreadSafe")
 	private static final Map<SLLicenseProduct, Date> f_knownReleaseDates = new ConcurrentHashMap<SLLicenseProduct, Date>();
 
 	/**
@@ -57,9 +59,9 @@ public final class SLLicenseUtility {
 	 *            the release date for the running version of <tt>product</tt>.
 	 */
 	public static void setReleaseDateFor(SLLicenseProduct product, Date value) {
-		if (product == null || product == null)
+		if (product == null || value == null)
 			return;
-		f_knownReleaseDates.put(product, value);
+		f_knownReleaseDates.put(product, new Date(value.getTime()));
 	}
 
 	/**
@@ -75,7 +77,7 @@ public final class SLLicenseUtility {
 		if (product != null) {
 			final Date releaseDate = f_knownReleaseDates.get(product);
 			if (releaseDate != null)
-				return releaseDate;
+				return new Date(releaseDate.getTime());
 		}
 		return new Date();
 	}

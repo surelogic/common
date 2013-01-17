@@ -1,6 +1,7 @@
 package com.surelogic.common.license;
 
 import com.surelogic.Immutable;
+import com.surelogic.RegionEffects;
 
 /**
  * The types of licenses supported by SureLogic.
@@ -34,6 +35,7 @@ public enum SLLicenseType {
 	 */
 	PERPETUAL;
 
+	@RegionEffects("reads this:Instance")
 	@Override
 	public String toString() {
 		StringBuilder b = new StringBuilder(name().toLowerCase());

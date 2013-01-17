@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.surelogic.Immutable;
 import com.surelogic.Vouch;
+import com.surelogic.RegionEffects;
 
 /**
  * The products licensed by SureLogic.
@@ -61,6 +62,7 @@ public enum SLLicenseProduct {
 		return false;
 	}
 
+	@RegionEffects("reads this:Instance")
 	@Override
 	public String toString() {
 		return f_symbol;

@@ -3,7 +3,7 @@ package com.surelogic.common.license;
 import java.util.Date;
 import java.util.UUID;
 
-import com.surelogic.Immutable;
+import com.surelogic.*;
 import com.surelogic.common.i18n.I18N;
 
 /**
@@ -77,6 +77,8 @@ public final class SLLicense {
 	 * An install before date. Installations and activations after this date
 	 * will fail. May not be <tt>null</tt>.
 	 */
+	@Vouch("Immutable")
+	@Unique
 	private final Date f_installBeforeDate;
 
 	/**
@@ -86,7 +88,7 @@ public final class SLLicense {
 	 * @return the non-<tt>null</tt> installation deadline for this license.
 	 */
 	public Date getInstallBeforeDate() {
-		return f_installBeforeDate;
+		return new Date(f_installBeforeDate.getTime());
 	}
 
 	/**
@@ -162,9 +164,9 @@ public final class SLLicense {
 	 *            {@code true} if net checks are required for the license,
 	 *            {@code false} otherwise.
 	 */
-	public SLLicense(final UUID uuid, final String holder,
+	SLLicense(final UUID uuid, final String holder,
 			final SLLicenseProduct product, final int durationInDays,
-			final Date installBeforeDate, final SLLicenseType type,
+			final @Unique Date installBeforeDate, final SLLicenseType type,
 			final int maxActive, final boolean performNetCheck) {
 		if (uuid == null)
 			throw new IllegalArgumentException(I18N.err(44, "uuid"));

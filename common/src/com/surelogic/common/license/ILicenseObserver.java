@@ -2,9 +2,12 @@ package com.surelogic.common.license;
 
 import java.util.Date;
 
+import com.surelogic.ReferenceObject;
+
 /**
  * Allows observation of license check failures.
  */
+@ReferenceObject
 public interface ILicenseObserver {
 
 	/**
