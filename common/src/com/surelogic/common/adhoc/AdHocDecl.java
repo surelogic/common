@@ -2,9 +2,7 @@ package com.surelogic.common.adhoc;
 
 import java.util.List;
 
-import com.surelogic.NonNull;
-import com.surelogic.Nullable;
-import com.surelogic.ValueObject;
+import com.surelogic.*;
 import com.surelogic.common.ref.DeclVisitor;
 import com.surelogic.common.ref.IDecl;
 import com.surelogic.common.ref.IDeclParameter;
@@ -31,6 +29,7 @@ import com.surelogic.common.ref.TypeRef;
  * </ul>
  */
 @ValueObject
+@Immutable
 public final class AdHocDecl implements IDecl {
 
   @NonNull
