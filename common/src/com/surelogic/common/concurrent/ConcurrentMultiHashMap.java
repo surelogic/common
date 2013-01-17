@@ -6,13 +6,18 @@ import java.util.concurrent.*;
 
 import org.apache.commons.collections15.MultiMap;
 
+import com.surelogic.*;
+
 /**
  * A thread-safe version of MultiHashMap
  * (note: no need for putIfAbsent, since we're not keeping the values unique)
  * 
  * @author Edwin
  */
+@ThreadSafe
+@AnnotationBounds(referenceObject = {"K", "V"}, threadSafe = {"K", "V"})
 public class ConcurrentMultiHashMap<K,V> implements MultiMap<K,V> {
+	@Vouch("ThreadSafe")
 	private final ConcurrentMap<K,Collection<V>> map = new ConcurrentHashMap<K,Collection<V>>();
 
 	private Collection<V> getOrEmpty(Object key) {

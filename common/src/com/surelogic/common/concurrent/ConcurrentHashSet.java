@@ -2,16 +2,18 @@ package com.surelogic.common.concurrent;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import com.surelogic.Starts;
+import com.surelogic.*;
 
+@ThreadSafe
+@AnnotationBounds(referenceObject = {"T"}, threadSafe = {"T"})
 public class ConcurrentHashSet<T> extends AbstractSet<T> {
-	private final ConcurrentHashMap<T,Object> map;
+	private final ConcurrentHashMap<T,T> map;
 	
 	public ConcurrentHashSet() {
 		this(16);
 	}
 	public ConcurrentHashSet(int capacity) {
-		map = new ConcurrentHashMap<T,Object>(capacity);
+		map = new ConcurrentHashMap<T,T>(capacity);
 	}
 
 	@Override
