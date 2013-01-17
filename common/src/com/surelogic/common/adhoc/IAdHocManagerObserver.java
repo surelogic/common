@@ -1,5 +1,7 @@
 package com.surelogic.common.adhoc;
 
+import com.surelogic.ReferenceObject;
+
 /**
  * An interface that lets the implementing object observe an
  * {@link AdHocManager}.
@@ -7,6 +9,7 @@ package com.surelogic.common.adhoc;
  * It is recommended that implementers override {@link AdHocManagerAdapter}
  * rather than implementing this interface if possible.
  */
+@ReferenceObject
 public interface IAdHocManagerObserver {
 
 	/**

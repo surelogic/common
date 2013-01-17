@@ -1,9 +1,12 @@
 package com.surelogic.common.adhoc;
 
+import com.surelogic.*;
+
 /**
  * A benign adaptor for an {@link IAdHocManagerObserver}. Subclasses override
  * methods to add behavior.
  */
+@ReferenceObject
 public abstract class AdHocManagerAdapter implements IAdHocManagerObserver {
 
 	public void notifyQueryModelChange(AdHocManager manager) {

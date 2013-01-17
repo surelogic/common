@@ -4,6 +4,7 @@ import java.io.File;
 import java.net.URL;
 import java.sql.SQLException;
 
+import com.surelogic.ReferenceObject;
 import com.surelogic.common.jdbc.DBConnection;
 
 /**
@@ -11,6 +12,7 @@ import com.surelogic.common.jdbc.DBConnection;
  * interface will be implemented in another plug-in or module that wants to
  * reuse the ad hoc query capability implemented in this plug-in/module.
  */
+@ReferenceObject
 public interface IAdHocDataSource {
 
 	/**

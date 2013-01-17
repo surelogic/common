@@ -14,6 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
+import com.surelogic.ReferenceObject;
 import com.surelogic.common.html.SimpleHTMLPrinter;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.jdbc.DBConnection;
@@ -26,6 +27,7 @@ import com.surelogic.common.jdbc.DBConnection;
  * after a set of changes has been made to the model (i.e., not after each small
  * change).
  */
+@ReferenceObject
 public final class AdHocManager {
 
     /**
