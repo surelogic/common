@@ -3,6 +3,8 @@ package com.surelogic.common.jobs.remote;
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.Starts;
+import com.surelogic.RegionEffects;
+import com.surelogic.Borrowed;
 
 public class RemoteSLJobException extends RuntimeException {
   private static final long serialVersionUID = 1L;
@@ -27,6 +29,8 @@ public class RemoteSLJobException extends RuntimeException {
     return number;
   }
 
+  @Borrowed("this")
+  @RegionEffects("reads Instance")
   @Starts("nothing")
   public String getToolMessage(String name) {
     if (args == null || args.length == 0) {
@@ -38,8 +42,10 @@ public class RemoteSLJobException extends RuntimeException {
     return I18N.err(number, args2);
   }
   
+  @Borrowed("this")
+  @RegionEffects("reads Instance")
   @Starts("nothing")
-@Override
+  @Override
   public String getMessage() {
 	  return getToolMessage(label);
   }

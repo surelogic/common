@@ -3,6 +3,8 @@ package com.surelogic.common.i18n;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
+import com.surelogic.*;
+
 /**
  * Manages a resource bundle of strings based upon the locale for SureLogic
  * applications. This is a J2SE approach so it is independent of any container
@@ -13,6 +15,7 @@ import java.util.ResourceBundle;
  * 
  * @author Tim Halloran
  */
+@Promise("@Starts(nothing) for *(**)")
 public final class I18N {
   private static final ResourceBundle BUNDLE = ResourceBundle.getBundle(I18N.class.getPackage().getName() + ".SureLogic");
 
