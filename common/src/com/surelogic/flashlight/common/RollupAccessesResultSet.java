@@ -76,7 +76,7 @@ public class RollupAccessesResultSet implements InvocationHandler {
             return true;
         } else if ("close".equals(methodName)) {
             set.close();
-
+            hb.finished();
             return null;
         } else if (methodName.startsWith("get")) {
             Object o = block.get((Integer) args[0]);

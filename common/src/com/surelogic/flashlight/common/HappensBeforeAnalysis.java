@@ -20,7 +20,7 @@ public class HappensBeforeAnalysis {
     private final PreparedStatement isVolatileSt;
     private final PreparedStatement isFinalSt;
 
-    HappensBeforeAnalysis(Connection conn) throws SQLException {
+    public HappensBeforeAnalysis(Connection conn) throws SQLException {
         hbSt = conn.prepareStatement(QB.get("Accesses.happensBefore"));
         isVolatileSt = conn
                 .prepareStatement(QB.get("Accesses.isFieldVolatile"));
@@ -252,7 +252,8 @@ public class HappensBeforeAnalysis {
             Timestamp read, long readThread) throws SQLException {
         return write == null
                 || writeThread == readThread
-                || happensBeforeVolatile(write, writeThread, read, readThread)
+                // || happensBeforeVolatile(write, writeThread, read,
+                // readThread)
                 || happensBeforeThread(write, writeThread, read, readThread)
                 || happensBeforeObject(write, writeThread, read, readThread)
                 || happensBeforeCollection(write, writeThread, read, readThread);
