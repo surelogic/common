@@ -252,8 +252,7 @@ public class HappensBeforeAnalysis {
             Timestamp read, long readThread) throws SQLException {
         return write == null
                 || writeThread == readThread
-                // || happensBeforeVolatile(write, writeThread, read,
-                // readThread)
+                || happensBeforeVolatile(write, writeThread, read, readThread)
                 || happensBeforeThread(write, writeThread, read, readThread)
                 || happensBeforeObject(write, writeThread, read, readThread)
                 || happensBeforeCollection(write, writeThread, read, readThread);
