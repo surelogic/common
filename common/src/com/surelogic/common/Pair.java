@@ -7,25 +7,25 @@ public class Pair<T1, T2> {
   private final T1 elem1;
   private final T2 elem2;
 
-  public static <T1, T2> Pair<T1, T2> getInstance(T1 o1, T2 o2) {
+  public static <T1, T2> Pair<T1, T2> getInstance(final T1 o1, final T2 o2) {
     return new Pair<T1, T2>(o1, o2);
   }
 
-  public Pair(T1 o1, T2 o2) {
+  public Pair(final T1 o1, final T2 o2) {
     elem1 = o1;
     elem2 = o2;
   }
 
-  public T1 first() {
+  public final T1 first() {
     return elem1;
   }
 
-  public T2 second() {
+  public final T2 second() {
     return elem2;
   }
 
   @Override
-  public boolean equals(Object other) {
+  public final boolean equals(final Object other) {
     if (!(other instanceof Pair)) {
       return false;
     }
@@ -43,7 +43,7 @@ public class Pair<T1, T2> {
   }
 
   @Override
-  public int hashCode() {
+  public final int hashCode() {
     if (elem1 == null && elem2 == null) {
       return 0;
     } else if (elem1 == null) {
@@ -56,7 +56,7 @@ public class Pair<T1, T2> {
   }
 
   @Override
-  public String toString() {
+  public final String toString() {
     return "<" + elem1 + ", " + elem2 + '>';
   }
 }
