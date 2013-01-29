@@ -36,4 +36,8 @@ public class StringCache {
     else
       return cached;
   }
+
+  public int size() {
+	  return f_stringCache.size();
+  }
 }
