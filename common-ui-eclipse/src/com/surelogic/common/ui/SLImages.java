@@ -37,6 +37,9 @@ import com.surelogic.common.ref.IJavaRef;
  * All image name refer to names in {@link CommonImages}. Pass one of the
  * <tt>SharedImages.IMG_*</tt> or <tt>DECR_*</tt> constants declared in that
  * utility.
+ * <p
+ * All of the methods in this utility should only be invoked in the context of
+ * the SWT User Interface thread.
  * 
  * @see CommonImages
  */
@@ -83,6 +86,13 @@ public final class SLImages {
     registerDisposeExecIfNeeded();
   }
 
+  /**
+   * Flags if a <tt>disposeExec</tt> {@link Runnable} needs to be setup to
+   * dispose of cached images.
+   * <p>
+   * With regard to concurrency this state is thread confined to the SWT User
+   * Interface thread.
+   */
   private static boolean f_needToRegisterDisposeExec = true;
 
   /**
