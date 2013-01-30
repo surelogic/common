@@ -1,5 +1,9 @@
 package com.surelogic.flashlight.common;
 
+import gnu.trove.map.TLongObjectMap;
+import gnu.trove.map.hash.TLongObjectHashMap;
+import gnu.trove.procedure.TLongObjectProcedure;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -20,6 +24,9 @@ public class HappensBeforeAnalysis {
     private final PreparedStatement isVolatileSt;
     private final PreparedStatement isFinalSt;
 
+    private final TLongObjectMap<Timestamp> targetsCache;
+    private final TLongObjectMap<Timestamp> sourcesCache;
+
     public HappensBeforeAnalysis(Connection conn) throws SQLException {
         hbSt = conn.prepareStatement(QB.get("Accesses.happensBefore"));
         isVolatileSt = conn
@@ -37,6 +44,8 @@ public class HappensBeforeAnalysis {
                 .get("Accesses.happensBeforeSourceColl"));
         hbCollTargetSt = conn.prepareStatement(QB
                 .get("Accesses.happensBeforeTargetColl"));
+        targetsCache = new TLongObjectHashMap<Timestamp>();
+        sourcesCache = new TLongObjectHashMap<Timestamp>();
     }
 
     void finished() throws SQLException {
@@ -60,62 +69,84 @@ public class HappensBeforeAnalysis {
         }
     }
 
-    public boolean happensBeforeVolatile(Timestamp write, long writeThread,
+    public boolean happensBefore(PreparedStatement sourceSt,
+            PreparedStatement targetSt, Timestamp write, long writeThread,
             Timestamp read, long readThread) throws SQLException {
-        int idx = 1;
-        hbVolWriteSt.setLong(idx++, writeThread);
-        hbVolWriteSt.setTimestamp(idx++, write);
-        hbVolWriteSt.setTimestamp(idx++, read);
-        final ResultSet hbVolWriteSet = hbVolWriteSt.executeQuery();
+        sourceSt.setLong(1, writeThread);
+        sourceSt.setTimestamp(2, write);
+        sourceSt.setTimestamp(3, read);
+        final ResultSet sourceSet = sourceSt.executeQuery();
         try {
-            idx = 1;
-            hbVolReadSt.setLong(idx++, readThread);
-            hbVolReadSt.setTimestamp(idx++, write);
-            hbVolReadSt.setTimestamp(idx++, read);
-            final ResultSet hbVolReadSet = hbVolReadSt.executeQuery();
-            try {
-                long targetField = -1;
-                Timestamp targetTs = null;
-                sourceLoop: while (hbVolWriteSet.next()) {
-                    long sourceField = hbVolWriteSet.getLong(1);
-                    Timestamp sourceTs = hbVolWriteSet.getTimestamp(2);
-                    if (sourceField == targetField) {
-                        if (sourceTs.before(targetTs)) {
-                            return true;
-                        }
-                    } else if (sourceField > targetField) {
-                        while (hbVolReadSet.next()) {
-                            targetField = hbVolReadSet.getLong(1);
-                            targetTs = hbVolReadSet.getTimestamp(2);
-                            if (sourceField == targetField
-                                    && sourceTs.before(targetTs)) {
-                                isVolatileSt.setLong(1, sourceField);
-                                ResultSet isVolatileSet = isVolatileSt
-                                        .executeQuery();
-                                try {
-                                    isVolatileSet.next();
-                                    if (isVolatileSet.getString(1).equals("Y")) {
-                                        return true;
-                                    }
-                                } finally {
-                                    isVolatileSet.close();
-                                }
-                            } else if (sourceField <= targetField) {
-                                continue sourceLoop;
-                            }
-                        }
-                        // We have exhausted our inner loop, we may as well
-                        // quit
-                        break;
-                    }
-                }
+            if (!sourceSet.next()) {
                 return false;
+            }
+            targetSt.setLong(1, writeThread);
+            targetSt.setTimestamp(2, write);
+            targetSt.setTimestamp(3, read);
+            final ResultSet targetSet = targetSt.executeQuery();
+            try {
+                if (!targetSet.next()) {
+                    return false;
+                }
+                final TLongObjectMap<Timestamp> sources = genSources(sourceSet);
+                sourceSet.close();
+                if (sources.isEmpty()) {
+                    return false;
+                }
+                final TLongObjectMap<Timestamp> targets = genTargets(targetSet);
+                targetSet.close();
+                if (targets.isEmpty()) {
+                    return false;
+                }
+                return !sources
+                        .forEachEntry(new TLongObjectProcedure<Timestamp>() {
+
+                            @Override
+                            public boolean execute(long field,
+                                    Timestamp sourceTs) {
+                                Timestamp targetTs = targets.get(field);
+                                return targetTs == null
+                                        || !sourceTs.before(targetTs);
+                            }
+                        });
             } finally {
-                hbVolReadSet.close();
+                targetSet.close();
             }
         } finally {
-            hbVolWriteSet.close();
+            sourceSet.close();
         }
+    }
+
+    public boolean happensBeforeVolatile(Timestamp write, long writeThread,
+            Timestamp read, long readThread) throws SQLException {
+        return happensBefore(hbVolReadSt, hbVolWriteSt, write, writeThread,
+                read, readThread);
+    }
+
+    TLongObjectMap<Timestamp> genSources(ResultSet set) throws SQLException {
+        sourcesCache.clear();
+        do {
+            long targetField = set.getLong(1);
+            Timestamp sourceTs = set.getTimestamp(2);
+            Timestamp ts = sourcesCache.get(targetField);
+            if (ts == null || ts.after(sourceTs)) {
+                sourcesCache.put(targetField, sourceTs);
+            }
+        } while (set.next());
+        return sourcesCache;
+    }
+
+    TLongObjectMap<Timestamp> genTargets(ResultSet set) throws SQLException {
+        targetsCache.clear();
+        do {
+            long targetField = set.getLong(1);
+            Timestamp targetTs = set.getTimestamp(2);
+            Timestamp ts = targetsCache.get(targetField);
+            if (ts == null || ts.before(targetTs)) {
+                targetsCache.put(targetField, targetTs);
+            }
+        } while (set.next());
+        return targetsCache;
     }
 
     public boolean happensBeforeThread(Timestamp write, long writeThread,
@@ -190,50 +221,8 @@ public class HappensBeforeAnalysis {
 
     public boolean happensBeforeObject(Timestamp write, long writeThread,
             Timestamp read, long readThread) throws SQLException {
-        int idx = 1;
-        hbObjSourceSt.setLong(idx++, writeThread);
-        hbObjSourceSt.setTimestamp(idx++, write);
-        hbObjSourceSt.setTimestamp(idx++, read);
-        final ResultSet hbObjSourceSet = hbObjSourceSt.executeQuery();
-        try {
-            idx = 1;
-            hbObjTargetSt.setLong(idx++, readThread);
-            hbObjTargetSt.setTimestamp(idx++, write);
-            hbObjTargetSt.setTimestamp(idx++, read);
-            final ResultSet hbObjTargetSet = hbObjTargetSt.executeQuery();
-            try {
-                long targetObj = -1;
-                Timestamp targetTs = null;
-                sourceLoop: while (hbObjSourceSet.next()) {
-                    long sourceObj = hbObjSourceSet.getLong(1);
-                    Timestamp sourceTs = hbObjSourceSet.getTimestamp(2);
-                    if (sourceObj == targetObj) {
-                        if (sourceTs.before(targetTs)) {
-                            return true;
-                        }
-                    } else if (sourceObj > targetObj) {
-                        while (hbObjTargetSet.next()) {
-                            targetObj = hbObjTargetSet.getLong(1);
-                            targetTs = hbObjTargetSet.getTimestamp(2);
-                            if (targetObj == sourceObj
-                                    && sourceTs.before(targetTs)) {
-                                return true;
-                            } else if (sourceObj <= targetObj) {
-                                continue sourceLoop;
-                            }
-                        }
-                        // We have exhausted our inner loop, we may as well
-                        // quit
-                        break;
-                    }
-                }
-                return false;
-            } finally {
-                hbObjTargetSet.close();
-            }
-        } finally {
-            hbObjSourceSet.close();
-        }
+        return happensBefore(hbObjSourceSt, hbObjTargetSt, write, writeThread,
+                read, readThread);
     }
 
     /**
