@@ -95,7 +95,8 @@ public class CancellableAdHocQueryJob extends AbstractSLJob {
 		f_accessKeys = accessKeys;
 	}
 
-	public SLStatus run(final SLProgressMonitor monitor) {
+	@Override
+  public SLStatus run(final SLProgressMonitor monitor) {
 		try {
 			final AdHocManager manager = f_query.getManager();
 			monitor.begin();

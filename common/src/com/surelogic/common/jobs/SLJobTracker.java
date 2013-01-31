@@ -24,6 +24,7 @@ public final class SLJobTracker {
   final AtomicInteger f_percentageOrState = new AtomicInteger(NOT_STARTED);
 
   final SLProgressMonitorObserver f_monitor = new SLProgressMonitorObserver() {
+    @Override
     public void notifyPercentComplete(int percentage) {
       if (percentage < -1) { // -1 is indeterminate
         SLLogger.getLogger().log(Level.WARNING, I18N.err(297, percentage, 0));

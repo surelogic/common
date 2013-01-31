@@ -104,6 +104,7 @@ public final class SLImages {
     if (f_needToRegisterDisposeExec) {
       f_needToRegisterDisposeExec = false;
       EclipseUIUtility.disposeExec(new Runnable() {
+        @Override
         public void run() {
           for (Image image : CACHEKEY_TO_IMAGE.values()) {
             image.dispose();

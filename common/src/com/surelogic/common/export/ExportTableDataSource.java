@@ -64,12 +64,14 @@ public abstract class ExportTableDataSource implements Iterable<String[]> {
 	/**
 	 * Support for the <tt>foreach</tt> statement.
 	 */
-	public final Iterator<String[]> iterator() {
+	@Override
+  public final Iterator<String[]> iterator() {
 		return new Iterator<String[]>() {
 
 			private boolean f_initialized = false;
 
-			public boolean hasNext() {
+			@Override
+      public boolean hasNext() {
 				if (f_initialized) {
 					boolean result = hasNextRow();
 					if (!result) {
@@ -81,7 +83,8 @@ public abstract class ExportTableDataSource implements Iterable<String[]> {
 				}
 			}
 
-			public String[] next() {
+			@Override
+      public String[] next() {
 				if (f_initialized) {
 					return nextRow();
 				} else {
@@ -90,7 +93,8 @@ public abstract class ExportTableDataSource implements Iterable<String[]> {
 				}
 			}
 
-			public void remove() {
+			@Override
+      public void remove() {
 				throw new UnsupportedOperationException();
 			}
 		};

@@ -186,6 +186,7 @@ public final class JDTUtility {
     if (pathname == null)
       throw new IllegalArgumentException(I18N.err(44, "pathname"));
     return isOnClasspath(javaProject, new IPathFilter() {
+      @Override
       public boolean match(IPath path) {
         return pathname.equals(path);
       }
@@ -209,6 +210,7 @@ public final class JDTUtility {
     if (file == null)
       throw new IllegalArgumentException(I18N.err(44, "file"));
     return isOnClasspath(javaProject, new IPathFilter() {
+      @Override
       public boolean match(IPath path) {
         return file.getFullPath().equals(path);
       }
@@ -1001,6 +1003,7 @@ public final class JDTUtility {
       SLLogger.getLogger().log(Level.SEVERE, msg, e);
     }
     Collections.sort(projectNames, new Comparator<IJavaProject>() {
+      @Override
       public int compare(final IJavaProject o1, final IJavaProject o2) {
         return o1.getElementName().compareToIgnoreCase(o2.getElementName());
       }
@@ -1328,6 +1331,7 @@ public final class JDTUtility {
       // Do nothing
     }
 
+    @Override
     public boolean check(final IWorkspaceRoot root, final IJavaProject p, final IClasspathEntry cpe) throws JavaModelException {
       init(root, p, cpe);
 
@@ -1414,6 +1418,7 @@ public final class JDTUtility {
       return true;
     }
 
+    @Override
     public boolean checkProjectDependencies(final IJavaProject p) {
       return true;
     }
@@ -1454,6 +1459,7 @@ public final class JDTUtility {
       return super.check(root, p, cpe);
     }
 
+    @Override
     public boolean checkProjectDependencies(final IJavaProject p) {
       return false;
     }
@@ -1515,6 +1521,7 @@ public final class JDTUtility {
       return !checkProject(root, status, jp, new AbstractChecker() {
         private boolean updated = false;
 
+        @Override
         public boolean checkProjectDependencies(final IJavaProject p) {
           return false;
         }

@@ -30,6 +30,7 @@ public final class AggregateSLJob extends AbstractSLJob {
     f_jobs = new CopyOnWriteArrayList<SLJob>(jobs);
   }
 
+  @Override
   public SLStatus run(SLProgressMonitor monitor) {
     final int perJobWork = 100;
     monitor.begin(f_jobs.size() * perJobWork);

@@ -475,7 +475,8 @@ public class PromisesAnnotationRewriter {
 			this.newAnnotations = new ArrayList<AnnotationDescription>(anns);
 		}
 
-		public Annotation merge(final AST ast, final Annotation cur,
+		@Override
+    public Annotation merge(final AST ast, final Annotation cur,
 				final IDecl target, final Set<String> imports) {
 			final Set<String> existing = new HashSet<String>();
 			if (cur != null) {
@@ -502,7 +503,8 @@ public class PromisesAnnotationRewriter {
 			return createWrappedAssume(ast, anns, imports);
 		}
 
-		public boolean match(final Annotation a) {
+		@Override
+    public boolean match(final Annotation a) {
 			final String aName = a.getTypeName().getFullyQualifiedName()
 					.replaceAll(".*\\.", "");
 			return ASSUME.equals(aName) || ASSUMES.equals(aName);
@@ -526,13 +528,15 @@ public class PromisesAnnotationRewriter {
 			this.name = name;
 		}
 
-		public boolean match(final Annotation a) {
+		@Override
+    public boolean match(final Annotation a) {
 			final String aName = a.getTypeName().getFullyQualifiedName()
 					.replaceAll(".*\\.", "");
 			return name.equals(aName);
 		}
 
-		public Annotation merge(final AST ast, final Annotation a,
+		@Override
+    public Annotation merge(final AST ast, final Annotation a,
 				final IDecl target, final Set<String> imports) {
 			addImport(name, imports);
 			final TreeSet<String> contents = new TreeSet<String>();
@@ -620,7 +624,8 @@ public class PromisesAnnotationRewriter {
 			this.wrapper = name + "s";
 		}
 
-		public Annotation merge(final AST ast, final Annotation cur,
+		@Override
+    public Annotation merge(final AST ast, final Annotation cur,
 				final IDecl target, final Set<String> imports) {
 			final Set<String> newContents = new HashSet<String>();
 			for (final AnnotationDescription desc : newAnnotations) {
@@ -662,7 +667,8 @@ public class PromisesAnnotationRewriter {
 			}
 		}
 		
-		public boolean match(final Annotation a) {
+		@Override
+    public boolean match(final Annotation a) {
 			final String aName = a.getTypeName().getFullyQualifiedName()
 					.replaceAll(".*\\.", "");
 			return name.equals(aName) || wrapper.equals(aName);

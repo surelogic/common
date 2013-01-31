@@ -16,15 +16,18 @@ public abstract class AbstractSingleProjectAction
 implements IViewActionDelegate, IObjectActionDelegate {
 	protected IProject project;
 	
-	public void init(IViewPart view) {
+	@Override
+  public void init(IViewPart view) {
 		// Nothing to do right now
 	}
 
-	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
+	@Override
+  public void setActivePart(IAction action, IWorkbenchPart targetPart) {
 		// Nothing to do right now
 	}
 	
-	public final void selectionChanged(IAction action, ISelection selection) {
+	@Override
+  public final void selectionChanged(IAction action, ISelection selection) {
 		if (selection instanceof IStructuredSelection) {
 			Object obj = (((IStructuredSelection) selection).getFirstElement());
 			if (obj != null) {

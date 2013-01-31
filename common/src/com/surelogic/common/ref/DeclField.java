@@ -29,6 +29,7 @@ final class DeclField extends DeclVisibility implements IDeclField {
     f_isVolatile = isVolatile;
   }
 
+  @Override
   @NonNull
   public Kind getKind() {
     return Kind.FIELD;

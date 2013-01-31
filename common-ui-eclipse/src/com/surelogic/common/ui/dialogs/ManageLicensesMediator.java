@@ -51,47 +51,55 @@ final class ManageLicensesMediator implements ILifecycle {
 		f_uninstallButton = uninstallButton;
 	}
 
-	public void init() {
+	@Override
+  public void init() {
 		updateTableContents();
 
 		f_licenseTable.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event event) {
+			@Override
+      public void handleEvent(Event event) {
 				updateButtonState();
 			}
 		});
 
 		f_installFromFileButton.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event event) {
+			@Override
+      public void handleEvent(Event event) {
 				installLicenseFromFile();
 			}
 		});
 		f_installFromClipboardButton.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event event) {
+			@Override
+      public void handleEvent(Event event) {
 				installLicenseFromClipboard();
 			}
 		});
 		f_activateButton.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event event) {
+			@Override
+      public void handleEvent(Event event) {
 				final List<PossiblyActivatedSLLicense> selection = getLicenseTableSelection();
 				activateRenewLicenses(selection, true);
 			}
 		});
 		f_renewButton.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event event) {
+			@Override
+      public void handleEvent(Event event) {
 				final List<PossiblyActivatedSLLicense> selection = getLicenseTableSelection();
 				activateRenewLicenses(selection, false);
 			}
 		});
 
 		f_uninstallButton.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event event) {
+			@Override
+      public void handleEvent(Event event) {
 				final List<PossiblyActivatedSLLicense> selection = getLicenseTableSelection();
 				uninstallLicenses(selection);
 			}
 		});
 	}
 
-	public void dispose() {
+	@Override
+  public void dispose() {
 		// nothing to do
 	}
 

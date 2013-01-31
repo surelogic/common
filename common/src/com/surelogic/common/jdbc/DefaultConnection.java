@@ -21,27 +21,33 @@ public class DefaultConnection extends AbstractDBConnection {
 		// Do nothing
 	}
 
-	public void bootAndCheckSchema() throws Exception {
+	@Override
+  public void bootAndCheckSchema() throws Exception {
 		throw new UnsupportedOperationException();
 	}
 
-	public void shutdown() {
+	@Override
+  public void shutdown() {
 		throw new UnsupportedOperationException();
 	}
 	
-	public void destroy() {
+	@Override
+  public void destroy() {
 		throw new UnsupportedOperationException();
 	}
 
-	public Connection getConnection() throws SQLException {
+	@Override
+  public Connection getConnection() throws SQLException {
 		return DriverManager.getConnection("jdbc:default:connection");
 	}
 
-	public SchemaData getSchemaLoader() {
+	@Override
+  public SchemaData getSchemaLoader() {
 		return null;
 	}
 
-	public void loggedBootAndCheckSchema() {
+	@Override
+  public void loggedBootAndCheckSchema() {
 		throw new UnsupportedOperationException();
 	}
 

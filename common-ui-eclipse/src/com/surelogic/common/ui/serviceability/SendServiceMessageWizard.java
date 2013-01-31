@@ -271,7 +271,8 @@ public class SendServiceMessageWizard extends Wizard {
 		f_data.generateMessage(false);
 		final String msg = f_data.getMessage();
 		final SLJob job = ServiceUtility.sendToSureLogic(msg, new Runnable() {
-			public void run() {
+			@Override
+      public void run() {
 				BalloonUtility.showMessage(
 						I18N.msg(f_data.propPfx() + "sent.title"),
 						I18N.msg(f_data.propPfx() + "sent.message"));

@@ -346,13 +346,15 @@ public final class QueryResultNavigator extends AdHocManagerAdapter implements
 	/**
 	 * Must be run from the SWT thread.
 	 */
-	public void init() {
+	@Override
+  public void init() {
 		getAdHocManager().addObserver(this);
 		initActions();
 		updateControlState();
 	}
 
-	public void dispose() {
+	@Override
+  public void dispose() {
 		getAdHocManager().removeObserver(this);
 		f_enableWhenAResultExists.clear();
 		f_enableWhenAResultIsSelected.clear();

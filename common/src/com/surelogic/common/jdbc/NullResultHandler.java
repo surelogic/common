@@ -8,7 +8,8 @@ package com.surelogic.common.jdbc;
  */
 public abstract class NullResultHandler implements ResultHandler<Void> {
 
-	public final Void handle(final Result result) {
+	@Override
+  public final Void handle(final Result result) {
 		doHandle(result);
 		return null;
 	}

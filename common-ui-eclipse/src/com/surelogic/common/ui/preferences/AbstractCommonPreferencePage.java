@@ -25,7 +25,8 @@ public abstract class AbstractCommonPreferencePage extends
 		prefsBase = p;
 	}
 
-	public void init(IWorkbench workbench) {
+	@Override
+  public void init(IWorkbench workbench) {
 		setPreferenceStore(EclipseUIUtility.getPreferences());
 		setDescription(I18N.msg(messagePrefix + "preference.page.title.msg"));
 	}

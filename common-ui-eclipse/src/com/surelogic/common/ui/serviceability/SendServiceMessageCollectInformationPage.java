@@ -108,7 +108,8 @@ public class SendServiceMessageCollectInformationPage extends WizardPage {
 		descriptionText.setLayoutData(data);
 
 		final Runnable updatePageComplete = new Runnable() {
-			public void run() {
+			@Override
+      public void run() {
 				f_data.setEmail(emailText.getText());
 				f_data.setName(nameText.getText());
 				f_data.setSummary(summaryText.getText());
@@ -124,7 +125,8 @@ public class SendServiceMessageCollectInformationPage extends WizardPage {
 		};
 
 		final Listener listener = new Listener() {
-			public void handleEvent(Event event) {
+			@Override
+      public void handleEvent(Event event) {
 				updatePageComplete.run();
 			}
 		};

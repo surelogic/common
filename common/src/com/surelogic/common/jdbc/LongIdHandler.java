@@ -9,11 +9,13 @@ package com.surelogic.common.jdbc;
  */
 public class LongIdHandler implements KeyHandler<Long> {
 
-	public Long handle(Row r) {
+	@Override
+  public Long handle(Row r) {
 		return r.nextLong();
 	}
 
-	public String[] keyNames() {
+	@Override
+  public String[] keyNames() {
 		return new String[] { "ID" };
 	}
 

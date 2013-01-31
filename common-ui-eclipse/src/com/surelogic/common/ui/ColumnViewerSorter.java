@@ -57,7 +57,8 @@ public abstract class ColumnViewerSorter<T> extends ViewerComparator {
 		this.f_viewer = viewer;
 		this.f_column.addSelectionListener(new SelectionAdapter() {
 
-			public void widgetSelected(SelectionEvent e) {
+			@Override
+      public void widgetSelected(SelectionEvent e) {
 				if (ColumnViewerSorter.this.f_viewer.getComparator() != null) {
 					if (ColumnViewerSorter.this.f_viewer.getComparator() == ColumnViewerSorter.this) {
 						int tdirection = ColumnViewerSorter.this.f_direction;
@@ -100,7 +101,8 @@ public abstract class ColumnViewerSorter<T> extends ViewerComparator {
 		}
 	}
 
-	public int compare(Viewer viewer, Object e1, Object e2) {
+	@Override
+  public int compare(Viewer viewer, Object e1, Object e2) {
 		@SuppressWarnings("unchecked")
 		final T o1 = (T) e1;
 		@SuppressWarnings("unchecked")

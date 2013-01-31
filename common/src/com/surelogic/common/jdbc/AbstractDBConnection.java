@@ -8,13 +8,15 @@ import com.surelogic.common.logging.SLLogger;
 
 public abstract class AbstractDBConnection implements DBConnection {
 
-	public Connection readOnlyConnection() throws SQLException {
+	@Override
+  public Connection readOnlyConnection() throws SQLException {
 		final Connection conn = getConnection();
 		conn.setReadOnly(true);
 		return conn;
 	}
 
-	public Connection transactionConnection() throws SQLException {
+	@Override
+  public Connection transactionConnection() throws SQLException {
 		final Connection conn = getConnection();
 		conn.setAutoCommit(false);
 		return conn;
@@ -29,7 +31,8 @@ public abstract class AbstractDBConnection implements DBConnection {
 	 * @throws TransactionException
 	 *             if an exception occurs.
 	 */
-	public <T> T withReadOnly(final DBQuery<T> action) {
+	@Override
+  public <T> T withReadOnly(final DBQuery<T> action) {
 		try {
 			return with(readOnlyConnection(), action, true);
 		} catch (final SQLException e) {
@@ -46,7 +49,8 @@ public abstract class AbstractDBConnection implements DBConnection {
 	 * @throws TransactionException
 	 *             if an exception occurs.
 	 */
-	public <T> T withReadOnly(final DBTransaction<T> action) {
+	@Override
+  public <T> T withReadOnly(final DBTransaction<T> action) {
 		try {
 			return with(readOnlyConnection(), action, true);
 		} catch (final SQLException e) {
@@ -63,7 +67,8 @@ public abstract class AbstractDBConnection implements DBConnection {
 	 * @throws TransactionException
 	 *             if an exception occurs.
 	 */
-	public <T> T withTransaction(final DBQuery<T> action) {
+	@Override
+  public <T> T withTransaction(final DBQuery<T> action) {
 		try {
 			return with(transactionConnection(), action, false);
 		} catch (final SQLException e) {
@@ -80,7 +85,8 @@ public abstract class AbstractDBConnection implements DBConnection {
 	 * @throws TransactionException
 	 *             if an exception occurs.
 	 */
-	public <T> T withTransaction(final DBTransaction<T> action) {
+	@Override
+  public <T> T withTransaction(final DBTransaction<T> action) {
 		try {
 			return with(transactionConnection(), action, false);
 		} catch (final SQLException e) {
@@ -88,7 +94,8 @@ public abstract class AbstractDBConnection implements DBConnection {
 		}
 	}
 
-	public <T> T withDefault(final DBQuery<T> dbQuery) {
+	@Override
+  public <T> T withDefault(final DBQuery<T> dbQuery) {
 		try {
 			return with(getConnection(), dbQuery, true);
 		} catch (final SQLException e) {
@@ -96,7 +103,8 @@ public abstract class AbstractDBConnection implements DBConnection {
 		}
 	}
 
-	public <T> T withDefault(final DBTransaction<T> action) {
+	@Override
+  public <T> T withDefault(final DBTransaction<T> action) {
 		try {
 			return with(getConnection(), action, true);
 		} catch (final SQLException e) {

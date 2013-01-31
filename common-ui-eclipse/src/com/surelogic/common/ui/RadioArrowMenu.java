@@ -29,11 +29,13 @@ public final class RadioArrowMenu {
 	private final Composite f_panel;
 
 	private final FocusListener f_focusListener = new FocusListener() {
-		public void focusGained(FocusEvent e) {
+		@Override
+    public void focusGained(FocusEvent e) {
 			paintFocus(true);
 		}
 
-		public void focusLost(FocusEvent e) {
+		@Override
+    public void focusLost(FocusEvent e) {
 			paintFocus(false);
 		}
 
@@ -46,7 +48,8 @@ public final class RadioArrowMenu {
 	};
 
 	private final Listener f_traverseListener = new Listener() {
-		public void handleEvent(Event e) {
+		@Override
+    public void handleEvent(Event e) {
 			switch (e.detail) {
 			case SWT.TRAVERSE_ESCAPE:
 				setCustomTabTraversal(e);
@@ -79,7 +82,8 @@ public final class RadioArrowMenu {
 	};
 
 	private final KeyListener f_keyListener = new KeyListener() {
-		public void keyPressed(KeyEvent e) {
+		@Override
+    public void keyPressed(KeyEvent e) {
 			switch (e.keyCode) {
 			default:
 				if (f_choices.isEmpty()) {
@@ -128,7 +132,8 @@ public final class RadioArrowMenu {
 			}
 		}
 
-		public void keyReleased(KeyEvent e) {
+		@Override
+    public void keyReleased(KeyEvent e) {
 			// Nothing to do
 		}
 	};
@@ -296,7 +301,8 @@ public final class RadioArrowMenu {
 		arrowImage.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false, false));
 
 		final Listener choiceClickListener = new Listener() {
-			public void handleEvent(Event event) {
+			@Override
+      public void handleEvent(Event event) {
 				selected(result, choice, true);
 			}
 		};

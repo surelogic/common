@@ -80,7 +80,8 @@ public final class SubSLProgressMonitor implements SLProgressMonitor {
 		return f_name;
 	}
 
-	public void begin() {
+	@Override
+  public void begin() {
 		/*
 		 * We handle indeterminate subtasks by making them one unit of work.
 		 * This unit will be ticked off when done is called.
@@ -88,7 +89,8 @@ public final class SubSLProgressMonitor implements SLProgressMonitor {
 		begin(1);
 	}
 
-	public void begin(int totalWork) {
+	@Override
+  public void begin(int totalWork) {
 		f_parent.subTask(f_name);
 		if (totalWork <= 0)
 			throw new IllegalStateException(I18N.err(115, "totalWork"));
@@ -97,7 +99,8 @@ public final class SubSLProgressMonitor implements SLProgressMonitor {
 		f_scaleFactor = (float) f_parentWorkedGoal / (float) f_workedGoal;
 	}
 
-	public void done() {
+	@Override
+  public void done() {
 		/*
 		 * This method can be called more than once, but we only want to do the
 		 * below logic once.
@@ -116,23 +119,28 @@ public final class SubSLProgressMonitor implements SLProgressMonitor {
 		}
 	}
 
-	public boolean isCanceled() {
+	@Override
+  public boolean isCanceled() {
 		return f_parent.isCanceled();
 	}
 
-	public void setCanceled(boolean value) {
+	@Override
+  public void setCanceled(boolean value) {
 		f_parent.setCanceled(value);
 	}
 
-	public void subTask(String name) {
+	@Override
+  public void subTask(String name) {
 		f_parent.subTask(name);
 	}
 
-	public void subTaskDone() {
+	@Override
+  public void subTaskDone() {
 		f_parent.subTaskDone();
 	}
 
-	public void worked(int work) {
+	@Override
+  public void worked(int work) {
 		if (f_worked < f_workedGoal) {
 			f_worked = Math.min(f_worked + work, f_workedGoal);
 

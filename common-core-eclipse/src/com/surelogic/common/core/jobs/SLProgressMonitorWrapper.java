@@ -99,6 +99,7 @@ public final class SLProgressMonitorWrapper implements SLProgressMonitor {
       f_observers.addAll(observers);
   }
 
+  @Override
   public void begin() {
     if (f_started) {
       throw new IllegalStateException(I18N.err(118));
@@ -108,6 +109,7 @@ public final class SLProgressMonitorWrapper implements SLProgressMonitor {
     notifyObservers(-1);
   }
 
+  @Override
   public void begin(int totalWork) {
     if (f_started) {
       throw new IllegalStateException(I18N.err(118));
@@ -118,6 +120,7 @@ public final class SLProgressMonitorWrapper implements SLProgressMonitor {
     notifyObservers(0);
   }
 
+  @Override
   public void done() {
     while (!f_enclosingSubTasks.isEmpty()) {
       subTaskDone();
@@ -126,14 +129,17 @@ public final class SLProgressMonitorWrapper implements SLProgressMonitor {
     notifyObservers(100);
   }
 
+  @Override
   public boolean isCanceled() {
     return f_monitor.isCanceled();
   }
 
+  @Override
   public void setCanceled(boolean value) {
     f_monitor.setCanceled(value);
   }
 
+  @Override
   public void subTask(String name) {
     if (!f_started) {
       throw new IllegalStateException(I18N.err(119, "subTask"));
@@ -143,12 +149,14 @@ public final class SLProgressMonitorWrapper implements SLProgressMonitor {
     f_monitor.subTask(name);
   }
 
+  @Override
   public void subTaskDone() {
     // restore the previous sub task name
     f_currentSubTask = f_enclosingSubTasks.removeFirst();
     f_monitor.subTask(f_currentSubTask);
   }
 
+  @Override
   public void worked(int work) {
     if (!f_started) {
       throw new IllegalStateException(I18N.err(119, "worked"));

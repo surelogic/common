@@ -7,7 +7,8 @@ import java.sql.Connection;
  */
 public abstract class NullDBTransaction implements DBTransaction<Void> {
 
-	public final Void perform(final Connection conn) throws Exception {
+	@Override
+  public final Void perform(final Connection conn) throws Exception {
 		doPerform(conn);
 		return null;
 	}

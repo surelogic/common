@@ -8,7 +8,8 @@ package com.surelogic.common.jdbc;
  */
 public final class StringResultHandler implements ResultHandler<String> {
 
-	public String handle(final Result r) {
+	@Override
+  public String handle(final Result r) {
 		for (final Row row : r) {
 			return row.nextString();
 		}

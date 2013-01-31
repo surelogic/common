@@ -152,7 +152,8 @@ public final class ChangeDirectoryLocationDialog extends TitleAreaDialog {
 
 		public void init() {
 			f_browseButton.addListener(SWT.Selection, new Listener() {
-				public void handleEvent(Event event) {
+				@Override
+        public void handleEvent(Event event) {
 					final DirectoryDialog dd = new DirectoryDialog(
 							f_browseButton.getShell());
 					dd.setMessage(I18N
@@ -165,7 +166,8 @@ public final class ChangeDirectoryLocationDialog extends TitleAreaDialog {
 			});
 
 			f_newText.addListener(SWT.Modify, new Listener() {
-				public void handleEvent(Event event) {
+				@Override
+        public void handleEvent(Event event) {
 					updateState();
 				}
 			});

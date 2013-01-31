@@ -5,7 +5,8 @@ package com.surelogic.common.jdbc;
  */
 public abstract class NullDBQuery implements DBQuery<Void> {
 
-	public final Void perform(final Query q) {
+	@Override
+  public final Void perform(final Query q) {
 		doPerform(q);
 		return null;
 	}

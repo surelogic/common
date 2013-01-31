@@ -48,7 +48,8 @@ public final class SierraScanCrashReport {
 	}
 
 	static private final IScanCrashReporter f_defaultReporter = new IScanCrashReporter() {
-		public void reportScanCrash(SLStatus status, File scanLog) {
+		@Override
+    public void reportScanCrash(SLStatus status, File scanLog) {
 			status.logTo(SLLogger.getLogger());
 		}
 	};

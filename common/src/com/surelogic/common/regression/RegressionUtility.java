@@ -34,6 +34,7 @@ public class RegressionUtility {
       suffix = post;
     }
 
+    @Override
     public boolean accept(File dir, String name) {
       return name.startsWith(prefix) && name.endsWith(suffix);
     }
@@ -46,6 +47,7 @@ public class RegressionUtility {
   public static final Filter logOracleFilter = new Filter(ORACLE, JSURE_LOG_SUFFIX);
   public static final Filter snapshotOracleFilter = new Filter(ORACLE_SNAPSHOT, JSURE_SNAPSHOT_SUFFIX);
   public static final Filter oracleScanDirFilter = new Filter(ORACLE_SCAN_DIR_PREFIX, "") {
+    @Override
     public boolean accept(File dir, String name) {
       // Also accept a directory starting with the project name
       final String dirName = SLUtility.getTruncatedProjectName(dir.getName());

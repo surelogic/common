@@ -81,7 +81,8 @@ public abstract class DerbyConnection extends AbstractDBConnection {
 	 * 
 	 * @see #bootAndCheckSchema()
 	 */
-	public void loggedBootAndCheckSchema() {
+	@Override
+  public void loggedBootAndCheckSchema() {
 		try {
 			bootAndCheckSchema();
 		} catch (final Exception e) {
@@ -109,7 +110,8 @@ public abstract class DerbyConnection extends AbstractDBConnection {
 	 *             if a failure occurs.
 	 * @see #loggedBootAndCheckSchema()
 	 */
-	public synchronized void bootAndCheckSchema() throws Exception {
+	@Override
+  public synchronized void bootAndCheckSchema() throws Exception {
 		if (!f_booted) {
 			if (deleteDatabaseOnStartup()) {
 				/*
@@ -183,13 +185,15 @@ public abstract class DerbyConnection extends AbstractDBConnection {
 		return f_booted;
 	}
 
-	public Connection getConnection() throws SQLException {
+	@Override
+  public Connection getConnection() throws SQLException {
 		final Connection conn = LazyPreparedStatementConnection
 				.wrap(DriverManager.getConnection(getConnectionURL()));
 		return conn;
 	}
 
-	public synchronized void shutdown() {
+	@Override
+  public synchronized void shutdown() {
 		if (f_booted) {
 			try {
 				synchronized (this) {
@@ -211,7 +215,8 @@ public abstract class DerbyConnection extends AbstractDBConnection {
 		}
 	}
 
-	public synchronized void destroy() {
+	@Override
+  public synchronized void destroy() {
 		shutdown();
 
 		final File dbLoc = new File(getDatabaseLocation());

@@ -1250,6 +1250,7 @@ public abstract class Decl implements IDecl {
    * Sorts parameters and type parameters by argument position.
    */
   final Comparator<IDecl> f_byPosition = new Comparator<IDecl>() {
+    @Override
     public int compare(IDecl o1, IDecl o2) {
       if (o1 == null && o2 == null)
         return 0;
@@ -1291,11 +1292,13 @@ public abstract class Decl implements IDecl {
       f_children = children.toArray(new IDecl[children.size()]);
   }
 
+  @Override
   @Nullable
   public final IDecl getParent() {
     return f_parent;
   }
 
+  @Override
   @NonNull
   public final List<IDecl> getChildren() {
     if (f_children == null)
@@ -1308,41 +1311,50 @@ public abstract class Decl implements IDecl {
     }
   }
 
+  @Override
   @NonNull
   public final String getName() {
     return f_name;
   }
 
+  @Override
   @Nullable
   public TypeRef getTypeOf() {
     return null;
   }
 
+  @Override
   @NonNull
   public Visibility getVisibility() {
     return Visibility.NA;
   }
 
+  @Override
   public boolean isStatic() {
     return false;
   }
 
+  @Override
   public boolean isFinal() {
     return false;
   }
 
+  @Override
   public boolean isAbstract() {
     return false;
   }
 
+  @Override
   public boolean isImplicit() {
     return false;
   }
 
+  @Override
   public boolean isVolatile() {
     return false;
   }
 
+  @Override
   @NonNull
   public final List<IDeclParameter> getParameters() {
     List<IDeclParameter> work = new ArrayList<IDeclParameter>();
@@ -1354,10 +1366,12 @@ public abstract class Decl implements IDecl {
     return work;
   }
 
+  @Override
   public int getPosition() {
     return -1;
   }
 
+  @Override
   @NonNull
   public final List<IDeclTypeParameter> getTypeParameters() {
     List<IDeclTypeParameter> work = new ArrayList<IDeclTypeParameter>();
@@ -1369,11 +1383,13 @@ public abstract class Decl implements IDecl {
     return work;
   }
 
+  @Override
   @NonNull
   public List<TypeRef> getBounds() {
     return Collections.emptyList();
   }
 
+  @Override
   public final boolean hasSameAttributesAs(IDecl o) {
     if (o == null)
       return false;
@@ -1400,6 +1416,7 @@ public abstract class Decl implements IDecl {
     return true;
   }
 
+  @Override
   public final boolean hasSameAttributesAsSloppy(IDecl o) {
     if (o == null)
       return false;
@@ -1410,6 +1427,7 @@ public abstract class Decl implements IDecl {
     return true;
   }
 
+  @Override
   public final boolean isSameSimpleDeclarationAs(IDecl o) {
     if (hasSameAttributesAs(o)) {
       boolean result = true;
@@ -1420,6 +1438,7 @@ public abstract class Decl implements IDecl {
       return false;
   }
 
+  @Override
   public final boolean isSameSimpleDeclarationAsSloppy(IDecl o, boolean checkAttributes) {
     if (!checkAttributes || hasSameAttributesAsSloppy(o)) {
       final List<IDeclParameter> l1 = getParameters();
@@ -1448,6 +1467,7 @@ public abstract class Decl implements IDecl {
       return false;
   }
 
+  @Override
   public final int simpleDeclarationHashCode() {
     final int prime = 31;
     int result = 1;
@@ -1480,6 +1500,7 @@ public abstract class Decl implements IDecl {
     return result;
   }
 
+  @Override
   public final int simpleDeclarationHashCodeSloppy() {
     final int prime = 31;
     int result = 1;
@@ -1534,6 +1555,7 @@ public abstract class Decl implements IDecl {
     return result;
   }
 
+  @Override
   public final boolean isSameDeclarationAs(IDecl o) {
     IDecl dThis = this;
     IDecl dO = o;
@@ -1552,6 +1574,7 @@ public abstract class Decl implements IDecl {
     }
   }
 
+  @Override
   public boolean isSameDeclarationAsSloppy(IDecl o) {
     IDecl dThis = this;
     IDecl dO = o;
@@ -1590,6 +1613,7 @@ public abstract class Decl implements IDecl {
       return false;
   }
 
+  @Override
   public void acceptThisToRoot(@NonNull DeclVisitor visitor) {
     LinkedList<Decl> nodes = new LinkedList<Decl>();
     Decl addMe = this;
@@ -1603,6 +1627,7 @@ public abstract class Decl implements IDecl {
     visitor.finish(this);
   }
 
+  @Override
   public void acceptRootToThis(@NonNull DeclVisitor visitor) {
     LinkedList<Decl> nodes = new LinkedList<Decl>();
     Decl pushMe = this;

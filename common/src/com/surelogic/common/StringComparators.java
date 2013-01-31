@@ -6,7 +6,8 @@ public final class StringComparators {
 	public static final Comparator<String> SORT_ALPHABETICALLY = String.CASE_INSENSITIVE_ORDER;
 
 	public static final Comparator<String> SORT_NUMERICALLY = new Comparator<String>() {
-		public int compare(final String o1, final String o2) {
+		@Override
+    public int compare(final String o1, final String o2) {
 			final long i1 = Long.parseLong(o1);
 			final long i2 = Long.parseLong(o2);
 			if (i1 < i2) {
@@ -20,7 +21,8 @@ public final class StringComparators {
 	};
 
 	public static final Comparator<String> SORT_NUMERICALLY_THEN_LEXICALLY = new Comparator<String>() {
-		public int compare(final String o1, final String o2) {
+		@Override
+    public int compare(final String o1, final String o2) {
 			final Long l1 = safeParseLong(o1);
 			final Long l2 = safeParseLong(o2);
 			if (l1 != null) {

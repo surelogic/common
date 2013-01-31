@@ -24,6 +24,7 @@ final class DeclParameter extends DeclWithPosition implements IDeclParameter {
     f_isFinal = isFinal;
   }
 
+  @Override
   @NonNull
   public Kind getKind() {
     return Kind.PARAMETER;

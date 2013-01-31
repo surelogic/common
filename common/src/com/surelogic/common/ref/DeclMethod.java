@@ -31,6 +31,7 @@ final class DeclMethod extends DeclVisibility implements IDeclFunction {
     f_isImplicit = isImplicit;
   }
 
+  @Override
   @NonNull
   public Kind getKind() {
     return Kind.METHOD;

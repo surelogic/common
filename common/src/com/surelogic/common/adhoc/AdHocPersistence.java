@@ -100,6 +100,7 @@ public final class AdHocPersistence {
    */
   public static void save(final List<AdHocQuery> queries, final File saveFile, final boolean updateRevision) {
     Collections.sort(queries, new Comparator<AdHocQuery>() {
+      @Override
       public int compare(final AdHocQuery o1, final AdHocQuery o2) {
         return o1.getId().compareTo(o2.getId());
       }

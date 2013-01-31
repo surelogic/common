@@ -58,18 +58,21 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements
 		f_navigator = navigator;
 	}
 
-	public void init() {
+	@Override
+  public void init() {
 		f_navigator.init();
 
 		f_queryMenu.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(final Event event) {
+			@Override
+      public void handleEvent(final Event event) {
 				final AdHocQuery query = getQueryMenuSelection();
 				setSelectedQuery(query);
 			}
 		});
 
 		final Listener runQueryListener = new Listener() {
-			public void handleEvent(final Event event) {
+			@Override
+      public void handleEvent(final Event event) {
 				runQueryAction();
 			}
 		};
@@ -81,7 +84,8 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements
 		runQuery.setText(I18N.msg("adhoc.query.menu.run"));
 		runQuery.addListener(SWT.Selection, runQueryListener);
 		menu.addListener(SWT.Show, new Listener() {
-			public void handleEvent(final Event event) {
+			@Override
+      public void handleEvent(final Event event) {
 				boolean menuItemEnabled = false;
 				if (f_queryMenu.getSelectionCount() == 1) {
 					final TableItem item = f_queryMenu.getSelection()[0];
@@ -102,7 +106,8 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements
 		updateQueryMenu();
 	}
 
-	public void dispose() {
+	@Override
+  public void dispose() {
 		f_manager.removeObserver(this);
 		f_navigator.init();
 	}

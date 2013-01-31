@@ -34,7 +34,8 @@ public final class ConfirmPerspectiveSwitchDialog extends MessageDialog {
 		rememberMyDecision.setText(I18N
 				.msg("common.confirm.perspective.switch.dialog.remember"));
 		rememberMyDecision.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event event) {
+			@Override
+      public void handleEvent(Event event) {
 				f_rememberMyDecision = rememberMyDecision.getSelection();
 			}
 		});

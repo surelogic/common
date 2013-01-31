@@ -43,7 +43,8 @@ public class SendServiceMessagePreviewPage extends WizardPage {
 				| SWT.V_SCROLL | SWT.H_SCROLL);
 		f_descriptionText.setFont(JFaceResources.getTextFont());
 		f_descriptionText.addListener(SWT.Modify, new Listener() {
-			public void handleEvent(Event event) {
+			@Override
+      public void handleEvent(Event event) {
 				f_data.setMessage(f_descriptionText.getText());
 			}
 		});

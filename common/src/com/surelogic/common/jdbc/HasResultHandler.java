@@ -7,7 +7,8 @@ package com.surelogic.common.jdbc;
  * 
  */
 public class HasResultHandler implements ResultHandler<Boolean> {
-	public Boolean handle(final Result result) {
+	@Override
+  public Boolean handle(final Result result) {
 		return result.iterator().hasNext();
 	}
 

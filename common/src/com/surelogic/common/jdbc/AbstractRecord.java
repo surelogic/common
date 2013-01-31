@@ -13,15 +13,18 @@ public abstract class AbstractRecord<T> implements Record<T> {
 		this.mapper = mapper;
 	}
 
-	public void delete() {
+	@Override
+  public void delete() {
 		mapper.remove(this);
 	}
 
-	public void insert() {
+	@Override
+  public void insert() {
 		mapper.insert(this);
 	}
 
-	public boolean select() {
+	@Override
+  public boolean select() {
 		return mapper.select(this);
 
 	}

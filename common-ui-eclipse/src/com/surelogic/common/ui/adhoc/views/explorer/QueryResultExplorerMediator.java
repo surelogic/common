@@ -35,11 +35,13 @@ public final class QueryResultExplorerMediator extends AdHocManagerAdapter
 		f_navigator = navigator;
 	}
 
-	public void init() {
+	@Override
+  public void init() {
 		f_navigator.init();
 
 		f_queryHistoryTree.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(final Event event) {
+			@Override
+      public void handleEvent(final Event event) {
 				final AdHocQueryResult selectedResult = getQueryHistoryTreeSelection();
 				f_manager.setSelectedResult(selectedResult);
 			}
@@ -48,7 +50,8 @@ public final class QueryResultExplorerMediator extends AdHocManagerAdapter
 		f_manager.addObserver(this);
 	}
 
-	public void dispose() {
+	@Override
+  public void dispose() {
 		f_manager.removeObserver(this);
 		f_navigator.dispose();
 	}

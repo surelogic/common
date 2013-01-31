@@ -28,17 +28,20 @@ public abstract class AbstractSLJob implements SLJob {
 
   private final String f_name;
 
+  @Override
   public final String getName() {
     return f_name;
   }
 
   private final CopyOnWriteArrayList<SLProgressMonitorObserver> f_observers = new CopyOnWriteArrayList<SLProgressMonitorObserver>();
 
+  @Override
   public final void addObserver(final SLProgressMonitorObserver observer) {
     if (observer != null)
       f_observers.add(observer);
   }
 
+  @Override
   public final boolean removeObserver(final SLProgressMonitorObserver observer) {
     if (observer != null)
       return f_observers.remove(observer);
@@ -46,6 +49,7 @@ public abstract class AbstractSLJob implements SLJob {
       return false;
   }
 
+  @Override
   @NonNull
   public Collection<SLProgressMonitorObserver> getObservers() {
     return new ArrayList<SLProgressMonitorObserver>(f_observers);

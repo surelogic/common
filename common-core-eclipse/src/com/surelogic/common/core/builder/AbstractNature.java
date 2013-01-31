@@ -27,7 +27,8 @@ public abstract class AbstractNature implements IProjectNature {
 	/**
 	 * @see org.eclipse.core.resources.IProjectNature#setProject(org.eclipse.core.resources.IProject)
 	 */
-	public final void setProject(IProject project) {
+	@Override
+  public final void setProject(IProject project) {
 		if (LOG.isLoggable(Level.FINE)) {
 			LOG.fine("setProject() called for project " + project.getName());
 		}
@@ -37,7 +38,8 @@ public abstract class AbstractNature implements IProjectNature {
 	/**
 	 * @see org.eclipse.core.resources.IProjectNature#getProject()
 	 */
-	public final IProject getProject() {
+	@Override
+  public final IProject getProject() {
 		if (LOG.isLoggable(Level.FINE))
 			LOG.fine("getProject() called");
 		return project;
@@ -46,7 +48,8 @@ public abstract class AbstractNature implements IProjectNature {
 	/**
 	 * @see org.eclipse.core.resources.IProjectNature#configure()
 	 */
-	public void configure() throws CoreException {
+	@Override
+  public void configure() throws CoreException {
 		if (LOG.isLoggable(Level.FINE))
 			LOG.fine("configure() called");
 		if (project == null) {
@@ -60,7 +63,8 @@ public abstract class AbstractNature implements IProjectNature {
 	/**
 	 * @see org.eclipse.core.resources.IProjectNature#deconfigure()
 	 */
-	public void deconfigure() throws CoreException {
+	@Override
+  public void deconfigure() throws CoreException {
 		if (project == null) {
 			LOG.log(Level.SEVERE,
 					"the project is strangely null -- this should not happen");

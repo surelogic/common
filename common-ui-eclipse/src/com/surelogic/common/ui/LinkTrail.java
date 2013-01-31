@@ -25,7 +25,8 @@ public class LinkTrail extends ScrolledComposite {
 	public LinkTrail(Composite parent) {
 		super(parent, SWT.V_SCROLL);
 		addListener(SWT.Resize, new Listener() {
-			public void handleEvent(Event e) {
+			@Override
+      public void handleEvent(Event e) {
 				reflow();
 			}
 		});

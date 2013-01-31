@@ -78,15 +78,18 @@ public final class TreeViewerUIState {
       return;
 
     treeViewer.addTreeListener(new ITreeViewerListener() {
+      @Override
       public void treeExpanded(TreeExpansionEvent event) {
         updateTreeViewerState(treeViewer);
       }
 
+      @Override
       public void treeCollapsed(TreeExpansionEvent event) {
         updateTreeViewerState(treeViewer);
       }
     });
     treeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+      @Override
       public void selectionChanged(SelectionChangedEvent event) {
         updateTreeViewerState(treeViewer);
       }
@@ -331,12 +334,14 @@ public final class TreeViewerUIState {
   }
 
   private static final MatchCallback f_restoreExpandedNodes = new MatchCallback() {
+    @Override
     public void onMatch(TreeViewer treeViewer, TreePath treePath) {
       treeViewer.setExpandedState(treePath, true);
     }
   };
 
   private static final MatchCallback f_restoreSelectedNodes = new MatchCallback() {
+    @Override
     public void onMatch(TreeViewer treeViewer, TreePath treePath) {
       final List<TreePath> result = new ArrayList<TreePath>();
       result.add(treePath);

@@ -67,7 +67,8 @@ public final class JavaSyntaxHighlighter {
 		f_result = null;
 
 		Arrays.sort(ranges, new Comparator<StyleRange>() {
-			public int compare(StyleRange r1, StyleRange r2) {
+			@Override
+      public int compare(StyleRange r1, StyleRange r2) {
 				return r1.start - r2.start;
 			}
 		});

@@ -99,14 +99,16 @@ public final class SearchBox {
 			}
 		});
 		f_clearLabel.addListener(SWT.MouseEnter, new Listener() {
-			public void handleEvent(Event event) {
+			@Override
+      public void handleEvent(Event event) {
 				if (f_searchTextInUse) {
 					f_clearLabel.setImage(f_clearImageHover);
 				}
 			}
 		});
 		f_clearLabel.addListener(SWT.MouseExit, new Listener() {
-			public void handleEvent(Event event) {
+			@Override
+      public void handleEvent(Event event) {
 				f_clearLabel.setImage(f_clearImage);
 			}
 		});
@@ -118,7 +120,8 @@ public final class SearchBox {
 		f_searchText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
 				false));
 		f_searchText.addModifyListener(new ModifyListener() {
-			public void modifyText(ModifyEvent unused) {
+			@Override
+      public void modifyText(ModifyEvent unused) {
 				/*
 				 * Check if the text is 'stable' in some amount of time ~500ms.
 				 */

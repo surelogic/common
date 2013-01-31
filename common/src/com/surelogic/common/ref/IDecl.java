@@ -410,6 +410,7 @@ public interface IDecl {
    *          object to be compared for equality with this declaration.
    * @return {@code true} if the specified object is equal to this declaration.
    */
+  @Override
   boolean equals(Object o);
 
   /**
@@ -417,6 +418,7 @@ public interface IDecl {
    * 
    * @return the hash code value for this declaration.
    */
+  @Override
   int hashCode();
 
   /**

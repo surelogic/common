@@ -27,6 +27,7 @@ final class DeclClass extends DeclVisibility implements IDeclType {
     f_anonymousType = anonymousType;
   }
 
+  @Override
   @NonNull
   public Kind getKind() {
     return Kind.CLASS;

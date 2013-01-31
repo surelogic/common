@@ -71,7 +71,8 @@ public class AnnotationDescription implements Comparable<AnnotationDescription> 
 		return String.format("@%s(%s)", getAnnotation(), getContents());
 	}
 
-	public int compareTo(final AnnotationDescription o) {
+	@Override
+  public int compareTo(final AnnotationDescription o) {
 		int compare = cmp.compare(getAnnotation(), o.getAnnotation());
 		if (compare == 0) {
 			compare = compare(contents, o.contents);
@@ -233,7 +234,8 @@ public class AnnotationDescription implements Comparable<AnnotationDescription> 
 				"AggregateInRegion", "Region", "Regions", "RegionLock",
 				"RegionLocks");
 
-		public int compare(final String o1, final String o2) {
+		@Override
+    public int compare(final String o1, final String o2) {
 			final int indexOf1 = custom.indexOf(o1);
 			final int indexOf2 = custom.indexOf(o2);
 			if (indexOf1 == -1 && indexOf2 == -1) {

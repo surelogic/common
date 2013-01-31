@@ -28,43 +28,53 @@ public class ConcurrentMultiHashMap<K,V> implements MultiMap<K,V> {
 		return values;
 	}
 	
-	public void clear() {
+	@Override
+  public void clear() {
 		map.clear();
 	}
 
-	public boolean containsKey(Object key) {
+	@Override
+  public boolean containsKey(Object key) {
 		return map.containsKey(key);
 	}
 
-	public boolean containsValue(Object arg0) {
+	@Override
+  public boolean containsValue(Object arg0) {
 		throw new UnsupportedOperationException();
 	}
 
-	public boolean containsValue(Object key, Object value) {
+	@Override
+  public boolean containsValue(Object key, Object value) {
 		return getOrEmpty(key).contains(value);
 	}
 
-	public Set<Entry<K, Collection<V>>> entrySet() {
+	@Override
+  public Set<Entry<K, Collection<V>>> entrySet() {
 		return map.entrySet();
 	}
 
-	public Collection<V> get(Object key) {
+	@Override
+  public Collection<V> get(Object key) {
 		return map.get(key);
 	}
 
-	public boolean isEmpty() {
+	@Override
+  public boolean isEmpty() {
 		return map.isEmpty();
 	}
 
-	public Iterator<V> iterator(Object key) {
+	@Override
+  public Iterator<V> iterator(Object key) {
 		return getOrEmpty(key).iterator();
 	}
 
-	public Set<K> keySet() {
+	@Override
+  public Set<K> keySet() {
 		return map.keySet();
 	}
 
-	public Map<K, Collection<V>> map() {
+	@Override
+  public Map<K, Collection<V>> map() {
 		throw new UnsupportedOperationException();
 	}
 
@@ -87,49 +97,58 @@ public class ConcurrentMultiHashMap<K,V> implements MultiMap<K,V> {
 		return new Vector<V>(1);
 	}
 	
-	public V put(K key, V value) {
+	@Override
+  public V put(K key, V value) {
 		Collection<V> values = ensureCollection(key);
 		values.add(value);
 		return value; // Always changed here
 	}
 
-	public void putAll(Map<? extends K, ? extends V> m) {
+	@Override
+  public void putAll(Map<? extends K, ? extends V> m) {
 		for(Entry<? extends K, ? extends V> e : m.entrySet()) {
 			put(e.getKey(), e.getValue());
 		}
 	}
 	
-	public void putAll(MultiMap<? extends K, ? extends V> mm) {
+	@Override
+  public void putAll(MultiMap<? extends K, ? extends V> mm) {
 		for(Entry<? extends K, ? extends Collection<? extends V>> e : mm.entrySet()) {
 			putAll(e.getKey(), e.getValue());
 		}		
 	}
 
-	public boolean putAll(K key, Collection<? extends V> newValues) {
+	@Override
+  public boolean putAll(K key, Collection<? extends V> newValues) {
 		Collection<V> values = ensureCollection(key);
 		values.addAll(newValues);
 		return !newValues.isEmpty();
 	}
 
-	public Collection<V> remove(Object key) {
+	@Override
+  public Collection<V> remove(Object key) {
 		return map.remove(key);
 	}
 
-	@SuppressWarnings("unchecked")
+	@Override
+  @SuppressWarnings("unchecked")
 	public V remove(Object key, Object value) {
 		boolean success = getOrEmpty(key).remove(value);
 		return success ? (V) value : null;
 	}
 
-	public int size() {
+	@Override
+  public int size() {
 		return map.size();
 	}
 
-	public int size(Object key) {
+	@Override
+  public int size(Object key) {
 		return getOrEmpty(key).size();
 	}
 
-	public Collection<V> values() {
+	@Override
+  public Collection<V> values() {
 		throw new UnsupportedOperationException();
 	}
 }

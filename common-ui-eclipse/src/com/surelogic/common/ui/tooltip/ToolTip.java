@@ -147,14 +147,16 @@ public class ToolTip {
 			control.addKeyListener(this);
 		}
 
-		public void mouseDoubleClick(final MouseEvent e) {
+		@Override
+    public void mouseDoubleClick(final MouseEvent e) {
 			mouseDown(e);
 		}
 
 		/*
 		 * Go sticky if we click the tool tip, otherwise get out of the way.
 		 */
-		public void mouseDown(final MouseEvent e) {
+		@Override
+    public void mouseDown(final MouseEvent e) {
 			if (toolTip.isVisible()) {
 				if (toolTip.mouseIsOver(e.widget, e.x, e.y)) {
 					if (!isSticky) {
@@ -166,11 +168,13 @@ public class ToolTip {
 			}
 		}
 
-		public void mouseUp(final MouseEvent e) {
+		@Override
+    public void mouseUp(final MouseEvent e) {
 			// Nothing to do here
 		}
 
-		public void mouseEnter(final MouseEvent e) {
+		@Override
+    public void mouseEnter(final MouseEvent e) {
 			// Nothing to do here
 		}
 
@@ -179,7 +183,8 @@ public class ToolTip {
 		 * in the future we need to check if the mouse leaves the tool tip. If
 		 * we aren't, then close the tool tip.
 		 */
-		public void mouseExit(final MouseEvent e) {
+		@Override
+    public void mouseExit(final MouseEvent e) {
 			if (toolTip.isVisible()) {
 				if (!toolTip.mouseIsOver(e.widget, e.x, e.y)) {
 					toolTip.setVisible(false);
@@ -193,7 +198,8 @@ public class ToolTip {
 		/*
 		 * Trap hover events to pop-up tooltip
 		 */
-		public void mouseHover(final MouseEvent event) {
+		@Override
+    public void mouseHover(final MouseEvent event) {
 			final Point pt = new Point(event.x, event.y);
 			Widget widget = event.widget;
 			if (widget instanceof ToolBar) {
@@ -244,7 +250,8 @@ public class ToolTip {
 			}
 		}
 
-		public void handleEvent(final Event event) {
+		@Override
+    public void handleEvent(final Event event) {
 			// Return if the tool tip is not active.
 			if (!toolTip.isVisible()) {
 				return;
@@ -307,11 +314,13 @@ public class ToolTip {
 			}
 		}
 
-		public void keyPressed(KeyEvent e) {
+		@Override
+    public void keyPressed(KeyEvent e) {
 			// Do nothing
 		}
 
-		public void keyReleased(KeyEvent e) {
+		@Override
+    public void keyReleased(KeyEvent e) {
 			if (toolTip.isVisible()) {
 				if (e.keyCode == SWT.F2 && !isSticky) {
 					stickyTip();
@@ -354,7 +363,8 @@ public class ToolTip {
 
 		private final Map<String, File> fileMap = new HashMap<String, File>();
 
-		public File getImageFile(String gifName) {
+		@Override
+    public File getImageFile(String gifName) {
 			synchronized (fileMap) {
 				File f = fileMap.get(gifName);
 				if (f == null) {

@@ -56,7 +56,8 @@ public final class TableUtility {
 			f_cmp = cmp;
 		}
 
-		public void handleEvent(final Event e) {
+		@Override
+    public void handleEvent(final Event e) {
 			final TableColumn tc = (TableColumn) e.widget;
 			final Table table = tc.getParent();
 			table.setRedraw(false);

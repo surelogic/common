@@ -100,7 +100,8 @@ public final class LowMaximumMemoryDialog extends Dialog {
 		check.setLayoutData(data);
 		check.setText("Please do not show this warning again");
 		check.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event event) {
+			@Override
+      public void handleEvent(Event event) {
 				CommonCorePreferencesUtility
 						.setWarnAboutLowMaximumMemory(!check.getSelection());
 			}

@@ -36,6 +36,7 @@ public enum MemoryWarningSystem {
     MemoryMXBean mbean = ManagementFactory.getMemoryMXBean();
     NotificationEmitter emitter = (NotificationEmitter) mbean;
     emitter.addNotificationListener(new NotificationListener() {
+      @Override
       public void handleNotification(Notification n, Object hb) {
     	//SLLogger.getLogger().warning("Got notification: "+n.getType());
         if (n.getType().equals(

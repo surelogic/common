@@ -36,7 +36,8 @@ public abstract class AbstractLicenseFieldEditorPreferencePage extends
 		final Button licenseButton = new Button(parent, SWT.PUSH);
 		licenseButton.setText(I18N.msg("common.manage.licenses.dialog.title"));
 		licenseButton.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event event) {
+			@Override
+      public void handleEvent(Event event) {
 				ManageLicensesDialog.open(getShell());
 			}
 		});

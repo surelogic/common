@@ -19,16 +19,19 @@ public class ImageImageDescriptor extends ImageDescriptor {
 		f_Image = image;
 	}
 
-	public ImageData getImageData() {
+	@Override
+  public ImageData getImageData() {
 		return f_Image.getImageData();
 	}
 
-	public boolean equals(Object obj) {
+	@Override
+  public boolean equals(Object obj) {
 		return (obj != null) && getClass().equals(obj.getClass())
 				&& f_Image.equals(((ImageImageDescriptor) obj).f_Image);
 	}
 
-	public int hashCode() {
+	@Override
+  public int hashCode() {
 		return f_Image.hashCode();
 	}
 }

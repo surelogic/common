@@ -153,6 +153,7 @@ public class TypeSelectionDialog extends SelectionDialog {
     });
     // Keep the CR from going to the default button
     searchText.addTraverseListener(new TraverseListener() {
+      @Override
       public void keyTraversed(TraverseEvent e) {
         if (e.detail == SWT.TRAVERSE_RETURN) {
           e.doit = false;
@@ -220,16 +221,20 @@ public class TypeSelectionDialog extends SelectionDialog {
     typesViewer.getControl().setLayoutData(new GridData(GridData.FILL_BOTH));
 
     typesViewer.setContentProvider(new IStructuredContentProvider() {
+      @Override
       @SuppressWarnings("unchecked")
       public Object[] getElements(Object inputElement) {
         return ((java.util.List<IType>) inputElement).toArray();
       }
+      @Override
       public void dispose() { /* do nothing */ }
+      @Override
       public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
         /* do nothing */
       }
     });
     typesViewer.setLabelProvider(new ITableLabelProvider() {
+      @Override
       public Image getColumnImage(final Object element, final int columnIndex) {
         final IType type = (IType) element;
         try {
@@ -249,28 +254,34 @@ public class TypeSelectionDialog extends SelectionDialog {
         }
       }
 
+      @Override
       public String getColumnText(final Object element, final int columnIndex) {
         return ((IType) element).getFullyQualifiedName('.');
       }
 
+      @Override
       public void dispose() {
         // Do nothing
       }
     
+      @Override
       public boolean isLabelProperty(final Object element,
           final String property) {
         return false;
       }
     
+      @Override
       public void addListener(final ILabelProviderListener listener) {
         // Do nothing
       }
     
+      @Override
       public void removeListener(final ILabelProviderListener listener) {
         // Do Nothing
       }
     });
     typesViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+      @Override
       public void selectionChanged(final SelectionChangedEvent event) {
         final ISelection selection = event.getSelection();
         if (selection.isEmpty()) {
@@ -307,6 +318,7 @@ public class TypeSelectionDialog extends SelectionDialog {
           @Override
           public void beginReporting() {
             EclipseUIUtility.asyncExec(new Runnable() {
+              @Override
               public void run() {
                 progressBar.setEnabled(true);
                 if (cancelButton != null) cancelButton.setEnabled(true);
@@ -319,6 +331,7 @@ public class TypeSelectionDialog extends SelectionDialog {
           @Override
           public void endReporting() {
             EclipseUIUtility.asyncExec(new Runnable() {
+              @Override
               public void run() {
                 progressBar.setMaximum(1);
                 progressBar.setSelection(0);
@@ -339,6 +352,7 @@ public class TypeSelectionDialog extends SelectionDialog {
           @Override
           public void acceptSearchMatch(final SearchMatch match) throws CoreException {
             EclipseUIUtility.asyncExec(new Runnable() {
+              @Override
               public void run() {
                 final IType element = (IType) match.getElement();
                 types.add(element);
@@ -407,30 +421,40 @@ public class TypeSelectionDialog extends SelectionDialog {
     
     public MyProgressMonitor() { super(); }
     
+    @Override
     public void beginTask(final String name, final int totalWork) {
       EclipseUIUtility.asyncExec(new Runnable() {
+        @Override
         public void run() {
           progressBar.setMaximum(totalWork);
         }
       });
     }
     
+    @Override
     public void internalWorked(final double work) {
       EclipseUIUtility.asyncExec(new Runnable() {
+        @Override
         public void run() {
           progressBar.setSelection(currentWork += work);
         }
       });
     }
 
+    @Override
     public void worked(final int work) {
       internalWorked(work);
     }    
 
+    @Override
     public void done() { /* don't care */ }
+    @Override
     public synchronized boolean isCanceled() { return canceled; }
+    @Override
     public synchronized void setCanceled(final boolean value) { canceled = value; }
+    @Override
     public void setTaskName(final String name) { /* don't care */ }
+    @Override
     public void subTask(final String name) { /* don't care */ }
   }
 }

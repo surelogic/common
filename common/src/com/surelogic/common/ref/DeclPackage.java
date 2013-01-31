@@ -19,6 +19,7 @@ final class DeclPackage extends Decl implements IDeclPackage {
     super(null, childBuilders, name);
   }
 
+  @Override
   @NonNull
   public Kind getKind() {
     return Kind.PACKAGE;

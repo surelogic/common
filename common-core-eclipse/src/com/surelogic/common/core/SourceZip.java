@@ -38,7 +38,8 @@ public class SourceZip extends AbstractJavaZip<IResource> {
 		z.close();
 	}
 
-	public void generateSourceZipContents(ZipOutputStream out, IResource res)
+	@Override
+  public void generateSourceZipContents(ZipOutputStream out, IResource res)
 			throws IOException {
 		super.generateSourceZipContents(out, res);
 	}

@@ -34,7 +34,8 @@ public class QueryableKeyedStatement<T> implements Queryable<T> {
 		this.kh = kh;
 	}
 
-	public T call(Object... args) {
+	@Override
+  public T call(Object... args) {
 		try {
 			JDBCUtils.fill(st, args);
 			st.execute();
@@ -46,7 +47,8 @@ public class QueryableKeyedStatement<T> implements Queryable<T> {
 		}
 	}
 
-	public void finished() {
+	@Override
+  public void finished() {
 		try {
 			st.close();
 		} catch (final SQLException e) {

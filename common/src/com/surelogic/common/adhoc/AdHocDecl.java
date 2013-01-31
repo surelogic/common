@@ -142,112 +142,137 @@ public final class AdHocDecl implements IDecl {
     }
   }
 
+  @Override
   @Nullable
   public IDecl getParent() {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   @NonNull
   public List<IDecl> getChildren() {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   @NonNull
   public Kind getKind() {
     return f_kind;
   }
 
+  @Override
   @NonNull
   public String getName() {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   @Nullable
   public TypeRef getTypeOf() {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   @NonNull
   public Visibility getVisibility() {
     return f_visibility;
   }
 
+  @Override
   public boolean isStatic() {
     return f_isStatic;
   }
 
+  @Override
   public boolean isFinal() {
     return f_isFinal;
   }
 
+  @Override
   public boolean isAbstract() {
     return f_isAbstract;
   }
 
+  @Override
   public boolean isImplicit() {
     return f_isImplicit;
   }
 
+  @Override
   public boolean isVolatile() {
     return f_isVolatile;
   }
 
+  @Override
   @NonNull
   public List<IDeclParameter> getParameters() {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public int getPosition() {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   @NonNull
   public List<IDeclTypeParameter> getTypeParameters() {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   @NonNull
   public List<TypeRef> getBounds() {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public boolean hasSameAttributesAs(IDecl o) {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public boolean hasSameAttributesAsSloppy(IDecl o) {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public boolean isSameSimpleDeclarationAs(IDecl o) {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public boolean isSameSimpleDeclarationAsSloppy(IDecl o, boolean checkAttributes) {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public int simpleDeclarationHashCode() {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public int simpleDeclarationHashCodeSloppy() {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public boolean isSameDeclarationAs(IDecl o) {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public boolean isSameDeclarationAsSloppy(IDecl o) {
     throw new UnsupportedOperationException();
   }
 
+  @Override
   public void acceptThisToRoot(@NonNull DeclVisitor visitor) {
     throw new UnsupportedOperationException();
 
   }
 
+  @Override
   public void acceptRootToThis(@NonNull DeclVisitor visitor) {
     throw new UnsupportedOperationException();
   }

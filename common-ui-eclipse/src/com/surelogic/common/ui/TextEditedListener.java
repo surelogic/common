@@ -18,7 +18,8 @@ public class TextEditedListener implements Listener {
 		f_action = action;
 	}
 
-	public void handleEvent(Event event) {
+	@Override
+  public void handleEvent(Event event) {
 		if (event.type == SWT.Modify) {
 			f_editInProgress = true;
 		} else if (event.type == SWT.FocusOut && f_editInProgress) {

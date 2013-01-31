@@ -61,6 +61,7 @@ public abstract class AbstractHistoricalSourceView extends ViewPart {
    * Internal class for informing this window when fonts change.
    */
   private class FontChangeListener implements IPropertyChangeListener {
+    @Override
     public void propertyChange(PropertyChangeEvent event) {
       if (f_source != null) {
         f_source.setFont(JFaceResources.getTextFont());

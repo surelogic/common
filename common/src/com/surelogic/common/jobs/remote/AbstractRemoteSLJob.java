@@ -231,16 +231,19 @@ public abstract class AbstractRemoteSLJob {
 			this.out = out;
 		}
 
-		public void begin() {
+		@Override
+    public void begin() {
 			throw new IllegalStateException(
 					"begin() can't be used in this context");
 		}
 
-		public void begin(final int totalWork) {
+		@Override
+    public void begin(final int totalWork) {
 			out.println("##" + Remote.TASK + ", Scan, " + totalWork);
 		}
 
-		public void done() {
+		@Override
+    public void done() {
 			out.println("##" + Remote.DONE);
 		}
 
@@ -272,11 +275,13 @@ public abstract class AbstractRemoteSLJob {
 			// Do nothing
 		}
 
-		public boolean isCanceled() {
+		@Override
+    public boolean isCanceled() {
 			return cancelled;
 		}
 
-		public void setCanceled(final boolean value) {
+		@Override
+    public void setCanceled(final boolean value) {
 			cancelled = value;
 		}
 
@@ -285,17 +290,20 @@ public abstract class AbstractRemoteSLJob {
 
 		}
 
-		public void subTask(final String name) {
+		@Override
+    public void subTask(final String name) {
 			out.println("##" + Remote.SUBTASK + ", " + name);
 			checkIfCancelled();
 		}
 		
-		public void subTaskDone() {
+		@Override
+    public void subTaskDone() {
 			out.println("##" + Remote.SUBTASK_DONE);
 			checkIfCancelled();
 		}
 
-		public void worked(final int work) {
+		@Override
+    public void worked(final int work) {
 			out.println("##" + Remote.WORK + ", " + work);
 			checkIfCancelled();
 		}

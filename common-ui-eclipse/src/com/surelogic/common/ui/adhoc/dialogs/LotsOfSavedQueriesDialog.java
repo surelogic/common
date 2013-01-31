@@ -43,7 +43,8 @@ public class LotsOfSavedQueriesDialog extends MessageDialog {
 				.msg("adhoc.query.dialog.lotsOfSavedQueries.remember"));
 		rememberMyDecision.setSelection(f_rememberMyDecision);
 		rememberMyDecision.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event event) {
+			@Override
+      public void handleEvent(Event event) {
 				f_rememberMyDecision = rememberMyDecision.getSelection();
 			}
 		});

@@ -11,7 +11,8 @@ class ResultRowHandler<T> implements ResultHandler<List<T>> {
 		this.rh = rh;
 	}
 
-	public List<T> handle(Result result) {
+	@Override
+  public List<T> handle(Result result) {
 		final List<T> list = new ArrayList<T>();
 		for (final Row row : result) {
 			list.add(rh.handle(row));

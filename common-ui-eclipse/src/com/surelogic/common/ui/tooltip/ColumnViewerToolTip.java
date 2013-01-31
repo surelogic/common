@@ -73,7 +73,8 @@ public class ColumnViewerToolTip extends ColumnViewerToolTipSupport {
 	 *            the parent of the content area
 	 * @return the content area created
 	 */
-	protected Composite createToolTipContentArea(Event event, Composite parent) {
+	@Override
+  protected Composite createToolTipContentArea(Event event, Composite parent) {
 		Image image = getImage(event);
 		Image bgImage = getBackgroundImage(event);
 		String text = getText(event);

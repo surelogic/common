@@ -15,7 +15,8 @@ class ResultSetResult implements Result {
 		this.row = new ResultSetRow(set);
 	}
 
-	public Iterator<Row> iterator() {
+	@Override
+  public Iterator<Row> iterator() {
 		if (set == null) {
 			throw new IllegalArgumentException(
 					"Cannot iterate over a null result set.  Please make sure that your query is a SELECT statement.");
@@ -25,7 +26,8 @@ class ResultSetResult implements Result {
 			private boolean hasNexted = false;
 			private boolean hasNext = true;
 
-			public boolean hasNext() {
+			@Override
+      public boolean hasNext() {
 				if (!hasNexted) {
 					hasNexted = true;
 					try {
@@ -37,7 +39,8 @@ class ResultSetResult implements Result {
 				return hasNext;
 			}
 
-			public Row next() {
+			@Override
+      public Row next() {
 				if (!hasNexted) {
 					try {
 						if (!set.next()) {
@@ -54,7 +57,8 @@ class ResultSetResult implements Result {
 				return row;
 			}
 
-			public void remove() {
+			@Override
+      public void remove() {
 				throw new UnsupportedOperationException();
 			}
 		};

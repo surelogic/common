@@ -19,7 +19,8 @@ public final class AdHocQueryResultTimeComparator implements
 		// singleton
 	}
 
-	public int compare(AdHocQueryResult o1, AdHocQueryResult o2) {
+	@Override
+  public int compare(AdHocQueryResult o1, AdHocQueryResult o2) {
 		return o1.getTimeQueryWasRun().compareTo(o2.getTimeQueryWasRun());
 	}
 }

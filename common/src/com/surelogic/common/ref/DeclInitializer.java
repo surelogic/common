@@ -17,6 +17,7 @@ final class DeclInitializer extends Decl {
     f_isStatic = isStatic;
   }
 
+  @Override
   @NonNull
   public Kind getKind() {
     return Kind.INITIALIZER;

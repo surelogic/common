@@ -68,7 +68,8 @@ public class ToolTipInformationControl extends AbstractInformationControl {
 		});
 
 		tipBrowser.addOpenWindowListener(new OpenWindowListener() {
-			public void open(final WindowEvent event) {
+			@Override
+      public void open(final WindowEvent event) {
 				event.required = true; // Cancel opening of new windows
 			}
 		});
@@ -155,7 +156,8 @@ public class ToolTipInformationControl extends AbstractInformationControl {
 
 		// Make sure the display wakes from sleep after timeout:
 		display.timerExec(100, new Runnable() {
-			public void run() {
+			@Override
+      public void run() {
 				completed = true;
 			}
 		});
@@ -184,7 +186,8 @@ public class ToolTipInformationControl extends AbstractInformationControl {
 		super.setVisible(true);
 	}
 
-	public boolean hasContents() {
+	@Override
+  public boolean hasContents() {
 		return browserHasContent;
 	}
 

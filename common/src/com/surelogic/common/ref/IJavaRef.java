@@ -493,6 +493,7 @@ public interface IJavaRef {
    *          object to be compared for equality with this reference.
    * @return {@code true} if the specified object is equal to this reference.
    */
+  @Override
   boolean equals(Object o);
 
   /**
@@ -500,5 +501,6 @@ public interface IJavaRef {
    * 
    * @return the hash code value for this reference.
    */
+  @Override
   int hashCode();
 }

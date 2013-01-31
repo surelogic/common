@@ -64,7 +64,8 @@ public final class AdHocQueryJob extends AbstractSLJob {
 		f_parentResultOrNull = parentResultOrNull;
 	}
 
-	public SLStatus run(final SLProgressMonitor monitor) {
+	@Override
+  public SLStatus run(final SLProgressMonitor monitor) {
 		final AdHocManager manager = f_query.getManager();
 		monitor.begin();
 

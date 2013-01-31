@@ -902,6 +902,7 @@ public class EclipseUtility {
     if (job == null)
       throw new IllegalArgumentException(I18N.err(44, "job"));
     final Job result = new EclipseAccessKeysJob(job.getName(), accessKeys) {
+      @Override
       protected IStatus run(IProgressMonitor monitor) {
         final SLStatus status = job.run(new SLProgressMonitorWrapper(monitor, job.getName(), job.getObservers()));
         return SLEclipseStatusUtility.convert(status);
@@ -933,6 +934,7 @@ public class EclipseUtility {
     if (resource == null)
       throw new IllegalArgumentException(I18N.err(44, "resource"));
     final WorkspaceJob result = new WorkspaceJob(job.getName()) {
+      @Override
       public IStatus runInWorkspace(IProgressMonitor monitor) {
         final SLStatus status = job.run(new SLProgressMonitorWrapper(monitor, job.getName(), job.getObservers()));
         return SLEclipseStatusUtility.convert(status);

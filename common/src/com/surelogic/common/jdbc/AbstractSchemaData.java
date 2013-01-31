@@ -28,11 +28,13 @@ public abstract class AbstractSchemaData implements SchemaData {
 		f_product = product;
 	}
 
-	public final SLLicenseProduct getProduct() {
+	@Override
+  public final SLLicenseProduct getProduct() {
 		return f_product;
 	}
 
-	public final SchemaAction getSchemaAction(final String action) {
+	@Override
+  public final SchemaAction getSchemaAction(final String action) {
 		try {
 			return (SchemaAction) newInstance(schemaPackage + "." + action);
 		} catch (final InstantiationException e) {
@@ -55,7 +57,8 @@ public abstract class AbstractSchemaData implements SchemaData {
 
 	protected abstract InputStream getResourceAsStream(String path);
 
-	public final int getVersion() {
+	@Override
+  public final int getVersion() {
 		final BufferedReader reader = new BufferedReader(new InputStreamReader(
 				getResourceAsStream(getSchemaResourcePath("version.txt"))));
 		try {

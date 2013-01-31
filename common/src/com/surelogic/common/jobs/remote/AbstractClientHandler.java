@@ -104,7 +104,8 @@ public abstract class AbstractClientHandler extends Thread implements IClientHan
 	 * Signals that this client handler should be shutdown. This method
 	 * returns immediately.
 	 */
-	public void requestShutdown() {
+	@Override
+  public void requestShutdown() {
 		f_shutdownRequested = true;
 		try {
 			this.interrupt(); // wake up

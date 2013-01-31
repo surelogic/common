@@ -14,6 +14,7 @@ final class DeclInterface extends DeclVisibility implements IDeclType {
     super(parent, childBuilders, name, visibility);
   }
 
+  @Override
   @NonNull
   public Kind getKind() {
     return Kind.INTERFACE;

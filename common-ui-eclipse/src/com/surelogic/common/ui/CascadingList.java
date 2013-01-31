@@ -43,6 +43,7 @@ public class CascadingList extends ScrolledComposite {
   private final Composite f_contents;
 
   private final Listener f_resizeAction = new Listener() {
+    @Override
     public void handleEvent(Event event) {
       fixupSize();
     }

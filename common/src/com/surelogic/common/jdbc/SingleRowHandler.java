@@ -10,7 +10,8 @@ package com.surelogic.common.jdbc;
  */
 public abstract class SingleRowHandler<T> implements ResultHandler<T> {
 
-	public T handle(Result r) {
+	@Override
+  public T handle(Result r) {
 		for (final Row row : r) {
 			return handleRow(row);
 		}

@@ -80,7 +80,8 @@ public final class TableExportDialog extends Dialog {
 		f_csvFormat.setText("Comma Separated Values (CSV)");
 		f_csvFormat.setSelection(true);
 		f_csvFormat.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event event) {
+			@Override
+      public void handleEvent(Event event) {
 				changeFileExtension("html", "csv");
 			}
 		});
@@ -88,7 +89,8 @@ public final class TableExportDialog extends Dialog {
 		f_htmlFormat = new Button(g, SWT.RADIO);
 		f_htmlFormat.setText("HTML Table (viewable in a web browser)");
 		f_htmlFormat.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event event) {
+			@Override
+      public void handleEvent(Event event) {
 				changeFileExtension("csv", "html");
 			}
 		});
@@ -110,7 +112,8 @@ public final class TableExportDialog extends Dialog {
 		browseButton.addListener(SWT.Selection, new Listener() {
 			private FileDialog fd;
 
-			public void handleEvent(Event event) {
+			@Override
+      public void handleEvent(Event event) {
 				if (fd == null) {
 					fd = new FileDialog(getShell(), SWT.SAVE);
 					fd.setText("Destination File");

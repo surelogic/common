@@ -19,21 +19,24 @@ public class CharBuffer implements CharSequence {
 		}
 	}
 	
-	@Borrowed("this")
+	@Override
+  @Borrowed("this")
 	@RegionEffects("reads Instance")
 	@Starts("nothing")
 	public char charAt(int index) {
 		return buf[index];
 	}
 
-	@Borrowed("this")
+	@Override
+  @Borrowed("this")
 	@RegionEffects("reads Instance")
 	@Starts("nothing")
 	public int length() {
 		return size;
 	}
 
-	@Borrowed("this")
+	@Override
+  @Borrowed("this")
 	@RegionEffects("reads Instance")
 	@Unique("return")
 	@Starts("nothing")

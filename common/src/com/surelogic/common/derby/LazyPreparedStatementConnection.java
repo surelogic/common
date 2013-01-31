@@ -41,7 +41,8 @@ public final class LazyPreparedStatementConnection implements InvocationHandler 
 				new LazyPreparedStatementConnection(conn));
 	}
 
-	public Object invoke(final Object proxy, final Method method,
+	@Override
+  public Object invoke(final Object proxy, final Method method,
 			final Object[] args) throws Throwable {
 		if ("prepareStatement".equals(method.getName())) {
 			return Proxy.newProxyInstance(PreparedStatement.class
@@ -75,7 +76,8 @@ public final class LazyPreparedStatementConnection implements InvocationHandler 
 		public LazyPreparedStatement(final Method method, final Object... args) {
 			init = new Callable<PreparedStatement>() {
 
-				public PreparedStatement call() throws Exception {
+				@Override
+        public PreparedStatement call() throws Exception {
 					try {
 						final PreparedStatement st = (PreparedStatement) method
 								.invoke(conn, args);
@@ -100,7 +102,8 @@ public final class LazyPreparedStatementConnection implements InvocationHandler 
 			}
 		}
 
-		public Object invoke(final Object proxy, final Method method,
+		@Override
+    public Object invoke(final Object proxy, final Method method,
 				final Object[] args) throws Throwable {
 			check();
 			try {

@@ -30,7 +30,8 @@ final class QueryableStatement<T> implements Queryable<T> {
 		this.handler = handler;
 	}
 
-	public T call(final Object... args) {
+	@Override
+  public T call(final Object... args) {
 		try {
 			st.execute(String.format(query, args));
 			final ResultSetResult rs = new ResultSetResult(st.getResultSet());
@@ -44,7 +45,8 @@ final class QueryableStatement<T> implements Queryable<T> {
 		}
 	}
 
-	public void finished() {
+	@Override
+  public void finished() {
 		try {
 			st.close();
 		} catch (final SQLException e) {

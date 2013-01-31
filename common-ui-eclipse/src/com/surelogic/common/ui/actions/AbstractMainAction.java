@@ -8,14 +8,17 @@ import org.eclipse.ui.IWorkbenchWindowActionDelegate;
 
 public abstract class AbstractMainAction extends Action implements IWorkbenchWindowActionDelegate {
 
+    @Override
     public void dispose() {
         // Nothing to do
     }
 
+    @Override
     public void init(IWorkbenchWindow window) {
         // Nothing to do
     }
 
+    @Override
     public void selectionChanged(IAction action, ISelection selection) {
         // Nothing to do
     }

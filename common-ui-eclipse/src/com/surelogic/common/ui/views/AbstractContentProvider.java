@@ -22,7 +22,8 @@ implements IStructuredContentProvider, ILabelProvider, IColorProvider {
 
 	}
 
-	public Image getImage(Object element) {
+	@Override
+  public Image getImage(Object element) {
 		return null;
 	}
 
@@ -44,11 +45,13 @@ implements IStructuredContentProvider, ILabelProvider, IColorProvider {
 
 	}
 
-	public Color getForeground(Object element) {
+	@Override
+  public Color getForeground(Object element) {
 		return null;
 	}
 
-	public Color getBackground(Object element) {
+	@Override
+  public Color getBackground(Object element) {
 		return null;
 	}
 }

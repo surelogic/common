@@ -432,6 +432,7 @@ public final class EclipseUIUtility {
     MenuManager menuMgr = new MenuManager("#PopupMenu");
     menuMgr.setRemoveAllWhenShown(true);
     menuMgr.addMenuListener(new IMenuListener() {
+      @Override
       public void menuAboutToShow(IMenuManager m) {
         final IStructuredSelection s = (IStructuredSelection) sv.getSelection();
         filler.fillContextMenu(m, s);

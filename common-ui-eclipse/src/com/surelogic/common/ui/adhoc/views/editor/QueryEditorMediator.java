@@ -120,6 +120,7 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
     f_subQueryTable = subQueryTable;
   }
 
+  @Override
   public void init() {
     f_sash.setWeights(new int[] { EclipseUtility.getIntPreference(CommonCorePreferencesUtility.QEDITOR_SASH_LHS_WEIGHT),
         EclipseUtility.getIntPreference(CommonCorePreferencesUtility.QEDITOR_SASH_RHS_WEIGHT) });
@@ -130,6 +131,7 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
      * only way to do this.
      */
     f_lhs.addListener(SWT.Resize, new Listener() {
+      @Override
       public void handleEvent(final Event event) {
         final int[] weights = f_sash.getWeights();
         if (weights != null && weights.length == 2) {
@@ -141,6 +143,7 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
 
     f_lhsFolder.setSelection(EclipseUtility.getIntPreference(CommonCorePreferencesUtility.QEDITOR_LHS_TAB_SELECTION));
     f_lhsFolder.addListener(SWT.Selection, new Listener() {
+      @Override
       public void handleEvent(final Event event) {
         EclipseUtility.setIntPreference(CommonCorePreferencesUtility.QEDITOR_LHS_TAB_SELECTION, f_lhsFolder.getSelectionIndex());
       }
@@ -148,12 +151,14 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
 
     f_sqlFolder.setSelection(EclipseUtility.getIntPreference(CommonCorePreferencesUtility.QEDITOR_SQL_TAB_SELECTION));
     f_sqlFolder.addListener(SWT.Selection, new Listener() {
+      @Override
       public void handleEvent(final Event event) {
         EclipseUtility.setIntPreference(CommonCorePreferencesUtility.QEDITOR_SQL_TAB_SELECTION, f_lhsFolder.getSelectionIndex());
       }
     });
 
     final Listener selectionListener = new Listener() {
+      @Override
       public void handleEvent(final Event event) {
         querySelectionAction(event.widget);
       }
@@ -162,6 +167,7 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
     f_queryTree.addListener(SWT.Selection, selectionListener);
 
     final Listener doubleClickListener = new Listener() {
+      @Override
       public void handleEvent(final Event event) {
         runQueryAction();
       }
@@ -172,6 +178,7 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
     f_filterTree = EclipseUtility.getBooleanPreference(CommonCorePreferencesUtility.QEDITOR_FILTER_TREE_CHECK);
     f_filterTreeCheck.setSelection(f_filterTree);
     f_filterTreeCheck.addListener(SWT.Selection, new Listener() {
+      @Override
       public void handleEvent(final Event event) {
         final boolean filterTree = f_filterTreeCheck.getSelection();
         if (filterTree != f_filterTree) {
@@ -183,6 +190,7 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
     });
 
     f_queryActionMenu.addListener(SWT.Show, new Listener() {
+      @Override
       public void handleEvent(final Event event) {
         for (final MenuItem item : f_queryActionMenu.getItems()) {
           item.dispose();
@@ -192,12 +200,14 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
     });
 
     f_runQuery.addListener(SWT.Selection, new Listener() {
+      @Override
       public void handleEvent(final Event event) {
         runQueryAction();
       }
     });
 
     f_newQuery.addListener(SWT.Selection, new Listener() {
+      @Override
       public void handleEvent(final Event event) {
         final String id = f_manager.generateUnusedId();
         final AdHocQuery query = f_manager.get(id);
@@ -209,6 +219,7 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
     });
 
     f_deleteQuery.addListener(SWT.Selection, new Listener() {
+      @Override
       public void handleEvent(final Event event) {
         deleteQueryAction();
       }
@@ -229,6 +240,7 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
     });
 
     f_showCheck.addListener(SWT.Selection, new Listener() {
+      @Override
       public void handleEvent(final Event event) {
         final boolean show = f_showCheck.getSelection();
         if (show != f_edit.showInQueryMenu()) {
@@ -244,6 +256,7 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
     });
 
     f_showAtRootCheck.addListener(SWT.Selection, new Listener() {
+      @Override
       public void handleEvent(final Event event) {
         final boolean show = f_showAtRootCheck.getSelection();
         if (show != f_edit.showAtRootOfQueryMenu()) {
@@ -270,6 +283,7 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
     cutItem.setText("Cut");
     cutItem.setImage(PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_TOOL_CUT));
     cutItem.addListener(SWT.Selection, new Listener() {
+      @Override
       public void handleEvent(final Event event) {
         f_sql.cut();
       }
@@ -278,6 +292,7 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
     copyItem.setText("Copy");
     copyItem.setImage(PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_TOOL_COPY));
     copyItem.addListener(SWT.Selection, new Listener() {
+      @Override
       public void handleEvent(final Event event) {
         f_sql.copy();
       }
@@ -286,6 +301,7 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
     pasteItem.setText("Paste");
     pasteItem.setImage(PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_TOOL_PASTE));
     pasteItem.addListener(SWT.Selection, new Listener() {
+      @Override
       public void handleEvent(final Event event) {
         f_sql.paste();
       }
@@ -294,6 +310,7 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
     final MenuItem selectAllItem = new MenuItem(cpsMenu, SWT.PUSH);
     selectAllItem.setText("Select All");
     selectAllItem.addListener(SWT.Selection, new Listener() {
+      @Override
       public void handleEvent(final Event event) {
         f_sql.selectAll();
       }
@@ -316,6 +333,7 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
     f_sql.setMenu(cpsMenu);
 
     f_addSubQuery.addListener(SWT.Selection, new Listener() {
+      @Override
       public void handleEvent(final Event event) {
         final List<AdHocQuery> available = f_manager.getQueryList();
         available.remove(f_edit);
@@ -334,6 +352,7 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
     });
 
     f_deleteSubQuery.addListener(SWT.Selection, new Listener() {
+      @Override
       public void handleEvent(final Event event) {
         final TableItem[] selected = f_subQueryTable.getSelection();
         boolean changed = false;
@@ -350,6 +369,7 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
     });
 
     f_subQueryTable.addListener(SWT.Selection, new Listener() {
+      @Override
       public void handleEvent(final Event event) {
         final TableItem[] selected = f_subQueryTable.getSelection();
         if (selected == null || selected.length < 1) {
@@ -367,6 +387,7 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
     notifyQueryModelChange(f_manager);
   }
 
+  @Override
   public void dispose() {
     f_manager.removeObserver(this);
   }
@@ -689,6 +710,7 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
       runItem.setText(I18N.msg("adhoc.query.editor.lhs.query.run"));
       runItem.setImage(SLImages.getImage(CommonImages.IMG_RUN_DRUM));
       runItem.addListener(SWT.Selection, new Listener() {
+        @Override
         public void handleEvent(final Event event) {
           runQueryAction();
         }
@@ -706,6 +728,7 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
     }
     showItem.setText(I18N.msg("adhoc.query.editor.lhs.query.show"));
     showItem.addListener(SWT.Selection, new Listener() {
+      @Override
       public void handleEvent(final Event event) {
         final boolean show = showItem.getSelection();
         for (final AdHocQuery selectedQuery : f_selections) {
@@ -725,6 +748,7 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
     }
     showAtRootItem.setText(I18N.msg("adhoc.query.editor.lhs.query.showAtRoot"));
     showAtRootItem.addListener(SWT.Selection, new Listener() {
+      @Override
       public void handleEvent(final Event event) {
         final boolean showAtRoot = showAtRootItem.getSelection();
         for (final AdHocQuery selectedQuery : f_selections) {
@@ -751,6 +775,7 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
     deleteItem.setText(I18N.msg("adhoc.query.editor.lhs.query.delete"));
     deleteItem.setImage(SLImages.getImage(CommonImages.IMG_EDIT_DELETE));
     deleteItem.addListener(SWT.Selection, new Listener() {
+      @Override
       public void handleEvent(final Event event) {
         deleteQueryAction();
       }

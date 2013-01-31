@@ -19,6 +19,7 @@ final class DeclTypeParameter extends DeclWithPosition implements IDeclTypeParam
     f_bounds = bounds;
   }
 
+  @Override
   @NonNull
   public Kind getKind() {
     return Kind.TYPE_PARAMETER;

@@ -41,7 +41,8 @@ public class SQLSyntaxHighlighter implements LineStyleListener {
 
 	private ArrayList<StyleRange> f_result;
 
-	public void lineGetStyle(LineStyleEvent event) {
+	@Override
+  public void lineGetStyle(LineStyleEvent event) {
 		f_event = event;
 		f_result = new ArrayList<StyleRange>();
 		highlightComment(0);

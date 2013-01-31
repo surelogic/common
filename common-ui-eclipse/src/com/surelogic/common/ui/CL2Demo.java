@@ -54,7 +54,8 @@ public class CL2Demo {
 		add.setText("add children");
 		final int[] index = new int[] { 0 };
 		add.addListener(SWT.Selection, new Listener() {
-			public void handleEvent(Event e) {
+			@Override
+      public void handleEvent(Event e) {
 				index[0]++;
 				Button button = new Button(c1, SWT.PUSH);
 				button.setText("button " + index[0]);

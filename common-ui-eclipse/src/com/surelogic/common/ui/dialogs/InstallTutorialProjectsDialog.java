@@ -169,7 +169,8 @@ public class InstallTutorialProjectsDialog extends TitleAreaDialog {
 		final boolean showHelpToTheUser = showHelp.getSelection();
 
 		final SLJob job = new AbstractSLJob("Importing tutorial projects") {
-			public SLStatus run(SLProgressMonitor monitor) {
+			@Override
+      public SLStatus run(SLProgressMonitor monitor) {
 				monitor.begin(projectList.size() + 1);
 				try {
 					for (final URL project : projectList) {

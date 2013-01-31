@@ -308,31 +308,37 @@ public class JavaRef implements IJavaRef {
     f_jarRelativePath = DeclUtil.aliasIfPossible(jarRelativePathOrNull);
   }
 
+  @Override
   @Nullable
   public String getAbsolutePathOrNull() {
     return f_absolutePath;
   }
 
+  @Override
   @NonNull
   public final IDecl getDeclaration() {
     return f_declaration;
   }
 
+  @Override
   @NonNull
   public final String getEclipseProjectName() {
     return f_eclipseProjectName == null ? SLUtility.UNKNOWN_PROJECT : f_eclipseProjectName;
   }
 
+  @Override
   @NonNull
   public final String getEclipseProjectNameOrEmpty() {
     return f_eclipseProjectName == null ? "" : f_eclipseProjectName;
   }
 
+  @Override
   @Nullable
   public final String getEclipseProjectNameOrNull() {
     return f_eclipseProjectName;
   }
 
+  @Override
   @Nullable
   public String getRealEclipseProjectNameOrNull() {
     if (f_eclipseProjectName == null)
@@ -342,33 +348,40 @@ public class JavaRef implements IJavaRef {
     return f_eclipseProjectName;
   }
 
+  @Override
   @Nullable
   public String getJarRelativePathOrNull() {
     return f_jarRelativePath;
   }
 
+  @Override
   public final int getLength() {
     return f_length;
   }
 
+  @Override
   public final int getLineNumber() {
     return f_lineNumber;
   }
 
+  @Override
   public final int getOffset() {
     return f_offset;
   }
 
+  @Override
   @NonNull
   public final String getPackageName() {
     return DeclUtil.getPackageName(f_declaration);
   }
 
+  @Override
   @NonNull
   public Position getPositionRelativeToDeclaration() {
     return f_positionRelativeToDeclaration;
   }
 
+  @Override
   @NonNull
   public final String getSimpleFileName() {
     if (f_within == Within.JAVA_FILE && f_absolutePath != null) {
@@ -389,6 +402,7 @@ public class JavaRef implements IJavaRef {
     return DeclUtil.guessSimpleFileName(getDeclaration(), f_within);
   }
 
+  @Override
   @NonNull
   public final String getSimpleFileNameWithNoExtension() {
     final String fileNameWithExtension = getSimpleFileName();
@@ -399,21 +413,25 @@ public class JavaRef implements IJavaRef {
     return fileNameWithExtension;
   }
 
+  @Override
   @NonNull
   public final String getTypeNameFullyQualified() {
     return DeclUtil.getTypeNameFullyQualified(f_declaration);
   }
 
+  @Override
   @NonNull
   public final String getTypeNameOrNull() {
     return DeclUtil.getTypeNameOrNull(f_declaration);
   }
 
+  @Override
   @NonNull
   public final Within getWithin() {
     return f_within;
   }
 
+  @Override
   public final boolean isFromSource() {
     return f_within == IJavaRef.Within.JAVA_FILE;
   }
@@ -493,6 +511,7 @@ public class JavaRef implements IJavaRef {
     return b.toString();
   }
 
+  @Override
   @NonNull
   public final String encodeForPersistence() {
     /*

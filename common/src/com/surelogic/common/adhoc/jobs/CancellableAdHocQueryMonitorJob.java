@@ -12,7 +12,8 @@ public class CancellableAdHocQueryMonitorJob extends AbstractSLJob {
 		f_job = job;
 	}
 
-	public SLStatus run(final SLProgressMonitor monitor) {
+	@Override
+  public SLStatus run(final SLProgressMonitor monitor) {
 		monitor.begin();
 		while (true) {
 			if (monitor.isCanceled()) {

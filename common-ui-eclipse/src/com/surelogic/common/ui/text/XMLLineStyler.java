@@ -65,7 +65,8 @@ public class XMLLineStyler implements LineStyleListener
 		colorIndexContainer[OTHER]		=		0; 
 		
 	}
-	public void lineGetStyle(LineStyleEvent event) 
+	@Override
+  public void lineGetStyle(LineStyleEvent event) 
 	{
 		List<StyleRange> styles = new ArrayList<StyleRange>();
 		int token;

@@ -14,7 +14,8 @@ public abstract class AbstractUpdatableRecord<R> extends AbstractRecord<R>
 		this.mapper = mapper;
 	}
 
-	public void update() {
+	@Override
+  public void update() {
 		mapper.update(this);
 	}
 

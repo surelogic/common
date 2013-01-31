@@ -20,7 +20,8 @@ public class AdHocQueryDescriptionComparator implements Comparator<AdHocQuery> {
 		// singleton
 	}
 
-	public int compare(AdHocQuery o1, AdHocQuery o2) {
+	@Override
+  public int compare(AdHocQuery o1, AdHocQuery o2) {
 		if (o1 == null)
 			throw new IllegalArgumentException(I18N.err(44, "o1"));
 		if (o2 == null)

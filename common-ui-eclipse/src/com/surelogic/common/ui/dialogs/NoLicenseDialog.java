@@ -34,7 +34,8 @@ public final class NoLicenseDialog implements ILicenseObserver {
 		f_toEclipseLog = toEclipseLog;
 	}
 
-	public void notifyNoLicenseFor(final String subject) {
+	@Override
+  public void notifyNoLicenseFor(final String subject) {
 		final UIJob job = new SLUIJob() {
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {
@@ -61,7 +62,8 @@ public final class NoLicenseDialog implements ILicenseObserver {
 	 */
 	private final Set<String> f_alreadyNotified = new HashSet<String>();
 
-	public void notifyExpiration(final String subject, final Date expiration) {
+	@Override
+  public void notifyExpiration(final String subject, final Date expiration) {
 		final UIJob job = new SLUIJob() {
 			@Override
 			public IStatus runInUIThread(IProgressMonitor monitor) {

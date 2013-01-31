@@ -155,7 +155,8 @@ public class CompactToolTipInformationControl extends AbstractInformationControl
 
 		// Make sure the display wakes from sleep after timeout:
 		display.timerExec(100, new Runnable() {
-			public void run() {
+			@Override
+      public void run() {
 				completed = true;
 			}
 		});
@@ -184,7 +185,8 @@ public class CompactToolTipInformationControl extends AbstractInformationControl
 		super.setVisible(true);
 	}
 
-	public boolean hasContents() {
+	@Override
+  public boolean hasContents() {
 		return browserHasContent;
 	}
 

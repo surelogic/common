@@ -21,6 +21,7 @@ public final class KeywordAccessRule implements ISchedulingRule {
     return new KeywordAccessRule(keywords);
   }
 
+  @Override
   public boolean contains(final ISchedulingRule rule) {
     if (rule == this) {
       return true;
@@ -33,6 +34,7 @@ public final class KeywordAccessRule implements ISchedulingRule {
     return false;
   }
 
+  @Override
   public boolean isConflicting(final ISchedulingRule rule) {
     if (rule == this) {
       return true;

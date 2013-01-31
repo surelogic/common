@@ -97,6 +97,7 @@ public class SureLogicToolsPropertiesUtility {
   }
 
   private static final SureLogicToolsFilter f_null = new SureLogicToolsFilter() {
+    @Override
     public boolean matches(@NonNull String absoluteOrRelativePath, @NonNull String packageName) {
       return false;
     }

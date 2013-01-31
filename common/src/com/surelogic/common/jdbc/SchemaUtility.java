@@ -410,7 +410,8 @@ public final class SchemaUtility {
 						final URL serverScript = server.script;
 						final SchemaAction serverAction = server.action;
 						schemaActions[i] = new SchemaAction() {
-							public void run(final Connection c)
+							@Override
+              public void run(final Connection c)
 									throws SQLException {
 								/*
 								 * This approach is very generic, the server may
@@ -456,7 +457,8 @@ public final class SchemaUtility {
 						// SchemaUtility.checkAndUpdate()
 						// that there be an action or script for each version
 						schemaActions[i] = new SchemaAction() {
-							public void run(final Connection c)
+							@Override
+              public void run(final Connection c)
 									throws SQLException {
 								SLLogger.getLogger().fine(
 										"Nothing to do in client; only server-side changes for version "

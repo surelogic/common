@@ -34,35 +34,42 @@ public class ConnectionQuery implements Query {
 		map = new HashMap<String, PreparedStatement>();
 	}
 
-	public Queryable<Void> prepared(String key) {
+	@Override
+  public Queryable<Void> prepared(String key) {
 		return new QueryablePreparedStatement<Void>(findOrCreate(key),
 				new EmptyResultHandler());
 	}
 
-	public <T> Queryable<List<T>> prepared(String key, RowHandler<T> rh) {
+	@Override
+  public <T> Queryable<List<T>> prepared(String key, RowHandler<T> rh) {
 		return new QueryablePreparedStatement<List<T>>(findOrCreate(key),
 				new ResultRowHandler<T>(rh));
 	}
 
-	public <T> Queryable<T> prepared(String key, ResultHandler<T> rh) {
+	@Override
+  public <T> Queryable<T> prepared(String key, ResultHandler<T> rh) {
 		return new QueryablePreparedStatement<T>(findOrCreate(key), rh);
 	}
 
-	public <T> Queryable<T> prepared(String key, KeyHandler<T> kh) {
+	@Override
+  public <T> Queryable<T> prepared(String key, KeyHandler<T> kh) {
 		return new QueryableKeyedStatement<T>(findOrCreateKeyed(key, kh
 				.keyNames()), kh);
 	}
 
-	public Queryable<Void> statement(String key) {
+	@Override
+  public Queryable<Void> statement(String key) {
 		return new QueryableStatement<Void>(conn, key, new EmptyResultHandler());
 
 	}
 
-	public <T> Queryable<T> statement(String key, ResultHandler<T> rh) {
+	@Override
+  public <T> Queryable<T> statement(String key, ResultHandler<T> rh) {
 		return new QueryableStatement<T>(conn, key, rh);
 	}
 
-	public <T> Queryable<List<T>> statement(String key, RowHandler<T> rh) {
+	@Override
+  public <T> Queryable<List<T>> statement(String key, RowHandler<T> rh) {
 		return new QueryableStatement<List<T>>(conn, key,
 				new ResultRowHandler<T>(rh));
 	}
@@ -80,7 +87,8 @@ public class ConnectionQuery implements Query {
 	 * foo.generated         - Whether or not this record has an auto-generated primary key
 	 * </pre>
 	 */
-	public <T extends Record<?>> T record(Class<T> record) {
+	@Override
+  public <T extends Record<?>> T record(Class<T> record) {
 		if (!Record.class.isAssignableFrom(record)) {
 			throw new IllegalArgumentException(
 					"Parameter must implement Record");

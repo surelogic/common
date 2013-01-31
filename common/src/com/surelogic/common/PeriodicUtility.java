@@ -16,7 +16,8 @@ public class PeriodicUtility {
 	
 	static {
 		final Runnable r = new Runnable() {
-			public void run() {
+			@Override
+      public void run() {
 				// constantly check for cancellation
 				while (true) {
 					try {

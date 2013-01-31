@@ -51,6 +51,7 @@ public abstract class AbstractOutlinePage extends Page implements
     /* (non-Javadoc)
      * Method declared on ISelectionProvider.
      */
+    @Override
     public void addSelectionChangedListener(ISelectionChangedListener listener) {
         selectionChangedListeners.add(listener);
     }
@@ -85,6 +86,7 @@ public abstract class AbstractOutlinePage extends Page implements
         for (int i = 0; i < listeners.length; ++i) {
             final ISelectionChangedListener l = (ISelectionChangedListener) listeners[i];
             Platform.run(new SafeRunnable() {
+                @Override
                 public void run() {
                     l.selectionChanged(event);
                 }
@@ -105,6 +107,7 @@ public abstract class AbstractOutlinePage extends Page implements
     /* (non-Javadoc)
      * Method declared on ISelectionProvider.
      */
+    @Override
     public ISelection getSelection() {
         if (viewer == null)
             return StructuredSelection.EMPTY;
@@ -134,6 +137,7 @@ public abstract class AbstractOutlinePage extends Page implements
     /* (non-Javadoc)
      * Method declared on ISelectionProvider.
      */
+    @Override
     public void removeSelectionChangedListener(
             ISelectionChangedListener listener) {
         selectionChangedListeners.remove(listener);
@@ -143,6 +147,7 @@ public abstract class AbstractOutlinePage extends Page implements
      * Method declared on ISelectionChangeListener.
      * Gives notification that the tree selection has changed.
      */
+    @Override
     public void selectionChanged(SelectionChangedEvent event) {
         fireSelectionChanged(event.getSelection());
     }
@@ -158,6 +163,7 @@ public abstract class AbstractOutlinePage extends Page implements
     /* (non-Javadoc)
      * Method declared on ISelectionProvider.
      */
+    @Override
     public void setSelection(ISelection selection) {
         if (viewer != null)
             viewer.setSelection(selection);

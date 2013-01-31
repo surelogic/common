@@ -33,11 +33,13 @@ public abstract class AbstractProjectSelectedMenuAction implements
 
 	private IStructuredSelection f_currentSelection = null;
 
-	public void setActivePart(IAction action, IWorkbenchPart targetPart) {
+	@Override
+  public void setActivePart(IAction action, IWorkbenchPart targetPart) {
 		// Nothing to do
 	}
 
-	public final void run(IAction action) {
+	@Override
+  public final void run(IAction action) {
 		/*
 		 * Beware the action parameter may be null.
 		 */
@@ -74,7 +76,8 @@ public abstract class AbstractProjectSelectedMenuAction implements
 		}
 	}
 
-	public void selectionChanged(IAction action, ISelection selection) {
+	@Override
+  public void selectionChanged(IAction action, ISelection selection) {
 		if (selection instanceof IStructuredSelection) {
 			f_currentSelection = (IStructuredSelection) selection;
 		} else {
@@ -82,11 +85,13 @@ public abstract class AbstractProjectSelectedMenuAction implements
 		}
 	}
 
-	public void dispose() {
+	@Override
+  public void dispose() {
 		// Nothing to do
 	}
 
-	public void init(IWorkbenchWindow window) {
+	@Override
+  public void init(IWorkbenchWindow window) {
 		// Nothing to do
 	}
 

@@ -31,7 +31,8 @@ public final class ServiceUtility {
 	public static SLJob sendToSureLogic(final String msg, final Runnable after) {
 		return new AbstractSLJob("Sending a servicability message to SureLogic") {
 
-			public SLStatus run(final SLProgressMonitor monitor) {
+			@Override
+      public SLStatus run(final SLProgressMonitor monitor) {
 				monitor.begin();
 				try {
 					// Prepare the URL connection

@@ -196,7 +196,8 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 		status.addChild(SLStatus.createErrorStatus(e));		
 	}
 		
-	public SLStatus run(final SLProgressMonitor topMonitor) {
+	@Override
+  public SLStatus run(final SLProgressMonitor topMonitor) {
 		try {
 			this.topMonitor = topMonitor;
 			
@@ -526,7 +527,8 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 			// Not done yet
 			final Thread currentThread = Thread.currentThread();
 			Thread t = new Thread() {
-				public void run() {
+				@Override
+        public void run() {
 					// Set to timeout in 1 minute
 					try {
 						Thread.sleep(60000);

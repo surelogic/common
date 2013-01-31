@@ -114,7 +114,8 @@ public final class ExportQueryDialog extends Dialog {
 	class Mediator {
 
 		private final Listener f_setDialogState = new Listener() {
-			public void handleEvent(final Event event) {
+			@Override
+      public void handleEvent(final Event event) {
 				setDialogState();
 			}
 		};
@@ -145,7 +146,8 @@ public final class ExportQueryDialog extends Dialog {
 			f_exportAllToggle.addListener(SWT.Selection, f_setDialogState);
 			f_fileNameText.addListener(SWT.Modify, f_setDialogState);
 			f_browseButton.addListener(SWT.Selection, new Listener() {
-				public void handleEvent(final Event event) {
+				@Override
+        public void handleEvent(final Event event) {
 					if (fd == null) {
 						fd = new FileDialog(getShell(), SWT.SAVE);
 						fd.setText("Destination File");

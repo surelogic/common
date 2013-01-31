@@ -165,6 +165,7 @@ public final class JavaProjectSelectionDialog extends Dialog {
     setShellStyle(getShellStyle() | SWT.RESIZE | SWT.MAX);
     f_openJavaProjects = openJavaProjects;
     Collections.sort(f_openJavaProjects, new Comparator<IJavaProject>() {
+      @Override
       public int compare(final IJavaProject o1, final IJavaProject o2) {
         return String.CASE_INSENSITIVE_ORDER.compare(o1.getProject().getName(), o2.getProject().getName());
       }
@@ -207,6 +208,7 @@ public final class JavaProjectSelectionDialog extends Dialog {
     }
 
     f_projectTable.addListener(SWT.Selection, new Listener() {
+      @Override
       public void handleEvent(final Event event) {
         setOKState();
       }
@@ -222,6 +224,7 @@ public final class JavaProjectSelectionDialog extends Dialog {
     allButton.setText("Select All");
     allButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
     allButton.addListener(SWT.Selection, new Listener() {
+      @Override
       public void handleEvent(final Event event) {
         selectAll();
       }
@@ -230,6 +233,7 @@ public final class JavaProjectSelectionDialog extends Dialog {
     noneButton.setText("Deselect All");
     noneButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, true));
     noneButton.addListener(SWT.Selection, new Listener() {
+      @Override
       public void handleEvent(final Event event) {
         deselectAll();
       }
@@ -241,6 +245,7 @@ public final class JavaProjectSelectionDialog extends Dialog {
       check.setText(I18N.msg("common.dialog.showDialogEvenWhenProjectsAreSelected"));
       check.setSelection(EclipseUtility.getBooleanPreference(f_configuration.f_alwaysChooseFromDialogPreferenceConstant));
       check.addListener(SWT.Selection, new Listener() {
+        @Override
         public void handleEvent(final Event event) {
           final boolean show = !EclipseUtility.getBooleanPreference(f_configuration.f_alwaysChooseFromDialogPreferenceConstant);
           EclipseUtility.setBooleanPreference(f_configuration.f_alwaysChooseFromDialogPreferenceConstant, show);
