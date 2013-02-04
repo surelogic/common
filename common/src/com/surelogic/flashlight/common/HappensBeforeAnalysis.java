@@ -98,7 +98,7 @@ public class HappensBeforeAnalysis {
                 if (targets.isEmpty()) {
                     return false;
                 }
-                return !sources
+                boolean found = !sources
                         .forEachEntry(new TLongObjectProcedure<Timestamp>() {
 
                             @Override
@@ -109,6 +109,7 @@ public class HappensBeforeAnalysis {
                                         || !sourceTs.before(targetTs);
                             }
                         });
+                return found;
             } finally {
                 targetSet.close();
             }
@@ -119,7 +120,7 @@ public class HappensBeforeAnalysis {
 
     public boolean happensBeforeVolatile(Timestamp write, long writeThread,
             Timestamp read, long readThread) throws SQLException {
-        return happensBefore(hbVolReadSt, hbVolWriteSt, write, writeThread,
+        return happensBefore(hbVolWriteSt, hbVolReadSt, write, writeThread,
                 read, readThread);
     }
 

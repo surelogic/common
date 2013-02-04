@@ -161,6 +161,10 @@ public class RollupAccessesResultSet implements InvocationHandler {
                 } else {
                     boolean hasHappensBefore = hb.hasHappensBefore(lastWrite,
                             lastWriteThread, a.ts, a.threadId);
+                    if (!hasHappensBefore) {
+                        hasHappensBefore = hb.hasHappensBefore(lastWrite,
+                                lastWriteThread, a.ts, a.threadId);
+                    }
                     return new AccessBlock(a, isStatic, isFinal, isFinal
                             || hasHappensBefore ? HappensBeforeState.YES
                             : HappensBeforeState.NO, lastWrite, lastWriteThread);
