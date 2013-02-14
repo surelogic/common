@@ -28,7 +28,6 @@ import com.surelogic.common.ref.TypeRef;
  * <li>{@link IDecl#isVolatile()}</li>
  * </ul>
  */
-@ValueObject
 @Immutable
 public final class AdHocDecl implements IDecl {
 

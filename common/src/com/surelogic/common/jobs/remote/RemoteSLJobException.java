@@ -30,7 +30,7 @@ public class RemoteSLJobException extends RuntimeException {
   }
 
   @Borrowed("this")
-  @RegionEffects("reads Instance")
+  @RegionEffects("reads Instance, I18N:Static")
   @Starts("nothing")
   public String getToolMessage(String name) {
     if (args == null || args.length == 0) {

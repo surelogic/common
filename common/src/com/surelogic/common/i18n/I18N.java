@@ -17,18 +17,22 @@ import com.surelogic.*;
  */
 @Promise("@Starts(nothing) for *(**)")
 public final class I18N {
+  @UniqueInRegion("Static")
   private static final ResourceBundle BUNDLE = ResourceBundle.getBundle(I18N.class.getPackage().getName() + ".SureLogic");
 
+  @UniqueInRegion("Static")
   private static final ResourceBundle ERRORS = ResourceBundle.getBundle(I18N.class.getPackage().getName() + ".SureLogicErrors");
 
   private static final String ERROR_FORMAT = "(SureLogic #%d) %s";
 
+  @UniqueInRegion("Static")
   private static final ResourceBundle RESULTS = ResourceBundle.getBundle(I18N.class.getPackage().getName() + ".SureLogicResults");
 
   private I18N() {
     // no instances
   }
 
+  @RegionEffects("reads bundle:Instance, args:Instance")
   private static String getString(final ResourceBundle bundle, final String keyTemplate, final Object... args) {
     return bundle.getString(String.format(keyTemplate, args));
   }
@@ -109,6 +113,7 @@ public final class I18N {
    * @throws MissingResourceException
    *           if the computed key is not found.
    */
+  @RegionEffects("reads Static")
   public static String err(final int number) {
     final String result = getString(ERRORS, "error.%05d", number);
     return String.format(ERROR_FORMAT, number, result);
@@ -143,6 +148,7 @@ public final class I18N {
    *           if the computed key is not found.
    * @see String#format(String, Object...)
    */
+  @RegionEffects("reads Static, args:Instance")
   public static String err(final int number, Object... args) {
     return String.format(I18N.err(number), args);
   }

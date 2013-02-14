@@ -2,6 +2,7 @@ package com.surelogic.common.serviceability.scan;
 
 import java.io.File;
 
+import com.surelogic.ThreadSafe;
 import com.surelogic.common.jobs.SLStatus;
 
 /**
@@ -11,6 +12,7 @@ import com.surelogic.common.jobs.SLStatus;
  * Eclipse JSure and Sierra clients to report scan failures, is not available to
  * the code that runs the external scans.
  */
+@ThreadSafe
 public interface IScanCrashReporter {
 
 	/**
