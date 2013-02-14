@@ -3,11 +3,7 @@ package com.surelogic.common.ref;
 import java.util.EnumSet;
 import java.util.List;
 
-import com.surelogic.Immutable;
-import com.surelogic.NonNull;
-import com.surelogic.Nullable;
-import com.surelogic.Part;
-import com.surelogic.ValueObject;
+import com.surelogic.*;
 import com.surelogic.common.SLUtility;
 
 /**
@@ -42,7 +38,6 @@ import com.surelogic.common.SLUtility;
  * @see DeclUtil
  */
 @Immutable(appliesTo=Part.Instance)
-@ValueObject
 public interface IDecl {
 
   /**

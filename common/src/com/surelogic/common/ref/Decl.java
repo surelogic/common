@@ -9,18 +9,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import com.surelogic.Immutable;
-import com.surelogic.NonNull;
-import com.surelogic.NotThreadSafe;
-import com.surelogic.Nullable;
-import com.surelogic.ValueObject;
+import com.surelogic.*;
 import com.surelogic.common.Pair;
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.xml.XMLUtil;
 
 @Immutable
-@ValueObject
 public abstract class Decl implements IDecl {
 
   /**
@@ -1241,6 +1236,7 @@ public abstract class Decl implements IDecl {
    * {@code null} indicates no children. Call {@link #getChildren()} instead of
    * using this field directly.
    */
+  @Vouch("Immutable")
   @Nullable
   final IDecl[] f_children;
   @NonNull
@@ -1249,7 +1245,8 @@ public abstract class Decl implements IDecl {
   /**
    * Sorts parameters and type parameters by argument position.
    */
-  final Comparator<IDecl> f_byPosition = new Comparator<IDecl>() {
+  @Vouch("Immutable")
+  static final Comparator<IDecl> f_byPosition = new Comparator<IDecl>() {
     @Override
     public int compare(IDecl o1, IDecl o2) {
       if (o1 == null && o2 == null)
