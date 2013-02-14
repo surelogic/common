@@ -57,6 +57,14 @@ public class Pair<T1, T2> {
 
   @Override
   public final String toString() {
-    return "<" + elem1 + ", " + elem2 + '>';
+    return "<" + firstToString(elem1) + ", " + secondToString(elem2) + '>';
+  }
+  
+  protected String firstToString(final T1 v) {
+    return v.toString();
+  }
+  
+  protected String secondToString(final T2 v) {
+    return v.toString();
   }
 }
