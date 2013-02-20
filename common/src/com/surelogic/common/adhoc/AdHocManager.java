@@ -627,9 +627,9 @@ public final class AdHocManager {
 
   /**
    * Notifies the observers of this manager that something about the set of
-   * queries owned by a query manager has changed. Clients should call this
-   * method after a set of changes has been made, i.e., not after each small
-   * change.
+   * queries or categories owned by a query manager has changed. Clients should
+   * call this method after a set of changes has been made, i.e., not after each
+   * small change.
    * <p>
    * Do <i>not</i> call this method holding any locks due to the potential for
    * deadlock.
