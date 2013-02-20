@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -30,8 +29,6 @@ public final class AdHocPersistence {
   /*
    * File formats. We read both but only write the latest.
    */
-  static final String VERSION_1_0 = "1.0";
-  static final String VERSION_2_0 = "2.0";
   static final String VERSION_3_0 = "3.0";
   static final String AD_HOC = "ad-hoc";
   static final String CHANGED = "changed";
@@ -44,6 +41,10 @@ public final class AdHocPersistence {
   static final String SUB_QUERY = "sub-query";
   static final String VERSION = "version";
   static final String REVISION = "revision";
+  static final String CATEGORY = "category";
+  static final String HAS_DATA = "has-data";
+  static final String NO_DATA = "no-data";
+  static final String CAT_QUERY = "cat-query";
 
   private static final Logger LOG = SLLogger.getLogger();
 
@@ -71,37 +72,51 @@ public final class AdHocPersistence {
    */
   public static void save(final AdHocManager manager, final File saveFile, final boolean defaultFile) {
     if (defaultFile) {
-      save(manager.getQueryList(), saveFile, true);
+      save(manager.getQueryList(), manager.getCategoryList(), saveFile, true);
     } else {
-      final List<AdHocQuery> queries = new ArrayList<AdHocQuery>(manager.getQueryList());
+      final List<AdHocQuery> queries = manager.getQueryList();
       for (final Iterator<AdHocQuery> iter = queries.iterator(); iter.hasNext();) {
         if (!iter.next().isChanged()) {
           iter.remove();
         }
       }
-      save(queries, saveFile, false);
+      final List<AdHocCategory> categories = manager.getCategoryList();
+      for (final Iterator<AdHocCategory> iter = categories.iterator(); iter.hasNext();) {
+        if (!iter.next().isChanged()) {
+          iter.remove();
+        }
+      }
+      save(queries, categories, saveFile, false);
     }
   }
 
   /**
-   * Saves the passed set of ad hoc queries into a file using a simple XML
-   * format. If there are no queries to be saved, this method ensures that the
-   * save file does not exist.
+   * Saves the passed set of ad hoc queries and categories into a file using a
+   * simple XML format. If there are no queries to be saved, this method ensures
+   * that the save file does not exist. (Categories without any queries makes no
+   * sense and will also result in no save file.)
    * 
-   * @param revision
-   *          the revision for the full file
    * @param queries
    *          the list of queries to export.
+   * @param categories
+   *          the list of categories to export
    * @param saveFile
    *          the file to export queries into.
    * @param updateRevision
-   *          {@code true} if we should update the revision of any queries
-   *          marked as dirty.
+   *          {@code true} if we should update the revision of any queries or
+   *          categories marked as dirty.
    */
-  public static void save(final List<AdHocQuery> queries, final File saveFile, final boolean updateRevision) {
+  public static void save(final List<AdHocQuery> queries, final List<AdHocCategory> categories, final File saveFile,
+      final boolean updateRevision) {
     Collections.sort(queries, new Comparator<AdHocQuery>() {
       @Override
       public int compare(final AdHocQuery o1, final AdHocQuery o2) {
+        return o1.getId().compareTo(o2.getId());
+      }
+    });
+    Collections.sort(categories, new Comparator<AdHocCategory>() {
+      @Override
+      public int compare(final AdHocCategory o1, final AdHocCategory o2) {
         return o1.getId().compareTo(o2.getId());
       }
     });
@@ -119,6 +134,9 @@ public final class AdHocPersistence {
       }
       for (final AdHocQuery query : queries) {
         outputSubQueries(pw, query);
+      }
+      for (final AdHocCategory category : categories) {
+        outputCategory(pw, category, updateRevision);
       }
       outputXMLFooter(pw);
       pw.close();
@@ -160,6 +178,30 @@ public final class AdHocPersistence {
     b.append(">");
     Entities.addEscaped(query.getSql(), b);
     b.append("</").append(QUERY).append(">");
+    pw.println(b.toString());
+  }
+
+  private static void outputCategory(final PrintWriter pw, final AdHocCategory category, final boolean updateRevision) {
+    final StringBuilder b = new StringBuilder();
+    b.append("  <").append(CATEGORY);
+    Entities.addAttribute(ID, category.getId(), b);
+    Entities.addAttribute(DESCRIPTION, category.getDescription(), b);
+    Entities.addAttribute(HAS_DATA, category.getHasDataText(), b);
+    Entities.addAttribute(NO_DATA, category.getNoDataText(), b);
+    long revision = category.getRevision();
+    if (updateRevision && category.isChanged())
+      revision++;
+    Entities.addAttribute(REVISION, Long.toString(revision), b);
+    if (!updateRevision && category.isChanged()) {
+      Entities.addAttribute(CHANGED, "true", b);
+    }
+    b.append(">\n");
+    for (AdHocQuery query : category.getQueries()) {
+      b.append("    <").append(CAT_QUERY);
+      Entities.addAttribute(ID, query.getId(), b);
+      b.append("/>\n");
+    }
+    b.append("</").append(CATEGORY).append(">");
     pw.println(b.toString());
   }
 

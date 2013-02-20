@@ -1,18 +1,20 @@
 package com.surelogic.common.adhoc;
 
 import static com.surelogic.common.adhoc.AdHocPersistence.AD_HOC;
+import static com.surelogic.common.adhoc.AdHocPersistence.CATEGORY;
+import static com.surelogic.common.adhoc.AdHocPersistence.CAT_QUERY;
 import static com.surelogic.common.adhoc.AdHocPersistence.CHANGED;
 import static com.surelogic.common.adhoc.AdHocPersistence.DEFAULT_SUB_QUERY;
 import static com.surelogic.common.adhoc.AdHocPersistence.DESCRIPTION;
 import static com.surelogic.common.adhoc.AdHocPersistence.DISPLAY;
 import static com.surelogic.common.adhoc.AdHocPersistence.DISPLAY_AT_ROOT;
+import static com.surelogic.common.adhoc.AdHocPersistence.HAS_DATA;
 import static com.surelogic.common.adhoc.AdHocPersistence.ID;
+import static com.surelogic.common.adhoc.AdHocPersistence.NO_DATA;
 import static com.surelogic.common.adhoc.AdHocPersistence.QUERY;
 import static com.surelogic.common.adhoc.AdHocPersistence.REVISION;
 import static com.surelogic.common.adhoc.AdHocPersistence.SUB_QUERY;
 import static com.surelogic.common.adhoc.AdHocPersistence.VERSION;
-import static com.surelogic.common.adhoc.AdHocPersistence.VERSION_1_0;
-import static com.surelogic.common.adhoc.AdHocPersistence.VERSION_2_0;
 import static com.surelogic.common.adhoc.AdHocPersistence.VERSION_3_0;
 
 import java.util.HashSet;
@@ -30,151 +32,148 @@ import com.surelogic.common.i18n.I18N;
  */
 public final class AdHocPersistenceReader extends DefaultHandler {
 
-	private final AdHocManager f_manager;
+  private final AdHocManager f_manager;
 
-	AdHocPersistenceReader(final AdHocManager manager) {
-		f_manager = manager;
-	}
+  AdHocPersistenceReader(final AdHocManager manager) {
+    f_manager = manager;
+  }
 
-	private String f_version = null;
+  private AdHocQuery f_query = null;
 
-	private AdHocQuery f_query = null;
+  private AdHocCategory f_category = null;
 
-	private StringBuilder f_sql = null;
+  private StringBuilder f_sql = null;
 
-	/*
-	 * Ignore list for queries that occur more than once but aren't actually
-	 * newer.
-	 */
-	private final Set<String> f_subQueryIgnoreList = new HashSet<String>();
+  /*
+   * Ignore list for queries that occur more than once but aren't actually
+   * newer.
+   */
+  private final Set<String> f_subQueryIgnoreList = new HashSet<String>();
 
-	@Override
-	public void startElement(final String uri, final String localName,
-			final String name, final Attributes attributes) throws SAXException {
-		if (name.equals(AD_HOC)) {
-			final String fileVersion = attributes.getValue(VERSION);
-			if (VERSION_1_0.equals(fileVersion)) {
-				f_version = VERSION_1_0;
-			} else if (VERSION_2_0.equals(fileVersion)) {
-				f_version = VERSION_2_0;
-			} else if (VERSION_3_0.equals(fileVersion)) {
-				f_version = VERSION_3_0;
-			} else {
-				throw new SAXException(I18N.err(122, fileVersion));
-			}
-		} else {
-			/*
-			 * Version 1.0 file format
-			 */
-			if (VERSION_1_0.equals(f_version)) {
-				// Do nothing, we are using the 3.0 system now
-			}
-			/*
-			 * Version 2.0 file format
-			 */
-			if (VERSION_2_0.equals(f_version)) {
-				// Do nothing, we are using the 3.0 system now
-			}
+  @Override
+  public void startElement(final String uri, final String localName, final String name, final Attributes attributes)
+      throws SAXException {
+    if (name.equals(AD_HOC)) {
+      final String fileVersion = attributes.getValue(VERSION);
+      if (!VERSION_3_0.equals(fileVersion)) {
+        throw new SAXException(I18N.err(122, fileVersion));
+      }
+    } else if (name.equals(QUERY)) {
+      final String queryId = attributes.getValue(ID);
+      if (!"".equals(queryId)) {
+        f_query = f_manager.getOrCreateQuery(queryId);
+        final long revision = Long.parseLong(attributes.getValue(REVISION));
+        if (f_query.getRevision() <= revision) {
+          f_subQueryIgnoreList.remove(queryId);
+          f_sql = new StringBuilder();
+          f_query.setRevision(Long.parseLong(attributes.getValue(REVISION)));
+          final String description = attributes.getValue(DESCRIPTION);
+          if (!"".equals(description)) {
+            f_query.setDescription(description);
+          }
+          final String displayString = attributes.getValue(DISPLAY);
+          if (!"".equals(displayString)) {
+            f_query.setShowInQueryMenu(Boolean.parseBoolean(displayString));
+          }
+          final String changed = attributes.getValue(CHANGED);
+          f_query.setChanged("true".equalsIgnoreCase(changed));
+          final String displayAtRootString = attributes.getValue(DISPLAY_AT_ROOT);
+          if (!"".equals(displayAtRootString)) {
+            f_query.setShowAtRootOfQueryMenu(Boolean.parseBoolean(displayAtRootString));
+          }
+          // Remove any extant subqueries. New ones will be
+          // added at the end of this file
+          f_query.clearSubQueries();
+        } else {
+          // We last parsed an newer version of this query, so
+          // don't process it's subqueries in this file.
+          f_subQueryIgnoreList.add(queryId);
+          f_query = null;
+          f_sql = null;
+        }
+      } else {
+        f_query = null;
+        f_sql = null;
+      }
+    } else if (name.equals(SUB_QUERY)) {
+      /*
+       * The below logic assumes that all query definitions come before any
+       * sub-query definitions.
+       */
+      final String queryId = attributes.getValue(ID);
+      final String subQueryId = attributes.getValue(SUB_QUERY);
+      if (!"".equals(queryId) && !"".equals(subQueryId)) {
+        if (!f_subQueryIgnoreList.contains(queryId)) {
+          final AdHocQuery query = f_manager.getOrCreateQuery(queryId);
+          final AdHocQuery subQuery = f_manager.getOrCreateQuery(subQueryId);
+          query.addSubQuery(subQuery);
 
-			/*
-			 * Version 3.0 file format
-			 */
-			if (VERSION_3_0.equals(f_version)) {
-				if (name.equals(QUERY)) {
-					final String queryId = attributes.getValue(ID);
-					if (!"".equals(queryId)) {
-						f_query = f_manager.get(queryId);
-						final long revision = Long.parseLong(attributes
-								.getValue(REVISION));
-						if (f_query.getRevision() <= revision) {
-							f_subQueryIgnoreList.remove(queryId);
-							f_sql = new StringBuilder();
-							f_query.setRevision(Long.parseLong(attributes
-									.getValue(REVISION)));
-							final String description = attributes
-									.getValue(DESCRIPTION);
-							if (!"".equals(description)) {
-								f_query.setDescription(description);
-							}
-							final String displayString = attributes
-									.getValue(DISPLAY);
-							if (!"".equals(displayString)) {
-								f_query.setShowInQueryMenu(Boolean
-										.parseBoolean(displayString));
-							}
-							final String changed = attributes.getValue(CHANGED);
-							f_query
-									.setChanged("true"
-											.equalsIgnoreCase(changed));
-							final String displayAtRootString = attributes
-									.getValue(DISPLAY_AT_ROOT);
-							if (!"".equals(displayAtRootString)) {
-								f_query.setShowAtRootOfQueryMenu(Boolean
-										.parseBoolean(displayAtRootString));
-							}
-							// Remove any extant subqueries. New ones will be
-							// added at the end of this file
-							for (final AdHocQuery q : f_query.getSubQueries()) {
-								f_query.removeSubQuery(q);
-							}
-						} else {
-							// We last parsed an older version of this query, so
-							// don't process it's subqueries.
-							f_subQueryIgnoreList.add(queryId);
-							f_query = null;
-							f_sql = null;
-						}
-					} else {
-						f_query = null;
-						f_sql = null;
-					}
-				} else if (name.equals(SUB_QUERY)) {
-					/*
-					 * The below logic assumes that all query definitions come
-					 * before any sub-query definitions.
-					 */
-					final String queryId = attributes.getValue(ID);
-					final String subQueryId = attributes.getValue(SUB_QUERY);
-					if (!"".equals(queryId) && !"".equals(subQueryId)) {
-						if (!f_subQueryIgnoreList.contains(queryId)) {
-							final AdHocQuery query = f_manager.get(queryId);
-							final AdHocQuery subQuery = f_manager
-									.get(subQueryId);
-							query.addSubQuery(subQuery);
+          final String isDefault = attributes.getValue(DEFAULT_SUB_QUERY);
+          if ("true".equalsIgnoreCase(isDefault))
+            query.setDefaultSubQuery(subQuery);
+        }
+      }
+    } else if (name.equals(CATEGORY)) {
+      final String categoryId = attributes.getValue(ID);
+      if (!"".equals(categoryId)) {
+        f_category = f_manager.getOrCreateCategory(categoryId);
+        final long revision = Long.parseLong(attributes.getValue(REVISION));
+        if (f_category.getRevision() <= revision) {
+          f_category.setRevision(Long.parseLong(attributes.getValue(REVISION)));
+          final String description = attributes.getValue(DESCRIPTION);
+          if (!"".equals(description)) {
+            f_category.setDescription(description);
+          }
+          final String hasDataText = attributes.getValue(HAS_DATA);
+          if (!"".equals(hasDataText)) {
+            f_category.setHasDataText(hasDataText);
+          }
+          final String noDataText = attributes.getValue(NO_DATA);
+          if (!"".equals(noDataText)) {
+            f_category.setNoDataText(noDataText);
+          }
+          final String changed = attributes.getValue(CHANGED);
+          f_category.setChanged("true".equalsIgnoreCase(changed));
+          // Remove any extant queries. New ones will be added
+          f_category.clearQueries();
+        } else {
+          // We last parsed an newer version of this category, so
+          // don't process it's queries from this file.
+          f_category = null;
+        }
+      } else {
+        f_category = null;
+      }
+    } else if (name.equals(CAT_QUERY)) {
+      if (f_category != null) {
+        final String queryId = attributes.getValue(ID);
+        final AdHocQuery query = f_manager.getQueryOrNull(queryId);
+        if (query != null)
+          f_category.addQuery(query);
+      }
+    }
+  }
 
-							final String isDefault = attributes
-									.getValue(DEFAULT_SUB_QUERY);
-							if ("true".equalsIgnoreCase(isDefault))
-								query.setDefaultSubQuery(subQuery);
-						}
-					}
-				}
-			}
-		}
-	}
+  @Override
+  public void characters(final char[] ch, final int start, final int length) throws SAXException {
+    /*
+     * Same logic for version 1.0 file format and version 2.0 file format.
+     */
+    if (f_sql != null) {
+      final String text = String.copyValueOf(ch, start, length);
+      f_sql.append(text);
+    }
+  }
 
-	@Override
-	public void characters(final char[] ch, final int start, final int length)
-			throws SAXException {
-		/*
-		 * Same logic for version 1.0 file format and version 2.0 file format.
-		 */
-		if (f_sql != null) {
-			final String text = String.copyValueOf(ch, start, length);
-			f_sql.append(text);
-		}
-	}
-
-	@Override
-	public void endElement(final String uri, final String localName,
-			final String name) throws SAXException {
-		/*
-		 * Same logic for version 1.0 file format and version 2.0 file format.
-		 */
-		if (QUERY.equals(name) && f_query != null && f_sql != null) {
-			f_query.setSql(f_sql.toString());
-			f_query = null;
-			f_sql = null;
-		}
-	}
+  @Override
+  public void endElement(final String uri, final String localName, final String name) throws SAXException {
+    /*
+     * Same logic for version 1.0 file format and version 2.0 file format.
+     */
+    if (QUERY.equals(name) && f_query != null && f_sql != null) {
+      f_query.setSql(f_sql.toString());
+      f_query = null;
+      f_sql = null;
+    }
+  }
 }

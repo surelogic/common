@@ -14,6 +14,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
+import com.surelogic.NonNull;
+import com.surelogic.Nullable;
 import com.surelogic.ReferenceObject;
 import com.surelogic.common.html.SimpleHTMLPrinter;
 import com.surelogic.common.i18n.I18N;
@@ -137,15 +139,16 @@ public final class AdHocManager {
 
   /**
    * The set of queries owned by this manager. It is an invariant that for all
-   * queries <i>x</i> and <i>y</i> that are elements of this list, !<i>x</i>
-   * {@code getId().equals(}<i>y</i>{@code getId())} unless <i>x</i>==<i>y</i>.
+   * queries and categories <i>x</i> and <i>y</i> that are elements of this
+   * list, !<i>x</i> {@code getId().equals(}<i>y</i>{@code getId())} unless
+   * <i>x</i>==<i>y</i>.
    */
   private final Set<AdHocQuery> f_queries = new HashSet<AdHocQuery>();
 
   /**
-   * Generates an identifier that is not used as the identifier for any query
-   * owned by this manager. This string will conform to the {@link UUID}
-   * specification.
+   * Generates an identifier that is not used as the identifier for any query or
+   * category owned by this manager. This string will conform to the
+   * {@link UUID} specification.
    * 
    * @return an identifier that is not used as the identifier for any query
    *         owned by this manager.
@@ -160,13 +163,37 @@ public final class AdHocManager {
   }
 
   /**
+   * Checks if this manager contains a query or category identified by the
+   * passed id.
+   * 
+   * @param id
+   *          the identifier of a query.
+   * @return {@code true} if this manager contains a query or category
+   *         identified by the passed id, {@code false} otherwise.
+   */
+  public boolean contains(final String id) {
+    for (final AdHocQuery query : f_queries) {
+      if (query.getId().equals(id)) {
+        return true;
+      }
+    }
+    for (final AdHocCategory category : f_categories) {
+      if (category.getId().equals(id)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  /**
    * Gets, or creates if necessary, the query identified by the passed id.
    * 
    * @param id
    *          the non-null identifier of a query.
    * @return the query (should never be {@code null});
    */
-  public AdHocQuery get(final String id) {
+  @NonNull
+  public AdHocQuery getOrCreateQuery(final String id) {
     if (id == null) {
       throw new IllegalArgumentException(I18N.err(44, "id"));
     }
@@ -189,7 +216,8 @@ public final class AdHocManager {
    * @return the query, or {@code null} if a query with <tt>id</tt> can't be
    *         found.
    */
-  public AdHocQuery getOrNull(final String id) {
+  @Nullable
+  public AdHocQuery getQueryOrNull(final String id) {
     if (id == null) {
       throw new IllegalArgumentException(I18N.err(44, "id"));
     }
@@ -199,23 +227,6 @@ public final class AdHocManager {
       }
     }
     return null;
-  }
-
-  /**
-   * Checks if this manager contains a query identified by the passed id.
-   * 
-   * @param id
-   *          the identifier of a query.
-   * @return {@code true} if this manager contains a query identified by the
-   *         passed id, {@code false} otherwise.
-   */
-  public boolean contains(final String id) {
-    for (final AdHocQuery query : f_queries) {
-      if (query.getId().equals(id)) {
-        return true;
-      }
-    }
-    return false;
   }
 
   /**
@@ -338,6 +349,112 @@ public final class AdHocManager {
     } else {
       return false;
     }
+  }
+
+  /**
+   * The set of categories owned by this manager. It is an invariant that for
+   * all queries and categories <i>x</i> and <i>y</i> that are elements of this
+   * list, !<i>x</i> {@code getId().equals(}<i>y</i>{@code getId())} unless
+   * <i>x</i>==<i>y</i>.
+   */
+  private final Set<AdHocCategory> f_categories = new HashSet<AdHocCategory>();
+
+  /**
+   * Gets, or creates if necessary, the category identified by the passed id.
+   * 
+   * @param id
+   *          the non-null identifier of a category.
+   * @return the query (should never be {@code null});
+   */
+  @NonNull
+  public AdHocCategory getOrCreateCategory(final String id) {
+    if (id == null) {
+      throw new IllegalArgumentException(I18N.err(44, "id"));
+    }
+    for (final AdHocCategory category : f_categories) {
+      if (category.getId().equals(id)) {
+        return category;
+      }
+    }
+    final AdHocCategory category = new AdHocCategory(this, id);
+    f_categories.add(category);
+    return category;
+  }
+
+  /**
+   * Gets the category identified by the passed id or returns {@code null} if
+   * this manager does not contain such a category.
+   * 
+   * @param id
+   *          the non-null identifier of a category.
+   * @return the category, or {@code null} if a category with <tt>id</tt> can't
+   *         be found.
+   */
+  @Nullable
+  public AdHocCategory getCategoryOrNull(final String id) {
+    if (id == null) {
+      throw new IllegalArgumentException(I18N.err(44, "id"));
+    }
+    for (final AdHocCategory category : f_categories) {
+      if (category.getId().equals(id)) {
+        return category;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Checks if this manager contains the passed category.
+   * 
+   * @param category
+   *          a category.
+   * @return {@code true} if this manager contains the category, {@code false}
+   *         otherwise.
+   */
+  public boolean contains(final AdHocCategory category) {
+    return f_categories.contains(category);
+  }
+
+  /**
+   * Gets the number of categories owned by this manager.
+   * 
+   * @return the number of categories owned by this manager.
+   */
+  public int getCategoryCount() {
+    return f_categories.size();
+  }
+
+  /**
+   * Gets the set of categories owned by this manager.
+   * 
+   * @return the set of categories owned by this manager.
+   */
+  public Set<AdHocCategory> getCategories() {
+    return new HashSet<AdHocCategory>(f_categories);
+  }
+
+  /**
+   * Gets a list of categories owned by this manager.
+   * 
+   * @return a list of categories owned by this manager.
+   */
+  public List<AdHocCategory> getCategoryList() {
+    final ArrayList<AdHocCategory> result = new ArrayList<AdHocCategory>(f_categories);
+    // TODO sort by something useful?
+    return result;
+  }
+
+  /**
+   * Deletes the category if it is present.
+   * 
+   * @param category
+   *          a category.
+   */
+  public void delete(final AdHocCategory category) {
+    /*
+     * Remove our link to the query.
+     */
+    f_categories.remove(category);
   }
 
   /**
@@ -727,7 +844,7 @@ public final class AdHocManager {
     final String id = parse.get(idKey);
     parse.remove(idKey);
     variables.putAll(parse);
-    AdHocQuery query = getOrNull(id);
+    AdHocQuery query = getQueryOrNull(id);
     if (query != null) {
       final AdHocQueryFullyBound boundQuery = new AdHocQueryFullyBound(query, variables, parse);
       return boundQuery;

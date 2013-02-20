@@ -87,7 +87,7 @@ public final class CategoryEditorMediator extends AdHocManagerAdapter implements
       @Override
       public void handleEvent(final Event event) {
         final String id = f_manager.generateUnusedId();
-        final AdHocQuery query = f_manager.get(id);
+        final AdHocQuery query = f_manager.getOrCreateQuery(id);
         query.setDescription("A new query");
 //        f_selections.clear();
 //        f_selections.add(query);

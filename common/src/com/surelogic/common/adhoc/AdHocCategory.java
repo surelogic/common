@@ -320,6 +320,13 @@ public final class AdHocCategory {
   }
 
   /**
+   * Removes all queries form this category.
+   */
+  public void clearQueries() {
+    f_queries.clear();
+  }
+
+  /**
    * Gets a copy of the set of queries in this category.
    * 
    * @return the set of queries in this category.

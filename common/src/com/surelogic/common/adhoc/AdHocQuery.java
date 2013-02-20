@@ -340,6 +340,13 @@ public final class AdHocQuery {
   }
 
   /**
+   * Removes all sub-queries form this query.
+   */
+  public void clearSubQueries() {
+    f_subQueries.clear();
+  }
+
+  /**
    * Gets a copy of the set of sub-queries for this query. A sub-query is a
    * query that can be executed based upon a selected row of the result of this
    * query.
