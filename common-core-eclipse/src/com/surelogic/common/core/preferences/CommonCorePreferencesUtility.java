@@ -16,6 +16,9 @@ public final class CommonCorePreferencesUtility {
 
       EclipseUtility.setDefaultIntPreference(QEDITOR_SASH_LHS_WEIGHT, 40);
       EclipseUtility.setDefaultIntPreference(QEDITOR_SASH_RHS_WEIGHT, 60);
+      
+      EclipseUtility.setDefaultIntPreference(QCEDITOR_SASH_LHS_WEIGHT, 40);
+      EclipseUtility.setDefaultIntPreference(QCEDITOR_SASH_RHS_WEIGHT, 60);
       /*
        * We'll take the default-default for the other preferences.
        */
@@ -27,6 +30,9 @@ public final class CommonCorePreferencesUtility {
   public static final String QEDITOR_LHS_TAB_SELECTION = PREFIX + "qeditor.lhs.tab.selection";
   public static final String QEDITOR_SQL_TAB_SELECTION = PREFIX + "qeditor.sql.tab.selection";
   public static final String QEDITOR_FILTER_TREE_CHECK = PREFIX + "qeditor.filter.tree.check";
+  
+  public static final String QCEDITOR_SASH_LHS_WEIGHT = PREFIX + "qceditor.sash.lhs.weight";
+  public static final String QCEDITOR_SASH_RHS_WEIGHT = PREFIX + "qceditor.sash.rhs.weight";
 
   private static final String WARN_LOW_MEMORY = PREFIX + "warnLowMemory";
   private static final String SERVICEABILITY_EMAIL = PREFIX + "serviceability.email";
