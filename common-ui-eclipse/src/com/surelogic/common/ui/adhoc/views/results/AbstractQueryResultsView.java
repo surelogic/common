@@ -279,12 +279,13 @@ public abstract class AbstractQueryResultsView extends ViewPart {
         final AdHocQuery resultQuery = result.getQueryFullyBound().getQuery();
         final List<AdHocQuery> subQueryList = resultQuery.getVisibleSubQueryList();
         final Map<String, String> variableValues = result.getVariableValues();
+        final Map<String, String> topVariableValues = result.getTopVariableValues();
         final Listener runSubQuery = new Listener() {
           @Override
           public void handleEvent(final Event event) {
             if (event.widget.getData() instanceof AdHocQuery) {
               final AdHocQuery query = (AdHocQuery) event.widget.getData();
-              final AdHocQueryFullyBound boundQuery = new AdHocQueryFullyBound(query, variableValues);
+              final AdHocQueryFullyBound boundQuery = new AdHocQueryFullyBound(query, variableValues, topVariableValues);
               EclipseQueryUtility.scheduleQuery(boundQuery, result);
             }
           }
@@ -536,9 +537,10 @@ public abstract class AbstractQueryResultsView extends ViewPart {
 
   private void runDefaultQueryOf(final AdHocQueryResultSqlData data) {
     final Map<String, String> variableValues = data.getVariableValues();
+    final Map<String, String> topVariableValues = data.getTopVariableValues();
     final AdHocQuery query = data.getQueryFullyBound().getQuery().getDefaultSubQuery();
     if (query != null) {
-      final AdHocQueryFullyBound boundQuery = new AdHocQueryFullyBound(query, variableValues);
+      final AdHocQueryFullyBound boundQuery = new AdHocQueryFullyBound(query, variableValues, topVariableValues);
       EclipseQueryUtility.scheduleQuery(boundQuery, data);
     }
   }

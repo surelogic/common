@@ -637,7 +637,7 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
         }
         variables.putAll(dialog.getEnteredValues());
       }
-      final AdHocQueryFullyBound boundQuery = new AdHocQueryFullyBound(query, variables);
+      final AdHocQueryFullyBound boundQuery = new AdHocQueryFullyBound(query, variables, null);
       EclipseQueryUtility.scheduleQuery(boundQuery, f_manager.getDataSource().getCurrentAccessKeys());
     }
   }
