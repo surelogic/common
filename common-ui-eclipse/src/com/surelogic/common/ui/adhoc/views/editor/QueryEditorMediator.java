@@ -784,6 +784,6 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
   }
 
   private Image getImageForQuery(AdHocQuery query) {
-    return SLImages.getImageForAdHocQuery(query.getType(), false, !query.showInQueryMenu());
+    return SLImages.getImageForAdHocQuery(query.getType(), query.showAtRootOfQueryMenu(), !query.showInQueryMenu());
   }
 }

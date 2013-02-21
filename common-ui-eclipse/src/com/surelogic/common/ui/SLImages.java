@@ -1137,7 +1137,7 @@ public final class SLImages {
    * 
    * @param type
    *          the type of information returned by the query.
-   * @param decorateAsDefault
+   * @param decorateWithAsterisk
    *          {@code true} if the image should include an asterisk.
    * @param grayscale
    *          {@code true} if the image should be grayscale to indicate no data
@@ -1145,13 +1145,14 @@ public final class SLImages {
    * @return the best icon for the ad hoc query.
    */
   @NonNull
-  public static Image getImageForAdHocQuery(AdHocQueryType type, boolean decorateAsDefault, boolean grayscale) {
-    if (decorateAsDefault) {
-      ImageDescriptor decr = SLImages.getImageDescriptor(CommonImages.DECR_ASTERISK);
+  public static Image getImageForAdHocQuery(AdHocQueryType type, boolean decorateWithAsterisk, boolean grayscale) {
+    if (decorateWithAsterisk) {
+      final ImageDescriptor[] decr = new ImageDescriptor[] { null, SLImages.getImageDescriptor(CommonImages.DECR_ASTERISK), null,
+          null, null };
       if (grayscale)
-        return SLImages.getDecoratedGrayscaleImage(type.getImageName(), new ImageDescriptor[] { null, decr, null, null, null });
+        return SLImages.getDecoratedGrayscaleImage(type.getImageName(), decr);
       else
-        return SLImages.getDecoratedImage(type.getImageName(), new ImageDescriptor[] { null, decr, null, null, null });
+        return SLImages.getDecoratedImage(type.getImageName(), decr);
     } else {
       if (grayscale)
         return SLImages.getGrayscaleImage(type.getImageName());
