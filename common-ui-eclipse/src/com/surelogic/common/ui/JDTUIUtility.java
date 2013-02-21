@@ -21,6 +21,8 @@ import com.surelogic.common.core.JDTUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.i18n.JavaSourceReference;
 import com.surelogic.common.logging.SLLogger;
+import com.surelogic.common.ref.DeclUtil;
+import com.surelogic.common.ref.IDecl;
 import com.surelogic.common.ref.IJavaRef;
 
 public class JDTUIUtility {
@@ -88,6 +90,37 @@ public class JDTUIUtility {
       return true;
     } catch (final Exception e) {
       SLLogger.getLogger().log(Level.SEVERE, I18N.err(132, element, javaRef), e);
+    }
+    return false;
+  }
+  
+  /**
+   * Tries to open the specified Java code reference in the editor and highlight
+   * the referenced code.
+   * 
+   * @param decl
+   *          a location in Java code.
+   * @return {@code true} if it was possible to open an editor, {@code false}
+   *         otherwise. A result of {@code false} might indicate that the file
+   *         was opened in an external editor.
+   */
+  public static boolean tryToOpenInEditor(final IDecl decl) {
+    if (decl == null)
+      return false;
+
+    final Pair<IJavaElement, Double> pair = JDTUtility.findJavaElement(decl);
+    final IJavaElement element = pair.first();
+    if (element == null)
+      return false;
+
+    try {
+      final IEditorPart editorPart = JavaUI.openInEditor(element, false, true);
+      if (editorPart == null)
+        return false;
+      //tryToHighlightHelper(javaRef, element, pair.second(), editorPart);
+      return true;
+    } catch (final Exception e) {
+      SLLogger.getLogger().log(Level.SEVERE, I18N.err(132, element, DeclUtil.toString(decl)), e);
     }
     return false;
   }
