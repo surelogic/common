@@ -61,6 +61,7 @@ import com.surelogic.common.Pair;
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.logging.SLLogger;
+import com.surelogic.common.ref.DeclUtil;
 import com.surelogic.common.ref.DeclVisitor;
 import com.surelogic.common.ref.IDecl;
 import com.surelogic.common.ref.IDeclField;
@@ -486,7 +487,28 @@ public final class JDTUtility {
     final boolean searchAllProjects = projectName == null || projectName.startsWith(SLUtility.LIBRARY_PROJECT);
     if (searchAllProjects)
       projectName = null;
+    return findJavaElement(decl, projectName, javaRef);
+  }
 
+  /**
+   * Tries to find the corresponding {@link IJavaElement} to the passed
+   * {@link IDecl}. The Eclipse Java element is returned if it can be found,
+   * and a confidence from 1 to 0 is found, where 1 indicates a perfect match
+   * and 0 indicates no match.
+   * 
+   * @param decl
+   *          a Java code reference.
+   * @return a pair: (first) the corresponding {@link IJavaElement} or
+   *         {@code null}, (second) the confidence of the match [1,0] where
+   *         higher is better.
+   */
+  @NonNull
+  public static Pair<IJavaElement, Double> findJavaElement(final IDecl decl) {
+	  return findJavaElement(decl, null, DeclUtil.toString(decl));
+  }
+  
+  @NonNull
+  private static Pair<IJavaElement, Double> findJavaElement(final IDecl decl, String projectName, Object context) {
     try {
       double confidence = 0;
       IJavaElement best = null;
@@ -522,11 +544,11 @@ public final class JDTUtility {
       System.out.println(" found (" + confidence + ") -> " + best);
       return new Pair<IJavaElement, Double>(best, Double.valueOf(confidence));
     } catch (Exception e) {
-      SLLogger.getLogger().log(Level.WARNING, I18N.err(156, javaRef), e);
+      SLLogger.getLogger().log(Level.WARNING, I18N.err(156, context), e);
     }
     return new Pair<IJavaElement, Double>(null, Double.valueOf(0));
   }
-
+  
   /**
    * This class matches up an {@link IDecl} to a corresponding
    * {@link IJavaElement}, whenever possible.
