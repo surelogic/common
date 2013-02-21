@@ -409,7 +409,7 @@ public abstract class AbstractQueryResultsView extends ViewPart {
           if (model.isColumnVisible(colI)) {
             final Cell cell = row[colI];
             item.setText(itemIndex, cell.getText());
-            Image image = SLImages.getImageForAdHocQuery(cell.getImageSymbolicName());
+            Image image = SLImages.getImageForEncodedAdHocQueryResult(cell.getImageSymbolicName());
             if (image == null || !image.isDisposed()) {
               item.setImage(itemIndex, image);
             }
@@ -561,7 +561,7 @@ public abstract class AbstractQueryResultsView extends ViewPart {
     if (cell instanceof NonLeafTreeCell) {
       final NonLeafTreeCell nonLeaf = (NonLeafTreeCell) cell;
       item.setText(nonLeaf.getText());
-      Image image = SLImages.getImageForAdHocQuery(nonLeaf.getImageSymbolicName());
+      Image image = SLImages.getImageForEncodedAdHocQueryResult(nonLeaf.getImageSymbolicName());
       if (image == null || !image.isDisposed()) {
         item.setImage(image);
       }
@@ -582,14 +582,14 @@ public abstract class AbstractQueryResultsView extends ViewPart {
       final LeafTreeCell leaf = (LeafTreeCell) cell;
       if (model.isPureTree()) {
         item.setText(leaf.getText());
-        item.setImage(SLImages.getImageForAdHocQuery(leaf.getImageSymbolicName()));
+        item.setImage(SLImages.getImageForEncodedAdHocQueryResult(leaf.getImageSymbolicName()));
       } else {
         int itemIndex = 0;
         for (int colI = model.getLastTreeIndex(); colI < model.getColumnCount(); colI++) {
           if (model.isColumnVisible(colI)) {
             final Cell rowCell = model.getRows()[leaf.getRowIndex()][colI];
             item.setText(itemIndex, rowCell.getText());
-            item.setImage(itemIndex, SLImages.getImageForAdHocQuery(rowCell.getImageSymbolicName()));
+            item.setImage(itemIndex, SLImages.getImageForEncodedAdHocQueryResult(rowCell.getImageSymbolicName()));
             itemIndex++;
           }
         }

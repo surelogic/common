@@ -28,6 +28,7 @@ public final class CommonImages {
   public static final String DECR_ANDROID = "decr/android.png";
   public static final String DECR_ANNOTATION = "decr/annotation.gif";
   public static final String DECR_ASSUME = "decr/assume.gif";
+  public static final String DECR_ASTERISK = "decr/asterisk.gif";
   public static final String DECR_BUGLINK = "decr/buglink.gif";
   public static final String DECR_CONSISTENT = "decr/consistent.gif";
   public static final String DECR_CONSTRUCTOR = "decr/constructor.gif";

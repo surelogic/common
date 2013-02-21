@@ -24,6 +24,7 @@ import com.surelogic.Utility;
 import com.surelogic.common.CommonImages;
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.adhoc.AdHocDecl;
+import com.surelogic.common.adhoc.AdHocQueryType;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.ref.IDecl;
 import com.surelogic.common.ref.IJavaRef;
@@ -1130,6 +1131,35 @@ public final class SLImages {
     return getImageForProject(projectName);
   }
 
+  /**
+   * Gets an image for an ad hoc query based upon the passed query type and
+   * flags.
+   * 
+   * @param type
+   *          the type of information returned by the query.
+   * @param decorateAsDefault
+   *          {@code true} if the image should include an asterisk.
+   * @param grayscale
+   *          {@code true} if the image should be grayscale to indicate no data
+   *          will result from invoking it.
+   * @return the best icon for the ad hoc query.
+   */
+  @NonNull
+  public static Image getImageForAdHocQuery(AdHocQueryType type, boolean decorateAsDefault, boolean grayscale) {
+    if (decorateAsDefault) {
+      ImageDescriptor decr = SLImages.getImageDescriptor(CommonImages.DECR_ASTERISK);
+      if (grayscale)
+        return SLImages.getDecoratedGrayscaleImage(type.getImageName(), new ImageDescriptor[] { null, decr, null, null, null });
+      else
+        return SLImages.getDecoratedImage(type.getImageName(), new ImageDescriptor[] { null, decr, null, null, null });
+    } else {
+      if (grayscale)
+        return SLImages.getGrayscaleImage(type.getImageName());
+      else
+        return SLImages.getImage(type.getImageName());
+    }
+  }
+
   @NonNull
   public static Image getImageFor(@Nullable IDecl decl) {
     switch (decl.getKind()) {
@@ -1295,8 +1325,14 @@ public final class SLImages {
     return getImage(CommonImages.IMG_UNKNOWN);
   }
 
+  /**
+   * Used by ad hoc query results to display encoded Java icons.
+   * 
+   * @param encoded an encoded string.
+   * @return an image.
+   */
   @Nullable
-  public static Image getImageForAdHocQuery(@Nullable String encoded) {
+  public static Image getImageForEncodedAdHocQueryResult(@Nullable String encoded) {
     if (encoded == null || !encoded.startsWith("@"))
       return getImage(encoded);
     else {

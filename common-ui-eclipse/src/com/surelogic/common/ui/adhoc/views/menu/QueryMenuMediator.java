@@ -18,7 +18,6 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.progress.UIJob;
 
-import com.surelogic.common.core.adhoc.EclipseQueryUtility;
 import com.surelogic.common.CommonImages;
 import com.surelogic.common.ILifecycle;
 import com.surelogic.common.Pair;
@@ -28,6 +27,7 @@ import com.surelogic.common.adhoc.AdHocQuery;
 import com.surelogic.common.adhoc.AdHocQueryFullyBound;
 import com.surelogic.common.adhoc.AdHocQueryResult;
 import com.surelogic.common.adhoc.AdHocQueryResultSqlData;
+import com.surelogic.common.core.adhoc.EclipseQueryUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.ui.SLImages;
 import com.surelogic.common.ui.adhoc.views.QueryResultNavigator;
@@ -190,14 +190,10 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
       item.setText(query.getDescription());
       item.setData(ToolTip.TIP_TEXT, query.getShortMessage());
       if (hasDatabaseAccess && query.isCompletelySubstitutedBy(variableValues)) {
-        if (f_view.queryResultWillBeEmpty(query)) {
-          item.setImage(SLImages.getImage(CommonImages.IMG_QUERY_EMPTY));
-        } else {
-          if (selectedResult != null && selectedResult.getQueryFullyBound().getQuery().isDefaultSubQuery(query))
-            item.setImage(SLImages.getImage(CommonImages.IMG_QUERY_DEFAULT));
-          else
-            item.setImage(SLImages.getImage(CommonImages.IMG_QUERY));
-        }
+        final boolean grayscale = f_view.queryResultWillBeEmpty(query);
+        final boolean decorateAsDefault = selectedResult != null
+            && selectedResult.getQueryFullyBound().getQuery().isDefaultSubQuery(query);
+        item.setImage(SLImages.getImageForAdHocQuery(query.getType(), decorateAsDefault, grayscale));
         item.setData(query);
       } else {
         item.setForeground(f_queryMenu.getDisplay().getSystemColor(SWT.COLOR_GRAY));
