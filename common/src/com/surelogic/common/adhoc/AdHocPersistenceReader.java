@@ -1,7 +1,7 @@
 package com.surelogic.common.adhoc;
 
 import static com.surelogic.common.adhoc.AdHocPersistence.AD_HOC;
-import static com.surelogic.common.adhoc.AdHocPersistence.CATEGORY;
+import static com.surelogic.common.adhoc.AdHocPersistence.*;
 import static com.surelogic.common.adhoc.AdHocPersistence.CAT_QUERY;
 import static com.surelogic.common.adhoc.AdHocPersistence.CHANGED;
 import static com.surelogic.common.adhoc.AdHocPersistence.DEFAULT_SUB_QUERY;
@@ -66,7 +66,7 @@ public final class AdHocPersistenceReader extends DefaultHandler {
         if (f_query.getRevision() <= revision) {
           f_subQueryIgnoreList.remove(queryId);
           f_sql = new StringBuilder();
-          f_query.setRevision(Long.parseLong(attributes.getValue(REVISION)));
+          f_query.setRevision(revision);
           final String description = attributes.getValue(DESCRIPTION);
           if (!"".equals(description)) {
             f_query.setDescription(description);
@@ -74,6 +74,14 @@ public final class AdHocPersistenceReader extends DefaultHandler {
           final String displayString = attributes.getValue(DISPLAY);
           if (!"".equals(displayString)) {
             f_query.setShowInQueryMenu(Boolean.parseBoolean(displayString));
+          }
+          final String sortHelpString = attributes.getValue(SORT_HELP);
+          if (sortHelpString != null) {
+            f_query.setSortHelp(Integer.parseInt(sortHelpString));
+          }
+          final String typeString = attributes.getValue(TYPE);
+          if (typeString != null) {
+            f_query.setType(AdHocQueryType.valueOf(typeString));
           }
           final String changed = attributes.getValue(CHANGED);
           f_query.setChanged("true".equalsIgnoreCase(changed));
@@ -123,7 +131,7 @@ public final class AdHocPersistenceReader extends DefaultHandler {
         f_category = f_manager.getOrCreateCategory(categoryId);
         final long revision = Long.parseLong(attributes.getValue(REVISION));
         if (f_category.getRevision() <= revision) {
-          f_category.setRevision(Long.parseLong(attributes.getValue(REVISION)));
+          f_category.setRevision(revision);
           final String description = attributes.getValue(DESCRIPTION);
           if (!"".equals(description)) {
             f_category.setDescription(description);
@@ -135,6 +143,10 @@ public final class AdHocPersistenceReader extends DefaultHandler {
           final String noDataText = attributes.getValue(NO_DATA);
           if (!"".equals(noDataText)) {
             f_category.setNoDataText(noDataText);
+          }
+          final String sortHelpString = attributes.getValue(SORT_HELP);
+          if (sortHelpString != null) {
+            f_category.setSortHelp(Integer.parseInt(sortHelpString));
           }
           final String changed = attributes.getValue(CHANGED);
           f_category.setChanged("true".equalsIgnoreCase(changed));
