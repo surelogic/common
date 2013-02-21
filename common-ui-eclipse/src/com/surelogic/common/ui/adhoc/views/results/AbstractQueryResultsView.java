@@ -294,13 +294,8 @@ public abstract class AbstractQueryResultsView extends ViewPart {
           final MenuItem item = new MenuItem(menu, SWT.PUSH);
           item.setText(query.getDescription());
           item.setData(query);
-          final String imageName;
-          if (resultQuery.isDefaultSubQuery(query)) {
-            imageName = CommonImages.IMG_QUERY_DEFAULT;
-          } else {
-            imageName = CommonImages.IMG_QUERY;
-          }
-          item.setImage(SLImages.getImage(imageName));
+          final boolean decorateAsDefault = resultQuery.isDefaultSubQuery(query);
+          item.setImage(SLImages.getImageForAdHocQuery(query.getType(), decorateAsDefault, false));
           item.setEnabled(query.isCompletelySubstitutedBy(variableValues));
           item.addListener(SWT.Selection, runSubQuery);
         }

@@ -1328,7 +1328,8 @@ public final class SLImages {
   /**
    * Used by ad hoc query results to display encoded Java icons.
    * 
-   * @param encoded an encoded string.
+   * @param encoded
+   *          an encoded string.
    * @return an image.
    */
   @Nullable

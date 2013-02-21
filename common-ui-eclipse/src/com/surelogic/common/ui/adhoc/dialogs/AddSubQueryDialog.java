@@ -29,104 +29,100 @@ import com.surelogic.common.ui.SLImages;
  */
 public class AddSubQueryDialog extends Dialog {
 
-	/**
-	 * Informs the user that no other queries exist.
-	 */
-	public static void openNoOtherQueries() {
-		MessageDialog.openInformation(EclipseUIUtility.getShell(), I18N
-				.msg("adhoc.query.dialog.addASubQuery.title"), I18N
-				.msg("adhoc.query.dialog.addASubQuery.noQueries.msg"));
-	}
+  /**
+   * Informs the user that no other queries exist.
+   */
+  public static void openNoOtherQueries() {
+    MessageDialog.openInformation(EclipseUIUtility.getShell(), I18N.msg("adhoc.query.dialog.addASubQuery.title"),
+        I18N.msg("adhoc.query.dialog.addASubQuery.noQueries.msg"));
+  }
 
-	private Table f_subQueryTable;
+  private Table f_subQueryTable;
 
-	private final List<AdHocQuery> f_queries = new ArrayList<AdHocQuery>();
+  private final List<AdHocQuery> f_queries = new ArrayList<AdHocQuery>();
 
-	private final Set<AdHocQuery> f_selectedQueries = new HashSet<AdHocQuery>();
+  private final Set<AdHocQuery> f_selectedQueries = new HashSet<AdHocQuery>();
 
-	/**
-	 * Gets the set of queries that the user selected to become sub-queries.
-	 * 
-	 * @return the set of queries that the user selected to become sub-queries.
-	 *         This set may be empty but it will not be {@code null}. The
-	 *         reference returned is the same underlying set used by the dialog,
-	 *         i.e., no copy is made.
-	 */
-	public Set<AdHocQuery> getSelectedQueries() {
-		return f_selectedQueries;
-	}
+  /**
+   * Gets the set of queries that the user selected to become sub-queries.
+   * 
+   * @return the set of queries that the user selected to become sub-queries.
+   *         This set may be empty but it will not be {@code null}. The
+   *         reference returned is the same underlying set used by the dialog,
+   *         i.e., no copy is made.
+   */
+  public Set<AdHocQuery> getSelectedQueries() {
+    return f_selectedQueries;
+  }
 
-	/**
-	 * Creates a dialog instance. If {@code queries.isEmpty()} the client should
-	 * call {@link #openNoOtherQueries()} rather than constructing an instance
-	 * of this dialog.
-	 * 
-	 * @param parentShell
-	 * @param queries
-	 */
-	public AddSubQueryDialog(Shell parentShell, List<AdHocQuery> queries) {
-		super(parentShell);
+  /**
+   * Creates a dialog instance. If {@code queries.isEmpty()} the client should
+   * call {@link #openNoOtherQueries()} rather than constructing an instance of
+   * this dialog.
+   * 
+   * @param parentShell
+   * @param queries
+   */
+  public AddSubQueryDialog(Shell parentShell, List<AdHocQuery> queries) {
+    super(parentShell);
 
-		if (queries.isEmpty())
-			throw new IllegalArgumentException(I18N.err(128));
+    if (queries.isEmpty())
+      throw new IllegalArgumentException(I18N.err(128));
 
-		f_queries.addAll(queries);
-		setShellStyle(getShellStyle() | SWT.RESIZE | SWT.MAX);
-	}
+    f_queries.addAll(queries);
+    setShellStyle(getShellStyle() | SWT.RESIZE | SWT.MAX);
+  }
 
-	@Override
-	protected final void configureShell(Shell newShell) {
-		super.configureShell(newShell);
-		newShell.setImage(SLImages.getImage(CommonImages.IMG_SIERRA_SERVER));
-		newShell.setText(I18N.msg("adhoc.query.dialog.addASubQuery.title"));
-	}
+  @Override
+  protected final void configureShell(Shell newShell) {
+    super.configureShell(newShell);
+    newShell.setImage(SLImages.getImage(CommonImages.IMG_SIERRA_SERVER));
+    newShell.setText(I18N.msg("adhoc.query.dialog.addASubQuery.title"));
+  }
 
-	@Override
-	protected Control createDialogArea(Composite parent) {
-		final Composite panel = (Composite) super.createDialogArea(parent);
-		final GridLayout gridLayout = new GridLayout();
-		panel.setLayout(gridLayout);
+  @Override
+  protected Control createDialogArea(Composite parent) {
+    final Composite panel = (Composite) super.createDialogArea(parent);
+    final GridLayout gridLayout = new GridLayout();
+    panel.setLayout(gridLayout);
 
-		final Label directions = new Label(panel, SWT.NONE);
-		directions.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false,
-				false));
-		directions.setText(I18N.msg("adhoc.query.dialog.addASubQuery.msg"));
+    final Label directions = new Label(panel, SWT.NONE);
+    directions.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false));
+    directions.setText(I18N.msg("adhoc.query.dialog.addASubQuery.msg"));
 
-		f_subQueryTable = new Table(panel, SWT.BORDER | SWT.FULL_SELECTION
-				| SWT.CHECK);
-		f_subQueryTable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,
-				true));
-		TableColumn col = new TableColumn(f_subQueryTable, SWT.NONE);
-		col.setText(I18N.msg("adhoc.query.dialog.addASubQuery.id"));
-		col.pack();
-		col = new TableColumn(f_subQueryTable, SWT.NONE);
-		col.setText(I18N.msg("adhoc.query.dialog.addASubQuery.description"));
-		col.pack();
-		f_subQueryTable.setHeaderVisible(true);
-		f_subQueryTable.setLinesVisible(true);
+    f_subQueryTable = new Table(panel, SWT.BORDER | SWT.FULL_SELECTION | SWT.CHECK);
+    f_subQueryTable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+    TableColumn col = new TableColumn(f_subQueryTable, SWT.NONE);
+    col.setText(I18N.msg("adhoc.query.dialog.addASubQuery.id"));
+    col.pack();
+    col = new TableColumn(f_subQueryTable, SWT.NONE);
+    col.setText(I18N.msg("adhoc.query.dialog.addASubQuery.description"));
+    col.pack();
+    f_subQueryTable.setHeaderVisible(true);
+    f_subQueryTable.setLinesVisible(true);
 
-		for (AdHocQuery query : f_queries) {
-			final TableItem item = new TableItem(f_subQueryTable, SWT.NONE);
-			item.setText(0, query.getId());
-			item.setImage(0, SLImages.getImage(query.getImageSymbolicName()));
-			item.setText(1, query.getDescription());
-			item.setData(query);
-		}
+    for (AdHocQuery query : f_queries) {
+      final TableItem item = new TableItem(f_subQueryTable, SWT.NONE);
+      item.setText(0, query.getId());
+      item.setImage(0, SLImages.getImageForAdHocQuery(query.getType(), false, !query.showInQueryMenu()));
+      item.setText(1, query.getDescription());
+      item.setData(query);
+    }
 
-		for (TableColumn c : f_subQueryTable.getColumns())
-			c.pack();
+    for (TableColumn c : f_subQueryTable.getColumns())
+      c.pack();
 
-		// add controls to composite as necessary
-		return panel;
-	}
+    // add controls to composite as necessary
+    return panel;
+  }
 
-	@Override
-	protected void okPressed() {
-		for (TableItem item : f_subQueryTable.getItems()) {
-			if (item.getChecked()) {
-				f_selectedQueries.add((AdHocQuery) item.getData());
-			}
-		}
-		super.okPressed();
-	}
+  @Override
+  protected void okPressed() {
+    for (TableItem item : f_subQueryTable.getItems()) {
+      if (item.getChecked()) {
+        f_selectedQueries.add((AdHocQuery) item.getData());
+      }
+    }
+    super.okPressed();
+  }
 }

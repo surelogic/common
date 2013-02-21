@@ -20,6 +20,7 @@ import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
@@ -524,7 +525,7 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
     final TableItem item = new TableItem(f_queryList, SWT.NONE);
     item.setText(query.getDescription());
     item.setData(ToolTip.TIP_TEXT, query.getShortMessage());
-    item.setImage(SLImages.getImage(query.getImageSymbolicName()));
+    item.setImage(getImageForQuery(query));
     item.setData(query);
   }
 
@@ -557,7 +558,7 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
     newSet.add(query);
     // f_queryTree.showItem(item);
     item.setText(query.getDescription());
-    item.setImage(SLImages.getImage(query.getImageSymbolicName()));
+    item.setImage(getImageForQuery(query));
     item.setData(query);
     item.setData(ToolTip.TIP_TEXT, query.getShortMessage());
     for (final AdHocQuery subQuery : query.getSubQueryList()) {
@@ -611,7 +612,7 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
         final TableItem item = new TableItem(f_subQueryTable, SWT.NONE);
         item.setData(subQuery);
         item.setText(0, subQuery.getId());
-        item.setImage(0, SLImages.getImage(subQuery.getImageSymbolicName()));
+        item.setImage(0, getImageForQuery(subQuery));
         item.setText(1, subQuery.getDescription());
         item.setData(ToolTip.TIP_TEXT, subQuery.getShortMessage());
         item.setChecked(query.isDefaultSubQuery(subQuery));
@@ -780,5 +781,9 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
         deleteQueryAction();
       }
     });
+  }
+
+  private Image getImageForQuery(AdHocQuery query) {
+    return SLImages.getImageForAdHocQuery(query.getType(), false, !query.showInQueryMenu());
   }
 }

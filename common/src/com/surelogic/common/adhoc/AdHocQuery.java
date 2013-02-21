@@ -14,7 +14,6 @@ import java.util.Properties;
 import java.util.Set;
 
 import com.surelogic.NonNull;
-import com.surelogic.common.CommonImages;
 import com.surelogic.common.i18n.I18N;
 
 /**
@@ -601,21 +600,6 @@ public final class AdHocQuery {
     }
     f_showAtRootOfQueryMenu = value;
     return true;
-  }
-
-  /**
-   * Gets the symbolic name from {@link CommonImages} for the image that should
-   * be displayed in the user interface for this query.
-   * 
-   * @return the symbolic name from {@link CommonImages} for the image that
-   *         should be displayed in the user interface for this query.
-   */
-  public String getImageSymbolicName() {
-    if (!showInQueryMenu()) {
-      return CommonImages.IMG_QUERY_GRAY;
-    } else {
-      return CommonImages.IMG_QUERY;
-    }
   }
 
   /**
