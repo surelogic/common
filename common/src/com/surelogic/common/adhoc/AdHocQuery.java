@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
+import com.surelogic.NonNull;
 import com.surelogic.common.CommonImages;
 import com.surelogic.common.i18n.I18N;
 
@@ -133,6 +134,73 @@ public final class AdHocQuery {
     }
     f_description = description;
     return true;
+  }
+
+  /**
+   * A value to help sort this query with other queries. May be negative, zero,
+   * or positive.
+   */
+  private int f_sortHelp = 0;
+
+  /**
+   * Gets a number to help sort this query with other queries.
+   * 
+   * @return a value. May be negative, zero, or positive.
+   */
+  public int getSortHelp() {
+    return f_sortHelp;
+  }
+
+  /**
+   * Sets a number to help sort this query with other queries.
+   * 
+   * @param value
+   *          a value. May be negative, zero, or positive.
+   * @return {@code true} if the value was changed, {@code false} otherwise.
+   */
+  public boolean setSortHelp(final int value) {
+    if (value == f_sortHelp)
+      return false;
+    else {
+      f_sortHelp = value;
+      return true;
+    }
+  }
+
+  /**
+   * The type of result this query returns. This can be used to help the display
+   * indicate queries that return informational results from ones that return
+   * probable program errors or other types of more specific information. By
+   * default it is an informational result.
+   */
+  @NonNull
+  private AdHocQueryType f_type = AdHocQueryType.INFORMATION;
+
+  /**
+   * Gets the type of result this query returns. This can be used to help the
+   * display indicate queries that return informational results from ones that
+   * return probable program errors or other types of more specific information.
+   * 
+   * @return type of result this query returns.
+   */
+  @NonNull
+  public AdHocQueryType getType() {
+    return f_type;
+  }
+
+  /**
+   * Sets the type of result this query returns.
+   * 
+   * @param value
+   *          a value, ignored if {@code null}.
+   * @return {@code true} if the value was changed, {@code false} otherwise.
+   */
+  public boolean setType(final AdHocQueryType value) {
+    if (value != null && value != f_type) {
+      f_type = value;
+      return true;
+    } else
+      return false;
   }
 
   private static final String STARTINFO = "BEGIN-INFO";

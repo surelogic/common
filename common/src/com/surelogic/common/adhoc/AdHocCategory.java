@@ -170,6 +170,37 @@ public final class AdHocCategory {
   }
 
   /**
+   * A value to help sort this category with other categories. May be negative,
+   * zero, or positive.
+   */
+  private int f_sortHelp = 0;
+
+  /**
+   * Gets a number to help sort this category with other categories.
+   * 
+   * @return a value. May be negative, zero, or positive.
+   */
+  public int getSortHelp() {
+    return f_sortHelp;
+  }
+
+  /**
+   * Sets a number to help sort this category with other categories.
+   * 
+   * @param value
+   *          a value. May be negative, zero, or positive.
+   * @return {@code true} if the value was changed, {@code false} otherwise.
+   */
+  public boolean setSortHelp(final int value) {
+    if (value == f_sortHelp)
+      return false;
+    else {
+      f_sortHelp = value;
+      return true;
+    }
+  }
+
+  /**
    * An increasing number that reflects how many changes have been made state of
    * this object. This value is only changed each time the software is released.
    * It cannot be changed by users of the software.
