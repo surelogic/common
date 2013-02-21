@@ -131,7 +131,7 @@ public final class AdHocManager {
    */
   private void tryToPersistToQuerySaveFile() {
     try {
-      AdHocPersistence.save(this, f_source.getQuerySaveFile(), false);
+      AdHocPersistence.exportDiffFile(this, f_source.getQuerySaveFile());
     } catch (final Exception e) {
       f_source.badQuerySaveFileNotification(e);
     }

@@ -114,6 +114,10 @@ public final class AdHocPersistenceReader extends DefaultHandler {
         }
       }
     } else if (name.equals(CATEGORY)) {
+      /*
+       * The below logic assumes that all query and sub-query definitions come
+       * before any category definitions.
+       */
       final String categoryId = attributes.getValue(ID);
       if (!"".equals(categoryId)) {
         f_category = f_manager.getOrCreateCategory(categoryId);
@@ -145,6 +149,9 @@ public final class AdHocPersistenceReader extends DefaultHandler {
         f_category = null;
       }
     } else if (name.equals(CAT_QUERY)) {
+      /*
+       * These links are nested within a category definition.
+       */
       if (f_category != null) {
         final String queryId = attributes.getValue(ID);
         final AdHocQuery query = f_manager.getQueryOrNull(queryId);
@@ -156,9 +163,6 @@ public final class AdHocPersistenceReader extends DefaultHandler {
 
   @Override
   public void characters(final char[] ch, final int start, final int length) throws SAXException {
-    /*
-     * Same logic for version 1.0 file format and version 2.0 file format.
-     */
     if (f_sql != null) {
       final String text = String.copyValueOf(ch, start, length);
       f_sql.append(text);
@@ -167,13 +171,12 @@ public final class AdHocPersistenceReader extends DefaultHandler {
 
   @Override
   public void endElement(final String uri, final String localName, final String name) throws SAXException {
-    /*
-     * Same logic for version 1.0 file format and version 2.0 file format.
-     */
     if (QUERY.equals(name) && f_query != null && f_sql != null) {
       f_query.setSql(f_sql.toString());
       f_query = null;
       f_sql = null;
+    } else if (CATEGORY.equals(name) && f_category != null) {
+      f_category = null;
     }
   }
 }

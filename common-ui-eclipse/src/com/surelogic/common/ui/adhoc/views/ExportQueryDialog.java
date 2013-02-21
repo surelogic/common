@@ -23,7 +23,6 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
-import com.surelogic.common.adhoc.AdHocCategory;
 import com.surelogic.common.adhoc.AdHocManager;
 import com.surelogic.common.adhoc.AdHocPersistence;
 import com.surelogic.common.adhoc.AdHocQuery;
@@ -170,17 +169,17 @@ public final class ExportQueryDialog extends Dialog {
     void doExport() {
       final String fileName = f_fileNameText.getText();
       final File exportFile = new File(fileName);
+      final List<AdHocQuery> selectedQueries;
       if (f_exportAllToggle.getSelection()) {
-        AdHocPersistence.save(f_manager, exportFile, true);
+        selectedQueries = null;
       } else {
-        final List<AdHocQuery> selectedQueries = new ArrayList<AdHocQuery>();
+        selectedQueries = new ArrayList<AdHocQuery>();
         for (final TableItem item : f_queryTable.getItems()) {
-          if (item.getChecked()) {
+          if (item.getChecked())
             selectedQueries.add((AdHocQuery) item.getData());
-          }
         }
-        AdHocPersistence.save(selectedQueries, new ArrayList<AdHocCategory>(), exportFile, true);
       }
+      AdHocPersistence.exportDefaultFile(f_manager, selectedQueries, exportFile);
     }
 
     private void setDialogState() {

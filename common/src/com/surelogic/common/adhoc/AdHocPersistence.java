@@ -19,6 +19,7 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.xml.sax.helpers.DefaultHandler;
 
+import com.surelogic.Nullable;
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.logging.SLLogger;
@@ -49,45 +50,50 @@ public final class AdHocPersistence {
   private static final Logger LOG = SLLogger.getLogger();
 
   /**
-   * Saves the set of queries into an XML file. An example of such a file is:
-   * 
-   * <pre>
-   *  &lt;?xml version='1.0' encoding='UTF-8' standalone='yes'?&gt;
-   *  &lt;ad-hoc version='3.0'&gt;
-   *  &lt;query id='a04dc317-d616-4708-9599-1d7657a57b97' description='show tables'&gt;show tables&lt;/query&gt;
-   *  &lt;query id='47863991-b84d-4624-82e0-9d6e6501341f' description='lockset results'&gt;select * from LOCK&lt;/query&gt;
-   *  &lt;query id='423f68cf-f922-4f6e-b9eb-85a2b436f04b' description='lock details'&gt;select * from LOCK_DETAIL
-   *  where LOCK_ID=?LOCK_ID?&lt;/query&gt;
-   *  &lt;sub-query id='a04dc317-d616-4708-9599-1d7657a57b97' sub-query='47863991-b84d-4624-82e0-9d6e6501341f'/&gt;
-   *  &lt;/ad-hoc&gt;
-   * </pre>
+   * Saves the set of queries into an XML file. A flag indicates if all queries
+   * or just changed queries are output.
    * 
    * @param manager
    *          a query manager.
    * @param saveFile
-   *          the file to export queries into.
-   * @param defaultFile
-   *          true if we are saving a new file of defaults, false if we are only
-   *          saving the changed queries
+   *          the file to export into.
    */
-  public static void save(final AdHocManager manager, final File saveFile, final boolean defaultFile) {
-    if (defaultFile) {
-      save(manager.getQueryList(), manager.getCategoryList(), saveFile, true);
-    } else {
-      final List<AdHocQuery> queries = manager.getQueryList();
-      for (final Iterator<AdHocQuery> iter = queries.iterator(); iter.hasNext();) {
-        if (!iter.next().isChanged()) {
-          iter.remove();
-        }
+  public static void exportDiffFile(final AdHocManager manager, final File saveFile) {
+    final List<AdHocQuery> queries = manager.getQueryList();
+    for (final Iterator<AdHocQuery> iter = queries.iterator(); iter.hasNext();) {
+      if (!iter.next().isChanged()) {
+        iter.remove();
       }
-      final List<AdHocCategory> categories = manager.getCategoryList();
-      for (final Iterator<AdHocCategory> iter = categories.iterator(); iter.hasNext();) {
-        if (!iter.next().isChanged()) {
-          iter.remove();
-        }
-      }
-      save(queries, categories, saveFile, false);
     }
+    final List<AdHocCategory> categories = manager.getCategoryList();
+    for (final Iterator<AdHocCategory> iter = categories.iterator(); iter.hasNext();) {
+      if (!iter.next().isChanged()) {
+        iter.remove();
+      }
+    }
+    export(queries, categories, saveFile, false);
+  }
+
+  /**
+   * Used to create a new default file (the revision is incremented for changed
+   * queries and categories) of queries and categories. Optionally, a list of
+   * specific queries may be passed&mdash;all of which must be owned by the
+   * passed query manager&mdash;to remove some queries from the new default file
+   * (such as test or debug queries). If this list is {@code null} then all
+   * queries owned by the manager are put into the file.
+   * 
+   * @param manager
+   *          a query manager.
+   * @param queries
+   *          an optional set of queries to output, {@code null} means to output
+   *          all of <tt>manager</tt>'s queries.
+   * @param saveFile
+   *          the file to export into.
+   */
+  public static void exportDefaultFile(final AdHocManager manager, @Nullable List<AdHocQuery> queries, final File saveFile) {
+    if (queries == null)
+      queries = manager.getQueryList();
+    export(queries, manager.getCategoryList(), saveFile, true);
   }
 
   /**
@@ -101,12 +107,12 @@ public final class AdHocPersistence {
    * @param categories
    *          the list of categories to export
    * @param saveFile
-   *          the file to export queries into.
+   *          the file to export into.
    * @param updateRevision
    *          {@code true} if we should update the revision of any queries or
-   *          categories marked as dirty.
+   *          categories marked as changed.
    */
-  public static void save(final List<AdHocQuery> queries, final List<AdHocCategory> categories, final File saveFile,
+  private static void export(final List<AdHocQuery> queries, final List<AdHocCategory> categories, final File saveFile,
       final boolean updateRevision) {
     Collections.sort(queries, new Comparator<AdHocQuery>() {
       @Override
@@ -136,7 +142,7 @@ public final class AdHocPersistence {
         outputSubQueries(pw, query);
       }
       for (final AdHocCategory category : categories) {
-        outputCategory(pw, category, updateRevision);
+        outputCategory(pw, category, updateRevision, queries);
       }
       outputXMLFooter(pw);
       pw.close();
@@ -181,7 +187,8 @@ public final class AdHocPersistence {
     pw.println(b.toString());
   }
 
-  private static void outputCategory(final PrintWriter pw, final AdHocCategory category, final boolean updateRevision) {
+  private static void outputCategory(final PrintWriter pw, final AdHocCategory category, final boolean updateRevision,
+      List<AdHocQuery> queries) {
     final StringBuilder b = new StringBuilder();
     b.append("  <").append(CATEGORY);
     Entities.addAttribute(ID, category.getId(), b);
@@ -197,9 +204,14 @@ public final class AdHocPersistence {
     }
     b.append(">\n");
     for (AdHocQuery query : category.getQueries()) {
-      b.append("    <").append(CAT_QUERY);
-      Entities.addAttribute(ID, query.getId(), b);
-      b.append("/>\n");
+      /*
+       * Only output a link if it is in the list of queries we are exporting.
+       */
+      if (queries.contains(query)) {
+        b.append("    <").append(CAT_QUERY);
+        Entities.addAttribute(ID, query.getId(), b);
+        b.append("/>\n");
+      }
     }
     b.append("</").append(CATEGORY).append(">");
     pw.println(b.toString());
