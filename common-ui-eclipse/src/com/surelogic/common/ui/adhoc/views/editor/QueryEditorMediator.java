@@ -241,13 +241,6 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
       }
     });
 
-    f_idText.addFocusListener(new FocusAdapter() {
-      @Override
-      public void focusLost(final FocusEvent e) {
-        savePossibleIdTextChanges();
-      }
-    });
-
     f_sortHint.addFocusListener(new FocusAdapter() {
       @Override
       public void focusLost(final FocusEvent e) {
@@ -700,7 +693,6 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
   private void saveAllPossibleTextEditingChanges() {
     savePossibleSqlChanges();
     savePossibleDescriptionTextChanges();
-    savePossibleIdTextChanges();
     savePossibleSortHintChanges();
     savePossibleTypeChanges();
   }
@@ -708,20 +700,6 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
   private void savePossibleDescriptionTextChanges() {
     if (f_edit.setDescription(f_descriptionText.getText())) {
       f_edit.markAsChanged();
-    }
-  }
-
-  private void savePossibleIdTextChanges() {
-    final String screenId = f_idText.getText();
-    final String id = f_edit.getId();
-    try {
-      if (f_edit.setId(f_idText.getText())) {
-        f_edit.markAsChanged();
-      }
-    } catch (IllegalArgumentException e) {
-      final String title = I18N.msg("adhoc.query.dialog.idChangeFailure.title");
-      final String msg = I18N.msg("adhoc.query.dialog.idChangeFailure.msg", screenId, id);
-      MessageDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), title, msg);
     }
   }
 

@@ -83,7 +83,7 @@ public abstract class AbstractCategoryEditorView extends ViewPart {
     label.setText(I18N.msg("adhoc.query.editor.category.rhs.id"));
     data = new GridData(SWT.FILL, SWT.CENTER, false, false);
     label.setLayoutData(data);
-    final Text idText = new Text(selectionPane, SWT.SINGLE);
+    final Text idText = new Text(selectionPane, SWT.SINGLE | SWT.READ_ONLY);
     data = new GridData(SWT.FILL, SWT.CENTER, true, false);
     idText.setLayoutData(data);
 
