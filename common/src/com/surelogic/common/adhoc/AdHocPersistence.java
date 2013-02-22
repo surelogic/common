@@ -8,7 +8,6 @@ import java.io.InputStream;
 import java.io.PrintWriter;
 import java.net.URL;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
@@ -116,33 +115,27 @@ public final class AdHocPersistence {
    */
   private static void export(final List<AdHocQuery> queries, final List<AdHocCategory> categories, final File saveFile,
       final boolean updateRevision) {
-    Collections.sort(queries, new Comparator<AdHocQuery>() {
-      @Override
-      public int compare(final AdHocQuery o1, final AdHocQuery o2) {
-        return o1.getId().compareTo(o2.getId());
-      }
-    });
-    Collections.sort(categories, new Comparator<AdHocCategory>() {
-      @Override
-      public int compare(final AdHocCategory o1, final AdHocCategory o2) {
-        return o1.getId().compareTo(o2.getId());
-      }
-    });
     if (queries == null || queries.isEmpty()) {
       if (saveFile.exists()) {
         saveFile.delete();
       }
       return;
     }
+
+    Collections.sort(queries, AdHocObjectDescriptionComparator.getInstance());
+    Collections.sort(categories, AdHocObjectDescriptionComparator.getInstance());
+
     try {
       final PrintWriter pw = new PrintWriter(new FileWriter(saveFile));
       outputXMLHeader(pw);
       for (final AdHocQuery query : queries) {
         outputQuery(pw, query, updateRevision);
       }
+      pw.println();
       for (final AdHocQuery query : queries) {
         outputSubQueries(pw, query);
       }
+      pw.println();
       for (final AdHocCategory category : categories) {
         outputCategory(pw, category, updateRevision, queries);
       }
