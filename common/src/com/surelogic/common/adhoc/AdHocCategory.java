@@ -173,15 +173,15 @@ public final class AdHocCategory {
    * A value to help sort this category with other categories. May be negative,
    * zero, or positive.
    */
-  private int f_sortHelp = 0;
+  private int f_sortHint = 0;
 
   /**
    * Gets a number to help sort this category with other categories.
    * 
    * @return a value. May be negative, zero, or positive.
    */
-  public int getSortHelp() {
-    return f_sortHelp;
+  public int getSortHint() {
+    return f_sortHint;
   }
 
   /**
@@ -191,11 +191,11 @@ public final class AdHocCategory {
    *          a value. May be negative, zero, or positive.
    * @return {@code true} if the value was changed, {@code false} otherwise.
    */
-  public boolean setSortHelp(final int value) {
-    if (value == f_sortHelp)
+  public boolean setSortHint(final int value) {
+    if (value == f_sortHint)
       return false;
     else {
-      f_sortHelp = value;
+      f_sortHint = value;
       return true;
     }
   }

@@ -75,9 +75,9 @@ public final class AdHocPersistenceReader extends DefaultHandler {
           if (!"".equals(displayString)) {
             f_query.setShowInQueryMenu(Boolean.parseBoolean(displayString));
           }
-          final String sortHelpString = attributes.getValue(SORT_HELP);
-          if (sortHelpString != null) {
-            f_query.setSortHelp(Integer.parseInt(sortHelpString));
+          final String sortHintString = attributes.getValue(SORT_HINT);
+          if (sortHintString != null) {
+            f_query.setSortHint(Integer.parseInt(sortHintString));
           }
           final String typeString = attributes.getValue(TYPE);
           if (typeString != null) {
@@ -144,9 +144,9 @@ public final class AdHocPersistenceReader extends DefaultHandler {
           if (!"".equals(noDataText)) {
             f_category.setNoDataText(noDataText);
           }
-          final String sortHelpString = attributes.getValue(SORT_HELP);
-          if (sortHelpString != null) {
-            f_category.setSortHelp(Integer.parseInt(sortHelpString));
+          final String sortHintString = attributes.getValue(SORT_HINT);
+          if (sortHintString != null) {
+            f_category.setSortHint(Integer.parseInt(sortHintString));
           }
           final String changed = attributes.getValue(CHANGED);
           f_category.setChanged("true".equalsIgnoreCase(changed));

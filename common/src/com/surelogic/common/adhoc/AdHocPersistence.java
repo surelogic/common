@@ -46,7 +46,7 @@ public final class AdHocPersistence {
   static final String HAS_DATA = "has-data";
   static final String NO_DATA = "no-data";
   static final String CAT_QUERY = "cat-query";
-  static final String SORT_HELP = "sort-help";
+  static final String SORT_HINT = "sort-hint";
   static final String TYPE = "type";
 
   private static final Logger LOG = SLLogger.getLogger();
@@ -170,9 +170,9 @@ public final class AdHocPersistence {
     b.append("  <").append(QUERY);
     Entities.addAttribute(ID, query.getId(), b);
     Entities.addAttribute(DESCRIPTION, query.getDescription(), b);
-    final int sortHelp = query.getSortHelp();
-    if (sortHelp != 0) {
-      Entities.addAttribute(SORT_HELP, sortHelp, b);
+    final int sortHint = query.getSortHint();
+    if (sortHint != 0) {
+      Entities.addAttribute(SORT_HINT, sortHint, b);
     }
     final AdHocQueryType type = query.getType();
     if (type != AdHocQueryType.INFORMATION) {
@@ -205,9 +205,9 @@ public final class AdHocPersistence {
     Entities.addAttribute(DESCRIPTION, category.getDescription(), b);
     Entities.addAttribute(HAS_DATA, category.getHasDataText(), b);
     Entities.addAttribute(NO_DATA, category.getNoDataText(), b);
-    final int sortHelp = category.getSortHelp();
-    if (sortHelp != 0) {
-      Entities.addAttribute(SORT_HELP, sortHelp, b);
+    final int sortHint = category.getSortHint();
+    if (sortHint != 0) {
+      Entities.addAttribute(SORT_HINT, sortHint, b);
     }
     long revision = category.getRevision();
     if (updateRevision && category.isChanged())
