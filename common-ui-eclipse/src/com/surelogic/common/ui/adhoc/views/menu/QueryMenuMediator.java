@@ -18,6 +18,7 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.progress.UIJob;
 
+import com.surelogic.Nullable;
 import com.surelogic.common.CommonImages;
 import com.surelogic.common.ILifecycle;
 import com.surelogic.common.Pair;
@@ -43,8 +44,6 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
   private final Table f_queryMenu;
   private final QueryResultNavigator f_navigator;
 
-  private AdHocQuery f_selectedQuery = null;
-
   public QueryMenuMediator(final AbstractQueryMenuView view, final PageBook pageBook, final Label noRunSelected,
       final Table queryMenu, final QueryResultNavigator navigator) {
     f_view = view;
@@ -61,18 +60,12 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
   public void init() {
     f_navigator.init();
 
-    f_queryMenu.addListener(SWT.Selection, new Listener() {
-      @Override
-      public void handleEvent(final Event event) {
-        final AdHocQuery query = getQueryMenuSelection();
-        setSelectedQuery(query);
-      }
-    });
-
     final Listener runQueryListener = new Listener() {
       @Override
       public void handleEvent(final Event event) {
-        runQueryAction();
+        final AdHocQuery query = getSelectionOrNull();
+        if (query != null)
+          runQuery(query);
       }
     };
     f_queryMenu.addListener(SWT.MouseDoubleClick, runQueryListener);
@@ -200,8 +193,6 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
       }
     }
 
-    f_selectedQuery = null;
-
     f_queryMenu.setRedraw(true);
     if (!atLeastOneQueryIsShown) {
       final TableItem item = new TableItem(f_queryMenu, SWT.NONE);
@@ -216,13 +207,8 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
     }
   }
 
-  private void setSelectedQuery(final AdHocQuery query) {
-    if (f_selectedQuery != query) {
-      f_selectedQuery = query;
-    }
-  }
-
-  private AdHocQuery getQueryMenuSelection() {
+  @Nullable
+  private AdHocQuery getSelectionOrNull() {
     AdHocQuery result = null;
     if (f_queryMenu.getSelectionCount() == 1) {
       final TableItem item = f_queryMenu.getSelection()[0];
@@ -231,16 +217,6 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
       }
     }
     return result;
-  }
-
-  private void runQueryAction() {
-    if (f_queryMenu.getSelectionCount() == 1) {
-      final TableItem item = f_queryMenu.getSelection()[0];
-      if (item.getData() instanceof AdHocQuery) {
-        final AdHocQuery query = (AdHocQuery) item.getData();
-        runQuery(query);
-      }
-    }
   }
 
   private void runQuery(final AdHocQuery query) {
@@ -254,7 +230,7 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
     }
   }
 
-  public void runRootQuery(final String id) {
+  void runRootQuery(final String id) {
     for (final AdHocQuery q : f_manager.getRootQueryList()) {
       if (q.getId().equals(id)) {
         runQuery(q);
