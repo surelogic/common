@@ -15,7 +15,6 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.TabFolder;
@@ -103,8 +102,6 @@ public abstract class AbstractQueryEditorView extends ViewPart {
     filterTreeCheck.setLayoutData(data);
 
     final Menu queryActionMenu = new Menu(parent.getShell(), SWT.POP_UP);
-    final MenuItem testItem = new MenuItem(queryActionMenu, SWT.NONE);
-    testItem.setText("Test Pop-up Action");
 
     /*
      * Right-hand-side allows editing of the selected query.

@@ -1,25 +1,47 @@
 package com.surelogic.common.ui.adhoc.views.editor;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.SashForm;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Item;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolItem;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.PageBook;
+import org.eclipse.ui.progress.UIJob;
 
+import com.surelogic.common.CommonImages;
 import com.surelogic.common.ILifecycle;
+import com.surelogic.common.adhoc.AdHocCategory;
 import com.surelogic.common.adhoc.AdHocManager;
 import com.surelogic.common.adhoc.AdHocManagerAdapter;
 import com.surelogic.common.adhoc.AdHocQuery;
 import com.surelogic.common.core.EclipseUtility;
 import com.surelogic.common.core.preferences.CommonCorePreferencesUtility;
+import com.surelogic.common.i18n.I18N;
+import com.surelogic.common.ui.SLImages;
+import com.surelogic.common.ui.jobs.SLUIJob;
 
 public final class CategoryEditorMediator extends AdHocManagerAdapter implements ILifecycle {
 
@@ -27,6 +49,7 @@ public final class CategoryEditorMediator extends AdHocManagerAdapter implements
   private final SashForm f_sash;
   private final Composite f_lhs;
   private final Table f_categoryList;
+  private final Menu f_categoryActionMenu;
   private final ToolItem f_newCategory;
   private final ToolItem f_deleteCategory;
   private final PageBook f_rhs;
@@ -37,14 +60,20 @@ public final class CategoryEditorMediator extends AdHocManagerAdapter implements
   private final Text f_hasDataText;
   private final Text f_noDataText;
   private final Spinner f_sortHint;
+  private final Table f_queryTable;
 
-  CategoryEditorMediator(AbstractCategoryEditorView view, SashForm sash, Composite lhs, Table categoryList, ToolItem newCategory,
-      ToolItem deleteCategory, PageBook rhs, Label noSelectionPane, Composite selectionPane, Text descriptionText, Text idText,
-      Text hasDataText, Text noDataText, Spinner sortHint) {
+  private final Set<AdHocCategory> f_selections = new HashSet<AdHocCategory>();
+  private AdHocCategory f_edit = null;
+
+  CategoryEditorMediator(AbstractCategoryEditorView view, SashForm sash, Composite lhs, Table categoryList,
+      Menu categoryActionMenu, ToolItem newCategory, ToolItem deleteCategory, PageBook rhs, Label noSelectionPane,
+      Composite selectionPane, Text descriptionText, Text idText, Text hasDataText, Text noDataText, Spinner sortHint,
+      Table queryTable) {
     f_manager = view.getManager();
     f_sash = sash;
     f_lhs = lhs;
     f_categoryList = categoryList;
+    f_categoryActionMenu = categoryActionMenu;
     f_newCategory = newCategory;
     f_deleteCategory = deleteCategory;
     f_rhs = rhs;
@@ -55,6 +84,7 @@ public final class CategoryEditorMediator extends AdHocManagerAdapter implements
     f_hasDataText = hasDataText;
     f_noDataText = noDataText;
     f_sortHint = sortHint;
+    f_queryTable = queryTable;
   }
 
   @Override
@@ -78,22 +108,31 @@ public final class CategoryEditorMediator extends AdHocManagerAdapter implements
       }
     });
 
+    f_categoryActionMenu.addListener(SWT.Show, new Listener() {
+      @Override
+      public void handleEvent(final Event event) {
+        for (final MenuItem item : f_categoryActionMenu.getItems()) {
+          item.dispose();
+        }
+        showCategoryActionMenu();
+      }
+    });
+
     f_categoryList.addListener(SWT.Selection, new Listener() {
       @Override
       public void handleEvent(final Event event) {
         categorySelectionAction();
       }
-
     });
 
     f_newCategory.addListener(SWT.Selection, new Listener() {
       @Override
       public void handleEvent(final Event event) {
         final String id = f_manager.generateUnusedId();
-        final AdHocQuery query = f_manager.getOrCreateQuery(id);
-        query.setDescription("A new query");
-        // f_selections.clear();
-        // f_selections.add(query);
+        final AdHocCategory category = f_manager.getOrCreateCategory(id);
+        category.setDescription("A new category");
+        f_selections.clear();
+        f_selections.add(category);
         f_manager.notifyQueryModelChange();
       }
     });
@@ -101,7 +140,7 @@ public final class CategoryEditorMediator extends AdHocManagerAdapter implements
     f_deleteCategory.addListener(SWT.Selection, new Listener() {
       @Override
       public void handleEvent(final Event event) {
-        deleteQueryAction();
+        deleteCategoryAction();
       }
     });
 
@@ -110,13 +149,26 @@ public final class CategoryEditorMediator extends AdHocManagerAdapter implements
       public void focusLost(final FocusEvent e) {
         savePossibleDescriptionTextChanges();
       }
-
     });
 
-    f_idText.addFocusListener(new FocusAdapter() {
+    f_hasDataText.addFocusListener(new FocusAdapter() {
       @Override
       public void focusLost(final FocusEvent e) {
-        savePossibleIdTextChanges();
+        savePossibleHasDataTextChanges();
+      }
+    });
+
+    f_noDataText.addFocusListener(new FocusAdapter() {
+      @Override
+      public void focusLost(final FocusEvent e) {
+        savePossibleNoDataTextChanges();
+      }
+    });
+
+    f_sortHint.addFocusListener(new FocusAdapter() {
+      @Override
+      public void focusLost(final FocusEvent e) {
+        savePossibleSortHintChanges();
       }
     });
 
@@ -130,26 +182,191 @@ public final class CategoryEditorMediator extends AdHocManagerAdapter implements
   }
 
   @Override
+  public void notifyQueryModelChange(final AdHocManager manager) {
+    final UIJob job = new SLUIJob() {
+      @Override
+      public IStatus runInUIThread(final IProgressMonitor monitor) {
+        updateCategoryListContents();
+        return Status.OK_STATUS;
+      }
+    };
+    job.schedule();
+  }
+
+  private void showCategoryActionMenu() {
+    final MenuItem deleteItem = new MenuItem(f_categoryActionMenu, SWT.PUSH);
+    deleteItem.setText(I18N.msg("adhoc.query.editor.category.delete"));
+    deleteItem.setImage(SLImages.getImage(CommonImages.IMG_EDIT_DELETE));
+    deleteItem.addListener(SWT.Selection, new Listener() {
+      @Override
+      public void handleEvent(final Event event) {
+        deleteCategoryAction();
+      }
+    });
+  }
+
+  private void updateCategoryListContents() {
+    f_categoryList.setRedraw(false);
+
+    f_categoryList.removeAll();
+
+    for (final AdHocCategory category : f_manager.getCategoryList()) {
+      addCategoryToList(category);
+    }
+
+    /*
+     * Intersect the selections with the remaining set of queries.
+     */
+    f_selections.retainAll(f_manager.getCategoryList());
+    setCategoryListSelections();
+    updateSelectionPane();
+
+    f_categoryList.setRedraw(true);
+  }
+
+  private void addCategoryToList(final AdHocCategory category) {
+    final TableItem item = new TableItem(f_categoryList, SWT.NONE);
+    item.setText(category.getDescription());
+    item.setData(category);
+  }
+
+  private void setCategoryListSelections() {
+    final ArrayList<TableItem> items = new ArrayList<TableItem>();
+    for (final TableItem item : f_categoryList.getItems()) {
+      if (item.getData() instanceof AdHocCategory) {
+        final AdHocCategory query = (AdHocCategory) item.getData();
+        if (f_selections.contains(query)) {
+          items.add(item);
+        }
+      }
+    }
+    f_categoryList.setSelection(items.toArray(new TableItem[items.size()]));
+  }
+
+  private void updateSelectionPane() {
+    final boolean oneQuerySelected = f_selections.size() == 1;
+    final boolean oneOrMoreQueriesSelected = !f_selections.isEmpty();
+    if (oneOrMoreQueriesSelected) {
+      f_categoryList.setMenu(f_categoryActionMenu);
+    } else {
+      f_categoryList.setMenu(null);
+    }
+    f_deleteCategory.setEnabled(oneOrMoreQueriesSelected);
+
+    if (!oneOrMoreQueriesSelected) {
+      f_noSelectionPane.setText(I18N.msg("adhoc.query.editor.category.rhs.noSelection"));
+      f_rhs.showPage(f_noSelectionPane);
+    } else if (oneOrMoreQueriesSelected && !oneQuerySelected) {
+      f_noSelectionPane.setText(I18N.msg("adhoc.query.editor.category.rhs.multipleSelection"));
+      f_rhs.showPage(f_noSelectionPane);
+    } else {
+      f_rhs.showPage(f_selectionPane);
+      final AdHocCategory theOne = f_selections.toArray(new AdHocCategory[1])[0];
+      setOnScreenEdit(theOne);
+    }
+  }
+
+  private void setOnScreenEdit(final AdHocCategory category) {
+    f_edit = category;
+    if (f_edit != null) {
+      f_descriptionText.setText(f_edit.getDescription());
+      f_idText.setText(f_edit.getId());
+      f_hasDataText.setText(f_edit.getHasDataText());
+      f_noDataText.setText(f_edit.getNoDataText());
+      f_sortHint.setSelection(f_edit.getSortHint());
+
+      f_queryTable.setRedraw(false);
+      f_queryTable.removeAll();
+      final List<AdHocQuery> queries = category.getQueryList();
+      for (final AdHocQuery query : queries) {
+        final TableItem item = new TableItem(f_queryTable, SWT.NONE);
+        item.setData(query);
+        item.setText(0, query.getId());
+        item.setImage(0, getImageForQuery(query));
+        item.setText(1, query.getDescription());
+      }
+      for (final TableColumn c : f_queryTable.getColumns()) {
+        c.pack();
+      }
+      f_queryTable.setRedraw(true);
+    }
+  }
+
+  @Override
   public void dispose() {
     f_manager.removeObserver(this);
   }
 
   void categorySelectionAction() {
-    // TODO Auto-generated method stub
+    /*
+     * Remember what categories are selected.
+     */
+    final Item[] selections = f_categoryList.getSelection();
+    final Set<AdHocCategory> newSelections = new HashSet<AdHocCategory>();
+    for (final Item item : selections) {
+      if (item.getData() instanceof AdHocCategory) {
+        newSelections.add((AdHocCategory) item.getData());
+      }
+    }
+    /*
+     * Did the set of selections change?
+     */
+    if (!f_selections.equals(newSelections)) {
+      f_selections.clear();
+      f_selections.addAll(newSelections);
 
+      updateSelectionPane();
+    }
   }
 
-  void deleteQueryAction() {
-    // TODO Auto-generated method stub
-
+  void deleteCategoryAction() {
+    final boolean multiDelete = f_selections.size() > 1;
+    final String title;
+    if (multiDelete) {
+      title = I18N.msg("adhoc.query.dialog.category.confirmDelete.title.many");
+    } else {
+      title = I18N.msg("adhoc.query.dialog.category.confirmDelete.title.one");
+    }
+    final String msg;
+    if (multiDelete) {
+      msg = I18N.msg("adhoc.query.dialog.category.confirmDelete.msg.many");
+    } else {
+      msg = I18N.msg("adhoc.query.dialog.category.confirmDelete.msg.one");
+    }
+    if (MessageDialog.openConfirm(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), title, msg)) {
+      for (final AdHocCategory category : f_selections) {
+        f_manager.delete(category);
+      }
+      f_manager.notifyQueryModelChange();
+    }
   }
 
-  void savePossibleDescriptionTextChanges() {
-    // TODO Auto-generated method stub
-
+  private void savePossibleDescriptionTextChanges() {
+    if (f_edit.setDescription(f_descriptionText.getText())) {
+      f_edit.markAsChanged();
+    }
   }
 
-  void savePossibleIdTextChanges() {
-    // TODO Auto-generated method stub
+  private void savePossibleHasDataTextChanges() {
+    if (f_edit.setHasDataText(f_hasDataText.getText())) {
+      f_edit.markAsChanged();
+    }
+  }
+
+  private void savePossibleNoDataTextChanges() {
+    if (f_edit.setNoDataText(f_noDataText.getText())) {
+      f_edit.markAsChanged();
+    }
+  }
+
+  private void savePossibleSortHintChanges() {
+    final int value = f_sortHint.getSelection();
+    if (f_edit.setSortHint(value)) {
+      f_edit.markAsChanged();
+    }
+  }
+
+  private Image getImageForQuery(AdHocQuery query) {
+    return SLImages.getImageForAdHocQuery(query.getType(), query.showAtRootOfQueryMenu(), !query.showInQueryMenu());
   }
 }

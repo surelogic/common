@@ -227,7 +227,7 @@ public final class AdHocPersistence {
         b.append("/>\n");
       }
     }
-    b.append("</").append(CATEGORY).append(">");
+    b.append("  </").append(CATEGORY).append(">");
     pw.println(b.toString());
   }
 

@@ -612,8 +612,8 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
     if (f_edit != null) {
       f_descriptionText.setText(f_edit.getDescription());
       f_idText.setText(f_edit.getId());
-      f_sortHint.setSelection(query.getSortHint());
-      f_type.setText(query.getType().toString());
+      f_sortHint.setSelection(f_edit.getSortHint());
+      f_type.setText(f_edit.getType().toString());
 
       final boolean show = f_edit.showInQueryMenu();
       f_showCheck.setSelection(show);

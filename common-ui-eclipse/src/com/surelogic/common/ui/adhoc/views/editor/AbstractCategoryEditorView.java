@@ -6,9 +6,12 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
@@ -56,6 +59,8 @@ public abstract class AbstractCategoryEditorView extends ViewPart {
     final Table categoryList = new Table(lhs, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
     data = new GridData(SWT.FILL, SWT.FILL, true, true);
     categoryList.setLayoutData(data);
+
+    final Menu categoryActionMenu = new Menu(parent.getShell(), SWT.POP_UP);
 
     /*
      * Right-hand-side allows editing of the selected category.
@@ -113,8 +118,23 @@ public abstract class AbstractCategoryEditorView extends ViewPart {
     sortHint.setMaximum(999);
     sortHint.setLayoutData(data);
 
-    f_mediator = new CategoryEditorMediator(this, sash, lhs, categoryList, newCategory, deleteCategory, rhs, noSelectionPane,
-        selectionPane, descriptionText, idText, hasDataText, noDataText, sortHint);
+    final Group group = new Group(selectionPane, SWT.NONE);
+    group.setText("Contents");
+    data = new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1);
+    group.setLayoutData(data);
+
+    final Table queryTable = new Table(group, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI | SWT.CHECK);
+    TableColumn col = new TableColumn(queryTable, SWT.NONE);
+    col.setText("Identifier");
+    col.pack();
+    col = new TableColumn(queryTable, SWT.NONE);
+    col.setText("Description");
+    col.pack();
+    queryTable.setHeaderVisible(true);
+    queryTable.setLinesVisible(true);
+
+    f_mediator = new CategoryEditorMediator(this, sash, lhs, categoryList, categoryActionMenu, newCategory, deleteCategory, rhs,
+        noSelectionPane, selectionPane, descriptionText, idText, hasDataText, noDataText, sortHint, queryTable);
     f_mediator.init();
   }
 
