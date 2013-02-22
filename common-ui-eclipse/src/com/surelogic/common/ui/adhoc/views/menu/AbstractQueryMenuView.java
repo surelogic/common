@@ -3,11 +3,12 @@ package com.surelogic.common.ui.adhoc.views.menu;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Table;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
@@ -66,7 +67,21 @@ public abstract class AbstractQueryMenuView extends ViewPart {
 
     final Label noRunSelected = new Label(pageBook, SWT.NONE);
 
-    final Table queryMenu = new Table(pageBook, SWT.BORDER | SWT.FULL_SELECTION);
+    final ScrolledComposite sc = new ScrolledComposite(pageBook, SWT.NONE);
+    final Composite content = new Composite(sc, SWT.NONE);
+    // content.setBackground(content.getDisplay().getSystemColor(SWT.COLOR_RED));
+    sc.setExpandHorizontal(true);
+    sc.setContent(content);
+    final GridLayout gl = new GridLayout();
+    gl.marginHeight = gl.marginWidth = 0;
+    gl.horizontalSpacing = gl.verticalSpacing = 2;
+    content.setLayout(gl);
+    // sc.addControlListener(new ControlAdapter() {
+    // @Override
+    // public void controlResized(ControlEvent e) {
+    // content.setSize(content.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+    // }
+    // });
 
     // init() called by the mediator
     final QueryResultNavigator navigator = QueryResultNavigator.getInstance(getManager().getDataSource());
@@ -79,10 +94,7 @@ public abstract class AbstractQueryMenuView extends ViewPart {
     final IMenuManager menu = actionBars.getMenuManager();
     menu.add(navigator.getClearSelectionAction());
 
-    final ToolTip tip = getToolTip(parent.getShell());
-    tip.activateToolTip(queryMenu);
-
-    f_mediator = new QueryMenuMediator(this, pageBook, noRunSelected, queryMenu, navigator);
+    f_mediator = new QueryMenuMediator(this, pageBook, noRunSelected, sc, content, navigator);
     f_mediator.init();
   }
 

@@ -7,7 +7,13 @@ import java.util.Map;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
@@ -15,6 +21,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.progress.UIJob;
 
@@ -22,6 +29,7 @@ import com.surelogic.Nullable;
 import com.surelogic.common.CommonImages;
 import com.surelogic.common.ILifecycle;
 import com.surelogic.common.Pair;
+import com.surelogic.common.adhoc.AdHocCategory;
 import com.surelogic.common.adhoc.AdHocManager;
 import com.surelogic.common.adhoc.AdHocManagerAdapter;
 import com.surelogic.common.adhoc.AdHocQuery;
@@ -41,46 +49,61 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
   private final AdHocManager f_manager;
   private final PageBook f_pageBook;
   private final Label f_noRunSelected;
-  private final Table f_queryMenu;
+  private final ScrolledComposite f_sc;
+  private final Composite f_content;
   private final QueryResultNavigator f_navigator;
 
+  private final Listener f_runQueryListener = new Listener() {
+    @Override
+    public void handleEvent(final Event event) {
+      final AdHocQuery query = getSelectionOrNull(event.widget);
+      if (query != null)
+        runQuery(query);
+    }
+  };
+
   public QueryMenuMediator(final AbstractQueryMenuView view, final PageBook pageBook, final Label noRunSelected,
-      final Table queryMenu, final QueryResultNavigator navigator) {
+      final ScrolledComposite sc, final Composite content, final QueryResultNavigator navigator) {
     f_view = view;
     f_manager = view.getManager();
     f_pageBook = pageBook;
     f_noRunSelected = noRunSelected;
     f_noRunSelected.setText(view.getNoDatabaseMessage());
     f_noRunSelected.setBackground(f_noRunSelected.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
-    f_queryMenu = queryMenu;
+    f_sc = sc;
+    f_content = content;
     f_navigator = navigator;
+
+    // TODO
+    // final Table queryMenu = new Table(pageBook, SWT.BORDER |
+    // SWT.FULL_SELECTION);
+    // final ToolTip tip = getToolTip(parent.getShell());
+    // tip.activateToolTip(queryMenu);
+    // f_queryMenu.addListener(SWT.MouseDoubleClick, runQueryListener);
+
   }
 
   @Override
   public void init() {
     f_navigator.init();
 
-    final Listener runQueryListener = new Listener() {
-      @Override
-      public void handleEvent(final Event event) {
-        final AdHocQuery query = getSelectionOrNull();
-        if (query != null)
-          runQuery(query);
-      }
-    };
-    f_queryMenu.addListener(SWT.MouseDoubleClick, runQueryListener);
+    f_manager.addObserver(this);
 
-    final Menu menu = new Menu(f_queryMenu.getShell(), SWT.POP_UP);
+    updateQueryMenu();
+  }
+
+  private void addContextMenuTo(final Table queryTable) {
+    final Menu menu = new Menu(queryTable.getShell(), SWT.POP_UP);
     final MenuItem runQuery = new MenuItem(menu, SWT.PUSH);
     runQuery.setImage(SLImages.getImage(CommonImages.IMG_RUN_DRUM));
     runQuery.setText(I18N.msg("adhoc.query.menu.run"));
-    runQuery.addListener(SWT.Selection, runQueryListener);
+    runQuery.addListener(SWT.Selection, f_runQueryListener);
     menu.addListener(SWT.Show, new Listener() {
       @Override
       public void handleEvent(final Event event) {
         boolean menuItemEnabled = false;
-        if (f_queryMenu.getSelectionCount() == 1) {
-          final TableItem item = f_queryMenu.getSelection()[0];
+        if (queryTable.getSelectionCount() == 1) {
+          final TableItem item = queryTable.getSelection()[0];
           /*
            * If there is data then the query can be run.
            */
@@ -91,11 +114,7 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
         runQuery.setEnabled(menuItemEnabled);
       }
     });
-    f_queryMenu.setMenu(menu);
-
-    f_manager.addObserver(this);
-
-    updateQueryMenu();
+    queryTable.setMenu(menu);
   }
 
   @Override
@@ -105,7 +124,7 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
   }
 
   void setFocus() {
-    f_queryMenu.setFocus();
+    f_sc.setFocus();
   }
 
   private final UIJob f_generalRefreshJob = new SLUIJob() {
@@ -162,58 +181,112 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
   }
 
   private void updateQueryMenu() {
-    f_queryMenu.setRedraw(false);
-    f_queryMenu.removeAll();
+    f_content.setRedraw(false);
+    // clear out old widget contents
+    for (Control child : f_content.getChildren())
+      child.dispose();
 
     final Map<String, String> variableValues = getVariableValues().first();
-
-    final AdHocQueryResult selectedResult = f_manager.getSelectedResult();
-
-    boolean atLeastOneQueryIsShown = false;
-    final List<AdHocQuery> queriesThatMightBeAbleToBeRun;
-    if (selectedResult == null) {
-      queriesThatMightBeAbleToBeRun = f_manager.getRootQueryList();
-    } else {
-      queriesThatMightBeAbleToBeRun = selectedResult.getQueryFullyBound().getQuery().getVisibleSubQueryList();
-    }
     final boolean hasDatabaseAccess = variableValues.containsKey(AdHocManager.DATABASE);
-    for (final AdHocQuery query : queriesThatMightBeAbleToBeRun) {
-      atLeastOneQueryIsShown = true;
-      final TableItem item = new TableItem(f_queryMenu, SWT.NONE);
+    if (hasDatabaseAccess) {
+      f_pageBook.showPage(f_sc);
+
+      final AdHocQueryResult selectedResult = f_manager.getSelectedResult();
+      if (selectedResult == null) {
+        /*
+         * top-level query
+         */
+        final List<AdHocQuery> rootQueries = f_manager.getRootQueryList();
+        final List<AdHocCategory> categories = f_manager.getCategoryList();
+
+        // TODO SORT CATS
+
+        for (AdHocCategory category : categories) {
+          final List<AdHocQuery> catQueries = category.getQueryList();
+          catQueries.retainAll(rootQueries);
+          final Label catLabel = new Label(f_content, SWT.NONE);
+          catLabel.setFont(JFaceResources.getFontRegistry().getBold(JFaceResources.HEADER_FONT));
+          catLabel.setText(category.getDescription());
+          final GridData data = new GridData(SWT.FILL, SWT.FILL, true, false);
+          catLabel.setLayoutData(data);
+
+          final Composite c = new Composite(f_content, SWT.NONE);
+          c.setLayoutData(data);
+          c.setLayout(new FillLayout());
+          final Label catMsgLabel = new Label(c, SWT.WRAP);
+          if (catQueries.isEmpty()) {
+            catMsgLabel.setText(category.getNoDataText());
+          } else {
+            catMsgLabel.setText(category.getHasDataText());
+            addQueryMenu(catQueries, selectedResult, variableValues);
+            rootQueries.removeAll(catQueries);
+          }
+        }
+        // add in the rest
+        addQueryMenu(rootQueries, selectedResult, variableValues);
+      } else {
+        /*
+         * sub-query
+         */
+        addQueryMenu(selectedResult.getQueryFullyBound().getQuery().getVisibleSubQueryList(), selectedResult, variableValues);
+      }
+
+      /*
+       * Handle the case where no queries exist
+       */
+      boolean noChildren = f_content.getChildren().length == 0;
+      if (noChildren) {
+        final Label msg = new Label(f_content, SWT.NONE);
+        msg.setText(I18N.msg("adhoc.query.menu.label.noQuery"));
+        final GridData data = new GridData(SWT.FILL, SWT.CENTER, true, false);
+        msg.setLayoutData(data);
+      }
+
+      f_content.setSize(f_content.computeSize(SWT.DEFAULT, SWT.DEFAULT));
+    } else {
+      f_pageBook.showPage(f_noRunSelected);
+    }
+
+    f_content.setRedraw(true);
+  }
+
+  private void addQueryMenu(List<AdHocQuery> queries, AdHocQueryResult selectedResult, Map<String, String> variableValues) {
+    final Table tm = new Table(f_content,  SWT.NO_SCROLL | SWT.FULL_SELECTION);
+    final ToolTip tip = f_view.getToolTip(tm.getShell());
+    tip.activateToolTip(tm);
+    final GridData data = new GridData(SWT.FILL, SWT.CENTER, true, false);
+    tm.setLayoutData(data);
+    addContextMenuTo(tm);
+    tm.addListener(SWT.MouseDoubleClick, f_runQueryListener);
+
+    // TODO A SORT THAT MAKES SENSE
+
+    for (AdHocQuery query : queries) {
+      final TableItem item = new TableItem(tm, SWT.NONE);
       item.setText(query.getDescription());
-      item.setData(ToolTip.TIP_TEXT, query.getShortMessage());
-      if (hasDatabaseAccess && query.isCompletelySubstitutedBy(variableValues)) {
+      // item.setData(ToolTip.TIP_TEXT, query.getShortMessage());
+      if (query.isCompletelySubstitutedBy(variableValues)) {
         final boolean grayscale = f_view.queryResultWillBeEmpty(query);
         final boolean decorateAsDefault = selectedResult != null
             && selectedResult.getQueryFullyBound().getQuery().isDefaultSubQuery(query);
         item.setImage(SLImages.getImageForAdHocQuery(query.getType(), decorateAsDefault, grayscale));
         item.setData(query);
       } else {
-        item.setForeground(f_queryMenu.getDisplay().getSystemColor(SWT.COLOR_GRAY));
+        item.setForeground(tm.getDisplay().getSystemColor(SWT.COLOR_GRAY));
       }
-    }
-
-    f_queryMenu.setRedraw(true);
-    if (!atLeastOneQueryIsShown) {
-      final TableItem item = new TableItem(f_queryMenu, SWT.NONE);
-      item.setText(I18N.msg("adhoc.query.menu.label.noQuery"));
-      item.setForeground(f_queryMenu.getDisplay().getSystemColor(SWT.COLOR_GRAY));
-    }
-
-    if (selectedResult != null || f_manager.getGlobalVariableValues().containsKey(AdHocManager.DATABASE)) {
-      f_pageBook.showPage(f_queryMenu);
-    } else {
-      f_pageBook.showPage(f_noRunSelected);
     }
   }
 
   @Nullable
-  private AdHocQuery getSelectionOrNull() {
+  private AdHocQuery getSelectionOrNull(Widget w) {
     AdHocQuery result = null;
-    if (f_queryMenu.getSelectionCount() == 1) {
-      final TableItem item = f_queryMenu.getSelection()[0];
-      if (item.getData() instanceof AdHocQuery) {
-        result = (AdHocQuery) item.getData();
+    if (w instanceof Table) {
+      final Table t = (Table) w;
+      if (t.getSelectionCount() == 1) {
+        final TableItem item = t.getSelection()[0];
+        if (item.getData() instanceof AdHocQuery) {
+          result = (AdHocQuery) item.getData();
+        }
       }
     }
     return result;
