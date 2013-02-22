@@ -32,6 +32,9 @@ import com.surelogic.common.ui.jobs.SLUIJob;
  * invoked on that instance (as well as {@link #dispose()} when the using view
  * is itself disposed).
  * <p>
+ * Each view that uses this capability (such as the menu and explorer) use their
+ * own instance.
+ * <p>
  * The instance manages backward, forward, and other actions that can be
  * obtained by calling {@link QueryResultNavigator#getBackwardAction()},
  * {@link #getForwardAction()} and so forth. The instance, by listening to the
