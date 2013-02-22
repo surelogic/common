@@ -2,7 +2,6 @@ package com.surelogic.common.ui.adhoc.views.editor;
 
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -172,6 +171,23 @@ public final class CategoryEditorMediator extends AdHocManagerAdapter implements
       }
     });
 
+    f_queryTable.addListener(SWT.Selection, new Listener() {
+      @Override
+      public void handleEvent(final Event event) {
+        boolean changed = false;
+        for (TableItem item : f_queryTable.getItems()) {
+          final AdHocQuery query = (AdHocQuery) item.getData();
+          if (item.getChecked()) {
+            changed |= f_edit.addQuery(query);
+          } else {
+            changed |= f_edit.removeQuery(query);
+          }
+        }
+        if (changed)
+          f_edit.markAsChanged();
+      }
+    });
+
     f_manager.addObserver(this);
 
     notifyQueryModelChange(f_manager);
@@ -277,13 +293,14 @@ public final class CategoryEditorMediator extends AdHocManagerAdapter implements
 
       f_queryTable.setRedraw(false);
       f_queryTable.removeAll();
-      final List<AdHocQuery> queries = category.getQueryList();
-      for (final AdHocQuery query : queries) {
-        final TableItem item = new TableItem(f_queryTable, SWT.NONE);
-        item.setData(query);
-        item.setText(0, query.getId());
-        item.setImage(0, getImageForQuery(query));
-        item.setText(1, query.getDescription());
+      for (final AdHocQuery query : f_manager.getQueryList()) {
+        if (query.showAtRootOfQueryMenu()) {
+          final TableItem item = new TableItem(f_queryTable, SWT.NONE);
+          item.setData(query);
+          item.setImage(0, getImageForQuery(query));
+          item.setText(0, query.getDescription());
+          item.setChecked(f_edit.contains(query));
+        }
       }
       for (final TableColumn c : f_queryTable.getColumns()) {
         c.pack();

@@ -44,7 +44,7 @@ import com.surelogic.common.i18n.I18N;
  * Queries define a set of sub-queries. A sub-query is a query that can be
  * executed based upon a selected row of the result of this query.
  */
-public final class AdHocQuery {
+public final class AdHocQuery implements AdHocObject {
 
   AdHocQuery(final AdHocManager manager, final String id) {
     assert manager != null;
@@ -431,11 +431,11 @@ public final class AdHocQuery {
    * @return a list of the sub-queries for this query sorted by their
    *         description.
    * 
-   * @see AdHocQueryDescriptionComparator
+   * @see AdHocObjectDescriptionComparator
    */
   public List<AdHocQuery> getSubQueryList() {
     final ArrayList<AdHocQuery> result = new ArrayList<AdHocQuery>(f_subQueries);
-    Collections.sort(result, AdHocQueryDescriptionComparator.getInstance());
+    Collections.sort(result, AdHocObjectDescriptionComparator.getInstance());
     return result;
   }
 

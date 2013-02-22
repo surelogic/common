@@ -122,12 +122,10 @@ public abstract class AbstractCategoryEditorView extends ViewPart {
     group.setText("Contents");
     data = new GridData(SWT.FILL, SWT.FILL, true, true, 2, 1);
     group.setLayoutData(data);
+    group.setLayout(new FillLayout());
 
     final Table queryTable = new Table(group, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI | SWT.CHECK);
     TableColumn col = new TableColumn(queryTable, SWT.NONE);
-    col.setText("Identifier");
-    col.pack();
-    col = new TableColumn(queryTable, SWT.NONE);
     col.setText("Description");
     col.pack();
     queryTable.setHeaderVisible(true);

@@ -218,14 +218,9 @@ public final class AdHocPersistence {
     }
     b.append(">\n");
     for (AdHocQuery query : category.getQueries()) {
-      /*
-       * Only output a link if it is in the list of queries we are exporting.
-       */
-      if (queries.contains(query)) {
-        b.append("    <").append(CAT_QUERY);
-        Entities.addAttribute(ID, query.getId(), b);
-        b.append("/>\n");
-      }
+      b.append("    <").append(CAT_QUERY);
+      Entities.addAttribute(ID, query.getId(), b);
+      b.append("/>\n");
     }
     b.append("  </").append(CATEGORY).append(">");
     pw.println(b.toString());

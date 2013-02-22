@@ -14,7 +14,7 @@ import com.surelogic.common.i18n.I18N;
  * Represents a group of ad hoc queries. Each instance is created and owned by
  * one and only one {@link AdHocManager}.
  */
-public final class AdHocCategory {
+public final class AdHocCategory implements AdHocObject {
 
   AdHocCategory(final AdHocManager manager, final String id) {
     assert manager != null;
@@ -289,6 +289,18 @@ public final class AdHocCategory {
   private final Set<AdHocQuery> f_queries = new HashSet<AdHocQuery>();
 
   /**
+   * Checks if this category contains the passed query.
+   * 
+   * @param query
+   *          a query.
+   * @return {@code true} if this category contains <tt>query</tt>,
+   *         {@code false} otherwise.
+   */
+  public boolean contains(AdHocQuery query) {
+    return f_queries.contains(query);
+  }
+
+  /**
    * Sets the set of queries in this category.
    * 
    * @param queries
@@ -371,11 +383,11 @@ public final class AdHocCategory {
    * 
    * @return a list of the queries in this category sorted by their description.
    * 
-   * @see AdHocQueryDescriptionComparator
+   * @see AdHocObjectDescriptionComparator
    */
   public List<AdHocQuery> getQueryList() {
     final ArrayList<AdHocQuery> result = new ArrayList<AdHocQuery>(f_queries);
-    Collections.sort(result, AdHocQueryDescriptionComparator.getInstance());
+    Collections.sort(result, AdHocObjectDescriptionComparator.getInstance());
     return result;
   }
 

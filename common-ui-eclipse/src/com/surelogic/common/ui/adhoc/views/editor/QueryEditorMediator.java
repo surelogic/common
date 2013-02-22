@@ -628,9 +628,8 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
       for (final AdHocQuery subQuery : subQueries) {
         final TableItem item = new TableItem(f_subQueryTable, SWT.NONE);
         item.setData(subQuery);
-        item.setText(0, subQuery.getId());
         item.setImage(0, getImageForQuery(subQuery));
-        item.setText(1, subQuery.getDescription());
+        item.setText(0, subQuery.getDescription());
         item.setData(ToolTip.TIP_TEXT, subQuery.getShortMessage());
         item.setChecked(query.isDefaultSubQuery(subQuery));
       }

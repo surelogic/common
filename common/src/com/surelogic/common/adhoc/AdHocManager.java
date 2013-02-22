@@ -279,11 +279,11 @@ public final class AdHocManager {
    * @return a list of the queries owned by this manager sorted by their
    *         description.
    * 
-   * @see AdHocQueryDescriptionComparator
+   * @see AdHocObjectDescriptionComparator
    */
   public List<AdHocQuery> getQueryList() {
     final ArrayList<AdHocQuery> result = new ArrayList<AdHocQuery>(f_queries);
-    Collections.sort(result, AdHocQueryDescriptionComparator.getInstance());
+    Collections.sort(result, AdHocObjectDescriptionComparator.getInstance());
     return result;
   }
 
@@ -440,7 +440,7 @@ public final class AdHocManager {
    */
   public List<AdHocCategory> getCategoryList() {
     final ArrayList<AdHocCategory> result = new ArrayList<AdHocCategory>(f_categories);
-    // TODO sort by something useful?
+    Collections.sort(result, AdHocObjectDescriptionComparator.getInstance());
     return result;
   }
 
