@@ -20,8 +20,11 @@ import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Item;
@@ -29,6 +32,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -49,6 +53,7 @@ import com.surelogic.common.adhoc.AdHocManager;
 import com.surelogic.common.adhoc.AdHocManagerAdapter;
 import com.surelogic.common.adhoc.AdHocQuery;
 import com.surelogic.common.adhoc.AdHocQueryFullyBound;
+import com.surelogic.common.adhoc.AdHocQueryType;
 import com.surelogic.common.core.EclipseUtility;
 import com.surelogic.common.core.adhoc.EclipseQueryUtility;
 import com.surelogic.common.core.preferences.CommonCorePreferencesUtility;
@@ -78,6 +83,8 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
   private final Composite f_selectionPane;
   private final Text f_descriptionText;
   private final Text f_idText;
+  private final Spinner f_sortHint;
+  private final Combo f_type;
   private final Button f_showCheck;
   private final Button f_showAtRootCheck;
   private final TabFolder f_sqlFolder;
@@ -90,12 +97,11 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
   private AdHocQuery f_edit = null;
   private boolean f_filterTree = false;
 
-  QueryEditorMediator(final AbstractQueryEditorView view, final SashForm sash, final Composite lhs, final TabFolder lhsFolder,
-      final Table queryList, final Tree queryTree, final Button filterTreeCheck, final Menu queryActionMenu,
-      final ToolItem runQuery, final ToolItem newQuery, final ToolItem deleteQuery, final PageBook rhs,
-      final Label noSelectionPane, final Composite selectionPane, final Text descriptionText, final Text idText,
-      final Button showCheck, final Button showAtRootCheck, final TabFolder sqlFolder, final StyledText sql,
-      final ToolItem addSubQuery, final ToolItem deleteSubQuery, final Table subQueryTable) {
+  QueryEditorMediator(AbstractQueryEditorView view, SashForm sash, Composite lhs, TabFolder lhsFolder, Table queryList,
+      Tree queryTree, Button filterTreeCheck, Menu queryActionMenu, ToolItem runQuery, ToolItem newQuery, ToolItem deleteQuery,
+      PageBook rhs, Label noSelectionPane, Composite selectionPane, Text descriptionText, Text idText, Spinner sortHint,
+      Combo type, Button showCheck, Button showAtRootCheck, TabFolder sqlFolder, StyledText sql, ToolItem addSubQuery,
+      ToolItem deleteSubQuery, Table subQueryTable) {
     f_manager = view.getManager();
     f_sash = sash;
     f_lhs = lhs;
@@ -112,6 +118,8 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
     f_selectionPane = selectionPane;
     f_descriptionText = descriptionText;
     f_idText = idText;
+    f_sortHint = sortHint;
+    f_type = type;
     f_showCheck = showCheck;
     f_showAtRootCheck = showAtRootCheck;
     f_sqlFolder = sqlFolder;
@@ -237,6 +245,20 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
       @Override
       public void focusLost(final FocusEvent e) {
         savePossibleIdTextChanges();
+      }
+    });
+
+    f_sortHint.addFocusListener(new FocusAdapter() {
+      @Override
+      public void focusLost(final FocusEvent e) {
+        savePossibleSortHintChanges();
+      }
+    });
+
+    f_type.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        savePossibleTypeChanges();
       }
     });
 
@@ -597,6 +619,8 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
     if (f_edit != null) {
       f_descriptionText.setText(f_edit.getDescription());
       f_idText.setText(f_edit.getId());
+      f_sortHint.setSelection(query.getSortHint());
+      f_type.setText(query.getType().toString());
 
       final boolean show = f_edit.showInQueryMenu();
       f_showCheck.setSelection(show);
@@ -677,6 +701,8 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
     savePossibleSqlChanges();
     savePossibleDescriptionTextChanges();
     savePossibleIdTextChanges();
+    savePossibleSortHintChanges();
+    savePossibleTypeChanges();
   }
 
   private void savePossibleDescriptionTextChanges() {
@@ -696,6 +722,20 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
       final String title = I18N.msg("adhoc.query.dialog.idChangeFailure.title");
       final String msg = I18N.msg("adhoc.query.dialog.idChangeFailure.msg", screenId, id);
       MessageDialog.openError(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), title, msg);
+    }
+  }
+
+  private void savePossibleSortHintChanges() {
+    final int value = f_sortHint.getSelection();
+    if (f_edit.setSortHint(value)) {
+      f_edit.markAsChanged();
+    }
+  }
+
+  private void savePossibleTypeChanges() {
+    final AdHocQueryType value = AdHocQueryType.valueOf(f_type.getText());
+    if (f_edit.setType(value)) {
+      f_edit.markAsChanged();
     }
   }
 

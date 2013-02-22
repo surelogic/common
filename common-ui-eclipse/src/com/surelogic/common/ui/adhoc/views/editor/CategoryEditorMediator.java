@@ -8,6 +8,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolItem;
@@ -35,10 +36,11 @@ public final class CategoryEditorMediator extends AdHocManagerAdapter implements
   private final Text f_idText;
   private final Text f_hasDataText;
   private final Text f_noDataText;
+  private final Spinner f_sortHint;
 
   CategoryEditorMediator(AbstractCategoryEditorView view, SashForm sash, Composite lhs, Table categoryList, ToolItem newCategory,
       ToolItem deleteCategory, PageBook rhs, Label noSelectionPane, Composite selectionPane, Text descriptionText, Text idText,
-      Text hasDataText, Text noDataText) {
+      Text hasDataText, Text noDataText, Spinner sortHint) {
     f_manager = view.getManager();
     f_sash = sash;
     f_lhs = lhs;
@@ -52,6 +54,7 @@ public final class CategoryEditorMediator extends AdHocManagerAdapter implements
     f_idText = idText;
     f_hasDataText = hasDataText;
     f_noDataText = noDataText;
+    f_sortHint = sortHint;
   }
 
   @Override
@@ -89,8 +92,8 @@ public final class CategoryEditorMediator extends AdHocManagerAdapter implements
         final String id = f_manager.generateUnusedId();
         final AdHocQuery query = f_manager.getOrCreateQuery(id);
         query.setDescription("A new query");
-//        f_selections.clear();
-//        f_selections.add(query);
+        // f_selections.clear();
+        // f_selections.add(query);
         f_manager.notifyQueryModelChange();
       }
     });

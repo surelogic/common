@@ -7,6 +7,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.ToolBar;
@@ -102,8 +103,18 @@ public abstract class AbstractCategoryEditorView extends ViewPart {
     data = new GridData(SWT.FILL, SWT.CENTER, true, false);
     noDataText.setLayoutData(data);
 
+    label = new Label(selectionPane, SWT.RIGHT);
+    label.setText(I18N.msg("adhoc.query.editor.category.rhs.sortHint"));
+    data = new GridData(SWT.FILL, SWT.CENTER, false, false);
+    label.setLayoutData(data);
+    final Spinner sortHint = new Spinner(selectionPane, SWT.BORDER);
+    data = new GridData(SWT.LEFT, SWT.CENTER, false, false);
+    sortHint.setMinimum(-999);
+    sortHint.setMaximum(999);
+    sortHint.setLayoutData(data);
+
     f_mediator = new CategoryEditorMediator(this, sash, lhs, categoryList, newCategory, deleteCategory, rhs, noSelectionPane,
-        selectionPane, descriptionText, idText, hasDataText, noDataText);
+        selectionPane, descriptionText, idText, hasDataText, noDataText, sortHint);
     f_mediator.init();
   }
 

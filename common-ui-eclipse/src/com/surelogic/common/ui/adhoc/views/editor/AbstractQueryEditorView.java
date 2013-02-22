@@ -11,6 +11,7 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
@@ -32,6 +33,7 @@ import org.eclipse.ui.progress.UIJob;
 import com.surelogic.common.CommonImages;
 import com.surelogic.common.adhoc.AdHocManager;
 import com.surelogic.common.adhoc.AdHocQuery;
+import com.surelogic.common.adhoc.AdHocQueryType;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.ui.SLImages;
 import com.surelogic.common.ui.jobs.SLUIJob;
@@ -141,8 +143,16 @@ public abstract class AbstractQueryEditorView extends ViewPart {
     data = new GridData(SWT.LEFT, SWT.CENTER, false, false);
     sortHint.setMinimum(-999);
     sortHint.setMaximum(999);
-    sortHint.setSelection(0);
     sortHint.setLayoutData(data);
+
+    label = new Label(selectionPane, SWT.RIGHT);
+    label.setText(I18N.msg("adhoc.query.editor.rhs.type"));
+    data = new GridData(SWT.FILL, SWT.CENTER, false, false);
+    label.setLayoutData(data);
+    final Combo type = new Combo(selectionPane, SWT.READ_ONLY);
+    type.setItems(AdHocQueryType.stringValues());
+    data = new GridData(SWT.LEFT, SWT.CENTER, false, false);
+    type.setLayoutData(data);
 
     final Button showCheck = new Button(selectionPane, SWT.CHECK);
     data = new GridData(SWT.NONE, SWT.CENTER, false, false, 2, 1);
@@ -201,8 +211,8 @@ public abstract class AbstractQueryEditorView extends ViewPart {
     tip.activateToolTip(subQueryTable);
 
     f_mediator = new QueryEditorMediator(this, sash, lhs, lhsFolder, queryList, queryTree, filterTreeCheck, queryActionMenu,
-        runQuery, newQuery, deleteQuery, rhs, noSelectionPane, selectionPane, descriptionText, idText, showCheck, showAtRootCheck,
-        sqlFolder, sql, addSubQuery, deleteSubQuery, subQueryTable);
+        runQuery, newQuery, deleteQuery, rhs, noSelectionPane, selectionPane, descriptionText, idText, sortHint, type, showCheck,
+        showAtRootCheck, sqlFolder, sql, addSubQuery, deleteSubQuery, subQueryTable);
     f_mediator.init();
   }
 
