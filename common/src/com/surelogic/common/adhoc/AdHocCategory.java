@@ -165,7 +165,7 @@ public final class AdHocCategory {
     if (value == null || value.equals(f_noDataText)) {
       return false;
     }
-    f_hasDataText = value;
+    f_noDataText = value;
     return true;
   }
 
