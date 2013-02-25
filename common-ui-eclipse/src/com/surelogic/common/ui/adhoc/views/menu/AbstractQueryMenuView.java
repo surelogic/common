@@ -50,9 +50,9 @@ public abstract class AbstractQueryMenuView extends ViewPart {
 
     final Label noRunSelected = new Label(pageBook, SWT.NONE);
 
-    final ScrolledComposite sc = new ScrolledComposite(pageBook, SWT.NONE);
+    final ScrolledComposite sc = new ScrolledComposite(pageBook, SWT.V_SCROLL);
     final Composite content = new Composite(sc, SWT.NONE);
-    // content.setBackground(content.getDisplay().getSystemColor(SWT.COLOR_RED));
+    content.setBackground(content.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
     sc.setExpandHorizontal(true);
     sc.setContent(content);
     final GridLayout gl = new GridLayout();

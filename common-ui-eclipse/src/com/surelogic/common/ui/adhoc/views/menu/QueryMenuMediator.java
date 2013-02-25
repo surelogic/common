@@ -228,11 +228,7 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
           // miscellaneous queries not in a category
           if (!categories.isEmpty()) {
             // only show miscellaneous title if another category was shown
-            final Label misc = new Label(f_content, SWT.NONE);
-            misc.setFont(JFaceResources.getFontRegistry().getBold(JFaceResources.HEADER_FONT));
-            misc.setText(I18N.msg("adhoc.query.menu.label.misc.cat"));
-            final GridData data = new GridData(SWT.FILL, SWT.CENTER, true, false);
-            misc.setLayoutData(data);
+            addTitle(I18N.msg("adhoc.query.menu.label.misc.cat"), true);
           }
           // add in the rest
           addQueryMenu(rootQueries, selectedResult, variableValues);
@@ -319,24 +315,30 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
   }
 
   public void addCategoryTitleAndMessage(final AdHocCategory category, boolean hasData) {
-    final Label title = new Label(f_content, SWT.NONE);
-    title.setFont(JFaceResources.getFontRegistry().getBold(JFaceResources.HEADER_FONT));
-    title.setText(category.getDescription());
-    if (!hasData)
-      title.setForeground(title.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
-    GridData data = new GridData(SWT.FILL, SWT.FILL, true, false);
-    title.setLayoutData(data);
+    addTitle(category.getDescription(), hasData);
 
     final Label message = new Label(f_content, SWT.WRAP);
-    data = new GridData(SWT.FILL, SWT.FILL, true, false);
+    final GridData data = new GridData(SWT.FILL, SWT.FILL, true, false);
     data.widthHint = 150; // needed for wrap to work at all
     message.setLayoutData(data);
     message.setForeground(message.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
+    message.setBackground(f_noRunSelected.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
     if (hasData) {
       message.setText(category.getHasDataText());
     } else {
       message.setText(category.getNoDataText());
     }
+  }
+
+  public void addTitle(final String text, boolean hasData) {
+    final Label title = new Label(f_content, SWT.NONE);
+    title.setFont(JFaceResources.getFontRegistry().getBold(JFaceResources.HEADER_FONT));
+    title.setBackground(f_noRunSelected.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
+    title.setText(text);
+    if (!hasData)
+      title.setForeground(title.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
+    final GridData data = new GridData(SWT.FILL, SWT.FILL, true, false);
+    title.setLayoutData(data);
   }
 
   @Nullable
