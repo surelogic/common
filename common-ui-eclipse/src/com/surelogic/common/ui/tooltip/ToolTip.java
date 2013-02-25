@@ -161,7 +161,7 @@ public class ToolTip {
 
   public ToolTip(final Shell shell, ImageLoader imgLoader) {
     if (shell == null)
-      throw new IllegalArgumentException(I18N.err(44, "parentShell"));
+      throw new IllegalArgumentException(I18N.err(44, "shell"));
     this.shell = shell;
     this.imgLoader = imgLoader;
   }
