@@ -310,6 +310,8 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
   }
 
   public boolean willAnyQueriesBeListed(List<AdHocQuery> queries) {
+    if (queries.isEmpty())
+      return false;
     if (noResults(queries)) {
       return f_showEmptyQueries;
     } else
