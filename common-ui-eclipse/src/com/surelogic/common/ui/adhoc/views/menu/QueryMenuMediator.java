@@ -1,5 +1,6 @@
 package com.surelogic.common.ui.adhoc.views.menu;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -7,6 +8,7 @@ import java.util.Map;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -35,7 +37,9 @@ import com.surelogic.common.adhoc.AdHocQuery;
 import com.surelogic.common.adhoc.AdHocQueryFullyBound;
 import com.surelogic.common.adhoc.AdHocQueryResult;
 import com.surelogic.common.adhoc.AdHocQueryResultSqlData;
+import com.surelogic.common.core.EclipseUtility;
 import com.surelogic.common.core.adhoc.EclipseQueryUtility;
+import com.surelogic.common.core.preferences.CommonCorePreferencesUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.ui.SLImages;
 import com.surelogic.common.ui.adhoc.views.QueryResultNavigator;
@@ -51,6 +55,8 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
   private final ScrolledComposite f_sc;
   private final Composite f_content;
   private final QueryResultNavigator f_navigator;
+  private final Action f_showEmptyQueriesAction;
+  private boolean f_showEmptyQueries;
 
   private final Listener f_runQueryListener = new Listener() {
     @Override
@@ -62,7 +68,7 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
   };
 
   public QueryMenuMediator(final AbstractQueryMenuView view, final PageBook pageBook, final Label noRunSelected,
-      final ScrolledComposite sc, final Composite content, final QueryResultNavigator navigator) {
+      final ScrolledComposite sc, final Composite content, final QueryResultNavigator navigator, final Action showEmptyQueriesAction) {
     f_view = view;
     f_manager = view.getManager();
     f_pageBook = pageBook;
@@ -72,19 +78,15 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
     f_sc = sc;
     f_content = content;
     f_navigator = navigator;
-
-    // TODO
-    // final Table queryMenu = new Table(pageBook, SWT.BORDER |
-    // SWT.FULL_SELECTION);
-    // final ToolTip tip = getToolTip(parent.getShell());
-    // tip.activateToolTip(queryMenu);
-    // f_queryMenu.addListener(SWT.MouseDoubleClick, runQueryListener);
-
+    f_showEmptyQueriesAction = showEmptyQueriesAction;
   }
 
   @Override
   public void init() {
     f_navigator.init();
+
+    f_showEmptyQueries = EclipseUtility.getBooleanPreference(CommonCorePreferencesUtility.QMENU_SHOW_EMPTY_QUERIES);
+    f_showEmptyQueriesAction.setChecked(f_showEmptyQueries);
 
     f_manager.addObserver(this);
 
@@ -164,6 +166,14 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
     generalRefresh();
   }
 
+  void notifyShowEmptyQueriesValueChange(final boolean value) {
+    if (value != f_showEmptyQueries) {
+      f_showEmptyQueries = value;
+      EclipseUtility.setBooleanPreference(CommonCorePreferencesUtility.QMENU_SHOW_EMPTY_QUERIES, value);
+      updateQueryMenu();
+    }
+  }
+
   private Pair<Map<String, String>, Map<String, String>> getVariableValues() {
     final Map<String, String> all;
     final Map<String, String> top;
@@ -198,32 +208,35 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
         final List<AdHocQuery> rootQueries = f_manager.getRootQueryList();
         final List<AdHocCategory> categories = f_manager.getCategoryList();
 
-        // TODO SORT CATS
+        final List<AdHocCategory> emptyCategories = new ArrayList<AdHocCategory>();
 
         for (AdHocCategory category : categories) {
           final List<AdHocQuery> catQueries = category.getQueryList();
-          catQueries.retainAll(rootQueries);
-          final Label catLabel = new Label(f_content, SWT.NONE);
-          catLabel.setFont(JFaceResources.getFontRegistry().getBold(JFaceResources.HEADER_FONT));
-          catLabel.setText(category.getDescription());
-          GridData data = new GridData(SWT.FILL, SWT.FILL, true, false);
-          catLabel.setLayoutData(data);
-
-          final Label catMsg = new Label(f_content, SWT.WRAP);
-          data = new GridData(SWT.FILL, SWT.FILL, true, false);
-          data.widthHint = 150; // needed for wrap to work at all
-          catMsg.setLayoutData(data);
-          catMsg.setForeground(catMsg.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
-          if (catQueries.isEmpty()) {
-            catMsg.setText(category.getNoDataText());
+          catQueries.retainAll(rootQueries); // show later
+          rootQueries.removeAll(catQueries);
+          if (catQueries.isEmpty() || noResults(catQueries)) {
+            emptyCategories.add(category);
           } else {
-            catMsg.setText(category.getHasDataText());
+            addCategoryTitleAndMessage(category, true);
             addQueryMenu(catQueries, selectedResult, variableValues);
-            rootQueries.removeAll(catQueries);
           }
         }
-        // add in the rest
-        addQueryMenu(rootQueries, selectedResult, variableValues);
+        for (AdHocCategory category : emptyCategories) {
+          addCategoryTitleAndMessage(category, false);
+        }
+        if (willAnyQueriesBeListed(rootQueries)) {
+          // miscellaneous queries not in a category
+          if (!categories.isEmpty()) {
+            // only show miscellaneous title if another category was shown
+            final Label misc = new Label(f_content, SWT.NONE);
+            misc.setFont(JFaceResources.getFontRegistry().getBold(JFaceResources.HEADER_FONT));
+            misc.setText(I18N.msg("adhoc.query.menu.label.misc.cat"));
+            final GridData data = new GridData(SWT.FILL, SWT.CENTER, true, false);
+            misc.setLayoutData(data);
+          }
+          // add in the rest
+          addQueryMenu(rootQueries, selectedResult, variableValues);
+        }
       } else {
         /*
          * sub-query
@@ -259,21 +272,68 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
     addContextMenuTo(tm);
     tm.addListener(SWT.MouseDoubleClick, f_runQueryListener);
 
-    // TODO A SORT THAT MAKES SENSE
-
     for (AdHocQuery query : queries) {
-      final TableItem item = new TableItem(tm, SWT.NONE);
-      item.setText(query.getDescription());
-      // item.setData(ToolTip.TIP_TEXT, query.getShortMessage());
       if (query.isCompletelySubstitutedBy(variableValues)) {
-        final boolean grayscale = query.resultIsKnownToBeEmpty();
-        final boolean decorateAsDefault = selectedResult != null
-            && selectedResult.getQueryFullyBound().getQuery().isDefaultSubQuery(query);
-        item.setImage(SLImages.getImageForAdHocQuery(query.getType(), decorateAsDefault, grayscale));
-        item.setData(query);
+        boolean emptyResult = query.resultIsKnownToBeEmpty();
+        if (!emptyResult || f_showEmptyQueries) {
+          final TableItem item = new TableItem(tm, SWT.NONE);
+          item.setText(query.getDescription());
+          item.setData(ToolTip.TIP_TEXT, query.getShortMessage());
+          final boolean decorateAsDefault = selectedResult != null
+              && selectedResult.getQueryFullyBound().getQuery().isDefaultSubQuery(query);
+          item.setImage(SLImages.getImageForAdHocQuery(query.getType(), decorateAsDefault, emptyResult));
+          if (emptyResult)
+            item.setForeground(tm.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
+          item.setData(query);
+        }
       } else {
+        final TableItem item = new TableItem(tm, SWT.NONE);
+        item.setText(query.getDescription());
         item.setForeground(tm.getDisplay().getSystemColor(SWT.COLOR_GRAY));
       }
+    }
+  }
+
+  /**
+   * Gets if none of the passed queries will return results.
+   * 
+   * @param catQueries
+   *          a list of queries.
+   * @return {@code true} if none of the passed queries will return results,
+   *         {@code false} otherwise.
+   */
+  public boolean noResults(List<AdHocQuery> queries) {
+    boolean result = true;
+    for (AdHocQuery query : queries)
+      result &= query.resultIsKnownToBeEmpty();
+    return result;
+  }
+
+  public boolean willAnyQueriesBeListed(List<AdHocQuery> queries) {
+    if (noResults(queries)) {
+      return f_showEmptyQueries;
+    } else
+      return true;
+  }
+
+  public void addCategoryTitleAndMessage(final AdHocCategory category, boolean hasData) {
+    final Label title = new Label(f_content, SWT.NONE);
+    title.setFont(JFaceResources.getFontRegistry().getBold(JFaceResources.HEADER_FONT));
+    title.setText(category.getDescription());
+    if (!hasData)
+      title.setForeground(title.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
+    GridData data = new GridData(SWT.FILL, SWT.FILL, true, false);
+    title.setLayoutData(data);
+
+    final Label message = new Label(f_content, SWT.WRAP);
+    data = new GridData(SWT.FILL, SWT.FILL, true, false);
+    data.widthHint = 150; // needed for wrap to work at all
+    message.setLayoutData(data);
+    message.setForeground(message.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
+    if (hasData) {
+      message.setText(category.getHasDataText());
+    } else {
+      message.setText(category.getNoDataText());
     }
   }
 

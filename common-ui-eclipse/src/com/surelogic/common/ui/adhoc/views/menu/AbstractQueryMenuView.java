@@ -1,7 +1,9 @@
 package com.surelogic.common.ui.adhoc.views.menu;
 
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.layout.FillLayout;
@@ -57,12 +59,14 @@ public abstract class AbstractQueryMenuView extends ViewPart {
     gl.marginHeight = gl.marginWidth = 0;
     gl.horizontalSpacing = gl.verticalSpacing = 2;
     content.setLayout(gl);
-    // sc.addControlListener(new ControlAdapter() {
-    // @Override
-    // public void controlResized(ControlEvent e) {
-    // content.setSize(content.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-    // }
-    // });
+
+    final Action showEmptyQueriesAction = new Action("Show Empty Queries", SWT.TOGGLE) {
+      @Override
+      public void run() {
+        if (f_mediator != null)
+          f_mediator.notifyShowEmptyQueriesValueChange(isChecked());
+      }
+    };
 
     // init() called by the mediator
     final QueryResultNavigator navigator = QueryResultNavigator.getInstance(getManager().getDataSource());
@@ -74,8 +78,10 @@ public abstract class AbstractQueryMenuView extends ViewPart {
 
     final IMenuManager menu = actionBars.getMenuManager();
     menu.add(navigator.getClearSelectionAction());
+    menu.add(new Separator());
+    menu.add(showEmptyQueriesAction);
 
-    f_mediator = new QueryMenuMediator(this, pageBook, noRunSelected, sc, content, navigator);
+    f_mediator = new QueryMenuMediator(this, pageBook, noRunSelected, sc, content, navigator, showEmptyQueriesAction);
     f_mediator.init();
   }
 

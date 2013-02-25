@@ -72,31 +72,32 @@ public abstract class AbstractQueryResultsView extends ViewPart {
   private Composite f_parent = null;
   private QueryResultNavigator f_navigator = null;
   private AdHocQueryResult f_result = null;
-  private ToolTip tooltip;
-  private final Action f_collapseAllAction = new Action() {
-    @Override
-    public void run() {
-      if (f_result != null && f_parent != null) {
-        for (final Control comp : ((Composite) f_parent.getChildren()[0]).getChildren()) {
-          if (comp instanceof Composite) {
-            for (final Control c : ((Composite) comp).getChildren()) {
-              if (c instanceof Tree) {
-                final Tree t = (Tree) c;
-                for (final TreeItem ti : t.getItems()) {
-                  ti.setExpanded(false);
+  private ToolTip f_tooltip;
+
+  @Override
+  public void createPartControl(final Composite parent) {
+    f_parent = parent;
+
+    final Action f_collapseAllAction = new Action() {
+      @Override
+      public void run() {
+        if (f_result != null && f_parent != null) {
+          for (final Control comp : ((Composite) f_parent.getChildren()[0]).getChildren()) {
+            if (comp instanceof Composite) {
+              for (final Control c : ((Composite) comp).getChildren()) {
+                if (c instanceof Tree) {
+                  final Tree t = (Tree) c;
+                  for (final TreeItem ti : t.getItems()) {
+                    ti.setExpanded(false);
+                  }
+                  return;
                 }
-                return;
               }
             }
           }
         }
       }
-    }
-  };
-
-  @Override
-  public void createPartControl(final Composite parent) {
-    f_parent = parent;
+    };
 
     f_collapseAllAction.setImageDescriptor(SLImages.getImageDescriptor(CommonImages.IMG_COLLAPSE_ALL));
     f_collapseAllAction.setToolTipText(I18N.msg("adhoc.query.results.collapseAll"));
@@ -125,7 +126,7 @@ public abstract class AbstractQueryResultsView extends ViewPart {
     menu.add(f_navigator.getDisposeAction());
     menu.add(f_navigator.getDisposeAllAction());
 
-    tooltip = getToolTip(parent.getShell());
+    f_tooltip = getToolTip(parent.getShell());
 
     displayNoResults();
   }
@@ -204,7 +205,7 @@ public abstract class AbstractQueryResultsView extends ViewPart {
 
     final Link queryDescription = new Link(panel, SWT.NONE);
     queryDescription.setData(ToolTip.TIP_TEXT, result.getQueryFullyBound().getQuery().getShortMessage());
-    tooltip.activateToolTip(queryDescription);
+    f_tooltip.activateToolTip(queryDescription);
     /*
      * Add a hyperlink to edit the query if the result was a failure or an
      * update count.
@@ -701,5 +702,4 @@ public abstract class AbstractQueryResultsView extends ViewPart {
   public ToolTip getToolTip(final Shell shell) {
     return new ToolTip(shell);
   }
-
 }

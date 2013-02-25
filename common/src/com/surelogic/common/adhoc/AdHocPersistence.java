@@ -99,9 +99,8 @@ public final class AdHocPersistence {
 
   /**
    * Saves the passed set of ad hoc queries and categories into a file using a
-   * simple XML format. If there are no queries to be saved, this method ensures
-   * that the save file does not exist. (Categories without any queries makes no
-   * sense and will also result in no save file.)
+   * simple XML format. If there are no queries or categories to be saved, this
+   * method ensures that the save file does not exist.
    * 
    * @param queries
    *          the list of queries to export.
@@ -115,7 +114,7 @@ public final class AdHocPersistence {
    */
   private static void export(final List<AdHocQuery> queries, final List<AdHocCategory> categories, final File saveFile,
       final boolean updateRevision) {
-    if (queries == null || queries.isEmpty()) {
+    if ((queries == null || queries.isEmpty()) && (categories == null || categories.isEmpty())) {
       if (saveFile.exists()) {
         saveFile.delete();
       }
