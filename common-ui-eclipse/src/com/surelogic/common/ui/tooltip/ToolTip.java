@@ -390,11 +390,15 @@ public final class ToolTip implements KeyListener, MouseListener, MouseTrackList
   }
 
   /**
-   * Registers or activates customized hover help for a specified control. When
-   * the control is disposed support goes away.
+   * Registers the passed control to get pop-up help similar to Eclipse JavaDoc
+   * in the Java editor. The control must define {@link #TIP_TEXT} as data on
+   * rows or items in the control.
+   * <p>
+   * When the control is disposed support goes away via a
+   * {@link DisposeListener} that is registered by this call.
    * 
    * @param on
-   *          the control on which to enable hover help.
+   *          the control on which to enable pop-up help.
    */
   public void register(final Control on) {
     if (on == null)
