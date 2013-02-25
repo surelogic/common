@@ -72,11 +72,6 @@ public final class AdHocQuery implements AdHocIdentity {
    */
   private String f_id;
 
-  /**
-   * Gets the identifier for this query.
-   * 
-   * @return the identifier for this query.
-   */
   @NonNull
   public String getId() {
     return f_id;
@@ -111,11 +106,6 @@ public final class AdHocQuery implements AdHocIdentity {
    */
   private String f_description = "";
 
-  /**
-   * Gets the description of this query.
-   * 
-   * @return the description of this query.
-   */
   @NonNull
   public String getDescription() {
     return f_description;
@@ -143,11 +133,6 @@ public final class AdHocQuery implements AdHocIdentity {
    */
   private int f_sortHint = 0;
 
-  /**
-   * Gets a number to help sort this query with other queries.
-   * 
-   * @return a value. May be negative, zero, or positive.
-   */
   public int getSortHint() {
     return f_sortHint;
   }

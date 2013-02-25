@@ -43,11 +43,6 @@ public final class AdHocCategory implements AdHocIdentity {
    */
   private String f_id;
 
-  /**
-   * Gets the identifier for this category.
-   * 
-   * @return the identifier for this category.
-   */
   @NonNull
   public String getId() {
     return f_id;
@@ -82,11 +77,6 @@ public final class AdHocCategory implements AdHocIdentity {
    */
   private String f_description = "";
 
-  /**
-   * Gets the description of this query.
-   * 
-   * @return the description of this category.
-   */
   @NonNull
   public String getDescription() {
     return f_description;
@@ -178,11 +168,6 @@ public final class AdHocCategory implements AdHocIdentity {
    */
   private int f_sortHint = 0;
 
-  /**
-   * Gets a number to help sort this category with other categories.
-   * 
-   * @return a value. May be negative, zero, or positive.
-   */
   public int getSortHint() {
     return f_sortHint;
   }
