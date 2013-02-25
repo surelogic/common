@@ -48,7 +48,7 @@ import com.surelogic.common.ui.tooltip.ToolTip;
 
 public final class QueryMenuMediator extends AdHocManagerAdapter implements ILifecycle {
 
-  private final AbstractQueryMenuView f_view;
+  private final ToolTip f_tip;
   private final AdHocManager f_manager;
   private final PageBook f_pageBook;
   private final Label f_noRunSelected;
@@ -67,9 +67,9 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
     }
   };
 
-  public QueryMenuMediator(final AbstractQueryMenuView view, final PageBook pageBook, final Label noRunSelected,
+  public QueryMenuMediator(final AbstractQueryMenuView view, final ToolTip tip, final PageBook pageBook, final Label noRunSelected,
       final ScrolledComposite sc, final Composite content, final QueryResultNavigator navigator, final Action showEmptyQueriesAction) {
-    f_view = view;
+    f_tip = tip;
     f_manager = view.getManager();
     f_pageBook = pageBook;
     f_noRunSelected = noRunSelected;
@@ -261,12 +261,11 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
 
   private void addQueryMenu(List<AdHocQuery> queries, AdHocQueryResult selectedResult, Map<String, String> variableValues) {
     final Table tm = new Table(f_content, SWT.NO_SCROLL | SWT.FULL_SELECTION);
-    final ToolTip tip = f_view.getToolTip(tm.getShell());
-    tip.activateToolTip(tm);
     final GridData data = new GridData(SWT.FILL, SWT.CENTER, true, false);
     tm.setLayoutData(data);
     addContextMenuTo(tm);
     tm.addListener(SWT.MouseDoubleClick, f_runQueryListener);
+    f_tip.activateToolTip(tm);
 
     for (AdHocQuery query : queries) {
       if (query.isCompletelySubstitutedBy(variableValues)) {

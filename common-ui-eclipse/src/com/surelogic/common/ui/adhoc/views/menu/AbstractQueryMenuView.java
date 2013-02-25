@@ -27,6 +27,15 @@ public abstract class AbstractQueryMenuView extends ViewPart {
 
   public abstract AdHocManager getManager();
 
+  /**
+   * Constructs a tool tip object for use by a view.
+   * 
+   * @param shell
+   *          a shell
+   * @return an object to invoke
+   *         {@link ToolTip#activateToolTip(org.eclipse.swt.widgets.Control)}
+   *         on.
+   */
   public ToolTip getToolTip(Shell shell) {
     return new ToolTip(shell);
   }
@@ -84,7 +93,9 @@ public abstract class AbstractQueryMenuView extends ViewPart {
     menu.add(new Separator());
     menu.add(showEmptyQueriesAction);
 
-    f_mediator = new QueryMenuMediator(this, pageBook, noRunSelected, sc, content, navigator, showEmptyQueriesAction);
+    final ToolTip tip = getToolTip(parent.getShell());
+
+    f_mediator = new QueryMenuMediator(this, tip, pageBook, noRunSelected, sc, content, navigator, showEmptyQueriesAction);
     f_mediator.init();
   }
 
