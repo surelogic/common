@@ -14,7 +14,6 @@ import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
 
 import com.surelogic.common.adhoc.AdHocManager;
-import com.surelogic.common.adhoc.AdHocQuery;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.ui.adhoc.views.QueryResultNavigator;
 import com.surelogic.common.ui.tooltip.ToolTip;
@@ -39,24 +38,6 @@ public abstract class AbstractQueryMenuView extends ViewPart {
    */
   public String getNoDatabaseMessage() {
     return I18N.msg("adhoc.query.menu.label.noDatabaseSelected");
-  }
-
-  /**
-   * Indicates that a particular query on the database will result in no data.
-   * Intended to be overridden by subclasses to provide an answer.
-   * <p>
-   * This method is used to provide visual indication in the user interface that
-   * the query will not result in data.
-   * <p>
-   * The default implementation returns {@code false}.
-   * 
-   * @param query
-   *          the query.
-   * @return {@code true} if the query when run on the database will result in
-   *         no data, {@code false} otherwise.
-   */
-  protected boolean queryResultWillBeEmpty(final AdHocQuery query) {
-    return false;
   }
 
   @Override

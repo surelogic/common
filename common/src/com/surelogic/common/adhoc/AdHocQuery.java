@@ -703,6 +703,19 @@ public final class AdHocQuery implements AdHocObject {
     return variableSet;
   }
 
+  /**
+   * Indicates that this particular query on the current data source will result
+   * in no data.
+   * <p>
+   * If the answer is not known {@code false} is returned.
+   * 
+   * @return {@code true} if this query when run on the current data source is
+   *         known to result in no data, {@code false} otherwise.
+   */
+  public boolean resultIsKnownToBeEmpty() {
+    return f_manager.getDataSource().queryResultWillBeEmpty(this);
+  }
+
   @Override
   public String toString() {
     return "[AdHocQuery: id=" + f_id + " description= " + f_description + " sql=\"" + f_sql + "]";

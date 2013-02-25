@@ -10,7 +10,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.resource.JFaceResources;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -207,17 +206,18 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
           final Label catLabel = new Label(f_content, SWT.NONE);
           catLabel.setFont(JFaceResources.getFontRegistry().getBold(JFaceResources.HEADER_FONT));
           catLabel.setText(category.getDescription());
-          final GridData data = new GridData(SWT.FILL, SWT.FILL, true, false);
+          GridData data = new GridData(SWT.FILL, SWT.FILL, true, false);
           catLabel.setLayoutData(data);
 
-          final Composite c = new Composite(f_content, SWT.NONE);
-          c.setLayoutData(data);
-          c.setLayout(new FillLayout());
-          final Label catMsgLabel = new Label(c, SWT.WRAP);
+          final Label catMsg = new Label(f_content, SWT.WRAP);
+          data = new GridData(SWT.FILL, SWT.FILL, true, false);
+          data.widthHint = 150; // needed for wrap to work at all
+          catMsg.setLayoutData(data);
+          catMsg.setForeground(catMsg.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
           if (catQueries.isEmpty()) {
-            catMsgLabel.setText(category.getNoDataText());
+            catMsg.setText(category.getNoDataText());
           } else {
-            catMsgLabel.setText(category.getHasDataText());
+            catMsg.setText(category.getHasDataText());
             addQueryMenu(catQueries, selectedResult, variableValues);
             rootQueries.removeAll(catQueries);
           }
@@ -251,7 +251,7 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
   }
 
   private void addQueryMenu(List<AdHocQuery> queries, AdHocQueryResult selectedResult, Map<String, String> variableValues) {
-    final Table tm = new Table(f_content,  SWT.NO_SCROLL | SWT.FULL_SELECTION);
+    final Table tm = new Table(f_content, SWT.NO_SCROLL | SWT.FULL_SELECTION);
     final ToolTip tip = f_view.getToolTip(tm.getShell());
     tip.activateToolTip(tm);
     final GridData data = new GridData(SWT.FILL, SWT.CENTER, true, false);
@@ -266,7 +266,7 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
       item.setText(query.getDescription());
       // item.setData(ToolTip.TIP_TEXT, query.getShortMessage());
       if (query.isCompletelySubstitutedBy(variableValues)) {
-        final boolean grayscale = f_view.queryResultWillBeEmpty(query);
+        final boolean grayscale = query.resultIsKnownToBeEmpty();
         final boolean decorateAsDefault = selectedResult != null
             && selectedResult.getQueryFullyBound().getQuery().isDefaultSubQuery(query);
         item.setImage(SLImages.getImageForAdHocQuery(query.getType(), decorateAsDefault, grayscale));
