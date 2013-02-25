@@ -54,6 +54,7 @@ public abstract class AbstractQueryMenuView extends ViewPart {
     final Composite content = new Composite(sc, SWT.NONE);
     content.setBackground(content.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
     sc.setExpandHorizontal(true);
+    sc.setExpandVertical(true);
     sc.setContent(content);
     final GridLayout gl = new GridLayout();
     gl.marginHeight = gl.marginWidth = 0;
