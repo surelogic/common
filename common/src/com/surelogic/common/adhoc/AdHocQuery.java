@@ -412,17 +412,15 @@ public final class AdHocQuery implements AdHocIdentity {
   }
 
   /**
-   * Returns a list of the sub-queries for this query sorted by their
-   * description.
+   * Returns a list of the sub-queries for this query sorted by their sort hint
+   * and description.
    * 
-   * @return a list of the sub-queries for this query sorted by their
-   *         description.
-   * 
-   * @see AdHocObjectDescriptionComparator
+   * @return a list of the sub-queries for this query sorted by their sort hint
+   *         and description.
    */
   public List<AdHocQuery> getSubQueryList() {
     final ArrayList<AdHocQuery> result = new ArrayList<AdHocQuery>(f_subQueries);
-    Collections.sort(result, AdHocObjectDescriptionComparator.getInstance());
+    Collections.sort(result, AdHocIdentity.BY_HINT_DESCRIPTION);
     return result;
   }
 

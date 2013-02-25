@@ -367,15 +367,17 @@ public final class AdHocCategory implements AdHocIdentity {
   }
 
   /**
-   * Returns a list of the queries in this category sorted by their description.
+   * Returns a list of the queries in this category sorted by their sort hint
+   * and description.
    * 
-   * @return a list of the queries in this category sorted by their description.
+   * @return a list of the queries in this category sorted by their sort hint
+   *         and description.
    * 
    * @see AdHocObjectDescriptionComparator
    */
   public List<AdHocQuery> getQueryList() {
     final ArrayList<AdHocQuery> result = new ArrayList<AdHocQuery>(f_queries);
-    Collections.sort(result, AdHocObjectDescriptionComparator.getInstance());
+    Collections.sort(result, AdHocIdentity.BY_HINT_DESCRIPTION);
     return result;
   }
 

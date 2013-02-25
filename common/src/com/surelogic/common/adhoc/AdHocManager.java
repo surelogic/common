@@ -273,17 +273,15 @@ public final class AdHocManager {
   }
 
   /**
-   * Gets a list of the queries owned by this manager sorted by their
-   * description.
+   * Gets a list of the queries owned by this manager sorted by their sort hint
+   * and description.
    * 
-   * @return a list of the queries owned by this manager sorted by their
-   *         description.
-   * 
-   * @see AdHocObjectDescriptionComparator
+   * @return a list of the queries owned by this manager sorted by their sort
+   *         hint and description.
    */
   public List<AdHocQuery> getQueryList() {
     final ArrayList<AdHocQuery> result = new ArrayList<AdHocQuery>(f_queries);
-    Collections.sort(result, AdHocObjectDescriptionComparator.getInstance());
+    Collections.sort(result, AdHocIdentity.BY_HINT_DESCRIPTION);
     return result;
   }
 
@@ -434,13 +432,15 @@ public final class AdHocManager {
   }
 
   /**
-   * Gets a list of categories owned by this manager.
+   * Gets a list of categories owned by this manager sorted by their sort hint
+   * and description.
    * 
-   * @return a list of categories owned by this manager.
+   * @return a list of categories owned by this manager sorted by their sort
+   *         hint and description.
    */
   public List<AdHocCategory> getCategoryList() {
     final ArrayList<AdHocCategory> result = new ArrayList<AdHocCategory>(f_categories);
-    Collections.sort(result, AdHocObjectDescriptionComparator.getInstance());
+    Collections.sort(result, AdHocIdentity.BY_HINT_DESCRIPTION);
     return result;
   }
 

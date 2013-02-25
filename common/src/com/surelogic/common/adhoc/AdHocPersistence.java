@@ -122,8 +122,8 @@ public final class AdHocPersistence {
       return;
     }
 
-    Collections.sort(queries, AdHocObjectDescriptionComparator.getInstance());
-    Collections.sort(categories, AdHocObjectDescriptionComparator.getInstance());
+    Collections.sort(queries, AdHocIdentity.BY_DESCRIPTION);
+    Collections.sort(categories, AdHocIdentity.BY_DESCRIPTION);
 
     try {
       final PrintWriter pw = new PrintWriter(new FileWriter(saveFile));

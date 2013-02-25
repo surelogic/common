@@ -1,5 +1,7 @@
 package com.surelogic.common.adhoc;
 
+import java.util.Comparator;
+
 import com.surelogic.NonNull;
 
 /**
@@ -32,4 +34,36 @@ public interface AdHocIdentity {
    *         important. The default value is zero.
    */
   int getSortHint();
+
+  public static final Comparator<AdHocIdentity> BY_HINT_DESCRIPTION = new Comparator<AdHocIdentity>() {
+    @Override
+    public int compare(AdHocIdentity o1, AdHocIdentity o2) {
+      if (o1 == null && o2 == null)
+        return 0;
+      else if (o1 == null && o2 != null)
+        return -1;
+      else if (o1 != null && o2 == null)
+        return 1;
+      else if (o1.getSortHint() < o2.getSortHint())
+        return -1;
+      else if (o1.getSortHint() > o2.getSortHint())
+        return 1;
+      else
+        return String.CASE_INSENSITIVE_ORDER.compare(o1.getDescription(), o2.getDescription());
+    }
+  };
+
+  public static final Comparator<AdHocIdentity> BY_DESCRIPTION = new Comparator<AdHocIdentity>() {
+    @Override
+    public int compare(AdHocIdentity o1, AdHocIdentity o2) {
+      if (o1 == null && o2 == null)
+        return 0;
+      else if (o1 == null && o2 != null)
+        return -1;
+      else if (o1 != null && o2 == null)
+        return 1;
+      else
+        return String.CASE_INSENSITIVE_ORDER.compare(o1.getDescription(), o2.getDescription());
+    }
+  };
 }
