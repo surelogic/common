@@ -44,9 +44,9 @@ public interface AdHocIdentity {
         return -1;
       else if (o1 != null && o2 == null)
         return 1;
-      else if (o1.getSortHint() < o2.getSortHint())
-        return -1;
       else if (o1.getSortHint() > o2.getSortHint())
+        return -1;
+      else if (o1.getSortHint() < o2.getSortHint())
         return 1;
       else
         return String.CASE_INSENSITIVE_ORDER.compare(o1.getDescription(), o2.getDescription());
