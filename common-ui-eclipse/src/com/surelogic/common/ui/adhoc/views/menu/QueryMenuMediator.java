@@ -221,9 +221,6 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
             addQueryMenu(catQueries, selectedResult, variableValues);
           }
         }
-        for (AdHocCategory category : emptyCategories) {
-          addCategoryTitleAndMessage(category, false);
-        }
         if (willAnyQueriesBeListed(rootQueries)) {
           // miscellaneous queries not in a category
           if (!categories.isEmpty()) {
@@ -232,6 +229,9 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
           }
           // add in the rest
           addQueryMenu(rootQueries, selectedResult, variableValues);
+        }
+        for (AdHocCategory category : emptyCategories) {
+          addCategoryTitleAndMessage(category, false);
         }
       } else {
         /*
@@ -332,7 +332,7 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
 
   public void addTitle(final String text, boolean hasData) {
     final Label title = new Label(f_content, SWT.NONE);
-    title.setFont(JFaceResources.getFontRegistry().getBold(JFaceResources.HEADER_FONT));
+    title.setFont(JFaceResources.getFontRegistry().getBold(JFaceResources.BANNER_FONT));
     title.setBackground(f_noRunSelected.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
     title.setText(text);
     if (!hasData)
