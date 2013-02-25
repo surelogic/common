@@ -215,7 +215,7 @@ public class ToolTip {
 
     ToolTipWatcher(final Control control) {
       if (control == null)
-        throw new IllegalStateException(I18N.err(44, "control"));
+        throw new IllegalArgumentException(I18N.err(44, "control"));
       this.control = control;
       this.display = control.getDisplay();
       toolTip = new ToolTipInformationControl(shell);
