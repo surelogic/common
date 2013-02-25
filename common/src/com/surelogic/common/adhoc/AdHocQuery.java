@@ -3,11 +3,11 @@ package com.surelogic.common.adhoc;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -413,23 +413,29 @@ public final class AdHocQuery implements AdHocIdentity {
 
   /**
    * Returns a list of the sub-queries for this query sorted by their sort hint
-   * and description.
+   * and description. The default sub-query, obtained from
+   * {@link #getDefaultSubQuery()}, if any, is always first in the returned
+   * list.
    * 
    * @return a list of the sub-queries for this query sorted by their sort hint
-   *         and description.
+   *         and description with the default-sub query, if any, first.
    */
   public List<AdHocQuery> getSubQueryList() {
-    final ArrayList<AdHocQuery> result = new ArrayList<AdHocQuery>(f_subQueries);
+    final LinkedList<AdHocQuery> result = new LinkedList<AdHocQuery>(f_subQueries);
     Collections.sort(result, AdHocIdentity.BY_HINT_DESCRIPTION);
+    if (f_defaultSubQuery != null) {
+      result.remove(f_defaultSubQuery);
+      result.addFirst(f_defaultSubQuery);
+    }
     return result;
   }
 
   /**
    * Returns a list of the sub-queries that should be displayed in the query
-   * menu for this query sorted by their description.
+   * menu for this query sorted per {@link #getSubQueryList()}.
    * 
    * @return a list of the sub-queries that should be displayed in the query
-   *         menu for this query sorted by their description.
+   *         menu for this query.
    * 
    * @see #showInQueryMenu()
    */
