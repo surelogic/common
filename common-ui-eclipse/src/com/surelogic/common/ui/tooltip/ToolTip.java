@@ -45,11 +45,13 @@ import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.ui.HTMLPrinter;
 
 /**
- * Handles pop-up help like the Eclipse JavaDoc. To use construct a single
- * instance per view and then register, via a call to {@link #register(Control)}
- * , each control that places {@link #TIP_TEXT} as data (for example, a table or
- * a tree). See the {@link #mouseHover(MouseEvent)} method for those controls
- * supported by this class.
+ * Handles pop-up help like the Javadoc pop-up help in the Eclipse Java editor.
+ * To use construct a single instance per view and then register, via a call to
+ * {@link #register(Control)} , each control that places {@link #TIP_TEXT} as
+ * data (for example, on rows in a table or a tree).
+ * <p>
+ * See the {@link #mouseHover(MouseEvent)} method for those controls supported
+ * by this class.
  */
 public final class ToolTip implements KeyListener, MouseListener, MouseTrackListener, Listener {
 
@@ -390,9 +392,9 @@ public final class ToolTip implements KeyListener, MouseListener, MouseTrackList
   }
 
   /**
-   * Registers the passed control to get pop-up help similar to Eclipse JavaDoc
-   * in the Java editor. The control must define {@link #TIP_TEXT} as data on
-   * rows or items in the control.
+   * Registers the passed control to get pop-up help like the Javadoc pop-up
+   * help in the Eclipse Java editor. The control must define {@link #TIP_TEXT}
+   * as data on rows or items in the control to set what is shown in the pop-up.
    * <p>
    * When the control is disposed support goes away via a
    * {@link DisposeListener} that is registered by this call.
