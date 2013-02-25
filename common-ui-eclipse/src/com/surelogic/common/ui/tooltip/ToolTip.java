@@ -41,22 +41,22 @@ import com.surelogic.NonNull;
 import com.surelogic.Nullable;
 import com.surelogic.common.CommonImages;
 import com.surelogic.common.FileUtility;
-import com.surelogic.common.ILifecycle;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.ui.HTMLPrinter;
 
 /**
- * Enables tool tip support on tables, trees, and other controls.
- * 
- * @author nathan
- * 
+ * Handles pop-up help like the Eclipse JavaDoc. To use construct a single
+ * instance per view and then register, via a call to {@link #register(Control)}
+ * , each control that places {@link #TIP_TEXT} as data (for example, a table or
+ * a tree). See the {@link #mouseHover(MouseEvent)} method for those controls
+ * supported by this class.
  */
-public class ToolTip {
+public final class ToolTip implements KeyListener, MouseListener, MouseTrackListener, Listener {
 
   public static final String TIP_TEXT = "TIP_TEXT";
 
   @Nullable
-  private static final String styleSheet = getStyleSheet();
+  private static final String STYLE_SHEET = getStyleSheet();
 
   /**
    * Returns the Javadoc hover style sheet with the current Javadoc font from
@@ -109,16 +109,13 @@ public class ToolTip {
   }
 
   @NonNull
-  private static final TemporaryFileImageCache cache = new TemporaryFileImageCache();
+  private static final TemporaryFileImageCache CACHE = new TemporaryFileImageCache();
 
   /**
    * Creates temporary files so that third party sources (such as browsers) can
    * view the files located in {@link CommonImages}.
-   * 
-   * @author nathan
-   * 
    */
-  private static class TemporaryFileImageCache implements ImageLoader {
+  private static class TemporaryFileImageCache implements ToolTipImageLoader {
 
     private final Map<String, File> fileMap = new HashMap<String, File>();
 
@@ -148,178 +145,120 @@ public class ToolTip {
   }
 
   @NonNull
-  private static final Pattern imagePattern = Pattern.compile("src=\"([^\"]*)\"");
+  private static final Pattern IMAGE_PATTERN = Pattern.compile("src=\"([^\"]*)\"");
 
   @NonNull
-  private final Shell shell;
+  private final Shell f_shell;
   @NonNull
-  private final ImageLoader imgLoader;
+  private final ToolTipImageLoader f_imgLoader;
 
-  public ToolTip(final Shell parent) {
-    this(parent, cache);
+  /* Whether or not the tool tip is in sticky mode */
+  private boolean isSticky;
+  /* Current tool tip and its text */
+  private ToolTipInformationControl toolTip;
+  private String tipText;
+  /* The current widget that we are displaying a tool tip for */
+  private Widget tipWidget;
+  /*
+   * Whether or not we should be looking for the mouse to exit the tip area.
+   */
+  boolean checkForTipAreaExit;
+  /* The position of the current tool tip. */
+  private Point tipPosition;
+
+  private void statusTip() {
+    toolTip.dispose();
+    toolTip = new ToolTipInformationControl(f_shell, I18N.msg("common.tooltip.statusText"));
+    isSticky = false;
+    toolTip.setTip(tipText);
+    toolTip.setHoverLocation(tipPosition);
+    toolTip.setVisible(true);
   }
 
-  public ToolTip(final Shell shell, ImageLoader imgLoader) {
+  private void stickyTip() {
+    toolTip.dispose();
+    toolTip = new ToolTipInformationControl(f_shell, getToolBar());
+    isSticky = true;
+    toolTip.setTip(tipText);
+    toolTip.setHoverLocation(tipPosition);
+    toolTip.setVisible(true);
+  }
+
+  private ToolBarManager getToolBar() {
+    ToolBarManager man = new ToolBarManager();
+
+    return man;
+  }
+
+  public ToolTip(final Shell shell) {
+    this(shell, CACHE);
+  }
+
+  public ToolTip(final Shell shell, ToolTipImageLoader imgLoader) {
     if (shell == null)
       throw new IllegalArgumentException(I18N.err(44, "shell"));
-    this.shell = shell;
-    this.imgLoader = imgLoader;
+    f_shell = shell;
+    f_imgLoader = imgLoader;
+    toolTip = new ToolTipInformationControl(shell);
   }
 
-  public interface ImageLoader {
-    File getImageFile(String gifName);
+  @Override
+  public void mouseDoubleClick(final MouseEvent e) {
+    mouseDown(e);
   }
 
-  private class ToolTipWatcher implements ILifecycle, KeyListener, MouseListener, MouseTrackListener, Listener {
-    /* The control that we are watching */
-    private final Control control;
-    private final Display display;
-
-    /* Whether or not the tool tip is in sticky mode */
-    private boolean isSticky;
-    /* Current tool tip and its text */
-    private ToolTipInformationControl toolTip;
-    private String tipText;
-    /* The current widget that we are displaying a tool tip for */
-    private Widget tipWidget;
-    /*
-     * Whether or not we should be looking for the mouse to exit the tip area.
-     */
-    boolean checkForTipAreaExit;
-    /* The position of the current tool tip. */
-    private Point tipPosition;
-
-    private void statusTip() {
-      toolTip.dispose();
-      toolTip = new ToolTipInformationControl(shell, I18N.msg("common.tooltip.statusText"));
-      isSticky = false;
-      toolTip.setTip(tipText);
-      toolTip.setHoverLocation(tipPosition);
-      toolTip.setVisible(true);
-    }
-
-    private void stickyTip() {
-      toolTip.dispose();
-      toolTip = new ToolTipInformationControl(shell, getToolBar());
-      isSticky = true;
-      toolTip.setTip(tipText);
-      toolTip.setHoverLocation(tipPosition);
-      toolTip.setVisible(true);
-    }
-
-    private ToolBarManager getToolBar() {
-      ToolBarManager man = new ToolBarManager();
-
-      return man;
-    }
-
-    ToolTipWatcher(final Control control) {
-      if (control == null)
-        throw new IllegalArgumentException(I18N.err(44, "control"));
-      this.control = control;
-      this.display = control.getDisplay();
-      toolTip = new ToolTipInformationControl(shell);
-    }
-
-    public void init() {
-      if (!display.isDisposed()) {
-        display.addFilter(SWT.Activate, this);
-        display.addFilter(SWT.MouseWheel, this);
-
-        display.addFilter(SWT.FocusOut, this);
-
-        display.addFilter(SWT.MouseDown, this);
-        display.addFilter(SWT.MouseUp, this);
-
-        display.addFilter(SWT.MouseMove, this);
-        display.addFilter(SWT.MouseEnter, this);
-        display.addFilter(SWT.MouseExit, this);
-        display.addFilter(SWT.KeyUp, this);
-      }
-      if (!control.isDisposed()) {
-        control.addMouseTrackListener(this);
-        control.addMouseListener(this);
-        control.addKeyListener(this);
-      }
-    }
-
-    public void dispose() {
-      if (!control.isDisposed()) {
-        control.removeMouseTrackListener(this);
-        control.removeMouseListener(this);
-        control.removeKeyListener(this);
-      }
-      if (!display.isDisposed()) {
-        display.removeFilter(SWT.Activate, this);
-        display.removeFilter(SWT.MouseWheel, this);
-
-        display.removeFilter(SWT.FocusOut, this);
-
-        display.removeFilter(SWT.MouseDown, this);
-        display.removeFilter(SWT.MouseUp, this);
-
-        display.removeFilter(SWT.MouseMove, this);
-        display.removeFilter(SWT.MouseEnter, this);
-        display.removeFilter(SWT.MouseExit, this);
-        display.removeFilter(SWT.KeyUp, this);
-      }
-    }
-
-    @Override
-    public void mouseDoubleClick(final MouseEvent e) {
-      mouseDown(e);
-    }
-
-    /*
-     * Go sticky if we click the tool tip, otherwise get out of the way.
-     */
-    @Override
-    public void mouseDown(final MouseEvent e) {
-      if (toolTip.isVisible()) {
-        if (toolTip.mouseIsOver(e.widget, e.x, e.y)) {
-          if (!isSticky) {
-            stickyTip();
-          }
-        } else {
-          toolTip.setVisible(false);
+  /*
+   * Go sticky if we click the tool tip, otherwise get out of the way.
+   */
+  @Override
+  public void mouseDown(final MouseEvent e) {
+    if (toolTip.isVisible()) {
+      if (toolTip.mouseIsOver(e.widget, e.x, e.y)) {
+        if (!isSticky) {
+          stickyTip();
         }
+      } else {
+        toolTip.setVisible(false);
       }
     }
+  }
 
-    @Override
-    public void mouseUp(final MouseEvent e) {
-      // Nothing to do here
-    }
+  @Override
+  public void mouseUp(final MouseEvent e) {
+    // Nothing to do here
+  }
 
-    @Override
-    public void mouseEnter(final MouseEvent e) {
-      // Nothing to do here
-    }
+  @Override
+  public void mouseEnter(final MouseEvent e) {
+    // Nothing to do here
+  }
 
-    /*
-     * Check to see if we are over the tool tip. If we are, then signal that in
-     * the future we need to check if the mouse leaves the tool tip. If we
-     * aren't, then close the tool tip.
-     */
-    @Override
-    public void mouseExit(final MouseEvent e) {
-      if (toolTip.isVisible()) {
-        if (!toolTip.mouseIsOver(e.widget, e.x, e.y)) {
-          toolTip.setVisible(false);
-          tipWidget = null;
-        } else {
-          checkForTipAreaExit = true;
-        }
+  /*
+   * Check to see if we are over the tool tip. If we are, then signal that in
+   * the future we need to check if the mouse leaves the tool tip. If we aren't,
+   * then close the tool tip.
+   */
+  @Override
+  public void mouseExit(final MouseEvent e) {
+    if (toolTip.isVisible()) {
+      if (!toolTip.mouseIsOver(e.widget, e.x, e.y)) {
+        toolTip.setVisible(false);
+        tipWidget = null;
+      } else {
+        checkForTipAreaExit = true;
       }
     }
+  }
 
-    /*
-     * Trap hover events to pop-up tooltip
-     */
-    @Override
-    public void mouseHover(final MouseEvent event) {
-      final Point pt = new Point(event.x, event.y);
-      Widget widget = event.widget;
+  /*
+   * Trap hover events to pop-up tooltip
+   */
+  @Override
+  public void mouseHover(final MouseEvent event) {
+    final Point pt = new Point(event.x, event.y);
+    Widget widget = event.widget;
+    if (widget instanceof Control) {
+      final Control control = (Control) widget;
       if (widget instanceof ToolBar) {
         final ToolBar w = (ToolBar) widget;
         widget = w.getItem(pt);
@@ -348,28 +287,31 @@ public class ToolTip {
       tipWidget = widget;
       statusTip();
     }
+  }
 
-    private void changeTipText(String text) {
-      final StringBuilder buffer = new StringBuilder();
-      HTMLPrinter.insertPageProlog(buffer, 0, styleSheet);
-      buffer.append(text);
-      HTMLPrinter.addPageEpilog(buffer);
-      tipText = buffer.toString();
-      Matcher m = imagePattern.matcher(text.toString());
-      final Set<String> images = new HashSet<String>();
-      while (m.find()) {
-        images.add(m.group(1));
-      }
-      for (String image : images) {
-        File im = imgLoader.getImageFile(image);
-        if (im != null) {
-          tipText = tipText.replace(image, im.getAbsolutePath());
-        }
+  private void changeTipText(String text) {
+    final StringBuilder buffer = new StringBuilder();
+    HTMLPrinter.insertPageProlog(buffer, 0, STYLE_SHEET);
+    buffer.append(text);
+    HTMLPrinter.addPageEpilog(buffer);
+    tipText = buffer.toString();
+    Matcher m = IMAGE_PATTERN.matcher(text.toString());
+    final Set<String> images = new HashSet<String>();
+    while (m.find()) {
+      images.add(m.group(1));
+    }
+    for (String image : images) {
+      File im = f_imgLoader.getImageFile(image);
+      if (im != null) {
+        tipText = tipText.replace(image, im.getAbsolutePath());
       }
     }
+  }
 
-    @Override
-    public void handleEvent(final Event event) {
+  @Override
+  public void handleEvent(final Event event) {
+    if (event.widget instanceof Control) {
+      final Control control = (Control) event.widget;
       // Return if the tool tip is not active.
       if (!toolTip.isVisible()) {
         return;
@@ -429,31 +371,35 @@ public class ToolTip {
 
       }
     }
+  }
 
-    @Override
-    public void keyPressed(KeyEvent e) {
-      // Do nothing
-    }
+  @Override
+  public void keyPressed(KeyEvent e) {
+    // Do nothing
+  }
 
-    @Override
-    public void keyReleased(KeyEvent e) {
-      if (toolTip.isVisible()) {
-        if (e.keyCode == SWT.F2 && !isSticky) {
-          stickyTip();
-        } else if (e.keyCode == SWT.ESC) {
-          toolTip.setVisible(false);
-        }
+  @Override
+  public void keyReleased(KeyEvent e) {
+    if (toolTip.isVisible()) {
+      if (e.keyCode == SWT.F2 && !isSticky) {
+        stickyTip();
+      } else if (e.keyCode == SWT.ESC) {
+        toolTip.setVisible(false);
       }
     }
   }
 
   /**
-   * Enables customized hover help for a specified control
+   * Registers or activates customized hover help for a specified control. When
+   * the control is disposed support goes away.
    * 
    * @param on
    *          the control on which to enable hover help.
    */
-  public void activateToolTip(final Control on) {
+  public void register(final Control on) {
+    if (on == null)
+      throw new IllegalArgumentException(I18N.err(44, "on"));
+
     try {
       Browser browser = new Browser(on.getParent(), SWT.None);
       browser.dispose();
@@ -466,12 +412,36 @@ public class ToolTip {
         throw e;
       }
     }
-    final ToolTipWatcher ttw = new ToolTipWatcher(on);
-    ttw.init();
+
+    final Display display = f_shell.getDisplay();
+    if (!display.isDisposed()) {
+      display.addFilter(SWT.Activate, this);
+      display.addFilter(SWT.MouseWheel, this);
+
+      display.addFilter(SWT.FocusOut, this);
+
+      display.addFilter(SWT.MouseDown, this);
+      display.addFilter(SWT.MouseUp, this);
+
+      display.addFilter(SWT.MouseMove, this);
+      display.addFilter(SWT.MouseEnter, this);
+      display.addFilter(SWT.MouseExit, this);
+      display.addFilter(SWT.KeyUp, this);
+    }
+    if (!on.isDisposed()) {
+      on.addMouseTrackListener(this);
+      on.addMouseListener(this);
+      on.addKeyListener(this);
+    }
     on.addDisposeListener(new DisposeListener() {
       @Override
       public void widgetDisposed(DisposeEvent e) {
-        ttw.dispose();
+        final ToolTip tip = ToolTip.this;
+        if (!on.isDisposed()) {
+          on.removeMouseTrackListener(tip);
+          on.removeMouseListener(tip);
+          on.removeKeyListener(tip);
+        }
       }
     });
   }

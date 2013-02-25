@@ -21,16 +21,7 @@ public abstract class AbstractQueryResultExplorerView extends ViewPart {
 
   public abstract AdHocManager getManager();
 
-  /**
-   * Constructs a tool tip object for use by a view.
-   * 
-   * @param shell
-   *          a shell
-   * @return an object to invoke
-   *         {@link ToolTip#activateToolTip(org.eclipse.swt.widgets.Control)}
-   *         on.
-   */
-  public ToolTip getToolTip(Shell shell) {
+  public ToolTip constructToolTip(final Shell shell) {
     return new ToolTip(shell);
   }
 
@@ -62,8 +53,8 @@ public abstract class AbstractQueryResultExplorerView extends ViewPart {
     menu.add(navigator.getDisposeAction());
     menu.add(navigator.getDisposeAllAction());
 
-    final ToolTip tip = getToolTip(parent.getShell());
-    tip.activateToolTip(queryHistoryTree);
+    final ToolTip tip = constructToolTip(parent.getShell());
+    tip.register(queryHistoryTree);
 
     f_mediator = new QueryResultExplorerMediator(this, queryHistoryTree, navigator);
     f_mediator.init();

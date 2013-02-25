@@ -69,6 +69,10 @@ public abstract class AbstractQueryResultsView extends ViewPart {
 
   public abstract AdHocManager getManager();
 
+  public ToolTip constructToolTip(final Shell shell) {
+    return new ToolTip(shell);
+  }
+
   private Composite f_parent = null;
   private QueryResultNavigator f_navigator = null;
   private AdHocQueryResult f_result = null;
@@ -126,7 +130,7 @@ public abstract class AbstractQueryResultsView extends ViewPart {
     menu.add(f_navigator.getDisposeAction());
     menu.add(f_navigator.getDisposeAllAction());
 
-    f_tooltip = getToolTip(parent.getShell());
+    f_tooltip = constructToolTip(parent.getShell());
 
     displayNoResults();
   }
@@ -205,7 +209,7 @@ public abstract class AbstractQueryResultsView extends ViewPart {
 
     final Link queryDescription = new Link(panel, SWT.NONE);
     queryDescription.setData(ToolTip.TIP_TEXT, result.getQueryFullyBound().getQuery().getShortMessage());
-    f_tooltip.activateToolTip(queryDescription);
+    f_tooltip.register(queryDescription);
     /*
      * Add a hyperlink to edit the query if the result was a failure or an
      * update count.
@@ -697,9 +701,5 @@ public abstract class AbstractQueryResultsView extends ViewPart {
         ((AbstractQueryEditorView) view).editInEditor(query);
       }
     }
-  }
-
-  public ToolTip getToolTip(final Shell shell) {
-    return new ToolTip(shell);
   }
 }

@@ -265,7 +265,7 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
     tm.setLayoutData(data);
     addContextMenuTo(tm);
     tm.addListener(SWT.MouseDoubleClick, f_runQueryListener);
-    f_tip.activateToolTip(tm);
+    f_tip.register(tm);
 
     for (AdHocQuery query : queries) {
       if (query.isCompletelySubstitutedBy(variableValues)) {

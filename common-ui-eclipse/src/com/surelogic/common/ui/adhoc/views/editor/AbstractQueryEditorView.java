@@ -44,7 +44,7 @@ public abstract class AbstractQueryEditorView extends ViewPart {
 
   public abstract AdHocManager getManager();
 
-  public ToolTip getToolTip(final Shell shell) {
+  public ToolTip constructToolTip(final Shell shell) {
     return new ToolTip(shell);
   }
 
@@ -199,10 +199,10 @@ public abstract class AbstractQueryEditorView extends ViewPart {
     subQueryTable.setHeaderVisible(true);
     subQueryTable.setLinesVisible(true);
 
-    final ToolTip tip = getToolTip(parent.getShell());
-    tip.activateToolTip(queryList);
-    tip.activateToolTip(queryTree);
-    tip.activateToolTip(subQueryTable);
+    final ToolTip tip = constructToolTip(parent.getShell());
+    tip.register(queryList);
+    tip.register(queryTree);
+    tip.register(subQueryTable);
 
     f_mediator = new QueryEditorMediator(this, sash, lhs, lhsFolder, queryList, queryTree, filterTreeCheck, queryActionMenu,
         runQuery, newQuery, deleteQuery, rhs, noSelectionPane, selectionPane, descriptionText, idText, sortHint, type, showCheck,
