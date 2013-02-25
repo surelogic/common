@@ -6,6 +6,7 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -50,11 +51,12 @@ public abstract class AbstractQueryMenuView extends ViewPart {
 
     final Label noRunSelected = new Label(pageBook, SWT.NONE);
 
+    final Color bkgnd = parent.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND);
     final ScrolledComposite sc = new ScrolledComposite(pageBook, SWT.V_SCROLL);
+    sc.setBackground(bkgnd);
     final Composite content = new Composite(sc, SWT.NONE);
-    content.setBackground(content.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
+    content.setBackground(bkgnd);
     sc.setExpandHorizontal(true);
-    sc.setExpandVertical(true);
     sc.setContent(content);
     final GridLayout gl = new GridLayout();
     gl.marginHeight = gl.marginWidth = 0;
