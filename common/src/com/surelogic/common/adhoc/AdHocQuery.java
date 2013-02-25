@@ -44,7 +44,7 @@ import com.surelogic.common.i18n.I18N;
  * Queries define a set of sub-queries. A sub-query is a query that can be
  * executed based upon a selected row of the result of this query.
  */
-public final class AdHocQuery implements AdHocObject {
+public final class AdHocQuery implements AdHocIdentity {
 
   AdHocQuery(final AdHocManager manager, final String id) {
     assert manager != null;
@@ -77,6 +77,7 @@ public final class AdHocQuery implements AdHocObject {
    * 
    * @return the identifier for this query.
    */
+  @NonNull
   public String getId() {
     return f_id;
   }
@@ -115,20 +116,21 @@ public final class AdHocQuery implements AdHocObject {
    * 
    * @return the description of this query.
    */
+  @NonNull
   public String getDescription() {
     return f_description;
   }
 
   /**
-   * Sets the description of this query. This method has no effect if the name
-   * passed is the empty string.
+   * Sets the description of this query. This method has no effect if the
+   * description passed is null.
    * 
    * @param description
    *          non-null description of this query.
    * @return {@code true} if the value was changed, {@code false} otherwise.
    */
   public boolean setDescription(final String description) {
-    if (description == null || description.equals(f_description) || "".equals(description)) {
+    if (description == null || description.equals(f_description)) {
       return false;
     }
     f_description = description;

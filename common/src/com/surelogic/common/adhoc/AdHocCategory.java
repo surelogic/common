@@ -8,13 +8,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import com.surelogic.NonNull;
 import com.surelogic.common.i18n.I18N;
 
 /**
  * Represents a group of ad hoc queries. Each instance is created and owned by
  * one and only one {@link AdHocManager}.
  */
-public final class AdHocCategory implements AdHocObject {
+public final class AdHocCategory implements AdHocIdentity {
 
   AdHocCategory(final AdHocManager manager, final String id) {
     assert manager != null;
@@ -47,6 +48,7 @@ public final class AdHocCategory implements AdHocObject {
    * 
    * @return the identifier for this category.
    */
+  @NonNull
   public String getId() {
     return f_id;
   }
@@ -76,29 +78,30 @@ public final class AdHocCategory implements AdHocObject {
   }
 
   /**
-   * A description of this query.
+   * A description of this category.
    */
   private String f_description = "";
 
   /**
    * Gets the description of this query.
    * 
-   * @return the description of this query.
+   * @return the description of this category.
    */
+  @NonNull
   public String getDescription() {
     return f_description;
   }
 
   /**
-   * Sets the description of this query. This method has no effect if the name
-   * passed is the empty string.
+   * Sets the description of this query. This method has no effect if the
+   * description passed is null.
    * 
    * @param description
-   *          non-null description of this query.
+   *          non-null description of this category.
    * @return {@code true} if the value was changed, {@code false} otherwise.
    */
   public boolean setDescription(final String description) {
-    if (description == null || description.equals(f_description) || "".equals(description)) {
+    if (description == null || description.equals(f_description)) {
       return false;
     }
     f_description = description;
