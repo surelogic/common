@@ -37,6 +37,8 @@ import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.Widget;
 
+import com.surelogic.NonNull;
+import com.surelogic.Nullable;
 import com.surelogic.common.CommonImages;
 import com.surelogic.common.FileUtility;
 import com.surelogic.common.ILifecycle;
@@ -53,26 +55,115 @@ public class ToolTip {
 
   public static final String TIP_TEXT = "TIP_TEXT";
 
-  private static final String styleSheet;
-  private static final TemporaryFileImageCache cache;
-  private static final Pattern imagePattern;
+  @Nullable
+  private static final String styleSheet = getStyleSheet();
 
-  static {
-    styleSheet = getStyleSheet();
-    cache = new TemporaryFileImageCache();
-    imagePattern = Pattern.compile("src=\"([^\"]*)\"");
+  /**
+   * Returns the Javadoc hover style sheet with the current Javadoc font from
+   * the preferences.
+   * 
+   * @return the updated style sheet, may be {@code null}.
+   */
+  @Nullable
+  private static String getStyleSheet() {
+    String css = loadStyleSheet();
+    if (css != null) {
+      final FontData fontData = JFaceResources.getFontRegistry().getFontData(PreferenceConstants.APPEARANCE_JAVADOC_FONT)[0];
+      css = HTMLPrinter.convertTopLevelFont(css, fontData);
+    }
+    return css;
   }
 
-  private final Shell parentShell;
-  private final ImageLoader loader;
+  /**
+   * Loads and returns the Javadoc hover style sheet.
+   * 
+   * @return the style sheet, or <code>null</code> if unable to load
+   */
+  private static String loadStyleSheet() {
+    final URL styleSheetURL = Thread.currentThread().getContextClassLoader()
+        .getResource("/com/surelogic/common/ui/tooltip/ToolTipHoverStyleSheet.css");
+    if (styleSheetURL != null) {
+      BufferedReader reader = null;
+      try {
+        reader = new BufferedReader(new InputStreamReader(styleSheetURL.openStream()));
+        final StringBuffer buffer = new StringBuffer(1500);
+        String line = reader.readLine();
+        while (line != null) {
+          buffer.append(line);
+          buffer.append('\n');
+          line = reader.readLine();
+        }
+        return buffer.toString();
+      } catch (final IOException ex) {
+        throw new IllegalStateException(ex);
+      } finally {
+        try {
+          if (reader != null) {
+            reader.close();
+          }
+        } catch (final IOException e) {
+        }
+      }
+    }
+    return null;
+  }
+
+  @NonNull
+  private static final TemporaryFileImageCache cache = new TemporaryFileImageCache();
+
+  /**
+   * Creates temporary files so that third party sources (such as browsers) can
+   * view the files located in {@link CommonImages}.
+   * 
+   * @author nathan
+   * 
+   */
+  private static class TemporaryFileImageCache implements ImageLoader {
+
+    private final Map<String, File> fileMap = new HashMap<String, File>();
+
+    @Override
+    public File getImageFile(String gifName) {
+      synchronized (fileMap) {
+        File f = fileMap.get(gifName);
+        if (f == null) {
+          URL gifURL = CommonImages.getImageURL(gifName);
+          if (gifURL != null) {
+            try {
+              f = File.createTempFile("IMAGE", "CACHE");
+              f.deleteOnExit();
+            } catch (IOException e) {
+              throw new IllegalStateException(e);
+            }
+            FileUtility.copy(gifURL, f);
+            return f.getAbsoluteFile();
+          } else {
+            return null;
+          }
+        } else {
+          return f.getAbsoluteFile();
+        }
+      }
+    }
+  }
+
+  @NonNull
+  private static final Pattern imagePattern = Pattern.compile("src=\"([^\"]*)\"");
+
+  @NonNull
+  private final Shell shell;
+  @NonNull
+  private final ImageLoader imgLoader;
 
   public ToolTip(final Shell parent) {
     this(parent, cache);
   }
 
-  public ToolTip(final Shell parent, ImageLoader loader) {
-    this.parentShell = parent;
-    this.loader = loader;
+  public ToolTip(final Shell shell, ImageLoader imgLoader) {
+    if (shell == null)
+      throw new IllegalArgumentException(I18N.err(44, "parentShell"));
+    this.shell = shell;
+    this.imgLoader = imgLoader;
   }
 
   public interface ImageLoader {
@@ -100,7 +191,7 @@ public class ToolTip {
 
     private void statusTip() {
       toolTip.dispose();
-      toolTip = new ToolTipInformationControl(parentShell, I18N.msg("common.tooltip.statusText"));
+      toolTip = new ToolTipInformationControl(shell, I18N.msg("common.tooltip.statusText"));
       isSticky = false;
       toolTip.setTip(tipText);
       toolTip.setHoverLocation(tipPosition);
@@ -109,7 +200,7 @@ public class ToolTip {
 
     private void stickyTip() {
       toolTip.dispose();
-      toolTip = new ToolTipInformationControl(parentShell, getToolBar());
+      toolTip = new ToolTipInformationControl(shell, getToolBar());
       isSticky = true;
       toolTip.setTip(tipText);
       toolTip.setHoverLocation(tipPosition);
@@ -127,7 +218,7 @@ public class ToolTip {
         throw new IllegalStateException(I18N.err(44, "control"));
       this.control = control;
       this.display = control.getDisplay();
-      toolTip = new ToolTipInformationControl(parentShell);
+      toolTip = new ToolTipInformationControl(shell);
     }
 
     public void init() {
@@ -270,7 +361,7 @@ public class ToolTip {
         images.add(m.group(1));
       }
       for (String image : images) {
-        File im = loader.getImageFile(image);
+        File im = imgLoader.getImageFile(image);
         if (im != null) {
           tipText = tipText.replace(image, im.getAbsolutePath());
         }
@@ -383,92 +474,5 @@ public class ToolTip {
         ttw.dispose();
       }
     });
-  }
-
-  /**
-   * Creates temporary files so that third party sources (such as browsers) can
-   * view the files located in {@link CommonImages}.
-   * 
-   * @author nathan
-   * 
-   */
-  private static class TemporaryFileImageCache implements ImageLoader {
-
-    private final Map<String, File> fileMap = new HashMap<String, File>();
-
-    @Override
-    public File getImageFile(String gifName) {
-      synchronized (fileMap) {
-        File f = fileMap.get(gifName);
-        if (f == null) {
-          URL gifURL = CommonImages.getImageURL(gifName);
-          if (gifURL != null) {
-            try {
-              f = File.createTempFile("IMAGE", "CACHE");
-              f.deleteOnExit();
-            } catch (IOException e) {
-              throw new IllegalStateException(e);
-            }
-            FileUtility.copy(gifURL, f);
-            return f.getAbsoluteFile();
-          } else {
-            return null;
-          }
-        } else {
-          return f.getAbsoluteFile();
-        }
-      }
-    }
-  }
-
-  /**
-   * Returns the Javadoc hover style sheet with the current Javadoc font from
-   * the preferences.
-   * 
-   * @return the updated style sheet
-   */
-  private static String getStyleSheet() {
-    final String styleSheet = loadStyleSheet();
-    String css = styleSheet;
-    if (css != null) {
-      final FontData fontData = JFaceResources.getFontRegistry().getFontData(PreferenceConstants.APPEARANCE_JAVADOC_FONT)[0];
-      css = HTMLPrinter.convertTopLevelFont(css, fontData);
-    }
-
-    return css;
-  }
-
-  /**
-   * Loads and returns the Javadoc hover style sheet.
-   * 
-   * @return the style sheet, or <code>null</code> if unable to load
-   */
-  private static String loadStyleSheet() {
-    final URL styleSheetURL = Thread.currentThread().getContextClassLoader()
-        .getResource("/com/surelogic/common/ui/tooltip/ToolTipHoverStyleSheet.css");
-    if (styleSheetURL != null) {
-      BufferedReader reader = null;
-      try {
-        reader = new BufferedReader(new InputStreamReader(styleSheetURL.openStream()));
-        final StringBuffer buffer = new StringBuffer(1500);
-        String line = reader.readLine();
-        while (line != null) {
-          buffer.append(line);
-          buffer.append('\n');
-          line = reader.readLine();
-        }
-        return buffer.toString();
-      } catch (final IOException ex) {
-        throw new IllegalStateException(ex);
-      } finally {
-        try {
-          if (reader != null) {
-            reader.close();
-          }
-        } catch (final IOException e) {
-        }
-      }
-    }
-    return null;
   }
 }
