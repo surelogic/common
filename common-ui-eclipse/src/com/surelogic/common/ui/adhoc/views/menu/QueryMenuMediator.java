@@ -58,12 +58,103 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
   private final Action f_showEmptyQueriesAction;
   private boolean f_showEmptyQueries;
 
+  /**
+   * This listener is used on double-click and the context menu to actually run
+   * a query.
+   */
   private final Listener f_runQueryListener = new Listener() {
     @Override
     public void handleEvent(final Event event) {
       final AdHocQuery query = getSelectionOrNull(event.widget);
       if (query != null)
         runQuery(query);
+    }
+  };
+
+  /**
+   * This listener maintains a single selection across all the category tables
+   * shown in the menu.
+   */
+  private final Listener f_oneSelectionListener = new Listener() {
+    @Override
+    public void handleEvent(Event event) {
+      for (Table t : getTables()) {
+        if (t != event.widget)
+          t.deselectAll();
+      }
+    }
+  };
+
+  /**
+   * This listener is used to detect return events to launch a query.
+   */
+  private final Listener f_traverseListener = new Listener() {
+    @Override
+    public void handleEvent(Event event) {
+      if (event.detail == SWT.TRAVERSE_RETURN) {
+        f_runQueryListener.handleEvent(event);
+      }
+    }
+  };
+
+  /**
+   * This handles up and down arrow movements within the tables so that the
+   * keyboard can be used as if a categorized menu was one big table.
+   */
+  private final Listener f_keyDownListener = new Listener() {
+    @Override
+    public void handleEvent(Event event) {
+      if (event.keyCode == SWT.ARROW_DOWN) {
+        Table currentTable = (Table) event.widget;
+        if (currentTable.getSelectionIndex() == currentTable.getItemCount() - 1) {
+          // move up to next table and select the last item
+          Table last = null;
+          for (final Table current : getTables()) {
+            if (last != null) {
+              if (currentTable == last) {
+                if (current.setFocus()) {
+                  final Table finalLast = last;
+                  currentTable.getDisplay().asyncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                      // do later - Table, by default, has other behavior
+                      current.setSelection(0);
+                      finalLast.deselectAll();
+                    }
+                  });
+                }
+                break;
+              }
+            }
+            last = current;
+          }
+        }
+      } else if (event.keyCode == SWT.ARROW_UP) {
+        Table currentTable = (Table) event.widget;
+        if (currentTable.getSelectionIndex() == 0) {
+          // move up to next table and select the last item
+          Table last = null;
+          for (final Table current : getTables()) {
+            if (currentTable == current) {
+              if (last != null) {
+                if (last.setFocus()) {
+                  final Table finalLast = last;
+                  currentTable.getDisplay().asyncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                      // do later - Table, by default, has other behavior
+                      finalLast.setSelection(finalLast.getItemCount() - 1);
+                      current.deselectAll();
+                    }
+                  });
+                }
+              }
+              break;
+            }
+            last = current;
+          }
+        }
+      }
     }
   };
 
@@ -260,11 +351,14 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
   }
 
   private void addQueryMenu(List<AdHocQuery> queries, AdHocQueryResult selectedResult, Map<String, String> variableValues) {
-    final Table tm = new Table(f_content, SWT.NO_SCROLL | SWT.FULL_SELECTION);
+    final Table tm = new Table(f_content, SWT.NO_SCROLL | SWT.FULL_SELECTION | SWT.SINGLE);
     final GridData data = new GridData(SWT.FILL, SWT.CENTER, true, false);
     tm.setLayoutData(data);
     addContextMenuTo(tm);
     tm.addListener(SWT.MouseDoubleClick, f_runQueryListener);
+    tm.addListener(SWT.Selection, f_oneSelectionListener);
+    tm.addListener(SWT.Traverse, f_traverseListener);
+    tm.addListener(SWT.KeyDown, f_keyDownListener);
     f_tip.register(tm);
 
     for (AdHocQuery query : queries) {
@@ -351,6 +445,25 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
           result = (AdHocQuery) item.getData();
         }
       }
+    } else {
+      // return the first selection
+      for (Table current : getTables()) {
+        if (current.getSelectionCount() == 1) {
+          final TableItem item = current.getSelection()[0];
+          if (item.getData() instanceof AdHocQuery) {
+            result = (AdHocQuery) item.getData();
+          }
+        }
+      }
+    }
+    return result;
+  }
+
+  private List<Table> getTables() {
+    final List<Table> result = new ArrayList<Table>();
+    for (Control child : f_content.getChildren()) {
+      if (child instanceof Table)
+        result.add((Table) child);
     }
     return result;
   }
