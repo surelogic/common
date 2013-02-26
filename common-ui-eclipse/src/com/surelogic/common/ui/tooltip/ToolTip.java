@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -42,6 +43,7 @@ import com.surelogic.Nullable;
 import com.surelogic.common.CommonImages;
 import com.surelogic.common.FileUtility;
 import com.surelogic.common.i18n.I18N;
+import com.surelogic.common.logging.SLLogger;
 import com.surelogic.common.ui.HTMLPrinter;
 
 /**
@@ -155,35 +157,35 @@ public final class ToolTip implements KeyListener, MouseListener, MouseTrackList
   private final ToolTipImageLoader f_imgLoader;
 
   /* Whether or not the tool tip is in sticky mode */
-  private boolean isSticky;
+  private boolean f_isSticky;
   /* Current tool tip and its text */
-  private ToolTipInformationControl toolTip;
-  private String tipText;
+  private ToolTipInformationControl f_toolTip;
+  private String f_tipText;
   /* The current widget that we are displaying a tool tip for */
-  private Widget tipWidget;
+  private Widget f_tipWidget;
   /*
    * Whether or not we should be looking for the mouse to exit the tip area.
    */
-  boolean checkForTipAreaExit;
+  boolean f_checkForTipAreaExit;
   /* The position of the current tool tip. */
-  private Point tipPosition;
+  private Point f_tipPosition;
 
   private void statusTip() {
-    toolTip.dispose();
-    toolTip = new ToolTipInformationControl(f_shell, I18N.msg("common.tooltip.statusText"));
-    isSticky = false;
-    toolTip.setTip(tipText);
-    toolTip.setHoverLocation(tipPosition);
-    toolTip.setVisible(true);
+    f_toolTip.dispose();
+    f_toolTip = new ToolTipInformationControl(f_shell, I18N.msg("common.tooltip.statusText"));
+    f_isSticky = false;
+    f_toolTip.setTip(f_tipText);
+    f_toolTip.setHoverLocation(f_tipPosition);
+    f_toolTip.setVisible(true);
   }
 
   private void stickyTip() {
-    toolTip.dispose();
-    toolTip = new ToolTipInformationControl(f_shell, getToolBar());
-    isSticky = true;
-    toolTip.setTip(tipText);
-    toolTip.setHoverLocation(tipPosition);
-    toolTip.setVisible(true);
+    f_toolTip.dispose();
+    f_toolTip = new ToolTipInformationControl(f_shell, getToolBar());
+    f_isSticky = true;
+    f_toolTip.setTip(f_tipText);
+    f_toolTip.setHoverLocation(f_tipPosition);
+    f_toolTip.setVisible(true);
   }
 
   private ToolBarManager getToolBar() {
@@ -201,7 +203,7 @@ public final class ToolTip implements KeyListener, MouseListener, MouseTrackList
       throw new IllegalArgumentException(I18N.err(44, "shell"));
     f_shell = shell;
     f_imgLoader = imgLoader;
-    toolTip = new ToolTipInformationControl(shell);
+    f_toolTip = new ToolTipInformationControl(shell);
   }
 
   @Override
@@ -214,13 +216,13 @@ public final class ToolTip implements KeyListener, MouseListener, MouseTrackList
    */
   @Override
   public void mouseDown(final MouseEvent e) {
-    if (toolTip.isVisible()) {
-      if (toolTip.mouseIsOver(e.widget, e.x, e.y)) {
-        if (!isSticky) {
+    if (f_toolTip.isVisible()) {
+      if (f_toolTip.mouseIsOver(e.widget, e.x, e.y)) {
+        if (!f_isSticky) {
           stickyTip();
         }
       } else {
-        toolTip.setVisible(false);
+        f_toolTip.setVisible(false);
       }
     }
   }
@@ -242,12 +244,12 @@ public final class ToolTip implements KeyListener, MouseListener, MouseTrackList
    */
   @Override
   public void mouseExit(final MouseEvent e) {
-    if (toolTip.isVisible()) {
-      if (!toolTip.mouseIsOver(e.widget, e.x, e.y)) {
-        toolTip.setVisible(false);
-        tipWidget = null;
+    if (f_toolTip.isVisible()) {
+      if (!f_toolTip.mouseIsOver(e.widget, e.x, e.y)) {
+        f_toolTip.setVisible(false);
+        f_tipWidget = null;
       } else {
-        checkForTipAreaExit = true;
+        f_checkForTipAreaExit = true;
       }
     }
   }
@@ -274,19 +276,19 @@ public final class ToolTip implements KeyListener, MouseListener, MouseTrackList
         widget = w.getItem(pt);
       }
       if (widget == null) {
-        toolTip.setVisible(false);
-        tipWidget = null;
+        f_toolTip.setVisible(false);
+        f_tipWidget = null;
         return;
       }
-      if (widget == tipWidget) {
+      if (widget == f_tipWidget) {
         return;
       }
-      tipWidget = widget;
-      tipPosition = control.toDisplay(pt);
+      f_tipWidget = widget;
+      f_tipPosition = control.toDisplay(pt);
       final String text = (String) widget.getData(TIP_TEXT);
       changeTipText(text);
-      checkForTipAreaExit = false;
-      tipWidget = widget;
+      f_checkForTipAreaExit = false;
+      f_tipWidget = widget;
       statusTip();
     }
   }
@@ -296,7 +298,7 @@ public final class ToolTip implements KeyListener, MouseListener, MouseTrackList
     HTMLPrinter.insertPageProlog(buffer, 0, STYLE_SHEET);
     buffer.append(text);
     HTMLPrinter.addPageEpilog(buffer);
-    tipText = buffer.toString();
+    f_tipText = buffer.toString();
     Matcher m = IMAGE_PATTERN.matcher(text.toString());
     final Set<String> images = new HashSet<String>();
     while (m.find()) {
@@ -305,7 +307,7 @@ public final class ToolTip implements KeyListener, MouseListener, MouseTrackList
     for (String image : images) {
       File im = f_imgLoader.getImageFile(image);
       if (im != null) {
-        tipText = tipText.replace(image, im.getAbsolutePath());
+        f_tipText = f_tipText.replace(image, im.getAbsolutePath());
       }
     }
   }
@@ -315,30 +317,30 @@ public final class ToolTip implements KeyListener, MouseListener, MouseTrackList
     if (event.widget instanceof Control) {
       final Control control = (Control) event.widget;
       // Return if the tool tip is not active.
-      if (!toolTip.isVisible()) {
+      if (!f_toolTip.isVisible()) {
         return;
       }
       // We listen to key events here because capturing key events from
       // the control is simply not reliable.
       if (event.type == SWT.KeyUp) {
-        if (event.keyCode == SWT.F2 && !isSticky) {
+        if (event.keyCode == SWT.F2 && !f_isSticky) {
           stickyTip();
         } else if (event.keyCode == SWT.ESC) {
-          toolTip.setVisible(false);
+          f_toolTip.setVisible(false);
         }
       }
       // Return unless we have exited the control we are monitoring. This
       // event handling mechanism is only for when we have exited the main
       // control, so there is some duplicated logic between this and the
       // listeners that we place on the control.
-      if (!checkForTipAreaExit || tipWidget == null || !(event.widget instanceof Control)) {
+      if (!f_checkForTipAreaExit || f_tipWidget == null || !(event.widget instanceof Control)) {
         return;
       }
       switch (event.type) {
       case SWT.MouseMove:
       case SWT.MouseEnter:
       case SWT.MouseExit:
-        if (!isSticky) {
+        if (!f_isSticky) {
           final Control eventControl = (Control) event.widget;
           if (eventControl == control) {
             return;
@@ -348,9 +350,9 @@ public final class ToolTip implements KeyListener, MouseListener, MouseTrackList
           if (control.getBounds().contains(mouseLoc)) {
             return;
           }
-          if (!toolTip.mouseIsOver(event.widget, event.x, event.y)) {
-            toolTip.setVisible(false);
-            tipWidget = null;
+          if (!f_toolTip.mouseIsOver(event.widget, event.x, event.y)) {
+            f_toolTip.setVisible(false);
+            f_tipWidget = null;
           }
         }
         break;
@@ -361,11 +363,11 @@ public final class ToolTip implements KeyListener, MouseListener, MouseTrackList
           return;
         }
         // transform coordinates to subject control:
-        if (!toolTip.mouseIsOver(event.widget, event.x, event.y)) {
-          toolTip.setVisible(false);
-          tipWidget = null;
+        if (!f_toolTip.mouseIsOver(event.widget, event.x, event.y)) {
+          f_toolTip.setVisible(false);
+          f_tipWidget = null;
         } else {
-          if (!isSticky) {
+          if (!f_isSticky) {
             stickyTip();
           }
         }
@@ -382,14 +384,20 @@ public final class ToolTip implements KeyListener, MouseListener, MouseTrackList
 
   @Override
   public void keyReleased(KeyEvent e) {
-    if (toolTip.isVisible()) {
-      if (e.keyCode == SWT.F2 && !isSticky) {
+    if (f_toolTip.isVisible()) {
+      if (e.keyCode == SWT.F2 && !f_isSticky) {
         stickyTip();
       } else if (e.keyCode == SWT.ESC) {
-        toolTip.setVisible(false);
+        f_toolTip.setVisible(false);
       }
     }
   }
+
+  /**
+   * Counts successful calls to {@link #register(Control)} so that listeners to
+   * the display can be removed when no all registered controls are disposed.
+   */
+  private int f_registerCount = 0;
 
   /**
    * Registers the passed control to get pop-up help like the Javadoc pop-up
@@ -410,43 +418,61 @@ public final class ToolTip implements KeyListener, MouseListener, MouseTrackList
       Browser browser = new Browser(on.getParent(), SWT.None);
       browser.dispose();
     } catch (SWTError e) {
+      SLLogger.getLogger().log(Level.SEVERE, I18N.err(304, ToolTip.class.getName(), on.toString(), Browser.class.getName(), e));
       if (e.code == SWT.ERROR_NO_HANDLES) {
-        // If we don't have a Browser, we just won't initialize the
-        // ToolTip
         return;
       } else {
         throw e;
       }
     }
 
-    final Display display = f_shell.getDisplay();
-    if (!display.isDisposed()) {
-      display.addFilter(SWT.Activate, this);
-      display.addFilter(SWT.MouseWheel, this);
-
-      display.addFilter(SWT.FocusOut, this);
-
-      display.addFilter(SWT.MouseDown, this);
-      display.addFilter(SWT.MouseUp, this);
-
-      display.addFilter(SWT.MouseMove, this);
-      display.addFilter(SWT.MouseEnter, this);
-      display.addFilter(SWT.MouseExit, this);
-      display.addFilter(SWT.KeyUp, this);
-    }
     if (!on.isDisposed()) {
+      final Display display = f_shell.getDisplay();
+      if (f_registerCount == 0) {
+        // only register once at first control registered
+        display.addFilter(SWT.Activate, this);
+        display.addFilter(SWT.MouseWheel, this);
+
+        display.addFilter(SWT.FocusOut, this);
+
+        display.addFilter(SWT.MouseDown, this);
+        display.addFilter(SWT.MouseUp, this);
+
+        display.addFilter(SWT.MouseMove, this);
+        display.addFilter(SWT.MouseEnter, this);
+        display.addFilter(SWT.MouseExit, this);
+        display.addFilter(SWT.KeyUp, this);
+      }
       on.addMouseTrackListener(this);
       on.addMouseListener(this);
       on.addKeyListener(this);
+      f_registerCount++;
     }
     on.addDisposeListener(new DisposeListener() {
       @Override
       public void widgetDisposed(DisposeEvent e) {
+        f_registerCount--;
         final ToolTip tip = ToolTip.this;
         if (!on.isDisposed()) {
           on.removeMouseTrackListener(tip);
           on.removeMouseListener(tip);
           on.removeKeyListener(tip);
+        }
+        if (f_registerCount == 0) {
+          // no longer need to listen -- no controls registered
+          final Display display = f_shell.getDisplay();
+          display.removeFilter(SWT.Activate, tip);
+          display.removeFilter(SWT.MouseWheel, tip);
+
+          display.removeFilter(SWT.FocusOut, tip);
+
+          display.removeFilter(SWT.MouseDown, tip);
+          display.removeFilter(SWT.MouseUp, tip);
+
+          display.removeFilter(SWT.MouseMove, tip);
+          display.removeFilter(SWT.MouseEnter, tip);
+          display.removeFilter(SWT.MouseExit, tip);
+          display.removeFilter(SWT.KeyUp, tip);
         }
       }
     });
