@@ -639,6 +639,7 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
         item.setData(subQuery);
         item.setImage(0, getImageForQuery(subQuery));
         item.setText(0, subQuery.getDescription());
+        item.setText(1, subQuery.getId());
         item.setData(ToolTip.TIP_TEXT, subQuery.getShortMessage());
         item.setChecked(query.isDefaultSubQuery(subQuery));
       }

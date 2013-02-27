@@ -204,6 +204,9 @@ public abstract class AbstractQueryEditorView extends ViewPart {
     TableColumn col = new TableColumn(subQueryTable, SWT.NONE);
     col.setText("Description");
     col.pack();
+    col = new TableColumn(subQueryTable, SWT.NONE);
+    col.setText("Identifier");
+    col.pack();
     subQueryTable.setHeaderVisible(true);
     subQueryTable.setLinesVisible(true);
 
