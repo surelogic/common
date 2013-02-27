@@ -94,5 +94,24 @@ public interface IAdHocDataSource {
    * @return {@code true} if the query when run on the database is known to
    *         result in no data, {@code false} otherwise.
    */
-  boolean queryResultWillBeEmpty(final AdHocQuery query);
+  boolean queryResultWillBeEmpty(AdHocQuery query);
+
+  /**
+   * Finds the passed class and returns it if it is of type
+   * <tt>IQueryResultCustomDisplay</tt>.
+   * <p>
+   * Implementations should always return <tt>IQueryResultCustomDisplay</tt> not
+   * {@link Object}.
+   * 
+   * @param className
+   *          name of the class to find on the classpath.
+   * @return an instance of the class.
+   * 
+   * @throws UnsupportedOperationException
+   *           if custom views are not supported by this data source.
+   * @throws Exception
+   *           if the class is not found, or something else goes wrong, such as
+   *           the type is not <tt>IQueryResultCustomDisplay</tt>.
+   */
+  Object getCustomDisplay(String className) throws Exception;
 }
