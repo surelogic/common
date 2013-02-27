@@ -41,6 +41,7 @@ import com.surelogic.common.core.EclipseUtility;
 import com.surelogic.common.core.adhoc.EclipseQueryUtility;
 import com.surelogic.common.core.preferences.CommonCorePreferencesUtility;
 import com.surelogic.common.i18n.I18N;
+import com.surelogic.common.ui.EclipseColorUtility;
 import com.surelogic.common.ui.SLImages;
 import com.surelogic.common.ui.adhoc.views.QueryResultNavigator;
 import com.surelogic.common.ui.jobs.SLUIJob;
@@ -297,6 +298,7 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
          * top-level query
          */
         final List<AdHocQuery> rootQueries = f_manager.getRootQueryList();
+        final List<AdHocQuery> rootQueriesNotInACategory = new ArrayList<AdHocQuery>(rootQueries);
         final List<AdHocCategory> categories = f_manager.getCategoryList();
 
         final List<AdHocCategory> emptyCategories = new ArrayList<AdHocCategory>();
@@ -304,7 +306,7 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
         for (AdHocCategory category : categories) {
           final List<AdHocQuery> catQueries = category.getQueryList();
           catQueries.retainAll(rootQueries); // show later
-          rootQueries.removeAll(catQueries);
+          rootQueriesNotInACategory.removeAll(catQueries);
           if (catQueries.isEmpty() || noResults(catQueries)) {
             emptyCategories.add(category);
           } else {
@@ -312,14 +314,14 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
             addQueryMenu(catQueries, selectedResult, variableValues);
           }
         }
-        if (willAnyQueriesBeListed(rootQueries)) {
+        if (willAnyQueriesBeListed(rootQueriesNotInACategory)) {
           // miscellaneous queries not in a category
           if (!categories.isEmpty()) {
             // only show miscellaneous title if another category was shown
             addTitle(I18N.msg("adhoc.query.menu.label.misc.cat"), true);
           }
           // add in the rest
-          addQueryMenu(rootQueries, selectedResult, variableValues);
+          addQueryMenu(rootQueriesNotInACategory, selectedResult, variableValues);
         }
         for (AdHocCategory category : emptyCategories) {
           addCategoryTitleAndMessage(category, false);
@@ -372,13 +374,13 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
               && selectedResult.getQueryFullyBound().getQuery().isDefaultSubQuery(query);
           item.setImage(SLImages.getImageForAdHocQuery(query.getType(), decorateAsDefault, emptyResult));
           if (emptyResult)
-            item.setForeground(tm.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
+            item.setForeground(EclipseColorUtility.getQueryMenuGrayColor());
           item.setData(query);
         }
       } else {
         final TableItem item = new TableItem(tm, SWT.NONE);
         item.setText(query.getDescription());
-        item.setForeground(tm.getDisplay().getSystemColor(SWT.COLOR_GRAY));
+        item.setForeground(EclipseColorUtility.getQueryMenuGrayColor());
       }
     }
   }
@@ -414,7 +416,8 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
     final GridData data = new GridData(SWT.FILL, SWT.FILL, true, false);
     data.widthHint = 150; // needed for wrap to work at all
     message.setLayoutData(data);
-    message.setForeground(message.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
+    message.setForeground(hasData ? EclipseColorUtility.getQueryMenuSubtleColor() : EclipseColorUtility
+        .getQueryMenuGrayColor());
     message.setBackground(f_noRunSelected.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
     if (hasData) {
       message.setText(category.getHasDataText());
@@ -429,7 +432,7 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
     title.setBackground(f_noRunSelected.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
     title.setText(text);
     if (!hasData)
-      title.setForeground(title.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
+      title.setForeground(EclipseColorUtility.getQueryMenuGrayColor());
     final GridData data = new GridData(SWT.FILL, SWT.FILL, true, false);
     title.setLayoutData(data);
   }
@@ -476,15 +479,6 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
       EclipseQueryUtility.scheduleQuery(boundQuery, (AdHocQueryResultSqlData) selectedResult);
     } else {
       EclipseQueryUtility.scheduleQuery(boundQuery, f_manager.getDataSource().getCurrentAccessKeys());
-    }
-  }
-
-  void runRootQuery(final String id) {
-    for (final AdHocQuery q : f_manager.getRootQueryList()) {
-      if (q.getId().equals(id)) {
-        runQuery(q);
-        return;
-      }
     }
   }
 }

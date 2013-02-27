@@ -83,6 +83,7 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
   private final Composite f_selectionPane;
   private final Text f_descriptionText;
   private final Text f_idText;
+  private final Text f_cdText;
   private final Spinner f_sortHint;
   private final Combo f_type;
   private final Button f_showCheck;
@@ -99,9 +100,9 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
 
   QueryEditorMediator(AbstractQueryEditorView view, SashForm sash, Composite lhs, TabFolder lhsFolder, Table queryList,
       Tree queryTree, Button filterTreeCheck, Menu queryActionMenu, ToolItem runQuery, ToolItem newQuery, ToolItem deleteQuery,
-      PageBook rhs, Label noSelectionPane, Composite selectionPane, Text descriptionText, Text idText, Spinner sortHint,
-      Combo type, Button showCheck, Button showAtRootCheck, TabFolder sqlFolder, StyledText sql, ToolItem addSubQuery,
-      ToolItem deleteSubQuery, Table subQueryTable) {
+      PageBook rhs, Label noSelectionPane, Composite selectionPane, Text descriptionText, Text idText, Text cdText,
+      Spinner sortHint, Combo type, Button showCheck, Button showAtRootCheck, TabFolder sqlFolder, StyledText sql,
+      ToolItem addSubQuery, ToolItem deleteSubQuery, Table subQueryTable) {
     f_manager = view.getManager();
     f_sash = sash;
     f_lhs = lhs;
@@ -118,6 +119,7 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
     f_selectionPane = selectionPane;
     f_descriptionText = descriptionText;
     f_idText = idText;
+    f_cdText = cdText;
     f_sortHint = sortHint;
     f_type = type;
     f_showCheck = showCheck;
@@ -238,6 +240,13 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
       @Override
       public void focusLost(final FocusEvent e) {
         savePossibleDescriptionTextChanges();
+      }
+    });
+
+    f_cdText.addFocusListener(new FocusAdapter() {
+      @Override
+      public void focusLost(final FocusEvent e) {
+        savePossibleCustomDisplayTextChanges();
       }
     });
 
@@ -698,6 +707,12 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
 
   private void savePossibleDescriptionTextChanges() {
     if (f_edit.setDescription(f_descriptionText.getText())) {
+      f_edit.markAsChanged();
+    }
+  }
+
+  private void savePossibleCustomDisplayTextChanges() {
+    if (f_edit.setCustomDisplayClassName(f_cdText.getText())) {
       f_edit.markAsChanged();
     }
   }

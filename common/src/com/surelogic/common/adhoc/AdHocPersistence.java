@@ -47,6 +47,7 @@ public final class AdHocPersistence {
   static final String CAT_QUERY = "cat-query";
   static final String SORT_HINT = "sort-hint";
   static final String TYPE = "type";
+  static final String CUSTOM_DISPLAY = "custom-display";
 
   private static final Logger LOG = SLLogger.getLogger();
 
@@ -179,6 +180,9 @@ public final class AdHocPersistence {
     }
     if (query.showAtRootOfQueryMenu()) {
       Entities.addAttribute(DISPLAY_AT_ROOT, query.showAtRootOfQueryMenu(), b);
+    }
+    if (query.usesCustomDisplay()) {
+      Entities.addAttribute(CUSTOM_DISPLAY, query.getCustomDisplayClassName(), b);
     }
     if (!updateRevision && query.isChanged()) {
       Entities.addAttribute(CHANGED, "true", b);

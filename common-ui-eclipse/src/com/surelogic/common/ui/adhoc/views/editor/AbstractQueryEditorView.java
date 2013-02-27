@@ -133,6 +133,14 @@ public abstract class AbstractQueryEditorView extends ViewPart {
     idText.setLayoutData(data);
 
     label = new Label(selectionPane, SWT.RIGHT);
+    label.setText(I18N.msg("adhoc.query.editor.rhs.custom.display"));
+    data = new GridData(SWT.FILL, SWT.CENTER, false, false);
+    label.setLayoutData(data);
+    final Text cdText = new Text(selectionPane, SWT.SINGLE);
+    data = new GridData(SWT.FILL, SWT.CENTER, true, false);
+    cdText.setLayoutData(data);
+
+    label = new Label(selectionPane, SWT.RIGHT);
     label.setText(I18N.msg("adhoc.query.editor.rhs.sortHint"));
     data = new GridData(SWT.FILL, SWT.CENTER, false, false);
     label.setLayoutData(data);
@@ -205,8 +213,8 @@ public abstract class AbstractQueryEditorView extends ViewPart {
     tip.register(subQueryTable);
 
     f_mediator = new QueryEditorMediator(this, sash, lhs, lhsFolder, queryList, queryTree, filterTreeCheck, queryActionMenu,
-        runQuery, newQuery, deleteQuery, rhs, noSelectionPane, selectionPane, descriptionText, idText, sortHint, type, showCheck,
-        showAtRootCheck, sqlFolder, sql, addSubQuery, deleteSubQuery, subQueryTable);
+        runQuery, newQuery, deleteQuery, rhs, noSelectionPane, selectionPane, descriptionText, idText, cdText, sortHint, type,
+        showCheck, showAtRootCheck, sqlFolder, sql, addSubQuery, deleteSubQuery, subQueryTable);
     f_mediator.init();
   }
 

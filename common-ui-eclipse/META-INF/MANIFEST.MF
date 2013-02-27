@@ -24,6 +24,7 @@ Bundle-ClassPath: .,
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: com.surelogic.common.ui,
  com.surelogic.common.ui.actions,
+ com.surelogic.common.ui.adhoc,
  com.surelogic.common.ui.adhoc.dialogs,
  com.surelogic.common.ui.adhoc.views,
  com.surelogic.common.ui.adhoc.views.editor,

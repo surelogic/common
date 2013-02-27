@@ -14,6 +14,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import com.surelogic.NonNull;
+import com.surelogic.Nullable;
 import com.surelogic.common.i18n.I18N;
 
 /**
@@ -187,6 +188,60 @@ public final class AdHocQuery implements AdHocIdentity {
       return true;
     } else
       return false;
+  }
+
+  /**
+   * Holds an optional name of a class that implements
+   * <tt>IQueryResultCustomDisplay</tt> (by extending
+   * <tt>AbstractQueryResultCustomDisplay</tt> if possible). This is a UI class
+   * and cannot be referred to in common.
+   * <p>
+   * A value of {@code null} indicates no custom display.
+   */
+  @Nullable
+  private String f_customDisplayClassName = null;
+
+  /**
+   * Gets the custom display class name for this query or {@code null}.
+   * 
+   * @return the custom display class name for this query or {@code null}.
+   */
+  @Nullable
+  public String getCustomDisplayClassName() {
+    return f_customDisplayClassName;
+  }
+
+  /**
+   * Checks if this query uses a custom display class.
+   * 
+   * @return {@code true} if this query uses a custom display class,
+   *         {@code false} otherwise.
+   */
+  public boolean usesCustomDisplay() {
+    return f_customDisplayClassName != null;
+  }
+
+  /**
+   * Sets the custom display class name for this query.
+   * 
+   * @param value
+   *          a class name that implements <tt>IQueryResultCustomDisplay</tt>
+   *          (by extending <tt>AbstractQueryResultCustomDisplay</tt> if
+   *          possible) or {@code null} or <tt>""</tt> to clear.
+   * @return {@code true} if the value was changed, {@code false} otherwise.
+   */
+  public boolean setCustomDisplayClassName(@Nullable String value) {
+    if (value == null || "".equals(value)) {
+      if (f_customDisplayClassName == null)
+        return false;
+      f_customDisplayClassName = null;
+      return true;
+    }
+    if (value.equals(f_customDisplayClassName)) {
+      return false;
+    }
+    f_customDisplayClassName = value;
+    return true;
   }
 
   private static final String STARTINFO = "BEGIN-INFO";

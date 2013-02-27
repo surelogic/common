@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 import org.apache.commons.lang3.SystemUtils;
 import org.eclipse.jface.action.Action;
@@ -16,6 +17,8 @@ import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.dnd.Clipboard;
 import org.eclipse.swt.dnd.TextTransfer;
 import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.events.DisposeEvent;
+import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
@@ -32,6 +35,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
@@ -57,9 +61,11 @@ import com.surelogic.common.adhoc.model.NonLeafTreeCell;
 import com.surelogic.common.adhoc.model.TreeCell;
 import com.surelogic.common.core.adhoc.EclipseQueryUtility;
 import com.surelogic.common.i18n.I18N;
+import com.surelogic.common.logging.SLLogger;
 import com.surelogic.common.ui.EclipseUIUtility;
 import com.surelogic.common.ui.SLImages;
 import com.surelogic.common.ui.TableUtility;
+import com.surelogic.common.ui.adhoc.IQueryResultCustomDisplay;
 import com.surelogic.common.ui.adhoc.views.QueryResultNavigator;
 import com.surelogic.common.ui.adhoc.views.editor.AbstractQueryEditorView;
 import com.surelogic.common.ui.adhoc.views.editor.SQLSyntaxHighlighterSkipFirstLine;
@@ -363,7 +369,32 @@ public abstract class AbstractQueryResultsView extends ViewPart {
     final Menu menu = new Menu(f_parent.getShell(), SWT.POP_UP);
     setupMenu(menu);
 
-    if (model.isPureTable()) {
+    if (data.getQueryFullyBound().getQuery().usesCustomDisplay()) {
+      /*
+       * CUSTOM
+       */
+      final String className = data.getQueryFullyBound().getQuery().getCustomDisplayClassName();
+      try {
+        final IQueryResultCustomDisplay customDisplay = (IQueryResultCustomDisplay) data.getQueryFullyBound().getManager()
+            .getDataSource().getCustomDisplay(className);
+        customDisplay.init();
+        customDisplay.displayResult(data, panel);
+        panel.addDisposeListener(new DisposeListener() {
+          @Override
+          public void widgetDisposed(DisposeEvent e) {
+            customDisplay.dispose();
+          }
+        });
+      } catch (Exception e) {
+        final String errorMsg = I18N.err(305, className, data.getQueryFullyBound().getQuery().getDescription());
+        SLLogger.getLogger().log(Level.SEVERE, errorMsg, e);
+        final Text show = new Text(panel, SWT.WRAP | SWT.READ_ONLY);
+        show.setText(errorMsg);
+      }
+    } else if (model.isPureTable()) {
+      /*
+       * TABLE
+       */
       final Table table = new Table(panel, SWT.BORDER | SWT.FULL_SELECTION);
       table.setHeaderVisible(true);
       table.setLinesVisible(true);
@@ -449,7 +480,7 @@ public abstract class AbstractQueryResultsView extends ViewPart {
       table.showColumn(table.getColumn(0));
     } else {
       /*
-       * It is a tree or a tree-table
+       * TREE / TREE-TABLE
        */
       final Tree tree = new Tree(panel, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION);
       tree.setHeaderVisible(true);
