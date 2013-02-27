@@ -297,6 +297,7 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
          * top-level query
          */
         final List<AdHocQuery> rootQueries = f_manager.getRootQueryList();
+        final List<AdHocQuery> rootQueriesNotInACategory = new ArrayList<AdHocQuery>(rootQueries);
         final List<AdHocCategory> categories = f_manager.getCategoryList();
 
         final List<AdHocCategory> emptyCategories = new ArrayList<AdHocCategory>();
@@ -304,7 +305,7 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
         for (AdHocCategory category : categories) {
           final List<AdHocQuery> catQueries = category.getQueryList();
           catQueries.retainAll(rootQueries); // show later
-          rootQueries.removeAll(catQueries);
+          rootQueriesNotInACategory.removeAll(catQueries);
           if (catQueries.isEmpty() || noResults(catQueries)) {
             emptyCategories.add(category);
           } else {
@@ -312,14 +313,14 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
             addQueryMenu(catQueries, selectedResult, variableValues);
           }
         }
-        if (willAnyQueriesBeListed(rootQueries)) {
+        if (willAnyQueriesBeListed(rootQueriesNotInACategory)) {
           // miscellaneous queries not in a category
           if (!categories.isEmpty()) {
             // only show miscellaneous title if another category was shown
             addTitle(I18N.msg("adhoc.query.menu.label.misc.cat"), true);
           }
           // add in the rest
-          addQueryMenu(rootQueries, selectedResult, variableValues);
+          addQueryMenu(rootQueriesNotInACategory, selectedResult, variableValues);
         }
         for (AdHocCategory category : emptyCategories) {
           addCategoryTitleAndMessage(category, false);
