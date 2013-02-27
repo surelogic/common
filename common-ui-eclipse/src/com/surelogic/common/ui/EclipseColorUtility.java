@@ -1,5 +1,6 @@
 package com.surelogic.common.ui;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 
 import com.surelogic.Utility;
@@ -65,6 +66,30 @@ public final class EclipseColorUtility {
       });
     }
     return f_runControlBackgroundColor;
+  }
+
+  private static Color f_QueryMenuSubtleColor;
+
+  public static Color getQueryMenuSubtleColor() {
+    if (f_QueryMenuSubtleColor == null) {
+      f_QueryMenuSubtleColor = new Color(EclipseUIUtility.getDisplay(), 169, 145, 91);
+      EclipseUIUtility.disposeExec(new Runnable() {
+        @Override
+        public void run() {
+          f_QueryMenuSubtleColor.dispose();
+        }
+      });
+    }
+    return f_QueryMenuSubtleColor;
+  }
+
+  private static Color f_QueryMenuGrayColor;
+
+  public static Color getQueryMenuGrayColor() {
+    if (f_QueryMenuGrayColor == null) {
+      f_QueryMenuGrayColor = EclipseUIUtility.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY);
+    }
+    return f_QueryMenuGrayColor;
   }
 
   private EclipseColorUtility() {

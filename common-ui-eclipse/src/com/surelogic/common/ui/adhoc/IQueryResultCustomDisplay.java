@@ -13,7 +13,9 @@ import com.surelogic.common.ui.adhoc.views.results.AbstractQueryResultsView;
  * <p>
  * All calls to this interface from the {@link AbstractQueryResultsView} are
  * made from the SWT event dispatch thread.
- * 
+ * <p>
+ * A new instance is created and the {@link ILifecycle} methods are invoked each
+ * time the query is run. Objects are not reused across query runs.
  */
 public interface IQueryResultCustomDisplay extends ILifecycle {
 

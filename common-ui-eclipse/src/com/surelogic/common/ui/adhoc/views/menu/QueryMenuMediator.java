@@ -374,13 +374,13 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
               && selectedResult.getQueryFullyBound().getQuery().isDefaultSubQuery(query);
           item.setImage(SLImages.getImageForAdHocQuery(query.getType(), decorateAsDefault, emptyResult));
           if (emptyResult)
-            item.setForeground(tm.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
+            item.setForeground(EclipseColorUtility.getQueryMenuGrayColor());
           item.setData(query);
         }
       } else {
         final TableItem item = new TableItem(tm, SWT.NONE);
         item.setText(query.getDescription());
-        item.setForeground(tm.getDisplay().getSystemColor(SWT.COLOR_GRAY));
+        item.setForeground(EclipseColorUtility.getQueryMenuGrayColor());
       }
     }
   }
@@ -416,8 +416,8 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
     final GridData data = new GridData(SWT.FILL, SWT.FILL, true, false);
     data.widthHint = 150; // needed for wrap to work at all
     message.setLayoutData(data);
-    message.setForeground(hasData ? EclipseColorUtility.getSubtleTextColor() : message.getDisplay().getSystemColor(
-        SWT.COLOR_DARK_GRAY));
+    message.setForeground(hasData ? EclipseColorUtility.getQueryMenuSubtleColor() : EclipseColorUtility
+        .getQueryMenuGrayColor());
     message.setBackground(f_noRunSelected.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
     if (hasData) {
       message.setText(category.getHasDataText());
@@ -432,7 +432,7 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
     title.setBackground(f_noRunSelected.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
     title.setText(text);
     if (!hasData)
-      title.setForeground(title.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
+      title.setForeground(EclipseColorUtility.getQueryMenuGrayColor());
     final GridData data = new GridData(SWT.FILL, SWT.FILL, true, false);
     title.setLayoutData(data);
   }
