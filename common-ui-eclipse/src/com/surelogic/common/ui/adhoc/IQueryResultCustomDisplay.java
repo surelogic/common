@@ -1,10 +1,11 @@
-package com.surelogic.common.ui.adhoc.views.results;
+package com.surelogic.common.ui.adhoc;
 
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 
 import com.surelogic.common.ILifecycle;
 import com.surelogic.common.adhoc.AdHocQueryResultSqlData;
+import com.surelogic.common.ui.adhoc.views.results.AbstractQueryResultsView;
 
 /**
  * Interface to define a custom display for a particular query. Implementations
