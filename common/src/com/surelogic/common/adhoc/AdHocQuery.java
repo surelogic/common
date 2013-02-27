@@ -194,6 +194,8 @@ public final class AdHocQuery implements AdHocIdentity {
    * Holds an optional name of a class that implements
    * <tt>IQueryResultCustomDisplay</tt>. This is a UI class and cannot be
    * referred to in common.
+   * <p>
+   * A value of {@code null} indicates no custom display.
    */
   @Nullable
   private String f_customDisplayClassName = null;
@@ -219,16 +221,21 @@ public final class AdHocQuery implements AdHocIdentity {
   }
 
   /**
-   * Sets the custom display class name for this query. This method has no
-   * effect if the name passed is null.
+   * Sets the custom display class name for this query.
    * 
    * @param value
-   *          non-null class name that implements
-   *          <tt>IQueryResultCustomDisplay</tt>.
+   *          a class name that implements <tt>IQueryResultCustomDisplay</tt> or
+   *          {@code null} or <tt>""</tt> to clear.
    * @return {@code true} if the value was changed, {@code false} otherwise.
    */
-  public boolean setCustomDisplayClassName(String value) {
-    if (value == null || value.equals(f_customDisplayClassName)) {
+  public boolean setCustomDisplayClassName(@Nullable String value) {
+    if (value == null || "".equals(value)) {
+      if (f_customDisplayClassName == null)
+        return false;
+      f_customDisplayClassName = null;
+      return true;
+    }
+    if (value.equals(f_customDisplayClassName)) {
       return false;
     }
     f_customDisplayClassName = value;

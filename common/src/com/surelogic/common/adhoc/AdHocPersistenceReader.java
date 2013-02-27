@@ -1,9 +1,10 @@
 package com.surelogic.common.adhoc;
 
 import static com.surelogic.common.adhoc.AdHocPersistence.AD_HOC;
-import static com.surelogic.common.adhoc.AdHocPersistence.*;
+import static com.surelogic.common.adhoc.AdHocPersistence.CATEGORY;
 import static com.surelogic.common.adhoc.AdHocPersistence.CAT_QUERY;
 import static com.surelogic.common.adhoc.AdHocPersistence.CHANGED;
+import static com.surelogic.common.adhoc.AdHocPersistence.CUSTOM_DISPLAY;
 import static com.surelogic.common.adhoc.AdHocPersistence.DEFAULT_SUB_QUERY;
 import static com.surelogic.common.adhoc.AdHocPersistence.DESCRIPTION;
 import static com.surelogic.common.adhoc.AdHocPersistence.DISPLAY;
@@ -13,7 +14,9 @@ import static com.surelogic.common.adhoc.AdHocPersistence.ID;
 import static com.surelogic.common.adhoc.AdHocPersistence.NO_DATA;
 import static com.surelogic.common.adhoc.AdHocPersistence.QUERY;
 import static com.surelogic.common.adhoc.AdHocPersistence.REVISION;
+import static com.surelogic.common.adhoc.AdHocPersistence.SORT_HINT;
 import static com.surelogic.common.adhoc.AdHocPersistence.SUB_QUERY;
+import static com.surelogic.common.adhoc.AdHocPersistence.TYPE;
 import static com.surelogic.common.adhoc.AdHocPersistence.VERSION;
 import static com.surelogic.common.adhoc.AdHocPersistence.VERSION_3_0;
 
@@ -74,6 +77,10 @@ public final class AdHocPersistenceReader extends DefaultHandler {
           final String displayString = attributes.getValue(DISPLAY);
           if (!"".equals(displayString)) {
             f_query.setShowInQueryMenu(Boolean.parseBoolean(displayString));
+          }
+          final String customDisplay = attributes.getValue(CUSTOM_DISPLAY);
+          if (customDisplay != null) {
+            f_query.setCustomDisplayClassName(customDisplay);
           }
           final String sortHintString = attributes.getValue(SORT_HINT);
           if (sortHintString != null) {

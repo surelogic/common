@@ -41,6 +41,7 @@ import com.surelogic.common.core.EclipseUtility;
 import com.surelogic.common.core.adhoc.EclipseQueryUtility;
 import com.surelogic.common.core.preferences.CommonCorePreferencesUtility;
 import com.surelogic.common.i18n.I18N;
+import com.surelogic.common.ui.EclipseColorUtility;
 import com.surelogic.common.ui.SLImages;
 import com.surelogic.common.ui.adhoc.views.QueryResultNavigator;
 import com.surelogic.common.ui.jobs.SLUIJob;
@@ -415,7 +416,8 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
     final GridData data = new GridData(SWT.FILL, SWT.FILL, true, false);
     data.widthHint = 150; // needed for wrap to work at all
     message.setLayoutData(data);
-    message.setForeground(message.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
+    message.setForeground(hasData ? EclipseColorUtility.getSubtleTextColor() : message.getDisplay().getSystemColor(
+        SWT.COLOR_DARK_GRAY));
     message.setBackground(f_noRunSelected.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
     if (hasData) {
       message.setText(category.getHasDataText());
