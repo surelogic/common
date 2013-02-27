@@ -330,7 +330,9 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
         /*
          * sub-query
          */
-        addQueryMenu(selectedResult.getQueryFullyBound().getQuery().getVisibleSubQueryList(), selectedResult, variableValues);
+        List<AdHocQuery> subQueries = selectedResult.getQueryFullyBound().getQuery().getVisibleSubQueryList();
+        if (!subQueries.isEmpty())
+          addQueryMenu(subQueries, selectedResult, variableValues);
       }
 
       /*
@@ -338,10 +340,12 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
        */
       boolean noChildren = f_content.getChildren().length == 0;
       if (noChildren) {
-        final Label msg = new Label(f_content, SWT.NONE);
-        msg.setText(I18N.msg("adhoc.query.menu.label.noQuery"));
+        final Label message = new Label(f_content, SWT.NONE);
+        message.setText(I18N.msg("adhoc.query.menu.label.noQuery"));
+        message.setForeground(EclipseColorUtility.getQueryMenuGrayColor());
+        message.setBackground(f_noRunSelected.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
         final GridData data = new GridData(SWT.FILL, SWT.CENTER, true, false);
-        msg.setLayoutData(data);
+        message.setLayoutData(data);
       }
 
       f_content.setSize(f_content.computeSize(SWT.DEFAULT, SWT.DEFAULT));
@@ -416,8 +420,7 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
     final GridData data = new GridData(SWT.FILL, SWT.FILL, true, false);
     data.widthHint = 150; // needed for wrap to work at all
     message.setLayoutData(data);
-    message.setForeground(hasData ? EclipseColorUtility.getQueryMenuSubtleColor() : EclipseColorUtility
-        .getQueryMenuGrayColor());
+    message.setForeground(hasData ? EclipseColorUtility.getQueryMenuSubtleColor() : EclipseColorUtility.getQueryMenuGrayColor());
     message.setBackground(f_noRunSelected.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
     if (hasData) {
       message.setText(category.getHasDataText());
