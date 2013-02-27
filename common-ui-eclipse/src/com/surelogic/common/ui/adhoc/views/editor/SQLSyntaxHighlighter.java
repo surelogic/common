@@ -46,9 +46,11 @@ public class SQLSyntaxHighlighter implements LineStyleListener {
     f_event = event;
     f_result = new ArrayList<StyleRange>();
     int upToIndex = highlightComment(0);
-    highlightQuotedText(0, upToIndex);
-    for (String word : SQL_RESERVED_WORDS) {
-      highlightWord(word);
+    if (upToIndex != 0) {
+      for (String word : SQL_RESERVED_WORDS) {
+        highlightWord(word, upToIndex);
+      }
+      highlightQuotedText(0, upToIndex);
     }
     event.styles = f_result.toArray(new StyleRange[f_result.size()]);
     f_event = null;
@@ -56,8 +58,10 @@ public class SQLSyntaxHighlighter implements LineStyleListener {
   }
 
   /**
+   * Highlights SQL comments.
    * 
    * @param fromIndex
+   *          where to start looking for a comment.
    * @return index of where the comment begins or -1 for no comment.
    */
   private int highlightComment(int fromIndex) {
@@ -66,7 +70,7 @@ public class SQLSyntaxHighlighter implements LineStyleListener {
     int ci = f_event.lineText.indexOf("--", fromIndex);
     if (ci == NOT_FOUND)
       return -1;
-    if (inQuote(ci, "\"") || inQuote(ci, "'"))
+    if (inSQLQuote(ci))
       return highlightComment(ci + 2);
     else {
       setToEndOfLine(ci, f_commentColor);
@@ -74,15 +78,34 @@ public class SQLSyntaxHighlighter implements LineStyleListener {
     }
   }
 
+  private boolean inSQLQuote(int index) {
+    return inQuote(index, "\"") || inQuote(index, "'");
+  }
+
+  private boolean inAnyQuote(int index) {
+    return inQuote(index, "\"") || inQuote(index, "'") || inQuote(index, "?");
+  }
+
+  /**
+   * Checks if a comment is in a quote by examining the line up to where the
+   * '--' occurs.
+   * 
+   * @param index
+   *          where '--' occurs.
+   * @param quote
+   *          the quoting string
+   * @return {@code true} if in a quote, {@code false} otherwise.
+   */
   private boolean inQuote(int index, String quote) {
+    final String beforeComment = f_event.lineText.substring(0, index);
     int count = 0;
-    int pos = index;
+    int pos = 0;
     while (true) {
-      int dq = f_event.lineText.indexOf(quote, pos);
+      int dq = beforeComment.indexOf(quote, pos);
       if (dq == NOT_FOUND)
         break;
       // check for two quotes in a row
-      int dqNext = f_event.lineText.indexOf(quote, dq + 1);
+      int dqNext = beforeComment.indexOf(quote, dq + 1);
       if (dqNext == dq + 1) {
         pos = dqNext + 1;
       } else {
@@ -187,7 +210,15 @@ public class SQLSyntaxHighlighter implements LineStyleListener {
     }
   }
 
-  private void highlightWord(String word) {
+  /**
+   * Highlights the passed word in the line. The match is not case sensitive.
+   * 
+   * @param word
+   *          a word.
+   * @param upToIndex
+   *          the index to stop quoting (a comment starts there).
+   */
+  private void highlightWord(final String word, int upToIndex) {
     final String lineText = f_event.lineText.toUpperCase();
     final int wordLength = word.length();
     int index = 0;
@@ -197,8 +228,12 @@ public class SQLSyntaxHighlighter implements LineStyleListener {
         break;
       if (isWord(index, wordLength, lineText)) {
         final int beginIndex = index;
-        final int endIndex = beginIndex + word.length() - 1;
-        set(f_keyWordColor, SWT.BOLD, beginIndex, endIndex);
+        final int endIndex = beginIndex + wordLength - 1;
+        if (upToIndex != -1 && beginIndex >= upToIndex)
+          return;
+        if (!inAnyQuote(beginIndex)) {
+          set(f_keyWordColor, SWT.BOLD, beginIndex, endIndex);
+        }
       }
       index = index + wordLength;
     }
@@ -220,7 +255,7 @@ public class SQLSyntaxHighlighter implements LineStyleListener {
   }
 
   private boolean isWhiteSpaceOrPunc(final char c) {
-    return c == ' ' || c == '\t' || c == ',';
+    return c == ' ' || c == '\t' || c == ',' || c == '.' || c == '(' || c == ')';
   }
 
   private void set(Color color, int style, int beginIndex, int endIndex) {
