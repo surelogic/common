@@ -6,10 +6,12 @@ import java.lang.reflect.Proxy;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.Iterator;
 import java.util.List;
 
 import com.surelogic.common.jdbc.DBQuery;
+import com.surelogic.common.jdbc.DBTransaction;
 import com.surelogic.common.jdbc.DefaultConnection;
 import com.surelogic.common.jdbc.Query;
 import com.surelogic.common.jdbc.Result;
@@ -17,6 +19,8 @@ import com.surelogic.common.jdbc.ResultHandler;
 import com.surelogic.common.jdbc.Row;
 import com.surelogic.common.jdbc.RowHandler;
 import com.surelogic.common.jdbc.SingleRowHandler;
+import com.surelogic.flashlight.common.HappensBeforeAnalysis;
+import com.surelogic.flashlight.common.HappensBeforeAnalysis.HBEdge;
 import com.surelogic.flashlight.common.RollupAccessesResultSet;
 
 /**
@@ -106,6 +110,58 @@ public final class Functions {
             return RollupAccessesResultSet.create(conn, fieldId, receiverId);
         } catch (SQLException e) {
             throw new IllegalStateException(e);
+        }
+    }
+
+    public static ResultSet happensBeforeEdges(final long writeThread,
+            final Timestamp write, final long readThread, final Timestamp read) {
+        return DefaultConnection.getInstance().withDefault(
+                new DBTransaction<ResultSet>() {
+
+                    @Override
+                    public ResultSet perform(Connection conn) throws Exception {
+                        HappensBeforeAnalysis hba = new HappensBeforeAnalysis(
+                                conn);
+                        return HBEdgeResultSet.create(hba.happensBeforeTraces(
+                                write, writeThread, read, readThread));
+                    }
+                });
+    }
+
+    static class HBEdgeResultSet implements InvocationHandler {
+        private Iterator<HBEdge> edges;
+        HBEdge edge;
+
+        HBEdgeResultSet(List<HBEdge> edges) {
+            this.edges = edges.iterator();
+        }
+
+        static ResultSet create(List<HBEdge> edges) {
+            return (ResultSet) Proxy
+                    .newProxyInstance(ResultSet.class.getClassLoader(),
+                            new Class[] { ResultSet.class },
+                            new HBEdgeResultSet(edges));
+        }
+
+        @Override
+        public Object invoke(Object proxy, Method method, Object[] args)
+                throws Throwable {
+            final String methodName = method.getName();
+            if ("next".equals(methodName)) {
+                if (edges.hasNext()) {
+                    edge = edges.next();
+                    return true;
+                } else {
+                    return false;
+                }
+            } else if ("close".equals(methodName)) {
+                edges = null;
+                edge = null;
+                return null;
+            } else if (methodName.startsWith("get")) {
+                return edge.get((Integer) args[0]);
+            }
+            throw new UnsupportedOperationException(method.getName());
         }
     }
 

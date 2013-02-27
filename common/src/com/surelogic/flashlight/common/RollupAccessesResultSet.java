@@ -190,8 +190,12 @@ public class RollupAccessesResultSet implements InvocationHandler {
             case 7:
                 return happensBefore.getDisplay();
             case 8:
-                return readsUC;
+                return lastWrite;
             case 9:
+                return lastWriteThread;
+            case 10:
+                return readsUC;
+            case 11:
                 return writesUC;
             default:
                 throw new IllegalArgumentException(i

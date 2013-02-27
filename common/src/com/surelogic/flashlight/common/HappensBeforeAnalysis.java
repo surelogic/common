@@ -9,6 +9,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import com.surelogic.common.jdbc.QB;
 
@@ -21,7 +27,14 @@ public class HappensBeforeAnalysis {
     private final PreparedStatement hbObjTargetSt;
     private final PreparedStatement hbCollSourceSt;
     private final PreparedStatement hbCollTargetSt;
-    private final PreparedStatement isVolatileSt;
+
+    private final PreparedStatement hbTraceSt;
+    private final PreparedStatement hbVolWriteTraceSt;
+    private final PreparedStatement hbVolReadTraceSt;
+    private final PreparedStatement hbObjSourceTraceSt;
+    private final PreparedStatement hbObjTargetTraceSt;
+    private final PreparedStatement hbCollSourceTraceSt;
+    private final PreparedStatement hbCollTargetTraceSt;
     private final PreparedStatement isFinalSt;
 
     private final TLongObjectMap<Timestamp> targetsCache;
@@ -29,8 +42,6 @@ public class HappensBeforeAnalysis {
 
     public HappensBeforeAnalysis(Connection conn) throws SQLException {
         hbSt = conn.prepareStatement(QB.get("Accesses.happensBefore"));
-        isVolatileSt = conn
-                .prepareStatement(QB.get("Accesses.isFieldVolatile"));
         isFinalSt = conn.prepareStatement(QB.get("Accesses.isFieldFinal"));
         hbVolReadSt = conn.prepareStatement(QB
                 .get("Accesses.happensBeforeVolatileRead"));
@@ -44,6 +55,20 @@ public class HappensBeforeAnalysis {
                 .get("Accesses.happensBeforeSourceColl"));
         hbCollTargetSt = conn.prepareStatement(QB
                 .get("Accesses.happensBeforeTargetColl"));
+        hbTraceSt = conn.prepareStatement(QB
+                .get("Accesses.trace.happensBefore"));
+        hbVolReadTraceSt = conn.prepareStatement(QB
+                .get("Accesses.trace.happensBeforeVolatileRead"));
+        hbVolWriteTraceSt = conn.prepareStatement(QB
+                .get("Accesses.trace.happensBeforeVolatileWrite"));
+        hbObjSourceTraceSt = conn.prepareStatement(QB
+                .get("Accesses.trace.happensBeforeSourceObject"));
+        hbObjTargetTraceSt = conn.prepareStatement(QB
+                .get("Accesses.trace.happensBeforeTargetObject"));
+        hbCollSourceTraceSt = conn.prepareStatement(QB
+                .get("Accesses.trace.happensBeforeSourceColl"));
+        hbCollTargetTraceSt = conn.prepareStatement(QB
+                .get("Accesses.trace.happensBeforeTargetColl"));
         targetsCache = new TLongObjectHashMap<Timestamp>();
         sourcesCache = new TLongObjectHashMap<Timestamp>();
     }
@@ -247,4 +272,186 @@ public class HappensBeforeAnalysis {
                 || happensBeforeObject(write, writeThread, read, readThread)
                 || happensBeforeCollection(write, writeThread, read, readThread);
     }
+
+    public List<HBEdge> happensBeforeTraces(Timestamp write, long writeThread,
+            Timestamp read, long readThread) throws SQLException {
+        if (write == null || writeThread == readThread) {
+            return Collections.emptyList();
+        }
+        List<HBEdge> list = new ArrayList<HBEdge>();
+        addHappensBeforeVolatile(write, writeThread, read, readThread, list);
+        addHappensBeforeThread(write, writeThread, read, readThread, list);
+        addHappensBeforeObject(write, writeThread, read, readThread, list);
+        addHappensBeforeCollection(write, writeThread, read, readThread, list);
+        return list;
+    }
+
+    private void addHappensBeforeCollection(Timestamp write, long writeThread,
+            Timestamp read, long readThread, List<HBEdge> list) {
+
+    }
+
+    private void addHappensBeforeObject(Timestamp write, long writeThread,
+            Timestamp read, long readThread, List<HBEdge> list)
+            throws SQLException {
+        addHappensBefore(hbObjSourceTraceSt, hbObjTargetTraceSt, write,
+                writeThread, read, readThread, list);
+    }
+
+    private void addHappensBeforeThread(Timestamp write, long writeThread,
+            Timestamp read, long readThread, List<HBEdge> list)
+            throws SQLException {
+        int idx = 1;
+        hbTraceSt.setLong(idx++, writeThread);
+        hbTraceSt.setLong(idx++, readThread);
+        hbTraceSt.setTimestamp(idx++, write);
+        hbTraceSt.setTimestamp(idx++, read);
+        final ResultSet hbTraceSet = hbTraceSt.executeQuery();
+        try {
+            while (hbTraceSet.next()) {
+                Timestamp ts = hbTraceSet.getTimestamp(1);
+                long trace = hbTraceSet.getLong(2);
+                HBNode node = new HBNode(ts, trace);
+                list.add(new HBEdge(node, null));
+            }
+        } finally {
+            hbTraceSet.close();
+        }
+    }
+
+    private void addHappensBeforeVolatile(Timestamp write, long writeThread,
+            Timestamp read, long readThread, List<HBEdge> list)
+            throws SQLException {
+        addHappensBefore(hbVolWriteTraceSt, hbVolReadTraceSt, write,
+                writeThread, read, readThread, list);
+    }
+
+    private void addHappensBefore(PreparedStatement sourceSt,
+            PreparedStatement targetSt, Timestamp write, long writeThread,
+            Timestamp read, long readThread, List<HBEdge> list)
+            throws SQLException {
+        sourceSt.setLong(1, writeThread);
+        sourceSt.setTimestamp(2, write);
+        sourceSt.setTimestamp(3, read);
+        final ResultSet sourceSet = sourceSt.executeQuery();
+        try {
+            if (!sourceSet.next()) {
+                return;
+            }
+            targetSt.setLong(1, writeThread);
+            targetSt.setTimestamp(2, write);
+            targetSt.setTimestamp(3, read);
+            final ResultSet targetSet = targetSt.executeQuery();
+            try {
+                if (!targetSet.next()) {
+                    return;
+                }
+                final Map<Long, HBNode> sources = genSourceNodes(sourceSet);
+                sourceSet.close();
+                if (sources.isEmpty()) {
+                    return;
+                }
+                final Map<Long, HBNode> targets = genTargetNodes(targetSet);
+                targetSet.close();
+                if (targets.isEmpty()) {
+                    return;
+                }
+                for (Entry<Long, HBNode> source : sources.entrySet()) {
+                    long sourceId = source.getKey();
+                    HBNode sourceNode = source.getValue();
+                    HBNode targetNode = targets.get(sourceId);
+                    if (targetNode != null
+                            && sourceNode.getTs().before(targetNode.getTs())) {
+                        list.add(new HBEdge(sourceNode, targetNode));
+                    }
+                }
+            } finally {
+                targetSet.close();
+            }
+        } finally {
+            sourceSet.close();
+        }
+    }
+
+    static class HBNode {
+        final Timestamp ts;
+        final long trace;
+
+        public HBNode(Timestamp ts, long trace) {
+            super();
+            this.ts = ts;
+            this.trace = trace;
+        }
+
+        public Timestamp getTs() {
+            return ts;
+        }
+
+        public long getTrace() {
+            return trace;
+        }
+    }
+
+    public static class HBEdge {
+        final HBNode source;
+        final HBNode target;
+
+        public HBNode getSource() {
+            return source;
+        }
+
+        public HBNode getTarget() {
+            return target;
+        }
+
+        public HBEdge(HBNode source, HBNode target) {
+            super();
+            this.source = source;
+            this.target = target;
+        }
+
+        public Object get(int col) {
+            switch (col) {
+            case 1:
+                return source.getTrace();
+            case 2:
+                return source.getTs();
+            case 3:
+                return target == null ? -1 : target.getTrace();
+            case 4:
+                return target == null ? null : target.getTs();
+            default:
+                throw new IllegalArgumentException(String.format(
+                        "%d is not a valid column.", col));
+            }
+        }
+
+    }
+
+    Map<Long, HBNode> genSourceNodes(ResultSet set) throws SQLException {
+        Map<Long, HBNode> map = new HashMap<Long, HBNode>();
+        do {
+            long sourceId = set.getLong(1);
+            Timestamp sourceTs = set.getTimestamp(2);
+            HBNode node = map.get(sourceId);
+            if (node == null || node.getTs().after(sourceTs)) {
+                map.put(sourceId, new HBNode(sourceTs, set.getLong(3)));
+            }
+        } while (set.next());
+        return map;
+    }
+
+    Map<Long, HBNode> genTargetNodes(ResultSet set) throws SQLException {
+        Map<Long, HBNode> map = new HashMap<Long, HBNode>();
+        do {
+            long targetId = set.getLong(1);
+            Timestamp targetTs = set.getTimestamp(2);
+            HBNode node = map.get(targetId);
+            if (node == null || node.getTs().before(targetTs)) {
+                map.put(targetId, new HBNode(targetTs, set.getLong(3)));
+            }
+        } while (set.next());
+        return map;
+    }
+
 }
