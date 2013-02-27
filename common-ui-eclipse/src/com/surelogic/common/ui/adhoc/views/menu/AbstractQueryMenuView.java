@@ -105,8 +105,4 @@ public abstract class AbstractQueryMenuView extends ViewPart {
     }
     super.dispose();
   }
-
-  public void runRootQuery(final String id) {
-    f_mediator.runRootQuery(id);
-  }
 }

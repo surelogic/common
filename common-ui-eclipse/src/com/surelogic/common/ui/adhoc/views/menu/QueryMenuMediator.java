@@ -481,13 +481,4 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
       EclipseQueryUtility.scheduleQuery(boundQuery, f_manager.getDataSource().getCurrentAccessKeys());
     }
   }
-
-  void runRootQuery(final String id) {
-    for (final AdHocQuery q : f_manager.getRootQueryList()) {
-      if (q.getId().equals(id)) {
-        runQuery(q);
-        return;
-      }
-    }
-  }
 }
