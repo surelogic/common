@@ -16,6 +16,13 @@ import com.surelogic.common.ui.adhoc.views.results.AbstractQueryResultsView;
  * <p>
  * A new instance is created and the {@link ILifecycle} methods are invoked each
  * time the query is run. Objects are not reused across query runs.
+ * <p>
+ * It is highly recommended that implementations subclass
+ * {@link AbstractQueryResultCustomDisplay} rather than implement this interface
+ * directly because that class helps the implementation execute sub-queries
+ * correctly.
+ * 
+ * @see AbstractQueryResultCustomDisplay
  */
 public interface IQueryResultCustomDisplay extends ILifecycle {
 
