@@ -86,6 +86,7 @@ public final class AdHocManager {
   /**
    * The data source for this manager.
    */
+  @NonNull
   private final IAdHocDataSource f_source;
 
   /**
@@ -93,6 +94,7 @@ public final class AdHocManager {
    * 
    * @return the data source for this manager.
    */
+  @NonNull
   public IAdHocDataSource getDataSource() {
     return f_source;
   }
@@ -100,8 +102,7 @@ public final class AdHocManager {
   /**
    * Only called by {@link #getInstance(String)}
    */
-  private AdHocManager(final IAdHocDataSource source) {
-    assert source != null;
+  private AdHocManager(@NonNull IAdHocDataSource source) {
     f_source = source;
   }
 
@@ -627,7 +628,7 @@ public final class AdHocManager {
    */
   public void setSelectedResult(final AdHocQueryResult result) {
     if (result != null && !f_results.contains(result)) {
-      throw new IllegalArgumentException(I18N.err(126, result));
+      throw new IllegalArgumentException(I18N.err(126, "setSelectedResult", result));
     }
     boolean notify = result == null;
     if (f_selectedResult != result) {
@@ -808,6 +809,61 @@ public final class AdHocManager {
   void notifyResultVariableValueChange(final AdHocQueryResultSqlData result) {
     for (final IAdHocManagerObserver o : f_observers) {
       o.notifyResultVariableValueChange(result);
+    }
+  }
+
+  @Nullable
+  private AdHocQuery f_showForQuerydoc = null;
+
+  /**
+   * Gets the one query to be displayed to the user via Querydoc, or
+   * {@code null} if none.
+   * 
+   * @return the one query to be displayed to the user via Querydoc, or
+   *         {@code null} if none.
+   */
+  @Nullable
+  public AdHocQuery getQueryDoc() {
+    return f_showForQuerydoc;
+  }
+
+  /**
+   * Sets the one query to be displayed to the user via Querydoc. May be set to
+   * {@code null} to indicate that no query is currently selected.
+   * <p>
+   * Observers will be notified if the selected query is changed.
+   * 
+   * @param query
+   *          the one query result that is selected and displayed to the user.
+   *          May be set to {@code null} to indicate that no result is currently
+   *          selected.
+   * @throws IllegalArgumentException
+   *           if the passed result is not managed by this manager.
+   */
+  public void setQuerydoc(@Nullable AdHocQuery query) {
+    if (query != null && !f_queries.contains(query)) {
+      throw new IllegalArgumentException(I18N.err(126, "setQuerydoc", query));
+    }
+    boolean notify = false;
+    if (f_showForQuerydoc != query) {
+      f_showForQuerydoc = query;
+      notify = true;
+    }
+    if (notify) {
+      notifyQuerydocValueChange(f_showForQuerydoc);
+    }
+  }
+
+  /**
+   * Notifies the observers of this manager that the query to be shown for
+   * Querydoc has changed.
+   * <p>
+   * Do <i>not</i> call this method holding any locks due to the potential for
+   * deadlock.
+   */
+  private void notifyQuerydocValueChange(final AdHocQuery query) {
+    for (final IAdHocManagerObserver o : f_observers) {
+      o.notifyQuerydocValueChange(query);
     }
   }
 

@@ -83,6 +83,9 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
         if (t != event.widget)
           t.deselectAll();
       }
+      final AdHocQuery query = getSelectionOrNull(event.widget);
+      if (query != null)
+        f_manager.setQuerydoc(query);
     }
   };
 

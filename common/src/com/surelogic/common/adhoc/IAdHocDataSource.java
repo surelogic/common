@@ -4,7 +4,9 @@ import java.io.File;
 import java.net.URL;
 import java.sql.SQLException;
 
+import com.surelogic.Nullable;
 import com.surelogic.ReferenceObject;
+import com.surelogic.common.CommonImages;
 import com.surelogic.common.jdbc.DBConnection;
 
 /**
@@ -114,4 +116,25 @@ public interface IAdHocDataSource {
    *           the type is not <tt>IQueryResultCustomDisplay</tt>.
    */
   Object getCustomDisplay(String className) throws Exception;
+
+  /**
+   * Gets a reference to the passed image for use in Querydoc. The passed
+   * reference will be copied into a temporary file and then used by the
+   * Querydoc. Therefore, the returned reference can be within a Jar.
+   * <p>
+   * As a fallback if a name can't be found, and rather than not providing an
+   * implementation, use
+   * 
+   * <pre>
+   * return CommonImages.getImageURL(imageName);
+   * </pre>
+   * 
+   * to allow Querydoc to use the symbolic images names in {@link CommonImages}.
+   * 
+   * @param imageName
+   *          an image name understood by the implementation.
+   * @return a reference to an image file.
+   */
+  @Nullable
+  URL getQuerydocImageURL(String imageName);
 }

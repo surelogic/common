@@ -9,28 +9,33 @@ import com.surelogic.*;
 @ReferenceObject
 public abstract class AdHocManagerAdapter implements IAdHocManagerObserver {
 
-	@Override
+  @Override
   public void notifyQueryModelChange(AdHocManager manager) {
-		// do nothing
-	}
+    // do nothing
+  }
 
-	@Override
+  @Override
   public void notifyGlobalVariableValueChange(AdHocManager manager) {
-		// do nothing
-	}
+    // do nothing
+  }
 
-	@Override
+  @Override
   public void notifyResultModelChange(AdHocManager manager) {
-		// do nothing
-	}
+    // do nothing
+  }
 
-	@Override
+  @Override
   public void notifySelectedResultChange(AdHocQueryResult result) {
-		// do nothing
-	}
+    // do nothing
+  }
 
-	@Override
+  @Override
   public void notifyResultVariableValueChange(AdHocQueryResultSqlData result) {
-		// do nothing
-	}
+    // do nothing
+  }
+
+  @Override
+  public void notifyQuerydocValueChange(AdHocQuery query) {
+    // do nothing
+  }
 }

@@ -72,4 +72,12 @@ public interface IAdHocManagerObserver {
    *          the result whose variable values changed.
    */
   void notifyResultVariableValueChange(AdHocQueryResultSqlData result);
+
+  /**
+   * Invoked when the selected query for Querydoc is changed
+   * 
+   * @param query
+   *          the query to show for Querydoc or {@code null} for none.
+   */
+  void notifyQuerydocValueChange(AdHocQuery query);
 }
