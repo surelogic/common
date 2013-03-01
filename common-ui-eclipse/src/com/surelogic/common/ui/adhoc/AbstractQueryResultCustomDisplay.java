@@ -22,12 +22,12 @@ public abstract class AbstractQueryResultCustomDisplay implements IQueryResultCu
 
   @Override
   public void init() {
-    // do nothing
+    // do nothing, implementations may override
   }
 
   @Override
   public void dispose() {
-    // do nothing
+    // do nothing, implementations may override
   }
 
   @Nullable
