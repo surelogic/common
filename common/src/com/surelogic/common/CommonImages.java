@@ -99,6 +99,7 @@ public final class CommonImages {
   public static final String IMG_CONSOLE = "console.gif";
   public static final String IMG_CPU = "cpu.gif";
   public static final String IMG_CPU_SUBDUED = "cpu_subdued.gif";
+  public static final String IMG_DOC = "doc.gif";
   public static final String IMG_DOWN = "down.gif";
   public static final String IMG_DRUM_EXPLORER = "drum_explorer.gif";
   public static final String IMG_DRUM_GRAY = "drum_gray.gif";

@@ -220,7 +220,7 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
     });
     if (f_manager.getDataSource().getQueryDocViewId() != null) {
       final MenuItem showQuerydoc = new MenuItem(menu, SWT.PUSH);
-      showQuerydoc.setImage(SLImages.getImage(CommonImages.IMG_FILE));
+      showQuerydoc.setImage(SLImages.getImage(CommonImages.IMG_DOC));
       showQuerydoc.setText(I18N.msg("adhoc.query.menu.querydoc"));
       showQuerydoc.addListener(SWT.Selection, f_showQuerydocListener);
       menu.addListener(SWT.Show, new Listener() {
