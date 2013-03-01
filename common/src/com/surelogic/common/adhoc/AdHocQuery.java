@@ -517,23 +517,12 @@ public final class AdHocQuery implements AdHocIdentity {
   private AdHocQuery f_defaultSubQuery = null;
 
   /**
-   * Gets the default sub-query for this query. If there is not a specific
-   * default sub-query set then the first visible sub-query is returned
-   * (obtained via {@link #getVisibleSubQueryList()). If no sub-queries exist
-   * for this query then {@code null} is returned.
+   * Gets the default sub-query for this query.
    * 
-   * @return a sub-query or {@code null}.
+   * @return a sub-query or {@code null} if no default.
    */
   public AdHocQuery getDefaultSubQuery() {
-    if (f_defaultSubQuery != null) {
-      return f_defaultSubQuery;
-    }
-    List<AdHocQuery> subs = getVisibleSubQueryList();
-    if (subs.isEmpty()) {
-      return null;
-    } else {
-      return subs.get(0);
-    }
+    return f_defaultSubQuery;
   }
 
   /**
@@ -546,7 +535,7 @@ public final class AdHocQuery implements AdHocIdentity {
    *         {@code false} otherwise.
    */
   public boolean isDefaultSubQuery(final AdHocQuery query) {
-    return getDefaultSubQuery() == query;
+    return f_defaultSubQuery == query;
   }
 
   /**

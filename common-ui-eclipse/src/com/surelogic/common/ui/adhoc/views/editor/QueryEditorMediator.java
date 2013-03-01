@@ -1,6 +1,7 @@
 package com.surelogic.common.ui.adhoc.views.editor;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +50,7 @@ import org.eclipse.ui.progress.UIJob;
 
 import com.surelogic.common.CommonImages;
 import com.surelogic.common.ILifecycle;
+import com.surelogic.common.adhoc.AdHocIdentity;
 import com.surelogic.common.adhoc.AdHocManager;
 import com.surelogic.common.adhoc.AdHocManagerAdapter;
 import com.surelogic.common.adhoc.AdHocQuery;
@@ -395,15 +397,22 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
     f_subQueryTable.addListener(SWT.Selection, new Listener() {
       @Override
       public void handleEvent(final Event event) {
-        final TableItem[] selected = f_subQueryTable.getSelection();
-        if (selected == null || selected.length < 1) {
-          return;
-        }
-        final AdHocQuery subQuery = (AdHocQuery) selected[0].getData();
-        if (subQuery != null)
-          f_manager.setQuerydoc(subQuery); // show Querydoc
-        if (f_edit.setDefaultSubQuery(subQuery)) {
-          f_edit.markAsChanged();
+        if (event.item instanceof TableItem) {
+          final TableItem item = (TableItem) event.item;
+          final AdHocQuery subQuery = (AdHocQuery) item.getData();
+          if (subQuery != null)
+            f_manager.setQuerydoc(subQuery); // show Querydoc
+
+          if (item.getChecked()) {
+            // wants to be default
+            if (f_edit.setDefaultSubQuery(subQuery))
+              f_edit.markAsChanged();
+          } else {
+            // may have cleared default
+            if (f_edit.getDefaultSubQuery() == subQuery)
+              if (f_edit.setDefaultSubQuery(null))
+                f_edit.markAsChanged();
+          }
         }
       }
     });
@@ -633,6 +642,7 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
       f_subQueryTable.setRedraw(false);
       f_subQueryTable.removeAll();
       final List<AdHocQuery> subQueries = query.getSubQueryList();
+      Collections.sort(subQueries, AdHocIdentity.BY_DESCRIPTION);
       for (final AdHocQuery subQuery : subQueries) {
         final TableItem item = new TableItem(f_subQueryTable, SWT.NONE);
         item.setData(subQuery);
