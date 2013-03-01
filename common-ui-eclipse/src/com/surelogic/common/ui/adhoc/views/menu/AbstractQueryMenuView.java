@@ -11,7 +11,6 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.part.ViewPart;
@@ -19,17 +18,12 @@ import org.eclipse.ui.part.ViewPart;
 import com.surelogic.common.adhoc.AdHocManager;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.ui.adhoc.views.QueryResultNavigator;
-import com.surelogic.common.ui.tooltip.ToolTip;
 
 public abstract class AbstractQueryMenuView extends ViewPart {
 
   private QueryMenuMediator f_mediator = null;
 
   public abstract AdHocManager getManager();
-
-  public ToolTip constructToolTip(final Shell shell) {
-    return new ToolTip(shell);
-  }
 
   /**
    * Gets the message for this view to display when no database is selected to
@@ -84,9 +78,7 @@ public abstract class AbstractQueryMenuView extends ViewPart {
     menu.add(new Separator());
     menu.add(showEmptyQueriesAction);
 
-    final ToolTip tip = constructToolTip(parent.getShell());
-
-    f_mediator = new QueryMenuMediator(this, tip, pageBook, noRunSelected, sc, content, navigator, showEmptyQueriesAction);
+    f_mediator = new QueryMenuMediator(this, pageBook, noRunSelected, sc, content, navigator, showEmptyQueriesAction);
     f_mediator.init();
   }
 

@@ -6,24 +6,18 @@ import org.eclipse.jface.action.Separator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.part.ViewPart;
 
 import com.surelogic.common.adhoc.AdHocManager;
 import com.surelogic.common.ui.adhoc.views.QueryResultNavigator;
-import com.surelogic.common.ui.tooltip.ToolTip;
 
 public abstract class AbstractQueryResultExplorerView extends ViewPart {
 
   private QueryResultExplorerMediator f_mediator = null;
 
   public abstract AdHocManager getManager();
-
-  public ToolTip constructToolTip(final Shell shell) {
-    return new ToolTip(shell);
-  }
 
   @Override
   public void createPartControl(final Composite parent) {
@@ -52,9 +46,6 @@ public abstract class AbstractQueryResultExplorerView extends ViewPart {
     menu.add(new Separator());
     menu.add(navigator.getDisposeAction());
     menu.add(navigator.getDisposeAllAction());
-
-    final ToolTip tip = constructToolTip(parent.getShell());
-    tip.register(queryHistoryTree);
 
     f_mediator = new QueryResultExplorerMediator(this, queryHistoryTree, navigator);
     f_mediator.init();

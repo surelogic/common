@@ -248,17 +248,21 @@ public final class AdHocQuery implements AdHocIdentity {
   private static final String STOPINFO = "END-INFO";
 
   /**
-   * Gets a short informational message associated with this query, such as
-   * could be displayed in a tool tip.
+   * Gets the Querydoc associated with this query. It has all <tt>--</tt> breaks
+   * removed.
+   * <p>
+   * If no <tt>BEGIN-INFO</tt> </tt>END-INFO</tt> pair exists in the SQL query
+   * then the description is returned as HTML, such as
+   * <tt>&lt;p&gt;&lt;strong&gt;</tt> <i>description</i>
+   * <tt>&lt;/p&gt;&lt;/strong&gt;</tt>
    * 
-   * @return a short informational message associated with this query, such as
-   *         could be displayed in a tool tip.
+   * @return an HTML description of this query.
    */
-  public String getShortMessage() {
+  public String getQueryDoc() {
     final int start = f_sql.indexOf(STARTINFO);
     final int stop = f_sql.indexOf(STOPINFO);
     if (start == -1 || stop == -1) {
-      return getDescription();
+      return "<p><strong>" + getDescription() + "</strong></p>";
     }
     return f_sql.substring(start + STARTINFO.length(), stop).replace("--", "");
   }

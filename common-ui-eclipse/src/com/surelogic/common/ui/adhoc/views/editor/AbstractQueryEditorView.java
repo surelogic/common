@@ -15,7 +15,6 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
@@ -36,17 +35,12 @@ import com.surelogic.common.adhoc.AdHocQueryType;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.ui.SLImages;
 import com.surelogic.common.ui.jobs.SLUIJob;
-import com.surelogic.common.ui.tooltip.ToolTip;
 
 public abstract class AbstractQueryEditorView extends ViewPart {
 
   private QueryEditorMediator f_mediator = null;
 
   public abstract AdHocManager getManager();
-
-  public ToolTip constructToolTip(final Shell shell) {
-    return new ToolTip(shell);
-  }
 
   @Override
   public void createPartControl(final Composite parent) {
@@ -209,11 +203,6 @@ public abstract class AbstractQueryEditorView extends ViewPart {
     col.pack();
     subQueryTable.setHeaderVisible(true);
     subQueryTable.setLinesVisible(true);
-
-    final ToolTip tip = constructToolTip(parent.getShell());
-    tip.register(queryList);
-    tip.register(queryTree);
-    tip.register(subQueryTable);
 
     f_mediator = new QueryEditorMediator(this, sash, lhs, lhsFolder, queryList, queryTree, filterTreeCheck, queryActionMenu,
         runQuery, newQuery, deleteQuery, rhs, noSelectionPane, selectionPane, descriptionText, idText, cdText, sortHint, type,

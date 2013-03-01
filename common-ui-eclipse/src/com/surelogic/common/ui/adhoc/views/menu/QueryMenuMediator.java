@@ -42,14 +42,13 @@ import com.surelogic.common.core.adhoc.EclipseQueryUtility;
 import com.surelogic.common.core.preferences.CommonCorePreferencesUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.ui.EclipseColorUtility;
+import com.surelogic.common.ui.EclipseUIUtility;
 import com.surelogic.common.ui.SLImages;
 import com.surelogic.common.ui.adhoc.views.QueryResultNavigator;
 import com.surelogic.common.ui.jobs.SLUIJob;
-import com.surelogic.common.ui.tooltip.ToolTip;
 
 public final class QueryMenuMediator extends AdHocManagerAdapter implements ILifecycle {
 
-  private final ToolTip f_tip;
   private final AdHocManager f_manager;
   private final PageBook f_pageBook;
   private final Label f_noRunSelected;
@@ -69,6 +68,16 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
       final AdHocQuery query = getSelectionOrNull(event.widget);
       if (query != null)
         runQuery(query);
+    }
+  };
+
+  private final Listener f_showQuerydocListener = new Listener() {
+    @Override
+    public void handleEvent(final Event event) {
+      final AdHocQuery query = getSelectionOrNull(event.widget);
+      final String viewId = f_manager.getDataSource().getQueryDocViewId();
+      if (query != null && viewId != null)
+        EclipseUIUtility.showView(viewId);
     }
   };
 
@@ -162,9 +171,8 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
     }
   };
 
-  public QueryMenuMediator(final AbstractQueryMenuView view, final ToolTip tip, final PageBook pageBook, final Label noRunSelected,
+  public QueryMenuMediator(final AbstractQueryMenuView view, final PageBook pageBook, final Label noRunSelected,
       final ScrolledComposite sc, final Composite content, final QueryResultNavigator navigator, final Action showEmptyQueriesAction) {
-    f_tip = tip;
     f_manager = view.getManager();
     f_pageBook = pageBook;
     f_noRunSelected = noRunSelected;
@@ -210,6 +218,28 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
         runQuery.setEnabled(menuItemEnabled);
       }
     });
+    if (f_manager.getDataSource().getQueryDocViewId() != null) {
+      final MenuItem showQuerydoc = new MenuItem(menu, SWT.PUSH);
+      showQuerydoc.setImage(SLImages.getImage(CommonImages.IMG_FILE));
+      showQuerydoc.setText(I18N.msg("adhoc.query.menu.querydoc"));
+      showQuerydoc.addListener(SWT.Selection, f_showQuerydocListener);
+      menu.addListener(SWT.Show, new Listener() {
+        @Override
+        public void handleEvent(final Event event) {
+          boolean menuItemEnabled = false;
+          if (queryTable.getSelectionCount() == 1) {
+            final TableItem item = queryTable.getSelection()[0];
+            /*
+             * If there is data then the query can be run.
+             */
+            if (item.getData() != null) {
+              menuItemEnabled = true;
+            }
+          }
+          showQuerydoc.setEnabled(menuItemEnabled);
+        }
+      });
+    }
     queryTable.setMenu(menu);
   }
 
@@ -368,7 +398,6 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
     tm.addListener(SWT.Selection, f_oneSelectionListener);
     tm.addListener(SWT.Traverse, f_traverseListener);
     tm.addListener(SWT.KeyDown, f_keyDownListener);
-    f_tip.register(tm);
 
     for (AdHocQuery query : queries) {
       if (query.isCompletelySubstitutedBy(variableValues)) {
@@ -376,7 +405,6 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
         if (!emptyResult || f_showEmptyQueries) {
           final TableItem item = new TableItem(tm, SWT.NONE);
           item.setText(query.getDescription());
-          item.setData(ToolTip.TIP_TEXT, query.getShortMessage());
           final boolean decorateAsDefault = selectedResult != null
               && selectedResult.getQueryFullyBound().getQuery().isDefaultSubQuery(query);
           item.setImage(SLImages.getImageForAdHocQuery(query.getType(), decorateAsDefault, emptyResult));

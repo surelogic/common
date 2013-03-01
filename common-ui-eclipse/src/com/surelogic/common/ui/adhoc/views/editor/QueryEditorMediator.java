@@ -63,7 +63,6 @@ import com.surelogic.common.ui.SLImages;
 import com.surelogic.common.ui.adhoc.dialogs.AddSubQueryDialog;
 import com.surelogic.common.ui.adhoc.dialogs.VariableValueDialog;
 import com.surelogic.common.ui.jobs.SLUIJob;
-import com.surelogic.common.ui.tooltip.ToolTip;
 
 public final class QueryEditorMediator extends AdHocManagerAdapter implements ILifecycle {
 
@@ -401,6 +400,8 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
           return;
         }
         final AdHocQuery subQuery = (AdHocQuery) selected[0].getData();
+        if (subQuery != null)
+          f_manager.setQuerydoc(subQuery); // show Querydoc
         if (f_edit.setDefaultSubQuery(subQuery)) {
           f_edit.markAsChanged();
         }
@@ -548,7 +549,6 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
   private void addQueryToList(final AdHocQuery query) {
     final TableItem item = new TableItem(f_queryList, SWT.NONE);
     item.setText(query.getDescription());
-    item.setData(ToolTip.TIP_TEXT, query.getShortMessage());
     item.setImage(getImageForQuery(query));
     item.setData(query);
   }
@@ -580,11 +580,9 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
     }
     final Set<AdHocQuery> newSet = new HashSet<AdHocQuery>(ancestorSet);
     newSet.add(query);
-    // f_queryTree.showItem(item);
     item.setText(query.getDescription());
     item.setImage(getImageForQuery(query));
     item.setData(query);
-    item.setData(ToolTip.TIP_TEXT, query.getShortMessage());
     for (final AdHocQuery subQuery : query.getSubQueryList()) {
       addQueryToTree(subQuery, item, newSet);
     }
@@ -619,6 +617,7 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
   private void setOnScreenEdit(final AdHocQuery query) {
     f_edit = query;
     if (f_edit != null) {
+      f_manager.setQuerydoc(f_edit); // show Querydoc
       f_descriptionText.setText(f_edit.getDescription());
       f_idText.setText(f_edit.getId());
       f_sortHint.setSelection(f_edit.getSortHint());
@@ -640,7 +639,6 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
         item.setImage(0, getImageForQuery(subQuery));
         item.setText(0, subQuery.getDescription());
         item.setText(1, subQuery.getId());
-        item.setData(ToolTip.TIP_TEXT, subQuery.getShortMessage());
         item.setChecked(query.isDefaultSubQuery(subQuery));
       }
       for (final TableColumn c : f_subQueryTable.getColumns()) {

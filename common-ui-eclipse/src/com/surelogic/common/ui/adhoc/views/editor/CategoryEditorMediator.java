@@ -174,6 +174,13 @@ public final class CategoryEditorMediator extends AdHocManagerAdapter implements
     f_queryTable.addListener(SWT.Selection, new Listener() {
       @Override
       public void handleEvent(final Event event) {
+        final TableItem[] selected = f_queryTable.getSelection();
+        if (selected != null && selected.length > 0) {
+          final AdHocQuery query = (AdHocQuery) selected[0].getData();
+          if (query != null)
+            f_manager.setQuerydoc(query); // show Querydoc
+        }
+
         boolean changed = false;
         for (TableItem item : f_queryTable.getItems()) {
           final AdHocQuery query = (AdHocQuery) item.getData();

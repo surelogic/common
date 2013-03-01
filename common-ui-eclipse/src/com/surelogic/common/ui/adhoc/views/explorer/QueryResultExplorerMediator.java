@@ -18,7 +18,6 @@ import com.surelogic.common.adhoc.AdHocQueryResult;
 import com.surelogic.common.ui.SLImages;
 import com.surelogic.common.ui.adhoc.views.QueryResultNavigator;
 import com.surelogic.common.ui.jobs.SLUIJob;
-import com.surelogic.common.ui.tooltip.ToolTip;
 
 public final class QueryResultExplorerMediator extends AdHocManagerAdapter implements ILifecycle {
 
@@ -42,6 +41,8 @@ public final class QueryResultExplorerMediator extends AdHocManagerAdapter imple
       public void handleEvent(final Event event) {
         final AdHocQueryResult selectedResult = getQueryHistoryTreeSelection();
         f_manager.setSelectedResult(selectedResult);
+        if (selectedResult != null)
+          f_manager.setQuerydoc(selectedResult.getQueryFullyBound().getQuery());
       }
     });
 
@@ -109,7 +110,6 @@ public final class QueryResultExplorerMediator extends AdHocManagerAdapter imple
     item.setText(result.toString());
     item.setImage(SLImages.getImage(result.getImageSymbolicName()));
     item.setData(result);
-    item.setData(ToolTip.TIP_TEXT, result.getQueryFullyBound().getQuery().getShortMessage());
     for (final AdHocQueryResult child : result.getChildrenList()) {
       addResultToTree(child, item);
     }

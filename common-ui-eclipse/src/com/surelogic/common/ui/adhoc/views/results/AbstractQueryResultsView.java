@@ -31,7 +31,6 @@ import org.eclipse.swt.widgets.Link;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -69,20 +68,14 @@ import com.surelogic.common.ui.adhoc.IQueryResultCustomDisplay;
 import com.surelogic.common.ui.adhoc.views.QueryResultNavigator;
 import com.surelogic.common.ui.adhoc.views.editor.AbstractQueryEditorView;
 import com.surelogic.common.ui.adhoc.views.editor.SQLSyntaxHighlighterSkipFirstLine;
-import com.surelogic.common.ui.tooltip.ToolTip;
 
 public abstract class AbstractQueryResultsView extends ViewPart {
 
   public abstract AdHocManager getManager();
 
-  public ToolTip constructToolTip(final Shell shell) {
-    return new ToolTip(shell);
-  }
-
   private Composite f_parent = null;
   private QueryResultNavigator f_navigator = null;
   private AdHocQueryResult f_result = null;
-  private ToolTip f_tooltip;
 
   @Override
   public void createPartControl(final Composite parent) {
@@ -136,8 +129,6 @@ public abstract class AbstractQueryResultsView extends ViewPart {
     menu.add(f_navigator.getDisposeAction());
     menu.add(f_navigator.getDisposeAllAction());
 
-    f_tooltip = constructToolTip(parent.getShell());
-
     displayNoResults();
   }
 
@@ -157,6 +148,10 @@ public abstract class AbstractQueryResultsView extends ViewPart {
   @Override
   public void setFocus() {
     if (f_parent != null) {
+      Object data = f_parent.getData();
+      if (data instanceof AdHocQuery) {
+        getManager().setQuerydoc((AdHocQuery) data);
+      }
       f_parent.setFocus();
     }
   }
@@ -170,6 +165,7 @@ public abstract class AbstractQueryResultsView extends ViewPart {
    */
   public void displayResult(final AdHocQueryResult result) {
     if (result != null) {
+      f_parent.setData(result.getQueryFullyBound().getQuery());
       f_result = result;
       if (f_result instanceof AdHocQueryResultEmpty) {
         displayResultEmpty((AdHocQueryResultEmpty) f_result);
@@ -183,6 +179,7 @@ public abstract class AbstractQueryResultsView extends ViewPart {
         throw new IllegalStateException("unknown subtype of AdHocQueryResult " + f_result.getClass().toString());
       }
     } else {
+      f_parent.setData(null);
       f_result = null;
       displayNoResults();
     }
@@ -214,13 +211,11 @@ public abstract class AbstractQueryResultsView extends ViewPart {
     panel.setLayout(layout);
 
     final Link queryDescription = new Link(panel, SWT.NONE);
-    queryDescription.setData(ToolTip.TIP_TEXT, result.getQueryFullyBound().getQuery().getShortMessage());
-    f_tooltip.register(queryDescription);
     /*
      * Add a hyperlink to edit the query if the result was a failure or an
      * update count.
      */
-    if (result.getManager().getDataSource().getEditorViewId() != null
+    if (result.getManager().getDataSource().getQueryEditorViewId() != null
         && (result instanceof AdHocQueryResultSqlException || result instanceof AdHocQueryResultSqlUpdateCount)) {
       queryDescription.setText(result.toLinkString());
     } else {
@@ -725,7 +720,7 @@ public abstract class AbstractQueryResultsView extends ViewPart {
    *          the query to open in the query editor.
    */
   private void editQueryInQueryEditor(final AdHocQuery query) {
-    final String viewId = query.getManager().getDataSource().getEditorViewId();
+    final String viewId = query.getManager().getDataSource().getQueryEditorViewId();
     if (viewId != null) {
       final IViewPart view = EclipseUIUtility.showView(viewId);
       if (view instanceof AbstractQueryEditorView) {

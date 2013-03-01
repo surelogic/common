@@ -4,6 +4,7 @@ import java.io.File;
 import java.net.URL;
 import java.sql.SQLException;
 
+import com.surelogic.NonNull;
 import com.surelogic.Nullable;
 import com.surelogic.ReferenceObject;
 import com.surelogic.common.CommonImages;
@@ -61,17 +62,6 @@ public interface IAdHocDataSource {
    * @return the maximum number of rows displayed per query.
    */
   int getMaxRowsPerQuery();
-
-  /**
-   * This method returns the identifier of the query editor view associated with
-   * this data source. This identifier is used to hyperlink into the view.
-   * Implementation is optional and a return of {@code null} is allowed to
-   * indicate that hyperlinking to the editor view should not be supported.
-   * 
-   * @return the identifier of the query editor view, or {@code null} if
-   *         hyperlinking to this view is not supported.
-   */
-  String getEditorViewId();
 
   /**
    * This method returns the access key that should be held by all jobs that use
@@ -137,4 +127,36 @@ public interface IAdHocDataSource {
    */
   @Nullable
   URL getQuerydocImageURL(String imageName);
+
+  /**
+   * This method returns the identifier of the query editor view associated with
+   * this data source. This view is an implementation of
+   * <tt>AbstractQueryEditorView</tt>.
+   * 
+   * @return the identifier of the query editor view associated with this data
+   *         source.
+   */
+  @NonNull
+  String getQueryEditorViewId();
+
+  /**
+   * This method returns the identifier of the query results view associated
+   * with this data source. This view is an implementation of
+   * <tt>AbstractQueryResultsView</tt>.
+   * 
+   * @return the identifier of the query results view associated with this data
+   *         source.
+   */
+  @NonNull
+  String getQueryResultsViewId();
+
+  /**
+   * Gets the Eclipse identifier for the Querydoc view associated with this data
+   * source. This view is an implementation of <tt>AbstractQuerydocView</tt>.
+   * 
+   * @return the Eclipse identifier for the Querydoc view associated with this
+   *         data source.
+   */
+  @NonNull
+  String getQueryDocViewId();
 }
