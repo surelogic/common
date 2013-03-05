@@ -372,7 +372,6 @@ public abstract class AbstractQueryResultsView extends ViewPart {
       try {
         final IQueryResultCustomDisplay customDisplay = (IQueryResultCustomDisplay) data.getQueryFullyBound().getManager()
             .getDataSource().getCustomDisplay(className);
-        customDisplay.init();
         customDisplay.displayResult(data, panel);
         panel.addDisposeListener(new DisposeListener() {
           @Override

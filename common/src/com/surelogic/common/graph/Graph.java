@@ -1,6 +1,7 @@
 package com.surelogic.common.graph;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import com.surelogic.NonNull;
 import com.surelogic.NotThreadSafe;
@@ -84,6 +85,15 @@ public class Graph {
    */
   final ArrayList<Node> f_nodes = new ArrayList<Node>();
 
+  public Iterable<Node> nodes() {
+    return new Iterable<Node>() {
+      @Override
+      public Iterator<Node> iterator() {
+        return f_nodes.iterator();
+      }
+    };
+  }
+
   @Nullable
   public Node getNode(String label) {
     synchronized (this) {
@@ -95,10 +105,27 @@ public class Graph {
     return null;
   }
 
+  public void transform(double dx, double dy) {
+    synchronized (this) {
+      for (Node n : f_nodes) {
+        n.movePosition(dx, dy);
+      }
+    }
+  }
+
   /**
    * Edges in this graph.
    */
   final ArrayList<Edge> f_edges = new ArrayList<Edge>();
+
+  public Iterable<Edge> edges() {
+    return new Iterable<Edge>() {
+      @Override
+      public Iterator<Edge> iterator() {
+        return f_edges.iterator();
+      }
+    };
+  }
 
   @Nullable
   public Edge getEdge(Node from, Node to) {

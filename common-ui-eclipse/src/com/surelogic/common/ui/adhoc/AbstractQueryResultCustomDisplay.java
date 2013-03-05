@@ -21,11 +21,6 @@ import com.surelogic.common.i18n.I18N;
 public abstract class AbstractQueryResultCustomDisplay implements IQueryResultCustomDisplay {
 
   @Override
-  public void init() {
-    // do nothing, implementations may override
-  }
-
-  @Override
   public void dispose() {
     // do nothing, implementations may override
   }

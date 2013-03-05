@@ -33,7 +33,7 @@ public final class Edge extends Element {
     return f_to;
   }
 
-  private double f_suggestedLength = 50.0;
+  private double f_suggestedLength = 150.0;
 
   public double getSuggestedLength() {
     synchronized (f_graph) {

@@ -320,7 +320,7 @@ public final class SLUtility {
    * @param value
    *          the long value.
    * @return an {@code int} value of the {@code long} value or
-   *         {@link Integer#MAX_VALUE} if the long is too bit to fit into an
+   *         {@link Integer#MAX_VALUE} if the long is too big to fit into an
    *         {@code int}.
    */
   public static int safeLongToInt(final long value) {
@@ -693,7 +693,7 @@ public final class SLUtility {
   }
 
   private static final String hs = "0123456789abcdef";
-  
+
   /**
    * Returns a hex string corresponding to the passed byte.
    * 
@@ -1322,7 +1322,7 @@ public final class SLUtility {
     sw.flush();
     return sw.toString();
   }
-  
+
   private SLUtility() {
     // no instances
   }

@@ -53,19 +53,19 @@ public final class EclipseColorUtility {
     return f_diffHighlightColorObsolete;
   }
 
-  private static Color f_runControlBackgroundColor;
+  private static Color f_slightlyDarkerBackgroundColor;
 
-  public static Color getRunControlBackgroundColor() {
-    if (f_runControlBackgroundColor == null) {
-      f_runControlBackgroundColor = new Color(EclipseUIUtility.getDisplay(), 137, 157, 181);
+  public static Color getSlightlyDarkerBackgroundColor() {
+    if (f_slightlyDarkerBackgroundColor == null) {
+      f_slightlyDarkerBackgroundColor = new Color(EclipseUIUtility.getDisplay(), 137, 157, 181);
       EclipseUIUtility.disposeExec(new Runnable() {
         @Override
         public void run() {
-          f_runControlBackgroundColor.dispose();
+          f_slightlyDarkerBackgroundColor.dispose();
         }
       });
     }
-    return f_runControlBackgroundColor;
+    return f_slightlyDarkerBackgroundColor;
   }
 
   private static Color f_QueryMenuSubtleColor;

@@ -3,7 +3,6 @@ package com.surelogic.common.ui.adhoc;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 
-import com.surelogic.common.ILifecycle;
 import com.surelogic.common.adhoc.AdHocQueryResultSqlData;
 import com.surelogic.common.ui.adhoc.views.results.AbstractQueryResultsView;
 
@@ -14,8 +13,10 @@ import com.surelogic.common.ui.adhoc.views.results.AbstractQueryResultsView;
  * All calls to this interface from the {@link AbstractQueryResultsView} are
  * made from the SWT event dispatch thread.
  * <p>
- * A new instance is created and the {@link ILifecycle} methods are invoked each
- * time the query is run. Objects are not reused across query runs.
+ * A new instance is created and the
+ * {@link #displayResult(AdHocQueryResultSqlData, Composite)} method followed by
+ * the {@link #dispose()} method are invoked each time the query is run. Objects
+ * are not reused across query runs.
  * <p>
  * It is highly recommended that implementations subclass
  * {@link AbstractQueryResultCustomDisplay} rather than implement this interface
@@ -24,7 +25,7 @@ import com.surelogic.common.ui.adhoc.views.results.AbstractQueryResultsView;
  * 
  * @see AbstractQueryResultCustomDisplay
  */
-public interface IQueryResultCustomDisplay extends ILifecycle {
+public interface IQueryResultCustomDisplay {
 
   /**
    * Invoked to draw a custom display for the passed query result.
@@ -38,4 +39,9 @@ public interface IQueryResultCustomDisplay extends ILifecycle {
    *          with a {@link FillLayout} (can be changed).
    */
   void displayResult(AdHocQueryResultSqlData result, Composite panel);
+
+  /**
+   * Actions required after use.
+   */
+  void dispose();
 }
