@@ -183,6 +183,7 @@ public final class CommonImages {
   public static final String IMG_LICENSE = "license.gif";
   public static final String IMG_LIGHTBULB = "lightbulb.gif";
   public static final String IMG_LINK = "link.gif";
+  public static final String IMG_LOCK = "lock.gif";
   public static final String IMG_METHOD_DEFAULT = "method_default.gif";
   public static final String IMG_METHOD_PRIVATE = "method_private.gif";
   public static final String IMG_METHOD_PROTECTED = "method_protected.gif";
