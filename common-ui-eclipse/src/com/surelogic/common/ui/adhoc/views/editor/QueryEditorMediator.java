@@ -656,6 +656,8 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
       f_manager.setQuerydoc(f_edit); // show Querydoc
       f_descriptionText.setText(f_edit.getDescription());
       f_idText.setText(f_edit.getId());
+      final String cdName = f_edit.getCustomDisplayClassName();
+      f_cdText.setText(cdName != null ? cdName : "");
       f_sortHint.setSelection(f_edit.getSortHint());
       f_type.setText(f_edit.getType().toString());
 
