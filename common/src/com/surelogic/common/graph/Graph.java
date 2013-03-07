@@ -85,6 +85,13 @@ public class Graph {
    */
   final ArrayList<Node> f_nodes = new ArrayList<Node>();
 
+  /**
+   * Gets an iterator over the nodes in this graph.
+   * <p>
+   * The caller must hold a <b>lock on this graph</b> when using this iterator.
+   * 
+   * @return an iterator over the nodes in this graph.
+   */
   public Iterable<Node> nodes() {
     return new Iterable<Node>() {
       @Override
@@ -118,6 +125,13 @@ public class Graph {
    */
   final ArrayList<Edge> f_edges = new ArrayList<Edge>();
 
+  /**
+   * Gets an iterator over the edges in this graph.
+   * <p>
+   * The caller must hold a <b>lock on this graph</b> when using this iterator.
+   * 
+   * @return an iterator over the edges in this graph.
+   */
   public Iterable<Edge> edges() {
     return new Iterable<Edge>() {
       @Override

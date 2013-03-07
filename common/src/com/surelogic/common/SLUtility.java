@@ -328,6 +328,20 @@ public final class SLUtility {
     return (int) result;
   }
 
+  /**
+   * Rounds the passed double with {@link Math#round(double)} then invokes
+   * {@link #safeLongToInt(long)}.
+   * 
+   * @param value
+   *          the double value.
+   * @return an {@code int} value of the {@code long} value or
+   *         {@link Integer#MAX_VALUE} if the long is too big to fit into an
+   *         {@code int}.
+   */
+  public static int safeDoubleToInt(final double value) {
+    return safeLongToInt(Math.round(value));
+  }
+
   private final static ThreadLocal<SimpleDateFormat> tl_dir_format = new ThreadLocal<SimpleDateFormat>() {
     @Override
     protected SimpleDateFormat initialValue() {

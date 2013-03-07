@@ -1,6 +1,7 @@
 package com.surelogic.common.graph;
 
 import com.surelogic.NonNull;
+import com.surelogic.Nullable;
 import com.surelogic.ThreadSafe;
 import com.surelogic.common.i18n.I18N;
 
@@ -19,5 +20,21 @@ public abstract class Element {
   @NonNull
   public Graph getGraph() {
     return f_graph;
+  }
+
+  @Nullable
+  Object f_data;
+
+  @Nullable
+  public Object getData() {
+    synchronized (f_graph) {
+      return f_data;
+    }
+  }
+
+  public void setData(@Nullable Object value) {
+    synchronized (f_graph) {
+      f_data = value;
+    }
   }
 }
