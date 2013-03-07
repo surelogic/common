@@ -112,6 +112,16 @@ public class Graph {
     return null;
   }
 
+  public boolean allNodesFixedPosition() {
+    synchronized (this) {
+      for (Node n : f_nodes) {
+        if (!n.isPositionFixed())
+          return false;
+      }
+    }
+    return true;
+  }
+
   public void transform(double dx, double dy) {
     synchronized (this) {
       for (Node n : f_nodes) {
@@ -154,6 +164,9 @@ public class Graph {
 
   public void relax() {
     synchronized (this) {
+      if (allNodesFixedPosition())
+        return;
+
       for (final Edge e : f_edges) {
         double vx = e.getTo().f_x - e.getFrom().f_x;
         double vy = e.getTo().f_y - e.getFrom().f_y;
