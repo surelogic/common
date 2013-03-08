@@ -161,6 +161,7 @@ public final class CommonImages {
   public static final String IMG_JAVA_DECLS_TREE = "java_decls_tree.gif";
   public static final String IMG_JAVA_SORT = "java_sort.gif";
   public static final String IMG_JETTY_LOG = "jetty_log.gif";
+  public static final String IMG_JSECURE_LOGO = "jsecure_logo.png";
   public static final String IMG_JSURE_COMP_UNIT = "jsure_comp_unit.gif";
   public static final String IMG_JSURE_DRUM = "jsure_drum.gif";
   public static final String IMG_JSURE_EXPLORER = "jsure_explorer.gif";
