@@ -488,7 +488,7 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 	/**
 	 * @return The subclass of AbstractRemoteSLJob to be run on the remote JVM
 	 */
-	protected abstract Class<?> getRemoteClass();
+	protected abstract Class<? extends AbstractRemoteSLJob> getRemoteClass();
 	
 	/**
 	 * Setup the classpath for the remote JVM
