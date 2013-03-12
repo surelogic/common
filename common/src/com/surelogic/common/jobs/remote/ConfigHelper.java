@@ -12,18 +12,25 @@ import com.surelogic.common.logging.SLLogger;
  * @author edwin
  */
 public final class ConfigHelper {
+	private final boolean debug;
 	private final ILocalConfig config;
+	private final Collection<File> path;
 	
-	public ConfigHelper(ILocalConfig config) {
-		this.config = config;
+	public ConfigHelper(boolean debug, ILocalConfig config) {
+		this(debug, config, new HashSet<File>());
 	}
 	
-	protected String getPluginDir(final boolean debug, final String pluginId) {
-		return getPluginDir(debug, pluginId, true);
+	public ConfigHelper(boolean debug, ILocalConfig config, Collection<File> path) {
+		this.debug = debug;
+		this.config = config;
+		this.path = path;
 	}
 
-	public String getPluginDir(final boolean debug, final String pluginId,
-			boolean required) {
+	protected String getPluginDir(final String pluginId) {
+		return getPluginDir(pluginId, true);
+	}
+
+	public String getPluginDir(final String pluginId, boolean required) {
 		final String pluginDir = config.getPluginDir(pluginId, required);
 		if (debug) {
 			System.out.println(pluginId + " = " + pluginDir);
@@ -35,39 +42,38 @@ public final class ConfigHelper {
 	/**
 	 * Adds libraries required to use the given Eclipse plugin
 	 */
-	public void addPluginToPath(final boolean debug, Collection<File> path, final String pluginId) {
-		addPluginToPath(debug, path, pluginId, false);
+	public void addPluginToPath(final String pluginId) {
+		addPluginToPath(pluginId, false);
 	}
 
-	public void addPluginToPath(final boolean debug, Collection<File> path, final String pluginId, boolean unpacked) {
-		final String pluginDir = getPluginDir(debug, pluginId);
+	public void addPluginToPath(final String pluginId, boolean unpacked) {
+		final String pluginDir = getPluginDir(pluginId);
 		if (unpacked) {
 			File loc = new File(pluginDir);
 			if (loc.isDirectory()) {
-				boolean workspaceExists = addToPath(path, pluginDir + "/bin", false); // in workspace
+				boolean workspaceExists = addToPath(pluginDir + "/bin", false); // in workspace
 				if (!workspaceExists) {
-					boolean jarExists = addToPath(path, pluginDir+"/"+loc.getName()+".jar", false); // in Ant	
+					boolean jarExists = addToPath(pluginDir+"/"+loc.getName()+".jar", false); // in Ant	
 					if (!jarExists) {
-						addToPath(path, pluginDir); // as plugin
+						addToPath(pluginDir); // as plugin
 					}
 				}
 			} else {
-				addToPath(path, pluginDir); // as plugin
+				addToPath(pluginDir); // as plugin
 			}
 
 		} else if (pluginDir.endsWith(".jar")) {
-			addToPath(path, pluginDir); // as plugin
+			addToPath(pluginDir); // as plugin
 		} else {
-			addToPath(path, pluginDir + "/bin"); // in workspace
+			addToPath(pluginDir + "/bin"); // in workspace
 		}
 	}
 
 	/**
 	 * @return true if found
 	 */
-	public boolean addPluginJarsToPath(final boolean debug, Collection<File> path, 
-			                              final String pluginId, String... jars) {
-		return addPluginJarsToPath(debug, path, pluginId, false, jars);
+	public boolean addPluginJarsToPath(final String pluginId, String... jars) {
+		return addPluginJarsToPath(pluginId, false, jars);
 	}
 
 	/**
@@ -75,13 +81,12 @@ public final class ConfigHelper {
 	 *            If true, try each of the jars in sequence until one exists
 	 * @return true if found
 	 */
-	public boolean addPluginJarsToPath(final boolean debug, 
-			Collection<File> path, final String pluginId, boolean exclusive,
+	public boolean addPluginJarsToPath(final String pluginId, boolean exclusive,
 			String... jars) {
 		boolean rv = true;
-		final String pluginDir = getPluginDir(debug, pluginId);
+		final String pluginDir = getPluginDir(pluginId);
 		for (String jar : jars) {
-			boolean exists = addToPath(path, pluginDir + '/' + jar,
+			boolean exists = addToPath(pluginDir + '/' + jar,
 					!exclusive);
 			if (exclusive && exists) {
 				return true;
@@ -91,21 +96,20 @@ public final class ConfigHelper {
 		return rv;
 	}
 
-	public void addAllPluginJarsToPath(final boolean debug,
-			Collection<File> path, final String pluginId, String libPath) {
-		final String pluginDir = getPluginDir(debug, pluginId);
-		findJars(path, pluginDir + '/' + libPath);
+	public void addAllPluginJarsToPath(final String pluginId, String libPath) {
+		final String pluginDir = getPluginDir(pluginId);
+		findJars(pluginDir + '/' + libPath);
 	}
 
-	public boolean addToPath(Collection<File> path, String name) {
-		return addToPath(path, new File(name), true);
+	public boolean addToPath(String name) {
+		return addToPath(new File(name), true);
 	}
 
-	protected boolean addToPath(Collection<File> path, String name, boolean required) {
-		return addToPath(path, new File(name), required);
+	protected boolean addToPath(String name, boolean required) {
+		return addToPath(new File(name), required);
 	}
 
-	public boolean addToPath(Collection<File> path, File f, boolean required) {
+	public boolean addToPath(File f, boolean required) {
 		final boolean exists = f.exists();
 		if (!exists) {
 			if (required) {
@@ -122,11 +126,11 @@ public final class ConfigHelper {
 		return exists;
 	}
 
-	protected void findJars(Collection<File> path, String folder) {
-		findJars(path, new File(folder));
+	protected void findJars(String folder) {
+		findJars(new File(folder));
 	}
 
-	protected void findJars(Collection<File> path, File folder) {
+	protected void findJars(File folder) {
 		if (!folder.exists()) {
 			SLLogger.getLogger().warning("Unable to find jars in non-existent folder: "+folder);
 		}
@@ -136,5 +140,22 @@ public final class ConfigHelper {
 				path.add(f);
 			}
 		}
+	}
+	
+	/**
+	 * Add the plugin and all the jars on the associated path
+	 */
+	public void addPluginAndJarsToPath(String pluginId, String jarPath) {
+		// All unpacked
+		addPluginToPath(pluginId, true);
+		addAllPluginJarsToPath(pluginId, jarPath);
+	}
+
+	public Collection<File> getPath() {
+		return path;
+	}
+
+	public void clear() {
+		path.clear();
 	}
 }
