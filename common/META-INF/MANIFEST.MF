@@ -245,7 +245,7 @@ Export-Package: com.surelogic,
  org.objectweb.asm.commons,
  org.objectweb.asm.signature
 Bundle-ClassPath: .,
- lib/runtime/commons-lang3-3.0.jar,
+ lib/runtime/commons-lang3-3.1.jar,
  lib/runtime/collections-generic-4.0.jar,
  lib/runtime/derby.jar,
  lib/runtime/antlr-runtime-3.1-sl.jar,
