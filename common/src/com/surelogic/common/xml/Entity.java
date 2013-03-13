@@ -126,37 +126,11 @@ public class Entity {
   public final String getAttributeByAliasIfPossible(String value) {
     return DeclUtil.aliasIfPossible(attributes.get(value));
   }
-
-  /*
-  private final String DIFF_STATUS = "DiffStatus";
-  private final String OLD = "Old";
-  private final String NEWER = "New";
-
-  public final void setAsOld() {
-    attributes.put(DIFF_STATUS, OLD);
-  }
-
-  public final void setAsNewer() {
-    attributes.put(DIFF_STATUS, NEWER);
-  }
-
-  public final boolean isOld() {
-    return attributes.get(DIFF_STATUS) == OLD;
-  }
-
-  public final boolean isNewer() {
-    return attributes.get(DIFF_STATUS) == NEWER;
-  }
-
-  public final String getDiffStatus() {
-    String rv = attributes.get(DIFF_STATUS);
-    if (rv == null) {
-      return "";
-    }
-    return rv;
-  }
-  */
-  
+	
+  public IJavaRef parsePersistedRef(String encode) {
+	  return JavaRef.parseEncodedForPersistence(encode);
+  }	  
+	
   public boolean hasRefs() {
     return !refs.isEmpty();
   }
