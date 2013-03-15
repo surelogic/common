@@ -16,15 +16,19 @@ public interface IClassPathEntry {
      */
 	boolean isExported();
 	
-	void init(IJavaProject jp, IJavacClassParser loader) throws IOException; 
+	/**
+	 * Initializes the classpath of the loader
+	 * @param loader The parser associated with the given project
+	 */
+	void init(IJavaProject context, IJavacClassParser loader) throws IOException; 
 	
 	/**
-	 * 
+	 * only used by JavacDriver.CopyJob
 	 */
 	void zipSources(File zipDir) throws IOException;
 	
 	/**
-	 * 
+	 * only used by JavacDriver.AnalysisJob
 	 */
 	void copySources(File zipDir, File targetDir) throws IOException;
 	
@@ -34,7 +38,7 @@ public interface IClassPathEntry {
 	JavaSourceFile mapPath(URI path);
 
 	/**
-	 * 
+	 * only used by JavacDriver.CopyJob
 	 */
 	void relocateJars(File targetDir) throws IOException;
 	
