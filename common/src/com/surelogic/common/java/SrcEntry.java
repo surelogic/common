@@ -1,6 +1,5 @@
 package com.surelogic.common.java;
 
-import java.io.File;
 import java.io.IOException;
 
 import com.surelogic.common.xml.XmlCreator;
