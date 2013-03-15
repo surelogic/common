@@ -47,6 +47,7 @@ public final class SLUtility {
   public static final String UNKNOWN_PROJECT = "(unknown project)";
   public static final String LIBRARY_PROJECT = "(standard library)";
   public static final String PACKAGE_INFO = "package-info";
+  public static final String PACKAGE_INFO_JAVA = SLUtility.PACKAGE_INFO + ".java";
   public static final String UTF8 = "UTF8";
   public static final String ENCODING = "UTF-8";
   public static final String AMPERSAND = "&amp;";
