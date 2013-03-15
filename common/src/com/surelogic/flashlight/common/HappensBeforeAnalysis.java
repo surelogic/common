@@ -105,7 +105,7 @@ public class HappensBeforeAnalysis {
             if (!sourceSet.next()) {
                 return false;
             }
-            targetSt.setLong(1, writeThread);
+            targetSt.setLong(1, readThread);
             targetSt.setTimestamp(2, write);
             targetSt.setTimestamp(3, read);
             final ResultSet targetSet = targetSt.executeQuery();
@@ -338,7 +338,7 @@ public class HappensBeforeAnalysis {
             if (!sourceSet.next()) {
                 return;
             }
-            targetSt.setLong(1, writeThread);
+            targetSt.setLong(1, readThread);
             targetSt.setTimestamp(2, write);
             targetSt.setTimestamp(3, read);
             final ResultSet targetSet = targetSt.executeQuery();
