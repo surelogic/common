@@ -20,6 +20,7 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -538,6 +539,27 @@ public final class SLUtility {
   public static int getCurrentMaxMemorySizeInMb() {
     final Runtime rt = Runtime.getRuntime();
     return SLUtility.safeLongToInt(SLUtility.byteToMByte(rt.maxMemory()));
+  }
+
+  /**
+   * Creates a comma separated list of strings from the passed collection by
+   * invoking {@link #toString()} on each element.
+   * 
+   * @param values
+   *          the values to form the list.
+   * @return a comma separated list.
+   */
+  public static <T> String toStringCommaSeparatedList(Collection<T> values) {
+    final StringBuilder b = new StringBuilder();
+    boolean first = true;
+    for (T value : values) {
+      if (first)
+        first = false;
+      else
+        b.append(", ");
+      b.append(value == null ? "null" : value.toString());
+    }
+    return b.toString();
   }
 
   /**
