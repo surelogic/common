@@ -24,4 +24,7 @@ public class JavaProjectSet {
 		return null;
 	}
 
+	public String getRun() {
+		return null;
+	}
 }
