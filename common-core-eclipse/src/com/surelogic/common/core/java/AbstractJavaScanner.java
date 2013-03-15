@@ -1,7 +1,6 @@
 package com.surelogic.common.core.java;
 
 import java.io.*;
-import java.util.Map;
 
 import com.surelogic.common.XUtil;
 import com.surelogic.common.core.EclipseUtility;
@@ -21,11 +20,11 @@ public abstract class AbstractJavaScanner<P extends JavaProjectSet> {
 	protected abstract void markAsRunning(File runDir);	
 	protected abstract AbstractAnalysisJob<P> makeAnalysisJob(P projects, File target, File zips, boolean useSeparateJVM);
 
-	protected void scheduleScanForExecution(P projects, Map<String, Object> args, SLJob copy) throws Exception {
+	protected void scheduleScanForExecution(P projects, SLJob copy) throws Exception {
 		EclipseUtility.toEntireWorkspaceJob(copy).schedule();
 	}
 	
-	protected final void startScan(P newProjects, Map<String, Object> args, SLProgressMonitor monitor, boolean useSeparateJVM) {
+	protected final void startScan(P newProjects, SLProgressMonitor monitor, boolean useSeparateJVM) {
 		try {
 			final File dataDir = prepForScan(newProjects, monitor, useSeparateJVM);
 			final File runDir = new File(dataDir, newProjects.getRun());
@@ -36,7 +35,7 @@ public abstract class AbstractJavaScanner<P extends JavaProjectSet> {
 
 			AbstractAnalysisJob<?> analysis = makeAnalysisJob(newProjects, target, zips, useSeparateJVM);
 			SLJob copy = new CopyProjectsJob(newProjects, target, zips, analysis);
-			scheduleScanForExecution(newProjects, args, copy);      
+			scheduleScanForExecution(newProjects, copy);      
 		} catch (Exception e) {
 			System.err.println("Unable to make config for JSure");
 			e.printStackTrace();

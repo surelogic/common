@@ -8,10 +8,10 @@ import com.surelogic.common.core.EclipseUtility;
 import com.surelogic.common.java.*;
 import com.surelogic.common.jobs.*;
 
-public class CopyProjectsJob extends AbstractScanDirJob<JavaProjectSet> {
+public class CopyProjectsJob extends AbstractScanDirJob<JavaProjectSet<?>> {
 	private final SLJob afterJob;
 
-	public CopyProjectsJob(JavaProjectSet projects, File target, File zips, SLJob after) {
+	public CopyProjectsJob(JavaProjectSet<?> projects, File target, File zips, SLJob after) {
 		super("Copying project info for " + projects.getLabel(), projects, target, zips);
 		afterJob = after;
 	}
