@@ -7,7 +7,7 @@ import java.io.File;
  * 
  * @author edwin
  */
-public class JavaProjectSet {
+public abstract class JavaProjectSet<P> implements Iterable<P> {
 
 	public String getLabel() {
 		// TODO Auto-generated method stub
@@ -25,6 +25,31 @@ public class JavaProjectSet {
 	}
 
 	public String getRun() {
+		return null;
+	}
+
+	public void mapToProject(File f, String name) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public P add(Config config) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public P get(String projectName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void resetOrdering() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public String checkMapping(File f) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 }

@@ -22,6 +22,12 @@ import com.surelogic.common.xml.XmlCreator;
  * @author edwin
  */
 public class Config extends AbstractClassPathEntry {
+	public static final String JRE_LIBRARY = "JRE System Library";
+	// Same as JavaRuntime.JRE_CONTAINER
+	public static final String JRE_NAME = "org.eclipse.jdt.launching.JRE_CONTAINER";
+	public static final String ANDROID_FWK_NAME = "com.android.ide.eclipse.adt.ANDROID_FRAMEWORK";
+	public static final String ANDROID_LIB_NAME = "com.android.ide.eclipse.adt.LIBRARIES";
+	
 	protected static final boolean followRefs = false;
 	public static final String SOURCE_LEVEL = "sourceLevel";
 	public static final String AS_SOURCE = "asSource";
@@ -238,7 +244,7 @@ public class Config extends AbstractClassPathEntry {
     }
 
 	@Override
-  public void init(IJavaProject jp, IJavacClassParser loader) throws IOException {
+  public void init(ISLJavaProject jp, IJavacClassParser loader) throws IOException {
 		if (loader.ensureInitialized(jp, this)) {
 			return;
 		}

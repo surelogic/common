@@ -20,7 +20,7 @@ public interface IClassPathEntry {
 	 * Initializes the classpath of the loader
 	 * @param loader The parser associated with the given project
 	 */
-	void init(IJavaProject context, IJavacClassParser loader) throws IOException; 
+	void init(ISLJavaProject context, IJavacClassParser loader) throws IOException; 
 	
 	/**
 	 * only used by JavacDriver.CopyJob
