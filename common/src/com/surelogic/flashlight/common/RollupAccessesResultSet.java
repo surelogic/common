@@ -105,9 +105,13 @@ public class RollupAccessesResultSet implements InvocationHandler {
         Timestamp lastAccess;
 
         // This is the last write visible across ALL accesses of this field, not
-        // just this thread.
-        Timestamp lastWrite;
-        long lastWriteThread;
+        // just this thread. If the first access of this block is itself a write
+        // then we set it to that.
+        final Timestamp lastWrite;
+        final long lastWriteThread;
+
+        Timestamp nextWrite;
+        long nextWriteThread;
 
         AccessBlock(Access first, boolean isStatic, boolean isFinal,
                 HappensBeforeState happensBefore, Timestamp lastWrite,
@@ -121,15 +125,15 @@ public class RollupAccessesResultSet implements InvocationHandler {
                 if (first.underConstruction) {
                     readsUC++;
                 }
-                this.lastWrite = lastWrite;
-                this.lastWriteThread = lastWriteThread;
+                this.lastWrite = nextWrite = lastWrite;
+                this.lastWriteThread = nextWriteThread = lastWriteThread;
             } else {
                 writes++;
                 if (first.underConstruction) {
                     writesUC++;
                 }
-                this.lastWrite = first.ts;
-                this.lastWriteThread = first.threadId;
+                this.lastWrite = nextWrite = first.ts;
+                this.lastWriteThread = nextWriteThread = first.threadId;
             }
             this.isStatic = isStatic;
             this.isFinal = isFinal;
@@ -151,23 +155,19 @@ public class RollupAccessesResultSet implements InvocationHandler {
                             readsUC++;
                         }
                     } else {
-                        lastWrite = a.ts;
-                        lastWriteThread = a.threadId;
+                        nextWrite = a.ts;
+                        nextWriteThread = a.threadId;
                         writes++;
                         if (a.underConstruction) {
                             writesUC++;
                         }
                     }
                 } else {
-                    boolean hasHappensBefore = hb.hasHappensBefore(lastWrite,
-                            lastWriteThread, a.ts, a.threadId);
-                    if (!hasHappensBefore) {
-                        hasHappensBefore = hb.hasHappensBefore(lastWrite,
-                                lastWriteThread, a.ts, a.threadId);
-                    }
+                    boolean hasHappensBefore = hb.hasHappensBefore(nextWrite,
+                            nextWriteThread, a.ts, a.threadId);
                     return new AccessBlock(a, isStatic, isFinal, isFinal
                             || hasHappensBefore ? HappensBeforeState.YES
-                            : HappensBeforeState.NO, lastWrite, lastWriteThread);
+                            : HappensBeforeState.NO, nextWrite, nextWriteThread);
                 }
             }
             return null;
