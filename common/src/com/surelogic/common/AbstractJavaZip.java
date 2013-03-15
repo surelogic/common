@@ -17,6 +17,11 @@ public abstract class AbstractJavaZip<T> {
 	public static final String FILE_HASHES = "sourceHashes.txt";
 	public static final String FILE_STAMPS = "sourceTimestamps.txt";
 
+	public static File makeZipReference(String zipPath, String relativePath) {
+  		String path = "jar:///"+zipPath+'!'+relativePath;
+		return new File(path.replace('\\', '/'));
+	}
+	
 	public void generateSourceZipContents(final ZipOutputStream out)
 			throws IOException {
 		generateSourceZipContents(out, getRoot());
