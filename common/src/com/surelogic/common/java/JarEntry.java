@@ -73,7 +73,7 @@ public class JarEntry extends AbstractClassPathEntry {
 	}
 	
 	@Override
-  public void init(IJavaProject jp, IJavacClassParser loader) throws IOException {
+  public void init(ISLJavaProject jp, IJavacClassParser loader) throws IOException {
 		if (!isExported() && jp.getConfig() != project) {
 			// Not supposed to be exported
 			return;
@@ -89,7 +89,7 @@ public class JarEntry extends AbstractClassPathEntry {
     	jp.mapJar(path, origPath);
 	}
 	
-	private void initForJarDir(IJavaProject jp, IJavacClassParser loader, File dir, String pkgPrefix) 
+	private void initForJarDir(ISLJavaProject jp, IJavacClassParser loader, File dir, String pkgPrefix) 
 	throws IOException {
 		System.out.println("Scanning "+dir.getAbsolutePath());
 		int i=0;
@@ -117,7 +117,7 @@ public class JarEntry extends AbstractClassPathEntry {
 		}
 	}
 	
-	private void initForJar(IJavaProject jp, IJavacClassParser loader, File jar) 
+	private void initForJar(ISLJavaProject jp, IJavacClassParser loader, File jar) 
 	throws IOException {
 		try {
     	ZipFile zf = new ZipFile(jar);    	

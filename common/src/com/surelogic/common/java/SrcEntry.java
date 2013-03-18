@@ -25,7 +25,7 @@ public class SrcEntry extends AbstractClassPathEntry {
 	}
 	
 	@Override
-  public void init(IJavaProject jp, IJavacClassParser loader)
+  public void init(ISLJavaProject jp, IJavacClassParser loader)
 			throws IOException {
 		// Nothing to do?
 	}

@@ -7,7 +7,7 @@ import com.surelogic.common.java.*;
 import com.surelogic.common.jobs.*;
 import com.surelogic.common.jobs.remote.AbstractLocalSLJob;
 
-public abstract class AbstractAnalysisJob<P extends JavaProjectSet> extends AbstractScanDirJob<P> {
+public abstract class AbstractAnalysisJob<P extends JavaProjectSet<?>> extends AbstractScanDirJob<P> {
 	protected final boolean useSeparateJVM;
 
 	protected AbstractAnalysisJob(P projects, File target, File zips, boolean useSeparateJVM) {
