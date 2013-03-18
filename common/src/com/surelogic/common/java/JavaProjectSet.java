@@ -3,10 +3,11 @@ package com.surelogic.common.java;
 import java.io.*;
 import java.util.*;
 
+import com.surelogic.common.*;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.jobs.*;
 import com.surelogic.common.tool.SureLogicToolsPropertiesUtility;
-import com.surelogic.common.util.FilterIterator;
+import com.surelogic.common.util.*;
 
 /**
  * A set for projects specified for a run/scan
@@ -14,6 +15,7 @@ import com.surelogic.common.util.FilterIterator;
  * @author edwin
  */
 public abstract class JavaProjectSet<P extends ISLJavaProject> implements Iterable<P> {
+	private final IJavaFactory<P> factory;
 	protected SLProgressMonitor monitor;
 	// private final Map<String,Object> options = new HashMap<String, Object>();
 	protected final Map<String, P> projects = new HashMap<String, P>();
@@ -34,7 +36,8 @@ public abstract class JavaProjectSet<P extends ISLJavaProject> implements Iterab
 	protected final boolean isAuto;
 	protected final Map<String, Object> args;
 	
-	public JavaProjectSet(File loc, boolean isAuto, Date d, Map<String, Object> args) {
+	public JavaProjectSet(IJavaFactory<P> f, File loc, boolean isAuto, Date d, Map<String, Object> args) {
+		factory = f;
 		location = loc;
 		this.isAuto = isAuto;
 		this.args = args;
@@ -45,7 +48,8 @@ public abstract class JavaProjectSet<P extends ISLJavaProject> implements Iterab
 	/**
 	 * Only used by Util and jsure-ant
 	 */
-	public JavaProjectSet(Config cfg, SLProgressMonitor monitor) {
+	public JavaProjectSet(IJavaFactory<P> f, Config cfg, SLProgressMonitor monitor) {
+		factory = f;
 		f_scanDirName = UNINIT;
 		this.monitor = monitor;
 		add(cfg);
@@ -336,8 +340,76 @@ public abstract class JavaProjectSet<P extends ISLJavaProject> implements Iterab
 		return projects.keySet().equals(other.projects.keySet());
 	}
 	
-	public P add(Config config) {
-		// TODO Auto-generated method stub
-		return null;
+	public P add(Config cfg) {
+		if (f_scanDirName != UNINIT) {
+			throw new IllegalStateException("Adding config after run already set: " + f_scanDirName);
+		}
+		resetOrdering();
+		P p = factory.newProject(this, cfg, cfg.getProject(), monitor);
+		projects.put(cfg.getProject(), p);
+		return p;
 	}
+	
+	/**
+	 * Create a new Projects, removing the specified projects
+	 */
+	public JavaProjectSet<P> remove(Collection<String> removed) {
+		if (removed == null) {
+			return null;
+		}
+		if (!XUtil.testing) {
+			final Iterator<String> it = removed.iterator();
+			while (it.hasNext()) {
+				String name = it.next();
+				if (get(name) == null) {
+					// eliminate projects that don't exist
+					System.err.println("No such project: " + name);
+					it.remove();
+				}
+			}
+		}
+		if (removed.isEmpty()) {
+			return this;
+		}
+		JavaProjectSet<P> p = factory.newProjectSet(location, isAuto, new Date(), args);
+		for (P old : projects.values()) {
+			if (!removed.contains(old.getName())) {
+				p.projects.put(old.getName(), old);
+			}
+		}
+		if (p.projects.isEmpty()) {
+			return null;
+		}
+		return p;
+	}
+	
+	public void computeScan(File dataDir, JavaProjectSet<P> oldProjects) throws Exception {
+		if (f_scanDirName != UNINIT) {
+			throw new IllegalStateException("Run already set: " + f_scanDirName);
+		}
+		if (oldProjects != null) {
+			setPreviousPartialScan(oldProjects.f_scanDirName);
+		}
+
+		final String scanDirName = SLUtility.getScanDirectoryName(getFirstProjectNameAlphaOrNull(), multiProject(), getDate());
+		f_scanDirName = scanDirName;
+		f_scanDir = new File(dataDir, scanDirName);
+		f_scanDir.mkdirs();
+
+		final String resultsName = oldProjects != null ? PersistenceConstants.PARTIAL_RESULTS_ZIP : PersistenceConstants.RESULTS_ZIP;
+		f_resultsFile = new File(f_scanDir, resultsName);
+
+		// System.out.println("Contents of projects: "+run);
+		final File xml = new File(f_scanDir, PersistenceConstants.PROJECTS_XML);
+		final PrintStream pw = new PrintStream(xml);
+		try {
+			JavaProjectsXMLCreator creator = new JavaProjectsXMLCreator(pw);
+			// TODO the problem is that I won't know what the last run was until
+			// later ...
+
+			creator.write(this);
+		} finally {
+			pw.close();
+		}
+	}	
 }
