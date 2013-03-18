@@ -12,7 +12,7 @@ import com.surelogic.common.jobs.*;
  * 
  * @author edwin
  */
-public abstract class AbstractJavaScanner<P extends JavaProjectSet> {
+public abstract class AbstractJavaScanner<P extends JavaProjectSet<?>> {
 	/**
 	 * @return the root data directory
 	 */
