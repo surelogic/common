@@ -5,7 +5,7 @@ import java.io.File;
 import com.surelogic.common.java.JavaProjectSet;
 import com.surelogic.common.jobs.AbstractSLJob;
 
-public abstract class AbstractScanDirJob<P extends JavaProjectSet> extends AbstractSLJob {
+public abstract class AbstractScanDirJob<P extends JavaProjectSet<?>> extends AbstractSLJob {
 	protected final P projects;
 	
     /**
