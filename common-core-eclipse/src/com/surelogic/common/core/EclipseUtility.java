@@ -513,6 +513,18 @@ public class EclipseUtility {
   }
 
   /**
+   * Gets the {@link File} for the JSecure data directory.
+   * 
+   * @return the JSecure data directory.
+   * @throws Exception
+   *           if something goes wrong.
+   */
+  @NonNull
+  public static File getJSecureDataDirectory() {
+    return EclipseUtility.getWorkspaceRelativeAsFile(FileUtility.JSECURE_DATA_PATH_FRAGMENT);
+  }
+  
+  /**
    * Gets the {@link File} for the Sierra data directory.
    * 
    * @return the Sierra data directory.
