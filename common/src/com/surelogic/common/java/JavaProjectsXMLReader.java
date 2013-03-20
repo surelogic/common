@@ -20,6 +20,11 @@ implements IXmlResultListener, PersistenceConstants {
     factory = f;
   }
 
+  public JavaProjectSet<P> readProjectsXML(File runDir) throws Exception {
+	  read(new File(runDir, PersistenceConstants.PROJECTS_XML));
+	  return projects;
+  }
+  
   @Override
   protected final String checkForRoot(String name, Attributes attributes) {
     if (PersistenceConstants.PROJECTS.equals(name)) {
@@ -156,9 +161,5 @@ implements IXmlResultListener, PersistenceConstants {
   @Override
   public final void done() {
     // Nothing to do here?
-  }
-
-  public JavaProjectSet<P> getProjects() {
-    return projects;
   }
 }
