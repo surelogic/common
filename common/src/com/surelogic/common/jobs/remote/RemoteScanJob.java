@@ -2,6 +2,7 @@ package com.surelogic.common.jobs.remote;
 
 import java.io.*;
 
+import com.surelogic.common.java.*;
 import com.surelogic.common.jobs.*;
 
 /**
@@ -9,9 +10,15 @@ import com.surelogic.common.jobs.*;
  * 
  * @author edwin
  */
-public class RemoteScanJob extends AbstractRemoteSLJob {
+public class RemoteScanJob<PS extends JavaProjectSet<P>, P extends ISLJavaProject> extends AbstractRemoteSLJob {
 	public static final String RUN_DIR_PROP = "sl.run.dir";
 	public static final String TEMP_PREFIX = "running_or_crashed_";
+
+	private final IJavaFactory<P> javaFactory;
+	
+	protected RemoteScanJob(IJavaFactory<P> f) {
+		javaFactory = f;
+	}
 
 	@Override
 	protected final SLJob init(BufferedReader br, Monitor mon) throws Throwable {
@@ -28,7 +35,12 @@ public class RemoteScanJob extends AbstractRemoteSLJob {
 		final File runDir = new File(runPath);	
 		// TODO check if runDir exists?	
 		try {
-			return finishInit(runDir);
+			out.println("Creating run: "+runDir.getName());
+			final JavaProjectsXMLReader<P> reader = new JavaProjectsXMLReader<P>(javaFactory);			
+			@SuppressWarnings("unchecked")
+			final PS projects = (PS) reader.readProjectsXML(runDir);
+			out.println("projects = "+projects.getLabel());
+			return finishInit(runDir, projects);
 		} catch(Throwable t) {
 			mon.failed("Unable to create SureLogic job", t);		
 			return null;
@@ -40,7 +52,7 @@ public class RemoteScanJob extends AbstractRemoteSLJob {
 		// Nothing to do yet
 	}
 	
-	protected SLJob finishInit(File runDir) throws Throwable {
+	protected SLJob finishInit(File runDir, PS projects) throws Throwable {
 		out.println("Doing nothing");
 		return new AbstractSLJob("Does nothing") {					
 			public SLStatus run(SLProgressMonitor monitor) {
