@@ -367,7 +367,9 @@ public abstract class ProjectInfo<P extends ISLJavaProject> {
 		return null;
 	}
 
-	protected abstract void setDefaultJRE(String name);
+	protected void setDefaultJRE(String name) {
+		// Nothing to do
+	}
 	
 	private P findJRE(JavaProjectSet<P> projects, final IClasspathContainer cc) {
 		final String name = cc.getPath().toPortableString();
