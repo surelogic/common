@@ -14,7 +14,7 @@ import com.surelogic.common.util.*;
  * 
  * @author edwin
  */
-public abstract class JavaProjectSet<P extends ISLJavaProject> implements Iterable<P> {
+public class JavaProjectSet<P extends ISLJavaProject> implements Iterable<P> {
 	private final IJavaFactory<P> factory;
 	protected SLProgressMonitor monitor;
 	// private final Map<String,Object> options = new HashMap<String, Object>();
