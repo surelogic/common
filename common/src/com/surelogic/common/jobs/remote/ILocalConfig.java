@@ -10,4 +10,10 @@ public interface ILocalConfig {
 	 * @return A path to where you want the console output to go
 	 */
 	String getLogPath();
+	
+	/**
+	 * 
+	 * @return A path to a directory to store output in
+	 */
+	String getRunDirectory();
 }
