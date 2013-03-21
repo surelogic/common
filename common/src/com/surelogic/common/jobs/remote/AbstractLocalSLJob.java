@@ -22,7 +22,9 @@ import com.surelogic.common.logging.SLLogger;
  */
 @Region("LocalState")
 @RegionLock("LocalLock is this protects LocalState")
-public abstract class AbstractLocalSLJob extends AbstractSLJob {
+public abstract class AbstractLocalSLJob<C extends ILocalConfig> extends AbstractSLJob {
+	public static final String COMMON_PLUGIN_ID = "com.surelogic.common";
+	
     protected static final Logger LOG = SLLogger.getLogger();
 	private static final int FIRST_LINES = 3;
 	
@@ -37,13 +39,15 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 	private Process remoteVM;
 	@InRegion("LocalState")
 	private Thread handlerThread; // Only if using a port
+	protected final C config;
 	
-	protected AbstractLocalSLJob(String name, int work, ILocalConfig config) {
+	protected AbstractLocalSLJob(String name, int work, C config) {
 		this(name, work, config, null);
 	}
 		
-	protected AbstractLocalSLJob(String name, int work, ILocalConfig config, Console console) {
+	protected AbstractLocalSLJob(String name, int work, C config, Console console) {
 		super(name);
+		this.config = config;
 		this.work  = work;
 		if (work <= 0) {
 			throw new IllegalArgumentException("work <= 0");
@@ -464,7 +468,8 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 		
 		final Project proj = new Project();
 		final Path path = cmdj.createClasspath(proj);
-		setupClassPath(verbose, cmdj, proj, path);
+		final ConfigHelper helper = new ConfigHelper(verbose, config);
+		setupClassPath(helper, cmdj, proj, path);
 		// TODO convert into error if things are really missing
 		for (String p : path.list()) {
 			if (!new File(p).exists()) {
@@ -494,12 +499,14 @@ public abstract class AbstractLocalSLJob extends AbstractSLJob {
 	 * Setup the classpath for the remote JVM
 	 * @param cmdj 
 	 */
-	protected abstract void setupClassPath(boolean debug, CommandlineJava cmdj, Project proj, Path path);
+	protected abstract void setupClassPath(ConfigHelper util, CommandlineJava cmdj, Project proj, Path path);
 	
 	/**
 	 * Finish setting JVM arguments
 	 */
-	protected abstract void finishSetupJVM(boolean debug, CommandlineJava cmdj, Project proj);
+	protected void finishSetupJVM(boolean debug, CommandlineJava cmdj, Project proj) {
+		// Nothing to do right now
+	}
 	
 	private void cancel(Process p, final PrintWriter pout) {
 		pout.println("##" + Local.CANCEL);
