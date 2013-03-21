@@ -24,7 +24,7 @@ public abstract class AbstractAnalysisJob<P extends JavaProjectSet<?>> extends A
 	 * Run in the same VM
 	 */
 	protected abstract boolean analyzeInVM() throws Exception;
-	protected abstract AbstractLocalSLJob makeLocalJob() throws Exception;
+	protected abstract AbstractLocalSLJob<?> makeLocalJob() throws Exception;
 	
 	protected abstract void handleSuccess();
 	protected abstract void handleFailure();
@@ -59,7 +59,7 @@ public abstract class AbstractAnalysisJob<P extends JavaProjectSet<?>> extends A
 			init(monitor);
 
 			if (useSeparateJVM) {
-				AbstractLocalSLJob job = makeLocalJob();
+				AbstractLocalSLJob<?> job = makeLocalJob();
 				SLStatus status = job.run(monitor);
 				if (status == SLStatus.OK_STATUS) {
 					ok = true;
