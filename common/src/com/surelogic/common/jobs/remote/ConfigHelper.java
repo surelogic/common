@@ -12,7 +12,7 @@ import com.surelogic.common.logging.SLLogger;
  * @author edwin
  */
 public final class ConfigHelper {
-	private final boolean debug;
+	public final boolean debug;
 	private final ILocalConfig config;
 	private final Collection<File> path;
 	
