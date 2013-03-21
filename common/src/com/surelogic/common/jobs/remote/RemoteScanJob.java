@@ -60,4 +60,10 @@ public class RemoteScanJob<PS extends JavaProjectSet<P>, P extends ISLJavaProjec
 			}
 		};
 	}
+	
+	public SLStatus runLocally(File runDir, PS projects, SLProgressMonitor monitor) throws Throwable {
+		SLJob job = finishInit(runDir, projects);
+		SLStatus status = job.run(monitor);
+		return status;
+	}
 }
