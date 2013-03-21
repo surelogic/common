@@ -6,7 +6,7 @@ import java.util.*;
 
 import com.surelogic.common.jobs.remote.Console;
 
-public abstract class AbstractLocalHandlerFactory<T extends AbstractLocalSLJob, T2 extends ILocalConfig> 
+public abstract class AbstractLocalHandlerFactory<T extends AbstractLocalSLJob<?>, T2 extends ILocalConfig> 
 implements IClientHandlerFactory {
 	private final Console console;
 	
