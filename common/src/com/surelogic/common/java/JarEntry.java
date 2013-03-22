@@ -139,7 +139,7 @@ public class JarEntry extends AbstractClassPathEntry {
     				System.out.println(jp.getName()+": mapping "+qname+" to "+jar.getAbsolutePath());    			
     			}
     			*/
-    	   		loader.map(jp.getName(), jar.getAbsolutePath(), project.getProject(), qname);
+    	   		loader.map(jp.getName(), qname, project.getProject(), jar.getAbsolutePath());
     		}
     	}
     	System.out.println(jp.getName()+": Done initializing with "+jar);
