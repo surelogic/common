@@ -16,7 +16,7 @@ public class JavaClassPath implements IJavacClassParser {
 	// Pair1 = new project
 	// Map to String if a jar
 	// Map to File   if source
-	protected final Map<Pair<String,String>,Pair<String,Object>> classToFile = 
+	private final Map<Pair<String,String>,Pair<String,Object>> classToFile = 
 		new HashMap<Pair<String,String>, Pair<String,Object>>();
 	
 	/**
@@ -68,5 +68,19 @@ public class JavaClassPath implements IJavacClassParser {
 */
 			classToFile.put(key, new Pair<String,Object>(srcProj, f));
 		}
+	}
+	
+	protected boolean isMapped(String destProj, String qname) {
+		final Pair<String,String> key = Pair.getInstance(destProj, qname);
+		return classToFile.containsKey(key);
+	}
+	
+	protected Pair<String,Object> getMapping(String destProj, String qname) {
+		final Pair<String,String> key = Pair.getInstance(destProj, qname);
+		return classToFile.get(key);
+	}
+	
+	protected Collection<Pair<String,String>> getMapKeys() {
+		return classToFile.keySet();
 	}
 }
