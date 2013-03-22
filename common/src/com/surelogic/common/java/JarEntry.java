@@ -130,7 +130,7 @@ public class JarEntry extends AbstractClassPathEntry {
     				// Skipping nested/local classes
     				continue;
     			}
-    			String qname = loader.convertClassToQname(name);
+    			String qname = convertClassToQname(name);
     			int lastDot  = qname.lastIndexOf('.');
     			String pkg   = lastDot < 0 ? "" : qname.substring(0, lastDot);
     			jp.addPackage(pkg);
@@ -148,6 +148,12 @@ public class JarEntry extends AbstractClassPathEntry {
 		}
 	}
 
+	public static String convertClassToQname(String name) {
+		String raw   = name.substring(0, name.length()-6);
+		String qname = raw.replace('/', '.');
+		return qname;
+	}
+	
 	@Override
   public void relocateJars(File targetDir) throws IOException {
 		final File target = computeTargetName(targetDir, path.getParentFile(), path.getName());
