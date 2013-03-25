@@ -1,6 +1,7 @@
 package com.surelogic.common.java;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.*;
 
 import org.apache.commons.collections15.MultiMap;
@@ -8,7 +9,7 @@ import org.apache.commons.collections15.multimap.*;
 
 import com.surelogic.common.Pair;
 
-public class JavaClassPath implements IJavacClassParser {
+public class JavaClassPath<PS extends JavaProjectSet<?>> implements IJavacClassParser {
 	private final MultiMap<ISLJavaProject,Config> initialized = new MultiHashMap<ISLJavaProject, Config>();
 	
 	// Key: project
@@ -18,6 +19,16 @@ public class JavaClassPath implements IJavacClassParser {
 	// Map to File   if source
 	private final Map<Pair<String,String>,Pair<String,Object>> classToFile = 
 		new HashMap<Pair<String,String>, Pair<String,Object>>();
+	
+	protected final PS projects;
+	
+	protected JavaClassPath(PS set) throws IOException {
+		projects = set;
+		
+		for(ISLJavaProject jp : set) {
+        	jp.getConfig().init(jp, this);
+		}
+	}
 	
 	/**
 	 * @return true if already initialized, false if not (and set to be true)
