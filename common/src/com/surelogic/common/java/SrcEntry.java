@@ -3,6 +3,7 @@ package com.surelogic.common.java;
 import java.io.File;
 import java.io.IOException;
 
+import com.surelogic.common.FileUtility;
 import com.surelogic.common.xml.XmlCreator;
 
 /**
@@ -11,6 +12,8 @@ import com.surelogic.common.xml.XmlCreator;
  * @author Edwin
  */
 public class SrcEntry extends AbstractClassPathEntry {
+	public static final String ZIP_BINARIES = "zip.binaries";
+	
 	@SuppressWarnings("unused")
 	private final Config project;
 	private final String projectRelativePathToSrc;
@@ -61,11 +64,10 @@ public class SrcEntry extends AbstractClassPathEntry {
 	@Override
 	public void zipSources(File zipDir) throws IOException {		
 		final File binDir = new File(project.getLocation(), projectRelativePathToBin);
-		//final SourceZip srcZip = new SourceZip(project);
-		File zipFile = new File(zipDir, project.getProject() + ".zip");
+		File zipFile = new File(zipDir, project.getProject()+'.'+projectRelativePathToBin.replace('/', '.') + ".zip");
 		if (!zipFile.exists()) {
 			zipFile.getParentFile().mkdirs();
-			//TODO srcZip.generateSourceZip(zipFile.getAbsolutePath(), project);
+			FileUtility.zipDir(binDir, zipFile);
 		} else {
 			// System.out.println("Already exists: "+zipFile);
 		}				

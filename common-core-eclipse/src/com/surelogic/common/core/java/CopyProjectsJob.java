@@ -2,6 +2,7 @@ package com.surelogic.common.core.java;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.*;
 
 import com.surelogic.common.XUtil;
 import com.surelogic.common.core.EclipseUtility;
@@ -19,13 +20,26 @@ public class CopyProjectsJob extends AbstractScanDirJob<JavaProjectSet<?>> {
 	@Override
 	public SLStatus run(SLProgressMonitor monitor) {
 		monitor.begin(3);
+		final Set<Config> configs = new HashSet<Config>();
+		for (Config config : projects.getConfigs()) {
+			configs.add(config);
+		}
 		final long start = System.currentTimeMillis();
-		try {
-			for (Config config : projects.getConfigs()) {
+		try {			
+			for (Config config : configs) {//projects.getConfigs()) {
 				if (monitor.isCanceled()) {
 					return SLStatus.CANCEL_STATUS;
 				}
 				config.zipSources(zipDir);
+				if (projects.getArg(SrcEntry.ZIP_BINARIES) != null) {
+					// For binaries
+					for(IClassPathEntry e : config.getClassPath()) {
+						if (configs.contains(e)) {
+							continue;
+						}
+						e.zipSources(zipDir);
+					}
+				}
 			}
 		} catch (IOException e) {
 			return SLStatus.createErrorStatus("Problem while zipping sources", e);
@@ -33,7 +47,7 @@ public class CopyProjectsJob extends AbstractScanDirJob<JavaProjectSet<?>> {
 		monitor.worked(1);
 		final long zip = System.currentTimeMillis();
 		try {
-			for (Config config : projects.getConfigs()) {
+			for (Config config : configs) {//projects.getConfigs()) {
 				if (monitor.isCanceled()) {
 					return SLStatus.CANCEL_STATUS;
 				}
