@@ -5,7 +5,7 @@ import java.io.*;
 public abstract class AbstractJavaFileZip extends AbstractJavaZip<File> {
 
 	@Override
-	protected InputStream getFileContents(File res) throws IOException {
+	protected final InputStream getFileContents(File res) throws IOException {
 		return new FileInputStream(res);
 	}
 
@@ -15,7 +15,7 @@ public abstract class AbstractJavaFileZip extends AbstractJavaZip<File> {
 	}
 	
 	@Override
-	protected File[] getMembers(File res) throws IOException {
+	protected final File[] getMembers(File res) throws IOException {
 		if (res.isDirectory()) {
 			return res.listFiles();
 		}
@@ -23,20 +23,30 @@ public abstract class AbstractJavaFileZip extends AbstractJavaZip<File> {
 	}
 
 	@Override
-	protected String getName(File res) {
+	protected final String getName(File res) {
 		return res.getName();
 	}
 
 	@Override
-	protected boolean isAccessible(File res) {
+	protected final boolean isAccessible(File res) {
 		return true;
 	}
 
 	@Override
-	protected boolean isFile(File res) {
+	protected final boolean isFile(File res) {
 		return res.isFile();
 	}
 
+    @Override
+    protected final long getTimestamp(final File res) {
+        return res.lastModified();
+    }
+	
+    @Override
+    protected final File getFile(final File res, final String name) {
+        return new File(res, name);
+    }
+    
 	@Override
 	protected String getJavaPackageNameOrNull(File res) {
 		throw new UnsupportedOperationException("not implemented yet");
