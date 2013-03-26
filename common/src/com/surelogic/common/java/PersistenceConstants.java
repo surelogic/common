@@ -21,6 +21,7 @@ public interface PersistenceConstants {
 	String SRC = "source";
 	String JAR = "jar";
 	String PATH = "path";
+	String BIN_PATH = "bin-path";
 	String ORIG_PATH = "orig-path";
 	
 	String PACKAGE = "package";

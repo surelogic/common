@@ -121,10 +121,11 @@ implements IXmlResultListener, PersistenceConstants {
         // System.out.println(proj + " has jar: " + path);
         p.getConfig().addToClassPath(new JarEntry(p.getConfig(), new File(path), new File(orig), jarIsExported));
       } else if (SRC.equals(name)) {
-        String path = nested.getAttribute(PATH);
+        String srcPath = nested.getAttribute(PATH);
+        String binPath = nested.getAttribute(BIN_PATH);
         final boolean srcIsExported = "true".equals(nested.getAttribute(IS_EXPORTED));
         // System.out.println(proj + " has jar: " + path);
-        p.getConfig().addToClassPath(new SrcEntry(p.getConfig(), path));
+        p.getConfig().addToClassPath(new SrcEntry(p.getConfig(), srcPath, binPath));
       } else if (PROJECT.equals(name)) {
         String pRefName = nested.getAttribute(NAME);
         // System.out.println(proj + " has ref to project " + pRefName);

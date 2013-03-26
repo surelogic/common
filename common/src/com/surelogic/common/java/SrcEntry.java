@@ -1,5 +1,6 @@
 package com.surelogic.common.java;
 
+import java.io.File;
 import java.io.IOException;
 
 import com.surelogic.common.xml.XmlCreator;
@@ -12,16 +13,18 @@ import com.surelogic.common.xml.XmlCreator;
 public class SrcEntry extends AbstractClassPathEntry {
 	@SuppressWarnings("unused")
 	private final Config project;
-	private final String projectRelativePath;
+	private final String projectRelativePathToSrc;
+	private final String projectRelativePathToBin;
 	
-	public SrcEntry(Config c, String path) {
+	public SrcEntry(Config c, String pathToSrc, String pathToBin) {
 		super(true); // TODO is this right?
 		project = c;
-		projectRelativePath = path;
+		projectRelativePathToSrc = pathToSrc;
+		projectRelativePathToBin = pathToBin;
 	}
 
 	public String getProjectRelativePath() {
-		return projectRelativePath;
+		return projectRelativePathToSrc;
 	}
 	
 	@Override
@@ -33,22 +36,39 @@ public class SrcEntry extends AbstractClassPathEntry {
 	@Override
   public void outputToXML(XmlCreator.Builder proj) {
 		XmlCreator.Builder b = proj.nest(PersistenceConstants.SRC);
-		b.addAttribute(PersistenceConstants.PATH, projectRelativePath);
+		b.addAttribute(PersistenceConstants.PATH, projectRelativePathToSrc);
+		if (projectRelativePathToBin != null) {				
+			b.addAttribute(PersistenceConstants.BIN_PATH, projectRelativePathToBin);
+		}
 		b.addAttribute(PersistenceConstants.IS_EXPORTED, isExported());
 		b.end();
 	}
 	
 	@Override
 	public int hashCode() {
-		return projectRelativePath.hashCode();
+		return projectRelativePathToSrc.hashCode();
 	}
 
 	@Override
 	public boolean equals(Object o) {
 		if (o instanceof SrcEntry) {
 			SrcEntry s2 = (SrcEntry) o;
-			return projectRelativePath.equals(s2.projectRelativePath);
+			return projectRelativePathToSrc.equals(s2.projectRelativePathToSrc);
 		}
 		return false;
 	}
+	
+	@Override
+	public void zipSources(File zipDir) throws IOException {		
+		final File binDir = new File(project.getLocation(), projectRelativePathToBin);
+		//final SourceZip srcZip = new SourceZip(project);
+		File zipFile = new File(zipDir, project.getProject() + ".zip");
+		if (!zipFile.exists()) {
+			zipFile.getParentFile().mkdirs();
+			//TODO srcZip.generateSourceZip(zipFile.getAbsolutePath(), project);
+		} else {
+			// System.out.println("Already exists: "+zipFile);
+		}				
+		super.zipSources(zipDir);
+	}	
 }

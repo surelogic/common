@@ -161,7 +161,16 @@ public abstract class ProjectInfo<P extends ISLJavaProject> {
 				}
 				config.addToClassPath(config);
 				// TODO makeRelativeTo is a 3.5 API
-				config.addToClassPath(new SrcEntry(config, cpe.getPath().makeRelativeTo(p.getFullPath()).toString()));
+				final IPath projectPath = p.getFullPath();
+				final String pathToSrc = cpe.getPath().makeRelativeTo(projectPath).toString();				
+				final String pathToBin;
+				if (cpe.getOutputLocation() != null) {
+					pathToBin = cpe.getOutputLocation().makeRelativeTo(projectPath).toString();	
+				} else {
+					// TODO what if there's more than one?
+					pathToBin = jp.getOutputLocation().makeRelativeTo(projectPath).toString();	
+				}								
+				config.addToClassPath(new SrcEntry(config, pathToSrc, pathToBin));
 				break;
 			case IClasspathEntry.CPE_LIBRARY:
 				// System.out.println("Adding "+cpe.getPath()+" for "+p.getName());
