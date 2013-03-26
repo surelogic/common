@@ -761,8 +761,8 @@ public final class FileUtility {
   /**
    * Zip up the given directory into the given zipfile
    */
-  public static void zipDir(final File tempDir, final File zipFile) throws IOException {
-    zipDirAndMore(tempDir, tempDir, zipFile).close();
+  public static void zipDir(final File srcDir, final File zipFile) throws IOException {
+    zipDirAndMore(srcDir, srcDir, zipFile).close();
   }
 
   /**
