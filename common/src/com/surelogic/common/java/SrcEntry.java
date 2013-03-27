@@ -2,6 +2,10 @@ package com.surelogic.common.java;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Enumeration;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
+import java.util.zip.ZipFile;
 
 import com.surelogic.common.FileUtility;
 import com.surelogic.common.xml.XmlCreator;
@@ -36,10 +40,28 @@ public class SrcEntry extends AbstractClassPathEntry {
 			throws IOException {
 		if (zipFile != null) {
 			final String jarPath = zipFile.getAbsolutePath();
-			//loader.mapBinary(jp.getName(), qname, project.getProject(), jarPath);
+			try {
+				// Not exactly what initForJar() does
+				final ZipFile zf = new ZipFile(zipFile);    	
+				Enumeration<? extends ZipEntry> e = zf.entries();
+				while (e.hasMoreElements()) {
+					ZipEntry ze = e.nextElement();
+					String name = ze.getName();
+					if (name.endsWith(".class")) {    			
+						final String qname = JarEntry.convertClassToQname(name);
+						//int lastDot  = qname.lastIndexOf('.');
+						//String pkg   = lastDot < 0 ? "" : qname.substring(0, lastDot);
+						//jp.addPackage(pkg);
+						loader.mapBinary(jp.getName(), qname, project.getProject(), jarPath);
+					}
+				}
+				System.out.println(jp.getName()+": Done initializing with "+zipFile);
+			} catch(ZipException e) {
+				System.out.println("Zip exception with "+zipFile);
+			}
 		}
 	}
-
+	
 	@Override
   public void outputToXML(XmlCreator.Builder proj) {
 		XmlCreator.Builder b = proj.nest(PersistenceConstants.SRC);
