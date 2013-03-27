@@ -18,6 +18,7 @@ public class SrcEntry extends AbstractClassPathEntry {
 	private final Config project;
 	private final String projectRelativePathToSrc;
 	private final String projectRelativePathToBin;
+	private File zipFile = null;
 	
 	public SrcEntry(Config c, String pathToSrc, String pathToBin) {
 		super(true); // TODO is this right?
@@ -31,9 +32,12 @@ public class SrcEntry extends AbstractClassPathEntry {
 	}
 	
 	@Override
-  public void init(ISLJavaProject jp, IJavacClassParser loader)
+	public void init(ISLJavaProject jp, IJavacClassParser loader)
 			throws IOException {
-		// Nothing to do?
+		if (zipFile != null) {
+			final String jarPath = zipFile.getAbsolutePath();
+			//loader.mapBinary(jp.getName(), qname, project.getProject(), jarPath);
+		}
 	}
 
 	@Override
@@ -64,7 +68,7 @@ public class SrcEntry extends AbstractClassPathEntry {
 	@Override
 	public void zipSources(File zipDir) throws IOException {		
 		final File binDir = new File(project.getLocation(), projectRelativePathToBin);
-		File zipFile = new File(zipDir, project.getProject()+'.'+projectRelativePathToBin.replace('/', '.') + ".zip");
+		zipFile = new File(zipDir, project.getProject()+'.'+projectRelativePathToBin.replace('/', '.') + ".zip");
 		if (!zipFile.exists()) {
 			zipFile.getParentFile().mkdirs();
 			FileUtility.zipDir(binDir, zipFile);
@@ -72,5 +76,5 @@ public class SrcEntry extends AbstractClassPathEntry {
 			// System.out.println("Already exists: "+zipFile);
 		}				
 		super.zipSources(zipDir);
-	}	
+	}
 }

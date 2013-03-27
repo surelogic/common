@@ -116,33 +116,34 @@ public class JarEntry extends AbstractClassPathEntry {
 			System.out.println("Mapped "+i+" classes in "+dir.getAbsolutePath());
 		}
 	}
-	
+
 	private void initForJar(ISLJavaProject jp, IJavacClassParser loader, File jar) 
-	throws IOException {
+			throws IOException {
 		try {
-    	ZipFile zf = new ZipFile(jar);    	
-    	Enumeration<? extends ZipEntry> e = zf.entries();
-    	while (e.hasMoreElements()) {
-    		ZipEntry ze = e.nextElement();
-    		String name = ze.getName();
-    		if (name.endsWith(".class")) {    			
-    			if (name.lastIndexOf('$') >= 0) {
-    				// Skipping nested/local classes
-    				continue;
-    			}
-    			String qname = convertClassToQname(name);
-    			int lastDot  = qname.lastIndexOf('.');
-    			String pkg   = lastDot < 0 ? "" : qname.substring(0, lastDot);
-    			jp.addPackage(pkg);
-    			/*
+			final String jarPath = jar.getAbsolutePath();
+			final ZipFile zf = new ZipFile(jar);    	
+			Enumeration<? extends ZipEntry> e = zf.entries();
+			while (e.hasMoreElements()) {
+				ZipEntry ze = e.nextElement();
+				String name = ze.getName();
+				if (name.endsWith(".class")) {    			
+					if (name.lastIndexOf('$') >= 0) {
+						// Skipping nested/local classes
+						continue;
+					}
+					String qname = convertClassToQname(name);
+					int lastDot  = qname.lastIndexOf('.');
+					String pkg   = lastDot < 0 ? "" : qname.substring(0, lastDot);
+					jp.addPackage(pkg);
+					/*
     			if (SLUtility.JAVA_LANG_OBJECT.equals(qname) || "java.lang.Enum".equals(qname)) {
     				System.out.println(jp.getName()+": mapping "+qname+" to "+jar.getAbsolutePath());    			
     			}
-    			*/
-    	   		loader.map(jp.getName(), qname, project.getProject(), jar.getAbsolutePath());
-    		}
-    	}
-    	System.out.println(jp.getName()+": Done initializing with "+jar);
+					 */
+					loader.map(jp.getName(), qname, project.getProject(), jarPath);
+				}
+			}
+			System.out.println(jp.getName()+": Done initializing with "+jar);
 		} catch(ZipException e) {
 			System.out.println("Zip exception with "+jar);
 		}

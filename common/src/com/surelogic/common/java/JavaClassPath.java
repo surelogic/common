@@ -21,10 +21,12 @@ public class JavaClassPath<PS extends JavaProjectSet<?>> implements IJavacClassP
 		new HashMap<Pair<String,String>, Pair<String,Object>>();
 	
 	protected final PS projects;
+	private final boolean useBinaries;
 	
-	protected JavaClassPath(PS set) throws IOException {
+	protected JavaClassPath(PS set, boolean useBin) throws IOException {
 		projects = set;
-		
+		useBinaries = useBin;
+
 		for(ISLJavaProject jp : set) {
         	jp.getConfig().init(jp, this);
 		}
@@ -57,7 +59,16 @@ public class JavaClassPath<PS extends JavaProjectSet<?>> implements IJavacClassP
 		}
 	}
 	
+	public void mapBinary(String destProj, String qname, String srcProj, String jarName) {
+      if (useBinaries) {
+    	  map(destProj, qname, srcProj, jarName);
+      }
+	}
+	
 	public void mapFile(String destProj, String qname, String srcProj, JavaSourceFile file) {
+	  if (useBinaries) {
+		  return;
+	  }
 	  final Pair<String,String> key = Pair.getInstance(destProj, qname);
 		if (!classToFile.containsKey(key)) {
 /*
