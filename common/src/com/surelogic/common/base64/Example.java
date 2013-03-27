@@ -98,6 +98,7 @@ public class Example {
 
 				try {
 					b64os.flush();
+					b64os.close();
 				} catch (Exception e) {
 				}
 				// try{ ps.close(); } catch( Exception e ){} // Closes

@@ -85,14 +85,14 @@ public class JDBCUtils {
 			} else if (o instanceof File) {
 				final File f = (File) o;
 				FileInputStream fin;
+				if (f.length() > Integer.MAX_VALUE) {
+					throw new IllegalArgumentException(
+							"File argument too big: " + f);
+				}
 				try {
 					fin = new FileInputStream(f);
 				} catch (final FileNotFoundException e) {
 					throw new StatementException(e);
-				}
-				if (f.length() > Integer.MAX_VALUE) {
-					throw new IllegalArgumentException(
-							"File argument too big: " + f);
 				}
 				st.setBinaryStream(idx, fin, (int) f.length());
 			} else {
