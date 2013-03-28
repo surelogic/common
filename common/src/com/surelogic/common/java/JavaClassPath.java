@@ -23,7 +23,7 @@ public class JavaClassPath<PS extends JavaProjectSet<?>> implements IJavacClassP
 	protected final PS projects;
 	private final boolean useBinaries;
 	
-	protected JavaClassPath(PS set, boolean useBin) throws IOException {
+	public JavaClassPath(PS set, boolean useBin) throws IOException {
 		projects = set;
 		useBinaries = useBin;
 
@@ -97,12 +97,16 @@ public class JavaClassPath<PS extends JavaProjectSet<?>> implements IJavacClassP
 		return classToFile.containsKey(key);
 	}
 	
-	protected Pair<String,Object> getMapping(String destProj, String qname) {
+	public Pair<String,Object> getMapping(String destProj, String qname) {
 		final Pair<String,String> key = Pair.getInstance(destProj, qname);
+		return getMapping(key);
+	}
+	
+	public Pair<String,Object> getMapping(Pair<String,String> key) {
 		return classToFile.get(key);
 	}
 	
-	protected Collection<Pair<String,String>> getMapKeys() {
+	public Collection<Pair<String,String>> getMapKeys() {
 		return classToFile.keySet();
 	}
 }
