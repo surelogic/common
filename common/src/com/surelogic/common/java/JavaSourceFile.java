@@ -1,24 +1,18 @@
 package com.surelogic.common.java;
 
-import java.io.File;
+import java.io.*;
 import java.net.URI;
 
 import com.surelogic.common.FileUtility;
 import com.surelogic.common.Pair;
 import com.surelogic.common.xml.XmlCreator;
 
-public class JavaSourceFile {
-	public final String qname;
-	public final File file;
+public final class JavaSourceFile extends AbstractJavaFile {
 	public final String relativePath;
 	public final boolean asBinary;
 	
-	public JavaSourceFile(String name, File f, String path, boolean asBinary) {
-		if (name != null && name.startsWith(".")) {
-			throw new IllegalArgumentException();
-		}
-		qname = name;
-		file = f;		
+	public JavaSourceFile(String name, File f, String path, boolean asBinary, String proj) {
+		super(name, f, proj);
 		relativePath = FileUtility.normalizePath(path);
 		this.asBinary = asBinary;
 	}
@@ -58,5 +52,9 @@ public class JavaSourceFile {
 		b.addAttribute(PersistenceConstants.LOCATION, file.getAbsolutePath());
 		b.addAttribute(PersistenceConstants.AS_BINARY, asBinary);
 		b.end();
+	}
+
+	public boolean isSource() {
+		return true;
 	}
 }

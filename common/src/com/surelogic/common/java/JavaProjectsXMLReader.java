@@ -113,7 +113,7 @@ implements IXmlResultListener, PersistenceConstants {
         String qname = nested.getAttributeByAliasIfPossible(QNAME);
         String asBinary = nested.getAttribute(AS_BINARY);
         // System.out.println(proj + " has source: " + path);
-        p.getConfig().addFile(new JavaSourceFile(qname, new File(file), path, "true".equals(asBinary)));
+        p.getConfig().addFile(new JavaSourceFile(qname, new File(file), path, "true".equals(asBinary), p.getName()));
       } else if (JAR.equals(name)) {
         String path = nested.getAttributeByAliasIfPossible(PATH);
         String orig = nested.getAttribute(ORIG_PATH);

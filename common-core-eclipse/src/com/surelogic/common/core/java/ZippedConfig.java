@@ -111,7 +111,7 @@ public class ZippedConfig extends Config {
 							// setFiles() below
 							srcFiles.add(new JavaSourceFile(name/*
 							 * .replace( '$', '.')
-							 */, f, null, false));
+							 */, f, null, false, getProject()));
 						}
 					} else if (ze.getName().endsWith("/package-info.java")) {
 						System.out.println("What to do about package-info.java?");

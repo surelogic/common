@@ -302,7 +302,7 @@ public abstract class ProjectInfo<P extends ISLJavaProject> {
 					final String qname = computeQualifiedName(icu);
 
 					// TODO Used when there's no project info
-					config.addFile(new JavaSourceFile(qname, f, path, false));
+					config.addFile(new JavaSourceFile(qname, f, path, false, project.getName()));
 
 					if (!added) {
 						added = true;
@@ -505,7 +505,7 @@ public abstract class ProjectInfo<P extends ISLJavaProject> {
 				qname = f.getName();
 			}
 			boolean excludeFilterMatchesTreatAsBinary = filter.matches(path.toFile().getAbsolutePath(), packageName);
-			files.add(new JavaSourceFile(qname, f, path.toPortableString(), excludeFilterMatchesTreatAsBinary));
+			files.add(new JavaSourceFile(qname, f, path.toPortableString(), excludeFilterMatchesTreatAsBinary, config.getProject()));
 		}
 		return files;
 	}    
