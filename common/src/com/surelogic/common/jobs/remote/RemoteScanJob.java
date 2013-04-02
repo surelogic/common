@@ -39,6 +39,7 @@ public class RemoteScanJob<PS extends JavaProjectSet<P>, P extends ISLJavaProjec
 			final JavaProjectsXMLReader<P> reader = new JavaProjectsXMLReader<P>(javaFactory);			
 			@SuppressWarnings("unchecked")
 			final PS projects = (PS) reader.readProjectsXML(runDir);
+			projects.setScanDir(runDir);
 			out.println("projects = "+projects.getLabel());
 			return finishInit(runDir, projects);
 		} catch(Throwable t) {
