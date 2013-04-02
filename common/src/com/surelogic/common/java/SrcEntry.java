@@ -39,7 +39,7 @@ public class SrcEntry extends AbstractClassPathEntry {
 	public void init(ISLJavaProject jp, IJavacClassParser loader)
 			throws IOException {
 		if (zipFile != null) {
-			final String jarPath = zipFile.getAbsolutePath();
+			//final String jarPath = zipFile.getAbsolutePath();
 			try {
 				// Not exactly what initForJar() does
 				final ZipFile zf = new ZipFile(zipFile);    	
@@ -52,7 +52,12 @@ public class SrcEntry extends AbstractClassPathEntry {
 						//int lastDot  = qname.lastIndexOf('.');
 						//String pkg   = lastDot < 0 ? "" : qname.substring(0, lastDot);
 						//jp.addPackage(pkg);
-						loader.mapBinary(jp.getName(), qname, project.getProject(), jarPath);
+						loader.map(jp.getName(), new JarredClassFile(qname, zipFile, project.getProject(), ze.getName()) {
+							@Override
+							public Type getType() {
+								return Type.CLASS_FOR_SRC;
+							}
+						});
 					}
 				}
 				System.out.println(jp.getName()+": Done initializing with "+zipFile);

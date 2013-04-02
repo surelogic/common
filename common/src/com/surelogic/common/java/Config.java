@@ -256,7 +256,7 @@ public class Config extends AbstractClassPathEntry {
 			int num = 0;
 			for(JavaSourceFile p : origFiles) {
 				//System.out.println("Initializing "+p.qname+" for "+jp.getName());
-				loader.mapFile(jp.getName(), p.qname, name, p);
+				loader.map(jp.getName(), p);
 				/* 
 				if (getProject().contains("common")) {
 					System.out.println("Mapping "+p.first()+" to "+p.second());
