@@ -16,7 +16,10 @@ public class JavaClassPath<PS extends JavaProjectSet<?>> implements IJavacClassP
 		new HashMap<Pair<String,String>, IJavaFile>();
 	
 	protected final PS projects;
-	private final boolean useBinaries; // TODO
+	/**
+	 * Only use binary; ignore sources
+	 */
+	private final boolean useBinaries;
 	
 	public JavaClassPath(PS set, boolean useBin) throws IOException {
 		projects = set;
@@ -42,7 +45,10 @@ public class JavaClassPath<PS extends JavaProjectSet<?>> implements IJavacClassP
 	 * Checking for a duplicate effectively simulates 
 	 * searching the classpath
 	 */
-	public void map(String destProj, IJavaFile file) {
+	public final void map(String destProj, IJavaFile file) {
+	  if (useBinaries && file.isSource()) {
+		  return; // ignore
+	  }
 	  final Pair<String,String> key = Pair.getInstance(destProj, file.getQualifiedName());
 		if (!classToFile.containsKey(key)) {
 /*
@@ -54,21 +60,25 @@ public class JavaClassPath<PS extends JavaProjectSet<?>> implements IJavacClassP
 		}
 	}
 	
-	protected boolean isMapped(String destProj, String qname) {
+	protected final boolean isMapped(String destProj, String qname) {
 		final Pair<String,String> key = Pair.getInstance(destProj, qname);
 		return classToFile.containsKey(key);
 	}
 	
-	public IJavaFile getMapping(String destProj, String qname) {
+	public final IJavaFile getMapping(String destProj, String qname) {
 		final Pair<String,String> key = Pair.getInstance(destProj, qname);
 		return getMapping(key);
 	}
 	
-	public IJavaFile getMapping(Pair<String,String> key) {
+	public final IJavaFile getMapping(Pair<String,String> key) {
 		return classToFile.get(key);
 	}
 	
-	public Collection<Pair<String,String>> getMapKeys() {
+	public final Collection<Pair<String,String>> getMapKeys() {
 		return classToFile.keySet();
+	}
+
+	public File getRunDir() {
+		return projects.getRunDir();
 	}
 }

@@ -1,5 +1,7 @@
 package com.surelogic.common.java;
 
+import java.io.File;
+
 /**
  * TODO How to split this code?
  * 
@@ -12,4 +14,5 @@ public interface IJavacClassParser {
 	 */
 	boolean ensureInitialized(ISLJavaProject jp, Config config);
 	void map(String destProj, IJavaFile file);
+	File getRunDir();
 }
