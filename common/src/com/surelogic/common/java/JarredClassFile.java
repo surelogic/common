@@ -22,8 +22,12 @@ public class JarredClassFile extends AbstractJavaBinaryFile {
 
 	public InputStream getStream() throws IOException {
 		final ZipFile zf = new ZipFile(file);
-		final ZipEntry e = zf.getEntry(pathInJar);
-		return zf.getInputStream(e);
+		try {
+			final ZipEntry e = zf.getEntry(pathInJar);
+			return zf.getInputStream(e);
+		} finally {
+			zf.close();
+		}
 	}
 	
 	public Type getType() {
