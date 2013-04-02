@@ -18,11 +18,9 @@ import com.surelogic.common.xml.XmlCreator;
 public class SrcEntry extends AbstractClassPathEntry {
 	public static final String ZIP_BINARIES = "zip.binaries";
 	
-	@SuppressWarnings("unused")
 	private final Config project;
 	private final String projectRelativePathToSrc;
 	private final String projectRelativePathToBin;
-	private File zipFile = null;
 	
 	public SrcEntry(Config c, String pathToSrc, String pathToBin) {
 		super(true); // TODO is this right?
@@ -38,8 +36,11 @@ public class SrcEntry extends AbstractClassPathEntry {
 	@Override
 	public void init(ISLJavaProject jp, IJavacClassParser loader)
 			throws IOException {
-		if (zipFile != null) {
+		File zipFile = computeZipFile(new File(loader.getRunDir(), PersistenceConstants.ZIPS_DIR));
+		System.out.println("Trying to find "+zipFile.getAbsolutePath());
+		if (zipFile.isFile()) {
 			//final String jarPath = zipFile.getAbsolutePath();
+			System.out.println("Found "+zipFile);
 			try {
 				// Not exactly what initForJar() does
 				final ZipFile zf = new ZipFile(zipFile);    	
@@ -47,6 +48,7 @@ public class SrcEntry extends AbstractClassPathEntry {
 				while (e.hasMoreElements()) {
 					ZipEntry ze = e.nextElement();
 					String name = ze.getName();
+					System.out.println("Looking at "+name);
 					if (name.endsWith(".class")) {    			
 						final String qname = JarEntry.convertClassToQname(name);
 						//int lastDot  = qname.lastIndexOf('.');
@@ -95,13 +97,18 @@ public class SrcEntry extends AbstractClassPathEntry {
 	@Override
 	public void zipSources(File zipDir) throws IOException {		
 		final File binDir = new File(project.getLocation(), projectRelativePathToBin);
-		zipFile = new File(zipDir, project.getProject()+'.'+projectRelativePathToBin.replace('/', '.') + ".zip");
+		final File zipFile = computeZipFile(zipDir);
 		if (!zipFile.exists()) {
 			zipFile.getParentFile().mkdirs();
 			FileUtility.zipDir(binDir, zipFile);
+			System.out.println("Zipped into "+zipFile);
 		} else {
 			// System.out.println("Already exists: "+zipFile);
 		}				
 		super.zipSources(zipDir);
+	}
+	
+	private File computeZipFile(File zipDir) {
+		return new File(zipDir, project.getProject()+'.'+projectRelativePathToBin.replace('/', '.') + ".zip");
 	}
 }
