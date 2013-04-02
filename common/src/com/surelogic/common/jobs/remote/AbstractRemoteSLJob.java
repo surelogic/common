@@ -108,7 +108,11 @@ public abstract class AbstractRemoteSLJob {
 			}
 			final SLStatus status = job.run(mon);
 			final long end = System.currentTimeMillis();
+			if (status != null) {
 			processStatus(mon, status);
+			} else {
+				out.println("Got null status after the job returned");
+			}
 			checkInput(br, mon, "Scanning complete (" + (end - start) + " ms)");
 
 			if (socket == null) {

@@ -101,7 +101,11 @@ public class JarEntry extends AbstractClassPathEntry {
 			else if (f.getName().endsWith(".class")) {
 				final String name  = f.getName().substring(0, f.getName().length()-6).replace('$', '.');				
 				final String qname = pkgPrefix == null ? name : pkgPrefix+'.'+name;
-				loader.mapClass(jp.getName(), qname, project.getProject(), f);
+				loader.map(jp.getName(), new AbstractJavaBinaryFile(qname, f, project.getProject()) {
+					public Type getType() {
+						return Type.CLASS;
+					}					
+				});
 				if (!createdPkg) {
 					jp.addPackage(pkgPrefix == null ? "" : pkgPrefix);
 				}
@@ -117,10 +121,10 @@ public class JarEntry extends AbstractClassPathEntry {
 		}
 	}
 
-	private void initForJar(ISLJavaProject jp, IJavacClassParser loader, File jar) 
+	private void initForJar(ISLJavaProject jp, IJavacClassParser loader, final File jar) 
 			throws IOException {
 		try {
-			final String jarPath = jar.getAbsolutePath();
+			//final String jarPath = jar.getAbsolutePath();
 			final ZipFile zf = new ZipFile(jar);    	
 			Enumeration<? extends ZipEntry> e = zf.entries();
 			while (e.hasMoreElements()) {
@@ -140,7 +144,7 @@ public class JarEntry extends AbstractClassPathEntry {
     				System.out.println(jp.getName()+": mapping "+qname+" to "+jar.getAbsolutePath());    			
     			}
 					 */
-					loader.map(jp.getName(), qname, project.getProject(), jarPath);
+					loader.map(jp.getName(), new JarredClassFile(qname, jar, project.getProject(), name));
 				}
 			}
 			System.out.println(jp.getName()+": Done initializing with "+jar);

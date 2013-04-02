@@ -483,6 +483,8 @@ public abstract class AbstractLocalSLJob<C extends ILocalConfig> extends Abstrac
 		if (port > 0) {
 			cmdj.createVmArgument().setValue("-D"+RemoteSLJobConstants.REMOTE_PORT_PROP+"="+port);
 		}
+		cmdj.createVmArgument().setValue("-D"+RemoteScanJob.RUN_DIR_PROP+"="+config.getRunDirectory());
+		
 		finishSetupJVM(verbose, cmdj, proj);
 	}
 	

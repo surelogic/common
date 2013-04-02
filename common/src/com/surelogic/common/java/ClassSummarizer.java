@@ -37,7 +37,7 @@ public class ClassSummarizer extends ClassVisitor {
 		return summarize(new FileInputStream(classFile));
 	}
 	
-	private Clazz summarize(InputStream is) throws IOException {		
+	public Clazz summarize(InputStream is) throws IOException {		
 		init();
 		
 		final ClassReader cr2 = new ClassReader(is);

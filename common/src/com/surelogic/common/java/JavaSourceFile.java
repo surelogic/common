@@ -57,4 +57,8 @@ public final class JavaSourceFile extends AbstractJavaFile {
 	public boolean isSource() {
 		return true;
 	}
+
+	public Type getType() {
+		return Type.SOURCE;
+	}
 }
