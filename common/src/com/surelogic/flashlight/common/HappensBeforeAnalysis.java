@@ -27,12 +27,16 @@ public class HappensBeforeAnalysis {
     private final PreparedStatement hbObjTargetSt;
     private final PreparedStatement hbCollSourceSt;
     private final PreparedStatement hbCollTargetSt;
+    private final PreparedStatement hbLockSourceSt;
+    private final PreparedStatement hbLockTargetSt;
 
     private final PreparedStatement hbTraceSt;
     private final PreparedStatement hbVolWriteTraceSt;
     private final PreparedStatement hbVolReadTraceSt;
     private final PreparedStatement hbObjSourceTraceSt;
     private final PreparedStatement hbObjTargetTraceSt;
+    private final PreparedStatement hbLockSourceTraceSt;
+    private final PreparedStatement hbLockTargetTraceSt;
     private final PreparedStatement hbCollSourceTraceSt;
     private final PreparedStatement hbCollTargetTraceSt;
     private final PreparedStatement isFinalSt;
@@ -51,6 +55,10 @@ public class HappensBeforeAnalysis {
                 .get("Accesses.happensBeforeSourceObject"));
         hbObjTargetSt = conn.prepareStatement(QB
                 .get("Accesses.happensBeforeTargetObject"));
+        hbLockSourceSt = conn.prepareStatement(QB
+                .get("Accesses.happensBeforeSourceLock"));
+        hbLockTargetSt = conn.prepareStatement(QB
+                .get("Accesses.happensBeforeTargetLock"));
         hbCollSourceSt = conn.prepareStatement(QB
                 .get("Accesses.happensBeforeSourceColl"));
         hbCollTargetSt = conn.prepareStatement(QB
@@ -69,11 +77,15 @@ public class HappensBeforeAnalysis {
                 .get("Accesses.trace.happensBeforeSourceColl"));
         hbCollTargetTraceSt = conn.prepareStatement(QB
                 .get("Accesses.trace.happensBeforeTargetColl"));
+        hbLockSourceTraceSt = conn.prepareStatement(QB
+                .get("Accesses.trace.happensBeforeSourceLock"));
+        hbLockTargetTraceSt = conn.prepareStatement(QB
+                .get("Accesses.trace.happensBeforeTargetLock"));
         targetsCache = new TLongObjectHashMap<Timestamp>();
         sourcesCache = new TLongObjectHashMap<Timestamp>();
     }
 
-    void finished() throws SQLException {
+    public void finished() throws SQLException {
         hbSt.close();
         hbObjSourceSt.close();
         hbObjTargetSt.close();
@@ -81,6 +93,18 @@ public class HappensBeforeAnalysis {
         hbCollTargetSt.close();
         hbVolReadSt.close();
         hbVolWriteSt.close();
+        hbLockSourceSt.close();
+        hbLockTargetSt.close();
+        hbTraceSt.close();
+        hbObjSourceTraceSt.close();
+        hbObjTargetTraceSt.close();
+        hbCollSourceTraceSt.close();
+        hbCollTargetTraceSt.close();
+        hbVolReadTraceSt.close();
+        hbVolWriteTraceSt.close();
+        hbLockSourceTraceSt.close();
+        hbLockTargetTraceSt.close();
+        isFinalSt.close();
     }
 
     public boolean happensBeforeFinal(long fieldId) throws SQLException {
@@ -251,6 +275,12 @@ public class HappensBeforeAnalysis {
                 read, readThread);
     }
 
+    public boolean happensBeforeLock(Timestamp write, long writeThread,
+            Timestamp read, long readThread) throws SQLException {
+        return happensBefore(hbLockSourceSt, hbLockTargetSt, write,
+                writeThread, read, readThread);
+    }
+
     /**
      * Determines whether or not a happens-before relationship exists between
      * two threads, typically from a write in one thread to a read in another
@@ -270,6 +300,7 @@ public class HappensBeforeAnalysis {
                 || happensBeforeVolatile(write, writeThread, read, readThread)
                 || happensBeforeThread(write, writeThread, read, readThread)
                 || happensBeforeObject(write, writeThread, read, readThread)
+                || happensBeforeLock(write, writeThread, read, readThread)
                 || happensBeforeCollection(write, writeThread, read, readThread);
     }
 
@@ -282,6 +313,7 @@ public class HappensBeforeAnalysis {
         addHappensBeforeVolatile(write, writeThread, read, readThread, list);
         addHappensBeforeThread(write, writeThread, read, readThread, list);
         addHappensBeforeObject(write, writeThread, read, readThread, list);
+        addHappensBeforeLock(write, writeThread, read, readThread, list);
         addHappensBeforeCollection(write, writeThread, read, readThread, list);
         return list;
     }
@@ -295,6 +327,13 @@ public class HappensBeforeAnalysis {
             Timestamp read, long readThread, List<HBEdge> list)
             throws SQLException {
         addHappensBefore(hbObjSourceTraceSt, hbObjTargetTraceSt, write,
+                writeThread, read, readThread, list);
+    }
+
+    private void addHappensBeforeLock(Timestamp write, long writeThread,
+            Timestamp read, long readThread, List<HBEdge> list)
+            throws SQLException {
+        addHappensBefore(hbLockSourceTraceSt, hbLockTargetTraceSt, write,
                 writeThread, read, readThread, list);
     }
 
