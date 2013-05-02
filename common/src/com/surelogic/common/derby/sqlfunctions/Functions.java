@@ -21,6 +21,7 @@ import com.surelogic.common.jdbc.RowHandler;
 import com.surelogic.common.jdbc.SingleRowHandler;
 import com.surelogic.flashlight.common.HappensBeforeAnalysis;
 import com.surelogic.flashlight.common.HappensBeforeAnalysis.HBEdge;
+import com.surelogic.flashlight.common.InstanceAccessesResultSet;
 import com.surelogic.flashlight.common.RollupAccessesResultSet;
 
 /**
@@ -108,6 +109,18 @@ public final class Functions {
             Connection conn = DefaultConnection.getInstance()
                     .readOnlyConnection();
             return RollupAccessesResultSet.create(conn, fieldId, receiverId);
+        } catch (SQLException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    public static ResultSet blockSummary(long receiverId, Timestamp start,
+            Timestamp stop) throws SQLException {
+        try {
+            Connection conn = DefaultConnection.getInstance()
+                    .readOnlyConnection();
+            return InstanceAccessesResultSet.create(conn, receiverId, start,
+                    stop);
         } catch (SQLException e) {
             throw new IllegalStateException(e);
         }
