@@ -37,6 +37,22 @@ public class InstanceAccessesResultSet implements InvocationHandler {
                 new InstanceAccessesResultSet(st.executeQuery()));
     }
 
+    public static ResultSet create(Connection conn, long receiverId,
+            Timestamp begin, Timestamp end, long fieldId, long secondFieldId)
+            throws SQLException {
+        PreparedStatement st = conn.prepareStatement(QB
+                .get("Accesses.prep.selectAccessesInBlockByFields"));
+        st.setLong(1, receiverId);
+        st.setTimestamp(2, begin);
+        st.setTimestamp(3, end);
+        st.setLong(4, fieldId);
+        st.setLong(5, secondFieldId);
+        return (ResultSet) Proxy.newProxyInstance(ResultSet.class
+                .getClassLoader(), new Class[] { ResultSet.class },
+                new InstanceAccessesResultSet(st.executeQuery()));
+
+    }
+
     @Override
     public Object invoke(Object proxy, Method method, Object[] args)
             throws Throwable {
@@ -167,4 +183,5 @@ public class InstanceAccessesResultSet implements InvocationHandler {
         }
 
     }
+
 }

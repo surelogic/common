@@ -126,6 +126,19 @@ public final class Functions {
         }
     }
 
+    public static ResultSet fieldsBlockSummary(long receiverId,
+            Timestamp start, Timestamp stop, long fieldId, long secondFieldId)
+            throws SQLException {
+        try {
+            Connection conn = DefaultConnection.getInstance()
+                    .readOnlyConnection();
+            return InstanceAccessesResultSet.create(conn, receiverId, start,
+                    stop, fieldId, secondFieldId);
+        } catch (SQLException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
     public static ResultSet happensBeforeEdges(final long writeThread,
             final Timestamp write, final long readThread, final Timestamp read) {
         return DefaultConnection.getInstance().withDefault(
