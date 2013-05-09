@@ -551,6 +551,9 @@ public abstract class ProjectInfo<P extends ISLJavaProject> {
 	 */
 	static boolean containsJavaLangObject(IJavaProject jp) throws JavaModelException {
 		IType t = jp.findType(SLUtility.JAVA_LANG_OBJECT);
+		if (t == null) {
+			return false;
+		}
 		return t.getCompilationUnit() != null;
 	}
 }
