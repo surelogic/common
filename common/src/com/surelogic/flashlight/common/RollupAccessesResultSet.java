@@ -163,8 +163,9 @@ public class RollupAccessesResultSet implements InvocationHandler {
                         }
                     }
                 } else {
-                    boolean hasHappensBefore = hb.hasHappensBefore(nextWrite,
-                            nextWriteThread, a.ts, a.threadId);
+                    boolean hasHappensBefore = !a.isRead
+                            || hb.hasHappensBefore(nextWrite, nextWriteThread,
+                                    a.ts, a.threadId);
                     return new AccessBlock(a, isStatic, isFinal, isFinal
                             || hasHappensBefore ? HappensBeforeState.YES
                             : HappensBeforeState.NO, nextWrite, nextWriteThread);
@@ -219,6 +220,13 @@ public class RollupAccessesResultSet implements InvocationHandler {
             ts = set.getTimestamp(idx++);
             isRead = set.getString(idx++).equals("R");
             underConstruction = !isStatic && set.getString(idx++).equals("Y");
+        }
+
+        @Override
+        public String toString() {
+            return "Access [threadId=" + threadId + ", threadName="
+                    + threadName + ", ts=" + ts + ", isRead=" + isRead
+                    + ", underConstruction=" + underConstruction + "]";
         }
 
     }
