@@ -19,6 +19,7 @@ import com.surelogic.common.jdbc.ResultHandler;
 import com.surelogic.common.jdbc.Row;
 import com.surelogic.common.jdbc.RowHandler;
 import com.surelogic.common.jdbc.SingleRowHandler;
+import com.surelogic.common.jdbc.StringResultHandler;
 import com.surelogic.flashlight.common.HappensBeforeAnalysis;
 import com.surelogic.flashlight.common.HappensBeforeAnalysis.HBEdge;
 import com.surelogic.flashlight.common.InstanceAccessesResultSet;
@@ -229,6 +230,11 @@ public final class Functions {
                 new DBQuery<String>() {
                     @Override
                     public String perform(final Query q) {
+                        String threadName = q.prepared("ObjectId.threadName",
+                                new StringResultHandler()).call(id);
+                        if (threadName != null) {
+                            return threadName;
+                        }
                         return q.prepared("ObjectId.selectClass",
                                 SingleRowHandler.from(new RowHandler<String>() {
                                     @Override
