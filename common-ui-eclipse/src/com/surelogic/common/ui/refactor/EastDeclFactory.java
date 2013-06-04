@@ -133,8 +133,14 @@ public class EastDeclFactory {
 
 	private static ParameterBuilder makeParameterBuilder(SingleVariableDeclaration p, int i) {
 		ParameterBuilder b = new ParameterBuilder(i, p.getName().getIdentifier());
-		ITypeBinding type = p.resolveBinding().getType();
-		b.setTypeOf(new TypeRef(type.getQualifiedName(), type.getName()));
+		final ITypeBinding type = p.resolveBinding().getType();
+		final String qname = type.getQualifiedName();		
+		final String pkgName = type.getPackage() == null ? null : type.getPackage().getName();
+		if (pkgName != null && qname.startsWith(pkgName)) {
+			b.setTypeOf(new TypeRef(qname, qname.substring(pkgName.length()+1)));
+		} else {
+			b.setTypeOf(new TypeRef(qname, type.getName()));
+		}
 		return b;
 	}
 
