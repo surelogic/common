@@ -318,8 +318,100 @@ public class HappensBeforeAnalysis {
         return list;
     }
 
+    static class Coll {
+        final long coll;
+        final long obj;
+
+        public Coll(long coll, long obj) {
+            this.coll = coll;
+            this.obj = obj;
+        }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + (int) (coll ^ coll >>> 32);
+            result = prime * result + (int) (obj ^ obj >>> 32);
+            return result;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            Coll other = (Coll) obj;
+            if (coll != other.coll) {
+                return false;
+            }
+            if (this.obj != other.obj) {
+                return false;
+            }
+            return true;
+        }
+
+    }
+
     private void addHappensBeforeCollection(Timestamp write, long writeThread,
-            Timestamp read, long readThread, List<HBEdge> list) {
+            Timestamp read, long readThread, List<HBEdge> list)
+            throws SQLException {
+        int idx = 1;
+        hbCollSourceTraceSt.setLong(idx++, writeThread);
+        hbCollSourceTraceSt.setTimestamp(idx++, write);
+        hbCollSourceTraceSt.setTimestamp(idx++, read);
+        final ResultSet hbCollSourceSet = hbCollSourceTraceSt.executeQuery();
+        final Map<Coll, HBNode> sources = new HashMap<HappensBeforeAnalysis.Coll, HBNode>();
+        final Map<Coll, HBNode> targets = new HashMap<Coll, HBNode>();
+        try {
+            while (hbCollSourceSet.next()) {
+                long sourceColl = hbCollSourceSet.getLong(1);
+                long sourceObj = hbCollSourceSet.getLong(2);
+                Timestamp sourceTs = hbCollSourceSet.getTimestamp(3);
+                long sourceTrace = hbCollSourceSet.getLong(4);
+                final Coll source = new Coll(sourceColl, sourceObj);
+                final HBNode trace = sources.get(source);
+                if (trace == null || trace.ts.after(sourceTs)) {
+                    sources.put(source, new HBNode(sourceTs, sourceTrace));
+                }
+            }
+        } finally {
+            hbCollSourceSet.close();
+        }
+        idx = 1;
+        hbCollTargetTraceSt.setLong(idx++, readThread);
+        hbCollTargetTraceSt.setTimestamp(idx++, write);
+        hbCollTargetTraceSt.setTimestamp(idx++, read);
+        final ResultSet hbCollTargetSet = hbCollTargetTraceSt.executeQuery();
+        try {
+            while (hbCollTargetSet.next()) {
+                long targetColl = hbCollTargetSet.getLong(1);
+                long targetObj = hbCollTargetSet.getLong(2);
+                Timestamp targetTs = hbCollTargetSet.getTimestamp(3);
+                long targetTrace = hbCollTargetSet.getLong(4);
+                final Coll target = new Coll(targetColl, targetObj);
+                final HBNode trace = targets.get(target);
+                if (trace == null || trace.ts.before(targetTs)) {
+                    targets.put(target, new HBNode(targetTs, targetTrace));
+                }
+            }
+        } finally {
+            hbCollTargetSet.close();
+        }
+        for (Entry<Coll, HBNode> sourceEntry : sources.entrySet()) {
+            Coll source = sourceEntry.getKey();
+            HBNode sourceTrace = sourceEntry.getValue();
+            HBNode targetTrace = targets.get(source);
+            if (targetTrace != null && targetTrace.ts.after(sourceTrace.ts)) {
+                list.add(new HBEdge(sourceTrace, targetTrace));
+            }
+        }
 
     }
 

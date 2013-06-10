@@ -266,6 +266,11 @@ public class PromisesAnnotationRewriter {
 			for (int i = 0; i < params.length; i++) {
 				params[i] = fromType(paramDecls[i]);
 			}
+			/*
+			if (node.getName().toString().equals("newResult")) {
+				System.out.println("Visiting "+node);
+			}
+			*/
 			IDeclFunction inMethod = EastDeclFactory.createDeclFunction(node);
 			//System.out.println("Looking at "+inMethod);
 			rewriteNode(node, MethodDeclaration.MODIFIERS2_PROPERTY, findTargets(inMethod), inMethod);
