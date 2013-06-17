@@ -7,7 +7,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Time;
 import java.sql.Timestamp;
 
 import com.surelogic.common.derby.sqlfunctions.Functions;
@@ -192,7 +191,7 @@ public class RollupAccessesResultSet implements InvocationHandler {
             case 7:
                 return happensBefore.getDisplay();
             case 8:
-                return lastWrite == null ? new Time(0) : lastWrite;
+                return lastWrite == null ? new Timestamp(0) : lastWrite;
             case 9:
                 return lastWriteThread;
             case 10:

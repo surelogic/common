@@ -536,11 +536,11 @@ public class HappensBeforeAnalysis {
             Timestamp read, long readThread, List<HBEdge> list)
             throws SQLException {
         int idx = 1;
-        hbClassInitSt.setLong(idx++, writeThread);
-        hbClassInitSt.setTimestamp(idx++, write);
-        hbClassInitSt.setLong(idx++, readThread);
-        hbClassInitSt.setTimestamp(idx++, read);
-        final ResultSet hbSet = hbClassInitSt.executeQuery();
+        hbClassInitTraceSt.setLong(idx++, writeThread);
+        hbClassInitTraceSt.setTimestamp(idx++, write);
+        hbClassInitTraceSt.setLong(idx++, readThread);
+        hbClassInitTraceSt.setTimestamp(idx++, read);
+        final ResultSet hbSet = hbClassInitTraceSt.executeQuery();
         try {
             while (hbSet.next()) {
                 idx = 1;
