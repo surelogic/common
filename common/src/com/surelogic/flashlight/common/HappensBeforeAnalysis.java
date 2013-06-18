@@ -29,6 +29,7 @@ public class HappensBeforeAnalysis {
     private final PreparedStatement hbCollTargetSt;
     private final PreparedStatement hbLockSourceSt;
     private final PreparedStatement hbLockTargetSt;
+    private final PreparedStatement hbClassInitSt;
 
     private final PreparedStatement hbTraceSt;
     private final PreparedStatement hbVolWriteTraceSt;
@@ -39,6 +40,8 @@ public class HappensBeforeAnalysis {
     private final PreparedStatement hbLockTargetTraceSt;
     private final PreparedStatement hbCollSourceTraceSt;
     private final PreparedStatement hbCollTargetTraceSt;
+    private final PreparedStatement hbClassInitTraceSt;
+
     private final PreparedStatement isFinalSt;
 
     private final TLongObjectMap<Timestamp> targetsCache;
@@ -63,6 +66,8 @@ public class HappensBeforeAnalysis {
                 .get("Accesses.happensBeforeSourceColl"));
         hbCollTargetSt = conn.prepareStatement(QB
                 .get("Accesses.happensBeforeTargetColl"));
+        hbClassInitSt = conn.prepareStatement(QB
+                .get("Accesses.happensBeforeClassInit"));
         hbTraceSt = conn.prepareStatement(QB
                 .get("Accesses.trace.happensBefore"));
         hbVolReadTraceSt = conn.prepareStatement(QB
@@ -81,6 +86,8 @@ public class HappensBeforeAnalysis {
                 .get("Accesses.trace.happensBeforeSourceLock"));
         hbLockTargetTraceSt = conn.prepareStatement(QB
                 .get("Accesses.trace.happensBeforeTargetLock"));
+        hbClassInitTraceSt = conn.prepareStatement(QB
+                .get("Accesses.trace.happensBeforeClassInit"));
         targetsCache = new TLongObjectHashMap<Timestamp>();
         sourcesCache = new TLongObjectHashMap<Timestamp>();
     }
@@ -199,6 +206,22 @@ public class HappensBeforeAnalysis {
         return targetsCache;
     }
 
+    public boolean happensBeforeClassInitialization(Timestamp write,
+            long writeThread, Timestamp read, long readThread)
+            throws SQLException {
+        int idx = 1;
+        hbClassInitSt.setLong(idx++, writeThread);
+        hbClassInitSt.setTimestamp(idx++, write);
+        hbClassInitSt.setLong(idx++, readThread);
+        hbClassInitSt.setTimestamp(idx++, read);
+        final ResultSet hbSet = hbClassInitSt.executeQuery();
+        try {
+            return hbSet.next();
+        } finally {
+            hbSet.close();
+        }
+    }
+
     public boolean happensBeforeThread(Timestamp write, long writeThread,
             Timestamp read, long readThread) throws SQLException {
         int idx = 1;
@@ -286,6 +309,8 @@ public class HappensBeforeAnalysis {
      * two threads, typically from a write in one thread to a read in another
      * thread. The first timestamp must always be earlier than the second.
      * 
+     * @param isStatic
+     * 
      * @param write
      * @param writeThread
      * @param read
@@ -301,7 +326,9 @@ public class HappensBeforeAnalysis {
                 || happensBeforeThread(write, writeThread, read, readThread)
                 || happensBeforeObject(write, writeThread, read, readThread)
                 || happensBeforeLock(write, writeThread, read, readThread)
-                || happensBeforeCollection(write, writeThread, read, readThread);
+                || happensBeforeCollection(write, writeThread, read, readThread)
+                || happensBeforeClassInitialization(write, writeThread, read,
+                        readThread);
     }
 
     public List<HBEdge> happensBeforeTraces(Timestamp write, long writeThread,
@@ -315,6 +342,7 @@ public class HappensBeforeAnalysis {
         addHappensBeforeObject(write, writeThread, read, readThread, list);
         addHappensBeforeLock(write, writeThread, read, readThread, list);
         addHappensBeforeCollection(write, writeThread, read, readThread, list);
+        addHappensBeforeClassInit(write, writeThread, read, readThread, list);
         return list;
     }
 
@@ -501,6 +529,29 @@ public class HappensBeforeAnalysis {
             }
         } finally {
             sourceSet.close();
+        }
+    }
+
+    private void addHappensBeforeClassInit(Timestamp write, long writeThread,
+            Timestamp read, long readThread, List<HBEdge> list)
+            throws SQLException {
+        int idx = 1;
+        hbClassInitTraceSt.setLong(idx++, writeThread);
+        hbClassInitTraceSt.setTimestamp(idx++, write);
+        hbClassInitTraceSt.setLong(idx++, readThread);
+        hbClassInitTraceSt.setTimestamp(idx++, read);
+        final ResultSet hbSet = hbClassInitTraceSt.executeQuery();
+        try {
+            while (hbSet.next()) {
+                idx = 1;
+                HBNode source = new HBNode(hbSet.getTimestamp(idx++),
+                        hbSet.getLong(idx++));
+                HBNode target = new HBNode(hbSet.getTimestamp(idx++),
+                        hbSet.getLong(idx++));
+                list.add(new HBEdge(source, target));
+            }
+        } finally {
+            hbSet.close();
         }
     }
 

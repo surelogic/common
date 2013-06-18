@@ -191,7 +191,7 @@ public class RollupAccessesResultSet implements InvocationHandler {
             case 7:
                 return happensBefore.getDisplay();
             case 8:
-                return lastWrite;
+                return lastWrite == null ? new Timestamp(0) : lastWrite;
             case 9:
                 return lastWriteThread;
             case 10:
