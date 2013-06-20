@@ -49,8 +49,8 @@ public final class AdHocQueryResultSqlData extends AdHocQueryResult {
    * Gets the row index selected in this result or -1 if nothing is selected or
    * if a partial row is selected.
    * 
-   * @return the row index selected in this result or -1 if no row is selected
-   *         or if a partial row is selected.
+   * @return the zero-based row index selected in this result or -1 if no row is
+   *         selected or if a partial row is selected.
    * @see #getSelectedCell()
    */
   public int getSelectedRowIndex() {
@@ -61,7 +61,7 @@ public final class AdHocQueryResultSqlData extends AdHocQueryResult {
    * Sets the selected result row to the passed row index.
    * 
    * @param rowIndex
-   *          a row index within the result model.
+   *          a zero-based row index within the result model.
    */
   public void setSelectedRowIndex(final int rowIndex) {
     if (rowIndex < -1 || rowIndex >= f_model.getRowCount()) {
