@@ -11,22 +11,22 @@ import com.surelogic.common.ui.EclipseUIUtility;
 
 public class QueryResultsCopyHandler extends AbstractHandler {
 
-	@Override
+  @Override
   public Object execute(final ExecutionEvent event) throws ExecutionException {
-		final Clipboard cb = new Clipboard(EclipseUIUtility.getShell()
-				.getDisplay());
-		try {
-			return execute(event, cb);
-		} finally {
-			cb.dispose();
-		}
-	}
+    final Clipboard cb = new Clipboard(EclipseUIUtility.getShell().getDisplay());
+    try {
+      return execute(event, cb);
+    } finally {
+      cb.dispose();
+    }
+  }
 
-	private Object execute(final ExecutionEvent event, final Clipboard cb) {
-		final IWorkbenchPart part = HandlerUtil.getActivePart(event);
-		if (part instanceof AbstractQueryResultsView) {
-			((AbstractQueryResultsView) part).copySelection();
-		}
-		return null;
-	}
+  private Object execute(final ExecutionEvent event, final Clipboard cb) {
+    final IWorkbenchPart part = HandlerUtil.getActivePart(event);
+    if (part instanceof AbstractQueryResultsView) {
+      final AbstractQueryResultsView view = (AbstractQueryResultsView) part;
+      AbstractQueryResultsView.copySelection(view.getResult());
+    }
+    return null;
+  }
 }

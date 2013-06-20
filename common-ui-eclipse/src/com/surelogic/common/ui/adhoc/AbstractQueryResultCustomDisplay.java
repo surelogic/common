@@ -1,15 +1,9 @@
 package com.surelogic.common.ui.adhoc;
 
-import java.util.List;
 import java.util.Map;
 
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 
 import com.surelogic.NonNull;
 import com.surelogic.Nullable;
@@ -18,7 +12,7 @@ import com.surelogic.common.adhoc.AdHocQueryFullyBound;
 import com.surelogic.common.adhoc.AdHocQueryResultSqlData;
 import com.surelogic.common.core.adhoc.EclipseQueryUtility;
 import com.surelogic.common.i18n.I18N;
-import com.surelogic.common.ui.SLImages;
+import com.surelogic.common.ui.adhoc.views.results.AbstractQueryResultsView;
 
 /**
  * A base implementation of {@link IQueryResultCustomDisplay} that makes running
@@ -66,8 +60,11 @@ public abstract class AbstractQueryResultCustomDisplay implements IQueryResultCu
   protected abstract void displayResult(Composite panel);
 
   /**
-   * Called to schedule a sub-query to this query result. This method can only
-   * be invoked after {@link #init()} has been called.
+   * Called to manually schedule a sub-query to this query result. This method
+   * can only be invoked after {@link #init()} has been called.
+   * <p>
+   * To use a menu in your custom display try to use
+   * {@link AbstractQueryResultsView#setupSubQueryMenu(org.eclipse.swt.widgets.Menu, com.surelogic.common.adhoc.AdHocQueryResult, Map)}.
    * 
    * @param query
    *          a query to run in the context of this result.
@@ -77,8 +74,11 @@ public abstract class AbstractQueryResultCustomDisplay implements IQueryResultCu
   }
 
   /**
-   * Called to schedule a sub-query to this query result. This method can only
-   * be invoked after {@link #init()} has been called.
+   * Called to manually schedule a sub-query to this query result. This method
+   * can only be invoked after {@link #init()} has been called.
+   * <p>
+   * To use a menu in your custom display try to use
+   * {@link AbstractQueryResultsView#setupSubQueryMenu(org.eclipse.swt.widgets.Menu, com.surelogic.common.adhoc.AdHocQueryResult, Map)}.
    * 
    * @param query
    *          a query to run in the context of this result.
@@ -98,39 +98,5 @@ public abstract class AbstractQueryResultCustomDisplay implements IQueryResultCu
     }
     final AdHocQueryFullyBound boundQuery = new AdHocQueryFullyBound(query, all, top);
     EclipseQueryUtility.scheduleQuery(boundQuery, getResult());
-  }
-
-  protected final void addSubQueriesToMenu(@NonNull Menu menu, @Nullable Map<String, String> extraVariables) {
-    if (menu == null)
-      throw new IllegalArgumentException(I18N.err(44, "menu"));
-
-    final AdHocQueryResultSqlData result = getResult();
-    final AdHocQuery resultQuery = result.getQueryFullyBound().getQuery();
-    final List<AdHocQuery> subQueryList = resultQuery.getVisibleSubQueryList();
-    final Map<String, String> variableValues = result.getVariableValues();
-    final Map<String, String> topVariableValues = result.getTopVariableValues();
-    if (extraVariables != null) {
-      variableValues.putAll(extraVariables);
-      topVariableValues.putAll(extraVariables);
-    }
-    final Listener runSubQuery = new Listener() {
-      @Override
-      public void handleEvent(final Event event) {
-        if (event.widget.getData() instanceof AdHocQuery) {
-          final AdHocQuery query = (AdHocQuery) event.widget.getData();
-          final AdHocQueryFullyBound boundQuery = new AdHocQueryFullyBound(query, variableValues, topVariableValues);
-          EclipseQueryUtility.scheduleQuery(boundQuery, result);
-        }
-      }
-    };
-    for (final AdHocQuery query : subQueryList) {
-      final MenuItem item = new MenuItem(menu, SWT.PUSH);
-      item.setText(query.getDescription());
-      item.setData(query);
-      final boolean decorateAsDefault = resultQuery.isDefaultSubQuery(query);
-      item.setImage(SLImages.getImageForAdHocQuery(query.getType(), decorateAsDefault, false));
-      item.setEnabled(query.isCompletelySubstitutedBy(variableValues));
-      item.addListener(SWT.Selection, runSubQuery);
-    }
   }
 }

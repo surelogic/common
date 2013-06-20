@@ -42,6 +42,7 @@ import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.part.ViewPart;
 
+import com.surelogic.Nullable;
 import com.surelogic.common.CommonImages;
 import com.surelogic.common.Justification;
 import com.surelogic.common.adhoc.AdHocManager;
@@ -266,60 +267,6 @@ public abstract class AbstractQueryResultsView extends ViewPart {
     sql.setText(text);
   }
 
-  private void setupMenu(final Menu menu) {
-    menu.addListener(SWT.Show, new Listener() {
-
-      @Override
-      public void handleEvent(final Event event) {
-        for (final MenuItem item : menu.getItems()) {
-          if (!item.isDisposed()) {
-            item.dispose();
-          }
-        }
-
-        if (!(f_result instanceof AdHocQueryResultSqlData)) {
-          return; // bail out
-        }
-
-        final AdHocQueryResultSqlData result = (AdHocQueryResultSqlData) f_result;
-        final AdHocQuery resultQuery = result.getQueryFullyBound().getQuery();
-        final List<AdHocQuery> subQueryList = resultQuery.getVisibleSubQueryList();
-        final Map<String, String> variableValues = result.getVariableValues();
-        final Map<String, String> topVariableValues = result.getTopVariableValues();
-        final Listener runSubQuery = new Listener() {
-          @Override
-          public void handleEvent(final Event event) {
-            if (event.widget.getData() instanceof AdHocQuery) {
-              final AdHocQuery query = (AdHocQuery) event.widget.getData();
-              final AdHocQueryFullyBound boundQuery = new AdHocQueryFullyBound(query, variableValues, topVariableValues);
-              EclipseQueryUtility.scheduleQuery(boundQuery, result);
-            }
-          }
-        };
-        for (final AdHocQuery query : subQueryList) {
-          final MenuItem item = new MenuItem(menu, SWT.PUSH);
-          item.setText(query.getDescription());
-          item.setData(query);
-          final boolean decorateAsDefault = resultQuery.isDefaultSubQuery(query);
-          item.setImage(SLImages.getImageForAdHocQuery(query.getType(), decorateAsDefault, false));
-          item.setEnabled(query.isCompletelySubstitutedBy(variableValues));
-          item.addListener(SWT.Selection, runSubQuery);
-        }
-        if (!subQueryList.isEmpty()) {
-          new MenuItem(menu, SWT.SEPARATOR);
-          final MenuItem copy = new MenuItem(menu, SWT.PUSH);
-          copy.setText(I18N.msg("adhoc.query.results.copy"));
-          copy.addListener(SWT.Selection, new Listener() {
-            @Override
-            public void handleEvent(final Event event) {
-              copySelection();
-            }
-          });
-        }
-      }
-    });
-  }
-
   private void displayNoResults() {
     disposeViewContents();
 
@@ -362,7 +309,7 @@ public abstract class AbstractQueryResultsView extends ViewPart {
     panel.setLayout(new FillLayout());
 
     final Menu menu = new Menu(f_parent.getShell(), SWT.POP_UP);
-    setupMenu(menu);
+    setupSubQueryMenu(menu, data, null);
 
     if (data.getQueryFullyBound().getQuery().usesCustomDisplay()) {
       /*
@@ -456,7 +403,7 @@ public abstract class AbstractQueryResultsView extends ViewPart {
       table.addListener(SWT.MouseDoubleClick, new Listener() {
         @Override
         public void handleEvent(final Event event) {
-          runDefaultQueryOf(data);
+          runDefaultQueryOf(data, null);
         }
       });
 
@@ -535,7 +482,7 @@ public abstract class AbstractQueryResultsView extends ViewPart {
       tree.addListener(SWT.MouseDoubleClick, new Listener() {
         @Override
         public void handleEvent(final Event event) {
-          runDefaultQueryOf(data);
+          runDefaultQueryOf(data, null);
         }
       });
 
@@ -558,16 +505,6 @@ public abstract class AbstractQueryResultsView extends ViewPart {
       }
     }
     f_parent.layout();
-  }
-
-  private void runDefaultQueryOf(final AdHocQueryResultSqlData data) {
-    final Map<String, String> variableValues = data.getVariableValues();
-    final Map<String, String> topVariableValues = data.getTopVariableValues();
-    final AdHocQuery query = data.getQueryFullyBound().getQuery().getDefaultSubQuery();
-    if (query != null) {
-      final AdHocQueryFullyBound boundQuery = new AdHocQueryFullyBound(query, variableValues, topVariableValues);
-      EclipseQueryUtility.scheduleQuery(boundQuery, data);
-    }
   }
 
   /**
@@ -668,9 +605,109 @@ public abstract class AbstractQueryResultsView extends ViewPart {
     f_parent.layout();
   }
 
-  public void copySelection() {
-    if (f_result != null && f_result instanceof AdHocQueryResultSqlData) {
-      final AdHocQueryResultSqlData result = (AdHocQueryResultSqlData) f_result;
+  /**
+   * Must be called from the SWT thread.
+   * 
+   * @param query
+   *          the query to open in the query editor.
+   */
+  private void editQueryInQueryEditor(final AdHocQuery query) {
+    final String viewId = query.getManager().getDataSource().getQueryEditorViewId();
+    if (viewId != null) {
+      final IViewPart view = EclipseUIUtility.showView(viewId);
+      if (view instanceof AbstractQueryEditorView) {
+        ((AbstractQueryEditorView) view).editInEditor(query);
+      }
+    }
+  }
+
+  /**
+   * Sets up a sub query menu for the view.
+   * <p>
+   * May be used by custom query result displays.
+   * 
+   * @param menu
+   *          the menu to populate.
+   * @param queryResult
+   *          a query result.
+   * @param extraVariables
+   *          used to add extra variables to the query run. Should be
+   *          {@code null} except for custom query result displays.
+   */
+  public static void setupSubQueryMenu(final Menu menu, final AdHocQueryResult queryResult,
+      @Nullable final Map<String, String> extraVariables) {
+    menu.addListener(SWT.Show, new Listener() {
+
+      @Override
+      public void handleEvent(final Event event) {
+        for (final MenuItem item : menu.getItems()) {
+          if (!item.isDisposed()) {
+            item.dispose();
+          }
+        }
+
+        if (!(queryResult instanceof AdHocQueryResultSqlData)) {
+          return; // bail out
+        }
+
+        final AdHocQueryResultSqlData result = (AdHocQueryResultSqlData) queryResult;
+        final AdHocQuery resultQuery = result.getQueryFullyBound().getQuery();
+        final List<AdHocQuery> subQueryList = resultQuery.getVisibleSubQueryList();
+        final Map<String, String> variableValues = result.getVariableValues();
+        final Map<String, String> topVariableValues = result.getTopVariableValues();
+        if (extraVariables != null) {
+          /*
+           * Only for custom result displays that need to add variables not
+           * expressed by selecting a row of the query data.
+           */
+          variableValues.putAll(extraVariables);
+          topVariableValues.putAll(extraVariables);
+        }
+        final Listener runSubQuery = new Listener() {
+          @Override
+          public void handleEvent(final Event event) {
+            if (event.widget.getData() instanceof AdHocQuery) {
+              final AdHocQuery query = (AdHocQuery) event.widget.getData();
+              final AdHocQueryFullyBound boundQuery = new AdHocQueryFullyBound(query, variableValues, topVariableValues);
+              EclipseQueryUtility.scheduleQuery(boundQuery, result);
+            }
+          }
+        };
+        for (final AdHocQuery query : subQueryList) {
+          final MenuItem item = new MenuItem(menu, SWT.PUSH);
+          item.setText(query.getDescription());
+          item.setData(query);
+          final boolean decorateAsDefault = resultQuery.isDefaultSubQuery(query);
+          item.setImage(SLImages.getImageForAdHocQuery(query.getType(), decorateAsDefault, false));
+          item.setEnabled(query.isCompletelySubstitutedBy(variableValues));
+          item.addListener(SWT.Selection, runSubQuery);
+        }
+        if (!subQueryList.isEmpty()) {
+          new MenuItem(menu, SWT.SEPARATOR);
+          final MenuItem copy = new MenuItem(menu, SWT.PUSH);
+          copy.setText(I18N.msg("adhoc.query.results.copy"));
+          copy.addListener(SWT.Selection, new Listener() {
+            @Override
+            public void handleEvent(final Event event) {
+              copySelection(queryResult);
+            }
+          });
+        }
+      }
+    });
+  }
+
+  /**
+   * Used to copy query result from the UI.
+   * <p>
+   * May be used by custom query result displays.
+   * 
+   * @param queryResult
+   *          a query result.
+   */
+  public static void copySelection(final AdHocQueryResult queryResult) {
+    if (queryResult != null && queryResult instanceof AdHocQueryResultSqlData) {
+      final AdHocQueryResultSqlData result = (AdHocQueryResultSqlData) queryResult;
       final StringBuilder b = new StringBuilder();
       final int selected = result.getSelectedRowIndex();
       if (selected != -1) {
@@ -713,17 +750,26 @@ public abstract class AbstractQueryResultsView extends ViewPart {
   }
 
   /**
-   * Must be called from the SWT thread.
+   * Used to run the default sub query for a result. If no such query exists or
+   * the query result does not contain data nothing occurs.
+   * <p>
+   * May be used by custom query result displays.
    * 
-   * @param query
-   *          the query to open in the query editor.
+   * @param queryResult
+   *          a query result.
+   * @param extraVariables
+   *          used to add extra variables to the query run. Should be
+   *          {@code null} except for custom query result displays.
    */
-  private void editQueryInQueryEditor(final AdHocQuery query) {
-    final String viewId = query.getManager().getDataSource().getQueryEditorViewId();
-    if (viewId != null) {
-      final IViewPart view = EclipseUIUtility.showView(viewId);
-      if (view instanceof AbstractQueryEditorView) {
-        ((AbstractQueryEditorView) view).editInEditor(query);
+  public static void runDefaultQueryOf(final AdHocQueryResult queryResult, @Nullable final Map<String, String> extraVariables) {
+    if (queryResult != null && queryResult instanceof AdHocQueryResultSqlData) {
+      final AdHocQueryResultSqlData data = (AdHocQueryResultSqlData) queryResult;
+      final Map<String, String> variableValues = data.getVariableValues();
+      final Map<String, String> topVariableValues = data.getTopVariableValues();
+      final AdHocQuery query = data.getQueryFullyBound().getQuery().getDefaultSubQuery();
+      if (query != null) {
+        final AdHocQueryFullyBound boundQuery = new AdHocQueryFullyBound(query, variableValues, topVariableValues);
+        EclipseQueryUtility.scheduleQuery(boundQuery, data);
       }
     }
   }
