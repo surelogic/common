@@ -523,7 +523,7 @@ public class EclipseUtility {
   public static File getJSecureDataDirectory() {
     return EclipseUtility.getWorkspaceRelativeAsFile(FileUtility.JSECURE_DATA_PATH_FRAGMENT);
   }
-  
+
   /**
    * Gets the {@link File} for the Sierra data directory.
    * 
@@ -889,6 +889,39 @@ public class EclipseUtility {
    */
   public static boolean bundleExists(final String id) {
     return Platform.getBundle(id) != null;
+  }
+
+  /**
+   * Checks if the Flashlight Android plug-in is installed into Eclipse. This
+   * done via a call to {@link #bundleExists(String)} with the correct plug-in
+   * identifier.
+   * 
+   * @return {@code true} if it is installed, {@code false} otherwise.
+   */
+  public static boolean isFlashlightAndroidInstalled() {
+    return bundleExists("com.surelogic.flashlight.android");
+  }
+
+  /**
+   * Checks if the JSure client plug-in is installed into Eclipse. This done via
+   * a call to {@link #bundleExists(String)} with the correct plug-in
+   * identifier.
+   * 
+   * @return {@code true} if it is installed, {@code false} otherwise.
+   */
+  public static boolean isJSureInstalled() {
+    return bundleExists("com.surelogic.jsure.client.eclipse");
+  }
+
+  /**
+   * Checks if the Sierra local team server plug-in is installed into Eclipse.
+   * This done via a call to {@link #bundleExists(String)} with the correct
+   * plug-in identifier.
+   * 
+   * @return {@code true} if it is installed, {@code false} otherwise.
+   */
+  public static boolean isLocalTeamServerInstalled() {
+    return bundleExists("com.surelogic.sierra.eclipse.teamserver");
   }
 
   /**
