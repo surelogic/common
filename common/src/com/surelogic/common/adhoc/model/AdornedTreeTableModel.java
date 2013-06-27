@@ -371,7 +371,7 @@ public final class AdornedTreeTableModel {
                 summaryTotal += value;
               }
               final NonLeafColumnSummary columnSummary = new NonLeafColumnSummary(colI, Long.toString(summaryTotal)
-                  + info.getSuffix());
+                  + info.getAggregateSuffix());
               cell.addColumnSummary(columnSummary);
             }
           } else if (info.maxPartialRows()) {
@@ -386,7 +386,7 @@ public final class AdornedTreeTableModel {
                 runningMax = Math.max(runningMax, value);
               }
               final NonLeafColumnSummary columnSummary = new NonLeafColumnSummary(colI, Long.toString(runningMax)
-                  + info.getSuffix());
+                  + info.getAggregateSuffix());
               cell.addColumnSummary(columnSummary);
             }
 
@@ -414,7 +414,7 @@ public final class AdornedTreeTableModel {
                 }
               }
               final NonLeafColumnSummary columnSummary = new NonLeafColumnSummary(colI, Integer.toString(countTotal)
-                  + info.getSuffix());
+                  + info.getAggregateSuffix());
               cell.addColumnSummary(columnSummary);
             }
           }

@@ -181,7 +181,7 @@ public final class ColumnAnnotation {
   public void setCountPartialRows(final boolean value) {
     f_countPartialRows = value;
   }
-  
+
   private String f_countReplaceValueWith = null;
 
   public String getCountReplaceValueWith() {
@@ -259,6 +259,32 @@ public final class ColumnAnnotation {
     }
   }
 
+  private String f_aggregateSuffix = "";
+
+  public String getAggregateSuffix() {
+    return f_aggregateSuffix;
+  }
+
+  /**
+   * Do not call this method. It should only be called by the parser.
+   */
+  public void setAggregateSuffix(final String value) {
+    f_aggregateSuffix = stripSingleQuotes(value);
+  }
+
+  private String f_prefix = "";
+
+  public String getPrefix() {
+    return f_prefix;
+  }
+
+  /**
+   * Do not call this method. It should only be called by the parser.
+   */
+  public void setPrefix(final String value) {
+    f_prefix = stripSingleQuotes(value);
+  }
+
   private String f_suffix = "";
 
   public String getSuffix() {
@@ -270,6 +296,19 @@ public final class ColumnAnnotation {
    */
   public void setSuffix(final String value) {
     f_suffix = stripSingleQuotes(value);
+  }
+
+  private boolean f_addCommas = false;
+
+  public boolean addCommas() {
+    return f_addCommas;
+  }
+
+  /**
+   * Do not call this method. It should only be called by the parser.
+   */
+  public void setAddCommas(final boolean value) {
+    f_addCommas = value;
   }
 
   private String stripSingleQuotes(String value) {

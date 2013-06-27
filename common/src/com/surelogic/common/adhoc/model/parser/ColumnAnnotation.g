@@ -65,7 +65,7 @@ columnAnnotation returns [ColumnAnnotation result]
 
 annotationPart
 	: treeTableSpec
-	| '(' (hideSpec | iconSpec | justSpec | countSpec | sumSpec | maxSpec) ')'
+	| '(' (hideSpec | iconSpec | justSpec | affixSpec | numSpec | countSpec | sumSpec | maxSpec) ')'
 	;
 
 treeTableSpec
@@ -91,6 +91,15 @@ justSpec
 	| ('c' | 'center')  { f_column.setJusification(Justification.CENTER); }
 	| ('l' | 'left') { f_column.setJusification(Justification.LEFT); }
 	;
+	
+affixSpec
+	: 'prefix' value=QUOTED_STRING { f_column.setPrefix($value.text); }
+	| 'suffix' value=QUOTED_STRING { f_column.setSuffix($value.text); }
+	;
+	
+numSpec
+	: ('add-commas') { f_column.setAddCommas(true); }
+	;
 
 countSpec
 	: 'count' { f_column.setCountPartialRows(true); } distinctPart? replaceValuePart? onPart? suffixPart?
@@ -115,7 +124,7 @@ replaceValuePart
 	;
 
 suffixPart
-	: suffix=QUOTED_STRING { f_column.setSuffix($suffix.text); }
+	: suffix=QUOTED_STRING { f_column.setAggregateSuffix($suffix.text); }
 	;
 
 INT
