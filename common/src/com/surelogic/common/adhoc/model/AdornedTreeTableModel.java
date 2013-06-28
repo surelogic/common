@@ -13,6 +13,7 @@ import java.util.logging.Level;
 
 import com.surelogic.common.Justification;
 import com.surelogic.common.Pair;
+import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.logging.SLLogger;
 
@@ -369,8 +370,10 @@ public final class AdornedTreeTableModel {
                 final long value = safeParseLong(contents);
                 summaryTotal += value;
               }
-              final NonLeafColumnSummary columnSummary = new NonLeafColumnSummary(colI, Long.toString(summaryTotal)
-                  + info.getAggregateSuffix());
+              final String text = info.getAggregatePrefix()
+                  + (info.getAddCommas() ? SLUtility.toStringHumanWithCommas(summaryTotal) : Long.toString(summaryTotal))
+                  + info.getAggregateSuffix();
+              final NonLeafColumnSummary columnSummary = new NonLeafColumnSummary(colI, text);
               cell.addColumnSummary(columnSummary);
             }
           } else if (info.maxPartialRows()) {
@@ -384,8 +387,10 @@ public final class AdornedTreeTableModel {
                 final long value = safeParseLong(contents);
                 runningMax = Math.max(runningMax, value);
               }
-              final NonLeafColumnSummary columnSummary = new NonLeafColumnSummary(colI, Long.toString(runningMax)
-                  + info.getAggregateSuffix());
+              final String text = info.getAggregatePrefix()
+                  + (info.getAddCommas() ? SLUtility.toStringHumanWithCommas(runningMax) : Long.toString(runningMax))
+                  + info.getAggregateSuffix();
+              final NonLeafColumnSummary columnSummary = new NonLeafColumnSummary(colI, text);
               cell.addColumnSummary(columnSummary);
             }
 
@@ -412,8 +417,10 @@ public final class AdornedTreeTableModel {
                   cellsToReplaceText.add(new Pair<Cell, String>(adornedCell, replaceValueWith));
                 }
               }
-              final NonLeafColumnSummary columnSummary = new NonLeafColumnSummary(colI, Integer.toString(countTotal)
-                  + info.getAggregateSuffix());
+              final String text = info.getAggregatePrefix()
+                  + (info.getAddCommas() ? SLUtility.toStringHumanWithCommas(countTotal) : Long.toString(countTotal))
+                  + info.getAggregateSuffix();
+              final NonLeafColumnSummary columnSummary = new NonLeafColumnSummary(colI, text);
               cell.addColumnSummary(columnSummary);
             }
           }
