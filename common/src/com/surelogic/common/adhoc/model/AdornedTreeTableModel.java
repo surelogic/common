@@ -225,7 +225,7 @@ public final class AdornedTreeTableModel {
       adornedColI = 0;
       for (int colI = 0; colI < columnLabels.length; colI++) {
         final boolean notAnImageDefinitionColumn = definesImageFor[colI] == NOT_FOUND;
-        final String cellText;
+        String cellText;
         String cellImageSymbolicName;
         if (notAnImageDefinitionColumn) {
           cellText = row[colI];
@@ -250,6 +250,26 @@ public final class AdornedTreeTableModel {
                 cellImageSymbolicName = null;
               }
             }
+          }
+          // Handle prefix, suffix, and add-commas
+          final ColumnAnnotation colInfo = adornedColumnAnnotationInfo[adornedColI];
+          if (cellText != null) {
+            if (colInfo.getAddCommas()) {
+              try {
+                long longValue = Long.parseLong(cellText);
+                cellText = SLUtility.toStringHumanWithCommas(longValue);
+              } catch (NumberFormatException ignore) {
+                // go on not a number
+              }
+            }
+          }
+          final String prefix = colInfo.getPrefix();
+          if (!"".equals(prefix)) {
+            cellText = (cellText == null ? prefix : prefix + cellText);
+          }
+          final String suffix = colInfo.getSuffix();
+          if (!"".equals(suffix)) {
+            cellText = (cellText == null ? suffix : cellText + suffix);
           }
           adornedRows[rowI][adornedColI] = new Cell(cellText, cellImageSymbolicName);
           adornedColI++;
@@ -434,7 +454,9 @@ public final class AdornedTreeTableModel {
   /**
    * This method converts a string to a long but it ignores non-numeric
    * suffices. For example, invoking {@code safeParseLong("40 ns")} would result
-   * in 40 (i.e., not an error).
+   * in 40 (i.e., not an error). Also commas are skipped so
+   * {@code safeParseLong("47,340 ns")} would result in 47340 (i.e., not an
+   * error).
    * 
    * @param value
    *          the string to convert.
@@ -447,12 +469,14 @@ public final class AdornedTreeTableModel {
     if (value != null) {
       for (int i = 0; i < value.length(); i++) {
         final char ch = value.charAt(i);
-        final long digit = ch - '0';
-        final boolean isNumeric = 0 <= digit && digit <= 9;
-        if (isNumeric) {
-          result = (result * 10) + digit;
-        } else {
-          return result;
+        if (ch != ',') { // skip commas
+          final long digit = ch - '0';
+          final boolean isNumeric = 0 <= digit && digit <= 9;
+          if (isNumeric) {
+            result = (result * 10) + digit;
+          } else {
+            return result;
+          }
         }
       }
     }
