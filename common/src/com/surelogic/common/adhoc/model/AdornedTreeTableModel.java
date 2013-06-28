@@ -251,22 +251,23 @@ public final class AdornedTreeTableModel {
               }
             }
           }
-          // Handle prefix, suffix, and add-commas
+          // Add commas to starting number (1000 -> 1,000 / 4544j -> 4,544j)
           final ColumnAnnotation colInfo = adornedColumnAnnotationInfo[adornedColI];
           if (cellText != null) {
             if (colInfo.getAddCommas()) {
-              try {
-                long longValue = Long.parseLong(cellText);
-                cellText = SLUtility.toStringHumanWithCommas(longValue);
-              } catch (NumberFormatException ignore) {
-                // go on not a number
+              Pair<Long, String> breakout = safeParseLongAtStart(cellText);
+              if (breakout != null) {
+                // the string begins with an integer
+                cellText = SLUtility.toStringHumanWithCommas(breakout.first()) + breakout.second();
               }
             }
           }
+          // Add prefix if necessary
           final String prefix = colInfo.getPrefix();
           if (!"".equals(prefix)) {
             cellText = (cellText == null ? prefix : prefix + cellText);
           }
+          // add suffix if necessary
           final String suffix = colInfo.getSuffix();
           if (!"".equals(suffix)) {
             cellText = (cellText == null ? suffix : cellText + suffix);
@@ -481,6 +482,42 @@ public final class AdornedTreeTableModel {
       }
     }
     return result;
+  }
+
+  /**
+   * Breaks a string into a long for the starting integer and the rest of the
+   * string.
+   * 
+   * @param value
+   *          a string value
+   * @return a pair containing the starting number followed by the remaining
+   *         string or {@code null} if the passed value does not being with a
+   *         number.
+   */
+  private static Pair<Long, String> safeParseLongAtStart(String value) {
+    if (value == null)
+      return null;
+
+    boolean startsWithANumber = false;
+    long result = 0;
+    for (int i = 0; i < value.length(); i++) {
+      final char ch = value.charAt(i);
+      final long digit = ch - '0';
+      final boolean isNumeric = 0 <= digit && digit <= 9;
+      if (isNumeric) {
+        result = (result * 10) + digit;
+        startsWithANumber = true;
+      } else {
+        if (startsWithANumber)
+          return new Pair<Long, String>(result, value.substring(i));
+        else
+          return null;
+      }
+    }
+    if (startsWithANumber)
+      return new Pair<Long, String>(result, "");
+    else
+      return null;
   }
 
   private static List<NonLeafTreeCell> getAllNonLeaf(final List<TreeCell> root) {
