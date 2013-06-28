@@ -251,27 +251,34 @@ public final class AdornedTreeTableModel {
               }
             }
           }
-          // Add commas to starting number (1000 -> 1,000 / 4544j -> 4,544j)
+
+          /*
+           * Handle commas, prefix, and suffix if necessary
+           */
           final ColumnAnnotation colInfo = adornedColumnAnnotationInfo[adornedColI];
-          if (cellText != null) {
-            if (colInfo.getAddCommas()) {
-              Pair<Long, String> breakout = safeParseLongAtStart(cellText);
-              if (breakout != null) {
-                // the string begins with an integer
-                cellText = SLUtility.toStringHumanWithCommas(breakout.first()) + breakout.second();
+          if (colInfo != null) {
+            // Add commas to starting number (1000 -> 1,000 / 4544j -> 4,544j)
+            if (cellText != null) {
+              if (colInfo.getAddCommas()) {
+                Pair<Long, String> breakout = safeParseLongAtStart(cellText);
+                if (breakout != null) {
+                  // the string begins with an integer
+                  cellText = SLUtility.toStringHumanWithCommas(breakout.first()) + breakout.second();
+                }
               }
             }
+            // Add prefix if necessary
+            final String prefix = colInfo.getPrefix();
+            if (!"".equals(prefix)) {
+              cellText = (cellText == null ? prefix : prefix + cellText);
+            }
+            // add suffix if necessary
+            final String suffix = colInfo.getSuffix();
+            if (!"".equals(suffix)) {
+              cellText = (cellText == null ? suffix : cellText + suffix);
+            }
           }
-          // Add prefix if necessary
-          final String prefix = colInfo.getPrefix();
-          if (!"".equals(prefix)) {
-            cellText = (cellText == null ? prefix : prefix + cellText);
-          }
-          // add suffix if necessary
-          final String suffix = colInfo.getSuffix();
-          if (!"".equals(suffix)) {
-            cellText = (cellText == null ? suffix : cellText + suffix);
-          }
+
           adornedRows[rowI][adornedColI] = new Cell(cellText, cellImageSymbolicName);
           adornedColI++;
         }
