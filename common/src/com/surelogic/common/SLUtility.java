@@ -454,7 +454,7 @@ public final class SLUtility {
    * @return a human readable string in days, hours, minutes and seconds.
    */
   public static String toStringDurationS(long duration, TimeUnit unit) {
-    return toStringDuration(duration, unit, false);
+    return toStringDuration(duration, unit, true, false);
   }
 
   /**
@@ -470,10 +470,26 @@ public final class SLUtility {
    *         milliseconds.
    */
   public static String toStringDurationMS(long duration, TimeUnit unit) {
-    return toStringDuration(duration, unit, true);
+    return toStringDuration(duration, unit, false, true);
   }
 
-  private static String toStringDuration(long duration, TimeUnit unit, boolean showMS) {
+  /**
+   * This converts a time into a human readable string in days, hours, minutes,
+   * seconds, milliseconds, and nanoseconds. It is useful for user interface
+   * display or logging of precise durations.
+   * 
+   * @param duration
+   *          a length of time.
+   * @param unit
+   *          the time unit for the passed duration.
+   * @return a human readable string in days, hours, minutes seconds,
+   *         milliseconds, and nanoseconds.
+   */
+  public static String toStringDurationNS(long duration, TimeUnit unit) {
+    return toStringDuration(duration, unit, false, false);
+  }
+
+  private static String toStringDuration(long duration, final TimeUnit unit, final boolean stopAtSeconds, final boolean stopAtMS) {
     final StringBuilder b = new StringBuilder();
     final long days = unit.toDays(duration);
     if (days > 0) {
@@ -509,20 +525,29 @@ public final class SLUtility {
         duration -= unit.convert(seconds, TimeUnit.SECONDS);
       }
     }
-    if (showMS) {
-      if (duration > 0) {
-        final long millis = unit.toMillis(duration);
-        if (millis > 0) {
-          b.append(" ").append(millis).append(" ms");
-        }
-      }
-      if (b.length() == 0)
-        b.append("under one millisecond");
-    } else {
+    if (stopAtSeconds) {
       if (b.length() == 0)
         b.append("under one second");
+      return b.toString().trim();
     }
-
+    if (duration > 0) {
+      final long millis = unit.toMillis(duration);
+      if (millis > 0) {
+        b.append(" ").append(millis).append(" ms");
+        duration -= unit.convert(millis, TimeUnit.MILLISECONDS);
+      }
+    }
+    if (stopAtMS) {
+      if (b.length() == 0)
+        b.append("under one millisecond");
+      return b.toString().trim();
+    }
+    if (duration > 0) {
+      final long nanos = unit.toNanos(duration);
+      if (nanos > 0) {
+        b.append(" ").append(toStringHumanWithCommas(duration)).append(" ns");
+      }
+    }
     return b.toString().trim();
   }
 
