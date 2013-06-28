@@ -102,13 +102,13 @@ numSpec
 	;
 
 countSpec
-	: 'count' { f_column.setCountPartialRows(true); } distinctPart? replaceValuePart? onPart? suffixPart?
+	: 'count' { f_column.setCountPartialRows(true); } distinctPart? replaceValuePart? onPart? prefixPart? suffixPart?
 	;
 
-sumSpec : 'sum' { f_column.setSumPartialRows(true); } onPart? suffixPart?
+sumSpec : 'sum' { f_column.setSumPartialRows(true); } onPart? prefixPart? suffixPart?
 	;
 	
-maxSpec : 'max' { f_column.setMaxPartialRows(true); } onPart? suffixPart?
+maxSpec : 'max' { f_column.setMaxPartialRows(true); } onPart? prefixPart? suffixPart?
 	;
 
 distinctPart
@@ -123,8 +123,12 @@ replaceValuePart
 	: 'replace-value-with' replace=QUOTED_STRING { f_column.setCountReplaceValueWith($replace.text); }
 	;
 
+prefixPart
+	: 'prefix' value=QUOTED_STRING { f_column.setAggregatePrefix($value.text); }
+	;
+
 suffixPart
-	: suffix=QUOTED_STRING { f_column.setAggregateSuffix($suffix.text); }
+	: 'suffix' value=QUOTED_STRING { f_column.setAggregateSuffix($value.text); }
 	;
 
 INT

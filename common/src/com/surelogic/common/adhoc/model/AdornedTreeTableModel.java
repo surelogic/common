@@ -201,7 +201,6 @@ public final class AdornedTreeTableModel {
     /*
      * Move hidden fields to the far right of the result.
      */
-
     for (int colI = 0; colI < adornedIsColumnVisible.length; colI++) {
       if (!adornedIsColumnVisible[colI]) {
         for (int colJ = colI; colJ < adornedIsColumnVisible.length; colJ++) {

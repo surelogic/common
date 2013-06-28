@@ -3,6 +3,7 @@ package com.surelogic.common.adhoc.model;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.surelogic.Nullable;
 import com.surelogic.common.Justification;
 import com.surelogic.common.i18n.I18N;
 
@@ -259,19 +260,6 @@ public final class ColumnAnnotation {
     }
   }
 
-  private String f_aggregateSuffix = "";
-
-  public String getAggregateSuffix() {
-    return f_aggregateSuffix;
-  }
-
-  /**
-   * Do not call this method. It should only be called by the parser.
-   */
-  public void setAggregateSuffix(final String value) {
-    f_aggregateSuffix = stripSingleQuotes(value);
-  }
-
   private String f_prefix = "";
 
   public String getPrefix() {
@@ -285,6 +273,29 @@ public final class ColumnAnnotation {
     f_prefix = stripSingleQuotes(value);
   }
 
+  @Nullable
+  private String f_aggregatePrefix = null;
+
+  /**
+   * Gets the prefix for an aggregate if any was set, otherwise returns the
+   * normal prefix from {@link #getPrefix()}.
+   * 
+   * @return a prefix.
+   */
+  public String getAggregatePrefix() {
+    if (f_aggregatePrefix != null)
+      return f_aggregatePrefix;
+    else
+      return getPrefix();
+  }
+
+  /**
+   * Do not call this method. It should only be called by the parser.
+   */
+  public void setAggregatePrefix(final String value) {
+    f_aggregatePrefix = stripSingleQuotes(value);
+  }
+
   private String f_suffix = "";
 
   public String getSuffix() {
@@ -296,6 +307,29 @@ public final class ColumnAnnotation {
    */
   public void setSuffix(final String value) {
     f_suffix = stripSingleQuotes(value);
+  }
+
+  @Nullable
+  private String f_aggregateSuffix = null;
+
+  /**
+   * Gets the suffix for an aggregate if any was set, otherwise returns the
+   * normal suffix from {@link #getSuffix()}.
+   * 
+   * @return a suffix.
+   */
+  public String getAggregateSuffix() {
+    if (f_aggregateSuffix != null)
+      return f_aggregateSuffix;
+    else
+      return getSuffix();
+  }
+
+  /**
+   * Do not call this method. It should only be called by the parser.
+   */
+  public void setAggregateSuffix(final String value) {
+    f_aggregateSuffix = stripSingleQuotes(value);
   }
 
   private boolean f_addCommas = false;
