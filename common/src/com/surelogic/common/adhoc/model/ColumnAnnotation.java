@@ -300,7 +300,7 @@ public final class ColumnAnnotation {
 
   private boolean f_addCommas = false;
 
-  public boolean addCommas() {
+  public boolean getAddCommas() {
     return f_addCommas;
   }
 
