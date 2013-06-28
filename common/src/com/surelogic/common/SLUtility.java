@@ -526,8 +526,12 @@ public final class SLUtility {
       }
     }
     if (stopAtSeconds) {
-      if (b.length() == 0)
-        b.append("under one second");
+      if (b.length() == 0) {
+        if (duration > 0)
+          b.append("under one second");
+        else
+          b.append("0 seconds");
+      }
       return b.toString().trim();
     }
     if (duration > 0) {
@@ -538,8 +542,12 @@ public final class SLUtility {
       }
     }
     if (stopAtMS) {
-      if (b.length() == 0)
-        b.append("under one millisecond");
+      if (b.length() == 0) {
+        if (duration > 0)
+          b.append("under one millisecond");
+        else
+          b.append("0 ms");
+      }
       return b.toString().trim();
     }
     if (duration > 0) {
@@ -547,6 +555,9 @@ public final class SLUtility {
       if (nanos > 0) {
         b.append(" ").append(toStringHumanWithCommas(duration)).append(" ns");
       }
+    }
+    if (b.length() == 0) {
+      b.append("0 ns");
     }
     return b.toString().trim();
   }
