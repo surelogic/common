@@ -587,7 +587,6 @@ public class HappensBeforeAnalysis {
         }
 
         public HBEdge(HBNode source, HBNode target) {
-            super();
             this.source = source;
             this.target = target;
         }
