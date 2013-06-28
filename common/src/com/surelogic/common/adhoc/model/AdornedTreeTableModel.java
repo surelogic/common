@@ -257,9 +257,17 @@ public final class AdornedTreeTableModel {
            */
           final ColumnAnnotation colInfo = adornedColumnAnnotationInfo[adornedColI];
           if (colInfo != null) {
-            // Add commas to starting number (1000 -> 1,000 / 4544j -> 4,544j)
             if (cellText != null) {
-              if (colInfo.getAddCommas()) {
+              // Human readable duration (hrd)
+              if (colInfo.getHumanReadableDuration()) {
+                Pair<Long, String> breakout = safeParseLongAtStart(cellText);
+                if (breakout != null) {
+                  // the string begins with an integer
+                  cellText = SLUtility.toStringDurationNS(breakout.first(), colInfo.getHumanReadableDurationUnit())
+                      + breakout.second();
+                }
+              } else if (colInfo.getAddCommas()) { // incompatible with hrd
+                // Comma-ize starting number (1000 -> 1,000 / 4544j -> 4,544j)
                 Pair<Long, String> breakout = safeParseLongAtStart(cellText);
                 if (breakout != null) {
                   // the string begins with an integer
