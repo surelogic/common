@@ -2,10 +2,13 @@ package com.surelogic.common.adhoc.model;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 
 import com.surelogic.Nullable;
 import com.surelogic.common.Justification;
 import com.surelogic.common.i18n.I18N;
+import com.surelogic.common.logging.SLLogger;
 
 /**
  * This class represents the data gathered from parsing a column annotation in
@@ -343,6 +346,39 @@ public final class ColumnAnnotation {
    */
   public void setAddCommas(final boolean value) {
     f_addCommas = value;
+  }
+
+  private boolean f_humanReadableDuration = false;
+  private TimeUnit f_humanReadableDurationUnit = TimeUnit.NANOSECONDS;
+
+  public boolean getHumanReadableDuration() {
+    return f_humanReadableDuration;
+  }
+
+  public TimeUnit getHumanReadableDurationUnit() {
+    return f_humanReadableDurationUnit;
+  }
+
+  /**
+   * Do not call this method. It should only be called by the parser.
+   */
+  public void setHumanReadableDuration(final boolean value) {
+    f_humanReadableDuration = value;
+  }
+
+  /**
+   * Do not call this method. It should only be called by the parser.
+   */
+  public void setHumanReadableDurationUnit(String value) {
+    if (value == null)
+      return;
+    value = stripSingleQuotes(value);
+    try {
+      f_humanReadableDurationUnit = TimeUnit.valueOf(value);
+    } catch (Exception e) {
+      SLLogger.getLogger().log(Level.WARNING,
+          "Human readable duration unit '" + value + "' not recornised as a java.util.concurrent.TimeUnit enumeration value", e);
+    }
   }
 
   private String stripSingleQuotes(String value) {

@@ -98,7 +98,12 @@ affixSpec
 	;
 	
 numSpec
-	: ('add-commas') { f_column.setAddCommas(true); }
+	: 'add-commas' { f_column.setAddCommas(true); }
+	| 'human-readable-duration' { f_column.setHumanReadableDuration(true); } unitPart?
+	;
+	
+unitPart
+	: 'unit' value=QUOTED_STRING { f_column.setHumanReadableDurationUnit($value.text); }
 	;
 
 countSpec
