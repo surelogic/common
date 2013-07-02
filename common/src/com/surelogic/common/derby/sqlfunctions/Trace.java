@@ -127,11 +127,13 @@ public class Trace {
                         "Trace.selectById",
                         SingleRowHandler.from(new TraceRowHandler()));
                 final LinkedList<Trace> traces = new LinkedList<Trace>();
-                Trace t = getTrace.call(traceId);
-                traces.add(t);
-                while (t.parentId != t.id) {
-                    t = getTrace.call(t.parentId);
+                if (traceId != -1) {
+                    Trace t = getTrace.call(traceId);
                     traces.add(t);
+                    while (t.parentId != t.id) {
+                        t = getTrace.call(t.parentId);
+                        traces.add(t);
+                    }
                 }
                 return traces;
             }

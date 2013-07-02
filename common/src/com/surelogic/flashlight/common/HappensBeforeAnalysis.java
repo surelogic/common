@@ -437,7 +437,8 @@ public class HappensBeforeAnalysis {
             HBNode sourceTrace = sourceEntry.getValue();
             HBNode targetTrace = targets.get(source);
             if (targetTrace != null && targetTrace.ts.after(sourceTrace.ts)) {
-                list.add(new HBEdge(sourceTrace, targetTrace));
+                list.add(new HBEdge(sourceTrace, targetTrace,
+                        EdgeType.COLLECTION));
             }
         }
 
@@ -447,14 +448,14 @@ public class HappensBeforeAnalysis {
             Timestamp read, long readThread, List<HBEdge> list)
             throws SQLException {
         addHappensBefore(hbObjSourceTraceSt, hbObjTargetTraceSt, write,
-                writeThread, read, readThread, list);
+                writeThread, read, readThread, list, EdgeType.OBJECT);
     }
 
     private void addHappensBeforeLock(Timestamp write, long writeThread,
             Timestamp read, long readThread, List<HBEdge> list)
             throws SQLException {
         addHappensBefore(hbLockSourceTraceSt, hbLockTargetTraceSt, write,
-                writeThread, read, readThread, list);
+                writeThread, read, readThread, list, EdgeType.LOCK);
     }
 
     private void addHappensBeforeThread(Timestamp write, long writeThread,
@@ -471,7 +472,7 @@ public class HappensBeforeAnalysis {
                 Timestamp ts = hbTraceSet.getTimestamp(1);
                 long trace = hbTraceSet.getLong(2);
                 HBNode node = new HBNode(ts, trace);
-                list.add(new HBEdge(node, null));
+                list.add(new HBEdge(node, null, EdgeType.THREAD));
             }
         } finally {
             hbTraceSet.close();
@@ -482,13 +483,13 @@ public class HappensBeforeAnalysis {
             Timestamp read, long readThread, List<HBEdge> list)
             throws SQLException {
         addHappensBefore(hbVolWriteTraceSt, hbVolReadTraceSt, write,
-                writeThread, read, readThread, list);
+                writeThread, read, readThread, list, EdgeType.VOLATILE);
     }
 
     private void addHappensBefore(PreparedStatement sourceSt,
             PreparedStatement targetSt, Timestamp write, long writeThread,
-            Timestamp read, long readThread, List<HBEdge> list)
-            throws SQLException {
+            Timestamp read, long readThread, List<HBEdge> list,
+            EdgeType edgeType) throws SQLException {
         sourceSt.setLong(1, writeThread);
         sourceSt.setTimestamp(2, write);
         sourceSt.setTimestamp(3, read);
@@ -521,7 +522,7 @@ public class HappensBeforeAnalysis {
                     HBNode targetNode = targets.get(sourceId);
                     if (targetNode != null
                             && sourceNode.getTs().before(targetNode.getTs())) {
-                        list.add(new HBEdge(sourceNode, targetNode));
+                        list.add(new HBEdge(sourceNode, targetNode, edgeType));
                     }
                 }
             } finally {
@@ -548,7 +549,8 @@ public class HappensBeforeAnalysis {
                         hbSet.getLong(idx++));
                 HBNode target = new HBNode(hbSet.getTimestamp(idx++),
                         hbSet.getLong(idx++));
-                list.add(new HBEdge(source, target));
+                list.add(new HBEdge(source, target,
+                        EdgeType.CLASS_INITIALIZATION));
             }
         } finally {
             hbSet.close();
@@ -574,9 +576,28 @@ public class HappensBeforeAnalysis {
         }
     }
 
+    enum EdgeType {
+        VOLATILE("Volatile"), WRITE_IN_THREAD(
+                "The previous write was in this thread"), OBJECT(
+                "java.util.concurrent class"), THREAD("Thread start/join"), COLLECTION(
+                "java.util.concurrent collection"), CLASS_INITIALIZATION(
+                "Class initialization"), LOCK("Locking");
+
+        private final String desc;
+
+        EdgeType(String desc) {
+            this.desc = desc;
+        }
+
+        String getDisplayName() {
+            return desc;
+        }
+    }
+
     public static class HBEdge {
         final HBNode source;
         final HBNode target;
+        final EdgeType type;
 
         public HBNode getSource() {
             return source;
@@ -586,9 +607,10 @@ public class HappensBeforeAnalysis {
             return target;
         }
 
-        public HBEdge(HBNode source, HBNode target) {
+        public HBEdge(HBNode source, HBNode target, EdgeType type) {
             this.source = source;
             this.target = target;
+            this.type = type;
         }
 
         public Object get(int col) {
@@ -601,6 +623,8 @@ public class HappensBeforeAnalysis {
                 return target == null ? -1 : target.getTrace();
             case 4:
                 return target == null ? null : target.getTs();
+            case 5:
+                return type.getDisplayName();
             default:
                 throw new IllegalArgumentException(String.format(
                         "%d is not a valid column.", col));
