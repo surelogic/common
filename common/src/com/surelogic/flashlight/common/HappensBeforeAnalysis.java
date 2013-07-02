@@ -41,7 +41,7 @@ public class HappensBeforeAnalysis {
     private final PreparedStatement hbCollSourceTraceSt;
     private final PreparedStatement hbCollTargetTraceSt;
     private final PreparedStatement hbClassInitTraceSt;
-
+    private final PreparedStatement hbLookupAccess;
     private final PreparedStatement isFinalSt;
 
     private final TLongObjectMap<Timestamp> targetsCache;
@@ -88,6 +88,8 @@ public class HappensBeforeAnalysis {
                 .get("Accesses.trace.happensBeforeTargetLock"));
         hbClassInitTraceSt = conn.prepareStatement(QB
                 .get("Accesses.trace.happensBeforeClassInit"));
+        hbLookupAccess = conn.prepareStatement(QB
+                .get("Accesses.trace.happensBeforeLookupAccess"));
         targetsCache = new TLongObjectHashMap<Timestamp>();
         sourcesCache = new TLongObjectHashMap<Timestamp>();
     }
@@ -333,16 +335,32 @@ public class HappensBeforeAnalysis {
 
     public List<HBEdge> happensBeforeTraces(Timestamp write, long writeThread,
             Timestamp read, long readThread) throws SQLException {
-        if (write == null || writeThread == readThread) {
+        if (write == null) {
             return Collections.emptyList();
         }
         List<HBEdge> list = new ArrayList<HBEdge>();
-        addHappensBeforeVolatile(write, writeThread, read, readThread, list);
-        addHappensBeforeThread(write, writeThread, read, readThread, list);
-        addHappensBeforeObject(write, writeThread, read, readThread, list);
-        addHappensBeforeLock(write, writeThread, read, readThread, list);
-        addHappensBeforeCollection(write, writeThread, read, readThread, list);
-        addHappensBeforeClassInit(write, writeThread, read, readThread, list);
+        if (readThread == writeThread) {
+            hbLookupAccess.setTimestamp(1, write);
+            hbLookupAccess.setLong(2, writeThread);
+            ResultSet set = hbLookupAccess.executeQuery();
+            try {
+                if (set.next()) {
+                    list.add(new HBEdge(new HBNode(write, set.getLong(1)),
+                            null, EdgeType.WRITE_IN_THREAD));
+                }
+            } finally {
+                set.close();
+            }
+        } else {
+            addHappensBeforeVolatile(write, writeThread, read, readThread, list);
+            addHappensBeforeThread(write, writeThread, read, readThread, list);
+            addHappensBeforeObject(write, writeThread, read, readThread, list);
+            addHappensBeforeLock(write, writeThread, read, readThread, list);
+            addHappensBeforeCollection(write, writeThread, read, readThread,
+                    list);
+            addHappensBeforeClassInit(write, writeThread, read, readThread,
+                    list);
+        }
         return list;
     }
 
