@@ -10,4 +10,5 @@ public interface ISLJavaProject {
 	String getName();
 	void mapJar(File path, File origPath);
 	Config getConfig();
+	void clear();
 }

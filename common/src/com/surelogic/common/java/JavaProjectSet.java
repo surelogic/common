@@ -412,4 +412,14 @@ public class JavaProjectSet<P extends ISLJavaProject> implements Iterable<P> {
 			pw.close();
 		}
 	}	
+	
+	public void clear() {
+		for(P proj : this) {
+			proj.clear();
+		}		
+		args.clear();
+		fileMap.clear();
+		ordering.clear();
+		projects.clear();
+	}
 }

@@ -496,4 +496,14 @@ public class Config extends AbstractClassPathEntry {
 	public boolean containsJavaLangObject() {
 		return containsJavaLangObject;
 	}
+
+	public void clear() {
+		classPath.clear();
+		files.clear();
+		options.clear();
+		origFiles.clear();
+		pathMapping.clear();
+		pkgs.clear();
+		removed.clear();
+	}
 }

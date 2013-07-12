@@ -72,5 +72,10 @@ public class JavaProject implements ISLJavaProject {
 	
 	public void addPackage(String pkg) {
 		// Nothing to do?
+	}
+
+	public void clear() {
+		mappedJars.clear();
+		config.clear();
 	}	
 }
