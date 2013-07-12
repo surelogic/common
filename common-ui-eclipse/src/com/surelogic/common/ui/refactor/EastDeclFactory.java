@@ -133,17 +133,46 @@ public class EastDeclFactory {
 
 	private static ParameterBuilder makeParameterBuilder(SingleVariableDeclaration p, int i) {
 		ParameterBuilder b = new ParameterBuilder(i, p.getName().getIdentifier());
-		final ITypeBinding type = p.resolveBinding().getType();
-		final String qname = type.getQualifiedName();		
+		final ITypeBinding type = p.resolveBinding().getType();		
+		final String qname = type.getQualifiedName();			
+		final String name = computeRelativeName(type);
+		b.setTypeOf(new TypeRef(qname, name));
+		return b;
+	}
+
+	private static String computeRelativeName(ITypeBinding type) {
+		final ITypeBinding enclosingType = type.getDeclaringClass();
+		final String name;
+		
+		// Hacks needed to handle nested and generic types		
+		if (enclosingType != null) {
+			name = computeRelativeNameNoBounds(enclosingType.getErasure())+'.'+type.getName();
+		} else if (type.isArray()) {
+			return computeRelativeName(type.getComponentType())+"[]";
+		} else {
+			name = type.getName();
+		}
+		/*
 		final String pkgName = type.getPackage() == null ? null : type.getPackage().getName();
 		if (pkgName != null && qname.startsWith(pkgName)) {
 			b.setTypeOf(new TypeRef(qname, qname.substring(pkgName.length()+1)));
 		} else {
 			b.setTypeOf(new TypeRef(qname, type.getName()));
 		}
-		return b;
+		*/
+		return name;
 	}
-
+	
+	/**
+	 * No bounds -- just the type name;
+	 */
+	private static String computeRelativeNameNoBounds(ITypeBinding type) {
+		final ITypeBinding enclosingType = type.getDeclaringClass();
+		if (enclosingType == null) {
+			return type.getName();
+		}
+		return computeRelativeName(enclosingType)+'.'+type.getElementType();				
+	}
 	
 	private static TypeParameterBuilder makeTypeParameterBuilder(TypeParameter n, int i) {
 		TypeParameterBuilder b = new TypeParameterBuilder(i, n.getName().getIdentifier());
