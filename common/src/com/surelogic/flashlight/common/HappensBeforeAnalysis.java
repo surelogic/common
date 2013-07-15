@@ -43,6 +43,7 @@ public class HappensBeforeAnalysis {
     private final PreparedStatement hbClassInitTraceSt;
     private final PreparedStatement hbLookupAccess;
     private final PreparedStatement isFinalSt;
+    private final PreparedStatement traceMethodCalledSt;
 
     private final TLongObjectMap<Timestamp> targetsCache;
     private final TLongObjectMap<Timestamp> sourcesCache;
@@ -90,6 +91,8 @@ public class HappensBeforeAnalysis {
                 .get("Accesses.trace.happensBeforeClassInit"));
         hbLookupAccess = conn.prepareStatement(QB
                 .get("Accesses.trace.happensBeforeLookupAccess"));
+        traceMethodCalledSt = conn.prepareStatement(QB
+                .get("Accesses.trace.traceMethodCalled"));
         targetsCache = new TLongObjectHashMap<Timestamp>();
         sourcesCache = new TLongObjectHashMap<Timestamp>();
     }
@@ -351,6 +354,7 @@ public class HappensBeforeAnalysis {
             } finally {
                 set.close();
             }
+
         } else {
             addHappensBeforeVolatile(write, writeThread, read, readThread, list);
             addHappensBeforeThread(write, writeThread, read, readThread, list);
@@ -360,6 +364,30 @@ public class HappensBeforeAnalysis {
                     list);
             addHappensBeforeClassInit(write, writeThread, read, readThread,
                     list);
+        }
+        for (HBEdge e : list) {
+            traceMethodCalledSt.setLong(1, e.getSource().getTrace());
+            ResultSet set = traceMethodCalledSt.executeQuery();
+            try {
+                if (set.next()) {
+                    e.setSourceMethod(set.getString(1).replaceAll("/", ".")
+                            + '.' + set.getString(2));
+                }
+            } finally {
+                set.close();
+            }
+            if (e.getTarget() != null) {
+                traceMethodCalledSt.setLong(1, e.getTarget().getTrace());
+                set = traceMethodCalledSt.executeQuery();
+                try {
+                    if (set.next()) {
+                        e.setTargetMethod(set.getString(1).replaceAll("/", ".")
+                                + '.' + set.getString(2));
+                    }
+                } finally {
+                    set.close();
+                }
+            }
         }
         return list;
     }
@@ -614,7 +642,9 @@ public class HappensBeforeAnalysis {
 
     public static class HBEdge {
         final HBNode source;
+        String sourceMethod;
         final HBNode target;
+        String targetMethod;
         final EdgeType type;
 
         public HBNode getSource() {
@@ -623,6 +653,14 @@ public class HappensBeforeAnalysis {
 
         public HBNode getTarget() {
             return target;
+        }
+
+        public void setSourceMethod(String sourceMethod) {
+            this.sourceMethod = sourceMethod;
+        }
+
+        public void setTargetMethod(String targetMethod) {
+            this.targetMethod = targetMethod;
         }
 
         public HBEdge(HBNode source, HBNode target, EdgeType type) {
@@ -643,6 +681,10 @@ public class HappensBeforeAnalysis {
                 return target == null ? null : target.getTs();
             case 5:
                 return type.getDisplayName();
+            case 6:
+                return sourceMethod;
+            case 7:
+                return targetMethod;
             default:
                 throw new IllegalArgumentException(String.format(
                         "%d is not a valid column.", col));
