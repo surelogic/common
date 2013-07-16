@@ -44,7 +44,7 @@ public class HappensBeforeAnalysis {
     private final PreparedStatement hbLookupAccess;
     private final PreparedStatement isFinalSt;
     private final PreparedStatement traceMethodCalledSt;
-
+    private final PreparedStatement fieldNameSt;
     private final TLongObjectMap<Timestamp> targetsCache;
     private final TLongObjectMap<Timestamp> sourcesCache;
 
@@ -93,6 +93,7 @@ public class HappensBeforeAnalysis {
                 .get("Accesses.trace.happensBeforeLookupAccess"));
         traceMethodCalledSt = conn.prepareStatement(QB
                 .get("Accesses.trace.traceMethodCalled"));
+        fieldNameSt = conn.prepareStatement(QB.get("Accesses.trace.fieldName"));
         targetsCache = new TLongObjectHashMap<Timestamp>();
         sourcesCache = new TLongObjectHashMap<Timestamp>();
     }
@@ -349,7 +350,7 @@ public class HappensBeforeAnalysis {
             try {
                 if (set.next()) {
                     list.add(new HBEdge(new HBNode(write, set.getLong(1)),
-                            null, EdgeType.WRITE_IN_THREAD));
+                            null, null, EdgeType.WRITE_IN_THREAD));
                 }
             } finally {
                 set.close();
@@ -364,30 +365,6 @@ public class HappensBeforeAnalysis {
                     list);
             addHappensBeforeClassInit(write, writeThread, read, readThread,
                     list);
-        }
-        for (HBEdge e : list) {
-            traceMethodCalledSt.setLong(1, e.getSource().getTrace());
-            ResultSet set = traceMethodCalledSt.executeQuery();
-            try {
-                if (set.next()) {
-                    e.setSourceMethod(set.getString(1).replaceAll("/", ".")
-                            + '.' + set.getString(2));
-                }
-            } finally {
-                set.close();
-            }
-            if (e.getTarget() != null) {
-                traceMethodCalledSt.setLong(1, e.getTarget().getTrace());
-                set = traceMethodCalledSt.executeQuery();
-                try {
-                    if (set.next()) {
-                        e.setTargetMethod(set.getString(1).replaceAll("/", ".")
-                                + '.' + set.getString(2));
-                    }
-                } finally {
-                    set.close();
-                }
-            }
         }
         return list;
     }
@@ -483,7 +460,7 @@ public class HappensBeforeAnalysis {
             HBNode sourceTrace = sourceEntry.getValue();
             HBNode targetTrace = targets.get(source);
             if (targetTrace != null && targetTrace.ts.after(sourceTrace.ts)) {
-                list.add(new HBEdge(sourceTrace, targetTrace,
+                list.add(new HBEdge(sourceTrace, targetTrace, source.coll,
                         EdgeType.COLLECTION));
             }
         }
@@ -518,7 +495,7 @@ public class HappensBeforeAnalysis {
                 Timestamp ts = hbTraceSet.getTimestamp(1);
                 long trace = hbTraceSet.getLong(2);
                 HBNode node = new HBNode(ts, trace);
-                list.add(new HBEdge(node, null, EdgeType.THREAD));
+                list.add(new HBEdge(node, null, null, EdgeType.THREAD));
             }
         } finally {
             hbTraceSet.close();
@@ -568,7 +545,8 @@ public class HappensBeforeAnalysis {
                     HBNode targetNode = targets.get(sourceId);
                     if (targetNode != null
                             && sourceNode.getTs().before(targetNode.getTs())) {
-                        list.add(new HBEdge(sourceNode, targetNode, edgeType));
+                        list.add(new HBEdge(sourceNode, targetNode, sourceId,
+                                edgeType));
                     }
                 }
             } finally {
@@ -595,7 +573,7 @@ public class HappensBeforeAnalysis {
                         hbSet.getLong(idx++));
                 HBNode target = new HBNode(hbSet.getTimestamp(idx++),
                         hbSet.getLong(idx++));
-                list.add(new HBEdge(source, target,
+                list.add(new HBEdge(source, target, null,
                         EdgeType.CLASS_INITIALIZATION));
             }
         } finally {
@@ -623,7 +601,7 @@ public class HappensBeforeAnalysis {
     }
 
     enum EdgeType {
-        VOLATILE("Volatile"), WRITE_IN_THREAD(
+        VOLATILE("Volatile write/read of %s"), WRITE_IN_THREAD(
                 "The previous write was in this thread"), OBJECT(
                 "java.util.concurrent class"), THREAD("Thread start/join"), COLLECTION(
                 "java.util.concurrent collection"), CLASS_INITIALIZATION(
@@ -640,12 +618,22 @@ public class HappensBeforeAnalysis {
         }
     }
 
-    public static class HBEdge {
+    public class HBEdge {
         final HBNode source;
-        String sourceMethod;
         final HBNode target;
-        String targetMethod;
         final EdgeType type;
+        final Long objId;
+        final String displayName;
+        final String sourceMethod;
+        final String targetMethod;
+
+        public Long getObjId() {
+            return objId;
+        }
+
+        public EdgeType getType() {
+            return type;
+        }
 
         public HBNode getSource() {
             return source;
@@ -655,18 +643,88 @@ public class HappensBeforeAnalysis {
             return target;
         }
 
-        public void setSourceMethod(String sourceMethod) {
-            this.sourceMethod = sourceMethod;
-        }
-
-        public void setTargetMethod(String targetMethod) {
-            this.targetMethod = targetMethod;
-        }
-
-        public HBEdge(HBNode source, HBNode target, EdgeType type) {
+        public HBEdge(HBNode source, HBNode target, Long objId, EdgeType type)
+                throws SQLException {
             this.source = source;
             this.target = target;
             this.type = type;
+            this.objId = objId;
+            displayName = getDisplayName();
+            targetMethod = getTargetMethod();
+            sourceMethod = getSourceMethod();
+        }
+
+        String getDisplayName() throws SQLException {
+            switch (getType()) {
+            case VOLATILE:
+                fieldNameSt.setLong(1, getObjId());
+                ResultSet set = fieldNameSt.executeQuery();
+                try {
+                    set.next();
+                    return String.format(type.getDisplayName(),
+                            set.getString(1));
+                } finally {
+                    set.close();
+                }
+            default:
+                return type.getDisplayName();
+            }
+        }
+
+        String getTargetMethod() throws SQLException {
+            switch (getType()) {
+            case VOLATILE:
+                break;
+            case WRITE_IN_THREAD:
+                break;
+            case CLASS_INITIALIZATION:
+                break;
+            case COLLECTION:
+            case LOCK:
+            case OBJECT:
+            case THREAD:
+                if (getTarget() != null) {
+                    traceMethodCalledSt.setLong(1, getTarget().getTrace());
+                    ResultSet set = traceMethodCalledSt.executeQuery();
+                    try {
+                        if (set.next()) {
+                            return set.getString(1).replaceAll("/", ".") + '.'
+                                    + set.getString(2);
+                        }
+                    } finally {
+                        set.close();
+                    }
+                }
+            }
+            return null;
+        }
+
+        String getSourceMethod() throws SQLException {
+            switch (getType()) {
+            case VOLATILE:
+                break;
+            case WRITE_IN_THREAD:
+                break;
+            case CLASS_INITIALIZATION:
+                break;
+            case COLLECTION:
+            case LOCK:
+            case OBJECT:
+            case THREAD:
+                traceMethodCalledSt.setLong(1, getSource().getTrace());
+                ResultSet set = traceMethodCalledSt.executeQuery();
+                try {
+                    if (set.next()) {
+                        return set.getString(1).replaceAll("/", ".") + '.'
+                                + set.getString(2);
+                    } else {
+                        return null;
+                    }
+                } finally {
+                    set.close();
+                }
+            }
+            return null;
         }
 
         public Object get(int col) {
@@ -680,7 +738,7 @@ public class HappensBeforeAnalysis {
             case 4:
                 return target == null ? null : target.getTs();
             case 5:
-                return type.getDisplayName();
+                return displayName;
             case 6:
                 return sourceMethod;
             case 7:
@@ -690,7 +748,6 @@ public class HappensBeforeAnalysis {
                         "%d is not a valid column.", col));
             }
         }
-
     }
 
     Map<Long, HBNode> genSourceNodes(ResultSet set) throws SQLException {
