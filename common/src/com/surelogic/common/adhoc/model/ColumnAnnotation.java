@@ -160,6 +160,20 @@ public final class ColumnAnnotation {
     f_definesAnIconForAnotherColumn = value;
   }
 
+  private String f_blankIf = null;
+
+  @Nullable
+  public String getBlankIf() {
+    return f_blankIf;
+  }
+
+  /**
+   * Do not call this method. It should only be called by the parser.
+   */
+  public void setBlankIf(String value) {
+    f_blankIf = value;
+  }
+
   private boolean f_sumPartialRows = false;
 
   public boolean sumPartialRows() {

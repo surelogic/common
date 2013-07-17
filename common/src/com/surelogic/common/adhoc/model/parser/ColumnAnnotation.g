@@ -105,6 +105,10 @@ numSpec
 unitPart
 	: 'unit' value=QUOTED_STRING { f_column.setHumanReadableDurationUnit($value.text); }
 	;
+	
+blankIfSpec
+	: 'blank-if' value=QUOTED_STRING { f_column.setBlankIf($value.text); }
+	;
 
 countSpec
 	: 'count' { f_column.setCountPartialRows(true); } distinctPart? replaceValuePart? onPart? prefixPart? suffixPart?
