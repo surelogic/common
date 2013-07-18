@@ -426,10 +426,11 @@ public class HappensBeforeAnalysis {
                 long sourceObj = hbCollSourceSet.getLong(2);
                 Timestamp sourceTs = hbCollSourceSet.getTimestamp(3);
                 long sourceTrace = hbCollSourceSet.getLong(4);
+                String id = hbCollSourceSet.getString(5);
                 final Coll source = new Coll(sourceColl, sourceObj);
                 final HBNode trace = sources.get(source);
                 if (trace == null || trace.ts.after(sourceTs)) {
-                    sources.put(source, new HBNode(sourceTs, sourceTrace));
+                    sources.put(source, new HBNode(id, sourceTs, sourceTrace));
                 }
             }
         } finally {
@@ -446,10 +447,11 @@ public class HappensBeforeAnalysis {
                 long targetObj = hbCollTargetSet.getLong(2);
                 Timestamp targetTs = hbCollTargetSet.getTimestamp(3);
                 long targetTrace = hbCollTargetSet.getLong(4);
+                String id = hbCollTargetSet.getString(5);
                 final Coll target = new Coll(targetColl, targetObj);
                 final HBNode trace = targets.get(target);
                 if (trace == null || trace.ts.before(targetTs)) {
-                    targets.put(target, new HBNode(targetTs, targetTrace));
+                    targets.put(target, new HBNode(id, targetTs, targetTrace));
                 }
             }
         } finally {
@@ -494,7 +496,8 @@ public class HappensBeforeAnalysis {
             while (hbTraceSet.next()) {
                 Timestamp ts = hbTraceSet.getTimestamp(1);
                 long trace = hbTraceSet.getLong(2);
-                HBNode node = new HBNode(ts, trace);
+                String id = hbTraceSet.getString(3);
+                HBNode node = new HBNode(id, ts, trace);
                 list.add(new HBEdge(node, null, null, EdgeType.THREAD));
             }
         } finally {
@@ -573,7 +576,8 @@ public class HappensBeforeAnalysis {
                         hbSet.getLong(idx++));
                 HBNode target = new HBNode(hbSet.getTimestamp(idx++),
                         hbSet.getLong(idx++));
-                list.add(new HBEdge(source, target, null,
+                list.add(new HBEdge(className(hbSet.getString(idx++),
+                        hbSet.getString(idx++)), source, target, null,
                         EdgeType.CLASS_INITIALIZATION));
             }
         } finally {
@@ -581,14 +585,30 @@ public class HappensBeforeAnalysis {
         }
     }
 
+    private static String className(String pakkage, String clazz) {
+        return pakkage == null || pakkage.isEmpty() ? clazz : pakkage + "."
+                + clazz;
+    }
+
     static class HBNode {
         final Timestamp ts;
         final long trace;
+        final String id;
 
-        public HBNode(Timestamp ts, long trace) {
-            super();
+        public HBNode(String id, Timestamp ts, long trace) {
             this.ts = ts;
             this.trace = trace;
+            this.id = id;
+        }
+
+        public HBNode(Timestamp ts, long trace) {
+            this.ts = ts;
+            this.trace = trace;
+            id = null;
+        }
+
+        public String getId() {
+            return id;
         }
 
         public Timestamp getTs() {
@@ -602,10 +622,9 @@ public class HappensBeforeAnalysis {
 
     enum EdgeType {
         VOLATILE("Volatile write/read of %s"), WRITE_IN_THREAD(
-                "The previous write was in this thread"), OBJECT(
-                "java.util.concurrent class"), THREAD("Thread start/join"), COLLECTION(
-                "java.util.concurrent collection"), CLASS_INITIALIZATION(
-                "Class initialization"), LOCK("Locking");
+                "The previous write was in this thread"), OBJECT("%s"), THREAD(
+                "%s"), COLLECTION("%s"), CLASS_INITIALIZATION(
+                "Class initialization of %s"), LOCK("%s Locking");
 
         private final String desc;
 
@@ -613,8 +632,8 @@ public class HappensBeforeAnalysis {
             this.desc = desc;
         }
 
-        String getDisplayName() {
-            return desc;
+        String displayId(String id) {
+            return String.format(desc, id);
         }
     }
 
@@ -622,8 +641,8 @@ public class HappensBeforeAnalysis {
         final HBNode source;
         final HBNode target;
         final EdgeType type;
+        final String id;
         final Long objId;
-        final String displayName;
         final String sourceMethod;
         final String targetMethod;
 
@@ -643,32 +662,26 @@ public class HappensBeforeAnalysis {
             return target;
         }
 
-        public HBEdge(HBNode source, HBNode target, Long objId, EdgeType type)
+        HBEdge(HBNode source, HBNode target, Long objId, EdgeType type)
                 throws SQLException {
+            id = type.displayId(source.getId());
             this.source = source;
             this.target = target;
             this.type = type;
             this.objId = objId;
-            displayName = getDisplayName();
             targetMethod = getTargetMethod();
             sourceMethod = getSourceMethod();
         }
 
-        String getDisplayName() throws SQLException {
-            switch (getType()) {
-            case VOLATILE:
-                fieldNameSt.setLong(1, getObjId());
-                ResultSet set = fieldNameSt.executeQuery();
-                try {
-                    set.next();
-                    return String.format(type.getDisplayName(),
-                            set.getString(1));
-                } finally {
-                    set.close();
-                }
-            default:
-                return type.getDisplayName();
-            }
+        HBEdge(String id, HBNode source, HBNode target, Long objId,
+                EdgeType type) throws SQLException {
+            this.id = type.displayId(id);
+            this.source = source;
+            this.target = target;
+            this.type = type;
+            this.objId = objId;
+            targetMethod = getTargetMethod();
+            sourceMethod = getSourceMethod();
         }
 
         String getTargetMethod() throws SQLException {
@@ -738,11 +751,11 @@ public class HappensBeforeAnalysis {
             case 4:
                 return target == null ? null : target.getTs();
             case 5:
-                return displayName;
-            case 6:
                 return sourceMethod;
-            case 7:
+            case 6:
                 return targetMethod;
+            case 7:
+                return id;
             default:
                 throw new IllegalArgumentException(String.format(
                         "%d is not a valid column.", col));
@@ -757,7 +770,9 @@ public class HappensBeforeAnalysis {
             Timestamp sourceTs = set.getTimestamp(2);
             HBNode node = map.get(sourceId);
             if (node == null || node.getTs().after(sourceTs)) {
-                map.put(sourceId, new HBNode(sourceTs, set.getLong(3)));
+                long trace = set.getLong(3);
+                String id = set.getString(4);
+                map.put(sourceId, new HBNode(id, sourceTs, trace));
             }
         } while (set.next());
         return map;
@@ -770,7 +785,9 @@ public class HappensBeforeAnalysis {
             Timestamp targetTs = set.getTimestamp(2);
             HBNode node = map.get(targetId);
             if (node == null || node.getTs().before(targetTs)) {
-                map.put(targetId, new HBNode(targetTs, set.getLong(3)));
+                long trace = set.getLong(3);
+                String id = set.getString(4);
+                map.put(targetId, new HBNode(id, targetTs, trace));
             }
         } while (set.next());
         return map;
