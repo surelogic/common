@@ -260,11 +260,8 @@ public final class AdornedTreeTableModel {
           if (colInfo != null) {
             if (cellText != null) {
               // Check if we should blank the text
-              final String blankIfValue = colInfo.getBlankIf();
-              if (blankIfValue != null) {
-                if (blankIfValue.equals(cellText))
-                  blankText = true;
-              }
+              if (cellText.equals(colInfo.getBlankIf()))
+                blankText = true;
               // Human readable duration (hrd)
               if (colInfo.getHumanReadableDuration()) {
                 Pair<Long, String> breakout = safeParseLongAtStart(cellText);
@@ -413,10 +410,12 @@ public final class AdornedTreeTableModel {
                 final long value = safeParseLong(contents);
                 summaryTotal += value;
               }
+              final String simpleText = Long.toString(summaryTotal);
+              final boolean blankText = simpleText.equals(info.getBlankIf());
               final String text = info.getAggregatePrefix()
-                  + (info.getAddCommas() ? SLUtility.toStringHumanWithCommas(summaryTotal) : Long.toString(summaryTotal))
+                  + (info.getAddCommas() ? SLUtility.toStringHumanWithCommas(summaryTotal) : simpleText)
                   + info.getAggregateSuffix();
-              final NonLeafColumnSummary columnSummary = new NonLeafColumnSummary(colI, text);
+              final NonLeafColumnSummaryCell columnSummary = new NonLeafColumnSummaryCell(text, blankText, colI);
               cell.addColumnSummary(columnSummary);
             }
           } else if (info.maxPartialRows()) {
@@ -430,10 +429,11 @@ public final class AdornedTreeTableModel {
                 final long value = safeParseLong(contents);
                 runningMax = Math.max(runningMax, value);
               }
+              final String simpleText = Long.toString(runningMax);
+              final boolean blankText = simpleText.equals(info.getBlankIf());
               final String text = info.getAggregatePrefix()
-                  + (info.getAddCommas() ? SLUtility.toStringHumanWithCommas(runningMax) : Long.toString(runningMax))
-                  + info.getAggregateSuffix();
-              final NonLeafColumnSummary columnSummary = new NonLeafColumnSummary(colI, text);
+                  + (info.getAddCommas() ? SLUtility.toStringHumanWithCommas(runningMax) : simpleText) + info.getAggregateSuffix();
+              final NonLeafColumnSummaryCell columnSummary = new NonLeafColumnSummaryCell(text, blankText, colI);
               cell.addColumnSummary(columnSummary);
             }
 
@@ -460,10 +460,11 @@ public final class AdornedTreeTableModel {
                   cellsToReplaceText.add(new Pair<Cell, String>(adornedCell, replaceValueWith));
                 }
               }
+              final String simpleText = Long.toString(countTotal);
+              final boolean blankText = simpleText.equals(info.getBlankIf());
               final String text = info.getAggregatePrefix()
-                  + (info.getAddCommas() ? SLUtility.toStringHumanWithCommas(countTotal) : Long.toString(countTotal))
-                  + info.getAggregateSuffix();
-              final NonLeafColumnSummary columnSummary = new NonLeafColumnSummary(colI, text);
+                  + (info.getAddCommas() ? SLUtility.toStringHumanWithCommas(countTotal) : simpleText) + info.getAggregateSuffix();
+              final NonLeafColumnSummaryCell columnSummary = new NonLeafColumnSummaryCell(text, blankText, colI);
               cell.addColumnSummary(columnSummary);
             }
           }
