@@ -29,14 +29,18 @@ public class Trace {
     final String pakkage;
     final String file;
     final String loc;
+    final String locCode;
     final String methodCallClass;
     final String methodCallName;
+    final String methodCallCode;
     final int line;
 
     Trace(final long id, final long parentId, final String inClass,
             final String classCode, final String inPackage,
-            final String inFile, final String location, final int atLine,
-            final String methodCallClass, final String methodCallName) {
+            final String inFile, final String location,
+            final String locationCode, final int atLine,
+            final String methodCallClass, final String methodCallName,
+            final String methodCallCode) {
         this.id = id;
         this.parentId = parentId;
         clazz = inClass;
@@ -44,9 +48,11 @@ public class Trace {
         pakkage = inPackage;
         file = inFile;
         loc = location;
+        locCode = locationCode;
         line = atLine;
         this.methodCallClass = methodCallClass;
         this.methodCallName = methodCallName;
+        this.methodCallCode = methodCallCode;
     }
 
     public Object get(final int i) {
@@ -67,6 +73,10 @@ public class Trace {
             return methodCallName;
         case 8:
             return clazzCode;
+        case 9:
+            return locCode;
+        case 10:
+            return methodCallCode;
         default:
             throw new IllegalArgumentException();
         }
@@ -146,7 +156,8 @@ public class Trace {
         public Trace handle(final Row r) {
             return new Trace(r.nextLong(), r.nextLong(), r.nextString(),
                     r.nextString(), r.nextString(), r.nextString(),
-                    r.nextString(), r.nextInt(), r.nextString(), r.nextString());
+                    r.nextString(), r.nextString(), r.nextInt(),
+                    r.nextString(), r.nextString(), r.nextString());
         }
 
     }
