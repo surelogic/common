@@ -171,6 +171,12 @@ public final class ColumnAnnotation {
    * Do not call this method. It should only be called by the parser.
    */
   public void setBlankIf(String value) {
+    if (value != null) {
+      value = stripSingleQuotes(value);
+      if ("".equals(value)) {
+        value = null;
+      }
+    }
     f_blankIf = value;
   }
 
