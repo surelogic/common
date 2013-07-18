@@ -1052,6 +1052,9 @@ public final class JDTUtility {
    *         {@code null} if there is no Java project using that name.
    */
   public static IJavaProject getJavaProject(final String projectName) {
+	if (projectName.indexOf('/') >= 0) {
+		return null;
+	}
     final IWorkspace ws = ResourcesPlugin.getWorkspace();
     final IWorkspaceRoot wsRoot = ws.getRoot();
     final IJavaModel model = JavaCore.create(wsRoot);

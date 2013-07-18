@@ -55,15 +55,15 @@ public final class NonLeafTreeCell extends TreeCell {
    * We mutate the column summaries only during the construction of an
    * {@link AdornedTreeTableModel}.
    */
-  private List<NonLeafColumnSummary> f_columnSummaries = null;
+  private List<NonLeafColumnSummaryCell> f_columnSummaries = null;
 
   /**
    * Should only be called from {@link AdornedTreeTableModel}.
    */
-  void addColumnSummary(NonLeafColumnSummary columnSummary) {
+  void addColumnSummary(NonLeafColumnSummaryCell columnSummary) {
     assert columnSummary != null;
     if (f_columnSummaries == null) {
-      f_columnSummaries = new ArrayList<NonLeafColumnSummary>();
+      f_columnSummaries = new ArrayList<NonLeafColumnSummaryCell>();
     }
     f_columnSummaries.add(columnSummary);
   }
@@ -81,7 +81,7 @@ public final class NonLeafTreeCell extends TreeCell {
    * @return the column summaries or an empty list if the tree cell has no
    *         column summaries.
    */
-  public List<NonLeafColumnSummary> getColumnSummaries() {
+  public List<NonLeafColumnSummaryCell> getColumnSummaries() {
     if (f_columnSummaries == null)
       return Collections.emptyList();
     else

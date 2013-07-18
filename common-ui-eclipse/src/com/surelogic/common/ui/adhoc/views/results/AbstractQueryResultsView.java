@@ -56,12 +56,13 @@ import com.surelogic.common.adhoc.AdHocQueryResultSqlUpdateCount;
 import com.surelogic.common.adhoc.model.AdornedTreeTableModel;
 import com.surelogic.common.adhoc.model.Cell;
 import com.surelogic.common.adhoc.model.LeafTreeCell;
-import com.surelogic.common.adhoc.model.NonLeafColumnSummary;
+import com.surelogic.common.adhoc.model.NonLeafColumnSummaryCell;
 import com.surelogic.common.adhoc.model.NonLeafTreeCell;
 import com.surelogic.common.adhoc.model.TreeCell;
 import com.surelogic.common.core.adhoc.EclipseQueryUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.logging.SLLogger;
+import com.surelogic.common.ui.EclipseColorUtility;
 import com.surelogic.common.ui.EclipseUIUtility;
 import com.surelogic.common.ui.SLImages;
 import com.surelogic.common.ui.TableUtility;
@@ -380,10 +381,12 @@ public abstract class AbstractQueryResultsView extends ViewPart {
         for (int colI = 0; colI < columnCount; colI++) {
           if (model.isColumnVisible(colI)) {
             final Cell cell = row[colI];
-            item.setText(itemIndex, cell.getText());
-            Image image = SLImages.getImageForEncodedAdHocQueryResult(cell.getImageSymbolicName());
-            if (image == null || !image.isDisposed()) {
-              item.setImage(itemIndex, image);
+            if (!cell.getBlankText()) {
+              item.setText(itemIndex, cell.getText());
+              Image image = SLImages.getImageForEncodedAdHocQueryResult(cell.getImageSymbolicName());
+              if (image == null || !image.isDisposed()) {
+                item.setImage(itemIndex, image);
+              }
             }
             itemIndex++;
           }
@@ -527,11 +530,13 @@ public abstract class AbstractQueryResultsView extends ViewPart {
       if (image == null || !image.isDisposed()) {
         item.setImage(image);
       }
-      for (final NonLeafColumnSummary columnSummary : nonLeaf.getColumnSummaries()) {
+      for (final NonLeafColumnSummaryCell columnSummary : nonLeaf.getColumnSummaries()) {
         final int itemIndex = columnSummary.getColumnIndex() - model.getLastTreeIndex();
         if (itemIndex >= 0) {
-          item.setText(itemIndex, columnSummary.getText());
-          item.setForeground(itemIndex, tree.getDisplay().getSystemColor(SWT.COLOR_GRAY));
+          if (!columnSummary.getBlankText()) {
+            item.setText(itemIndex, columnSummary.getText());
+            item.setForeground(itemIndex, EclipseColorUtility.getSubtleTextColor());
+          }
         }
       }
       if (nonLeaf == data.getSelectedCell()) {
@@ -550,8 +555,10 @@ public abstract class AbstractQueryResultsView extends ViewPart {
         for (int colI = model.getLastTreeIndex(); colI < model.getColumnCount(); colI++) {
           if (model.isColumnVisible(colI)) {
             final Cell rowCell = model.getRows()[leaf.getRowIndex()][colI];
-            item.setText(itemIndex, rowCell.getText());
-            item.setImage(itemIndex, SLImages.getImageForEncodedAdHocQueryResult(rowCell.getImageSymbolicName()));
+            if (!rowCell.getBlankText()) {
+              item.setText(itemIndex, rowCell.getText());
+              item.setImage(itemIndex, SLImages.getImageForEncodedAdHocQueryResult(rowCell.getImageSymbolicName()));
+            }
             itemIndex++;
           }
         }
@@ -727,7 +734,7 @@ public abstract class AbstractQueryResultsView extends ViewPart {
             cells.add(0, nltc.getText());
             nltc = nltc.getParent();
           }
-          for (final NonLeafColumnSummary nlcs : selectedC.getColumnSummaries()) {
+          for (final NonLeafColumnSummaryCell nlcs : selectedC.getColumnSummaries()) {
             cells.add(nlcs.getText());
           }
           for (final String str : cells) {
