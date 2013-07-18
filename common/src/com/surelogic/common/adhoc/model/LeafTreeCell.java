@@ -10,25 +10,25 @@ package com.surelogic.common.adhoc.model;
  */
 public final class LeafTreeCell extends TreeCell {
 
-	LeafTreeCell(String text, String imageSymbolicName, int rowIndex) {
-		super(text, imageSymbolicName);
-		f_rowIndex = rowIndex;
-	}
+  LeafTreeCell(String text, boolean blankText, String imageSymbolicName, int rowIndex) {
+    super(text, blankText, imageSymbolicName);
+    f_rowIndex = rowIndex;
+  }
 
-	LeafTreeCell(Cell cell, int rowIndex) {
-		this(cell.getText(), cell.getImageSymbolicName(), rowIndex);
-	}
+  LeafTreeCell(Cell cell, int rowIndex) {
+    this(cell.getText(), cell.getBlankText(), cell.getImageSymbolicName(), rowIndex);
+  }
 
-	final int f_rowIndex;
+  final int f_rowIndex;
 
-	/**
-	 * Gets the index of the row in the table representation of an
-	 * {@link AdornedTreeTableModel} that this leaf cell maps to.
-	 * 
-	 * @return the index of the row in the table representation of an
-	 *         {@link AdornedTreeTableModel} that this leaf cell maps to.
-	 */
-	public int getRowIndex() {
-		return f_rowIndex;
-	}
+  /**
+   * Gets the index of the row in the table representation of an
+   * {@link AdornedTreeTableModel} that this leaf cell maps to.
+   * 
+   * @return the index of the row in the table representation of an
+   *         {@link AdornedTreeTableModel} that this leaf cell maps to.
+   */
+  public int getRowIndex() {
+    return f_rowIndex;
+  }
 }

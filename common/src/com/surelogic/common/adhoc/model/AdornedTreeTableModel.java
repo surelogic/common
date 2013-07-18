@@ -253,11 +253,18 @@ public final class AdornedTreeTableModel {
           }
 
           /*
-           * Handle commas, prefix, and suffix if necessary
+           * Handle blanking, commas, prefix, and suffix if necessary
            */
+          boolean blankText = false; // default
           final ColumnAnnotation colInfo = adornedColumnAnnotationInfo[adornedColI];
           if (colInfo != null) {
             if (cellText != null) {
+              // Check if we should blank the text
+              final String blankIfValue = colInfo.getBlankIf();
+              if (blankIfValue != null) {
+                if (blankIfValue.equals(cellText))
+                  blankText = true;
+              }
               // Human readable duration (hrd)
               if (colInfo.getHumanReadableDuration()) {
                 Pair<Long, String> breakout = safeParseLongAtStart(cellText);
@@ -287,7 +294,7 @@ public final class AdornedTreeTableModel {
             }
           }
 
-          adornedRows[rowI][adornedColI] = new Cell(cellText, cellImageSymbolicName);
+          adornedRows[rowI][adornedColI] = new Cell(cellText, blankText, cellImageSymbolicName);
           adornedColI++;
         }
       }

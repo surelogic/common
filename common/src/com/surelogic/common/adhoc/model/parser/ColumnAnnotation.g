@@ -65,7 +65,7 @@ columnAnnotation returns [ColumnAnnotation result]
 
 annotationPart
 	: treeTableSpec
-	| '(' (hideSpec | iconSpec | justSpec | affixSpec | numSpec | countSpec | sumSpec | maxSpec) ')'
+	| '(' (hideSpec | iconSpec | justSpec | affixSpec | numSpec | blankIfSpec | countSpec | sumSpec | maxSpec) ')'
 	;
 
 treeTableSpec
