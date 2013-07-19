@@ -91,7 +91,13 @@ public final class TreeUtility {
       if (first) {
         first = false;
         if (SystemUtils.IS_OS_LINUX) {
-          col.setWidth(col.getWidth() + 30);
+          /*
+           * The expansion sees wrong under Linux. So we expand by 30% the width
+           * of the column
+           */
+          final int linuxFirstColWidth = col.getWidth();
+          final int width = linuxFirstColWidth + (int) (linuxFirstColWidth * 0.3);
+          col.setWidth(width);
         }
       }
     }
