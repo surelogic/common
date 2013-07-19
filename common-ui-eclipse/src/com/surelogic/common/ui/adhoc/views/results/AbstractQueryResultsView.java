@@ -66,6 +66,7 @@ import com.surelogic.common.ui.EclipseColorUtility;
 import com.surelogic.common.ui.EclipseUIUtility;
 import com.surelogic.common.ui.SLImages;
 import com.surelogic.common.ui.TableUtility;
+import com.surelogic.common.ui.TreeUtility;
 import com.surelogic.common.ui.adhoc.IQueryResultCustomDisplay;
 import com.surelogic.common.ui.adhoc.views.QueryResultNavigator;
 import com.surelogic.common.ui.adhoc.views.editor.AbstractQueryEditorView;
@@ -92,9 +93,7 @@ public abstract class AbstractQueryResultsView extends ViewPart {
               for (final Control c : ((Composite) comp).getChildren()) {
                 if (c instanceof Tree) {
                   final Tree t = (Tree) c;
-                  for (final TreeItem ti : t.getItems()) {
-                    ti.setExpanded(false);
-                  }
+                  TreeUtility.collapseTreeDeep(t);
                   return;
                 }
               }
@@ -411,9 +410,8 @@ public abstract class AbstractQueryResultsView extends ViewPart {
       });
 
       // minimize the column widths
-      for (final TableColumn c : table.getColumns()) {
-        c.pack();
-      }
+      TableUtility.packColumns(table);
+
       // select the previously selected row
       final int selectedRowIndex = data.getSelectedRowIndex();
       if (selectedRowIndex != -1) {
@@ -489,10 +487,9 @@ public abstract class AbstractQueryResultsView extends ViewPart {
         }
       });
 
-      // minimize the column widths
-      for (final TreeColumn c : tree.getColumns()) {
-        c.pack();
-      }
+      // minimize the column widths -- but with enough room if tree is expanded
+      TreeUtility.packColumnsForExpansion(tree);
+
       // select the previously selected row
       if (tree.getSelectionCount() == 1) {
         final TreeItem selected = tree.getSelection()[0];

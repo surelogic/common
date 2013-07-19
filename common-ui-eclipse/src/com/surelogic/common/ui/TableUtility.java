@@ -63,7 +63,7 @@ public final class TableUtility {
   /**
    * Pack the columns of our table to the ideal width.
    * 
-   * @param tableViewer
+   * @param table
    *          a table.
    */
   public static void packColumns(Table table) {
