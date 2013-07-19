@@ -44,7 +44,6 @@ public class HappensBeforeAnalysis {
     private final PreparedStatement hbLookupAccess;
     private final PreparedStatement isFinalSt;
     private final PreparedStatement traceMethodCalledSt;
-    private final PreparedStatement fieldNameSt;
     private final TLongObjectMap<Timestamp> targetsCache;
     private final TLongObjectMap<Timestamp> sourcesCache;
 
@@ -93,7 +92,6 @@ public class HappensBeforeAnalysis {
                 .get("Accesses.trace.happensBeforeLookupAccess"));
         traceMethodCalledSt = conn.prepareStatement(QB
                 .get("Accesses.trace.traceMethodCalled"));
-        fieldNameSt = conn.prepareStatement(QB.get("Accesses.trace.fieldName"));
         targetsCache = new TLongObjectHashMap<Timestamp>();
         sourcesCache = new TLongObjectHashMap<Timestamp>();
     }
@@ -624,7 +622,8 @@ public class HappensBeforeAnalysis {
         VOLATILE("Volatile write/read of %s"), WRITE_IN_THREAD(
                 "The previous write was in this thread"), OBJECT("%s"), THREAD(
                 "%s"), COLLECTION("%s"), CLASS_INITIALIZATION(
-                "Class initialization of %s"), LOCK("%s Locking");
+                "Class initialization of %s"), LOCK(
+                "%s lock release to lock acquisition");
 
         private final String desc;
 
