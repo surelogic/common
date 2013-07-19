@@ -2,6 +2,7 @@ package com.surelogic.common.ui;
 
 import java.util.ArrayList;
 
+import org.apache.commons.lang3.SystemUtils;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.swt.widgets.TreeItem;
@@ -84,8 +85,15 @@ public final class TreeUtility {
    *          an SWT Tree widget.
    */
   public static void packColumns(final Tree tree) {
+    boolean first = true;
     for (final TreeColumn col : tree.getColumns()) {
       col.pack();
+      if (first) {
+        first = false;
+        if (SystemUtils.IS_OS_LINUX) {
+          col.setWidth(col.getWidth() + 30);
+        }
+      }
     }
   }
 
