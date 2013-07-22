@@ -117,13 +117,10 @@ public final class TreeUtility {
   private static ArrayList<TreeItem> getExpansionState_Internal(final Tree tree, final ArrayList<TreeItem> items) {
     final ArrayList<TreeItem> result = new ArrayList<TreeItem>();
     for (final TreeItem ti : items) {
-      System.out.println(ti.getText());
       if (ti.getExpanded()) {
         result.add(ti);
-        System.out.println("(expanded) " + ti.getText());
       }
     }
-    System.out.println(result);
     return result;
   }
 
