@@ -79,6 +79,33 @@ public final class SLUtility {
   public static final String DOT_XML = ".xml";
 
   /**
+   * Removes any entry from the passed map that has an empty string or
+   * {@code null} as its value. Optionally, {@link String#trim()} can be invoked
+   * on the value before it is checked if it is equal to the empty string.
+   * 
+   * @param mutableMap
+   *          a map
+   * @param trimValue
+   *          {@code true} if {@link String#trim()} should be invoked on the map
+   *          entry's value prior to being checked if it is equal to the empty
+   *          string.
+   */
+  public static <T> void removeEmptyStringValuesFromMap(final Map<T, String> mutableMap, final boolean trimValue) {
+    for (Iterator<Map.Entry<T, String>> iterator = mutableMap.entrySet().iterator(); iterator.hasNext();) {
+      Map.Entry<T, String> entry = iterator.next();
+      String value = entry.getValue();
+      if (value == null) {
+        iterator.remove();
+      } else {
+        if (trimValue)
+          value = value.trim();
+        if ("".equals(value))
+          iterator.remove();
+      }
+    }
+  }
+
+  /**
    * Checks if a string is both non-null and not the empty string.
    * 
    * @param value
