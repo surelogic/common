@@ -739,21 +739,34 @@ public class HappensBeforeAnalysis {
             return null;
         }
 
+        private boolean wasNull;
+
+        public boolean wasNull() {
+            return wasNull;
+        }
+
         public Object get(int col) {
             switch (col) {
             case 1:
+                wasNull = false;
                 return source.getTrace();
             case 2:
+                wasNull = false;
                 return source.getTs();
             case 3:
-                return target == null ? -1 : target.getTrace();
+                wasNull = target == null;
+                return target == null ? 0 : target.getTrace();
             case 4:
+                wasNull = target == null;
                 return target == null ? null : target.getTs();
             case 5:
+                wasNull = sourceMethod == null;
                 return sourceMethod;
             case 6:
+                wasNull = targetMethod == null;
                 return targetMethod;
             case 7:
+                wasNull = id == null;
                 return id;
             default:
                 throw new IllegalArgumentException(String.format(

@@ -187,6 +187,8 @@ public final class Functions {
                 return null;
             } else if (methodName.startsWith("get")) {
                 return edge.get((Integer) args[0]);
+            } else if (methodName.equals("wasNull")) {
+                return edge.wasNull();
             }
             throw new UnsupportedOperationException(method.getName());
         }
