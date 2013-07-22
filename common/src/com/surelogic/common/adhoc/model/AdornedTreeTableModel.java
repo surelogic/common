@@ -812,6 +812,9 @@ public final class AdornedTreeTableModel {
 
   /**
    * Gets the set of variables at a given row in this model.
+   * <p>
+   * This method filters out all variables in the selected row that are
+   * {@code null}, the empty string, or whitespace.
    * 
    * @param rowIndex
    *          a row in this model.
@@ -832,6 +835,7 @@ public final class AdornedTreeTableModel {
         }
       }
     }
+    SLUtility.removeEmptyStringValuesFromMap(result, true);
     return result;
   }
 
@@ -840,6 +844,9 @@ public final class AdornedTreeTableModel {
    * non-leaf tree cell. This is done by examining all the leaf cells below the
    * passed cell and defining variables for all columns where the value is
    * invariant.
+   * <p>
+   * This method filters out all variables in the selected row that are
+   * {@code null}, the empty string, or whitespace.
    * 
    * @param cell
    *          a non-leaf tree cell.
@@ -854,7 +861,7 @@ public final class AdornedTreeTableModel {
     final Map<String, String> result = new HashMap<String, String>();
     final Set<LeafTreeCell> leaves = cell.getLeaves();
     if (leaves.isEmpty()) {
-      return result;
+      return result; // empty
     }
 
     final int columnCount = getColumnCount();
@@ -905,6 +912,7 @@ public final class AdornedTreeTableModel {
       }
     }
 
+    SLUtility.removeEmptyStringValuesFromMap(result, true);
     return result;
   }
 }
