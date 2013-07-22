@@ -130,7 +130,11 @@ public abstract class AbstractQueryResultsView extends ViewPart {
     menu.add(f_navigator.getDisposeAction());
     menu.add(f_navigator.getDisposeAllAction());
 
-    displayNoResults();
+    AdHocQueryResult result = getManager().getSelectedResult();
+    if (result != null)
+      displayResult(result);
+    else
+      displayNoResults();
   }
 
   @Override
