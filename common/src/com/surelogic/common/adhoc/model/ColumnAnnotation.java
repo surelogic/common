@@ -296,6 +296,19 @@ public final class ColumnAnnotation {
     f_prefix = stripSingleQuotes(value);
   }
 
+  private boolean f_prefixOnlyIfNonempty = false;
+
+  public boolean getPrefixOnlyIfNonempty() {
+    return f_prefixOnlyIfNonempty;
+  }
+
+  /**
+   * Do not call this method. It should only be called by the parser.
+   */
+  public void setPrefixOnlyIfNonempty(final boolean value) {
+    f_prefixOnlyIfNonempty = value;
+  }
+
   @Nullable
   private String f_aggregatePrefix = null;
 
@@ -330,6 +343,19 @@ public final class ColumnAnnotation {
    */
   public void setSuffix(final String value) {
     f_suffix = stripSingleQuotes(value);
+  }
+
+  private boolean f_suffixOnlyIfNonempty = false;
+
+  public boolean getSuffixOnlyIfNonempty() {
+    return f_suffixOnlyIfNonempty;
+  }
+
+  /**
+   * Do not call this method. It should only be called by the parser.
+   */
+  public void setSuffixOnlyIfNonempty(final boolean value) {
+    f_suffixOnlyIfNonempty = value;
   }
 
   @Nullable

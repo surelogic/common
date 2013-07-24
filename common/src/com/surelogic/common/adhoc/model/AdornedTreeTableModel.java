@@ -282,12 +282,25 @@ public final class AdornedTreeTableModel {
             // Add prefix if necessary
             final String prefix = colInfo.getPrefix();
             if (!"".equals(prefix)) {
-              cellText = (cellText == null ? prefix : prefix + cellText);
+              if (colInfo.getPrefixOnlyIfNonempty()) {
+                if (cellText != null && !"".equals(cellText.trim())) {
+                  cellText = prefix + cellText;
+                }
+
+              } else {
+                cellText = (cellText == null ? prefix : prefix + cellText);
+              }
             }
             // add suffix if necessary
             final String suffix = colInfo.getSuffix();
             if (!"".equals(suffix)) {
-              cellText = (cellText == null ? suffix : cellText + suffix);
+              if (colInfo.getSuffixOnlyIfNonempty()) {
+                if (cellText != null && !"".equals(cellText.trim())) {
+                  cellText = cellText + suffix;
+                }
+              } else {
+                cellText = (cellText == null ? suffix : cellText + suffix);
+              }
             }
           }
 

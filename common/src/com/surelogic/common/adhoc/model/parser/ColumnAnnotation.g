@@ -94,7 +94,9 @@ justSpec
 	
 affixSpec
 	: 'prefix' value=QUOTED_STRING { f_column.setPrefix($value.text); }
+	| 'prefix-only-if-nonempty' value=QUOTED_STRING { f_column.setPrefix($value.text); f_column.setPrefixOnlyIfNonempty(true); }
 	| 'suffix' value=QUOTED_STRING { f_column.setSuffix($value.text); }
+	| 'suffix-only-if-nonempty' value=QUOTED_STRING { f_column.setSuffix($value.text); f_column.setSuffixOnlyIfNonempty(true); }
 	;
 	
 numSpec
