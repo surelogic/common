@@ -500,6 +500,7 @@ public abstract class AbstractQueryResultsView extends ViewPart {
         tree.showItem(selected);
       } else {
         if (tree.getItemCount() > 0) {
+          // select the first row?
           tree.showItem(tree.getItems()[0]);
         }
       }

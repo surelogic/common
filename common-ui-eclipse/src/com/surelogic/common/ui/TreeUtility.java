@@ -70,8 +70,7 @@ public final class TreeUtility {
     final ArrayList<TreeItem> expandedItems = getExpansionState_Internal(tree, items);
     setTreeExpanded_Internal(tree, items, true); // expandAll
     packColumns(tree);
-    setTreeExpanded_Internal(tree, items, false); // collapseAll
-    setExpansionState_Internal(tree, expandedItems);
+    setExpansionState_Internal(tree, items, expandedItems);
   }
 
   /**
@@ -124,9 +123,10 @@ public final class TreeUtility {
     return result;
   }
 
-  private static void setExpansionState_Internal(final Tree tree, final ArrayList<TreeItem> expandedItems) {
-    for (final TreeItem ti : expandedItems) {
-      ti.setExpanded(true);
+  private static void setExpansionState_Internal(final Tree tree, final ArrayList<TreeItem> items,
+      final ArrayList<TreeItem> expandedItems) {
+    for (final TreeItem ti : items) {
+      ti.setExpanded(expandedItems.contains(ti));
     }
   }
 
