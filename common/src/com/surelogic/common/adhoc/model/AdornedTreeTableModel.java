@@ -410,11 +410,15 @@ public final class AdornedTreeTableModel {
                 final long value = safeParseLong(contents);
                 summaryTotal += value;
               }
-              final String simpleText = Long.toString(summaryTotal);
-              final boolean blankText = simpleText.equals(info.getBlankIf());
-              final String text = info.getAggregatePrefix()
-                  + (info.getAddCommas() ? SLUtility.toStringHumanWithCommas(summaryTotal) : simpleText)
-                  + info.getAggregateSuffix();
+              String cellText = Long.toString(summaryTotal);
+              final boolean blankText = cellText.equals(info.getBlankIf());
+              if (info.getHumanReadableDuration()) {
+                // the string begins with an integer
+                cellText = SLUtility.toStringDurationNS(summaryTotal, info.getHumanReadableDurationUnit());
+              } else if (info.getAddCommas()) {
+                cellText = SLUtility.toStringHumanWithCommas(summaryTotal);
+              }
+              final String text = info.getAggregatePrefix() + cellText + info.getAggregateSuffix();
               final NonLeafColumnSummaryCell columnSummary = new NonLeafColumnSummaryCell(text, blankText, colI);
               cell.addColumnSummary(columnSummary);
             }
@@ -429,10 +433,15 @@ public final class AdornedTreeTableModel {
                 final long value = safeParseLong(contents);
                 runningMax = Math.max(runningMax, value);
               }
-              final String simpleText = Long.toString(runningMax);
-              final boolean blankText = simpleText.equals(info.getBlankIf());
-              final String text = info.getAggregatePrefix()
-                  + (info.getAddCommas() ? SLUtility.toStringHumanWithCommas(runningMax) : simpleText) + info.getAggregateSuffix();
+              String cellText = Long.toString(runningMax);
+              final boolean blankText = cellText.equals(info.getBlankIf());
+              if (info.getHumanReadableDuration()) {
+                // the string begins with an integer
+                cellText = SLUtility.toStringDurationNS(runningMax, info.getHumanReadableDurationUnit());
+              } else if (info.getAddCommas()) {
+                cellText = SLUtility.toStringHumanWithCommas(runningMax);
+              }
+              final String text = info.getAggregatePrefix() + cellText + info.getAggregateSuffix();
               final NonLeafColumnSummaryCell columnSummary = new NonLeafColumnSummaryCell(text, blankText, colI);
               cell.addColumnSummary(columnSummary);
             }
