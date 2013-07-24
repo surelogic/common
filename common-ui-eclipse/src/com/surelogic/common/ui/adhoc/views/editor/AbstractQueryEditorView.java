@@ -13,7 +13,9 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.TabFolder;
@@ -34,7 +36,9 @@ import com.surelogic.common.adhoc.AdHocManager;
 import com.surelogic.common.adhoc.AdHocQuery;
 import com.surelogic.common.adhoc.AdHocQueryType;
 import com.surelogic.common.i18n.I18N;
+import com.surelogic.common.ui.EclipseUIUtility;
 import com.surelogic.common.ui.SLImages;
+import com.surelogic.common.ui.adhoc.views.ExportQueryDialog;
 import com.surelogic.common.ui.jobs.SLUIJob;
 
 public abstract class AbstractQueryEditorView extends ViewPart {
@@ -81,6 +85,16 @@ public abstract class AbstractQueryEditorView extends ViewPart {
             saveQueries = new ToolItem(queryToolBar, SWT.PUSH);
             saveQueries.setImage(SLImages.getImage(CommonImages.IMG_SAVE_EDIT));
             saveQueries.setToolTipText("Save queries.");
+            
+            new ToolItem(queryToolBar, SWT.SEPARATOR);
+            ToolItem exportQueries = new ToolItem(queryToolBar, SWT.PUSH);
+            exportQueries.setImage(SLImages.getImage(CommonImages.IMG_SAVEAS_EDIT));
+            exportQueries.setToolTipText("Export queries...");
+            exportQueries.addListener(SWT.Selection, new Listener() {
+                public void handleEvent(final Event event) {
+                	new ExportQueryDialog(EclipseUIUtility.getShell(), getManager()).open();
+                }
+            });
         }
 
         final TabFolder lhsFolder = new TabFolder(lhs, SWT.NONE);
