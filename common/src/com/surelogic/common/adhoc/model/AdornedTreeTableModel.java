@@ -837,6 +837,11 @@ public final class AdornedTreeTableModel {
    * <p>
    * This method filters out all variables in the selected row that are
    * {@code null}, the empty string, or whitespace.
+   * <p>
+   * This method adds in the ad hoc meta variable
+   * {@link SLUtility#ADHOC_META_ROW} and sets its value to
+   * {@link SLUtility#ADHOC_META_VALUE} as an indication to any subquery that
+   * and entire row of data is selected.
    * 
    * @param rowIndex
    *          a row in this model.
@@ -858,6 +863,7 @@ public final class AdornedTreeTableModel {
       }
     }
     SLUtility.removeEmptyStringValuesFromMap(result, true);
+    result.put(SLUtility.ADHOC_META_ROW, SLUtility.ADHOC_META_VALUE);
     return result;
   }
 
@@ -869,6 +875,11 @@ public final class AdornedTreeTableModel {
    * <p>
    * This method filters out all variables in the selected row that are
    * {@code null}, the empty string, or whitespace.
+   * <p>
+   * This method adds in the ad hoc meta variable
+   * {@link SLUtility#ADHOC_META_PARTIAL_ROW} and sets its value to
+   * {@link SLUtility#ADHOC_META_VALUE} as an indication to any subquery that
+   * and entire row of data is selected.
    * 
    * @param cell
    *          a non-leaf tree cell.
@@ -935,6 +946,7 @@ public final class AdornedTreeTableModel {
     }
 
     SLUtility.removeEmptyStringValuesFromMap(result, true);
+    result.put(SLUtility.ADHOC_META_PARTIAL_ROW, SLUtility.ADHOC_META_VALUE);
     return result;
   }
 }

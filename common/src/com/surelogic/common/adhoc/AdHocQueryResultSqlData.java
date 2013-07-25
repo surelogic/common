@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.surelogic.common.CommonImages;
+import com.surelogic.common.SLUtility;
 import com.surelogic.common.adhoc.model.AdornedTreeTableModel;
 import com.surelogic.common.adhoc.model.NonLeafTreeCell;
 import com.surelogic.common.i18n.I18N;
@@ -121,6 +122,9 @@ public final class AdHocQueryResultSqlData extends AdHocQueryResult {
      * Get a copy of the variable values used by the query.
      */
     final Map<String, String> result = getQueryFullyBound().getVariableValues();
+    // remove meta variables from the previous query.
+    SLUtility.removeAdHocQueryMetaVariablesFrom(result);
+    // add in the selection
     result.putAll(getTopVariableValues());
     return result;
   }

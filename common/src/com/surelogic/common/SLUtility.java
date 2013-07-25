@@ -78,6 +78,27 @@ public final class SLUtility {
   public static final String VIEW_PERSISTENCE_PREFIX = "view-state_";
   public static final String DOT_XML = ".xml";
 
+  /*
+   * Constants for special ad hoc query meta variables
+   */
+  public static final String ADHOC_META_ROW = "(meta-row)";
+  public static final String ADHOC_META_PARTIAL_ROW = "(meta-partial-row)";
+
+  public static final String ADHOC_META_VALUE = "defined";
+
+  /**
+   * Removes defined ad hoc query meta variables, if any, from the passed map.
+   * 
+   * @param mutableMap
+   *          a mutable map of ad hoc variables.
+   */
+  public static <T> void removeAdHocQueryMetaVariablesFrom(final Map<String, T> mutableMap) {
+    if (mutableMap != null) {
+      mutableMap.remove(ADHOC_META_ROW);
+      mutableMap.remove(ADHOC_META_PARTIAL_ROW);
+    }
+  }
+
   /**
    * Removes any entry from the passed map that has an empty string or
    * {@code null} as its value. Optionally, {@link String#trim()} can be invoked
