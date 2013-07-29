@@ -698,17 +698,6 @@ public abstract class AbstractQueryResultsView extends ViewPart {
             item.addListener(SWT.Selection, runSubQuery);
           }
         }
-        if (!subQueryList.isEmpty()) {
-          new MenuItem(menu, SWT.SEPARATOR);
-          final MenuItem copy = new MenuItem(menu, SWT.PUSH);
-          copy.setText(I18N.msg("adhoc.query.results.copy"));
-          copy.addListener(SWT.Selection, new Listener() {
-            @Override
-            public void handleEvent(final Event event) {
-              copySelection(queryResult);
-            }
-          });
-        }
       }
     });
   }
