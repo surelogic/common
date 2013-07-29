@@ -19,6 +19,8 @@ public final class CommonCorePreferencesUtility {
 
       EclipseUtility.setDefaultIntPreference(QCEDITOR_SASH_LHS_WEIGHT, 40);
       EclipseUtility.setDefaultIntPreference(QCEDITOR_SASH_RHS_WEIGHT, 60);
+      
+      //EclipseUtility.setDefaultStringPreference(SERVICEABILITY_NAME, System.getProperty("user.name"));
       /*
        * We'll take the default-default for the other preferences.
        */
@@ -35,6 +37,7 @@ public final class CommonCorePreferencesUtility {
   public static final String QCEDITOR_SASH_RHS_WEIGHT = PREFIX + "qceditor.sash.rhs.weight";
 
   public static final String QMENU_SHOW_EMPTY_QUERIES = PREFIX + "qmenu.show.empty.queries";
+  public static final String QMENU_SHOW_UNRUNNABLE_QUERIES = PREFIX + "qmenu.show.unrunnable.queries";
 
   private static final String WARN_LOW_MEMORY = PREFIX + "warnLowMemory";
   private static final String SERVICEABILITY_EMAIL = PREFIX + "serviceability.email";
@@ -57,7 +60,8 @@ public final class CommonCorePreferencesUtility {
   }
 
   public static String getServicabilityName() {
-    return EclipseUtility.getStringPreference(SERVICEABILITY_NAME);
+    String rv = EclipseUtility.getStringPreference(SERVICEABILITY_NAME);
+    return rv;
   }
 
   public static void setServicabilityName(String value) {
