@@ -56,7 +56,9 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
   private final Composite f_content;
   private final QueryResultNavigator f_navigator;
   private final Action f_showEmptyQueriesAction;
+  private final Action f_showUnrunnableQueriesAction;
   private boolean f_showEmptyQueries;
+  private boolean f_showUnrunnableQueries;
 
   /**
    * This listener is used on double-click and the context menu to actually run
@@ -172,7 +174,8 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
   };
 
   public QueryMenuMediator(final AbstractQueryMenuView view, final PageBook pageBook, final Label noRunSelected,
-      final ScrolledComposite sc, final Composite content, final QueryResultNavigator navigator, final Action showEmptyQueriesAction) {
+      final ScrolledComposite sc, final Composite content, final QueryResultNavigator navigator,
+      final Action showEmptyQueriesAction, final Action showUnrunnableQueriesAction) {
     f_manager = view.getManager();
     f_pageBook = pageBook;
     f_noRunSelected = noRunSelected;
@@ -182,6 +185,7 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
     f_content = content;
     f_navigator = navigator;
     f_showEmptyQueriesAction = showEmptyQueriesAction;
+    f_showUnrunnableQueriesAction = showUnrunnableQueriesAction;
   }
 
   @Override
@@ -190,6 +194,8 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
 
     f_showEmptyQueries = EclipseUtility.getBooleanPreference(CommonCorePreferencesUtility.QMENU_SHOW_EMPTY_QUERIES);
     f_showEmptyQueriesAction.setChecked(f_showEmptyQueries);
+    f_showUnrunnableQueries = EclipseUtility.getBooleanPreference(CommonCorePreferencesUtility.QMENU_SHOW_UNRUNNABLE_QUERIES);
+    f_showUnrunnableQueriesAction.setChecked(f_showUnrunnableQueries);
 
     f_manager.addObserver(this);
 
@@ -295,6 +301,14 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
     if (value != f_showEmptyQueries) {
       f_showEmptyQueries = value;
       EclipseUtility.setBooleanPreference(CommonCorePreferencesUtility.QMENU_SHOW_EMPTY_QUERIES, value);
+      updateQueryMenu();
+    }
+  }
+
+  void notifyShowUnrunnableQueriesValueChange(final boolean value) {
+    if (value != f_showUnrunnableQueries) {
+      f_showUnrunnableQueries = value;
+      EclipseUtility.setBooleanPreference(CommonCorePreferencesUtility.QMENU_SHOW_UNRUNNABLE_QUERIES, value);
       updateQueryMenu();
     }
   }
@@ -413,9 +427,11 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
           item.setData(query);
         }
       } else {
-        final TableItem item = new TableItem(tm, SWT.NONE);
-        item.setText(query.getDescription());
-        item.setForeground(EclipseColorUtility.getQueryMenuGrayColor());
+        if (f_showUnrunnableQueries) {
+          final TableItem item = new TableItem(tm, SWT.NONE);
+          item.setText(query.getDescription());
+          item.setForeground(EclipseColorUtility.getQueryMenuGrayColor());
+        }
       }
     }
   }

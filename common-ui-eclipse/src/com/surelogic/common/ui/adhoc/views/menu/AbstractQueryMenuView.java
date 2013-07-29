@@ -65,6 +65,14 @@ public abstract class AbstractQueryMenuView extends ViewPart {
       }
     };
 
+    final Action showUnrunnableQueriesAction = new Action("Show Unrunnable Queries", SWT.TOGGLE) {
+      @Override
+      public void run() {
+        if (f_mediator != null)
+          f_mediator.notifyShowUnrunnableQueriesValueChange(isChecked());
+      }
+    };
+
     // init() called by the mediator
     final QueryResultNavigator navigator = QueryResultNavigator.getInstance(getManager().getDataSource());
 
@@ -77,8 +85,10 @@ public abstract class AbstractQueryMenuView extends ViewPart {
     menu.add(navigator.getClearSelectionAction());
     menu.add(new Separator());
     menu.add(showEmptyQueriesAction);
+    menu.add(showUnrunnableQueriesAction);
 
-    f_mediator = new QueryMenuMediator(this, pageBook, noRunSelected, sc, content, navigator, showEmptyQueriesAction);
+    f_mediator = new QueryMenuMediator(this, pageBook, noRunSelected, sc, content, navigator, showEmptyQueriesAction,
+        showUnrunnableQueriesAction);
     f_mediator.init();
   }
 

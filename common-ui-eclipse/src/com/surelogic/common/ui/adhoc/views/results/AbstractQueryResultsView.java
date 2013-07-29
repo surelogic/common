@@ -59,7 +59,9 @@ import com.surelogic.common.adhoc.model.LeafTreeCell;
 import com.surelogic.common.adhoc.model.NonLeafColumnSummaryCell;
 import com.surelogic.common.adhoc.model.NonLeafTreeCell;
 import com.surelogic.common.adhoc.model.TreeCell;
+import com.surelogic.common.core.EclipseUtility;
 import com.surelogic.common.core.adhoc.EclipseQueryUtility;
+import com.surelogic.common.core.preferences.CommonCorePreferencesUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.logging.SLLogger;
 import com.surelogic.common.ui.EclipseColorUtility;
@@ -682,25 +684,19 @@ public abstract class AbstractQueryResultsView extends ViewPart {
             }
           }
         };
+        final boolean showUnrunnableQueries = EclipseUtility
+            .getBooleanPreference(CommonCorePreferencesUtility.QMENU_SHOW_UNRUNNABLE_QUERIES);
         for (final AdHocQuery query : subQueryList) {
-          final MenuItem item = new MenuItem(menu, SWT.PUSH);
-          item.setText(query.getDescription());
-          item.setData(query);
-          final boolean decorateAsDefault = resultQuery.isDefaultSubQuery(query);
-          item.setImage(SLImages.getImageForAdHocQuery(query.getType(), decorateAsDefault, false));
-          item.setEnabled(query.isCompletelySubstitutedBy(variableValues));
-          item.addListener(SWT.Selection, runSubQuery);
-        }
-        if (!subQueryList.isEmpty()) {
-          new MenuItem(menu, SWT.SEPARATOR);
-          final MenuItem copy = new MenuItem(menu, SWT.PUSH);
-          copy.setText(I18N.msg("adhoc.query.results.copy"));
-          copy.addListener(SWT.Selection, new Listener() {
-            @Override
-            public void handleEvent(final Event event) {
-              copySelection(queryResult);
-            }
-          });
+          final boolean isCompletelySubstituted = query.isCompletelySubstitutedBy(variableValues);
+          if (isCompletelySubstituted || showUnrunnableQueries) {
+            final MenuItem item = new MenuItem(menu, SWT.PUSH);
+            item.setText(query.getDescription());
+            item.setData(query);
+            final boolean decorateAsDefault = resultQuery.isDefaultSubQuery(query);
+            item.setImage(SLImages.getImageForAdHocQuery(query.getType(), decorateAsDefault, false));
+            item.setEnabled(isCompletelySubstituted);
+            item.addListener(SWT.Selection, runSubQuery);
+          }
         }
       }
     });
