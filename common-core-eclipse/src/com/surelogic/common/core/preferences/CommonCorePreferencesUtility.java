@@ -35,6 +35,7 @@ public final class CommonCorePreferencesUtility {
   public static final String QCEDITOR_SASH_RHS_WEIGHT = PREFIX + "qceditor.sash.rhs.weight";
 
   public static final String QMENU_SHOW_EMPTY_QUERIES = PREFIX + "qmenu.show.empty.queries";
+  public static final String QMENU_SHOW_UNRUNNABLE_QUERIES = PREFIX + "qmenu.show.unrunnable.queries";
 
   private static final String WARN_LOW_MEMORY = PREFIX + "warnLowMemory";
   private static final String SERVICEABILITY_EMAIL = PREFIX + "serviceability.email";
