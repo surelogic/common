@@ -24,8 +24,6 @@ import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.MenuAdapter;
 import org.eclipse.swt.events.MenuEvent;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
@@ -690,8 +688,11 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
         final TableItem item = new TableItem(f_subQueryTable, SWT.NONE);
         final TableEditor editor = new TableEditor(f_subQueryTable);
         final Spinner defaultPriority = new Spinner(f_subQueryTable, SWT.NONE);
-        defaultPriority.addModifyListener(new ModifyListener() {
-          public void modifyText(ModifyEvent e) {
+        defaultPriority.setMaximum(100);
+        defaultPriority.setMinimum(-100);
+        defaultPriority.addFocusListener(new FocusAdapter() {
+          @Override
+          public void focusLost(final FocusEvent e) {
             final int value = defaultPriority.getSelection();
             if (subQuery.setPriorityAsDefault(value)) {
               f_edit.markAsChanged();
