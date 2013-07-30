@@ -680,8 +680,10 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
         f_sql.setText(f_edit.getSql());
       }
 
+      savePossibleDefaultPrioritySubQueryChanges(); // if possible
       f_subQueryTable.setRedraw(false);
       f_subQueryTable.removeAll();
+      f_defaultPrioritySubQuerySaveChanges.clear();
       final List<AdHocSubQuery> subQueries = query.getSubQueryList();
       AdHocSubQuery.sortByDescriptionHelper(subQueries);
       for (final AdHocSubQuery subQuery : subQueries) {
@@ -690,13 +692,21 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
         final Spinner defaultPriority = new Spinner(f_subQueryTable, SWT.NONE);
         defaultPriority.setMaximum(100);
         defaultPriority.setMinimum(-100);
+        final Runnable saveChangesIfNeeded = new Runnable() {
+          public void run() {
+            if (!defaultPriority.isDisposed()) {
+              final int value = defaultPriority.getSelection();
+              if (subQuery.setPriorityAsDefault(value)) {
+                f_edit.markAsChanged();
+              }
+            }
+          }
+        };
+        f_defaultPrioritySubQuerySaveChanges.add(saveChangesIfNeeded);
         defaultPriority.addFocusListener(new FocusAdapter() {
           @Override
           public void focusLost(final FocusEvent e) {
-            final int value = defaultPriority.getSelection();
-            if (subQuery.setPriorityAsDefault(value)) {
-              f_edit.markAsChanged();
-            }
+            saveChangesIfNeeded.run();
           }
         });
         defaultPriority.setSelection(subQuery.getPriorityAsDefault());
@@ -768,8 +778,8 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
   }
 
   /**
-   * This method check for changes to all the text controls and saves any
-   * changes to the model.
+   * This method check for changes to all the text/spinner controls and saves
+   * any changes to the model.
    * <p>
    * We need this method because some controls, such as tool bar buttons, don't
    * grab the focus. Typically, we save changes to text controls when they lose
@@ -779,6 +789,7 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
     savePossibleSqlChanges();
     savePossibleDescriptionTextChanges();
     savePossibleSortHintChanges();
+    savePossibleDefaultPrioritySubQueryChanges();
     savePossibleTypeChanges();
   }
 
@@ -812,6 +823,13 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
     if (f_edit.setSql(f_sql.getText())) {
       f_edit.markAsChanged();
     }
+  }
+
+  private final ArrayList<Runnable> f_defaultPrioritySubQuerySaveChanges = new ArrayList<Runnable>();
+
+  private void savePossibleDefaultPrioritySubQueryChanges() {
+    for (Runnable r : f_defaultPrioritySubQuerySaveChanges)
+      r.run();
   }
 
   private void showQueryActionMenu() {
