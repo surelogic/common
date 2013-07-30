@@ -3,11 +3,10 @@ package com.surelogic.common.adhoc;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -379,29 +378,40 @@ public final class AdHocQuery implements AdHocIdentity {
     f_manager.notifyQueryModelChange();
   }
 
+  private boolean f_noDefaultSubQuery = false;
+
+  /**
+   * Gets if this query is intended to <i>never</i> have a default sub-query.
+   * 
+   * @return {@code true} if this query should never have a default sub-query,
+   *         {@code false} otherwise.
+   */
+  public boolean noDefaultSubQuery() {
+    return f_noDefaultSubQuery;
+  }
+
+  /**
+   * Sets if this query is intended to <i>never</i> have a default sub-query.
+   * 
+   * @param value
+   *          {@code true} if this query should never have a default sub-query,
+   *          {@code false} otherwise.
+   * @return {@code true} if the value was changed, {@code false} otherwise.
+   */
+  public boolean setNoDefaultSubQuery(boolean value) {
+    if (value != f_noDefaultSubQuery) {
+      f_noDefaultSubQuery = value;
+      return true;
+    } else {
+      return false; // no change
+    }
+  }
+
   /**
    * The set of queries that can be executed based upon a selected row of the
    * result of this query.
    */
-  private final Set<AdHocQuery> f_subQueries = new HashSet<AdHocQuery>();
-
-  /**
-   * Sets the set of queries that can be executed based upon a selected row of
-   * the result of this query.
-   * 
-   * @param subQueries
-   *          a set of queries.
-   * @return {@code true} if the set of sub-queries was changed, {@code false}
-   *         otherwise.
-   */
-  public boolean setSubQueries(final Set<AdHocQuery> subQueries) {
-    if (subQueries == null || f_subQueries.equals(subQueries)) {
-      return false;
-    }
-    f_subQueries.clear();
-    f_subQueries.addAll(subQueries);
-    return true;
-  }
+  private final List<AdHocSubQuery> f_subQueries = new ArrayList<AdHocSubQuery>();
 
   /**
    * Adds a sub-query to this query if it is a query managed by the same query
@@ -410,32 +420,36 @@ public final class AdHocQuery implements AdHocIdentity {
    * 
    * @param subQuery
    *          a sub-query.
+   * @param priorityAsDefaultSubQuery
+   *          a priority for this query to be the default sub-query. The highest
+   *          query able to be run gets chosen as the default.
    * @return {@code true} if the set of sub-queries was changed, {@code false}
    *         otherwise.
    */
-  public boolean addSubQuery(final AdHocQuery subQuery) {
+  public boolean addSubQuery(final AdHocQuery subQuery, final int priorityAsDefaultSubQuery) {
     if (subQuery == null || !f_manager.contains(subQuery)) {
       return false;
     }
-    return f_subQueries.add(subQuery);
+    return AdHocSubQuery.addHelper(f_subQueries, new AdHocSubQuery(subQuery, priorityAsDefaultSubQuery));
   }
 
   /**
-   * Adds the sub-queries to this query if, for each sub-query, it is a query
-   * managed by the same query manager as this query. A sub-query is a query
-   * that can be executed based upon a selected row of the result of this query.
+   * Adds all the passed queries as sub-queries to this query with default
+   * priority to be the default sub-query.
    * 
-   * @param subQueries
-   *          a collection of sub-queries.
+   * @param queries
+   *          a collection of queries.
    * @return {@code true} if the set of sub-queries was changed, {@code false}
    *         otherwise.
    */
-  public boolean addSubQueries(final Collection<AdHocQuery> subQueries) {
-    boolean val = false;
-    for (AdHocQuery q : subQueries) {
-      val |= addSubQuery(q);
+  public boolean addSubQueries(final Collection<AdHocQuery> queries) {
+    boolean modified = false;
+    for (AdHocQuery query : queries) {
+      if (addSubQuery(query, AdHocSubQuery.DEFAULT_PRIORITY)) {
+        modified = true;
+      }
     }
-    return val;
+    return modified;
   }
 
   /**
@@ -449,7 +463,7 @@ public final class AdHocQuery implements AdHocIdentity {
    *         otherwise.
    */
   public boolean removeSubQuery(final AdHocQuery subQuery) {
-    return f_subQueries.remove(subQuery);
+    return AdHocSubQuery.removeHelper(f_subQueries, subQuery);
   }
 
   /**
@@ -460,110 +474,47 @@ public final class AdHocQuery implements AdHocIdentity {
   }
 
   /**
-   * Gets a copy of the set of sub-queries for this query. A sub-query is a
+   * Gets a copy of the sub-query aggregates for this query. A sub-query is a
    * query that can be executed based upon a selected row of the result of this
    * query.
+   * <p>
+   * This is a rather raw copy and is not sorted in any particular order. In
+   * particular, it should be processed before being displayed in the user
+   * interface.
    * 
-   * @return the set of sub-queries for this query.
+   * @return the sub-query aggregates for this query.
    */
-  public Set<AdHocQuery> getSubQueries() {
-    return new HashSet<AdHocQuery>(f_subQueries);
+  public ArrayList<AdHocSubQuery> getSubQueryList() {
+    return new ArrayList<AdHocSubQuery>(f_subQueries);
   }
 
   /**
-   * Returns a list of the sub-queries for this query sorted by their sort hint
-   * and description. The default sub-query, obtained from
-   * {@link #getDefaultSubQuery()}, if any, is always first in the returned
-   * list.
+   * Gets a copy of the sub-query aggregates for this query removing queries
+   * that are not intended to be displayed in any query menu. A sub-query is a
+   * query that can be executed based upon a selected row of the result of this
+   * query.
+   * <p>
+   * This is a rather raw copy and is not sorted in any particular order. In
+   * particular, it should be processed before being displayed in the user
+   * interface.
    * 
-   * @return a list of the sub-queries for this query sorted by their sort hint
-   *         and description with the default-sub query, if any, first.
-   */
-  public List<AdHocQuery> getSubQueryList() {
-    final LinkedList<AdHocQuery> result = new LinkedList<AdHocQuery>(f_subQueries);
-    Collections.sort(result, AdHocIdentity.BY_HINT_DESCRIPTION);
-    if (f_defaultSubQuery != null) {
-      result.remove(f_defaultSubQuery);
-      result.addFirst(f_defaultSubQuery);
-    }
-    return result;
-  }
-
-  /**
-   * Returns a list of the sub-queries that should be displayed in the query
-   * menu for this query sorted per {@link #getSubQueryList()}.
-   * 
-   * @return a list of the sub-queries that should be displayed in the query
-   *         menu for this query.
+   * @return the visible sub-query aggregates for this query.
    * 
    * @see #showInQueryMenu()
    */
-  public List<AdHocQuery> getVisibleSubQueryList() {
-    final List<AdHocQuery> result = getSubQueryList();
-    for (final Iterator<AdHocQuery> i = result.iterator(); i.hasNext();) {
-      final AdHocQuery query = i.next();
-      if (!query.showInQueryMenu()) {
+  public ArrayList<AdHocSubQuery> getVisibleSubQueryList() {
+    final ArrayList<AdHocSubQuery> result = getSubQueryList();
+    for (final Iterator<AdHocSubQuery> i = result.iterator(); i.hasNext();) {
+      final AdHocSubQuery item = i.next();
+      if (!item.getQuery().showInQueryMenu()) {
         i.remove();
       }
     }
     return result;
   }
 
-  /**
-   * A default queries that can be executed based upon a selected row of the
-   * result of this query. It must be true that
-   * <tt>f_subQueries.contains(f_defaultSubQuery)</tt>.
-   */
-  private AdHocQuery f_defaultSubQuery = null;
-
-  /**
-   * Gets the default sub-query for this query.
-   * 
-   * @return a sub-query or {@code null} if no default.
-   */
-  public AdHocQuery getDefaultSubQuery() {
-    return f_defaultSubQuery;
-  }
-
-  /**
-   * Gets if a query is the default sub-query. This is method has the same
-   * effect as <tt>getDefaultSubQuery() == query</tt>.
-   * 
-   * @param query
-   *          a query.
-   * @return {@code true} if <tt>query</tt> is the default sub-query,
-   *         {@code false} otherwise.
-   */
-  public boolean isDefaultSubQuery(final AdHocQuery query) {
-    return f_defaultSubQuery == query;
-  }
-
-  /**
-   * Sets the default sub-query for this query.
-   * 
-   * @param subQuery
-   *          a sub-query, may be {@code null}.
-   * @return {@code true} if the value was changed, {@code false} otherwise.
-   * @throws IllegalArgumentException
-   *           if the passed query is not contained in the set of sub-queries
-   *           for this query.
-   */
-  public boolean setDefaultSubQuery(final AdHocQuery subQuery) {
-    if (f_defaultSubQuery == subQuery) {
-      return false;
-    }
-    if (subQuery == null) {
-      f_defaultSubQuery = null;
-      return true;
-    }
-    if (!f_manager.contains(subQuery)) {
-      return false;
-    }
-    if (!f_subQueries.contains(subQuery)) {
-      throw new IllegalArgumentException(I18N.err(216, subQuery.getId(), getId()));
-    }
-    f_defaultSubQuery = subQuery;
-    return true;
+  public HashSet<AdHocQuery> getSubQueries() {
+    return AdHocSubQuery.querySetHelper(f_subQueries);
   }
 
   /**

@@ -12,13 +12,13 @@ import static com.surelogic.common.adhoc.AdHocPersistence.DISPLAY_AT_ROOT;
 import static com.surelogic.common.adhoc.AdHocPersistence.HAS_DATA;
 import static com.surelogic.common.adhoc.AdHocPersistence.ID;
 import static com.surelogic.common.adhoc.AdHocPersistence.NO_DATA;
+import static com.surelogic.common.adhoc.AdHocPersistence.NO_DEFAULT_SUB_QUERY;
 import static com.surelogic.common.adhoc.AdHocPersistence.QUERY;
 import static com.surelogic.common.adhoc.AdHocPersistence.REVISION;
 import static com.surelogic.common.adhoc.AdHocPersistence.SORT_HINT;
 import static com.surelogic.common.adhoc.AdHocPersistence.SUB_QUERY;
 import static com.surelogic.common.adhoc.AdHocPersistence.TYPE;
 import static com.surelogic.common.adhoc.AdHocPersistence.VERSION;
-import static com.surelogic.common.adhoc.AdHocPersistence.VERSION_3_0;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -58,7 +58,7 @@ public final class AdHocPersistenceReader extends DefaultHandler {
       throws SAXException {
     if (name.equals(AD_HOC)) {
       final String fileVersion = attributes.getValue(VERSION);
-      if (!VERSION_3_0.equals(fileVersion)) {
+      if (AdHocPersistence.checkIfFileVersionIsTooOldToRead(fileVersion)) {
         throw new SAXException(I18N.err(122, fileVersion));
       }
     } else if (name.equals(QUERY)) {
@@ -77,6 +77,10 @@ public final class AdHocPersistenceReader extends DefaultHandler {
           final String displayString = attributes.getValue(DISPLAY);
           if (!"".equals(displayString)) {
             f_query.setShowInQueryMenu(Boolean.parseBoolean(displayString));
+          }
+          final String noDefaultSubQueryString = attributes.getValue(NO_DEFAULT_SUB_QUERY);
+          if (!"".equals(noDefaultSubQueryString)) {
+            f_query.setNoDefaultSubQuery(Boolean.parseBoolean(noDefaultSubQueryString));
           }
           final String customDisplay = attributes.getValue(CUSTOM_DISPLAY);
           if (customDisplay != null) {
@@ -121,11 +125,20 @@ public final class AdHocPersistenceReader extends DefaultHandler {
         if (!f_subQueryIgnoreList.contains(queryId)) {
           final AdHocQuery query = f_manager.getOrCreateQuery(queryId);
           final AdHocQuery subQuery = f_manager.getOrCreateQuery(subQueryId);
-          query.addSubQuery(subQuery);
-
+          int isDefaultValue = 0; // default priority for default sub-query
           final String isDefault = attributes.getValue(DEFAULT_SUB_QUERY);
-          if ("true".equalsIgnoreCase(isDefault))
-            query.setDefaultSubQuery(subQuery);
+          if ("true".equalsIgnoreCase(isDefault)) {
+            // obsolete scheme of "true" to mark static default -- change to 10
+            isDefaultValue = 10;
+          } else {
+            try {
+              // new scheme is a priority
+              isDefaultValue = Integer.parseInt(isDefault);
+            } catch (Exception ignore) {
+              // ignore
+            }
+          }
+          query.addSubQuery(subQuery, isDefaultValue);
         }
       }
     } else if (name.equals(CATEGORY)) {
