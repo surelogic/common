@@ -127,6 +127,60 @@ public final class SLUtility {
   }
 
   /**
+   * Extracts text from a comment block that starts with a whole-line comment
+   * delimiter, such a <tt>--</tt> or </tt>//</tt>. This doesn't handle
+   * parenthetical comments and lines in the passed text that do not contain the
+   * delimiter are not processed in the output block.
+   * <p>
+   * Note the examples below use <tt>--</tt> as the whole-line comment
+   * delimiter.
+   * <p>
+   * Only the first delimiter per line is removed and all text prior to it is
+   * ignored. Thus, " <tt>fff -- my--dog</tt> " would result in "
+   * <tt> my--dog</tt>".
+   * <p>
+   * Lines in the passed text that do not contain the delimiter are not
+   * processed in the output block. Thus
+   * 
+   * <pre>
+   * -- My work
+   * select from dual
+   * -- is done
+   * </pre>
+   * 
+   * would result in "<tt> My work\n is done</tt>".
+   * 
+   * @param text
+   *          the comment block.
+   * @param commentDelimiter
+   *          a whole-line comment delimiter.
+   * @return the block with the whole-line comment delimiters removed.
+   */
+  public static String extractTextFromWholeLineCommentBlock(final String text, final String commentDelimiter) {
+    if (text == null)
+      throw new IllegalArgumentException(I18N.err(44, "text"));
+    if (commentDelimiter == null)
+      throw new IllegalArgumentException(I18N.err(44, "commentDelimiter"));
+
+    final StringBuilder b = new StringBuilder();
+    final BufferedReader r = new BufferedReader(new StringReader(text));
+
+    String line;
+    try {
+      while ((line = r.readLine()) != null) {
+        int comment = line.indexOf(commentDelimiter);
+        if (comment != -1) {
+          b.append(line.substring(comment + commentDelimiter.length()));
+          b.append('\n');
+        }
+      }
+    } catch (IOException e) {
+      throw new IllegalStateException(e);
+    }
+    return b.toString();
+  }
+
+  /**
    * Checks if a string is both non-null and not the empty string.
    * 
    * @param value
