@@ -14,6 +14,7 @@ import java.util.Set;
 
 import com.surelogic.NonNull;
 import com.surelogic.Nullable;
+import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
 
 /**
@@ -251,19 +252,62 @@ public final class AdHocQuery implements AdHocIdentity {
    * removed.
    * <p>
    * If no <tt>BEGIN-INFO</tt> </tt>END-INFO</tt> pair exists in the SQL query
-   * then the description is returned as HTML, such as
+   * comments then the description is returned as HTML, such as
    * <tt>&lt;p&gt;&lt;strong&gt;</tt> <i>description</i>
    * <tt>&lt;/p&gt;&lt;/strong&gt;</tt>
    * 
    * @return an HTML description of this query.
    */
   public String getQueryDoc() {
-    final int start = f_sql.indexOf(STARTINFO);
-    final int stop = f_sql.indexOf(STOPINFO);
+    final String strippedCommentText = SLUtility.extractTextFromWholeLineCommentBlock(f_sql, "--");
+    final int start = strippedCommentText.indexOf(STARTINFO);
+    final int stop = strippedCommentText.indexOf(STOPINFO);
     if (start == -1 || stop == -1) {
       return "<p><strong>" + getDescription() + "</strong></p>";
     }
-    return f_sql.substring(start + STARTINFO.length(), stop).replace("--", "");
+    return strippedCommentText.substring(start + STARTINFO.length(), stop).trim();
+  }
+
+  private static final String STARTMETA = "BEGIN-META(";
+  private static final char STARTMETA_CLOSE = ')';
+  private static final String STOPMETA = "END-META";
+
+  /**
+   * Gets the raw text for a meta within the comments of this query. It has all
+   * <tt>--</tt> breaks removed.
+   * <p>
+   * If no <tt>BEGIN-META(</tt><i>name</i><tt>)</tt> </tt>END-META</tt> pair
+   * exists in the SQL query comments then {@code null} is returned.
+   * <p>
+   * While multiple meta regions may exist in a query only the first of a given
+   * name can be read. The second one with the same name will be ignored.
+   * Therefore, names of meta regions should be unique per query.
+   * 
+   * @param name
+   *          for the meta region.
+   * @return the text of the meta, or {@code null} if a meta region with the
+   *         passed name does not exist in the query comments.
+   * @throws IllegalArgumentException
+   *           if <tt>name</tt> is {@code null}.
+   */
+  public String getMetaRaw(final String name) {
+    if (name == null)
+      throw new IllegalArgumentException(I18N.err(44, "name"));
+    final String strippedCommentText = SLUtility.extractTextFromWholeLineCommentBlock(f_sql, "--");
+    final int start = strippedCommentText.indexOf(STARTMETA);
+    final int stop = strippedCommentText.indexOf(STOPMETA);
+    if (start == -1 || stop == -1) {
+      return null;
+    }
+    final String potentialMeta = strippedCommentText.substring(start + STARTMETA.length(), stop);
+    final int closeMetaName = potentialMeta.indexOf(STARTMETA_CLOSE);
+    if (closeMetaName == -1)
+      return null;
+    final String metaName = potentialMeta.substring(0, closeMetaName);
+    if (name.equals(metaName)) {
+      return potentialMeta.substring(metaName.length() + 1);
+    } else
+      return null;
   }
 
   /**
