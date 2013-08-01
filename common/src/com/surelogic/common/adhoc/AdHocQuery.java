@@ -273,6 +273,53 @@ public final class AdHocQuery implements AdHocIdentity {
   private static final String STOPMETA = "END-META";
 
   /**
+   * Gets the raw text for a meta within the comments of the passed text which
+   * is assumed to be from an ad hoc query. It has all <tt>--</tt> breaks
+   * removed. This method is intended for use in low-level data access code that
+   * no longer has access to an ad hoc query code (such as within a driver
+   * implementation).
+   * <p>
+   * If no <tt>BEGIN-META(</tt><i>name</i><tt>)</tt> </tt>END-META</tt> pair
+   * exists in the SQL query comments within the text then {@code null} is
+   * returned.
+   * <p>
+   * While multiple meta regions may exist in a query only the first of a given
+   * name can be read. The second one with the same name will be ignored.
+   * Therefore, names of meta regions should be unique.
+   * 
+   * @param text
+   *          the fully-qualified SQL text (with comments) of an ad hoc query.
+   * @param name
+   *          for the meta region.
+   * @return the text of the meta, or {@code null} if a meta region with the
+   *         passed name does not exist in the query comments.
+   * @throws IllegalArgumentException
+   *           if <tt>name</tt> is {@code null}.
+   */
+  @Nullable
+  public static String getMetaFromString(final String text, final String name) {
+    if (text == null)
+      return null;
+    if (name == null)
+      return null;
+    final String strippedCommentText = SLUtility.extractTextFromWholeLineCommentBlock(text, "--");
+    final int start = strippedCommentText.indexOf(STARTMETA);
+    final int stop = strippedCommentText.indexOf(STOPMETA);
+    if (start == -1 || stop == -1) {
+      return null;
+    }
+    final String potentialMeta = strippedCommentText.substring(start + STARTMETA.length(), stop);
+    final int closeMetaName = potentialMeta.indexOf(STARTMETA_CLOSE);
+    if (closeMetaName == -1)
+      return null;
+    final String metaName = potentialMeta.substring(0, closeMetaName);
+    if (name.equals(metaName)) {
+      return potentialMeta.substring(metaName.length() + 1);
+    } else
+      return null;
+  }
+
+  /**
    * Gets the raw text for a meta within the comments of this query. It has all
    * <tt>--</tt> breaks removed.
    * <p>
