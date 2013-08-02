@@ -203,7 +203,9 @@ public class CancellableAdHocQueryJob extends AbstractSLJob {
 	}
 
 	public void cancel() {
-		((EmbedConnection) f_connection).cancelRunningStatement();
+		if (f_connection instanceof EmbedConnection) {
+			((EmbedConnection) f_connection).cancelRunningStatement();
+		}
 	}
 
 	private volatile boolean f_done;
