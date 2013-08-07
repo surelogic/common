@@ -85,11 +85,11 @@ public class JavaClassPath<PS extends JavaProjectSet<?>> implements IJavacClassP
 		/**
 		 * @return The qualified names of classes that it depends on
 		 */
-		Iterable<String> process(String referencingProject, IJavaFile file);
+		Iterable<String> process(IJavaFile file) throws IOException;
 	}
 	
 	// Note that this may not be particularly efficient if parallelized
-	public void process(final Processor p, final String project, final Iterable<String> classes) {
+	public void process(final Processor p, final String project, final Iterable<String> classes) throws IOException {
 		final MultiMap<String, IJavaFile> byProject = new MultiHashMap<String, IJavaFile>();
 		for(final String qname : classes) {
 			final Pair<String,String> key = new Pair<String, String>(project, qname);
@@ -98,18 +98,44 @@ public class JavaClassPath<PS extends JavaProjectSet<?>> implements IJavacClassP
 				byProject.put(file.getProject(), file);
 			}
 		}
+		process(p, byProject);
+	}
+	private void process(final Processor p, final MultiMap<String, IJavaFile> byProject) throws IOException {
 		for(final Map.Entry<String, Collection<IJavaFile>> e : byProject.entrySet()) {
 			for(final IJavaFile file : e.getValue()) {
-				process(p, e.getKey(), p.process(project, file));			
+				process(p, e.getKey(), p.process(file));			
 			}
 		}
 	}
 
+	public void process(Processor p, List<IJavaFile> sources) throws IOException {
+		final MultiMap<String, IJavaFile> byProject = new MultiHashMap<String, IJavaFile>();
+		for(final IJavaFile file : sources) {
+			final Pair<String,String> key = new Pair<String, String>(file.getProject(), file.getQualifiedName());
+			if (!markAsLoaded(key)) {
+				byProject.put(file.getProject(), file);
+			}
+		}
+		process(p, byProject);
+	}
+	
 	/**
+	 * Marks the key as being seen
+	 * 
 	 * @return true if previously marked
 	 */
-	private boolean markAsLoaded(Pair<String, String> key) {
-		// TODO what if it's part of the JRE?
+	private boolean markAsLoaded(final Pair<String, String> key) {
+		boolean previouslySeen = !loaded.add(key);
+		if (previouslySeen) {
+			return true;
+		}
+		// Check if it's from the JRE
+		//
+		// TODO should I change this to return IJavaFile?
+		final IJavaFile file = classToFile.get(key);
+		if (file.getProject().startsWith(Config.JRE_NAME)) {
+			return !loaded.add(new Pair<String,String>(file.getProject(), file.getQualifiedName()));
+		}
 		return false;
 	}
 	
