@@ -92,4 +92,8 @@ public class PerformanceProperties {
 			// Ignore
 		}
 	}
+
+	public boolean isTiming() {
+		return start != UNINIT;
+	}
 }
