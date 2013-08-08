@@ -52,9 +52,11 @@ public class JavaClassPath<PS extends JavaProjectSet<?>> implements IJavacClassP
 	  }
 	  final Pair<String,String> key = Pair.getInstance(destProj, file.getQualifiedName());
 		if (!classToFile.containsKey(key)) {
+			/*
 			if (!key.first().startsWith(Config.JRE_NAME) && file.getFile() != null) {
 				System.out.println("Mapping "+key.second()+" to "+file.getFile());
 			}
+			*/
 			classToFile.put(key, file);		
 		}
 	}
@@ -133,6 +135,13 @@ public class JavaClassPath<PS extends JavaProjectSet<?>> implements IJavacClassP
 		//
 		// TODO should I change this to return IJavaFile?
 		final IJavaFile file = classToFile.get(key);
+		if (file == null) {
+			return true; // ignore
+		}
+		if (file.getProject().equals(key.first())) {
+			// No need to continue checking
+			return false;
+		}
 		if (file.getProject().startsWith(Config.JRE_NAME)) {
 			return !loaded.add(new Pair<String,String>(file.getProject(), file.getQualifiedName()));
 		}
