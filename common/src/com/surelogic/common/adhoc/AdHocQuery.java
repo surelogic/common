@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -273,19 +274,63 @@ public final class AdHocQuery implements AdHocIdentity {
   private static final String STOPMETA = "END-META";
 
   /**
-   * Gets the raw text for a meta within the comments of the passed text which
-   * is assumed to be from an ad hoc query. It has all <tt>--</tt> breaks
-   * removed. This method is intended for use in low-level data access code that
-   * no longer has access to an ad hoc query code (such as within a driver
+   * Extracts meta information within the comments of the passed text, which is
+   * assumed to be from an ad hoc query, and returns it as a map of the meta
+   * name to its detailed information. This method is intended for use in
+   * low-level data access code that no longer has access to an ad hoc query
+   * code (such as within a driver implementation).
+   * <p>
+   * The returned map maps the meta name to a structure describing it.
+   * <p>
+   * If no <tt>BEGIN-META(</tt><i>name</i><tt>)</tt> </tt>END-META</tt> pair
+   * exists in the SQL query comments within the text then an empty map is
+   * returned.
+   * <p>
+   * While multiple meta regions may exist in a query only the <i>last</i> of a
+   * given name will appear in the returned map. Therefore, names of meta
+   * regions in SQL comments should be unique per query.
+   * 
+   * @param text
+   *          the fully-qualified SQL text (with comments) of an ad hoc query.
+   * @return a possibly empty map containing all the meta information in the
+   *         passed text.
+   */
+  @NonNull
+  public static HashMap<String, AdHocQueryMeta> getMetaFromString(final String text) {
+    final HashMap<String, AdHocQueryMeta> result = new HashMap<String, AdHocQueryMeta>();
+    if (text == null)
+      return result;
+    String strippedCommentText = SLUtility.extractTextFromWholeLineCommentBlock(text, "--");
+    while (true) {
+      final int start = strippedCommentText.indexOf(STARTMETA);
+      final int stop = strippedCommentText.indexOf(STOPMETA);
+      if (start == -1 || stop == -1)
+        break; // no more
+      final String potentialMeta = strippedCommentText.substring(start + STARTMETA.length(), stop);
+      final int closeMetaName = potentialMeta.indexOf(STARTMETA_CLOSE);
+      if (closeMetaName != -1) {
+        final String metaName = potentialMeta.substring(0, closeMetaName);
+        if (!"".equals(metaName)) {
+          final String metaText = potentialMeta.substring(metaName.length() + 1);
+          AdHocQueryMeta meta = new AdHocQueryMeta(metaName, metaText);
+          result.put(meta.getName(), meta);
+        }
+      }
+      strippedCommentText = strippedCommentText.substring(stop + STOPMETA.length());
+    }
+    return result;
+  }
+
+  /**
+   * Gets the detailed information for a particular meta name within the
+   * comments of the passed text which is assumed to be from an ad hoc query.
+   * This method is intended for use in low-level data access code that no
+   * longer has access to an ad hoc query code (such as within a driver
    * implementation).
    * <p>
    * If no <tt>BEGIN-META(</tt><i>name</i><tt>)</tt> </tt>END-META</tt> pair
-   * exists in the SQL query comments within the text then {@code null} is
-   * returned.
-   * <p>
-   * While multiple meta regions may exist in a query only the first of a given
-   * name can be read. The second one with the same name will be ignored.
-   * Therefore, names of meta regions should be unique.
+   * with the passed name exists in the SQL query comments within the text then
+   * {@code null} is returned.
    * 
    * @param text
    *          the fully-qualified SQL text (with comments) of an ad hoc query.
@@ -297,70 +342,22 @@ public final class AdHocQuery implements AdHocIdentity {
    *           if <tt>name</tt> is {@code null}.
    */
   @Nullable
-  public static String getMetaFromString(final String text, final String name) {
-    if (text == null)
-      return null;
-    if (name == null)
-      return null;
-    final String strippedCommentText = SLUtility.extractTextFromWholeLineCommentBlock(text, "--");
-    final int start = strippedCommentText.indexOf(STARTMETA);
-    final int stop = strippedCommentText.indexOf(STOPMETA);
-    if (start == -1 || stop == -1) {
-      return null;
-    }
-    final String potentialMeta = strippedCommentText.substring(start + STARTMETA.length(), stop);
-    final int closeMetaName = potentialMeta.indexOf(STARTMETA_CLOSE);
-    if (closeMetaName == -1)
-      return null;
-    final String metaName = potentialMeta.substring(0, closeMetaName);
-    if (name.equals(metaName)) {
-      return potentialMeta.substring(metaName.length() + 1);
-    } else
-      return null;
-  }
-
-  /**
-   * Gets the raw text for a meta within the comments of this query. It has all
-   * <tt>--</tt> breaks removed.
-   * <p>
-   * If no <tt>BEGIN-META(</tt><i>name</i><tt>)</tt> </tt>END-META</tt> pair
-   * exists in the SQL query comments then {@code null} is returned.
-   * <p>
-   * While multiple meta regions may exist in a query only the first of a given
-   * name can be read. The second one with the same name will be ignored.
-   * Therefore, names of meta regions should be unique per query.
-   * 
-   * @param name
-   *          for the meta region.
-   * @return the text of the meta, or {@code null} if a meta region with the
-   *         passed name does not exist in the query comments.
-   * @throws IllegalArgumentException
-   *           if <tt>name</tt> is {@code null}.
-   */
-  public String getMetaRaw(final String name) {
+  public static AdHocQueryMeta getMetaFromStringWithName(final String text, final String name) {
     if (name == null)
       throw new IllegalArgumentException(I18N.err(44, "name"));
-    final String strippedCommentText = SLUtility.extractTextFromWholeLineCommentBlock(f_sql, "--");
-    final int start = strippedCommentText.indexOf(STARTMETA);
-    final int stop = strippedCommentText.indexOf(STOPMETA);
-    if (start == -1 || stop == -1) {
-      return null;
-    }
-    final String potentialMeta = strippedCommentText.substring(start + STARTMETA.length(), stop);
-    final int closeMetaName = potentialMeta.indexOf(STARTMETA_CLOSE);
-    if (closeMetaName == -1)
-      return null;
-    final String metaName = potentialMeta.substring(0, closeMetaName);
-    if (name.equals(metaName)) {
-      return potentialMeta.substring(metaName.length() + 1);
-    } else
-      return null;
+    return getMetaFromString(text).get(name);
   }
 
   /**
    * The SQL text of this query.
    */
   private String f_sql = "";
+
+  /**
+   * Holds meta information about this query. It is obtained from the query
+   * comments so it needs to be update any time {@link #f_sql} changes.
+   */
+  private final Map<String, AdHocQueryMeta> f_nameToMeta = new HashMap<String, AdHocQueryMeta>();
 
   /**
    * Gets the SQL text of this query.
@@ -383,6 +380,8 @@ public final class AdHocQuery implements AdHocIdentity {
       return false;
     }
     f_sql = sql;
+    f_nameToMeta.clear();
+    f_nameToMeta.putAll(getMetaFromString(sql));
     return true;
   }
 
