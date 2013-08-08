@@ -12,11 +12,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.logging.Level;
 
 import com.surelogic.NonNull;
 import com.surelogic.Nullable;
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
+import com.surelogic.common.logging.SLLogger;
 
 /**
  * Represents an SQL query and its associated meta-data. Each instance is
@@ -306,11 +308,12 @@ public final class AdHocQuery implements AdHocIdentity {
       final int stop = strippedCommentText.indexOf(STOPMETA);
       if (start == -1 || stop == -1)
         break; // no more
-      if (stop > start) {
+      if (start > stop) {
         /*
-         * The comment is not well formed there is a stop before a start. All we
-         * can do is bail out.
+         * The meta information appears to is not well formed there is a stop
+         * before a start. All we can do is bail out.
          */
+        SLLogger.getLogger().log(Level.WARNING, I18N.err(307, stop, start, strippedCommentText));
         return result;
       }
       final String potentialMeta = strippedCommentText.substring(start + STARTMETA.length(), stop);
