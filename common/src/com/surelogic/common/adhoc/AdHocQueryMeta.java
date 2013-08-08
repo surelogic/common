@@ -90,7 +90,7 @@ public final class AdHocQueryMeta {
    * @throws IllegalArgumentException
    *           if any parameter is {@code null}.
    */
-  public AdHocQueryMeta(final String name, final String text) {
+  AdHocQueryMeta(final String name, final String text) {
     if (name == null)
       throw new IllegalArgumentException(I18N.err(44, "name"));
     if (text == null)

@@ -282,7 +282,7 @@ public final class AdHocQuery implements AdHocIdentity {
    * <p>
    * The returned map maps the meta name to a structure describing it.
    * <p>
-   * If no <tt>BEGIN-META(</tt><i>name</i><tt>)</tt> </tt>END-META</tt> pair
+   * If no <tt>BEGIN-META(</tt><i>name</i><tt>)</tt> <tt>END-META</tt> pair
    * exists in the SQL query comments within the text then an empty map is
    * returned.
    * <p>
@@ -335,16 +335,16 @@ public final class AdHocQuery implements AdHocIdentity {
    * longer has access to an ad hoc query code (such as within a driver
    * implementation).
    * <p>
-   * If no <tt>BEGIN-META(</tt><i>name</i><tt>)</tt> </tt>END-META</tt> pair
-   * with the passed name exists in the SQL query comments within the text then
+   * If no <tt>BEGIN-META(</tt><i>name</i><tt>)</tt> <tt>END-META</tt> pair with
+   * the passed name exists in the SQL query comments within the text then
    * {@code null} is returned.
    * 
    * @param text
    *          the fully-qualified SQL text (with comments) of an ad hoc query.
    * @param name
-   *          for the meta region.
-   * @return the text of the meta, or {@code null} if a meta region with the
-   *         passed name does not exist in the query comments.
+   *          of a meta region.
+   * @return the detailed information about the meta, or {@code null} if a meta
+   *         region with the passed name does not exist in the query comments.
    * @throws IllegalArgumentException
    *           if <tt>name</tt> is {@code null}.
    */
@@ -390,6 +390,49 @@ public final class AdHocQuery implements AdHocIdentity {
     f_nameToMeta.clear();
     f_nameToMeta.putAll(getMetaFromString(sql));
     return true;
+  }
+
+  /**
+   * Extracts meta information within the comments of this query and returns it
+   * as a map of the meta name to its detailed information.
+   * <p>
+   * The returned map maps the meta name to a structure describing it.
+   * <p>
+   * If no <tt>BEGIN-META(</tt><i>name</i><tt>)</tt> <tt>END-META</tt> pair
+   * exists in the SQL query comments then an empty map is returned.
+   * <p>
+   * While multiple meta regions may exist in a query only the <i>last</i> of a
+   * given name will appear in the returned map. Therefore, names of meta
+   * regions in SQL comments should be unique per query.
+   * 
+   * @return a possibly empty map containing all the meta information in this
+   *         query.
+   */
+  @NonNull
+  public HashMap<String, AdHocQueryMeta> getMeta() {
+    return new HashMap<String, AdHocQueryMeta>(f_nameToMeta);
+  }
+
+  /**
+   * Gets the detailed information for a particular meta name within the
+   * comments of this query.
+   * <p>
+   * If no <tt>BEGIN-META(</tt><i>name</i><tt>)</tt> <tt>END-META</tt> pair with
+   * the passed name exists in the SQL query comments then {@code null} is
+   * returned.
+   * 
+   * @param name
+   *          of a meta region.
+   * @return the detailed information about the meta, or {@code null} if a meta
+   *         region with the passed name does not exist in the query comments.
+   * @throws IllegalArgumentException
+   *           if <tt>name</tt> is {@code null}.
+   */
+  @Nullable
+  public AdHocQueryMeta getMetaWithName(final String name) {
+    if (name == null)
+      throw new IllegalArgumentException(I18N.err(44, "name"));
+    return f_nameToMeta.get(name);
   }
 
   /**
