@@ -694,7 +694,7 @@ public final class AdHocQuery implements AdHocIdentity {
    *         complete substitution of the variables in this query, {@code false}
    *         otherwise.
    */
-  public boolean isCompletelySubstitutedBy(final Map<String, String> variableValues) {
+  public boolean isCompletelySubstitutedBy(@Nullable final Map<String, String> variableValues) {
     final Set<String> work = getVariables();
     if (variableValues == null) {
       return work.isEmpty();
@@ -711,10 +711,10 @@ public final class AdHocQuery implements AdHocIdentity {
    *          the defined values for variables.
    * @return the text of the query with as many substitutions made as possible.
    */
-  public String getSql(final Map<String, String> variableValues) {
-    if (variableValues == null) {
+  public String getSql(@NonNull final Map<String, String> variableValues) {
+    if (variableValues == null)
       throw new IllegalArgumentException(I18N.err(44, "variableValues"));
-    }
+
     final StringBuilder b = new StringBuilder();
     final BufferedReader r = new BufferedReader(new StringReader(f_sql));
 
