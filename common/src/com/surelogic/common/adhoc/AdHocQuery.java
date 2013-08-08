@@ -269,9 +269,9 @@ public final class AdHocQuery implements AdHocIdentity {
     return strippedCommentText.substring(start + STARTINFO.length(), stop).trim();
   }
 
-  private static final String STARTMETA = "BEGIN-META(";
-  private static final char STARTMETA_CLOSE = ')';
-  private static final String STOPMETA = "END-META";
+  public static final String STARTMETA = "BEGIN-META(";
+  public static final char STARTMETA_CLOSE = ')';
+  public static final String STOPMETA = "END-META";
 
   /**
    * Extracts meta information within the comments of the passed text, which is
@@ -306,6 +306,13 @@ public final class AdHocQuery implements AdHocIdentity {
       final int stop = strippedCommentText.indexOf(STOPMETA);
       if (start == -1 || stop == -1)
         break; // no more
+      if (stop > start) {
+        /*
+         * The comment is not well formed there is a stop before a start. All we
+         * can do is bail out.
+         */
+        return result;
+      }
       final String potentialMeta = strippedCommentText.substring(start + STARTMETA.length(), stop);
       final int closeMetaName = potentialMeta.indexOf(STARTMETA_CLOSE);
       if (closeMetaName != -1) {
