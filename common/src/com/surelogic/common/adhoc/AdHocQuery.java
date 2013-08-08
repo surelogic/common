@@ -290,17 +290,17 @@ public final class AdHocQuery implements AdHocIdentity {
    * given name will appear in the returned map. Therefore, names of meta
    * regions in SQL comments should be unique per query.
    * 
-   * @param text
+   * @param sqlText
    *          the fully-qualified SQL text (with comments) of an ad hoc query.
    * @return a possibly empty map containing all the meta information in the
    *         passed text.
    */
   @NonNull
-  public static HashMap<String, AdHocQueryMeta> getMetaFromString(final String text) {
+  public static HashMap<String, AdHocQueryMeta> getMetaFromString(final String sqlText) {
     final HashMap<String, AdHocQueryMeta> result = new HashMap<String, AdHocQueryMeta>();
-    if (text == null)
+    if (sqlText == null)
       return result;
-    String strippedCommentText = SLUtility.extractTextFromWholeLineCommentBlock(text, "--");
+    String strippedCommentText = SLUtility.extractTextFromWholeLineCommentBlock(sqlText, "--");
     while (true) {
       final int start = strippedCommentText.indexOf(STARTMETA);
       final int stop = strippedCommentText.indexOf(STOPMETA);
@@ -339,7 +339,7 @@ public final class AdHocQuery implements AdHocIdentity {
    * the passed name exists in the SQL query comments within the text then
    * {@code null} is returned.
    * 
-   * @param text
+   * @param sqlText
    *          the fully-qualified SQL text (with comments) of an ad hoc query.
    * @param name
    *          of a meta region.
@@ -349,10 +349,10 @@ public final class AdHocQuery implements AdHocIdentity {
    *           if <tt>name</tt> is {@code null}.
    */
   @Nullable
-  public static AdHocQueryMeta getMetaFromStringWithName(final String text, final String name) {
+  public static AdHocQueryMeta getMetaFromStringWithName(final String sqlText, final String name) {
     if (name == null)
       throw new IllegalArgumentException(I18N.err(44, "name"));
-    return getMetaFromString(text).get(name);
+    return getMetaFromString(sqlText).get(name);
   }
 
   /**
