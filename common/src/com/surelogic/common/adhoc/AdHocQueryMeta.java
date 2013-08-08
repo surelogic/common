@@ -20,11 +20,11 @@ import com.surelogic.common.i18n.I18N;
  * For example, consider the query snippet below.
  * 
  * <pre>
- * -- BEGIN-META(doc)
+ * -- META-BEGIN(doc)
  * -- This is information about
  * -- this <b>great</b> query that
  * -- should be displayed to the <i>user</i>.
- * -- END-META
+ * -- META-END
  * </pre>
  * 
  * This example creates a meta that is named <b>doc</b> that contains the text
@@ -41,9 +41,9 @@ import com.surelogic.common.i18n.I18N;
  * snippet below.
  * 
  * <pre>
- * -- BEGIN-META(?gremlin?)
+ * -- META-BEGIN(?gremlin?)
  * --   parentClass.matches(?package?.?class?)
- * -- END-META
+ * -- META-END
  * </pre>
  * 
  * This example creates a meta that is named <b>gremlin</b> where variable
@@ -211,14 +211,13 @@ public final class AdHocQueryMeta {
       while ((line = r.readLine()) != null) {
         int q1 = indexOfNonEscapedQuestionMark(line);
         int q2 = indexOfNonEscapedQuestionMark(line, q1 + 1);
-        // Keep replacing any variables before the comment
         while (q1 != -1 && q2 != -1) {
           // there could be escaped question marks in the variable name (yuck)
           final String var = line.substring(q1 + 1, q2);
           final String varEscaped = escapeQuestionMarks(var);
           // lookup with escaped variable name
           final String value = variableValues.get(varEscaped);
-          // replace in string with raw (unescaped) variable name
+          // replace raw (unescaped) variable name with a value
           line = line.replace('?' + var + '?', value == null ? "" : value);
           q1 = indexOfNonEscapedQuestionMark(line);
           q2 = indexOfNonEscapedQuestionMark(line, q1 + 1);

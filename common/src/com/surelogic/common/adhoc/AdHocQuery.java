@@ -271,9 +271,9 @@ public final class AdHocQuery implements AdHocIdentity {
     return strippedCommentText.substring(start + STARTINFO.length(), stop).trim();
   }
 
-  public static final String STARTMETA = "BEGIN-META(";
-  public static final char STARTMETA_CLOSE = ')';
-  public static final String STOPMETA = "END-META";
+  public static final String META_BEGIN = "META-BEGIN(";
+  public static final char META_BEGIN_CLOSE = ')';
+  public static final String META_END = "META-END";
 
   /**
    * Extracts meta information within the comments of the passed text, which is
@@ -284,7 +284,7 @@ public final class AdHocQuery implements AdHocIdentity {
    * <p>
    * The returned map maps the meta name to a structure describing it.
    * <p>
-   * If no <tt>BEGIN-META(</tt><i>name</i><tt>)</tt> <tt>END-META</tt> pair
+   * If no <tt>META-BEGIN(</tt><i>name</i><tt>)</tt> <tt>META-END</tt> pair
    * exists in the SQL query comments within the text then an empty map is
    * returned.
    * <p>
@@ -304,8 +304,8 @@ public final class AdHocQuery implements AdHocIdentity {
       return result;
     String strippedCommentText = SLUtility.extractTextFromWholeLineCommentBlock(sqlText, "--");
     while (true) {
-      final int start = strippedCommentText.indexOf(STARTMETA);
-      final int stop = strippedCommentText.indexOf(STOPMETA);
+      final int start = strippedCommentText.indexOf(META_BEGIN);
+      final int stop = strippedCommentText.indexOf(META_END);
       if (start == -1 || stop == -1)
         break; // no more
       if (start > stop) {
@@ -316,8 +316,8 @@ public final class AdHocQuery implements AdHocIdentity {
         SLLogger.getLogger().log(Level.WARNING, I18N.err(307, stop, start, strippedCommentText));
         return result;
       }
-      final String potentialMeta = strippedCommentText.substring(start + STARTMETA.length(), stop);
-      final int closeMetaName = potentialMeta.indexOf(STARTMETA_CLOSE);
+      final String potentialMeta = strippedCommentText.substring(start + META_BEGIN.length(), stop);
+      final int closeMetaName = potentialMeta.indexOf(META_BEGIN_CLOSE);
       if (closeMetaName != -1) {
         final String metaName = potentialMeta.substring(0, closeMetaName);
         if (!"".equals(metaName)) {
@@ -326,7 +326,7 @@ public final class AdHocQuery implements AdHocIdentity {
           result.put(meta.getName(), meta);
         }
       }
-      strippedCommentText = strippedCommentText.substring(stop + STOPMETA.length());
+      strippedCommentText = strippedCommentText.substring(stop + META_END.length());
     }
     return result;
   }
@@ -338,7 +338,7 @@ public final class AdHocQuery implements AdHocIdentity {
    * longer has access to an ad hoc query code (such as within a driver
    * implementation).
    * <p>
-   * If no <tt>BEGIN-META(</tt><i>name</i><tt>)</tt> <tt>END-META</tt> pair with
+   * If no <tt>META-BEGIN(</tt><i>name</i><tt>)</tt> <tt>META-END</tt> pair with
    * the passed name exists in the SQL query comments within the text then
    * {@code null} is returned.
    * 
@@ -401,7 +401,7 @@ public final class AdHocQuery implements AdHocIdentity {
    * <p>
    * The returned map maps the meta name to a structure describing it.
    * <p>
-   * If no <tt>BEGIN-META(</tt><i>name</i><tt>)</tt> <tt>END-META</tt> pair
+   * If no <tt>META-BEGIN(</tt><i>name</i><tt>)</tt> <tt>META-END</tt> pair
    * exists in the SQL query comments then an empty map is returned.
    * <p>
    * While multiple meta regions may exist in a query only the <i>last</i> of a
@@ -420,7 +420,7 @@ public final class AdHocQuery implements AdHocIdentity {
    * Gets the detailed information for a particular meta name within the
    * comments of this query.
    * <p>
-   * If no <tt>BEGIN-META(</tt><i>name</i><tt>)</tt> <tt>END-META</tt> pair with
+   * If no <tt>META-BEGIN(</tt><i>name</i><tt>)</tt> <tt>META-END</tt> pair with
    * the passed name exists in the SQL query comments then {@code null} is
    * returned.
    * 
@@ -771,6 +771,9 @@ public final class AdHocQuery implements AdHocIdentity {
     final StringBuilder b = new StringBuilder();
     final BufferedReader r = new BufferedReader(new StringReader(f_sql));
 
+    String metaNameWeAreWithin = null;
+    boolean metaHasVariables = false;
+
     String line;
     try {
       while ((line = r.readLine()) != null) {
@@ -786,6 +789,54 @@ public final class AdHocQuery implements AdHocIdentity {
           q2 = line.indexOf('?', q1 + 1);
           comment = line.indexOf("--");
         }
+        // Now deal with meta variables within the comment
+        if (comment != -1) {
+          int at = comment + 2;
+          boolean keepGoing = true;
+          while (keepGoing) {
+            keepGoing = false;
+            if (metaNameWeAreWithin == null) {
+              // look for start
+              final int start = line.indexOf(META_BEGIN, at);
+              if (start != -1) {
+                final int closeMetaName = line.indexOf(META_BEGIN_CLOSE, start);
+                if (closeMetaName != -1) {
+                  // META-BEGIN(name) found
+                  final String metaName = line.substring(start + META_BEGIN.length(), closeMetaName);
+                  if (metaName.startsWith("?") && metaName.endsWith("?")) {
+                    final String realMetaName = metaName.substring(1, metaName.length() - 1);
+                    line = line.substring(0, start) + META_BEGIN + realMetaName + Character.toString(META_BEGIN_CLOSE)
+                        + line.substring(closeMetaName + 1);
+                    metaNameWeAreWithin = realMetaName;
+                    metaHasVariables = true;
+                    at = closeMetaName - 1;
+                  } else {
+                    metaNameWeAreWithin = metaName;
+                    metaHasVariables = false;
+                    at = closeMetaName + 1;
+                  }
+                  keepGoing = true;
+                }
+              }
+            } else { // we are within a meta
+              // look for end marker
+              final int end = line.indexOf(META_END, at);
+              if (end != -1) {
+                // found end marker - sub from at to end marker
+                if (metaHasVariables)
+                  line = substituteMetaVariablesHelper(line, at, end, variableValues);
+                metaNameWeAreWithin = null;
+                metaHasVariables = false;
+                at = end + META_END.length();
+                keepGoing = true;
+              } else {
+                // no end marker -- sub at to end of line
+                if (metaHasVariables)
+                  line = substituteMetaVariablesHelper(line, at, -1, variableValues);
+              }
+            }
+          }
+        }
         b.append(line);
         b.append('\n');
       }
@@ -793,6 +844,27 @@ public final class AdHocQuery implements AdHocIdentity {
       throw new IllegalStateException(e);
     }
     return b.toString();
+  }
+
+  private String substituteMetaVariablesHelper(String line, int fromIndex, int endIndexOrNegOne, Map<String, String> variableValues) {
+    int q1 = AdHocQueryMeta.indexOfNonEscapedQuestionMark(line, fromIndex);
+    if (q1 != -1) {
+      int q2 = AdHocQueryMeta.indexOfNonEscapedQuestionMark(line, q1 + 1);
+      while (q1 != -1 && q2 != -1 && (endIndexOrNegOne == -1 || q1 < endIndexOrNegOne && q2 < endIndexOrNegOne)) {
+        // there could be escaped question marks in the variable name (yuck)
+        final String var = line.substring(q1 + 1, q2);
+        final String varEscaped = AdHocQueryMeta.escapeQuestionMarks(var);
+        // lookup with escaped variable name
+        final String value = variableValues.get(varEscaped);
+        // replace in string with variable value
+        line = line.substring(0, q1) + value + line.substring(q2 + 1);
+        q1 = AdHocQueryMeta.indexOfNonEscapedQuestionMark(line, fromIndex);
+        if (q1 != -1) {
+          q2 = AdHocQueryMeta.indexOfNonEscapedQuestionMark(line, q1 + 1);
+        }
+      }
+    }
+    return line;
   }
 
   /**

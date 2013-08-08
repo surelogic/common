@@ -83,9 +83,9 @@ public class SQLSyntaxHighlighter implements LineStyleListener {
       while (keepLooking) {
         keepLooking = false;
         // BEGIN-META(name)
-        int metaBeginIndex = f_event.lineText.indexOf(AdHocQuery.STARTMETA, ci);
+        int metaBeginIndex = f_event.lineText.indexOf(AdHocQuery.META_BEGIN, ci);
         // END-META
-        int metaEndIndex = f_event.lineText.indexOf(AdHocQuery.STOPMETA, ci);
+        int metaEndIndex = f_event.lineText.indexOf(AdHocQuery.META_END, ci);
 
         /*
          * Did we find both (in which case we must consider order)
@@ -93,7 +93,7 @@ public class SQLSyntaxHighlighter implements LineStyleListener {
         if (metaBeginIndex != -1 && metaEndIndex != -1) {
           if (metaBeginIndex < metaEndIndex) {
             // BEGIN-META(name)
-            final int closeMetaName = f_event.lineText.indexOf(AdHocQuery.STARTMETA_CLOSE, metaBeginIndex);
+            final int closeMetaName = f_event.lineText.indexOf(AdHocQuery.META_BEGIN_CLOSE, metaBeginIndex);
             if (closeMetaName != -1) {
               set(f_commentColor, SWT.NORMAL, ci, metaBeginIndex - 1);
               set(f_metaQuoteColor, SWT.BOLD, metaBeginIndex, closeMetaName);
@@ -102,19 +102,19 @@ public class SQLSyntaxHighlighter implements LineStyleListener {
             }
             // END-META
             set(f_commentColor, SWT.NORMAL, ci, metaEndIndex - 1);
-            final int endOfEndIndex = metaEndIndex + AdHocQuery.STOPMETA.length() - 1;
+            final int endOfEndIndex = metaEndIndex + AdHocQuery.META_END.length() - 1;
             set(f_metaQuoteColor, SWT.BOLD, metaEndIndex, endOfEndIndex);
             ci = endOfEndIndex + 1;
             keepLooking = true;
           } else {
             // END-META
             set(f_commentColor, SWT.NORMAL, ci, metaEndIndex - 1);
-            final int endOfEndIndex = metaEndIndex + AdHocQuery.STOPMETA.length() - 1;
+            final int endOfEndIndex = metaEndIndex + AdHocQuery.META_END.length() - 1;
             set(f_metaQuoteColor, SWT.BOLD, metaEndIndex, endOfEndIndex);
             ci = endOfEndIndex + 1;
             keepLooking = true;
             // BEGIN-META(name)
-            final int closeMetaName = f_event.lineText.indexOf(AdHocQuery.STARTMETA_CLOSE, metaBeginIndex);
+            final int closeMetaName = f_event.lineText.indexOf(AdHocQuery.META_BEGIN_CLOSE, metaBeginIndex);
             if (closeMetaName != -1) {
               set(f_commentColor, SWT.NORMAL, ci, metaBeginIndex - 1);
               set(f_metaQuoteColor, SWT.BOLD, metaBeginIndex, closeMetaName);
@@ -124,7 +124,7 @@ public class SQLSyntaxHighlighter implements LineStyleListener {
           }
         } else if (metaBeginIndex != -1) { // only found a begin
           // BEGIN-META(name)
-          final int closeMetaName = f_event.lineText.indexOf(AdHocQuery.STARTMETA_CLOSE, metaBeginIndex);
+          final int closeMetaName = f_event.lineText.indexOf(AdHocQuery.META_BEGIN_CLOSE, metaBeginIndex);
           if (closeMetaName != -1) {
             set(f_commentColor, SWT.NORMAL, ci, metaBeginIndex - 1);
             set(f_metaQuoteColor, SWT.BOLD, metaBeginIndex, closeMetaName);
@@ -134,7 +134,7 @@ public class SQLSyntaxHighlighter implements LineStyleListener {
         } else if (metaEndIndex != -1) { // only found an end
           // END-META
           set(f_commentColor, SWT.NORMAL, ci, metaEndIndex - 1);
-          final int endOfEndIndex = metaEndIndex + AdHocQuery.STOPMETA.length() - 1;
+          final int endOfEndIndex = metaEndIndex + AdHocQuery.META_END.length() - 1;
           set(f_metaQuoteColor, SWT.BOLD, metaEndIndex, endOfEndIndex);
           ci = endOfEndIndex + 1;
           keepLooking = true;
