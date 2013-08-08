@@ -734,7 +734,8 @@ public final class AdHocQuery implements AdHocIdentity {
 
   /**
    * Checks if the passed set of variable values would allow a complete
-   * substitution of the variables in this query.
+   * substitution of the variables in this query. Note that the passed set of
+   * variables must also include values for any variables used in a meta.
    * 
    * @param variableValues
    *          the defined values for variables, or {@code null} for no defined
@@ -792,12 +793,15 @@ public final class AdHocQuery implements AdHocIdentity {
   }
 
   /**
-   * Returns the set of variables found in this query's SQL text. The returned
-   * set is a copy and may be freely mutated by the caller.
+   * Returns the set of variables found in this query. The returned set is fresh
+   * and may be freely mutated by the caller.
+   * <p>
+   * This method does include variables used in a meta.
    * 
-   * @return the set of variables found in this query's SQL text or the empty
-   *         set if no variable are used.
+   * @return the set of variables used in this query or the empty set if no
+   *         variables are used.
    */
+  @NonNull
   public Set<String> getVariables() {
     final String sql = f_sql;
     final Set<String> variableSet = new HashSet<String>();
@@ -829,6 +833,10 @@ public final class AdHocQuery implements AdHocIdentity {
       }
     } catch (IOException e) {
       throw new IllegalStateException(e);
+    }
+    // add in meta variables
+    for (final AdHocQueryMeta meta : f_nameToMeta.values()) {
+      variableSet.addAll(meta.getVariables());
     }
     return variableSet;
   }
