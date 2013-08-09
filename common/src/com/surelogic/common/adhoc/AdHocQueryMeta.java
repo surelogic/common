@@ -150,6 +150,7 @@ public final class AdHocQueryMeta {
     return f_usesVariables;
   }
 
+  @NonNull
   private final String f_text;
 
   /**
@@ -176,6 +177,7 @@ public final class AdHocQueryMeta {
    * @return the text of this meta, in raw form if the meta uses variable
    *         references.
    */
+  @NonNull
   public String getText() {
     return f_text;
   }
@@ -196,6 +198,7 @@ public final class AdHocQueryMeta {
    *         and escaped question marks resolved. If this meta does not use
    *         variables then the result of {@link #getText()} is returned.
    */
+  @NonNull
   public String getText(@NonNull final Map<String, String> variableValues) {
     if (!f_usesVariables)
       return getText();

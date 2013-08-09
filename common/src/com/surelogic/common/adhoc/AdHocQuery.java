@@ -247,28 +247,31 @@ public final class AdHocQuery implements AdHocIdentity {
     return true;
   }
 
-  private static final String STARTINFO = "BEGIN-INFO";
-  private static final String STOPINFO = "END-INFO";
+  /**
+   * Special meta name for Querydoc.
+   */
+  public static final String META_QUERYDOC_NAME = "doc";
 
   /**
-   * Gets the Querydoc associated with this query. It has all <tt>--</tt> breaks
-   * removed.
+   * Gets the Querydoc associated with this query. This is from the meta with
+   * the name <tt>doc</tt> ({@link #META_QUERYDOC_NAME}).
    * <p>
-   * If no <tt>BEGIN-INFO</tt> </tt>END-INFO</tt> pair exists in the SQL query
-   * comments then the description is returned as HTML, such as
-   * <tt>&lt;p&gt;&lt;strong&gt;</tt> <i>description</i>
-   * <tt>&lt;/p&gt;&lt;/strong&gt;</tt>
+   * If no <tt>doc</tt> meta exists in this queries comments then the
+   * description is returned as HTML, such as <tt>&lt;p&gt;&lt;strong&gt;</tt>
+   * <i>description</i> <tt>&lt;/p&gt;&lt;/strong&gt;</tt>
    * 
    * @return an HTML description of this query.
    */
   public String getQueryDoc() {
-    final String strippedCommentText = SLUtility.extractTextFromWholeLineCommentBlock(f_sql, "--");
-    final int start = strippedCommentText.indexOf(STARTINFO);
-    final int stop = strippedCommentText.indexOf(STOPINFO);
-    if (start == -1 || stop == -1) {
-      return "<p><strong>" + getDescription() + "</strong></p>";
+    @Nullable
+    final AdHocQueryMeta docMeta = getMetaWithName(META_QUERYDOC_NAME);
+    if (docMeta != null) {
+      final String docText = docMeta.getText();
+      if (!"".equals(docText)) {
+        return docText;
+      }
     }
-    return strippedCommentText.substring(start + STARTINFO.length(), stop).trim();
+    return "<p><strong>" + getDescription() + "</strong></p>";
   }
 
   public static final String META_BEGIN = "META-BEGIN(";
