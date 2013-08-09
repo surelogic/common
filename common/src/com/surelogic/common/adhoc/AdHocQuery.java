@@ -254,7 +254,9 @@ public final class AdHocQuery implements AdHocIdentity {
 
   /**
    * Gets the Querydoc associated with this query. This is from the meta with
-   * the name <tt>doc</tt> ({@link #META_QUERYDOC_NAME}).
+   * the name <tt>doc</tt> ({@link #META_QUERYDOC_NAME}). This code handles the
+   * case where no Querydoc is provided better than just asking for the meta
+   * directly.
    * <p>
    * If no <tt>doc</tt> meta exists in this queries comments then the
    * description is returned as HTML, such as <tt>&lt;p&gt;&lt;strong&gt;</tt>
