@@ -78,6 +78,46 @@ public final class Functions {
         }
     }
 
+    private static class LockTraceResultSet implements InvocationHandler {
+        private final Iterator<LockTrace> traces;
+        private LockTrace trace;
+
+        LockTraceResultSet(final List<LockTrace> traces) {
+            this.traces = traces.iterator();
+        }
+
+        static ResultSet create(final List<LockTrace> traces) {
+            return (ResultSet) Proxy.newProxyInstance(ResultSet.class
+                    .getClassLoader(), new Class[] { ResultSet.class },
+                    new LockTraceResultSet(traces));
+        }
+
+        @Override
+        public Object invoke(final Object proxy, final Method method,
+                final Object[] args) throws Throwable {
+            final String methodName = method.getName();
+            if ("next".equals(methodName)) {
+                if (traces.hasNext()) {
+                    trace = traces.next();
+                    return true;
+                } else {
+                    return false;
+                }
+            } else if ("close".equals(methodName)) {
+                while (traces.hasNext()) {
+                    traces.next();
+                }
+                trace = null;
+                return null;
+            } else if (methodName.startsWith("get")) {
+                return trace.get((Integer) args[0]);
+            } else if (methodName.startsWith("wasNull")) {
+                return false;
+            }
+            throw new UnsupportedOperationException(method.getName());
+        }
+    }
+
     /**
      * Returns a <em>table</em> representing the stack trace belonging to this
      * trace id.
@@ -88,6 +128,18 @@ public final class Functions {
     public static ResultSet stackTrace(final long traceId) {
         return TraceResultSet.create(DefaultConnection.getInstance()
                 .withDefault(Trace.stackTrace(traceId)));
+    }
+
+    /**
+     * Returns a <em>table</em> representing the lock trace belonging to this
+     * trace id.
+     * 
+     * @param traceId
+     * @return
+     */
+    public static ResultSet lockTrace(final long traceId) {
+        return LockTraceResultSet.create(DefaultConnection.getInstance()
+                .withDefault(LockTrace.lockTrace(traceId)));
     }
 
     public static ResultSet staticAccessSummary(long fieldId) {
