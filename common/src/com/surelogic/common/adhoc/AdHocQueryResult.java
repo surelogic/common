@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.surelogic.NonNull;
 import com.surelogic.Nullable;
 import com.surelogic.common.CommonImages;
 import com.surelogic.common.SLUtility;
@@ -18,6 +19,7 @@ import com.surelogic.common.jdbc.DBConnection;
  */
 public abstract class AdHocQueryResult {
 
+  @NonNull
   private final AdHocManager f_manager;
 
   /**
@@ -25,6 +27,7 @@ public abstract class AdHocQueryResult {
    * 
    * @return the query manager that owns this query result.
    */
+  @NonNull
   public AdHocManager getManager() {
     return f_manager;
   }
@@ -51,6 +54,7 @@ public abstract class AdHocQueryResult {
     return f_db;
   }
 
+  @NonNull
   private final Set<AdHocQueryResult> f_children = new HashSet<AdHocQueryResult>();
 
   protected void addChild(final AdHocQueryResult child) {
@@ -91,6 +95,7 @@ public abstract class AdHocQueryResult {
     return result;
   }
 
+  @NonNull
   private final AdHocQueryFullyBound f_query;
 
   /**
@@ -98,6 +103,7 @@ public abstract class AdHocQueryResult {
    * 
    * @return the fully bound query.
    */
+  @NonNull
   public AdHocQueryFullyBound getQueryFullyBound() {
     return f_query;
   }
