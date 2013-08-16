@@ -29,9 +29,22 @@ public final class AdHocPersistence {
   /*
    * File formats. We read both but only write the latest.
    */
-  static final String VERSION_3_0 = "3.0";
+  static final String VERSION_CURRENT = "4.0";
+  static final String[] OLDER_COMPATIBLE_VERSIONS = { "3.0" };
+
+  static boolean checkIfFileVersionIsTooOldToRead(String versionString) {
+    if (VERSION_CURRENT.equals(versionString))
+      return false;
+    for (String value : OLDER_COMPATIBLE_VERSIONS) {
+      if (value.equals(versionString))
+        return false;
+    }
+    return true; // no good
+  }
+
   static final String AD_HOC = "ad-hoc";
   static final String CHANGED = "changed";
+  static final String NO_DEFAULT_SUB_QUERY = "no-default-sub-query";
   static final String DEFAULT_SUB_QUERY = "is-default";
   static final String DESCRIPTION = "description";
   static final String DISPLAY = "display";
@@ -153,7 +166,7 @@ public final class AdHocPersistence {
     pw.println("<?xml version='1.0' encoding='" + SLUtility.ENCODING + "' standalone='yes'?>");
     final StringBuilder b = new StringBuilder();
     b.append("<").append(AD_HOC);
-    Entities.addAttribute(VERSION, VERSION_3_0, b);
+    Entities.addAttribute(VERSION, VERSION_CURRENT, b);
     b.append(">"); // don't end this element
     pw.println(b.toString());
   }
@@ -180,6 +193,9 @@ public final class AdHocPersistence {
     }
     if (query.showAtRootOfQueryMenu()) {
       Entities.addAttribute(DISPLAY_AT_ROOT, query.showAtRootOfQueryMenu(), b);
+    }
+    if (query.noDefaultSubQuery()) {
+      Entities.addAttribute(NO_DEFAULT_SUB_QUERY, query.noDefaultSubQuery(), b);
     }
     if (query.usesCustomDisplay()) {
       Entities.addAttribute(CUSTOM_DISPLAY, query.getCustomDisplayClassName(), b);
@@ -223,13 +239,13 @@ public final class AdHocPersistence {
   }
 
   private static void outputSubQueries(final PrintWriter pw, final AdHocQuery query) {
-    for (final AdHocQuery subQuery : query.getSubQueries()) {
+    for (final AdHocSubQuery subQuery : query.getSubQueryList()) {
       final StringBuilder b = new StringBuilder();
       b.append("  <").append(SUB_QUERY);
       Entities.addAttribute(ID, query.getId(), b);
-      Entities.addAttribute(SUB_QUERY, subQuery.getId(), b);
-      if (query.isDefaultSubQuery(subQuery)) {
-        Entities.addAttribute(DEFAULT_SUB_QUERY, true, b);
+      Entities.addAttribute(SUB_QUERY, subQuery.getQuery().getId(), b);
+      if (subQuery.getPriorityAsDefault() != AdHocSubQuery.DEFAULT_PRIORITY) {
+        Entities.addAttribute(DEFAULT_SUB_QUERY, Integer.toString(subQuery.getPriorityAsDefault()), b);
       }
       b.append("/>");
       pw.println(b.toString());

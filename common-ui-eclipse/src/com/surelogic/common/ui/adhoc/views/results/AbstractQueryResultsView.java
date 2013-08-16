@@ -53,13 +53,16 @@ import com.surelogic.common.adhoc.AdHocQueryResultEmpty;
 import com.surelogic.common.adhoc.AdHocQueryResultSqlData;
 import com.surelogic.common.adhoc.AdHocQueryResultSqlException;
 import com.surelogic.common.adhoc.AdHocQueryResultSqlUpdateCount;
+import com.surelogic.common.adhoc.AdHocSubQuery;
 import com.surelogic.common.adhoc.model.AdornedTreeTableModel;
 import com.surelogic.common.adhoc.model.Cell;
 import com.surelogic.common.adhoc.model.LeafTreeCell;
 import com.surelogic.common.adhoc.model.NonLeafColumnSummaryCell;
 import com.surelogic.common.adhoc.model.NonLeafTreeCell;
 import com.surelogic.common.adhoc.model.TreeCell;
+import com.surelogic.common.core.EclipseUtility;
 import com.surelogic.common.core.adhoc.EclipseQueryUtility;
+import com.surelogic.common.core.preferences.CommonCorePreferencesUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.logging.SLLogger;
 import com.surelogic.common.ui.EclipseColorUtility;
@@ -661,7 +664,7 @@ public abstract class AbstractQueryResultsView extends ViewPart {
 
         final AdHocQueryResultSqlData result = (AdHocQueryResultSqlData) queryResult;
         final AdHocQuery resultQuery = result.getQueryFullyBound().getQuery();
-        final List<AdHocQuery> subQueryList = resultQuery.getVisibleSubQueryList();
+        final List<AdHocSubQuery> subQueries = resultQuery.getVisibleSubQueryList();
         final Map<String, String> variableValues = result.getVariableValues();
         final Map<String, String> topVariableValues = result.getTopVariableValues();
         if (extraVariables != null) {
@@ -682,25 +685,25 @@ public abstract class AbstractQueryResultsView extends ViewPart {
             }
           }
         };
-        for (final AdHocQuery query : subQueryList) {
-          final MenuItem item = new MenuItem(menu, SWT.PUSH);
-          item.setText(query.getDescription());
-          item.setData(query);
-          final boolean decorateAsDefault = resultQuery.isDefaultSubQuery(query);
-          item.setImage(SLImages.getImageForAdHocQuery(query.getType(), decorateAsDefault, false));
-          item.setEnabled(query.isCompletelySubstitutedBy(variableValues));
-          item.addListener(SWT.Selection, runSubQuery);
-        }
-        if (!subQueryList.isEmpty()) {
-          new MenuItem(menu, SWT.SEPARATOR);
-          final MenuItem copy = new MenuItem(menu, SWT.PUSH);
-          copy.setText(I18N.msg("adhoc.query.results.copy"));
-          copy.addListener(SWT.Selection, new Listener() {
-            @Override
-            public void handleEvent(final Event event) {
-              copySelection(queryResult);
-            }
-          });
+        final boolean showUnrunnableQueries = EclipseUtility
+            .getBooleanPreference(CommonCorePreferencesUtility.QMENU_SHOW_UNRUNNABLE_QUERIES);
+
+        @Nullable
+        final AdHocSubQuery defaultSubQuery = AdHocSubQuery.sortHelper(subQueries, variableValues, queryResult.getQueryFullyBound()
+            .getQuery());
+
+        for (final AdHocSubQuery subQuery : subQueries) {
+          final AdHocQuery query = subQuery.getQuery();
+          final boolean isCompletelySubstituted = query.isCompletelySubstitutedBy(variableValues);
+          if (isCompletelySubstituted || showUnrunnableQueries) {
+            final MenuItem item = new MenuItem(menu, SWT.PUSH);
+            item.setText(query.getDescription());
+            item.setData(query);
+            final boolean decorateAsDefault = subQuery.equals(defaultSubQuery);
+            item.setImage(SLImages.getImageForAdHocQuery(query.getType(), decorateAsDefault, false));
+            item.setEnabled(isCompletelySubstituted);
+            item.addListener(SWT.Selection, runSubQuery);
+          }
         }
       }
     });
@@ -775,9 +778,13 @@ public abstract class AbstractQueryResultsView extends ViewPart {
       final AdHocQueryResultSqlData data = (AdHocQueryResultSqlData) queryResult;
       final Map<String, String> variableValues = data.getVariableValues();
       final Map<String, String> topVariableValues = data.getTopVariableValues();
-      final AdHocQuery query = data.getQueryFullyBound().getQuery().getDefaultSubQuery();
-      if (query != null) {
-        final AdHocQueryFullyBound boundQuery = new AdHocQueryFullyBound(query, variableValues, topVariableValues);
+      final ArrayList<AdHocSubQuery> subQueries = data.getQueryFullyBound().getQuery().getVisibleSubQueryList();
+      @Nullable
+      final AdHocSubQuery defaultSubQuery = AdHocSubQuery.sortHelper(subQueries, variableValues, data.getQueryFullyBound()
+          .getQuery());
+      if (defaultSubQuery != null) {
+        final AdHocQueryFullyBound boundQuery = new AdHocQueryFullyBound(defaultSubQuery.getQuery(), variableValues,
+            topVariableValues);
         EclipseQueryUtility.scheduleQuery(boundQuery, data);
       }
     }

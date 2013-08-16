@@ -37,6 +37,7 @@ import com.surelogic.common.adhoc.AdHocQuery;
 import com.surelogic.common.adhoc.AdHocQueryFullyBound;
 import com.surelogic.common.adhoc.AdHocQueryResult;
 import com.surelogic.common.adhoc.AdHocQueryResultSqlData;
+import com.surelogic.common.adhoc.AdHocSubQuery;
 import com.surelogic.common.core.EclipseUtility;
 import com.surelogic.common.core.adhoc.EclipseQueryUtility;
 import com.surelogic.common.core.preferences.CommonCorePreferencesUtility;
@@ -56,7 +57,9 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
   private final Composite f_content;
   private final QueryResultNavigator f_navigator;
   private final Action f_showEmptyQueriesAction;
+  private final Action f_showUnrunnableQueriesAction;
   private boolean f_showEmptyQueries;
+  private boolean f_showUnrunnableQueries;
 
   /**
    * This listener is used on double-click and the context menu to actually run
@@ -172,7 +175,8 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
   };
 
   public QueryMenuMediator(final AbstractQueryMenuView view, final PageBook pageBook, final Label noRunSelected,
-      final ScrolledComposite sc, final Composite content, final QueryResultNavigator navigator, final Action showEmptyQueriesAction) {
+      final ScrolledComposite sc, final Composite content, final QueryResultNavigator navigator,
+      final Action showEmptyQueriesAction, final Action showUnrunnableQueriesAction) {
     f_manager = view.getManager();
     f_pageBook = pageBook;
     f_noRunSelected = noRunSelected;
@@ -182,6 +186,7 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
     f_content = content;
     f_navigator = navigator;
     f_showEmptyQueriesAction = showEmptyQueriesAction;
+    f_showUnrunnableQueriesAction = showUnrunnableQueriesAction;
   }
 
   @Override
@@ -190,6 +195,8 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
 
     f_showEmptyQueries = EclipseUtility.getBooleanPreference(CommonCorePreferencesUtility.QMENU_SHOW_EMPTY_QUERIES);
     f_showEmptyQueriesAction.setChecked(f_showEmptyQueries);
+    f_showUnrunnableQueries = EclipseUtility.getBooleanPreference(CommonCorePreferencesUtility.QMENU_SHOW_UNRUNNABLE_QUERIES);
+    f_showUnrunnableQueriesAction.setChecked(f_showUnrunnableQueries);
 
     f_manager.addObserver(this);
 
@@ -299,6 +306,14 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
     }
   }
 
+  void notifyShowUnrunnableQueriesValueChange(final boolean value) {
+    if (value != f_showUnrunnableQueries) {
+      f_showUnrunnableQueries = value;
+      EclipseUtility.setBooleanPreference(CommonCorePreferencesUtility.QMENU_SHOW_UNRUNNABLE_QUERIES, value);
+      updateQueryMenu();
+    }
+  }
+
   private Pair<Map<String, String>, Map<String, String>> getVariableValues() {
     final Map<String, String> all;
     final Map<String, String> top;
@@ -344,7 +359,7 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
             emptyCategories.add(category);
           } else {
             addCategoryTitleAndMessage(category, true);
-            addQueryMenu(catQueries, selectedResult, variableValues);
+            addQueryTopLevelMenu(catQueries, variableValues);
           }
         }
         if (willAnyQueriesBeListed(rootQueriesNotInACategory)) {
@@ -354,7 +369,7 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
             addTitle(I18N.msg("adhoc.query.menu.label.misc.cat"), true);
           }
           // add in the rest
-          addQueryMenu(rootQueriesNotInACategory, selectedResult, variableValues);
+          addQueryTopLevelMenu(rootQueriesNotInACategory, variableValues);
         }
         for (AdHocCategory category : emptyCategories) {
           addCategoryTitleAndMessage(category, false);
@@ -363,9 +378,9 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
         /*
          * sub-query
          */
-        List<AdHocQuery> subQueries = selectedResult.getQueryFullyBound().getQuery().getVisibleSubQueryList();
+        ArrayList<AdHocSubQuery> subQueries = selectedResult.getQueryFullyBound().getQuery().getVisibleSubQueryList();
         if (!subQueries.isEmpty())
-          addQueryMenu(subQueries, selectedResult, variableValues);
+          addSubQueryMenu(subQueries, selectedResult, variableValues);
       }
 
       /*
@@ -389,7 +404,7 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
     f_content.setRedraw(true);
   }
 
-  private void addQueryMenu(List<AdHocQuery> queries, AdHocQueryResult selectedResult, Map<String, String> variableValues) {
+  private void addQueryTopLevelMenu(List<AdHocQuery> queries, Map<String, String> variableValues) {
     final Table tm = new Table(f_content, SWT.NO_SCROLL | SWT.FULL_SELECTION | SWT.SINGLE);
     final GridData data = new GridData(SWT.FILL, SWT.CENTER, true, false);
     tm.setLayoutData(data);
@@ -405,17 +420,54 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
         if (!emptyResult || f_showEmptyQueries) {
           final TableItem item = new TableItem(tm, SWT.NONE);
           item.setText(query.getDescription());
-          final boolean decorateAsDefault = selectedResult != null
-              && selectedResult.getQueryFullyBound().getQuery().isDefaultSubQuery(query);
+          item.setImage(SLImages.getImageForAdHocQuery(query.getType(), false, emptyResult));
+          if (emptyResult)
+            item.setForeground(EclipseColorUtility.getQueryMenuGrayColor());
+          item.setData(query);
+        }
+      } else {
+        if (f_showUnrunnableQueries) {
+          final TableItem item = new TableItem(tm, SWT.NONE);
+          item.setText(query.getDescription());
+          item.setForeground(EclipseColorUtility.getQueryMenuGrayColor());
+        }
+      }
+    }
+  }
+
+  private void addSubQueryMenu(List<AdHocSubQuery> subQueries, AdHocQueryResult selectedResult, Map<String, String> variableValues) {
+    final Table tm = new Table(f_content, SWT.NO_SCROLL | SWT.FULL_SELECTION | SWT.SINGLE);
+    final GridData data = new GridData(SWT.FILL, SWT.CENTER, true, false);
+    tm.setLayoutData(data);
+    addContextMenuTo(tm);
+    tm.addListener(SWT.MouseDoubleClick, f_runQueryListener);
+    tm.addListener(SWT.Selection, f_oneSelectionListener);
+    tm.addListener(SWT.Traverse, f_traverseListener);
+    tm.addListener(SWT.KeyDown, f_keyDownListener);
+
+    @Nullable
+    final AdHocSubQuery defaultSubQuery = AdHocSubQuery.sortHelper(subQueries, variableValues, selectedResult.getQueryFullyBound()
+        .getQuery());
+
+    for (AdHocSubQuery subQuery : subQueries) {
+      final AdHocQuery query = subQuery.getQuery();
+      if (query.isCompletelySubstitutedBy(variableValues)) {
+        boolean emptyResult = query.resultIsKnownToBeEmpty();
+        if (!emptyResult || f_showEmptyQueries) {
+          final TableItem item = new TableItem(tm, SWT.NONE);
+          item.setText(query.getDescription());
+          final boolean decorateAsDefault = subQuery.equals(defaultSubQuery);
           item.setImage(SLImages.getImageForAdHocQuery(query.getType(), decorateAsDefault, emptyResult));
           if (emptyResult)
             item.setForeground(EclipseColorUtility.getQueryMenuGrayColor());
           item.setData(query);
         }
       } else {
-        final TableItem item = new TableItem(tm, SWT.NONE);
-        item.setText(query.getDescription());
-        item.setForeground(EclipseColorUtility.getQueryMenuGrayColor());
+        if (f_showUnrunnableQueries) {
+          final TableItem item = new TableItem(tm, SWT.NONE);
+          item.setText(query.getDescription());
+          item.setForeground(EclipseColorUtility.getQueryMenuGrayColor());
+        }
       }
     }
   }

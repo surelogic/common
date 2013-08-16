@@ -9,6 +9,8 @@ import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.widgets.Display;
 
+import com.surelogic.common.adhoc.AdHocQuery;
+
 /**
  * This class performs color syntax highlighting of SQL statements.
  */
@@ -19,6 +21,8 @@ public class SQLSyntaxHighlighter implements LineStyleListener {
   private final Color f_commentColor;
 
   private final Color f_doubleQuoteColor;
+
+  private final Color f_metaQuoteColor;
 
   private final Color f_keyWordColor;
 
@@ -31,6 +35,7 @@ public class SQLSyntaxHighlighter implements LineStyleListener {
   public SQLSyntaxHighlighter(final Display display) {
     f_commentColor = display.getSystemColor(SWT.COLOR_BLUE);
     f_doubleQuoteColor = display.getSystemColor(SWT.COLOR_DARK_YELLOW);
+    f_metaQuoteColor = display.getSystemColor(SWT.COLOR_DARK_YELLOW);
     f_keyWordColor = display.getSystemColor(SWT.COLOR_DARK_GREEN);
     f_problemColor = display.getSystemColor(SWT.COLOR_RED);
     f_questionColor = display.getSystemColor(SWT.COLOR_BLUE);
@@ -73,6 +78,68 @@ public class SQLSyntaxHighlighter implements LineStyleListener {
     if (inSQLQuote(ci))
       return highlightComment(ci + 2);
     else {
+      // we want to highlight the meta
+      boolean keepLooking = true;
+      while (keepLooking) {
+        keepLooking = false;
+        // BEGIN-META(name)
+        int metaBeginIndex = f_event.lineText.indexOf(AdHocQuery.META_BEGIN, ci);
+        // END-META
+        int metaEndIndex = f_event.lineText.indexOf(AdHocQuery.META_END, ci);
+
+        /*
+         * Did we find both (in which case we must consider order)
+         */
+        if (metaBeginIndex != -1 && metaEndIndex != -1) {
+          if (metaBeginIndex < metaEndIndex) {
+            // BEGIN-META(name)
+            final int closeMetaName = f_event.lineText.indexOf(AdHocQuery.META_BEGIN_CLOSE, metaBeginIndex);
+            if (closeMetaName != -1) {
+              set(f_commentColor, SWT.NORMAL, ci, metaBeginIndex - 1);
+              set(f_metaQuoteColor, SWT.BOLD, metaBeginIndex, closeMetaName);
+              ci = closeMetaName + 1;
+              keepLooking = true;
+            }
+            // END-META
+            set(f_commentColor, SWT.NORMAL, ci, metaEndIndex - 1);
+            final int endOfEndIndex = metaEndIndex + AdHocQuery.META_END.length() - 1;
+            set(f_metaQuoteColor, SWT.BOLD, metaEndIndex, endOfEndIndex);
+            ci = endOfEndIndex + 1;
+            keepLooking = true;
+          } else {
+            // END-META
+            set(f_commentColor, SWT.NORMAL, ci, metaEndIndex - 1);
+            final int endOfEndIndex = metaEndIndex + AdHocQuery.META_END.length() - 1;
+            set(f_metaQuoteColor, SWT.BOLD, metaEndIndex, endOfEndIndex);
+            ci = endOfEndIndex + 1;
+            keepLooking = true;
+            // BEGIN-META(name)
+            final int closeMetaName = f_event.lineText.indexOf(AdHocQuery.META_BEGIN_CLOSE, metaBeginIndex);
+            if (closeMetaName != -1) {
+              set(f_commentColor, SWT.NORMAL, ci, metaBeginIndex - 1);
+              set(f_metaQuoteColor, SWT.BOLD, metaBeginIndex, closeMetaName);
+              ci = closeMetaName + 1;
+              keepLooking = true;
+            }
+          }
+        } else if (metaBeginIndex != -1) { // only found a begin
+          // BEGIN-META(name)
+          final int closeMetaName = f_event.lineText.indexOf(AdHocQuery.META_BEGIN_CLOSE, metaBeginIndex);
+          if (closeMetaName != -1) {
+            set(f_commentColor, SWT.NORMAL, ci, metaBeginIndex - 1);
+            set(f_metaQuoteColor, SWT.BOLD, metaBeginIndex, closeMetaName);
+            ci = closeMetaName + 1;
+            keepLooking = true;
+          }
+        } else if (metaEndIndex != -1) { // only found an end
+          // END-META
+          set(f_commentColor, SWT.NORMAL, ci, metaEndIndex - 1);
+          final int endOfEndIndex = metaEndIndex + AdHocQuery.META_END.length() - 1;
+          set(f_metaQuoteColor, SWT.BOLD, metaEndIndex, endOfEndIndex);
+          ci = endOfEndIndex + 1;
+          keepLooking = true;
+        }
+      }
       setToEndOfLine(ci, f_commentColor);
       return ci;
     }
