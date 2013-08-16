@@ -253,6 +253,11 @@ public final class AdHocQuery implements AdHocIdentity {
   public static final String META_QUERYDOC_NAME = "doc";
 
   /**
+   * Special meta name for no rows message.
+   */
+  public static final String META_NO_ROWS_NAME = "no-rows";
+
+  /**
    * Gets the Querydoc associated with this query. This is from the meta with
    * the name <tt>doc</tt> ({@link #META_QUERYDOC_NAME}). This code handles the
    * case where no Querydoc is provided better than just asking for the meta
