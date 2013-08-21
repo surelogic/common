@@ -21,8 +21,7 @@ import com.surelogic.common.core.SourceZip;
 import com.surelogic.common.java.*;
 
 public class ZippedConfig extends Config {
-	private static final boolean useSourceZipsDirectly = !(SystemUtils.IS_OS_LINUX && XUtil.runJSureInMemory);
-
+	private static final boolean useSourceZipsDirectly = !XUtil.runJSureInMemory || SystemUtils.IS_OS_WINDOWS;
 	public ZippedConfig(String name, File location, boolean isExported, boolean hasJLO) {
 		super(name, location, isExported, hasJLO);
 	}
