@@ -1,7 +1,6 @@
 package com.surelogic.common.ui.adhoc.views.menu;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -26,6 +25,7 @@ import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.progress.UIJob;
 
+import com.surelogic.NonNull;
 import com.surelogic.Nullable;
 import com.surelogic.common.CommonImages;
 import com.surelogic.common.ILifecycle;
@@ -70,7 +70,7 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
     public void handleEvent(final Event event) {
       final AdHocQuery query = getSelectionOrNull(event.widget);
       if (query != null)
-        runQuery(query);
+        runQueryInContext(f_manager, query);
     }
   };
 
@@ -314,28 +314,13 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
     }
   }
 
-  private Pair<Map<String, String>, Map<String, String>> getVariableValues() {
-    final Map<String, String> all;
-    final Map<String, String> top;
-    final AdHocQueryResult selectedResult = f_manager.getSelectedResult();
-    if (selectedResult instanceof AdHocQueryResultSqlData) {
-      final AdHocQueryResultSqlData result = (AdHocQueryResultSqlData) selectedResult;
-      all = result.getVariableValues();
-      top = result.getTopVariableValues();
-    } else {
-      all = f_manager.getGlobalVariableValues();
-      top = Collections.emptyMap();
-    }
-    return new Pair<Map<String, String>, Map<String, String>>(all, top);
-  }
-
   private void updateQueryMenu() {
     f_content.setRedraw(false);
     // clear out old widget contents
     for (Control child : f_content.getChildren())
       child.dispose();
 
-    final Map<String, String> variableValues = getVariableValues().first();
+    final Map<String, String> variableValues = f_manager.getVariableValuesAsPair().first();
     final boolean hasDatabaseAccess = variableValues.containsKey(AdHocManager.DATABASE);
     if (hasDatabaseAccess) {
       f_pageBook.showPage(f_sc);
@@ -557,14 +542,23 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
     return result;
   }
 
-  private void runQuery(final AdHocQuery query) {
-    final Pair<Map<String, String>, Map<String, String>> variableValues = getVariableValues();
+  /**
+   * Runs the passed query under the passed manager in the current selection
+   * context, or at the top-level if there is no selection.
+   * 
+   * @param manager
+   *          a query manager.
+   * @param query
+   *          a query.
+   */
+  public static void runQueryInContext(@NonNull final AdHocManager manager, @NonNull final AdHocQuery query) {
+    final Pair<Map<String, String>, Map<String, String>> variableValues = manager.getVariableValuesAsPair();
     final AdHocQueryFullyBound boundQuery = new AdHocQueryFullyBound(query, variableValues.first(), variableValues.second());
-    final AdHocQueryResult selectedResult = f_manager.getSelectedResult();
+    final AdHocQueryResult selectedResult = manager.getSelectedResult();
     if (selectedResult instanceof AdHocQueryResultSqlData) {
       EclipseQueryUtility.scheduleQuery(boundQuery, (AdHocQueryResultSqlData) selectedResult);
     } else {
-      EclipseQueryUtility.scheduleQuery(boundQuery, f_manager.getDataSource().getCurrentAccessKeys());
+      EclipseQueryUtility.scheduleQuery(boundQuery, manager.getDataSource().getCurrentAccessKeys());
     }
   }
 }
