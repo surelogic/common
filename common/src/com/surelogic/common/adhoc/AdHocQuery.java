@@ -257,6 +257,14 @@ public final class AdHocQuery implements AdHocIdentity {
    */
   public static final String META_NO_ROWS_NAME = "no-rows";
 
+  /*
+   * Special names for Flashlight (here so we don't spell them wrong)
+   */
+  public static final String META_FL_EMPTY_IS_GOOD_NEWS_NAME = "empty-is-good-news";
+  public static final String META_FL_EMPTY_IS_BAD_NEWS_NAME = "empty-is-bad-news";
+  public static final String META_FL_RESULT_IS_GOOD_NEWS_NAME = "result-is-good-news";
+  public static final String META_FL_RESULT_IS_BAD_NEWS_NAME = "result-is-bad-news";
+
   /**
    * Gets the Querydoc associated with this query. This is from the meta with
    * the name <tt>doc</tt> ({@link #META_QUERYDOC_NAME}). This code handles the
