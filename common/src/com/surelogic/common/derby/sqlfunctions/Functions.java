@@ -332,11 +332,15 @@ public final class Functions {
                         if (threadName != null) {
                             return threadName;
                         }
-                        return q.prepared("ObjectId.selectClass",
+                        return q.prepared("ObjectId.selectObjectClass",
                                 SingleRowHandler.from(new RowHandler<String>() {
                                     @Override
                                     public String handle(final Row r) {
                                         String clazz = r.nextString();
+                                        if (clazz != null) {
+                                            return clazz + ".class";
+                                        }
+                                        clazz = r.nextString();
                                         if (clazz.length() > 50) {
                                             clazz = clazz.substring(0, 50);
                                         }
