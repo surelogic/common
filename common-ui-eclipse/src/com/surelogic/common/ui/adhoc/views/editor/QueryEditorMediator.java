@@ -441,7 +441,7 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
         final TableItem[] selected = f_subQueryTable.getSelection();
         boolean changed = false;
         for (final TableItem item : selected) {
-          final AdHocQuery subQuery = (AdHocQuery) item.getData();
+          final AdHocSubQuery subQuery = (AdHocSubQuery) item.getData();
           if (f_edit.removeSubQuery(subQuery)) {
             changed = true;
           }

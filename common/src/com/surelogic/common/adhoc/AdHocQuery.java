@@ -628,6 +628,20 @@ public final class AdHocQuery implements AdHocIdentity {
   }
 
   /**
+   * Removes a sub-query from this query if it is present. A sub-query is a
+   * query that can be executed based upon a selected row of the result of this
+   * query.
+   * 
+   * @param subQuery
+   *          a sub-query.
+   * @return {@code true} if the set of sub-queries was changed, {@code false}
+   *         otherwise.
+   */
+  public boolean removeSubQuery(final AdHocSubQuery subQuery) {
+    return f_subQueries.remove(subQuery);
+  }
+
+  /**
    * Removes all sub-queries form this query.
    */
   public void clearSubQueries() {
