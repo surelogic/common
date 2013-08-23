@@ -118,6 +118,49 @@ public final class Functions {
         }
     }
 
+    static class ThreadCountHandler implements ResultHandler<String> {
+
+        @Override
+        public String handle(Result result) {
+            StringBuilder b = new StringBuilder();
+            for (Row r : result) {
+                if (b.length() > 0) {
+                    b.append(", ");
+                }
+                String thread = r.nextString();
+                int count = r.nextInt();
+                b.append(thread);
+                b.append(" (");
+                if (count == 1) {
+                    b.append("once");
+                } else {
+                    b.append(count);
+                    b.append(" times");
+                }
+                b.append(')');
+            }
+            return b.toString();
+        }
+
+    }
+
+    public static String coalesceLockTraceThreads(final long lockTraceId) {
+        return DefaultConnection.getInstance().withReadOnly(
+                new DBQuery<String>() {
+                    @Override
+                    public String perform(Query q) {
+                        return q.prepared("LockTrace.threads",
+                                new ThreadCountHandler()).call(lockTraceId);
+
+                    }
+                });
+    }
+
+    public static String coalesceLockEdgeThreads(final long lockHeld,
+            final long lockAcquired) {
+        return null;
+    }
+
     /**
      * Returns a <em>table</em> representing the stack trace belonging to this
      * trace id.
