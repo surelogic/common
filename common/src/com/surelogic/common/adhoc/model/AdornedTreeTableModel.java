@@ -206,7 +206,8 @@ public final class AdornedTreeTableModel {
       if (!adornedIsColumnVisible[colI]) {
         for (int colJ = colI; colJ < adornedIsColumnVisible.length; colJ++) {
           if (adornedIsColumnVisible[colJ]) {
-            SLLogger.getLogger().log(Level.WARNING, I18N.err(138));
+            String label = adornedColumnLabels[colI];
+            SLLogger.getLogger().log(Level.WARNING, I18N.err(138, label));
             break;
           }
         }
