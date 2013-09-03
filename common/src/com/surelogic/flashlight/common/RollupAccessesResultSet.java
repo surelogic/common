@@ -40,7 +40,7 @@ public class RollupAccessesResultSet implements InvocationHandler {
         }
     }
 
-    public static ResultSet create(Connection conn, long fieldId,
+    public static ResultSet createForField(Connection conn, long fieldId,
             long receiverId) throws SQLException {
         PreparedStatement st = conn.prepareStatement(QB
                 .get("Accesses.selectByFieldAndReceiver"));
@@ -52,7 +52,7 @@ public class RollupAccessesResultSet implements InvocationHandler {
                         fieldId));
     }
 
-    public static ResultSet create(Connection conn, long fieldId)
+    public static ResultSet createForStaticField(Connection conn, long fieldId)
             throws SQLException {
         PreparedStatement st = conn.prepareStatement(QB
                 .get("Accesses.selectByField"));

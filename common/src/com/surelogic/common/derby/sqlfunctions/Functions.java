@@ -24,6 +24,7 @@ import com.surelogic.flashlight.common.HappensBeforeAnalysis;
 import com.surelogic.flashlight.common.HappensBeforeAnalysis.HBEdge;
 import com.surelogic.flashlight.common.InstanceAccessesResultSet;
 import com.surelogic.flashlight.common.RollupAccessesResultSet;
+import com.surelogic.flashlight.common.RollupIndirectAccessesResultSet;
 
 /**
  * Some useful functions used in the Flashlight tool. This class should be
@@ -185,13 +186,26 @@ public final class Functions {
                 .withDefault(LockTrace.lockTrace(traceId)));
     }
 
+    public static ResultSet objectSummary(long objectId) {
+        try {
+            // We can't use the framework code here, because we have to leave
+            // the result sets open when we return from this block.
+            Connection conn = DefaultConnection.getInstance()
+                    .readOnlyConnection();
+            return RollupIndirectAccessesResultSet.createForObject(conn,
+                    objectId);
+        } catch (SQLException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
     public static ResultSet staticAccessSummary(long fieldId) {
         try {
             // We can't use the framework code here, because we have to leave
             // the result sets open when we return from this block.
             Connection conn = DefaultConnection.getInstance()
                     .readOnlyConnection();
-            return RollupAccessesResultSet.create(conn, fieldId);
+            return RollupAccessesResultSet.createForStaticField(conn, fieldId);
         } catch (SQLException e) {
             throw new IllegalStateException(e);
         }
@@ -204,7 +218,8 @@ public final class Functions {
             // the result sets open when we return from this block.
             Connection conn = DefaultConnection.getInstance()
                     .readOnlyConnection();
-            return RollupAccessesResultSet.create(conn, fieldId, receiverId);
+            return RollupAccessesResultSet.createForField(conn, fieldId,
+                    receiverId);
         } catch (SQLException e) {
             throw new IllegalStateException(e);
         }

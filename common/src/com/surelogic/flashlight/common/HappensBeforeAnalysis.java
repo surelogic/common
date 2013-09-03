@@ -700,8 +700,12 @@ public class HappensBeforeAnalysis {
                     ResultSet set = traceMethodCalledSt.executeQuery();
                     try {
                         if (set.next()) {
-                            return set.getString(1).replaceAll("/", ".") + '.'
-                                    + set.getString(2);
+                            String clazz = set.getString(1);
+                            String method = set.getString(2);
+                            if (clazz != null) {
+                                return clazz.replaceAll("/", ".") + '.'
+                                        + method;
+                            }
                         }
                     } finally {
                         set.close();
@@ -727,10 +731,11 @@ public class HappensBeforeAnalysis {
                 ResultSet set = traceMethodCalledSt.executeQuery();
                 try {
                     if (set.next()) {
-                        return set.getString(1).replaceAll("/", ".") + '.'
-                                + set.getString(2);
-                    } else {
-                        return null;
+                        String clazz = set.getString(1);
+                        String method = set.getString(2);
+                        if (clazz != null) {
+                            return clazz.replaceAll("/", ".") + '.' + method;
+                        }
                     }
                 } finally {
                     set.close();
