@@ -10,6 +10,7 @@ import java.sql.Timestamp;
 import java.util.Iterator;
 import java.util.List;
 
+import com.surelogic.common.jdbc.BooleanResultHandler;
 import com.surelogic.common.jdbc.DBQuery;
 import com.surelogic.common.jdbc.DBTransaction;
 import com.surelogic.common.jdbc.DefaultConnection;
@@ -119,7 +120,79 @@ public final class Functions {
         }
     }
 
-    static class ThreadCountHandler implements ResultHandler<String> {
+    static class TraceHandler implements ResultHandler<String> {
+
+        boolean isStatic;
+
+        TraceHandler(boolean isStatic) {
+            this.isStatic = isStatic;
+        }
+
+        @Override
+        public String handle(Result result) {
+            StringBuilder b = new StringBuilder();
+            int reads = 0, writes = 0, readsUC = 0, writesUC = 0;
+            String curThread = null;
+            for (Row r : result) {
+                String thread = r.nextString();
+                if (!thread.equals(curThread)) {
+                    if (thread != null) {
+                        b.append(thread);
+                        b.append('(');
+                        boolean something = false;
+                        if (reads > 0) {
+                            b.append(reads);
+                            b.append(" reads");
+                            something = true;
+                        }
+                        if (writes > 0) {
+                            if (something) {
+                                b.append(", ");
+                            }
+                            b.append(writes);
+                            b.append(" writes");
+                            something = true;
+                        }
+                        if (!isStatic) {
+                            if (readsUC > 0) {
+                                if (something) {
+                                    b.append(", ");
+                                }
+                                b.append(readsUC);
+                                b.append(" reads under construction");
+                                something = true;
+                            }
+                            if (writesUC > 0) {
+                                if (something) {
+                                    b.append(", ");
+                                }
+                                b.append(writesUC);
+                                b.append(" writes under construction");
+                                something = true;
+                            }
+                        }
+                    }
+                }
+                if ("R".equals(r.nextString())) {
+                    if (r.nextBoolean()) {
+                        readsUC = r.nextInt();
+                    } else {
+                        reads = r.nextInt();
+                    }
+                } else {
+                    if (r.nextBoolean()) {
+                        writesUC = r.nextInt();
+                    } else {
+                        writes = r.nextInt();
+                    }
+                }
+
+            }
+            return b.toString();
+        }
+    }
+
+    static class LockTraceHandler implements ResultHandler<String> {
 
         @Override
         public String handle(Result result) {
@@ -151,15 +224,26 @@ public final class Functions {
                     @Override
                     public String perform(Query q) {
                         return q.prepared("LockTrace.threads",
-                                new ThreadCountHandler()).call(lockTraceId);
+                                new LockTraceHandler()).call(lockTraceId);
 
                     }
                 });
     }
 
-    public static String coalesceLockEdgeThreads(final long lockHeld,
-            final long lockAcquired) {
-        return null;
+    public static String coalesceTraceThreads(final long fieldId,
+            final long traceId) {
+        return DefaultConnection.getInstance().withReadOnly(
+                new DBQuery<String>() {
+                    @Override
+                    public String perform(Query q) {
+                        return q.prepared(
+                                "Accesses.trace.accessCounts",
+                                new TraceHandler(q.prepared(
+                                        "Accesses.isFieldStatic",
+                                        new BooleanResultHandler()).call()))
+                                .call(fieldId, traceId);
+                    }
+                });
     }
 
     /**
