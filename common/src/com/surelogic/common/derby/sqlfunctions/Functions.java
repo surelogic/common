@@ -135,44 +135,47 @@ public final class Functions {
             String curThread = null;
             for (Row r : result) {
                 String thread = r.nextString();
-                if (!thread.equals(curThread)) {
-                    if (thread != null) {
-                        b.append(thread);
-                        b.append('(');
-                        boolean something = false;
-                        if (reads > 0) {
-                            b.append(reads);
-                            b.append(" reads");
-                            something = true;
+                if (!thread.equals(curThread) && curThread != null) {
+                    if (b.length() > 0) {
+                        b.append(", ");
+                    }
+                    b.append(thread);
+                    b.append(" (");
+                    boolean something = false;
+                    if (reads > 0) {
+                        b.append(reads);
+                        b.append(" reads");
+                        something = true;
+                    }
+                    if (writes > 0) {
+                        if (something) {
+                            b.append(", ");
                         }
-                        if (writes > 0) {
+                        b.append(writes);
+                        b.append(" writes");
+                        something = true;
+                    }
+                    if (!isStatic) {
+                        if (readsUC > 0) {
                             if (something) {
                                 b.append(", ");
                             }
-                            b.append(writes);
-                            b.append(" writes");
+                            b.append(readsUC);
+                            b.append(" reads under construction");
                             something = true;
                         }
-                        if (!isStatic) {
-                            if (readsUC > 0) {
-                                if (something) {
-                                    b.append(", ");
-                                }
-                                b.append(readsUC);
-                                b.append(" reads under construction");
-                                something = true;
+                        if (writesUC > 0) {
+                            if (something) {
+                                b.append(", ");
                             }
-                            if (writesUC > 0) {
-                                if (something) {
-                                    b.append(", ");
-                                }
-                                b.append(writesUC);
-                                b.append(" writes under construction");
-                                something = true;
-                            }
+                            b.append(writesUC);
+                            b.append(" writes under construction");
+                            something = true;
                         }
                     }
+                    b.append(')');
                 }
+                curThread = thread;
                 if ("R".equals(r.nextString())) {
                     if (r.nextBoolean()) {
                         readsUC = r.nextInt();
@@ -186,7 +189,6 @@ public final class Functions {
                         writes = r.nextInt();
                     }
                 }
-
             }
             return b.toString();
         }
@@ -240,8 +242,8 @@ public final class Functions {
                                 "Accesses.trace.accessCounts",
                                 new TraceHandler(q.prepared(
                                         "Accesses.isFieldStatic",
-                                        new BooleanResultHandler()).call()))
-                                .call(fieldId, traceId);
+                                        new BooleanResultHandler()).call(
+                                        fieldId))).call(fieldId, traceId);
                     }
                 });
     }
