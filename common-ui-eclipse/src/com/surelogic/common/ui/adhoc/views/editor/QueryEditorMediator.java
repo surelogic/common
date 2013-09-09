@@ -635,6 +635,7 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
   }
 
   private void updateSelectionPane() {
+    f_sql.setRedraw(false);
     final boolean oneQuerySelected = f_selections.size() == 1;
     final boolean oneOrMoreQueriesSelected = !f_selections.isEmpty();
     if (oneOrMoreQueriesSelected) {
@@ -658,6 +659,7 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
       final AdHocQuery theOne = f_selections.toArray(new AdHocQuery[1])[0];
       setOnScreenEdit(theOne);
     }
+    f_sql.setRedraw(true);
   }
 
   private void setOnScreenEdit(final AdHocQuery query) {
