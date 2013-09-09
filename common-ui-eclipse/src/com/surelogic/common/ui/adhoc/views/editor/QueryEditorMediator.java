@@ -101,6 +101,7 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
   private final ToolItem f_addSubQuery;
   private final ToolItem f_deleteSubQuery;
   private final Table f_subQueryTable;
+  private final Table f_usedByTable;
 
   private final Set<AdHocQuery> f_selections = new HashSet<AdHocQuery>();
   private AdHocQuery f_edit = null;
@@ -110,7 +111,7 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
       Tree queryTree, Button filterTreeCheck, Menu queryActionMenu, ToolItem runQuery, ToolItem newQuery, ToolItem deleteQuery,
       ToolItem saveQueries, PageBook rhs, Label noSelectionPane, Composite selectionPane, Text descriptionText, Text idText,
       Text cdText, Spinner sortHint, Combo type, Button noDefaultSubQueryCheck, Button showCheck, Button showAtRootCheck,
-      TabFolder sqlFolder, StyledText sql, ToolItem addSubQuery, ToolItem deleteSubQuery, Table subQueryTable) {
+      TabFolder sqlFolder, StyledText sql, ToolItem addSubQuery, ToolItem deleteSubQuery, Table subQueryTable, Table usedByTable) {
     f_manager = view.getManager();
     f_sash = sash;
     f_lhs = lhs;
@@ -139,6 +140,7 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
     f_addSubQuery = addSubQuery;
     f_deleteSubQuery = deleteSubQuery;
     f_subQueryTable = subQueryTable;
+    f_usedByTable = usedByTable;
   }
 
   @Override
@@ -729,6 +731,21 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
       }
       f_deleteSubQuery.setEnabled(!subQueries.isEmpty());
       f_subQueryTable.setRedraw(true);
+
+      final List<AdHocQuery> usedByQueries = query.getUsedByList();
+      f_usedByTable.setRedraw(false);
+      f_usedByTable.removeAll();
+      for (AdHocQuery usedBy : usedByQueries) {
+        final TableItem item = new TableItem(f_usedByTable, SWT.NONE);
+        item.setData(usedBy);
+        item.setImage(0, getImageForQuery(usedBy));
+        item.setText(0, usedBy.getDescription());
+        item.setText(1, usedBy.getId());
+      }
+      for (final TableColumn c : f_usedByTable.getColumns()) {
+        c.pack();
+      }
+      f_usedByTable.setRedraw(true);
     }
   }
 

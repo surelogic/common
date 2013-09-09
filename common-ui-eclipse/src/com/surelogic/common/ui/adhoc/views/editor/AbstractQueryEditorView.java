@@ -235,10 +235,26 @@ public abstract class AbstractQueryEditorView extends ViewPart {
     subQueryTable.setHeaderVisible(true);
     subQueryTable.setLinesVisible(true);
 
+    final TabItem usedByTab = new TabItem(sqlFolder, SWT.NONE);
+    usedByTab.setText("Sub-Query Of (Used By)");
+    final Composite usedByPane = new Composite(sqlFolder, SWT.NONE);
+    usedByTab.setControl(usedByPane);
+    usedByPane.setLayout(new FillLayout());
+
+    final Table usedByTable = new Table(usedByPane, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
+    col = new TableColumn(usedByTable, SWT.NONE);
+    col.setText("Description");
+    col.pack();
+    col = new TableColumn(usedByTable, SWT.NONE);
+    col.setText("Identifier");
+    col.pack();
+    usedByTable.setHeaderVisible(true);
+    usedByTable.setLinesVisible(true);
+
     f_mediator = new QueryEditorMediator(this, sash, lhs, lhsFolder, queryList, queryTree, filterTreeCheck, queryActionMenu,
         runQuery, newQuery, deleteQuery, saveQueries, rhs, noSelectionPane, selectionPane, descriptionText, idText, cdText,
         sortHint, type, noDefaultSubQueryCheck, showCheck, showAtRootCheck, sqlFolder, sql, addSubQuery, deleteSubQuery,
-        subQueryTable);
+        subQueryTable, usedByTable);
     f_mediator.init();
   }
 

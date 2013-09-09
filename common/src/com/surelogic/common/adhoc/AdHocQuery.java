@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -661,6 +662,30 @@ public final class AdHocQuery implements AdHocIdentity {
    */
   public ArrayList<AdHocSubQuery> getSubQueryList() {
     return new ArrayList<AdHocSubQuery>(f_subQueries);
+  }
+
+  /**
+   * Gets the set of queries that this query is a sub-query of or, put another
+   * way, is used by. This method reports queries that directly use this query
+   * as as sub-query, i.e., it does not report a transitive result.
+   * 
+   * @return a list of the queries owned by this manager sorted by their sort
+   *         hint and description that this query is a sub-query of.
+   */
+  public ArrayList<AdHocQuery> getUsedByList() {
+    ArrayList<AdHocQuery> result = new ArrayList<AdHocQuery>(getManager().getQueries());
+    for (Iterator<AdHocQuery> iterator = result.iterator(); iterator.hasNext();) {
+      final AdHocQuery query = iterator.next();
+      /*
+       * if this query is not a direct sub-query of the query we remove it from
+       * our result
+       */
+      if (AdHocSubQuery.find(this, query.f_subQueries) == null)
+        iterator.remove();
+    }
+
+    Collections.sort(result, AdHocIdentity.BY_HINT_DESCRIPTION);
+    return result;
   }
 
   /**
