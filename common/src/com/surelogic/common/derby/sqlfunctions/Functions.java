@@ -7,10 +7,10 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.surelogic.common.jdbc.BooleanResultHandler;
 import com.surelogic.common.jdbc.DBQuery;
 import com.surelogic.common.jdbc.DBTransaction;
 import com.surelogic.common.jdbc.DefaultConnection;
@@ -128,65 +128,95 @@ public final class Functions {
             this.isStatic = isStatic;
         }
 
+        class CountInfo {
+            String thread;
+            int reads, writes, readsUC, writesUC;
+
+            CountInfo(String threadName) {
+                thread = threadName;
+            }
+
+            StringBuilder toString(StringBuilder b) {
+                boolean something = false;
+                if (reads > 0) {
+                    b.append(reads);
+                    b.append(" read");
+                    if (reads > 1) {
+                        b.append('s');
+                    }
+                    something = true;
+                }
+                if (writes > 0) {
+                    if (something) {
+                        b.append(", ");
+                    }
+                    b.append(writes);
+                    b.append(" write");
+                    if (writes > 1) {
+                        b.append('s');
+                    }
+                    something = true;
+                }
+                if (readsUC > 0) {
+                    if (something) {
+                        b.append(", ");
+                    }
+                    b.append(readsUC);
+                    b.append("read");
+                    if (readsUC > 1) {
+                        b.append('s');
+                    }
+                    b.append(isStatic ? " during class initialization"
+                            : "  under construction");
+                    something = true;
+                }
+                if (writesUC > 0) {
+                    if (something) {
+                        b.append(", ");
+                    }
+                    b.append(writesUC);
+                    b.append("write");
+                    if (writesUC > 1) {
+                        b.append('s');
+                    }
+                    b.append(isStatic ? " during class initialization"
+                            : " under construction");
+                }
+                return b;
+            }
+        }
+
         @Override
         public String handle(Result result) {
-            StringBuilder b = new StringBuilder();
-            int reads = 0, writes = 0, readsUC = 0, writesUC = 0;
-            String curThread = null;
+            List<CountInfo> counts = new ArrayList<CountInfo>();
+            CountInfo info = null;
             for (Row r : result) {
                 String thread = r.nextString();
-                if (!thread.equals(curThread)) {
-                    if (thread != null) {
-                        b.append(thread);
-                        b.append('(');
-                        boolean something = false;
-                        if (reads > 0) {
-                            b.append(reads);
-                            b.append(" reads");
-                            something = true;
-                        }
-                        if (writes > 0) {
-                            if (something) {
-                                b.append(", ");
-                            }
-                            b.append(writes);
-                            b.append(" writes");
-                            something = true;
-                        }
-                        if (!isStatic) {
-                            if (readsUC > 0) {
-                                if (something) {
-                                    b.append(", ");
-                                }
-                                b.append(readsUC);
-                                b.append(" reads under construction");
-                                something = true;
-                            }
-                            if (writesUC > 0) {
-                                if (something) {
-                                    b.append(", ");
-                                }
-                                b.append(writesUC);
-                                b.append(" writes under construction");
-                                something = true;
-                            }
-                        }
-                    }
+                if (info == null || !info.thread.equals(thread)) {
+                    info = new CountInfo(thread);
+                    counts.add(info);
                 }
                 if ("R".equals(r.nextString())) {
                     if (r.nextBoolean()) {
-                        readsUC = r.nextInt();
+                        info.readsUC = r.nextInt();
                     } else {
-                        reads = r.nextInt();
+                        info.reads = r.nextInt();
                     }
                 } else {
                     if (r.nextBoolean()) {
-                        writesUC = r.nextInt();
+                        info.writesUC = r.nextInt();
                     } else {
-                        writes = r.nextInt();
+                        info.writes = r.nextInt();
                     }
                 }
-
+            }
+            StringBuilder b = new StringBuilder();
+            for (Iterator<CountInfo> iter = counts.iterator(); iter.hasNext();) {
+                CountInfo i = iter.next();
+                i.toString(b);
+                if (iter.hasNext()) {
+                    b.append(", ");
+                }
             }
             return b.toString();
         }
@@ -230,18 +260,27 @@ public final class Functions {
                 });
     }
 
-    public static String coalesceTraceThreads(final long fieldId,
+    public static String coalesceStaticTraceThreads(final long fieldId,
             final long traceId) {
         return DefaultConnection.getInstance().withReadOnly(
                 new DBQuery<String>() {
                     @Override
                     public String perform(Query q) {
-                        return q.prepared(
-                                "Accesses.trace.accessCounts",
-                                new TraceHandler(q.prepared(
-                                        "Accesses.isFieldStatic",
-                                        new BooleanResultHandler()).call()))
-                                .call(fieldId, traceId);
+                        return q.prepared("Accesses.trace.staticAccessCounts",
+                                new TraceHandler(true)).call(fieldId, traceId);
+                    }
+                });
+    }
+
+    public static String coalesceTraceThreads(final long fieldId,
+            final long receiverId, final long traceId) {
+        return DefaultConnection.getInstance().withReadOnly(
+                new DBQuery<String>() {
+                    @Override
+                    public String perform(Query q) {
+                        return q.prepared("Accesses.trace.accessCounts",
+                                new TraceHandler(false)).call(fieldId,
+                                receiverId, traceId);
                     }
                 });
     }
