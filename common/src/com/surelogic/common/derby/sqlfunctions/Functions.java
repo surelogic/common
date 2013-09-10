@@ -162,7 +162,7 @@ public final class Functions {
                         b.append(", ");
                     }
                     b.append(readsUC);
-                    b.append("read");
+                    b.append(" read");
                     if (readsUC > 1) {
                         b.append('s');
                     }
@@ -175,7 +175,7 @@ public final class Functions {
                         b.append(", ");
                     }
                     b.append(writesUC);
-                    b.append("write");
+                    b.append(" write");
                     if (writesUC > 1) {
                         b.append('s');
                     }
