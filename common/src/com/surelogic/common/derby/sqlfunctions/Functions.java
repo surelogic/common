@@ -137,6 +137,8 @@ public final class Functions {
             }
 
             StringBuilder toString(StringBuilder b) {
+                b.append(thread);
+                b.append(" (");
                 boolean something = false;
                 if (reads > 0) {
                     b.append(reads);
@@ -182,6 +184,7 @@ public final class Functions {
                     b.append(isStatic ? " during class initialization"
                             : " under construction");
                 }
+                b.append(")");
                 return b;
             }
         }
