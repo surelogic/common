@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import com.surelogic.common.jdbc.BooleanResultHandler;
 import com.surelogic.common.jdbc.DBQuery;
 import com.surelogic.common.jdbc.DBTransaction;
 import com.surelogic.common.jdbc.DefaultConnection;
@@ -284,6 +285,27 @@ public final class Functions {
                         return q.prepared("Accesses.trace.accessCounts",
                                 new TraceHandler(false)).call(fieldId,
                                 receiverId, traceId);
+                    }
+                });
+    }
+
+    public static String coalesceAllTraceThreads(final long fieldId,
+            final long traceId) {
+        return DefaultConnection.getInstance().withReadOnly(
+                new DBQuery<String>() {
+                    @Override
+                    public String perform(Query q) {
+                        if (q.prepared("Accesses.isFieldStatic",
+                                new BooleanResultHandler()).call(fieldId)) {
+                            return q.prepared(
+                                    "Accesses.trace.staticAccessCounts",
+                                    new TraceHandler(true)).call(fieldId,
+                                    traceId);
+                        } else {
+                            return q.prepared("Accesses.trace.allAccessCounts",
+                                    new TraceHandler(false)).call(fieldId,
+                                    traceId);
+                        }
                     }
                 });
     }
