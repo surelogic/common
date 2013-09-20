@@ -191,4 +191,19 @@ public final class AdHocQueryResultSqlData extends AdHocQueryResult {
   public String[] getAccessKeys() {
     return f_accessKeys;
   }
+
+  @Override
+  public String toString() {
+    String result = super.toString();
+    int rows = getModel().getRowCount();
+    final String rowString;
+    if (rows < 1) {
+      rowString = " - no rows";
+    } else if (rows == 1) {
+      rowString = " - one row";
+    } else {
+      rowString = " - " + rows + " rows";
+    }
+    return result + rowString;
+  }
 }

@@ -19,6 +19,11 @@ import com.surelogic.common.jdbc.DBConnection;
  */
 public abstract class AdHocQueryResult {
 
+  /**
+   * An empty array of {@link AdHocQueryResult} objects.
+   */
+  public static final AdHocQueryResult[] EMPTY = new AdHocQueryResult[0];
+
   @NonNull
   private final AdHocManager f_manager;
 

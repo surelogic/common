@@ -3,10 +3,10 @@ package com.surelogic.common.ui.adhoc.views.explorer;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.part.ViewPart;
 
@@ -23,7 +23,8 @@ public abstract class AbstractQueryResultExplorerView extends ViewPart {
   public void createPartControl(final Composite parent) {
     final FillLayout layout = new FillLayout();
     parent.setLayout(layout);
-    final Tree queryHistoryTree = new Tree(parent, SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION);
+
+    final TreeViewer queryHistoryTree = new TreeViewer(parent, SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION);
 
     // init() called by the mediator
     final QueryResultNavigator navigator = QueryResultNavigator.getInstance(getManager().getDataSource());

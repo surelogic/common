@@ -528,6 +528,25 @@ public final class AdHocManager {
   }
 
   /**
+   * Gets a list of the top-level or root results owned by this manager sorted
+   * by when they were run on the database.
+   * 
+   * @return a list of the top-level or root results owned by this manager
+   *         sorted by when they were run on the database.
+   * 
+   * @see AdHocQueryResultTimeComparator
+   */
+  public List<AdHocQueryResult> getRootResultList() {
+    final List<AdHocQueryResult> result = getResultList();
+    for (Iterator<AdHocQueryResult> iterator = result.iterator(); iterator.hasNext();) {
+      final AdHocQueryResult adHocQueryResult = iterator.next();
+      if (adHocQueryResult.getParent() != null)
+        iterator.remove();
+    }
+    return result;
+  }
+
+  /**
    * Adds a result to the set of results owned by this manager. This method
    * should only be invoked by
    * {@link AdHocQueryResult#AdHocQueryResult(AdHocManager, AdHocQueryResultSqlData, AdHocQueryFullyBound)}
@@ -614,10 +633,7 @@ public final class AdHocManager {
    * Sets the one query result that is selected and displayed to the user. May
    * be set to {@code null} to indicate that no result is currently selected.
    * <p>
-   * Observers will be notified if the selected result is changed or if the
-   * passed result is {@code null}. This exception for {@code null} exists
-   * because we want to allow changing what is shown for no result and this is
-   * triggered by setting the selected result to {@code null}.
+   * Observers will be notified if the selected result is changed.
    * 
    * @param result
    *          the one query result that is selected and displayed to the user.
@@ -630,7 +646,7 @@ public final class AdHocManager {
     if (result != null && !f_results.contains(result)) {
       throw new IllegalArgumentException(I18N.err(126, "setSelectedResult", result));
     }
-    boolean notify = result == null;
+    boolean notify = false;
     if (f_selectedResult != result) {
       f_selectedResult = result;
       notify = true;

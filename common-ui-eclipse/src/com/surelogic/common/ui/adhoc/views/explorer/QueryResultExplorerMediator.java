@@ -3,18 +3,22 @@ package com.surelogic.common.ui.adhoc.views.explorer;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Tree;
-import org.eclipse.swt.widgets.TreeColumn;
-import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.StyledCellLabelProvider;
+import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.ui.progress.UIJob;
 
+import com.surelogic.Nullable;
 import com.surelogic.common.ILifecycle;
 import com.surelogic.common.adhoc.AdHocManager;
 import com.surelogic.common.adhoc.AdHocManagerAdapter;
 import com.surelogic.common.adhoc.AdHocQueryResult;
+import com.surelogic.common.ui.EclipseColorUtility;
 import com.surelogic.common.ui.SLImages;
 import com.surelogic.common.ui.adhoc.views.QueryResultNavigator;
 import com.surelogic.common.ui.jobs.SLUIJob;
@@ -23,9 +27,35 @@ public final class QueryResultExplorerMediator extends AdHocManagerAdapter imple
 
   private final AdHocManager f_manager;
   private final QueryResultNavigator f_navigator;
-  private final Tree f_queryHistoryTree;
+  private final TreeViewer f_queryHistoryTree;
+  private final QueryResultExplorerContentProvider f_contentProvider = new QueryResultExplorerContentProvider();
 
-  public QueryResultExplorerMediator(final AbstractQueryResultExplorerView view, final Tree queryHistoryTree,
+  static final StyledCellLabelProvider TREE = new StyledCellLabelProvider() {
+
+    @Override
+    public void update(ViewerCell cell) {
+      final Object rawElement = cell.getElement();
+      if (rawElement instanceof AdHocQueryResult) {
+        final AdHocQueryResult result = (AdHocQueryResult) rawElement;
+        final String label = result.toString();
+
+        /*
+         * Match Eclipse with uses subtle text color for " at time"
+         */
+        final int colonIndex = label.lastIndexOf(" at ");
+        if (colonIndex != -1) {
+          StyleRange[] ranges = { new StyleRange(colonIndex, label.length(), EclipseColorUtility.getSubtleTextColor(), null) };
+          cell.setStyleRanges(ranges);
+        }
+
+        cell.setText(label);
+        cell.setImage(SLImages.getImage(result.getImageSymbolicName()));
+      } else
+        super.update(cell);
+    }
+  };
+
+  public QueryResultExplorerMediator(final AbstractQueryResultExplorerView view, final TreeViewer queryHistoryTree,
       final QueryResultNavigator navigator) {
     f_manager = view.getManager();
     f_queryHistoryTree = queryHistoryTree;
@@ -36,9 +66,12 @@ public final class QueryResultExplorerMediator extends AdHocManagerAdapter imple
   public void init() {
     f_navigator.init();
 
-    f_queryHistoryTree.addListener(SWT.Selection, new Listener() {
+    f_queryHistoryTree.setContentProvider(f_contentProvider);
+    f_queryHistoryTree.setLabelProvider(TREE);
+
+    f_queryHistoryTree.addSelectionChangedListener(new ISelectionChangedListener() {
       @Override
-      public void handleEvent(final Event event) {
+      public void selectionChanged(SelectionChangedEvent event) {
         final AdHocQueryResult selectedResult = getQueryHistoryTreeSelection();
         f_manager.setSelectedResult(selectedResult);
         if (selectedResult != null)
@@ -56,7 +89,7 @@ public final class QueryResultExplorerMediator extends AdHocManagerAdapter imple
   }
 
   void setFocus() {
-    f_queryHistoryTree.setFocus();
+    f_queryHistoryTree.getTree().setFocus();
   }
 
   private final UIJob f_generalRefreshJob = new SLUIJob() {
@@ -83,66 +116,29 @@ public final class QueryResultExplorerMediator extends AdHocManagerAdapter imple
   }
 
   private void updateQueryHistory() {
-    f_queryHistoryTree.setRedraw(false);
-    f_queryHistoryTree.removeAll();
+    // Change input
+    QueryResultExplorerContentProvider.Input newInput = new QueryResultExplorerContentProvider.Input(f_manager.getRootResultList());
+    f_queryHistoryTree.setInput(newInput);
 
-    for (final AdHocQueryResult result : f_manager.getResultList()) {
-      if (result.getParent() == null) {
-        addResultToTree(result, null);
-      }
-    }
-
-    for (final TreeColumn c : f_queryHistoryTree.getColumns()) {
-      c.pack();
-    }
-    setQueryHistoryTreeSelection(null);
-    f_queryHistoryTree.setRedraw(true);
-  }
-
-  private void addResultToTree(final AdHocQueryResult result, final TreeItem parent) {
-    final TreeItem item;
-    if (parent == null) {
-      item = new TreeItem(f_queryHistoryTree, SWT.NONE);
-    } else {
-      item = new TreeItem(parent, SWT.NONE);
-    }
-    f_queryHistoryTree.showItem(item);
-    item.setText(result.toString());
-    item.setImage(SLImages.getImage(result.getImageSymbolicName()));
-    item.setData(result);
-    for (final AdHocQueryResult child : result.getChildrenList()) {
-      addResultToTree(child, item);
-    }
-  }
-
-  private void setQueryHistoryTreeSelection(final TreeItem parent) {
+    // Set correct selection
     final AdHocQueryResult selectedResult = f_manager.getSelectedResult();
-    final TreeItem[] children;
-    if (parent == null) {
-      f_queryHistoryTree.deselectAll();
-      if (selectedResult == null) {
-        return; // bail nothing to select
-      }
-      children = f_queryHistoryTree.getItems();
-    } else {
-      final AdHocQueryResult itemResult = (AdHocQueryResult) parent.getData();
-      if (itemResult == selectedResult) {
-        f_queryHistoryTree.setSelection(parent);
-        return; // bail only one can be selected
-      }
-      children = parent.getItems();
-    }
-    for (final TreeItem item : children) {
-      setQueryHistoryTreeSelection(item);
-    }
+    if (selectedResult != null)
+      f_queryHistoryTree.setSelection(new StructuredSelection(selectedResult), true);
+    else
+      f_queryHistoryTree.setSelection(StructuredSelection.EMPTY);
+
+    // Show everything
+    f_queryHistoryTree.expandAll();
   }
 
+  @Nullable
   private AdHocQueryResult getQueryHistoryTreeSelection() {
-    final TreeItem[] selectedItems = f_queryHistoryTree.getSelection();
-    if (selectedItems.length == 1) {
-      return (AdHocQueryResult) selectedItems[0].getData();
-    } else {
-      return null;
+    final IStructuredSelection s = (IStructuredSelection) f_queryHistoryTree.getSelection();
+    if (!s.isEmpty()) {
+      final Object o = s.getFirstElement();
+      if (o instanceof AdHocQueryResult)
+        return (AdHocQueryResult) o;
     }
+    return null;
   }
 }

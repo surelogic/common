@@ -53,7 +53,7 @@ public interface IAdHocManagerObserver {
    * may be {@code null} if no result is selected or if there are no results.
    * <p>
    * This is triggered via a client call to
-   * {@link AdHocManager#setSelectedResult(AdHocQueryResult)}.
+   * {@link AdHocManager#notifySelectedResultChange()} on a query manager..
    * 
    * @param result
    *          the selected result or {@code null} if none.
