@@ -6,10 +6,12 @@ import java.util.zip.*;
 public class ZipInfo {
 	private final byte[] readBuffer = new byte[4096];
 	private final ZipOutputStream zos;
+	private final File file;
 	
 	ZipInfo(File zipFile) throws FileNotFoundException {
 		final FileOutputStream fos = new FileOutputStream(zipFile);
 		zos = new ZipOutputStream(fos);
+		file = zipFile;
 	}
 	
 	public void close() throws IOException {
@@ -67,5 +69,9 @@ public class ZipInfo {
 		}
 		// close the Stream
 		fis.close();
+	}
+
+	public File getFile() {
+		return file;
 	}
 }
