@@ -21,7 +21,7 @@ import com.surelogic.common.ui.adhoc.views.QueryResultNavigator;
 
 public abstract class AbstractQueryMenuView extends ViewPart {
 
-  private QueryMenuMediator f_mediator = null;
+  QueryMenuMediator f_mediator = null;
 
   public abstract AdHocManager getManager();
 

@@ -50,22 +50,22 @@ import com.surelogic.common.ui.jobs.SLUIJob;
 
 public final class QueryMenuMediator extends AdHocManagerAdapter implements ILifecycle {
 
-  private final AdHocManager f_manager;
-  private final PageBook f_pageBook;
-  private final Label f_noRunSelected;
-  private final ScrolledComposite f_sc;
-  private final Composite f_content;
-  private final QueryResultNavigator f_navigator;
-  private final Action f_showEmptyQueriesAction;
-  private final Action f_showUnrunnableQueriesAction;
-  private boolean f_showEmptyQueries;
-  private boolean f_showUnrunnableQueries;
+  final AdHocManager f_manager;
+  final PageBook f_pageBook;
+  final Label f_noRunSelected;
+  final ScrolledComposite f_sc;
+  final Composite f_content;
+  final QueryResultNavigator f_navigator;
+  final Action f_showEmptyQueriesAction;
+  final Action f_showUnrunnableQueriesAction;
+  boolean f_showEmptyQueries;
+  boolean f_showUnrunnableQueries;
 
   /**
    * This listener is used on double-click and the context menu to actually run
    * a query.
    */
-  private final Listener f_runQueryListener = new Listener() {
+  final Listener f_runQueryListener = new Listener() {
     @Override
     public void handleEvent(final Event event) {
       final AdHocQuery query = getSelectionOrNull(event.widget);
@@ -74,7 +74,7 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
     }
   };
 
-  private final Listener f_showQuerydocListener = new Listener() {
+  final Listener f_showQuerydocListener = new Listener() {
     @Override
     public void handleEvent(final Event event) {
       final AdHocQuery query = getSelectionOrNull(event.widget);
@@ -314,7 +314,7 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
     }
   }
 
-  private void updateQueryMenu() {
+  void updateQueryMenu() {
     f_content.setRedraw(false);
     // clear out old widget contents
     for (Control child : f_content.getChildren())
@@ -509,7 +509,7 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
   }
 
   @Nullable
-  private AdHocQuery getSelectionOrNull(Widget w) {
+  AdHocQuery getSelectionOrNull(Widget w) {
     AdHocQuery result = null;
     if (w instanceof Table) {
       final Table t = (Table) w;
@@ -533,7 +533,7 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
     return result;
   }
 
-  private List<Table> getTables() {
+  List<Table> getTables() {
     final List<Table> result = new ArrayList<Table>();
     for (Control child : f_content.getChildren()) {
       if (child instanceof Table)

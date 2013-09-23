@@ -73,39 +73,39 @@ import com.surelogic.common.ui.jobs.SLUIJob;
 
 public final class QueryEditorMediator extends AdHocManagerAdapter implements ILifecycle {
 
-  private final AdHocManager f_manager;
-  private final SashForm f_sash;
-  private final Composite f_lhs;
-  private final TabFolder f_lhsFolder;
-  private final Table f_queryList;
-  private final Tree f_queryTree;
-  private final Button f_filterTreeCheck;
-  private final Menu f_queryActionMenu;
-  private final ToolItem f_runQuery;
-  private final ToolItem f_newQuery;
-  private final ToolItem f_deleteQuery;
-  private final ToolItem f_saveQueries;
-  private final PageBook f_rhs;
-  private final Label f_noSelectionPane;
-  private final Composite f_selectionPane;
-  private final Text f_descriptionText;
-  private final Text f_idText;
-  private final Text f_cdText;
-  private final Spinner f_sortHint;
-  private final Combo f_type;
-  private final Button f_noDefaultSubQueryCheck;
-  private final Button f_showCheck;
-  private final Button f_showAtRootCheck;
-  private final TabFolder f_sqlFolder;
-  private final StyledText f_sql;
-  private final ToolItem f_addSubQuery;
-  private final ToolItem f_deleteSubQuery;
-  private final Table f_subQueryTable;
-  private final Table f_usedByTable;
+  final AdHocManager f_manager;
+  final SashForm f_sash;
+  final Composite f_lhs;
+  final TabFolder f_lhsFolder;
+  final Table f_queryList;
+  final Tree f_queryTree;
+  final Button f_filterTreeCheck;
+  final Menu f_queryActionMenu;
+  final ToolItem f_runQuery;
+  final ToolItem f_newQuery;
+  final ToolItem f_deleteQuery;
+  final ToolItem f_saveQueries;
+  final PageBook f_rhs;
+  final Label f_noSelectionPane;
+  final Composite f_selectionPane;
+  final Text f_descriptionText;
+  final Text f_idText;
+  final Text f_cdText;
+  final Spinner f_sortHint;
+  final Combo f_type;
+  final Button f_noDefaultSubQueryCheck;
+  final Button f_showCheck;
+  final Button f_showAtRootCheck;
+  final TabFolder f_sqlFolder;
+  final StyledText f_sql;
+  final ToolItem f_addSubQuery;
+  final ToolItem f_deleteSubQuery;
+  final Table f_subQueryTable;
+  final Table f_usedByTable;
 
-  private final Set<AdHocQuery> f_selections = new HashSet<AdHocQuery>();
-  private AdHocQuery f_edit = null;
-  private boolean f_filterTree = false;
+  final Set<AdHocQuery> f_selections = new HashSet<AdHocQuery>();
+  AdHocQuery f_edit = null;
+  boolean f_filterTree = false;
 
   QueryEditorMediator(AbstractQueryEditorView view, SashForm sash, Composite lhs, TabFolder lhsFolder, Table queryList,
       Tree queryTree, Button filterTreeCheck, Menu queryActionMenu, ToolItem runQuery, ToolItem newQuery, ToolItem deleteQuery,
@@ -503,7 +503,7 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
     job.schedule();
   }
 
-  private void querySelectionAction(final Widget widget) {
+  void querySelectionAction(final Widget widget) {
     /*
      * Remember what queries are selected.
      */
@@ -569,7 +569,7 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
     }
   }
 
-  private void updateQueryListContents() {
+  void updateQueryListContents() {
     f_queryList.setRedraw(false);
     f_queryTree.setRedraw(false);
 
@@ -634,7 +634,7 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
     }
   }
 
-  private void updateSelectionPane() {
+  void updateSelectionPane() {
     f_sql.setRedraw(false);
     final boolean oneQuerySelected = f_selections.size() == 1;
     final boolean oneOrMoreQueriesSelected = !f_selections.isEmpty();
@@ -662,7 +662,7 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
     f_sql.setRedraw(true);
   }
 
-  private void setOnScreenEdit(final AdHocQuery query) {
+  void setOnScreenEdit(final AdHocQuery query) {
     f_edit = query;
     if (f_edit != null) {
       f_manager.setQuerydoc(f_edit); // show Querydoc
@@ -751,7 +751,7 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
     }
   }
 
-  private void runQueryAction() {
+  void runQueryAction() {
     saveAllPossibleTextEditingChanges();
     final AdHocQuery query = f_edit;
     if (query != null && f_manager.getGlobalVariableValues().containsKey(AdHocManager.DATABASE)) {
@@ -769,7 +769,7 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
     }
   }
 
-  private void deleteQueryAction() {
+  void deleteQueryAction() {
     final boolean multiDelete = f_selections.size() > 1;
     final String title;
     if (multiDelete) {
@@ -791,7 +791,7 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
     }
   }
 
-  private void saveQueriesAction() {
+  void saveQueriesAction() {
     saveAllPossibleTextEditingChanges();
     f_manager.tryToPersistToQuerySaveFile();
   }
@@ -804,7 +804,7 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
    * grab the focus. Typically, we save changes to text controls when they lose
    * the focus.
    */
-  private void saveAllPossibleTextEditingChanges() {
+  void saveAllPossibleTextEditingChanges() {
     savePossibleSqlChanges();
     savePossibleDescriptionTextChanges();
     savePossibleSortHintChanges();
@@ -812,33 +812,33 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
     savePossibleTypeChanges();
   }
 
-  private void savePossibleDescriptionTextChanges() {
+  void savePossibleDescriptionTextChanges() {
     if (f_edit.setDescription(f_descriptionText.getText())) {
       f_edit.markAsChanged();
     }
   }
 
-  private void savePossibleCustomDisplayTextChanges() {
+  void savePossibleCustomDisplayTextChanges() {
     if (f_edit.setCustomDisplayClassName(f_cdText.getText())) {
       f_edit.markAsChanged();
     }
   }
 
-  private void savePossibleSortHintChanges() {
+  void savePossibleSortHintChanges() {
     final int value = f_sortHint.getSelection();
     if (f_edit.setSortHint(value)) {
       f_edit.markAsChanged();
     }
   }
 
-  private void savePossibleTypeChanges() {
+  void savePossibleTypeChanges() {
     final AdHocQueryType value = AdHocQueryType.valueOf(f_type.getText());
     if (f_edit.setType(value)) {
       f_edit.markAsChanged();
     }
   }
 
-  private void savePossibleSqlChanges() {
+  void savePossibleSqlChanges() {
     if (f_edit.setSql(f_sql.getText())) {
       f_edit.markAsChanged();
     }
@@ -851,7 +851,7 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
       r.run();
   }
 
-  private void showQueryActionMenu() {
+  void showQueryActionMenu() {
     if (f_selections.size() == 1 && f_edit != null) {
       final MenuItem runItem = new MenuItem(f_queryActionMenu, SWT.PUSH);
       runItem.setText(I18N.msg("adhoc.query.editor.lhs.query.run"));

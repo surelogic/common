@@ -10,7 +10,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.part.ViewPart;
 
+import com.surelogic.NonNull;
+import com.surelogic.Nullable;
 import com.surelogic.common.adhoc.AdHocManager;
+import com.surelogic.common.adhoc.AdHocQueryResult;
 import com.surelogic.common.ui.adhoc.views.QueryResultNavigator;
 
 public abstract class AbstractQueryResultExplorerView extends ViewPart {
@@ -18,6 +21,39 @@ public abstract class AbstractQueryResultExplorerView extends ViewPart {
   private QueryResultExplorerMediator f_mediator = null;
 
   public abstract AdHocManager getManager();
+
+  /**
+   * Provides a label for this view for a particular query result. May be
+   * overridden by implementations to provide custom information.
+   * <p>
+   * The default implementation invokes {@link AdHocQueryResult#toString()} on
+   * the passed result.
+   * 
+   * @param result
+   *          a query result.
+   * @return a label for the passed query result.
+   */
+  @NonNull
+  public String getLabelFor(@NonNull AdHocQueryResult result) {
+    return result.toString();
+  }
+
+  /**
+   * Gives a string to search for in the label for a query result that marks
+   * where to begin using the subtle text color. The dividing text is drawn
+   * using the subtle text color. May be overridden by implementations to
+   * provide custom information which should match what is being returned by
+   * {@link #getLabelFor(AdHocQueryResult)}.
+   * <p>
+   * The default implementation returns <tt>" at "</tt>.
+   * 
+   * @return the text to begin using subtle text color or {@code null} to not
+   *         use subtle text color at all.
+   */
+  @Nullable
+  public String getWhereToStartSubtleTextColor() {
+    return " at ";
+  }
 
   @Override
   public void createPartControl(final Composite parent) {

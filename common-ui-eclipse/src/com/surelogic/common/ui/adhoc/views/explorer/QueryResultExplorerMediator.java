@@ -25,24 +25,25 @@ import com.surelogic.common.ui.jobs.SLUIJob;
 
 public final class QueryResultExplorerMediator extends AdHocManagerAdapter implements ILifecycle {
 
-  private final AdHocManager f_manager;
-  private final QueryResultNavigator f_navigator;
-  private final TreeViewer f_queryHistoryTree;
-  private final QueryResultExplorerContentProvider f_contentProvider = new QueryResultExplorerContentProvider();
+  final AbstractQueryResultExplorerView f_view;
+  final AdHocManager f_manager;
+  final QueryResultNavigator f_navigator;
+  final TreeViewer f_queryHistoryTree;
+  final QueryResultExplorerContentProvider f_contentProvider = new QueryResultExplorerContentProvider();
 
-  static final StyledCellLabelProvider TREE = new StyledCellLabelProvider() {
+  class ResultExplorerCellLabelProvide extends StyledCellLabelProvider {
 
     @Override
     public void update(ViewerCell cell) {
       final Object rawElement = cell.getElement();
       if (rawElement instanceof AdHocQueryResult) {
         final AdHocQueryResult result = (AdHocQueryResult) rawElement;
-        final String label = result.toString();
+        final String label = f_view.getLabelFor(result);
 
         /*
          * Match Eclipse with uses subtle text color for " at time"
          */
-        final int colonIndex = label.lastIndexOf(" at ");
+        final int colonIndex = label.lastIndexOf(f_view.getWhereToStartSubtleTextColor());
         if (colonIndex != -1) {
           StyleRange[] ranges = { new StyleRange(colonIndex, label.length(), EclipseColorUtility.getSubtleTextColor(), null) };
           cell.setStyleRanges(ranges);
@@ -57,6 +58,7 @@ public final class QueryResultExplorerMediator extends AdHocManagerAdapter imple
 
   public QueryResultExplorerMediator(final AbstractQueryResultExplorerView view, final TreeViewer queryHistoryTree,
       final QueryResultNavigator navigator) {
+    f_view = view;
     f_manager = view.getManager();
     f_queryHistoryTree = queryHistoryTree;
     f_navigator = navigator;
@@ -67,7 +69,7 @@ public final class QueryResultExplorerMediator extends AdHocManagerAdapter imple
     f_navigator.init();
 
     f_queryHistoryTree.setContentProvider(f_contentProvider);
-    f_queryHistoryTree.setLabelProvider(TREE);
+    f_queryHistoryTree.setLabelProvider(new ResultExplorerCellLabelProvide());
 
     f_queryHistoryTree.addSelectionChangedListener(new ISelectionChangedListener() {
       @Override
@@ -115,7 +117,7 @@ public final class QueryResultExplorerMediator extends AdHocManagerAdapter imple
     generalRefresh();
   }
 
-  private void updateQueryHistory() {
+  void updateQueryHistory() {
     // Change input
     QueryResultExplorerContentProvider.Input newInput = new QueryResultExplorerContentProvider.Input(f_manager.getRootResultList());
     f_queryHistoryTree.setInput(newInput);
@@ -132,7 +134,7 @@ public final class QueryResultExplorerMediator extends AdHocManagerAdapter imple
   }
 
   @Nullable
-  private AdHocQueryResult getQueryHistoryTreeSelection() {
+  AdHocQueryResult getQueryHistoryTreeSelection() {
     final IStructuredSelection s = (IStructuredSelection) f_queryHistoryTree.getSelection();
     if (!s.isEmpty()) {
       final Object o = s.getFirstElement();

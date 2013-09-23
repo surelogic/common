@@ -44,25 +44,25 @@ import com.surelogic.common.ui.jobs.SLUIJob;
 
 public final class CategoryEditorMediator extends AdHocManagerAdapter implements ILifecycle {
 
-  private final AdHocManager f_manager;
-  private final SashForm f_sash;
-  private final Composite f_lhs;
-  private final Table f_categoryList;
-  private final Menu f_categoryActionMenu;
-  private final ToolItem f_newCategory;
-  private final ToolItem f_deleteCategory;
-  private final PageBook f_rhs;
-  private final Label f_noSelectionPane;
-  private final Composite f_selectionPane;
-  private final Text f_descriptionText;
-  private final Text f_idText;
-  private final Text f_hasDataText;
-  private final Text f_noDataText;
-  private final Spinner f_sortHint;
-  private final Table f_queryTable;
+  final AdHocManager f_manager;
+  final SashForm f_sash;
+  final Composite f_lhs;
+  final Table f_categoryList;
+  final Menu f_categoryActionMenu;
+  final ToolItem f_newCategory;
+  final ToolItem f_deleteCategory;
+  final PageBook f_rhs;
+  final Label f_noSelectionPane;
+  final Composite f_selectionPane;
+  final Text f_descriptionText;
+  final Text f_idText;
+  final Text f_hasDataText;
+  final Text f_noDataText;
+  final Spinner f_sortHint;
+  final Table f_queryTable;
 
-  private final Set<AdHocCategory> f_selections = new HashSet<AdHocCategory>();
-  private AdHocCategory f_edit = null;
+  final Set<AdHocCategory> f_selections = new HashSet<AdHocCategory>();
+  AdHocCategory f_edit = null;
 
   CategoryEditorMediator(AbstractCategoryEditorView view, SashForm sash, Composite lhs, Table categoryList,
       Menu categoryActionMenu, ToolItem newCategory, ToolItem deleteCategory, PageBook rhs, Label noSelectionPane,
@@ -216,7 +216,7 @@ public final class CategoryEditorMediator extends AdHocManagerAdapter implements
     job.schedule();
   }
 
-  private void showCategoryActionMenu() {
+  void showCategoryActionMenu() {
     final MenuItem deleteItem = new MenuItem(f_categoryActionMenu, SWT.PUSH);
     deleteItem.setText(I18N.msg("adhoc.query.editor.category.delete"));
     deleteItem.setImage(SLImages.getImage(CommonImages.IMG_EDIT_DELETE));
@@ -228,7 +228,7 @@ public final class CategoryEditorMediator extends AdHocManagerAdapter implements
     });
   }
 
-  private void updateCategoryListContents() {
+  void updateCategoryListContents() {
     f_categoryList.setRedraw(false);
 
     f_categoryList.removeAll();
@@ -365,25 +365,25 @@ public final class CategoryEditorMediator extends AdHocManagerAdapter implements
     }
   }
 
-  private void savePossibleDescriptionTextChanges() {
+  void savePossibleDescriptionTextChanges() {
     if (f_edit.setDescription(f_descriptionText.getText())) {
       f_edit.markAsChanged();
     }
   }
 
-  private void savePossibleHasDataTextChanges() {
+  void savePossibleHasDataTextChanges() {
     if (f_edit.setHasDataText(f_hasDataText.getText())) {
       f_edit.markAsChanged();
     }
   }
 
-  private void savePossibleNoDataTextChanges() {
+  void savePossibleNoDataTextChanges() {
     if (f_edit.setNoDataText(f_noDataText.getText())) {
       f_edit.markAsChanged();
     }
   }
 
-  private void savePossibleSortHintChanges() {
+  void savePossibleSortHintChanges() {
     final int value = f_sortHint.getSelection();
     if (f_edit.setSortHint(value)) {
       f_edit.markAsChanged();

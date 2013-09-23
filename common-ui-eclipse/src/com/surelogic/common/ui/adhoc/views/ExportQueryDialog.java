@@ -29,7 +29,7 @@ import com.surelogic.common.adhoc.AdHocQuery;
 
 public final class ExportQueryDialog extends Dialog {
 
-  private final AdHocManager f_manager;
+  final AdHocManager f_manager;
 
   private Mediator f_mediator = null;
 
@@ -115,17 +115,17 @@ public final class ExportQueryDialog extends Dialog {
       }
     };
 
-    private final Button f_exportAllToggle;
+    final Button f_exportAllToggle;
 
-    private final Group f_queryGroup;
+    final Group f_queryGroup;
 
-    private final Table f_queryTable;
+    final Table f_queryTable;
 
-    private final Text f_fileNameText;
+    final Text f_fileNameText;
 
-    private final Button f_browseButton;
+    final Button f_browseButton;
 
-    private FileDialog fd = null;
+    FileDialog fd = null;
 
     Mediator(final Button exportAllToggle, final Group queryGroup, final Table queryTable, final Text fileNameText,
         final Button browseButton) {
@@ -182,7 +182,7 @@ public final class ExportQueryDialog extends Dialog {
       AdHocPersistence.exportDefaultFile(f_manager, selectedQueries, exportFile);
     }
 
-    private void setDialogState() {
+    void setDialogState() {
       final String fileName = f_fileNameText.getText();
       setOKEnabled(!("".equals(fileName)));
       final boolean queryEnabled = !f_exportAllToggle.getSelection();

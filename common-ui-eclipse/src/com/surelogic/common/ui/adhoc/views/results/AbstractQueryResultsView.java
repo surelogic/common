@@ -79,9 +79,9 @@ public abstract class AbstractQueryResultsView extends ViewPart {
 
   public abstract AdHocManager getManager();
 
-  private Composite f_parent = null;
-  private QueryResultNavigator f_navigator = null;
-  private AdHocQueryResult f_result = null;
+  Composite f_parent = null;
+  QueryResultNavigator f_navigator = null;
+  AdHocQueryResult f_result = null;
 
   @Override
   public void createPartControl(final Composite parent) {
@@ -623,7 +623,7 @@ public abstract class AbstractQueryResultsView extends ViewPart {
    * @param query
    *          the query to open in the query editor.
    */
-  private void editQueryInQueryEditor(final AdHocQuery query) {
+  void editQueryInQueryEditor(final AdHocQuery query) {
     final String viewId = query.getManager().getDataSource().getQueryEditorViewId();
     if (viewId != null) {
       final IViewPart view = EclipseUIUtility.showView(viewId);

@@ -43,7 +43,7 @@ import com.surelogic.common.ui.jobs.SLUIJob;
 
 public abstract class AbstractQueryEditorView extends ViewPart {
 
-  private QueryEditorMediator f_mediator = null;
+  QueryEditorMediator f_mediator = null;
 
   public abstract AdHocManager getManager();
 

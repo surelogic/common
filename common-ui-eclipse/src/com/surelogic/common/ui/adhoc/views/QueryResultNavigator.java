@@ -69,15 +69,15 @@ public final class QueryResultNavigator extends AdHocManagerAdapter implements I
 
   private final IAdHocDataSource f_source;
 
-  private AdHocManager getAdHocManager() {
+  AdHocManager getAdHocManager() {
     return AdHocManager.getInstance(f_source);
   }
 
-  private AdHocQueryResult getSelectedResult() {
+  AdHocQueryResult getSelectedResult() {
     return getAdHocManager().getSelectedResult();
   }
 
-  private AdHocQueryResult getBackwardTarget() {
+  AdHocQueryResult getBackwardTarget() {
     final AdHocQueryResult selected = getSelectedResult();
     if (selected != null) {
       final AdHocQueryResult target = selected.getParent();
@@ -100,7 +100,7 @@ public final class QueryResultNavigator extends AdHocManagerAdapter implements I
     return f_backward;
   }
 
-  private AdHocQueryResult getForwardTarget() {
+  AdHocQueryResult getForwardTarget() {
     final AdHocQueryResult selected = getSelectedResult();
     if (selected != null) {
       if (selected.hasChildren()) {
@@ -292,7 +292,7 @@ public final class QueryResultNavigator extends AdHocManagerAdapter implements I
   /**
    * Must be run from the SWT thread.
    */
-  private void updateControlState() {
+  void updateControlState() {
     final boolean aResultExists = getAdHocManager().getResultCount() > 0;
     final AdHocQueryResult result = getSelectedResult();
     boolean hasAParent = false;
