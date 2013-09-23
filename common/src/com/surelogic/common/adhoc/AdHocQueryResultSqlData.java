@@ -3,6 +3,7 @@ package com.surelogic.common.adhoc;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.surelogic.NonNull;
 import com.surelogic.common.CommonImages;
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.adhoc.model.AdornedTreeTableModel;
@@ -193,7 +194,13 @@ public final class AdHocQueryResultSqlData extends AdHocQueryResult {
   }
 
   @Override
+  @NonNull
+  public String getRowCountInformationAsHumanReadableString() {
+    return getModel().getRowCountAsHumanReadableString();
+  }
+
+  @Override
   public String toString() {
-    return super.toString() + " - " + getModel().getRowCountAsHumanReadableString();
+    return super.toString() + " - " + getRowCountInformationAsHumanReadableString();
   }
 }

@@ -213,6 +213,18 @@ public abstract class AdHocQueryResult {
     return f_data;
   }
 
+  /**
+   * Gets the rows returned or other descriptive information about this result
+   * as a string.
+   * <p>
+   * Implementations may decide what should be returned.
+   * 
+   * @return the rows returned or other descriptive information about this
+   *         result as a string.
+   */
+  @NonNull
+  public abstract String getRowCountInformationAsHumanReadableString();
+
   @Override
   public String toString() {
     return f_query.getQuery().getDescription() + " at " + SLUtility.toStringDayHMS(f_timeQueryWasRun);

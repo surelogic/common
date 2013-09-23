@@ -35,4 +35,10 @@ public final class AdHocQueryResultEmpty extends AdHocQueryResult {
     }
     return I18N.msg("adhoc.query.results.empty.msg");
   }
+
+  @Override
+  @NonNull
+  public String getRowCountInformationAsHumanReadableString() {
+    return "no rows";
+  }
 }

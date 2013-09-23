@@ -2,6 +2,7 @@ package com.surelogic.common.adhoc;
 
 import java.sql.SQLException;
 
+import com.surelogic.NonNull;
 import com.surelogic.common.CommonImages;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.jdbc.DBConnection;
@@ -29,4 +30,10 @@ public final class AdHocQueryResultSqlException extends AdHocQueryResult {
 	public String getImageSymbolicName() {
 		return CommonImages.IMG_ERROR;
 	}
+
+  @Override
+  @NonNull
+  public String getRowCountInformationAsHumanReadableString() {
+    return "query failed";
+  }
 }
