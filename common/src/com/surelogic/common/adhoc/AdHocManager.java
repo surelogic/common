@@ -639,10 +639,12 @@ public final class AdHocManager {
    *          the one query result that is selected and displayed to the user.
    *          May be set to {@code null} to indicate that no result is currently
    *          selected.
+   * @return {@code true} if something changed and observers were notified,
+   *         {@code false} otherwise.
    * @throws IllegalArgumentException
    *           if the passed result is not managed by this manager.
    */
-  public void setSelectedResult(final AdHocQueryResult result) {
+  public boolean setSelectedResult(final AdHocQueryResult result) {
     if (result != null && !f_results.contains(result)) {
       throw new IllegalArgumentException(I18N.err(126, "setSelectedResult", result));
     }
@@ -654,6 +656,7 @@ public final class AdHocManager {
     if (notify) {
       notifySelectedResultChange();
     }
+    return notify;
   }
 
   /**

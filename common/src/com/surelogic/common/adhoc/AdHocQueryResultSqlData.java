@@ -194,16 +194,6 @@ public final class AdHocQueryResultSqlData extends AdHocQueryResult {
 
   @Override
   public String toString() {
-    String result = super.toString();
-    int rows = getModel().getRowCount();
-    final String rowString;
-    if (rows < 1) {
-      rowString = " - no rows";
-    } else if (rows == 1) {
-      rowString = " - one row";
-    } else {
-      rowString = " - " + rows + " rows";
-    }
-    return result + rowString;
+    return super.toString() + " - " + getModel().getRowCountAsHumanReadableString();
   }
 }

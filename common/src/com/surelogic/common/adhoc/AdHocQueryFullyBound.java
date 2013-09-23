@@ -78,6 +78,17 @@ public final class AdHocQueryFullyBound {
     return new HashMap<String, String>(f_variableValues);
   }
 
+  /**
+   * Gets the value for the passed variable.
+   * 
+   * @param variable
+   *          a variable name.
+   * @return the value for the variable or {@code null} if none.
+   */
+  public String getVariableValueOrNull(String variable) {
+    return f_variableValues.get(variable);
+  }
+
   private final Map<String, String> f_topVariableValues;
 
   /**

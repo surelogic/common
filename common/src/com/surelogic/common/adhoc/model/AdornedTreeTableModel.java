@@ -709,6 +709,25 @@ public final class AdornedTreeTableModel {
   }
 
   /**
+   * Gets the number of rows as a human readable string. For example,
+   * <tt>no rows</tt> or <tt>1,300 rows</tt>.
+   * 
+   * @return the number of rows as a human readable string.
+   */
+  public String getRowCountAsHumanReadableString() {
+    final String rowString;
+    final int rows = getRowCount();
+    if (rows < 1) {
+      rowString = "no rows";
+    } else if (rows == 1) {
+      rowString = "one row";
+    } else {
+      rowString = SLUtility.toStringHumanWithCommas(rows) + " rows";
+    }
+    return rowString;
+  }
+
+  /**
    * Gets a table representation of this model. The table representation
    * includes the tree part represented as a table. To determine the last column
    * used in the tree part invoke the {@link #getLastTreeIndex()} method.
