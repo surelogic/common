@@ -3,14 +3,15 @@ package com.surelogic.common.ui.adhoc.views.explorer;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.StyledCellLabelProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.ViewerCell;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyleRange;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.progress.UIJob;
 
 import com.surelogic.Nullable;
@@ -71,9 +72,9 @@ public final class QueryResultExplorerMediator extends AdHocManagerAdapter imple
     f_queryHistoryTree.setContentProvider(f_contentProvider);
     f_queryHistoryTree.setLabelProvider(new ResultExplorerCellLabelProvide());
 
-    f_queryHistoryTree.addSelectionChangedListener(new ISelectionChangedListener() {
+    f_queryHistoryTree.getTree().addListener(SWT.Selection, new Listener() {
       @Override
-      public void selectionChanged(SelectionChangedEvent event) {
+      public void handleEvent(final Event event) {
         final AdHocQueryResult selectedResult = getQueryHistoryTreeSelection();
         f_manager.setSelectedResult(selectedResult);
         if (selectedResult != null)
