@@ -500,7 +500,7 @@ public class Config extends AbstractClassPathEntry {
 	public void clear() {
 		classPath.clear();
 		files.clear();
-		options.clear();
+		//options.clear();
 		origFiles.clear();
 		pathMapping.clear();
 		pkgs.clear();
