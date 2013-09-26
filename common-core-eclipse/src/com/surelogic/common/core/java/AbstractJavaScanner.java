@@ -184,6 +184,10 @@ public abstract class AbstractJavaScanner<PS extends JavaProjectSet<P>, P extend
 		return projectMap.get(proj);
 	}
 	
+	protected final Iterable<IProject> getProjects() {
+		return projectMap.keySet();
+	}
+	
 	/**
 	 * Register resources
 	 */
