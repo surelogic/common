@@ -38,9 +38,9 @@ public class JavaBuild {
 			Integer.toString(IncrementalProjectBuilder.FULL_BUILD));	
 
 	public static <PS extends JavaProjectSet<P>, P extends ISLJavaProject>
-	boolean analyze(AbstractJavaScanner<PS, P> scanner, List<IJavaProject> selectedProjects, IErrorListener l) {
+	PS analyze(AbstractJavaScanner<PS, P> scanner, List<IJavaProject> selectedProjects, IErrorListener l) {
 		if (selectedProjects == null || selectedProjects.isEmpty())
-			return false;
+			return null;
 		try {
 			scanner.clearProjectInfo();
 			
@@ -55,13 +55,13 @@ public class JavaBuild {
 								"JSure is unable to analyze "
 								+ p.getElementName()
 								+ " due to some compilation errors.  Please fix (or do a clean build).");
-						return false;
+						return null;
 					}
 				}
 			} catch(IllegalStateException e) {
 				l.reportError("Error within Eclipse", 
 						"JSure is unable to determine if there are any compilation errors, due to problems within Eclipse:\n\t"+e.getMessage());
-				return false;
+				return null;
 			}
 			// Setup project info
 			for (IJavaProject p : selectedProjects) {
@@ -76,12 +76,11 @@ public class JavaBuild {
 			}
 
 			SLLogger.getLogger().fine("Configuring explicit build");
-			scanner.doExplicitBuild(buildArgs, true);
-			return true;
+			return scanner.doExplicitBuild(buildArgs, true);
 		} catch (CoreException e) {
 			SLLogger.getLogger().log(Level.SEVERE,
 					"Failure setting up to analyze: " + selectedProjects, e);
-			return false;
+			return null;
 		}
 	}
 }

@@ -227,18 +227,18 @@ public abstract class AbstractJavaScanner<PS extends JavaProjectSet<P>, P extend
 	}
 	
 	@SuppressWarnings({ "rawtypes" })
-	public void doExplicitBuild(Map args, boolean ignoreNature) {
-	    configureBuild(args, ignoreNature);
+	public PS doExplicitBuild(Map args, boolean ignoreNature) {
+	    return configureBuild(args, ignoreNature);
 	}
 
 	@SuppressWarnings({ "rawtypes" })
-	public void configureBuild(Map args, boolean ignoreNature) {
+	public PS configureBuild(Map args, boolean ignoreNature) {
 		final int k = getBuildKind(args);
-		configureBuild(EclipseUtility.getWorkspacePath(),
+		return configureBuild(EclipseUtility.getWorkspacePath(),
 				(k & IncrementalProjectBuilder.AUTO_BUILD) == IncrementalProjectBuilder.AUTO_BUILD, ignoreNature);
 	}
 	
-	public void configureBuild(File location, boolean isAuto /* IProject p */, boolean ignoreNature) {
+	public PS configureBuild(File location, boolean isAuto /* IProject p */, boolean ignoreNature) {
 		ConfigureJob configure = new ConfigureJob("Configuring JSure build", location, isAuto, args, ignoreNature);
 
 		synchronized (this) {
@@ -255,6 +255,7 @@ public abstract class AbstractJavaScanner<PS extends JavaProjectSet<P>, P extend
 				EclipseUtility.toEclipseJob(configure).schedule();
 			}
 		}
+		return configure.projects;
 	}
 	
 	public static SLStatus waitForBuild(boolean isAuto) {
