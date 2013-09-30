@@ -1,5 +1,7 @@
 package com.surelogic.common.adhoc.model;
 
+import com.surelogic.NonNull;
+
 /**
  * Abstract class that describes of a cell in an {@link AdornedTreeTableModel}.
  */
@@ -27,6 +29,7 @@ public abstract class AbstractCell {
   /**
    * The text to be displayed in this cell.
    */
+  @NonNull
   private String f_text;
 
   /**
@@ -34,6 +37,7 @@ public abstract class AbstractCell {
    * 
    * @return the non-null text to be displayed in this cell.
    */
+  @NonNull
   public final String getText() {
     return f_text;
   }

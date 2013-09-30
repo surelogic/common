@@ -462,22 +462,25 @@ public final class AdornedTreeTableModel {
 
           } else if (info.countPartialRows()) {
             /*
-             * COUNT (DISTINCT)
+             * COUNT (DISTINCT) (NONEMPTY)
              */
             if (info.onSetContains(cell.filledColumnCount())) {
               final boolean distinct = info.countDistinct();
+              final boolean allowEmptyValues = !info.countNonempty();
               final String replaceValueWith = info.getCountReplaceValueWith();
               final Set<String> distinctFound = new HashSet<String>();
               int countTotal = 0;
               for (final LeafTreeCell leaf : cell.getLeaves()) {
                 final Cell adornedCell = adornedRows[leaf.getRowIndex()][colI];
+                final String contents = adornedCell.getText();
+                final boolean considerInCount = allowEmptyValues || !contents.trim().isEmpty();
                 if (distinct) {
-                  final String contents = adornedCell.getText();
-                  if (distinctFound.add(contents)) {
-                    countTotal++;
-                  }
+                  if (considerInCount)
+                    if (distinctFound.add(contents))
+                      countTotal++;
                 } else {
-                  countTotal++;
+                  if (considerInCount)
+                    countTotal++;
                 }
                 if (replaceValueWith != null) {
                   cellsToReplaceText.add(new Pair<Cell, String>(adornedCell, replaceValueWith));
@@ -489,6 +492,27 @@ public final class AdornedTreeTableModel {
                   + (info.getAddCommas() ? SLUtility.toStringHumanWithCommas(countTotal) : simpleText) + info.getAggregateSuffix();
               final NonLeafColumnSummaryCell columnSummary = new NonLeafColumnSummaryCell(text, blankText, colI);
               cell.addColumnSummary(columnSummary);
+            }
+          } else if (info.containsPartialRows()) {
+            /*
+             * CONTAINS 'X' SHOW 'Y'
+             */
+            if (info.onSetContains(cell.filledColumnCount())) {
+              boolean show = false;
+              final String containsValue = info.getContainsValue();
+              for (final LeafTreeCell leaf : cell.getLeaves()) {
+                final Cell adornedCell = adornedRows[leaf.getRowIndex()][colI];
+                final String contents = adornedCell.getText();
+                if (contents.equals(containsValue))
+                  show = true;
+              }
+              if (show) {
+                final String showText = info.getShowValue();
+                final boolean blankText = showText.equals(info.getBlankIf());
+                final String text = info.getAggregatePrefix() + showText + info.getAggregateSuffix();
+                final NonLeafColumnSummaryCell columnSummary = new NonLeafColumnSummaryCell(text, blankText, colI);
+                cell.addColumnSummary(columnSummary);
+              }
             }
           }
         }
