@@ -255,6 +255,51 @@ public final class ColumnAnnotation {
     f_countNonempty = value;
   }
 
+  private boolean f_containsPartialRows = false;
+
+  public boolean containsPartialRows() {
+    return f_containsPartialRows;
+  }
+
+  /**
+   * Do not call this method. It should only be called by the parser.
+   */
+  public void setContainsPartialRows(final boolean value) {
+    f_containsPartialRows = value;
+  }
+
+  /**
+   * The X in (contains X show Y)
+   */
+  private String f_containsValue = "";
+
+  public String getContainsValue() {
+    return f_containsValue;
+  }
+
+  /**
+   * Do not call this method. It should only be called by the parser.
+   */
+  public void setContainsValue(final String value) {
+    f_containsValue = stripSingleQuotes(value);
+  }
+
+  /**
+   * The Y in (contains X show Y)
+   */
+  private String f_showValue = "";
+
+  public String getShowValue() {
+    return f_showValue;
+  }
+
+  /**
+   * Do not call this method. It should only be called by the parser.
+   */
+  public void setShowValue(final String value) {
+    f_showValue = stripSingleQuotes(value);
+  }
+
   private final Set<Integer> f_onSet = new HashSet<Integer>();
 
   public Set<Integer> getOnSet() {
