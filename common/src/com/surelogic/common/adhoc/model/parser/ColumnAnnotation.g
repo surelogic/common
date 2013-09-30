@@ -65,7 +65,7 @@ columnAnnotation returns [ColumnAnnotation result]
 
 annotationPart
 	: treeTableSpec
-	| '(' (hideSpec | iconSpec | justSpec | affixSpec | numSpec | blankIfSpec | countSpec | sumSpec | maxSpec) ')'
+	| '(' (hideSpec | iconSpec | justSpec | affixSpec | numSpec | blankIfSpec | countSpec | sumSpec | maxSpec | containsSpec) ')'
 	;
 
 treeTableSpec
@@ -113,17 +113,32 @@ blankIfSpec
 	;
 
 countSpec
-	: 'count' { f_column.setCountPartialRows(true); } distinctPart? replaceValuePart? onPart? prefixPart? suffixPart?
+	: 'count' { f_column.setCountPartialRows(true); } distinctPart?  nonemptyPart? replaceValuePart? onPart? prefixPart? suffixPart?
 	;
 
-sumSpec : 'sum' { f_column.setSumPartialRows(true); } onPart? prefixPart? suffixPart?
+sumSpec
+    : 'sum' { f_column.setSumPartialRows(true); } onPart? prefixPart? suffixPart?
 	;
 	
-maxSpec : 'max' { f_column.setMaxPartialRows(true); } onPart? prefixPart? suffixPart?
+maxSpec
+    : 'max' { f_column.setMaxPartialRows(true); } onPart? prefixPart? suffixPart?
 	;
+	
+containsSpec
+    : 'contains' { f_column.setContainsPartialRows(true); } showPart onPart? prefixPart? suffixPart?
+	;
+	
+showPart
+	: cValue=QUOTED_STRING 'show' sValue=QUOTED_STRING { f_column.setContainsValue($cValue.text);  f_column.setShowValue($sValue.text);}
+	;
+
 
 distinctPart
 	: 'distinct' { f_column.setCountDistinct(true); }
+	;
+
+nonemptyPart
+	: 'nonempty' { f_column.setCountNonempty(true); }
 	;
 
 onPart
