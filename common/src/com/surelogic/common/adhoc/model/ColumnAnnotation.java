@@ -242,6 +242,19 @@ public final class ColumnAnnotation {
     f_countDistinct = value;
   }
 
+  private boolean f_countNonempty = false;
+
+  public boolean countNonempty() {
+    return f_countNonempty;
+  }
+
+  /**
+   * Do not call this method. It should only be called by the parser.
+   */
+  public void setCountNonempty(final boolean value) {
+    f_countNonempty = value;
+  }
+
   private final Set<Integer> f_onSet = new HashSet<Integer>();
 
   public Set<Integer> getOnSet() {

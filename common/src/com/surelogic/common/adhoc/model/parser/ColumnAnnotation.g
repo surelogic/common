@@ -113,7 +113,7 @@ blankIfSpec
 	;
 
 countSpec
-	: 'count' { f_column.setCountPartialRows(true); } distinctPart? replaceValuePart? onPart? prefixPart? suffixPart?
+	: 'count' { f_column.setCountPartialRows(true); } distinctPart? nonemptyPart? replaceValuePart? onPart? prefixPart? suffixPart?
 	;
 
 sumSpec : 'sum' { f_column.setSumPartialRows(true); } onPart? prefixPart? suffixPart?
@@ -124,6 +124,10 @@ maxSpec : 'max' { f_column.setMaxPartialRows(true); } onPart? prefixPart? suffix
 
 distinctPart
 	: 'distinct' { f_column.setCountDistinct(true); }
+	;
+
+nonemptyPart
+	: 'nonempty' { f_column.setCountNonempty(true); }
 	;
 
 onPart
