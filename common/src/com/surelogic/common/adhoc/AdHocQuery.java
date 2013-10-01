@@ -249,14 +249,32 @@ public final class AdHocQuery implements AdHocIdentity {
   }
 
   /**
-   * Special meta name for Querydoc.
+   * The comments of a query can use the special meta comment doc to provide
+   * HTML documentation for a query that will be displayed to the user about the
+   * query. This "querydoc" is defined by the contents of this meta.
    */
   public static final String META_QUERYDOC_NAME = "doc";
 
   /**
-   * Special meta name for no rows message.
+   * When a query executes successfully but results in zero rows being returned
+   * it is often desirable to output a query specific message rather than the
+   * default message. The contents of this meta define a custom no rows message.
    */
   public static final String META_NO_ROWS_NAME = "no-rows";
+
+  /**
+   * When a query returns tabular results, the user interface allows the user to
+   * sort by the contents of any column by clicking on that column's header.
+   * This is helpful to allow the user to arrange complex data, but does not
+   * make sense for all tabular results. In particular, results that show stack
+   * traces or any result where the row order is critical to communicate the
+   * result should not allow user column sorting.
+   * <p>
+   * Use this meta with any value to disable the column header sort capability.
+   * <p>
+   * This meta only applies to tabular results, trees and tree-tables ignore it.
+   */
+  public static final String META_DISABLE_COLUMN_SORT = "disable-column-sort";
 
   /*
    * Special names for Flashlight (here so we don't spell them wrong)

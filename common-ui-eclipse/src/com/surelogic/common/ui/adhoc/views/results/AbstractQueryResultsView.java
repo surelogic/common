@@ -348,6 +348,8 @@ public abstract class AbstractQueryResultsView extends ViewPart {
       table.setLinesVisible(true);
       table.setMenu(menu);
 
+      boolean allowColumnSorting = data.getQueryFullyBound().getQuery().getMetaWithName(AdHocQuery.META_DISABLE_COLUMN_SORT) == null;
+
       // add the columns
       final String[] columnLabels = model.getColumnLabels();
       for (int colI = 0; colI < model.getColumnCount(); colI++) {
@@ -361,7 +363,8 @@ public abstract class AbstractQueryResultsView extends ViewPart {
           } else if (justification == Justification.CENTER) {
             column.setAlignment(SWT.CENTER);
           }
-          column.addListener(SWT.Selection, TableUtility.SORT_COLUMN_NUMERICALLY_THEN_LEXICALLY);
+          if (allowColumnSorting)
+            column.addListener(SWT.Selection, TableUtility.SORT_COLUMN_NUMERICALLY_THEN_LEXICALLY);
           column.setMoveable(true);
         }
       }
