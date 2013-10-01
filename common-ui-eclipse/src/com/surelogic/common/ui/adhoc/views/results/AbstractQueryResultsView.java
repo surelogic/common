@@ -227,7 +227,7 @@ public abstract class AbstractQueryResultsView extends ViewPart {
         && (result instanceof AdHocQueryResultSqlException || result instanceof AdHocQueryResultSqlUpdateCount)) {
       queryDescription.setText(result.toLinkString());
     } else {
-      queryDescription.setText(result.toString());
+      queryDescription.setText(result.getQueryFullyBound().getQuery().getDescription());
     }
     gridData = new GridData(SWT.DEFAULT, SWT.CENTER, true, false);
     queryDescription.setLayoutData(gridData);

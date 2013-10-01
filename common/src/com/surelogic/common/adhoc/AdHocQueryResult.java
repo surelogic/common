@@ -231,6 +231,6 @@ public abstract class AdHocQueryResult {
   }
 
   public String toLinkString() {
-    return "<A HREF=\"edit\">" + f_query.getQuery().getDescription() + "</A> at " + SLUtility.toStringDayHMS(f_timeQueryWasRun);
+    return "<A HREF=\"edit\">" + f_query.getQuery().getDescription() + "</A>";
   }
 }
