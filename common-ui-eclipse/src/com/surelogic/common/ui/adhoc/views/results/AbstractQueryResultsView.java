@@ -230,8 +230,9 @@ public abstract class AbstractQueryResultsView extends ViewPart {
     } else {
       queryDescription.setText(result.getQueryFullyBound().getQuery().getDescription());
     }
-    gridData = new GridData(SWT.DEFAULT, SWT.CENTER, true, false);
+    gridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
     queryDescription.setLayoutData(gridData);
+    queryDescription.setBackground(queryDescription.getDisplay().getSystemColor(SWT.COLOR_GREEN));
     queryDescription.addListener(SWT.Selection, new Listener() {
       @Override
       public void handleEvent(final Event event) {
