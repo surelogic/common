@@ -45,6 +45,7 @@ import org.eclipse.ui.part.ViewPart;
 import com.surelogic.Nullable;
 import com.surelogic.common.CommonImages;
 import com.surelogic.common.Justification;
+import com.surelogic.common.XUtil;
 import com.surelogic.common.adhoc.AdHocManager;
 import com.surelogic.common.adhoc.AdHocQuery;
 import com.surelogic.common.adhoc.AdHocQueryFullyBound;
@@ -221,10 +222,10 @@ public abstract class AbstractQueryResultsView extends ViewPart {
     final Link queryDescription = new Link(panel, SWT.NONE);
     /*
      * Add a hyperlink to edit the query if the result was a failure or an
-     * update count.
+     * update count OR if -DSureLogicX=on
      */
-    if (result.getManager().getDataSource().getQueryEditorViewId() != null
-        && (result instanceof AdHocQueryResultSqlException || result instanceof AdHocQueryResultSqlUpdateCount)) {
+    if (XUtil.useExperimental
+        || (result.getManager().getDataSource().getQueryEditorViewId() != null && (result instanceof AdHocQueryResultSqlException || result instanceof AdHocQueryResultSqlUpdateCount))) {
       queryDescription.setText(result.toLinkString());
     } else {
       queryDescription.setText(result.getQueryFullyBound().getQuery().getDescription());
