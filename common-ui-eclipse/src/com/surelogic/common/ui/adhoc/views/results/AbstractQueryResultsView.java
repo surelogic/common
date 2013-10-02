@@ -232,7 +232,6 @@ public abstract class AbstractQueryResultsView extends ViewPart {
     }
     gridData = new GridData(SWT.FILL, SWT.CENTER, true, false);
     queryDescription.setLayoutData(gridData);
-    queryDescription.setBackground(queryDescription.getDisplay().getSystemColor(SWT.COLOR_GREEN));
     queryDescription.addListener(SWT.Selection, new Listener() {
       @Override
       public void handleEvent(final Event event) {
