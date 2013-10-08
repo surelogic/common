@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -50,8 +49,6 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.PageBook;
 import org.eclipse.ui.progress.UIJob;
-import org.jdesktop.core.animation.timing.TimingSource;
-import org.jdesktop.swt.animation.timing.sources.SWTTimingSource;
 
 import com.surelogic.common.CommonImages;
 import com.surelogic.common.ILifecycle;
@@ -333,33 +330,9 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
       }
     });
 
-    /*
-     * When we are typing in the SQL editor, about every five seconds we save
-     * what we are typing so that it gets shown in the Querydoc view. This can
-     * be very helpful if you are editing the Querydoc for a query.
-     */
     f_sql.addFocusListener(new FocusAdapter() {
-
-      private SWTTimingSource f_ts = null;
-
-      @Override
-      public void focusGained(FocusEvent e) {
-        f_ts = new SWTTimingSource(5, TimeUnit.SECONDS, f_sql.getDisplay());
-        f_ts.addTickListener(new TimingSource.TickListener() {
-          @Override
-          public void timingSourceTick(TimingSource source, long nanoTime) {
-            savePossibleSqlChanges();
-          }
-        });
-        f_ts.init();
-      }
-
       @Override
       public void focusLost(final FocusEvent e) {
-        if (f_ts != null) {
-          f_ts.dispose();
-          f_ts = null;
-        }
         savePossibleSqlChanges();
       }
     });
