@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import com.surelogic.common.SLUtility;
 import com.surelogic.common.jdbc.BooleanResultHandler;
 import com.surelogic.common.jdbc.DBQuery;
 import com.surelogic.common.jdbc.DBTransaction;
@@ -142,7 +143,7 @@ public final class Functions {
                 b.append(" (");
                 boolean something = false;
                 if (reads > 0) {
-                    b.append(reads);
+                    b.append(SLUtility.toStringHumanWithCommas(reads));
                     b.append(" read");
                     if (reads > 1) {
                         b.append('s');
@@ -153,7 +154,7 @@ public final class Functions {
                     if (something) {
                         b.append(", ");
                     }
-                    b.append(writes);
+                    b.append(SLUtility.toStringHumanWithCommas(writes));
                     b.append(" write");
                     if (writes > 1) {
                         b.append('s');
@@ -164,7 +165,7 @@ public final class Functions {
                     if (something) {
                         b.append(", ");
                     }
-                    b.append(readsUC);
+                    b.append(SLUtility.toStringHumanWithCommas(readsUC));
                     b.append(" read");
                     if (readsUC > 1) {
                         b.append('s');
@@ -177,7 +178,7 @@ public final class Functions {
                     if (something) {
                         b.append(", ");
                     }
-                    b.append(writesUC);
+                    b.append(SLUtility.toStringHumanWithCommas(writesUC));
                     b.append(" write");
                     if (writesUC > 1) {
                         b.append('s');
@@ -242,7 +243,7 @@ public final class Functions {
                 if (count == 1) {
                     b.append("once");
                 } else {
-                    b.append(count);
+                    b.append(SLUtility.toStringHumanWithCommas(count));
                     b.append(" times");
                 }
                 b.append(')');
