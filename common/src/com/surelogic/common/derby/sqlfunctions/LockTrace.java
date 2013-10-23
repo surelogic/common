@@ -45,7 +45,7 @@ public class LockTrace {
         case 2:
             return traceId;
         case 3:
-            return type.toString();
+            return type.getFlag();
         case 4:
             return packageName;
         case 5:
