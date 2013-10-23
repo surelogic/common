@@ -11,6 +11,7 @@ import com.surelogic.common.jdbc.SingleRowHandler;
 
 public class LockTrace {
     final long lockTraceId;
+    final LockType type;
     final long parentId;
     final long lockId;
     final String packageName;
@@ -22,9 +23,10 @@ public class LockTrace {
     final long traceId;
 
     private LockTrace(long lockTraceId, long parentId, long lockId,
-            long traceId, String packageName, String className,
+            long traceId, LockType type, String packageName, String className,
             String classCode, String location, String locationCode, int atLine) {
         this.lockTraceId = lockTraceId;
+        this.type = type;
         this.parentId = parentId;
         this.lockId = lockId;
         this.packageName = packageName;
@@ -43,18 +45,20 @@ public class LockTrace {
         case 2:
             return traceId;
         case 3:
-            return packageName;
+            return type.toString();
         case 4:
-            return className;
+            return packageName;
         case 5:
-            return classCode;
+            return className;
         case 6:
-            return location;
+            return classCode;
         case 7:
-            return locationCode;
+            return location;
         case 8:
-            return atLine;
+            return locationCode;
         case 9:
+            return atLine;
+        case 10:
             return lockTraceId;
         default:
             throw new IllegalArgumentException();
@@ -125,9 +129,40 @@ public class LockTrace {
         @Override
         public LockTrace handle(Row r) {
             return new LockTrace(r.nextLong(), r.nextLong(), r.nextLong(),
-                    r.nextLong(), r.nextString(), r.nextString(),
-                    r.nextString(), r.nextString(), r.nextString(), r.nextInt());
+                    r.nextLong(), LockType.fromFlag(r.nextString()),
+                    r.nextString(), r.nextString(), r.nextString(),
+                    r.nextString(), r.nextString(), r.nextInt());
         }
 
+    }
+
+    enum LockType {
+        INTRINSIC("I", "Intrinsic lock"), UTIL("U", "java.util.concurrent lock");
+
+        private final String flag;
+        private final String desc;
+
+        LockType(String flag, String desc) {
+            this.flag = flag;
+            this.desc = desc;
+        }
+
+        public String getFlag() {
+            return flag;
+        }
+
+        static LockType fromFlag(String flag) {
+            for (LockType t : values()) {
+                if (t.flag.equals(flag)) {
+                    return t;
+                }
+            }
+            throw new IllegalArgumentException("Not a valid flag.");
+        }
+
+        @Override
+        public String toString() {
+            return desc;
+        }
     }
 }
