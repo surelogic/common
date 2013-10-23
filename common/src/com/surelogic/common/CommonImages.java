@@ -40,6 +40,7 @@ public final class CommonImages {
   public static final String DECR_INCONSISTENT = "decr/inconsistent.gif";
   public static final String DECR_INFO = "decr/info.gif";
   public static final String DECR_JAVA = "decr/java.gif";
+  public static final String DECR_LIBRARY = "decr/library.gif";
   public static final String DECR_NEW = "decr/new.gif";
   public static final String DECR_RECURSIVE = "decr/recursive.gif";
   public static final String DECR_REDDOT = "decr/reddot.gif";
@@ -185,6 +186,7 @@ public final class CommonImages {
   public static final String IMG_LIGHTBULB = "lightbulb.gif";
   public static final String IMG_LINK = "link.gif";
   public static final String IMG_LOCK = "lock.gif";
+  public static final String IMG_LOCK_DYNAMIC = "lock_dynamic.gif";
   public static final String IMG_METHOD_DEFAULT = "method_default.gif";
   public static final String IMG_METHOD_PRIVATE = "method_private.gif";
   public static final String IMG_METHOD_PROTECTED = "method_protected.gif";
