@@ -1,5 +1,6 @@
 package com.surelogic.common.adhoc.model;
 
+import com.surelogic.Nullable;
 import com.surelogic.common.CommonImages;
 
 /**
@@ -30,6 +31,7 @@ public class Cell extends AbstractCell {
    * A symbolic name from {@link CommonImages} or {@code null} if no image
    * should be displayed for this cell.
    */
+  @Nullable
   private final String f_imageSymbolicName;
 
   /**
@@ -39,6 +41,7 @@ public class Cell extends AbstractCell {
    * @return a symbolic name from {@link CommonImages} or {@code null} if no
    *         image should be displayed for this cell.
    */
+  @Nullable
   public String getImageSymbolicName() {
     return f_imageSymbolicName;
   }

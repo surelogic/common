@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 
+import com.surelogic.Nullable;
 import com.surelogic.common.Justification;
 import com.surelogic.common.Pair;
 import com.surelogic.common.SLUtility;
@@ -355,11 +356,16 @@ public final class AdornedTreeTableModel {
           final IndexedRowOfCells possibleChild = i.next();
           final String rowText = rowTreeCell.getText();
           final String possibleChildText = possibleChild.getRow()[columnIndex].getText();
-          if (rowText != null) {
-            if (rowText.equals(possibleChildText)) {
-              i.remove();
-              childrenOfRow.add(possibleChild);
-            }
+          final boolean rowTextMatches = rowText != null && rowText.equals(possibleChildText);
+          @Nullable
+          final String rowImageSymbolicName = rowTreeCell.getImageSymbolicName();
+          @Nullable
+          final String possibleChildImageSymbolicName = possibleChild.getRow()[columnIndex].getImageSymbolicName();
+          final boolean rowImageSymbolicNameMatches = rowImageSymbolicName != null
+              && rowImageSymbolicName.equals(possibleChildImageSymbolicName);
+          if (rowTextMatches && rowImageSymbolicNameMatches) {
+            i.remove();
+            childrenOfRow.add(possibleChild);
           } else if (possibleChildText == null) {
             i.remove();
             childrenOfRow.add(possibleChild);
