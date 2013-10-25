@@ -364,9 +364,19 @@ public final class AdornedTreeTableModel {
           final boolean rowImageSymbolicNameMatches = rowImageSymbolicName != null
               && rowImageSymbolicName.equals(possibleChildImageSymbolicName);
           if (rowTextMatches && rowImageSymbolicNameMatches) {
+            /*
+             * Match by text and image name -- needed to deal with intrinsic and
+             * util.concurrent locks which are shown in Flashlight by only
+             * changing the icon.
+             */
             i.remove();
             childrenOfRow.add(possibleChild);
           } else if (possibleChildText == null) {
+            /*
+             * It is not good that this is null, so we stick all of them at this
+             * level so that the query author will fix the query to not have
+             * nulls in the tree portion of this result.
+             */
             i.remove();
             childrenOfRow.add(possibleChild);
           }
