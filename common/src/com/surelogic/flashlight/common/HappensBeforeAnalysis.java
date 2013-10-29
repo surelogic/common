@@ -46,6 +46,8 @@ public class HappensBeforeAnalysis {
     private final PreparedStatement traceMethodCalledSt;
     private final TLongObjectMap<Timestamp> targetsCache;
     private final TLongObjectMap<Timestamp> sourcesCache;
+    private final Map<LockId, Timestamp> lockTargetsCache;
+    private final Map<LockId, Timestamp> lockSourcesCache;
 
     public HappensBeforeAnalysis(Connection conn) throws SQLException {
         hbSt = conn.prepareStatement(QB.get("Accesses.happensBefore"));
@@ -94,6 +96,8 @@ public class HappensBeforeAnalysis {
                 .get("Accesses.trace.traceMethodCalled"));
         targetsCache = new TLongObjectHashMap<Timestamp>();
         sourcesCache = new TLongObjectHashMap<Timestamp>();
+        lockTargetsCache = new HashMap<LockId, Timestamp>();
+        lockSourcesCache = new HashMap<LockId, Timestamp>();
     }
 
     public void finished() throws SQLException {
@@ -184,6 +188,20 @@ public class HappensBeforeAnalysis {
                 read, readThread);
     }
 
+    Map<LockId, Timestamp> genLockSources(ResultSet set) throws SQLException {
+        lockSourcesCache.clear();
+        do {
+            LockId sourceLock = new LockId(set.getLong(1),
+                    LockType.fromFlag(set.getString(2)));
+            Timestamp sourceTs = set.getTimestamp(3);
+            Timestamp ts = lockSourcesCache.get(sourceLock);
+            if (ts == null || ts.after(sourceTs)) {
+                lockSourcesCache.put(sourceLock, sourceTs);
+            }
+        } while (set.next());
+        return lockSourcesCache;
+    }
+
     TLongObjectMap<Timestamp> genSources(ResultSet set) throws SQLException {
         sourcesCache.clear();
         do {
@@ -195,6 +213,20 @@ public class HappensBeforeAnalysis {
             }
         } while (set.next());
         return sourcesCache;
+    }
+
+    Map<LockId, Timestamp> genLockTargets(ResultSet set) throws SQLException {
+        lockTargetsCache.clear();
+        do {
+            LockId targetLock = new LockId(set.getLong(1),
+                    LockType.fromFlag(set.getString(2)));
+            Timestamp targetTs = set.getTimestamp(3);
+            Timestamp ts = lockTargetsCache.get(targetLock);
+            if (ts == null || ts.before(targetTs)) {
+                lockTargetsCache.put(targetLock, targetTs);
+            }
+        } while (set.next());
+        return lockTargetsCache;
     }
 
     TLongObjectMap<Timestamp> genTargets(ResultSet set) throws SQLException {
@@ -304,8 +336,46 @@ public class HappensBeforeAnalysis {
 
     public boolean happensBeforeLock(Timestamp write, long writeThread,
             Timestamp read, long readThread) throws SQLException {
-        return happensBefore(hbLockSourceSt, hbLockTargetSt, write,
-                writeThread, read, readThread);
+        hbLockSourceSt.setLong(1, writeThread);
+        hbLockSourceSt.setTimestamp(2, write);
+        hbLockSourceSt.setTimestamp(3, read);
+        final ResultSet sourceSet = hbLockSourceSt.executeQuery();
+        try {
+            if (!sourceSet.next()) {
+                return false;
+            }
+            hbLockTargetSt.setLong(1, readThread);
+            hbLockTargetSt.setTimestamp(2, write);
+            hbLockTargetSt.setTimestamp(3, read);
+            final ResultSet targetSet = hbLockTargetSt.executeQuery();
+            try {
+                if (!targetSet.next()) {
+                    return false;
+                }
+                final Map<LockId, Timestamp> sources = genLockSources(sourceSet);
+                sourceSet.close();
+                if (sources.isEmpty()) {
+                    return false;
+                }
+                final Map<LockId, Timestamp> targets = genLockTargets(targetSet);
+                targetSet.close();
+                if (targets.isEmpty()) {
+                    return false;
+                }
+                for (Entry<LockId, Timestamp> sourceEntry : sources.entrySet()) {
+                    Timestamp targetTs = targets.get(sourceEntry.getKey());
+                    if (targetTs != null
+                            && sourceEntry.getValue().before(targetTs)) {
+                        return true;
+                    }
+                }
+            } finally {
+                targetSet.close();
+            }
+        } finally {
+            sourceSet.close();
+        }
+        return false;
     }
 
     /**
@@ -348,7 +418,7 @@ public class HappensBeforeAnalysis {
             try {
                 if (set.next()) {
                     list.add(new HBEdge(new HBNode(write, set.getLong(1)),
-                            null, null, EdgeType.WRITE_IN_THREAD));
+                            null, EdgeType.WRITE_IN_THREAD));
                 }
             } finally {
                 set.close();
@@ -460,7 +530,7 @@ public class HappensBeforeAnalysis {
             HBNode sourceTrace = sourceEntry.getValue();
             HBNode targetTrace = targets.get(source);
             if (targetTrace != null && targetTrace.ts.after(sourceTrace.ts)) {
-                list.add(new HBEdge(sourceTrace, targetTrace, source.coll,
+                list.add(new HBEdge(sourceTrace, targetTrace,
                         EdgeType.COLLECTION));
             }
         }
@@ -477,8 +547,48 @@ public class HappensBeforeAnalysis {
     private void addHappensBeforeLock(Timestamp write, long writeThread,
             Timestamp read, long readThread, List<HBEdge> list)
             throws SQLException {
-        addHappensBefore(hbLockSourceTraceSt, hbLockTargetTraceSt, write,
-                writeThread, read, readThread, list, EdgeType.LOCK);
+        hbLockSourceTraceSt.setLong(1, writeThread);
+        hbLockSourceTraceSt.setTimestamp(2, write);
+        hbLockSourceTraceSt.setTimestamp(3, read);
+        final ResultSet sourceSet = hbLockSourceTraceSt.executeQuery();
+        try {
+            if (!sourceSet.next()) {
+                return;
+            }
+            hbLockTargetTraceSt.setLong(1, readThread);
+            hbLockTargetTraceSt.setTimestamp(2, write);
+            hbLockTargetTraceSt.setTimestamp(3, read);
+            final ResultSet targetSet = hbLockTargetTraceSt.executeQuery();
+            try {
+                if (!targetSet.next()) {
+                    return;
+                }
+                final Map<LockId, HBNode> sources = genSourceLockNodes(sourceSet);
+                sourceSet.close();
+                if (sources.isEmpty()) {
+                    return;
+                }
+                final Map<LockId, HBNode> targets = genTargetLockNodes(targetSet);
+                targetSet.close();
+                if (targets.isEmpty()) {
+                    return;
+                }
+                for (Entry<LockId, HBNode> source : sources.entrySet()) {
+                    LockId sourceId = source.getKey();
+                    HBNode sourceNode = source.getValue();
+                    HBNode targetNode = targets.get(sourceId);
+                    if (targetNode != null
+                            && sourceNode.getTs().before(targetNode.getTs())) {
+                        list.add(new HBEdge(sourceNode, targetNode,
+                                EdgeType.LOCK));
+                    }
+                }
+            } finally {
+                targetSet.close();
+            }
+        } finally {
+            sourceSet.close();
+        }
     }
 
     private void addHappensBeforeThread(Timestamp write, long writeThread,
@@ -496,7 +606,7 @@ public class HappensBeforeAnalysis {
                 long trace = hbTraceSet.getLong(2);
                 String id = hbTraceSet.getString(3);
                 HBNode node = new HBNode(id, ts, trace);
-                list.add(new HBEdge(node, null, null, EdgeType.THREAD));
+                list.add(new HBEdge(node, null, EdgeType.THREAD));
             }
         } finally {
             hbTraceSet.close();
@@ -546,8 +656,7 @@ public class HappensBeforeAnalysis {
                     HBNode targetNode = targets.get(sourceId);
                     if (targetNode != null
                             && sourceNode.getTs().before(targetNode.getTs())) {
-                        list.add(new HBEdge(sourceNode, targetNode, sourceId,
-                                edgeType));
+                        list.add(new HBEdge(sourceNode, targetNode, edgeType));
                     }
                 }
             } finally {
@@ -575,7 +684,7 @@ public class HappensBeforeAnalysis {
                 HBNode target = new HBNode(hbSet.getTimestamp(idx++),
                         hbSet.getLong(idx++));
                 list.add(new HBEdge(className(hbSet.getString(idx++),
-                        hbSet.getString(idx++)), source, target, null,
+                        hbSet.getString(idx++)), source, target,
                         EdgeType.CLASS_INITIALIZATION));
             }
         } finally {
@@ -641,13 +750,8 @@ public class HappensBeforeAnalysis {
         final HBNode target;
         final EdgeType type;
         final String id;
-        final Long objId;
         final String sourceMethod;
         final String targetMethod;
-
-        public Long getObjId() {
-            return objId;
-        }
 
         public EdgeType getType() {
             return type;
@@ -661,24 +765,21 @@ public class HappensBeforeAnalysis {
             return target;
         }
 
-        HBEdge(HBNode source, HBNode target, Long objId, EdgeType type)
-                throws SQLException {
+        HBEdge(HBNode source, HBNode target, EdgeType type) throws SQLException {
             id = type.displayId(source.getId());
             this.source = source;
             this.target = target;
             this.type = type;
-            this.objId = objId;
             targetMethod = getTargetMethod();
             sourceMethod = getSourceMethod();
         }
 
-        HBEdge(String id, HBNode source, HBNode target, Long objId,
-                EdgeType type) throws SQLException {
+        HBEdge(String id, HBNode source, HBNode target, EdgeType type)
+                throws SQLException {
             this.id = type.displayId(id);
             this.source = source;
             this.target = target;
             this.type = type;
-            this.objId = objId;
             targetMethod = getTargetMethod();
             sourceMethod = getSourceMethod();
         }
@@ -795,6 +896,38 @@ public class HappensBeforeAnalysis {
         return map;
     }
 
+    Map<LockId, HBNode> genSourceLockNodes(ResultSet set) throws SQLException {
+        Map<LockId, HBNode> map = new HashMap<LockId, HBNode>();
+        do {
+            LockId sourceId = new LockId(set.getLong(1), LockType.fromFlag(set
+                    .getString(2)));
+            Timestamp sourceTs = set.getTimestamp(3);
+            HBNode node = map.get(sourceId);
+            if (node == null || node.getTs().after(sourceTs)) {
+                long trace = set.getLong(4);
+                String id = set.getString(5);
+                map.put(sourceId, new HBNode(id, sourceTs, trace));
+            }
+        } while (set.next());
+        return map;
+    }
+
+    Map<LockId, HBNode> genTargetLockNodes(ResultSet set) throws SQLException {
+        Map<LockId, HBNode> map = new HashMap<LockId, HBNode>();
+        do {
+            LockId targetId = new LockId(set.getLong(1), LockType.fromFlag(set
+                    .getString(2)));
+            Timestamp targetTs = set.getTimestamp(3);
+            HBNode node = map.get(targetId);
+            if (node == null || node.getTs().before(targetTs)) {
+                long trace = set.getLong(4);
+                String id = set.getString(5);
+                map.put(targetId, new HBNode(id, targetTs, trace));
+            }
+        } while (set.next());
+        return map;
+    }
+
     Map<Long, HBNode> genTargetNodes(ResultSet set) throws SQLException {
         Map<Long, HBNode> map = new HashMap<Long, HBNode>();
         do {
@@ -808,11 +941,6 @@ public class HappensBeforeAnalysis {
             }
         } while (set.next());
         return map;
-    }
-
-    static class LockId {
-        long lock;
-
     }
 
 }
