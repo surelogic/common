@@ -8,6 +8,7 @@ import com.surelogic.common.jdbc.Queryable;
 import com.surelogic.common.jdbc.Row;
 import com.surelogic.common.jdbc.RowHandler;
 import com.surelogic.common.jdbc.SingleRowHandler;
+import com.surelogic.flashlight.common.LockType;
 
 public class LockTrace {
     final long lockTraceId;
@@ -134,35 +135,5 @@ public class LockTrace {
                     r.nextString(), r.nextString(), r.nextInt());
         }
 
-    }
-
-    enum LockType {
-        INTRINSIC("I", "Intrinsic lock"), UTIL("U", "java.util.concurrent lock");
-
-        private final String flag;
-        private final String desc;
-
-        LockType(String flag, String desc) {
-            this.flag = flag;
-            this.desc = desc;
-        }
-
-        public String getFlag() {
-            return flag;
-        }
-
-        static LockType fromFlag(String flag) {
-            for (LockType t : values()) {
-                if (t.flag.equals(flag)) {
-                    return t;
-                }
-            }
-            throw new IllegalArgumentException("Not a valid flag.");
-        }
-
-        @Override
-        public String toString() {
-            return desc;
-        }
     }
 }

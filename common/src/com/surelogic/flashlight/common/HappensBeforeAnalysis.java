@@ -810,4 +810,9 @@ public class HappensBeforeAnalysis {
         return map;
     }
 
+    static class LockId {
+        long lock;
+
+    }
+
 }
