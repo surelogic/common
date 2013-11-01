@@ -253,6 +253,22 @@ public final class Functions {
 
     }
 
+    public static String coalesceLockEdgeThreads(final long component,
+            final long lockHeld, final String lockHeldType,
+            final long lockAcquired, final String lockAcquiredType) {
+        return DefaultConnection.getInstance().withReadOnly(
+                new DBQuery<String>() {
+                    @Override
+                    public String perform(Query q) {
+                        return q.prepared("LockEdge.threads",
+                                new LockTraceHandler()).call(component,
+                                lockHeld, lockHeldType, lockAcquired,
+                                lockAcquiredType);
+
+                    }
+                });
+    }
+
     public static String coalesceLockTraceThreads(final long lockTraceId) {
         return DefaultConnection.getInstance().withReadOnly(
                 new DBQuery<String>() {
