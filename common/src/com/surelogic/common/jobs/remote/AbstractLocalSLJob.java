@@ -452,7 +452,7 @@ public abstract class AbstractLocalSLJob<C extends ILocalConfig> extends Abstrac
 			}				
 			cmdj.createVmArgument().setValue("-verbosegc");
 		}
-		if (SLUtility.is64bit && SystemUtils.JAVA_VENDOR.contains("Sun")) {
+		if (SLUtility.is64bit && (SystemUtils.JAVA_VENDOR.contains("Sun") || SystemUtils.JAVA_VENDOR.contains("Apple"))) {
 		    // TODO do I need to check if I'm running in 64-bit mode?
 		    cmdj.createVmArgument().setValue("-XX:+UseCompressedOops");
 		}	
