@@ -264,6 +264,9 @@ public final class AdornedTreeTableModel {
               // Check if we should blank the text
               if (cellText.equals(colInfo.getBlankIf()))
                 blankText = true;
+              // Check if we should change the text (a change-if annotation)
+              if (cellText.equals(colInfo.getChangeIfFrom()))
+                cellText = colInfo.getChangeIfTo();
               // Human readable duration (hrd)
               if (colInfo.getHumanReadableDuration()) {
                 Pair<Long, String> breakout = safeParseLongAtStart(cellText);
