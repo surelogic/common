@@ -65,7 +65,7 @@ columnAnnotation returns [ColumnAnnotation result]
 
 annotationPart
 	: treeTableSpec
-	| '(' (hideSpec | iconSpec | justSpec | affixSpec | numSpec | blankIfSpec | countSpec | sumSpec | maxSpec | containsSpec) ')'
+	| '(' (hideSpec | iconSpec | justSpec | affixSpec | numSpec | blankIfSpec | changeIfSpec | countSpec | sumSpec | maxSpec | containsSpec) ')'
 	;
 
 treeTableSpec
@@ -110,6 +110,10 @@ unitPart
 	
 blankIfSpec
 	: 'blank-if' value=QUOTED_STRING { f_column.setBlankIf($value.text); }
+	;
+
+changeIfSpec
+	: 'change-if' fValue=QUOTED_STRING 'to' tValue=QUOTED_STRING { f_column.setChangeIf($fValue.text, $tValue.text); }
 	;
 
 countSpec

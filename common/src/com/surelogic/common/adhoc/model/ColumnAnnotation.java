@@ -180,6 +180,32 @@ public final class ColumnAnnotation {
     f_blankIf = value;
   }
 
+  private String f_changeIfFrom = null;
+
+  @Nullable
+  public String getChangeIfFrom() {
+    return f_changeIfFrom;
+  }
+
+  private String f_changeIfTo = null;
+
+  @Nullable
+  public String getChangeIfTo() {
+    return f_changeIfTo;
+  }
+
+  /**
+   * Do not call this method. It should only be called by the parser.
+   */
+  public void setChangeIf(String fromValue, String toValue) {
+    if (fromValue != null && toValue != null) {
+      f_changeIfFrom = stripSingleQuotes(fromValue);
+      f_changeIfTo = stripSingleQuotes(toValue);
+    } else {
+      f_changeIfFrom = f_changeIfTo = null;
+    }
+  }
+
   private boolean f_sumPartialRows = false;
 
   public boolean sumPartialRows() {
