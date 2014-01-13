@@ -333,9 +333,14 @@ public abstract class AbstractLocalSLJob<C extends ILocalConfig> extends Abstrac
 							monitor.subTaskDone();
 							break;
 						case WORK:							
-							println(line);							
-							monitor.worked(Integer.valueOf(st.nextToken()
-									.trim()));
+							println(line);					
+							try {								
+								monitor.worked(Integer.valueOf(st.nextToken()
+										.trim()));
+							} catch (NumberFormatException e) {
+								printErr(Level.WARNING, "Couldn't parse amount worked: "+line);
+								monitor.worked(1);
+							}
 							break;
 						case WARNING:							
 							printErr(Level.WARNING, getRest(line));
