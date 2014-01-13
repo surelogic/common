@@ -34,6 +34,7 @@ public class Trace {
     final String methodCallName;
     final String methodCallCode;
     final int line;
+    boolean wasNull;
 
     Trace(final long id, final long parentId, final String inClass,
             final String classCode, final String inPackage,
@@ -56,6 +57,7 @@ public class Trace {
     }
 
     public Object get(final int i) {
+        wasNull = false;
         switch (i) {
         case 1:
             return clazz;
@@ -66,6 +68,10 @@ public class Trace {
         case 4:
             return loc;
         case 5:
+            if (line == -1) {
+                wasNull = true;
+                return 0;
+            }
             return line;
         case 6:
             return methodCallClass;
@@ -80,6 +86,10 @@ public class Trace {
         default:
             throw new IllegalArgumentException();
         }
+    }
+
+    public boolean wasNull() {
+        return wasNull;
     }
 
     public long getParentId() {

@@ -46,6 +46,7 @@ public final class Functions {
     private static class TraceResultSet implements InvocationHandler {
         private final Iterator<Trace> traces;
         private Trace trace;
+        private boolean wasNull;
 
         TraceResultSet(final List<Trace> traces) {
             this.traces = traces.iterator();
@@ -77,6 +78,8 @@ public final class Functions {
                 return null;
             } else if (methodName.startsWith("get")) {
                 return trace.get((Integer) args[0]);
+            } else if (methodName.equals("wasNull")) {
+                return trace.wasNull();
             }
             throw new UnsupportedOperationException(method.getName());
         }
