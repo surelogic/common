@@ -170,6 +170,7 @@ public final class CommonImages {
   public static final String IMG_JSURE_FINDER = "jsure_finder.gif";
   public static final String IMG_JSURE_GRAPH = "jsure_graph.gif";
   public static final String IMG_JSURE_LOGO = "jsure_logo.gif";
+  public static final String IMG_JSURE_METRICS = "jsure_metrics.gif";
   public static final String IMG_JSURE_MODEL_PROBLEMS_EXIST = "jsure_model_problems_exist.gif";
   public static final String IMG_JSURE_MODEL_PROBLEMS = "jsure_model_problems.gif";
   public static final String IMG_JSURE_QUICK_REF_ICON = "jsure_quick_ref_icon.gif";
