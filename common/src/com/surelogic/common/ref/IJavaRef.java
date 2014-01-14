@@ -27,7 +27,6 @@ public interface IJavaRef {
   /**
    * A referenced location in Java code can be within a <tt>.java</tt> file, a
    * <tt>.class</tt> file, or a <tt>.jar</tt> file.
-   * 
    */
   @Immutable
   enum Within {
