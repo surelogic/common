@@ -92,6 +92,156 @@ public final class EclipseColorUtility {
     return f_QueryMenuGrayColor;
   }
 
+  private static Color f_compoundScheme1Color0;
+
+  public static Color getCompoundScheme1Color0() {
+    if (f_compoundScheme1Color0 == null) {
+      f_compoundScheme1Color0 = new Color(EclipseUIUtility.getDisplay(), 204, 152, 28);
+      EclipseUIUtility.disposeExec(new Runnable() {
+        @Override
+        public void run() {
+          f_compoundScheme1Color0.dispose();
+        }
+      });
+    }
+    return f_compoundScheme1Color0;
+  }
+
+  private static Color f_compoundScheme1Color1;
+
+  public static Color getCompoundScheme1Color1() {
+    if (f_compoundScheme1Color1 == null) {
+      f_compoundScheme1Color1 = new Color(EclipseUIUtility.getDisplay(), 153, 155, 59);
+      EclipseUIUtility.disposeExec(new Runnable() {
+        @Override
+        public void run() {
+          f_compoundScheme1Color1.dispose();
+        }
+      });
+    }
+    return f_compoundScheme1Color1;
+  }
+
+  private static Color f_compoundScheme1Color2;
+
+  public static Color getCompoundScheme1Color2() {
+    if (f_compoundScheme1Color2 == null) {
+      f_compoundScheme1Color2 = new Color(EclipseUIUtility.getDisplay(), 255, 151, 60);
+      EclipseUIUtility.disposeExec(new Runnable() {
+        @Override
+        public void run() {
+          f_compoundScheme1Color2.dispose();
+        }
+      });
+    }
+    return f_compoundScheme1Color2;
+  }
+
+  private static Color f_compoundScheme1Color3;
+
+  public static Color getCompoundScheme1Color3() {
+    if (f_compoundScheme1Color3 == null) {
+      f_compoundScheme1Color3 = new Color(EclipseUIUtility.getDisplay(), 124, 255, 242);
+      EclipseUIUtility.disposeExec(new Runnable() {
+        @Override
+        public void run() {
+          f_compoundScheme1Color3.dispose();
+        }
+      });
+    }
+    return f_compoundScheme1Color3;
+  }
+
+  private static Color f_compoundScheme1Color4;
+
+  public static Color getCompoundScheme1Color4() {
+    if (f_compoundScheme1Color4 == null) {
+      f_compoundScheme1Color4 = new Color(EclipseUIUtility.getDisplay(), 28, 204, 137);
+      EclipseUIUtility.disposeExec(new Runnable() {
+        @Override
+        public void run() {
+          f_compoundScheme1Color4.dispose();
+        }
+      });
+    }
+    return f_compoundScheme1Color4;
+  }
+
+  private static Color f_analogousScheme1Color0;
+
+  public static Color getAnalogousScheme1Color0() {
+    if (f_analogousScheme1Color0 == null) {
+      f_analogousScheme1Color0 = new Color(EclipseUIUtility.getDisplay(), 194, 172, 255);
+      EclipseUIUtility.disposeExec(new Runnable() {
+        @Override
+        public void run() {
+          f_analogousScheme1Color0.dispose();
+        }
+      });
+    }
+    return f_analogousScheme1Color0;
+  }
+
+  private static Color f_analogousScheme1Color1;
+
+  public static Color getAnalogousScheme1Color1() {
+    if (f_analogousScheme1Color1 == null) {
+      f_analogousScheme1Color1 = new Color(EclipseUIUtility.getDisplay(), 218, 255, 200);
+      EclipseUIUtility.disposeExec(new Runnable() {
+        @Override
+        public void run() {
+          f_analogousScheme1Color1.dispose();
+        }
+      });
+    }
+    return f_analogousScheme1Color1;
+  }
+
+  private static Color f_analogousScheme1Color2;
+
+  public static Color getAnalogousScheme1Color2() {
+    if (f_analogousScheme1Color2 == null) {
+      f_analogousScheme1Color2 = new Color(EclipseUIUtility.getDisplay(), 232, 214, 128);
+      EclipseUIUtility.disposeExec(new Runnable() {
+        @Override
+        public void run() {
+          f_analogousScheme1Color2.dispose();
+        }
+      });
+    }
+    return f_analogousScheme1Color2;
+  }
+
+  private static Color f_analogousScheme1Color3;
+
+  public static Color getAnalogousScheme1Color3() {
+    if (f_analogousScheme1Color3 == null) {
+      f_analogousScheme1Color3 = new Color(EclipseUIUtility.getDisplay(), 255, 169, 113);
+      EclipseUIUtility.disposeExec(new Runnable() {
+        @Override
+        public void run() {
+          f_analogousScheme1Color3.dispose();
+        }
+      });
+    }
+    return f_analogousScheme1Color3;
+  }
+
+  private static Color f_analogousScheme1Color4;
+
+  public static Color getAnalogousScheme1Color4() {
+    if (f_analogousScheme1Color4 == null) {
+      f_analogousScheme1Color4 = new Color(EclipseUIUtility.getDisplay(), 232, 152, 192);
+      EclipseUIUtility.disposeExec(new Runnable() {
+        @Override
+        public void run() {
+          f_analogousScheme1Color4.dispose();
+        }
+      });
+    }
+    return f_analogousScheme1Color4;
+  }
+
   private EclipseColorUtility() {
     // no instances
   }
