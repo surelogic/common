@@ -170,6 +170,7 @@ public final class CommonImages {
   public static final String IMG_JSURE_FINDER = "jsure_finder.gif";
   public static final String IMG_JSURE_GRAPH = "jsure_graph.gif";
   public static final String IMG_JSURE_LOGO = "jsure_logo.gif";
+  public static final String IMG_JSURE_METRICS = "jsure_metrics.gif";
   public static final String IMG_JSURE_MODEL_PROBLEMS_EXIST = "jsure_model_problems_exist.gif";
   public static final String IMG_JSURE_MODEL_PROBLEMS = "jsure_model_problems.gif";
   public static final String IMG_JSURE_QUICK_REF_ICON = "jsure_quick_ref_icon.gif";
@@ -250,6 +251,8 @@ public final class CommonImages {
   public static final String IMG_SORT_UP = "sort_up.gif";
   public static final String IMG_SUGGESTIONS_WARNINGS = "suggestions_warnings.gif";
   public static final String IMG_THREAD = "thread.gif";
+  public static final String IMG_THRESHOLD_ABOVE = "threshold_above.gif";
+  public static final String IMG_THRESHOLD_BELOW = "threshold_below.gif";
   public static final String IMG_TIMEOUT_X = "timeout_x.gif";
   public static final String IMG_TRAFFIC_LIGHT_GREEN = "traffic_light_green.png";
   public static final String IMG_TRAFFIC_LIGHT_RED = "traffic_light_red.png";
