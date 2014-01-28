@@ -1456,7 +1456,7 @@ public abstract class Decl implements IDecl {
           if (t1 == null || t2 == null)
             return false;
           else
-            result &= t1.getCompact().equals(t1.getCompact());
+            result &= t1.getCompact().equals(t2.getCompact());
         }
       }
       return result;
