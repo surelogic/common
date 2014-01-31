@@ -1883,6 +1883,7 @@ public abstract class Decl implements IDecl {
       break;
     case INITIALIZER:
       addB(STATIC, decl.isStatic(), b);
+      addB(IMPLICIT, decl.isImplicit(), b);
       break;
     case INTERFACE:
       add(NAME, decl.getName(), b);
@@ -2132,6 +2133,9 @@ public abstract class Decl implements IDecl {
       pair = parseEqualsPair(b);
       if (isFor(STATIC, pair)) {
         initializerBuilder.setIsStatic(Boolean.valueOf(pair.second()));
+      }
+      if (isFor(IMPLICIT, pair)) {
+        initializerBuilder.setIsImplicit(Boolean.valueOf(pair.second()));
       }
       thisDeclBuilder = initializerBuilder;
       break;
