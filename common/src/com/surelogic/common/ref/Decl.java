@@ -2133,6 +2133,7 @@ public abstract class Decl implements IDecl {
       pair = parseEqualsPair(b);
       if (isFor(STATIC, pair)) {
         initializerBuilder.setIsStatic(Boolean.valueOf(pair.second()));
+        pair = parseEqualsPair(b);
       }
       if (isFor(IMPLICIT, pair)) {
         initializerBuilder.setIsImplicit(Boolean.valueOf(pair.second()));
