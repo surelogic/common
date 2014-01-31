@@ -1291,11 +1291,15 @@ public final class SLImages {
         return getDecoratedImage(imageName, new ImageDescriptor[] { null, getImageDescriptor(topRight), null, null, null });
     }
     case INITIALIZER:
+      String topRight = decl.isStatic() ? CommonImages.DECR_STATIC : null;
       if (decl.isStatic())
-        return getDecoratedImage(CommonImages.IMG_METHOD_PRIVATE, new ImageDescriptor[] { null,
-            getImageDescriptor(CommonImages.DECR_STATIC), null, null, null });
-      else
+        topRight = CommonImages.DECR_STATIC;
+      String topLeft = decl.isImplicit() ? CommonImages.DECR_IMPLICIT : null;
+      if (topRight == null && topLeft == null)
         return getImage(CommonImages.IMG_METHOD_PRIVATE);
+      else
+        return getDecoratedImage(CommonImages.IMG_METHOD_PRIVATE, new ImageDescriptor[] { getImageDescriptor(topLeft),
+            getImageDescriptor(topRight), null, null, null });
     case INTERFACE: {
       String imageName = CommonImages.IMG_INTERFACE;
       switch (decl.getVisibility()) {
