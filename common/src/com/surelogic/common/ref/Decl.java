@@ -572,6 +572,7 @@ public abstract class Decl implements IDecl {
   public static final class InitializerBuilder extends DeclBuilder {
 
     boolean f_isStatic = false;
+    boolean f_isImplicit = false;
 
     /**
      * Constructs an initializer declaration builder.
@@ -607,12 +608,26 @@ public abstract class Decl implements IDecl {
       return this;
     }
 
+    /**
+     * Sets if this declaration does <i>not</i> appear in source code, it is an
+     * implicit declaration.
+     * 
+     * @param value
+     *          {@code true} if this declaration does <i>not</i> appear in
+     *          source code, {@code false} otherwise.
+     * @return this builder.
+     */
+    public InitializerBuilder setIsImplicit(boolean value) {
+      f_isImplicit = value;
+      return this;
+    }
+
     @Override
     public IDecl buildInternal(IDecl parent) {
       if (parent == null)
         throw new IllegalArgumentException(I18N.err(272, f_name));
 
-      return new DeclInitializer(parent, f_childBuilders, f_isStatic);
+      return new DeclInitializer(parent, f_childBuilders, f_isStatic, f_isImplicit);
     }
   }
 
@@ -1456,7 +1471,7 @@ public abstract class Decl implements IDecl {
           if (t1 == null || t2 == null)
             return false;
           else
-            result &= t1.getCompact().equals(t1.getCompact());
+            result &= t1.getCompact().equals(t2.getCompact());
         }
       }
       return result;
@@ -1868,6 +1883,7 @@ public abstract class Decl implements IDecl {
       break;
     case INITIALIZER:
       addB(STATIC, decl.isStatic(), b);
+      addB(IMPLICIT, decl.isImplicit(), b);
       break;
     case INTERFACE:
       add(NAME, decl.getName(), b);
@@ -2117,6 +2133,10 @@ public abstract class Decl implements IDecl {
       pair = parseEqualsPair(b);
       if (isFor(STATIC, pair)) {
         initializerBuilder.setIsStatic(Boolean.valueOf(pair.second()));
+        pair = parseEqualsPair(b);
+      }
+      if (isFor(IMPLICIT, pair)) {
+        initializerBuilder.setIsImplicit(Boolean.valueOf(pair.second()));
       }
       thisDeclBuilder = initializerBuilder;
       break;
