@@ -1292,10 +1292,10 @@ public final class SLImages {
     }
     case INITIALIZER:
       if (decl.isStatic())
-        return getImage(CommonImages.IMG_METHOD_PRIVATE);
-      else
         return getDecoratedImage(CommonImages.IMG_METHOD_PRIVATE, new ImageDescriptor[] { null,
             getImageDescriptor(CommonImages.DECR_STATIC), null, null, null });
+      else
+        return getImage(CommonImages.IMG_METHOD_PRIVATE);
     case INTERFACE: {
       String imageName = CommonImages.IMG_INTERFACE;
       switch (decl.getVisibility()) {
