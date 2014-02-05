@@ -79,7 +79,7 @@ public abstract class AbstractJavaScanner<PS extends JavaProjectSet<P>, P extend
 			SLJob copy = new CopyProjectsJob(newProjects, target, zips, analysis);
 			scheduleScanForExecution(newProjects, copy);      
 		} catch (Exception e) {
-			System.err.println("Unable to make config for JSure");
+			System.err.println("Unable to make config for JSure: "+e.getClass().getName());
 			e.printStackTrace();
 			if (XUtil.testing) {
 				throw (RuntimeException) e;
