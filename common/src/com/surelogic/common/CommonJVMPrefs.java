@@ -16,6 +16,8 @@ public class CommonJVMPrefs {
 	    Properties prefs = new Properties();
 	    try {
 			prefs.load(url.openStream());
+ 		} catch (NullPointerException e) {
+			SLLogger.getLogger().log(Level.WARNING, "Problem loading "+PATH, e);
 		} catch (IOException e) {
 			SLLogger.getLogger().log(Level.WARNING, "Problem loading "+PATH, e);
 		}
