@@ -58,6 +58,11 @@ public final class CommonImages {
   public static final String DECR_WARNING = "decr/warning.gif";
 
   /*
+   * Symbolic fill names
+   */
+  public static final String FILL_DIAGONOAL = "fill_diagonal.png";
+
+  /*
    * Symbolic image names
    */
   public static final String IMG_ALPHA_SORT = "alpha_sort.gif";
