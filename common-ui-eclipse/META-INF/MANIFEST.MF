@@ -20,7 +20,7 @@ Require-Bundle: com.surelogic.common,
 Eclipse-LazyStart: true
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .,
- lib/timingframework-swt-6.1.jar
+ lib/timingframework-swt-7.3.jar
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: com.surelogic.common.ui,
  com.surelogic.common.ui.actions,
