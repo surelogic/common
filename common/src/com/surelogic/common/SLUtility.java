@@ -68,6 +68,7 @@ public final class SLUtility {
 
   public static final String OBJECT = "Object";
   public static final String JAVA_LANG_OBJECT = "java.lang.Object";
+  public static final String JAVA_LANG = "java.lang";
 
   public static final String SLASH_STAR_COMMENT_START = "/*";
   public static final String SLASH_STAR_COMMENT_END = "*/";
@@ -85,6 +86,35 @@ public final class SLUtility {
   public static final String ADHOC_META_PARTIAL_ROW = "(meta-partial-row)";
 
   public static final String ADHOC_META_VALUE = "defined";
+
+  /**
+   * This is a hack to remove the package from type names in the
+   * <tt>java.lang</tt> package, but not nested packages.
+   * 
+   * @param typeName
+   *          a fully-qualified type name.
+   * @return the passed type name or the simple type if the passed type name is
+   *         in the package <tt>java.lang</tt>
+   */
+  public static String unqualifyTypeNameInJavaLang(final String typeName) {
+    if (typeName == null)
+      throw new IllegalArgumentException(I18N.err(44, "typeName"));
+    if (typeName.startsWith(JAVA_LANG)) {
+      if (typeName.equals(JAVA_LANG))
+        return typeName;
+      /*
+       * Check if this is a type in a nested package, e.g.,
+       * java.lang.annotation.SuppressWarning
+       */
+      final String proposedToReturn = typeName.substring(JAVA_LANG.length() + 1);
+      if (proposedToReturn.indexOf('.') == -1)
+        return proposedToReturn;
+      else
+        return typeName;
+
+    } else
+      return typeName;
+  }
 
   /**
    * Removes defined ad hoc query meta variables, if any, from the passed map.
