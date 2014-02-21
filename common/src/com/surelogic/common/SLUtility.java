@@ -89,7 +89,7 @@ public final class SLUtility {
 
   /**
    * This is a hack to remove the package from type names in the
-   * <tt>java.lang</tt> package, but not nested packages.
+   * <tt>java.lang</tt> package, but not other packages (including nested ones).
    * 
    * @param typeName
    *          a fully-qualified type name.
