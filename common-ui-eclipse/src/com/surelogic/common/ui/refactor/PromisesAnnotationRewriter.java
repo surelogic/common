@@ -25,7 +25,6 @@ import org.eclipse.jdt.core.dom.FieldDeclaration;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.ImportDeclaration;
-import org.eclipse.jdt.core.dom.InfixExpression;
 import org.eclipse.jdt.core.dom.MarkerAnnotation;
 import org.eclipse.jdt.core.dom.MemberValuePair;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
@@ -36,7 +35,6 @@ import org.eclipse.jdt.core.dom.SingleVariableDeclaration;
 import org.eclipse.jdt.core.dom.StringLiteral;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
-import org.eclipse.jdt.core.dom.InfixExpression.Operator;
 import org.eclipse.jdt.core.dom.rewrite.ASTRewrite;
 import org.eclipse.jdt.core.dom.rewrite.ListRewrite;
 import org.eclipse.text.edits.TextEdit;
@@ -47,6 +45,7 @@ import com.surelogic.common.logging.SLLogger;
 import com.surelogic.common.ref.*;
 import com.surelogic.common.ref.IDecl.Kind;
 import com.surelogic.common.refactor.AnnotationDescription;
+import com.surelogic.common.refactor.AnnotationDescription.Builder;
 import com.surelogic.common.refactor.ScopedPromiseUtil;
 
 public class PromisesAnnotationRewriter {
@@ -200,8 +199,7 @@ public class PromisesAnnotationRewriter {
 					// Convert annos on the implicit method into a scoped promise on the enclosing type
 					final List<AnnotationDescription> annos = findTargets(decl);					
 					for(AnnotationDescription a : annos) {
-						final String contents = computeScopedPromiseContents(a, m);
-						AnnotationDescription a2 = new AnnotationDescription("Promise", contents, decl);
+						AnnotationDescription a2 = computeScopedPromiseDescription(a, m);	
 						scopedPromises.add(a2);
 					}					
 				}		
@@ -216,11 +214,36 @@ public class PromisesAnnotationRewriter {
 			}
 		}
 		
-		private String computeScopedPromiseContents(AnnotationDescription a, IDeclFunction m) {
+		private AnnotationDescription computeScopedPromiseDescription(AnnotationDescription a, IDeclFunction m) {		
 			final StringBuilder sb = new StringBuilder("@");
-			sb.append(a.getAnnotation()).append('(').append(a.getContents()).append(") for ");
-			sb.append(m.getName()).append('(');
+			sb.append(a.getAnnotation());
+			
 			boolean first = true;
+			if (a.getContents().length() > 0) {
+				first = false;
+			    sb.append('(');
+			    if (a.hasAttributes()) {
+			    	sb.append("value=").append(a.getContents());
+			    } else {
+			    	sb.append(a.getContents());
+			    }
+			}
+			for(Map.Entry<String,String> e : a.getAttributes().entrySet()) {
+				if (first) {
+					first = false;
+				    sb.append('(');
+				} else {
+					sb.append(", ");
+				}
+				sb.append(e.getKey()).append('=').append(e.getValue());
+				
+			}
+			if (!first) {
+				sb.append(')');
+			}
+			sb.append(" for ");
+			sb.append(m.getName()).append('(');
+			first = true;
 			for(IDecl param : m.getParameters()) {
 				if (first) {
 					first = false;
@@ -230,7 +253,7 @@ public class PromisesAnnotationRewriter {
 				sb.append(param.getTypeOf().getFullyQualified());
 			}
 			sb.append(')');
-			return sb.toString();
+			return new Builder("Promise", sb.toString(), m).build();
 		}
 		
 		@Override
@@ -423,12 +446,30 @@ public class PromisesAnnotationRewriter {
 
 	abstract class AbstractMergeable implements Mergeable {
 		@SuppressWarnings("unchecked")
-		protected void extractExistingAnnos(final Annotation cur, final Set<String> contents) {		
-			final Expression e = extractValue(cur);
-			if (e instanceof StringLiteral) {
-				final String lit = ((StringLiteral) e).getLiteralValue();
-				handleExistingAnno(lit, contents);
-			} else if (e instanceof ArrayInitializer) {
+		protected void extractExistingAnnos(final Annotation a, final Set<AnnoSummary> contents) {		
+			if (a.isNormalAnnotation()) {
+				final NormalAnnotation na = (NormalAnnotation) a;
+				final List<MemberValuePair> ps = na.values();
+				final Map<String,String> attrs = new HashMap<String, String>(4);
+				String value = null;
+				for (final MemberValuePair p : ps) {
+					if (p.getName().getIdentifier().equals(AnnotationConstants.VALUE_ATTR)) {
+						value = extractValue(p.getValue());
+					}
+					attrs.put(p.getName().getIdentifier(), extractValue(p.getValue()));
+				}
+				handleExistingAnno(new AnnoSummary(a.getTypeName().toString(), value, attrs), contents);
+			} else if (a.isSingleMemberAnnotation()) {
+				final SingleMemberAnnotation sa = (SingleMemberAnnotation) a;
+				handlePossibleArray(a, contents, sa.getValue());
+			} else {
+				// Assumed to be a marker annotation
+				handleExistingAnno(new AnnoSummary(a.getTypeName().toString(), null, Collections.<String,String>emptyMap()), contents);
+			}
+		}
+		
+		private void handlePossibleArray(Annotation a, Set<AnnoSummary> contents, Expression e) {
+			if (e instanceof ArrayInitializer) {
 				final ArrayInitializer init = (ArrayInitializer) e;
 				final List<Expression> es = init.expressions();
 				for (final Expression ex : es) {
@@ -436,6 +477,19 @@ public class PromisesAnnotationRewriter {
 						extractExistingAnnos((Annotation) ex, contents);
 					}
 				}
+			} else {
+				// Assume it converts to a String
+				handleExistingAnno(new AnnoSummary(a.getTypeName().toString(), extractValue(e), Collections.<String,String>emptyMap()), contents);
+			}
+		}
+
+		String extractValue(Expression e) {
+			// TODO is this right?
+			return e.resolveConstantExpressionValue().toString();
+		    /*
+			if (e instanceof StringLiteral) {
+				final String lit = ((StringLiteral) e).getLiteralValue();
+				return lit; 
 			} else if (e instanceof InfixExpression) {
 				final InfixExpression ex = (InfixExpression) e;
 				if (ex.getOperator() == Operator.PLUS) {
@@ -449,10 +503,9 @@ public class PromisesAnnotationRewriter {
 						}
 					}
 				}
-			} else if (e == null) {
-				// Marker annotation
-				handleExistingAnno(null, contents);
-			}
+			} 			
+			throw new IllegalStateException();
+			*/
 		}
 
 		private String extractString(Expression e) {
@@ -463,7 +516,7 @@ public class PromisesAnnotationRewriter {
 			return e.toString();
 		}
 		
-		protected void handleExistingAnno(String s, Set<String> contents) {
+		protected void handleExistingAnno(AnnoSummary s, Set<AnnoSummary> contents) {
 			// Default thing to do
 			contents.add(s);
 		}
@@ -483,25 +536,26 @@ public class PromisesAnnotationRewriter {
 		@Override
     public Annotation merge(final AST ast, final Annotation cur,
 				final IDecl target, final Set<String> imports) {
-			final Set<String> existing = new HashSet<String>();
+			final Set<AnnoSummary> existing = new HashSet<AnnoSummary>();
 			if (cur != null) {
 				extractExistingAnnos(cur, existing);
 			}
 			for (final AnnotationDescription desc : newAnnotations) {
 				addImport(ASSUME, imports);
-				existing.add(String
-						.format("%s for %s", desc.toString(), ScopedPromiseUtil.getForSyntax(desc.getTarget())));
+				String value = String
+						.format("%s for %s", desc.toString(), ScopedPromiseUtil.getForSyntax(desc.getTarget())); 
+				existing.add(new AnnoSummary(ASSUME, value, Collections.<String,String>emptyMap()));
 			}
-			final List<String> sortedAnns = new ArrayList<String>(existing);
+			final List<AnnoSummary> sortedAnns = new ArrayList<AnnoSummary>(existing);
 			Collections.sort(sortedAnns);
 			final List<Annotation> anns = new ArrayList<Annotation>(sortedAnns
 					.size());
-			for (final String s : sortedAnns) {
+			for (final AnnoSummary s : sortedAnns) {
 				final SingleMemberAnnotation ann = ast
 						.newSingleMemberAnnotation();
 				ann.setTypeName(ast.newName(ASSUME));
 				final StringLiteral lit = ast.newStringLiteral();
-				lit.setLiteralValue(s);
+				lit.setLiteralValue(s.contents);
 				ann.setValue(lit);
 				anns.add(ann);
 			}
@@ -544,13 +598,9 @@ public class PromisesAnnotationRewriter {
     public Annotation merge(final AST ast, final Annotation a,
 				final IDecl target, final Set<String> imports) {
 			addImport(name, imports);
-			final TreeSet<String> contents = new TreeSet<String>();
+			final TreeSet<AnnoSummary> contents = new TreeSet<AnnoSummary>();
 			for (final AnnotationDescription desc : newAnnotations) {
-				if (desc.getContents() != null) {
-					for (final String s : desc.getContents().split(",")) {
-						contents.add(s.trim());
-					}
-				}
+				handleExistingAnno(new AnnoSummary(desc), contents);
 			}
 			if (a != null) {
 				extractExistingAnnos(a, contents);
@@ -569,11 +619,32 @@ public class PromisesAnnotationRewriter {
 				return ann;
 			}
 		}
+		
+		/*
+		 * join together a list of names with the ',' separator
+		 */
+		private String join(final Iterable<AnnoSummary> names) {
+			return join(names, ',');
+		}
+		
+
+		private String join(final Iterable<AnnoSummary> names, final char delim) {
+			final StringBuilder b = new StringBuilder();
+			for (final AnnoSummary name : names) {
+				b.append(name.contents);
+				b.append(delim);
+			}
+			if (b.length() == 0) {
+				return "";
+			}
+			return b.substring(0, b.length() - 1);
+		}
+		
 		@Override
-		protected void handleExistingAnno(String ss, Set<String> contents) {
-			if (ss != null && ss.length() > 0) {
-				for (final String s : ss.split(",")) {
-					contents.add(s.trim());
+		protected void handleExistingAnno(AnnoSummary ss, Set<AnnoSummary> contents) {
+			if (ss.contents != null && ss.contents.length() > 0) {
+				for (final String s : ss.contents.split(",")) {
+					contents.add(new AnnoSummary(ss.annotation, s.trim(), ss.attributes));
 				}
 			}
 		}
@@ -632,9 +703,9 @@ public class PromisesAnnotationRewriter {
 		@Override
     public Annotation merge(final AST ast, final Annotation cur,
 				final IDecl target, final Set<String> imports) {
-			final Set<String> newContents = new HashSet<String>();
+			final Set<AnnoSummary> newContents = new HashSet<AnnoSummary>();
 			for (final AnnotationDescription desc : newAnnotations) {
-				newContents.add(desc.getContents());
+				newContents.add(new AnnoSummary(desc));
 			}
 			if (cur != null) {
 				extractExistingAnnos(cur, newContents);
@@ -649,7 +720,7 @@ public class PromisesAnnotationRewriter {
 		}
 
 		@Override
-		protected void handleExistingAnno(String s, Set<String> contents) {
+		protected void handleExistingAnno(AnnoSummary s, Set<AnnoSummary> contents) {
 			if (altAnnotations.isEmpty()) {				
 				if (allowsMultiple || contents.isEmpty()) {
 					contents.add(s);
@@ -666,7 +737,7 @@ public class PromisesAnnotationRewriter {
 				alt = altAnnotations.values().iterator().next();
 			}
 			if (alt != null) {
-				contents.add(alt.getContents());
+				contents.add(new AnnoSummary(alt));
 			} else {
 				contents.add(s);
 			}
@@ -708,7 +779,7 @@ public class PromisesAnnotationRewriter {
 	@SuppressWarnings("unchecked")
 	private Annotation createWrappedAnnotation(final AST ast,
 			final String name, final String wrapperName,
-			final Set<String> contents, final Set<String> imports) {
+			final Set<AnnoSummary> contents, final Set<String> imports) {
 		final int len = contents.size();
 		if (len == 1) {
 			return ann(ast, name, contents.iterator().next(), imports);
@@ -718,9 +789,9 @@ public class PromisesAnnotationRewriter {
 			addImport(wrapperName, imports);
 			final ArrayInitializer arr = ast.newArrayInitializer();
 			final List<Expression> expressions = arr.expressions();
-			final List<String> cs = new ArrayList<String>(contents);
+			final List<AnnoSummary> cs = new ArrayList<AnnoSummary>(contents);
 			Collections.sort(cs);
-			for (final String desc : cs) {
+			for (final AnnoSummary desc : cs) {
 				expressions.add(ann(ast, name, desc, imports));
 			}
 			a.setValue(arr);
@@ -759,66 +830,114 @@ public class PromisesAnnotationRewriter {
 	 */
 
 	private Annotation ann(final AST ast, final String name,
-			final String contents, final Set<String> imports) {
+			final AnnoSummary anno, final Set<String> imports) {
 		addImport(name, imports);
-		if (contents != null) {
-			final SingleMemberAnnotation ann = ast.newSingleMemberAnnotation();
-			ann.setTypeName(ast.newName(name));
+		switch (anno.getKind()) {
+		case Normal:
+			final NormalAnnotation na = ast.newNormalAnnotation();
+			na.setTypeName(ast.newName(name));
+			if (anno.contents != null) {				
+				na.values().add(newPair(ast, AnnotationConstants.VALUE_ATTR, anno.contents));
+			}
+			for(Map.Entry<String, String> e : anno.attributes.entrySet()) {
+				na.values().add(newPair(ast, e.getKey(), e.getValue()));
+			}
+			return na;
+		case Single:
+			final SingleMemberAnnotation sma = ast.newSingleMemberAnnotation();
+			sma.setTypeName(ast.newName(name));
 			final StringLiteral lit = ast.newStringLiteral();
-			lit.setLiteralValue(contents);
-			ann.setValue(lit);
-			return ann;
-		} else {
-			final MarkerAnnotation ann = ast.newMarkerAnnotation();
-			ann.setTypeName(ast.newName(name));
-			return ann;
+			lit.setLiteralValue(anno.contents);
+			sma.setValue(lit);
+			return sma;
+		case Marker:
+		default:
+			final MarkerAnnotation ma = ast.newMarkerAnnotation();
+			ma.setTypeName(ast.newName(name));
+			return ma;
 		}
 	}
 
+	private MemberValuePair newPair(final AST ast, String name, String value) {
+		MemberValuePair pair = ast.newMemberValuePair();
+		pair.setName(ast.newSimpleName(name));
+		StringLiteral s = ast.newStringLiteral();
+		s.setLiteralValue(value);
+		pair.setValue(s);
+		return pair;
+	}
+	
 	static void addImport(final String promise, final Set<String> imports) {
 		imports.add(PROMISE_PKG+'.' + promise);
 	}
 
-	/**
-	 * Returns the value of an annotation, or null if no value exists
-	 * 
-	 * @param a
-	 * @return
-	 */
-	@SuppressWarnings("unchecked")
-	private static Expression extractValue(final Annotation a) {
-		if (a.isNormalAnnotation()) {
-			final NormalAnnotation na = (NormalAnnotation) a;
-			final List<MemberValuePair> ps = na.values();
-			for (final MemberValuePair p : ps) {
-				if (p.getName().getIdentifier().equals(AnnotationConstants.VALUE_ATTR)) {
-					return p.getValue();
-				}
+	enum AnnoKind {
+		Marker, Single, Normal
+	}
+	
+	static class AnnoSummary implements Comparable<AnnoSummary> {
+		final String annotation;
+		final String contents;
+		final Map<String, String> attributes;
+		
+		AnnoSummary(String a, String v, Map<String,String> attrs) {
+			annotation = a;
+			contents = v;
+			attributes = attrs;
+		}
+		
+		AnnoSummary(AnnotationDescription desc) {
+			annotation = desc.getAnnotation();
+			contents = desc.getContents();
+			attributes = desc.getAttributes();
+		}
+		
+		AnnoKind getKind() {		
+			if (!attributes.isEmpty()) {
+				return AnnoKind.Normal;
 			}
-		} else if (a.isSingleMemberAnnotation()) {
-			final SingleMemberAnnotation sa = (SingleMemberAnnotation) a;
-			return sa.getValue();
+			if (contents != null) {
+				return AnnoKind.Single;
+			}
+			return AnnoKind.Marker;
 		}
-		return null;
-	}
 
-	private static String join(final Iterable<String> names, final char delim) {
-		final StringBuilder b = new StringBuilder();
-		for (final String name : names) {
-			b.append(name);
-			b.append(delim);
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result
+					+ (annotation == null ? 0 : annotation.hashCode());
+			result = prime * result + (contents == null ? 0 : contents.hashCode());
+			// TODO Skips doing anything about the attributes
+			return result;
 		}
-		if (b.length() == 0) {
-			return "";
+
+		@Override
+		public boolean equals(final Object obj) {
+			if (this == obj) {
+				return true;
+			}
+			if (obj == null) {
+				return false;
+			}
+			if (getClass() != obj.getClass()) {
+				return false;
+			}
+			final AnnoSummary other = (AnnoSummary) obj;
+			return AnnotationDescription.isSame(annotation, other.annotation) &&
+				   AnnotationDescription.isSame(contents, other.contents) &&		
+			       attributes.equals(other.attributes);
 		}
-		return b.substring(0, b.length() - 1);
-	}
 
-	/*
-	 * join together a list of names with the ',' separator
-	 */
-	private static String join(final Iterable<String> names) {
-		return join(names, ',');
+		@Override
+		public int compareTo(AnnoSummary o) {
+			int compare = AnnotationDescription.compare(annotation, o.annotation);
+			if (compare == 0) {
+				compare = AnnotationDescription.compare(contents, o.contents);
+			}
+			// TODO what about attributes -- unstable sort
+			return compare;
+		}
 	}
-
 }

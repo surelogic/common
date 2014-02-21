@@ -8,7 +8,61 @@ import com.surelogic.common.ref.IDecl;
  * Describes an annotation that should be placed at a given target.
  */
 public class AnnotationDescription implements Comparable<AnnotationDescription> {
-
+    public static class Builder {
+    	private final String annotation;
+    	private final String contents;
+    	private String replacedContents;
+    	private final IDecl target;
+    	private IDecl assumptionTarget;
+    	private CU cu;
+    	private CU assumptionCU;
+    	private Map<String, String> attributes = Collections.emptyMap();
+    	private Map<String, String> replacedAttributes = Collections.emptyMap();
+    	
+    	public Builder(final String annotation,
+    			final String contents, final IDecl target) {
+    		this.annotation = annotation;
+    		this.contents = contents;
+    		this.target = target;
+    	}
+    	
+    	public Builder setReplacedContents(String replaced) {
+    		replacedContents = replaced;
+    		return this;
+    	}
+    	
+    	public Builder setAssumeInfo(IDecl t, CU cu) {
+    		assumptionTarget = t;
+    		assumptionCU = cu;
+    		return this;
+    	}
+    	
+    	public Builder setCU(CU cu) {
+    		this.cu = cu;
+    		return this;
+    	}
+    	
+		public void setAttributes(Map<String, String> attributes) {
+			if (attributes == null) {
+				throw new IllegalStateException();
+			}
+			this.attributes = attributes;
+		}
+		
+		public void setReplacedAttributes(Map<String, String> attributes) {
+			if (attributes == null) {
+				throw new IllegalStateException();
+			}
+			this.replacedAttributes = attributes;
+		}
+    	
+    	public AnnotationDescription build() {
+    		return new AnnotationDescription(annotation, contents, attributes, 
+    				replacedContents, replacedAttributes,
+    				target, assumptionTarget, cu, assumptionCU);
+    	}
+    }
+	
 	private final String annotation;
 	private final String contents;
 	private final String replacedContents;
@@ -16,14 +70,13 @@ public class AnnotationDescription implements Comparable<AnnotationDescription> 
 	private final IDecl assumptionTarget;
 	private final CU cu;
 	private final CU assumptionCU;
-
-	public AnnotationDescription(final String annotation,
-			final String contents, final IDecl target) {
-		this(annotation, contents, null, target, null, null, null);
-	}
-
-	public AnnotationDescription(final String annotation,
-			final String contents, final String replaced, final IDecl target,
+	private final Map<String, String> attributes;
+	private final Map<String, String> replacedAttributes;
+	
+	AnnotationDescription(final String annotation,
+			final String contents, Map<String, String> attributes, 
+			final String replaced, Map<String, String> replacedAttributes,
+			final IDecl target,
 			final IDecl assumptionTarget, final CU cu,
 			final CU assumptionCU) {
 		if (annotation == null) {
@@ -41,6 +94,8 @@ public class AnnotationDescription implements Comparable<AnnotationDescription> 
 		this.replacedContents = replaced;
 		this.cu = cu;
 		this.assumptionCU = assumptionCU;
+		this.attributes = attributes;
+		this.replacedAttributes = replacedAttributes;
 	}
 
 	public IDecl getTarget() {
@@ -63,6 +118,14 @@ public class AnnotationDescription implements Comparable<AnnotationDescription> 
 		return replacedContents;
 	}
 	
+	public boolean hasAttributes() {
+		return !attributes.isEmpty();
+	}
+	
+	public Map<String, String> getAttributes() {
+		return attributes;
+	}
+	
 	@Override
 	public String toString() {
 		if (getContents() == null) {
@@ -83,7 +146,7 @@ public class AnnotationDescription implements Comparable<AnnotationDescription> 
 		return compare;
 	}
 	
-	private static int compare(String s1, String s2) {
+	public static int compare(String s1, String s2) {
 		if (s1 == null && s2 == null) {
 			return 0;
 		} else if (s1 == null) {
@@ -108,6 +171,7 @@ public class AnnotationDescription implements Comparable<AnnotationDescription> 
 		result = prime * result + (contents == null ? 0 : contents.hashCode());
 		result = prime * result + (replacedContents == null ? 0 : replacedContents.hashCode());
 		result = prime * result + (target == null ? 0 : target.hashCode());
+		// TODO Skips doing anything about the attributes
 		return result;
 	}
 
@@ -126,10 +190,12 @@ public class AnnotationDescription implements Comparable<AnnotationDescription> 
 		return isSame(annotation, other.annotation) &&
 		       isSame(contents, other.contents) &&
 		       isSame(replacedContents, other.replacedContents) &&
-		       isSame(target, other.target);
+		       isSame(target, other.target) &&
+		       attributes.equals(other.attributes) &&
+		       replacedAttributes.equals(other.attributes);
 	}
 
-	private static <T> boolean isSame(T o1, T o2) {
+	public static <T> boolean isSame(T o1, T o2) {
 		if (o1 == null) {
 			if (o2 != null) {
 				return false;
