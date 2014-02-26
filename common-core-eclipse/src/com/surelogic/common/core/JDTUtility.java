@@ -541,7 +541,7 @@ public final class JDTUtility {
             return new Pair<IJavaElement, Double>(cf, Double.valueOf(1)); // package-info.class
         }
       }
-      System.out.println(" found (" + confidence + ") -> " + best);
+      //System.out.println(" found (" + confidence + ") -> " + best);
       return new Pair<IJavaElement, Double>(best, Double.valueOf(confidence));
     } catch (Exception e) {
       SLLogger.getLogger().log(Level.WARNING, I18N.err(156, context), e);
