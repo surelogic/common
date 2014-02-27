@@ -20,7 +20,7 @@ public class XmlCreator {
   /**
    * Used to buffer output to the PrintWriter above
    */
-  private final StringBuilder sb = new StringBuilder();
+  final StringBuilder sb = new StringBuilder();
   protected final Builder b = new Builder(0);
 
   protected XmlCreator(OutputStream out) throws IOException {
@@ -94,6 +94,17 @@ public class XmlCreator {
       Entities.start(name, sb, indent);
     }
 
+    public void endWithContents(String contents) {
+        if (nested.isEmpty()) {
+            Entities.closeStart(sb, false, false);        	
+        } else {
+        	Entities.indent(sb, indent);
+        }
+        sb.append(contents);
+        Entities.end(name, sb, nested.isEmpty() ? 0 : indent);
+        flushBuffer();
+    }
+    
     public void end() {
       if (nested.isEmpty()) {
         Entities.closeStart(sb, true, true);
