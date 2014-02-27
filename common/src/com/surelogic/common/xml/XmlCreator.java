@@ -97,9 +97,11 @@ public class XmlCreator {
     public void endWithContents(String contents) {
         if (nested.isEmpty()) {
             Entities.closeStart(sb, false, false);        	
+        } else {
+        	Entities.indent(sb, indent);
         }
         sb.append(contents);
-        Entities.end(name, sb, indent);
+        Entities.end(name, sb, nested.isEmpty() ? 0 : indent);
         flushBuffer();
     }
     
