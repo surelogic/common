@@ -6,7 +6,8 @@ package com.surelogic.common;
 public class Pair<T1, T2> {
   private final T1 elem1;
   private final T2 elem2;
-
+  // Could store a hash code?
+  
   public static <T1, T2> Pair<T1, T2> getInstance(final T1 o1, final T2 o2) {
     return new Pair<T1, T2>(o1, o2);
   }
