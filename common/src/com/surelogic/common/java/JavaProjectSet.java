@@ -91,6 +91,14 @@ public class JavaProjectSet<P extends ISLJavaProject> implements Iterable<P> {
 		return projects.size();
 	}
 
+	public int getNumSourceFiles() {
+		int rv = 0;
+		for(Config c : getConfigs()) {
+			rv += c.getFiles().size();
+		}
+		return rv;
+	}
+	
 	public boolean multiProject() {
 		int count = 0;
 		for (P p : projects.values()) {
