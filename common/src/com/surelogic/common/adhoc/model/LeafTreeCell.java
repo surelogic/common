@@ -10,13 +10,13 @@ package com.surelogic.common.adhoc.model;
  */
 public final class LeafTreeCell extends TreeCell {
 
-  LeafTreeCell(String text, boolean blankText, String imageSymbolicName, int rowIndex) {
-    super(text, blankText, imageSymbolicName);
+  LeafTreeCell(String text, Long longValue, boolean blankText, String imageSymbolicName, int rowIndex) {
+    super(text, longValue, blankText, imageSymbolicName);
     f_rowIndex = rowIndex;
   }
 
   LeafTreeCell(Cell cell, int rowIndex) {
-    this(cell.getText(), cell.getBlankText(), cell.getImageSymbolicName(), rowIndex);
+    this(cell.getText(), cell.getLongValueThatStartsTextOrNull(), cell.getBlankText(), cell.getImageSymbolicName(), rowIndex);
   }
 
   final int f_rowIndex;

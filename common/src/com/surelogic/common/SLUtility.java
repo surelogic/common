@@ -463,6 +463,38 @@ public final class SLUtility {
   }
 
   /**
+   * This method converts a string to a long but it ignores non-numeric
+   * suffices. For example, invoking {@code safeParseLong("40 ns")} would result
+   * in 40 (i.e., not an error). Also commas are skipped so
+   * {@code safeParseLong("47,340 ns")} would result in 47340 (i.e., not an
+   * error).
+   * 
+   * @param value
+   *          the string to convert.
+   * @return the resulting long value. If the value is entirely non-numeric the
+   *         result will be 0.
+   */
+  public static long safeParseLong(String value) {
+    value = value.trim();
+    long result = 0;
+    if (value != null) {
+      for (int i = 0; i < value.length(); i++) {
+        final char ch = value.charAt(i);
+        if (ch != ',') { // skip commas
+          final long digit = ch - '0';
+          final boolean isNumeric = 0 <= digit && digit <= 9;
+          if (isNumeric) {
+            result = (result * 10) + digit;
+          } else {
+            return result;
+          }
+        }
+      }
+    }
+    return result;
+  }
+
+  /**
    * Rounds the passed double with {@link Math#round(double)} then invokes
    * {@link #safeLongToInt(long)}.
    * 
