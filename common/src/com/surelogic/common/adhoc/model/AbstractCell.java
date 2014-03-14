@@ -9,7 +9,7 @@ public abstract class AbstractCell {
 
   /**
    * Constructs a cell with text and a flag to indicate if the text should be
-   * blaked in the user interface.
+   * blanked in the user interface.
    * 
    * @param text
    *          the text to be displayed in this cell. If this parameter is

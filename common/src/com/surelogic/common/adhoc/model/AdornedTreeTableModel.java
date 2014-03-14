@@ -258,9 +258,13 @@ public final class AdornedTreeTableModel {
            * Handle blanking, commas, prefix, and suffix if necessary
            */
           boolean blankText = false; // default
+          Long longValue = null; // default
           final ColumnAnnotation colInfo = adornedColumnAnnotationInfo[adornedColI];
           if (colInfo != null) {
             if (cellText != null) {
+              final Pair<Long, String> breakout = safeParseLongAtStart(cellText);
+              if (breakout != null)
+                longValue = breakout.first();
               // Check if we should blank the text
               if (cellText.equals(colInfo.getBlankIf()))
                 blankText = true;
@@ -269,7 +273,6 @@ public final class AdornedTreeTableModel {
                 cellText = colInfo.getChangeIfTo();
               // Human readable duration (hrd)
               if (colInfo.getHumanReadableDuration()) {
-                Pair<Long, String> breakout = safeParseLongAtStart(cellText);
                 if (breakout != null) {
                   // the string begins with an integer
                   cellText = SLUtility.toStringDurationNS(breakout.first(), colInfo.getHumanReadableDurationUnit())
@@ -277,7 +280,6 @@ public final class AdornedTreeTableModel {
                 }
               } else if (colInfo.getAddCommas()) { // incompatible with hrd
                 // Comma-ize starting number (1000 -> 1,000 / 4544j -> 4,544j)
-                Pair<Long, String> breakout = safeParseLongAtStart(cellText);
                 if (breakout != null) {
                   // the string begins with an integer
                   cellText = SLUtility.toStringHumanWithCommas(breakout.first()) + breakout.second();
@@ -309,7 +311,7 @@ public final class AdornedTreeTableModel {
             }
           }
 
-          adornedRows[rowI][adornedColI] = new Cell(cellText, blankText, cellImageSymbolicName);
+          adornedRows[rowI][adornedColI] = new Cell(cellText, longValue, blankText, cellImageSymbolicName);
           adornedColI++;
         }
       }
@@ -428,7 +430,7 @@ public final class AdornedTreeTableModel {
   private static void addNonLeafColumnSummaries(final List<NonLeafTreeCell> nonLeafCells,
       final ColumnAnnotation[] adornedColumnAnnotationInfo, final int lastTreeIndex, final Cell[][] adornedRows) {
     final Set<Pair<Cell, String>> cellsToReplaceText = new HashSet<Pair<Cell, String>>();
-    for (final NonLeafTreeCell cell : nonLeafCells) {
+    for (final NonLeafTreeCell nonLeafCell : nonLeafCells) {
       for (int colI = lastTreeIndex; colI < adornedColumnAnnotationInfo.length; colI++) {
         final ColumnAnnotation info = adornedColumnAnnotationInfo[colI];
         if (info != null) {
@@ -436,12 +438,12 @@ public final class AdornedTreeTableModel {
             /*
              * SUM
              */
-            if (info.onSetContains(cell.filledColumnCount())) {
+            if (info.onSetContains(nonLeafCell.filledColumnCount())) {
               long summaryTotal = 0;
-              for (final LeafTreeCell leaf : cell.getLeaves()) {
-                final String contents = adornedRows[leaf.getRowIndex()][colI].getText();
-                final long value = safeParseLong(contents);
-                summaryTotal += value;
+              for (final LeafTreeCell leaf : nonLeafCell.getLeaves()) {
+                final Long longValue = adornedRows[leaf.getRowIndex()][colI].getLongValueThatStartsTextOrNull();
+                if (longValue != null)
+                  summaryTotal += longValue;
               }
               String cellText = Long.toString(summaryTotal);
               final boolean blankText = cellText.equals(info.getBlankIf());
@@ -453,18 +455,18 @@ public final class AdornedTreeTableModel {
               }
               final String text = info.getAggregatePrefix() + cellText + info.getAggregateSuffix();
               final NonLeafColumnSummaryCell columnSummary = new NonLeafColumnSummaryCell(text, blankText, colI);
-              cell.addColumnSummary(columnSummary);
+              nonLeafCell.addColumnSummary(columnSummary);
             }
           } else if (info.maxPartialRows()) {
             /*
              * MAX
              */
-            if (info.onSetContains(cell.filledColumnCount())) {
+            if (info.onSetContains(nonLeafCell.filledColumnCount())) {
               long runningMax = 0;
-              for (final LeafTreeCell leaf : cell.getLeaves()) {
-                final String contents = adornedRows[leaf.getRowIndex()][colI].getText();
-                final long value = safeParseLong(contents);
-                runningMax = Math.max(runningMax, value);
+              for (final LeafTreeCell leaf : nonLeafCell.getLeaves()) {
+                final Long longValue = adornedRows[leaf.getRowIndex()][colI].getLongValueThatStartsTextOrNull();
+                if (longValue != null)
+                  runningMax = Math.max(runningMax, longValue);
               }
               String cellText = Long.toString(runningMax);
               final boolean blankText = cellText.equals(info.getBlankIf());
@@ -476,20 +478,20 @@ public final class AdornedTreeTableModel {
               }
               final String text = info.getAggregatePrefix() + cellText + info.getAggregateSuffix();
               final NonLeafColumnSummaryCell columnSummary = new NonLeafColumnSummaryCell(text, blankText, colI);
-              cell.addColumnSummary(columnSummary);
+              nonLeafCell.addColumnSummary(columnSummary);
             }
 
           } else if (info.countPartialRows()) {
             /*
              * COUNT (DISTINCT) (NONEMPTY)
              */
-            if (info.onSetContains(cell.filledColumnCount())) {
+            if (info.onSetContains(nonLeafCell.filledColumnCount())) {
               final boolean distinct = info.countDistinct();
               final boolean allowEmptyValues = !info.countNonempty();
               final String replaceValueWith = info.getCountReplaceValueWith();
               final Set<String> distinctFound = new HashSet<String>();
               int countTotal = 0;
-              for (final LeafTreeCell leaf : cell.getLeaves()) {
+              for (final LeafTreeCell leaf : nonLeafCell.getLeaves()) {
                 final Cell adornedCell = adornedRows[leaf.getRowIndex()][colI];
                 final String contents = adornedCell.getText();
                 final boolean considerInCount = allowEmptyValues || !contents.trim().isEmpty();
@@ -510,16 +512,16 @@ public final class AdornedTreeTableModel {
               final String text = info.getAggregatePrefix()
                   + (info.getAddCommas() ? SLUtility.toStringHumanWithCommas(countTotal) : simpleText) + info.getAggregateSuffix();
               final NonLeafColumnSummaryCell columnSummary = new NonLeafColumnSummaryCell(text, blankText, colI);
-              cell.addColumnSummary(columnSummary);
+              nonLeafCell.addColumnSummary(columnSummary);
             }
           } else if (info.containsPartialRows()) {
             /*
              * CONTAINS 'X' SHOW 'Y'
              */
-            if (info.onSetContains(cell.filledColumnCount())) {
+            if (info.onSetContains(nonLeafCell.filledColumnCount())) {
               boolean show = false;
               final String containsValue = info.getContainsValue();
-              for (final LeafTreeCell leaf : cell.getLeaves()) {
+              for (final LeafTreeCell leaf : nonLeafCell.getLeaves()) {
                 final Cell adornedCell = adornedRows[leaf.getRowIndex()][colI];
                 final String contents = adornedCell.getText();
                 if (contents.equals(containsValue))
@@ -530,7 +532,7 @@ public final class AdornedTreeTableModel {
                 final boolean blankText = showText.equals(info.getBlankIf());
                 final String text = info.getAggregatePrefix() + showText + info.getAggregateSuffix();
                 final NonLeafColumnSummaryCell columnSummary = new NonLeafColumnSummaryCell(text, blankText, colI);
-                cell.addColumnSummary(columnSummary);
+                nonLeafCell.addColumnSummary(columnSummary);
               }
             }
           }
@@ -539,38 +541,6 @@ public final class AdornedTreeTableModel {
     }
     for (final Pair<Cell, String> pair : cellsToReplaceText)
       pair.first().setText(pair.second());
-  }
-
-  /**
-   * This method converts a string to a long but it ignores non-numeric
-   * suffices. For example, invoking {@code safeParseLong("40 ns")} would result
-   * in 40 (i.e., not an error). Also commas are skipped so
-   * {@code safeParseLong("47,340 ns")} would result in 47340 (i.e., not an
-   * error).
-   * 
-   * @param value
-   *          the string to convert.
-   * @return the resulting long value. If the value is entirely non-numeric the
-   *         result will be 0.
-   */
-  private static long safeParseLong(String value) {
-    value = value.trim();
-    long result = 0;
-    if (value != null) {
-      for (int i = 0; i < value.length(); i++) {
-        final char ch = value.charAt(i);
-        if (ch != ',') { // skip commas
-          final long digit = ch - '0';
-          final boolean isNumeric = 0 <= digit && digit <= 9;
-          if (isNumeric) {
-            result = (result * 10) + digit;
-          } else {
-            return result;
-          }
-        }
-      }
-    }
-    return result;
   }
 
   /**

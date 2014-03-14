@@ -14,12 +14,12 @@ import com.surelogic.common.i18n.I18N;
  */
 public final class NonLeafTreeCell extends TreeCell {
 
-  NonLeafTreeCell(String text, boolean blankText, String imageSymbolicName) {
-    super(text, blankText, imageSymbolicName);
+  NonLeafTreeCell(String text, Long longValue, boolean blankText, String imageSymbolicName) {
+    super(text, longValue, blankText, imageSymbolicName);
   }
 
   NonLeafTreeCell(Cell cell) {
-    this(cell.getText(), cell.getBlankText(), cell.getImageSymbolicName());
+    this(cell.getText(), cell.getLongValueThatStartsTextOrNull(), cell.getBlankText(), cell.getImageSymbolicName());
   }
 
   /**

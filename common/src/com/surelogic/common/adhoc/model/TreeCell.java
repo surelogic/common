@@ -5,12 +5,12 @@ package com.surelogic.common.adhoc.model;
  */
 public abstract class TreeCell extends Cell {
 
-  TreeCell(String text, boolean blankText, String imageSymbolicName) {
-    super(text, blankText, imageSymbolicName);
+  TreeCell(String text, Long longValue, boolean blankText, String imageSymbolicName) {
+    super(text, longValue, blankText, imageSymbolicName);
   }
 
   TreeCell(Cell cell) {
-    this(cell.getText(), cell.getBlankText(), cell.getImageSymbolicName());
+    this(cell.getText(), cell.getLongValueThatStartsTextOrNull(), cell.getBlankText(), cell.getImageSymbolicName());
   }
 
   /**
