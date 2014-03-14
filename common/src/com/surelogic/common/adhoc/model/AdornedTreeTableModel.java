@@ -258,7 +258,7 @@ public final class AdornedTreeTableModel {
            * Handle blanking, commas, prefix, and suffix if necessary
            */
           boolean blankText = false; // default
-          long longValue = -0; // default
+          Long longValue = null; // default
           final ColumnAnnotation colInfo = adornedColumnAnnotationInfo[adornedColI];
           if (colInfo != null) {
             if (cellText != null) {
