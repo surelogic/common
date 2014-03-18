@@ -6,7 +6,7 @@ import java.io.File;
  * Named to distinguish it from Eclipse's IJavaProject
  */
 public interface ISLJavaProject {
-	void addPackage(String pkg);
+	void addPackage(String pkg, Config.Type type);
 	String getName();
 	void mapJar(File path, File origPath);
 	Config getConfig();

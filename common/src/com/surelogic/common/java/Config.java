@@ -22,6 +22,32 @@ import com.surelogic.common.xml.XmlCreator;
  * @author edwin
  */
 public class Config extends AbstractClassPathEntry {
+	public enum Type {
+		/**
+		 * Fully loaded from a .java file
+		 */
+		SOURCE() {
+			@Override
+			public boolean fromSourceFile() { return true; }
+		}, 
+		/**
+		 * Loading only the interface from a .java file
+		 */
+		INTERFACE() {
+			@Override
+			public boolean fromSourceFile() { return true; }
+		}, 
+		/**
+		 * Loaded from a .class file
+		 */
+		BINARY,
+		UNKNOWN;
+
+		public boolean fromSourceFile() {
+			return false;
+		}
+	}
+	
 	public static final String JRE_LIBRARY = "JRE System Library";
 	// Same as JavaRuntime.JRE_CONTAINER
 	public static final String JRE_NAME = "org.eclipse.jdt.launching.JRE_CONTAINER";
@@ -30,7 +56,7 @@ public class Config extends AbstractClassPathEntry {
 	
 	protected static final boolean followRefs = false;
 	public static final String SOURCE_LEVEL = "sourceLevel";
-	public static final String AS_SOURCE = "asSource";
+	public static final String AS_SOURCE = "asSource";	
 	
 	private final String name;
 	private final File location;
@@ -46,7 +72,7 @@ public class Config extends AbstractClassPathEntry {
 	 */
 	private final List<JavaSourceFile> origFiles = new ArrayList<JavaSourceFile>();
 	private final List<File> removed = new ArrayList<File>();
-	private final Set<String> pkgs = new HashSet<String>();
+	private final Set<String> pkgs = new HashSet<String>(); // of the sources
 	
 	private String run;
 	private final Map<URI,JavaSourceFile> pathMapping = new HashMap<URI, JavaSourceFile>();
@@ -264,7 +290,7 @@ public class Config extends AbstractClassPathEntry {
 				*/
 				// Add packages to type env
 				for(String pkg : pkgs) {
-					jp.addPackage(pkg);
+					jp.addPackage(pkg, options.get(AS_SOURCE) == Boolean.TRUE ? Config.Type.SOURCE : Config.Type.INTERFACE);
 				}
 				/*
 				final String parentPath = p.second().getParent().replace(File.separatorChar, '.');
