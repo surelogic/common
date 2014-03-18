@@ -112,7 +112,7 @@ public class ZippedConfig extends Config {
 							 * .replace( '$', '.')
 							 */, f, null, false, getProject()));
 						}
-					} else if (ze.getName().endsWith("/package-info.java")) {
+					} else if (ze.getName().endsWith(JavaSourceFile.SLASH_PACKAGE_INFO)) {
 						System.out.println("What to do about package-info.java?");
 					} else {
 						System.err.println("Unable to get qname for " + ze.getName());
@@ -145,4 +145,4 @@ public class ZippedConfig extends Config {
 		this.setFiles(srcFiles);
 		super.copySources(zipDir, targetDir);
 	}      
-}
+ }
