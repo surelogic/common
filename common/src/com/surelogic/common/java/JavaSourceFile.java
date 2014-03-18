@@ -5,9 +5,12 @@ import java.net.URI;
 
 import com.surelogic.common.FileUtility;
 import com.surelogic.common.Pair;
+import com.surelogic.common.SLUtility;
 import com.surelogic.common.xml.XmlCreator;
 
 public final class JavaSourceFile extends AbstractJavaFile {
+	public static final String SLASH_PACKAGE_INFO = '/'+SLUtility.PACKAGE_INFO_JAVA;
+	
 	public final String relativePath;
 	public final boolean asBinary;
 	
