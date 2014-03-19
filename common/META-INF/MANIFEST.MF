@@ -254,7 +254,7 @@ Bundle-ClassPath: .,
  lib/runtime/ant.jar,
  lib/runtime/asm-4.1.jar,
  lib/runtime/asm-commons-4.1.jar,
- lib/runtime/promises-5.1.0.jar,
+ lib/runtime/promises-5.2.0.jar,
  lib/runtime/jsr166y.jar,
  lib/runtime/extra166y.jar,
  lib/runtime/trove-3.0.3.jar

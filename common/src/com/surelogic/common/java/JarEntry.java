@@ -107,7 +107,7 @@ public class JarEntry extends AbstractClassPathEntry {
 					}					
 				});
 				if (!createdPkg) {
-					jp.addPackage(pkgPrefix == null ? "" : pkgPrefix);
+					jp.addPackage(pkgPrefix == null ? "" : pkgPrefix, Config.Type.BINARY);
 				}
 				System.out.println("\tMapping "+qname);
 				i++;
@@ -138,7 +138,7 @@ public class JarEntry extends AbstractClassPathEntry {
 					String qname = convertClassToQname(name);
 					int lastDot  = qname.lastIndexOf('.');
 					String pkg   = lastDot < 0 ? "" : qname.substring(0, lastDot);
-					jp.addPackage(pkg);
+					jp.addPackage(pkg, Config.Type.BINARY);
 					/*
     			if (SLUtility.JAVA_LANG_OBJECT.equals(qname) || "java.lang.Enum".equals(qname)) {
     				System.out.println(jp.getName()+": mapping "+qname+" to "+jar.getAbsolutePath());    			

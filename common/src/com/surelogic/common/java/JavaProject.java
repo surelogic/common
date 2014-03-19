@@ -70,7 +70,7 @@ public class JavaProject implements ISLJavaProject {
 		*/
 	}
 	
-	public void addPackage(String pkg) {
+	public void addPackage(String pkg, Config.Type t) {
 		// Nothing to do?
 	}
 
