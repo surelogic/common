@@ -1371,11 +1371,16 @@ public abstract class Decl implements IDecl {
   public final List<IDeclParameter> getParameters() {
     if (f_children == null || f_children.length == 0)
       return Collections.emptyList();
-    List<IDeclParameter> work = new ArrayList<IDeclParameter>();
+    List<IDeclParameter> work = null;
     for (IDecl decl : f_children) {
-      if (decl instanceof IDeclParameter)
+      if (decl instanceof IDeclParameter) {
+        if (work == null)
+          work = new ArrayList<IDeclParameter>();
         work.add((IDeclParameter) decl);
+      }
     }
+    if (work == null)
+      return Collections.emptyList();
     Collections.sort(work, f_byPosition);
     return work;
   }
