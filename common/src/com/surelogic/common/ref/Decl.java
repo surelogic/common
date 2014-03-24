@@ -1369,8 +1369,10 @@ public abstract class Decl implements IDecl {
   @Override
   @NonNull
   public final List<IDeclParameter> getParameters() {
+    if (f_children == null || f_children.length == 0)
+      return Collections.emptyList();
     List<IDeclParameter> work = new ArrayList<IDeclParameter>();
-    for (IDecl decl : getChildren()) {
+    for (IDecl decl : f_children) {
       if (decl instanceof IDeclParameter)
         work.add((IDeclParameter) decl);
     }
