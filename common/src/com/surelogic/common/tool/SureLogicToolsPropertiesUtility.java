@@ -27,6 +27,8 @@ public class SureLogicToolsPropertiesUtility {
 
   public static final String SCAN_EXCLUDE_SOURCE_FOLDER = "scan.exclude.source.folder";
   public static final String SCAN_EXCLUDE_SOURCE_PACKAGE = "scan.exclude.source.package";
+  public static final String SCAN_SOURCE_FOLDER_AS_BYTECODE = "scan.source.folder.as.bytecode";
+  public static final String SCAN_SOURCE_PACKAGE_AS_BYTECODE = "scan.source.package.as.bytecode";
 
   /**
    * Reads in the passed file, it is suggested that the {@link #PROPS_FILE} file
@@ -64,6 +66,29 @@ public class SureLogicToolsPropertiesUtility {
     return l.split("[ ,]+");
   }
 
+  public static String combineListProperties(String p, String p2) {
+	if (p == null) {
+		return p2;
+	}
+	if (p2 == null) {
+		return p;		
+	}
+	return p+", "+p2;
+  }
+  
+  public static String[] combineLists(String[] s1, String[] s2) {
+	  if (s1 == null || s1.length == 0) {
+		  return s2;
+	  }
+	  if (s2 == null || s2.length == 0) {
+		  return s1;
+	  }
+	  String[] rv = new String[s1.length + s2.length];
+	  System.arraycopy(s1, 0, rv, 0, s1.length);
+	  System.arraycopy(s2, 0, rv, s1.length, s2.length);
+	  return rv;
+  }
+  
   /**
    * Assuming the passed properties file is from a
    * <tt>surelogic-tools.properties</tt> file, this method returns a list of the
@@ -96,6 +121,38 @@ public class SureLogicToolsPropertiesUtility {
     return getListProperty(props, SCAN_EXCLUDE_SOURCE_PACKAGE);
   }
 
+  /**
+   * Assuming the passed properties file is from a
+   * <tt>surelogic-tools.properties</tt> file, this method returns a list of the
+   * source folders to be loaded as bytecode.
+   * 
+   * @param props
+   *          properties from a <tt>surelogic-tools.properties</tt> file or
+   *          {@code null}.
+   * @return a possibly empty array listing exclusions.
+   */
+  @NonNull
+  public static String[] getBytecodeSourceFolders(@Nullable Properties props) {
+    return getListProperty(props, SCAN_SOURCE_FOLDER_AS_BYTECODE);
+  }
+
+  /**
+   * Assuming the passed properties file is from a
+   * <tt>surelogic-tools.properties</tt> file, this method returns a list of the
+   * packages to be loaded as bytecode.
+   * <p>
+   * These could include wildcards such as <tt>*test*</tt>.
+   * 
+   * @param props
+   *          properties from a <tt>surelogic-tools.properties</tt> file or
+   *          {@code null}.
+   * @return a possibly empty array listing exclusions.
+   */
+  @NonNull
+  public static String[] getBytecodePackagePatterns(@Nullable Properties props) {
+    return getListProperty(props, SCAN_SOURCE_PACKAGE_AS_BYTECODE);
+  }
+  
   private static final SureLogicToolsFilter f_null = new SureLogicToolsFilter() {
     @Override
     public boolean matches(@NonNull String absoluteOrRelativePath, @NonNull String packageName) {
@@ -158,6 +215,23 @@ public class SureLogicToolsPropertiesUtility {
     };
   }
 
+  public static SureLogicToolsFilter combine(final SureLogicToolsFilter f, final SureLogicToolsFilter f2) {
+	  if (f == null || f == f_null) {
+		  return f2;
+	  }
+	  if (f2 == null || f2 == f_null) {
+		  return f;
+	  }
+	  if (f == f2) {
+		  return f;
+	  }
+	  return new SureLogicToolsFilter() {
+		public boolean matches(@NonNull String absoluteOrRelativePath, @NonNull String packageName) {			
+			return f.matches(absoluteOrRelativePath, packageName) || f2.matches(absoluteOrRelativePath, packageName);
+		}
+	};
+  }
+  
   public static Pattern[] makePackageMatchers(String[] patterns) {
     final Pattern[] excludePatterns = new Pattern[patterns.length];
     int i = 0;

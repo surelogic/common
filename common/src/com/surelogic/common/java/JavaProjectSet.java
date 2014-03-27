@@ -271,9 +271,37 @@ public class JavaProjectSet<P extends ISLJavaProject> implements Iterable<P> {
 	 * @return the excluded source folders, or an empty list if none.
 	 */
 	public List<String> getExcludedSourceFolders() {
+		return getSourceFoldersFor(SureLogicToolsPropertiesUtility.SCAN_EXCLUDE_SOURCE_FOLDER);
+	}
+	
+	/**
+	 * Gets the excluded source packages with wildcards.
+	 * 
+	 * @return the excluded source package spec with wildcards, or an empty list
+	 *         if none.
+	 */
+	public List<String> getExcludedSourcePackageSpec() {
+		return getSourcePackageSpecFor(SureLogicToolsPropertiesUtility.SCAN_EXCLUDE_SOURCE_PACKAGE);
+	}
+	
+	public List<String> getSourceFoldersLoadedAsBytecode() {
+		return getSourceFoldersFor(SureLogicToolsPropertiesUtility.SCAN_SOURCE_FOLDER_AS_BYTECODE);
+	}
+	
+	public List<String> getSourcePackageSpecLoadedAsBytecode() {
+		return getSourcePackageSpecFor(SureLogicToolsPropertiesUtility.SCAN_SOURCE_PACKAGE_AS_BYTECODE);
+	}
+	
+	/**
+	 * Gets the source folders for the given property (relative to the
+	 * workspace).
+	 * 
+	 * @return the source folders, or an empty list if none.
+	 */
+	private List<String> getSourceFoldersFor(String prop) {
 		List<String> folders = new ArrayList<String>();
 		for (Config c : getConfigs()) {
-			String[] here = c.getListOption(SureLogicToolsPropertiesUtility.SCAN_EXCLUDE_SOURCE_FOLDER);
+			String[] here = c.getListOption(prop);
 			for (String p : here) {
 				folders.add('/' + c.getProject() + '/' + p);
 			}
@@ -284,16 +312,10 @@ public class JavaProjectSet<P extends ISLJavaProject> implements Iterable<P> {
 		return folders;
 	}
 	
-	/**
-	 * Gets the excluded source packages with wildcards.
-	 * 
-	 * @return the excluded source package spec with wildcards, or an empty list
-	 *         if none.
-	 */
-	public List<String> getExcludedSourcePackageSpec() {
+	private List<String> getSourcePackageSpecFor(String prop) {
 		List<String> pkgs = new ArrayList<String>();
 		for (Config c : getConfigs()) {
-			String[] here = c.getListOption(SureLogicToolsPropertiesUtility.SCAN_EXCLUDE_SOURCE_PACKAGE);
+			String[] here = c.getListOption(prop);
 			for (String p : here) {
 				pkgs.add(p);
 			}

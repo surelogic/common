@@ -481,8 +481,14 @@ public abstract class ProjectInfo<P extends ISLJavaProject> {
 		// setup filter
 		final String[] excludedSourceFolders = config.getListOption(SureLogicToolsPropertiesUtility.SCAN_EXCLUDE_SOURCE_FOLDER);
 		final String[] excludedPackagePatterns = config.getListOption(SureLogicToolsPropertiesUtility.SCAN_EXCLUDE_SOURCE_PACKAGE);
-		final SureLogicToolsFilter filter = SureLogicToolsPropertiesUtility
-				.getFilterFor(excludedSourceFolders, excludedPackagePatterns);
+		final SureLogicToolsFilter excludeFilter = 
+				SureLogicToolsPropertiesUtility.getFilterFor(excludedSourceFolders, excludedPackagePatterns);
+		
+		final String[] bytecodeSourceFolders = config.getListOption(SureLogicToolsPropertiesUtility.SCAN_SOURCE_FOLDER_AS_BYTECODE);
+		final String[] bytecodePackagePatterns = config.getListOption(SureLogicToolsPropertiesUtility.SCAN_SOURCE_PACKAGE_AS_BYTECODE);
+		final SureLogicToolsFilter bytecodeFilter = 
+				SureLogicToolsPropertiesUtility.getFilterFor(bytecodeSourceFolders, bytecodePackagePatterns);
+		final SureLogicToolsFilter combinedFilter = SureLogicToolsPropertiesUtility.combine(excludeFilter, bytecodeFilter);
 		for (ICompilationUnit icu : cus) {
 			// Check if legal
 			final String name = icu.getElementName();
@@ -504,7 +510,7 @@ public abstract class ProjectInfo<P extends ISLJavaProject> {
 			} else { // Removed
 				qname = f.getName();
 			}
-			boolean excludeFilterMatchesTreatAsBinary = filter.matches(path.toFile().getAbsolutePath(), packageName);
+			boolean excludeFilterMatchesTreatAsBinary = combinedFilter.matches(path.toFile().getAbsolutePath(), packageName);
 			files.add(new JavaSourceFile(qname, f, path.toPortableString(), excludeFilterMatchesTreatAsBinary, config.getProject()));
 		}
 		return files;
