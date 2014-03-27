@@ -20,6 +20,7 @@ public class RegressionUtility {
   private static final boolean debug = XUtil.testing;
   public static final String JSURE_LOG_SUFFIX = ".log.xml";
   public static final String JSURE_SNAPSHOT_SUFFIX = ".sea.xml";
+  public static final String JSURE_GZ_SNAPSHOT_SUFFIX = JSURE_SNAPSHOT_SUFFIX+FileUtility.GZIP_SUFFIX;
   public static final String JSURE_SNAPSHOT_DIFF_SUFFIX = ".sea.diffs.xml";
 
   public static final String ORACLE = "oracle";
