@@ -21,6 +21,7 @@ public abstract class FilterIterator<T,T2> extends SimpleIterator<T2>
     iterator = iter;
   }
 
+  @Override
   public void remove() {
     iterator.remove();
   }
