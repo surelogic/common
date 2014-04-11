@@ -239,7 +239,7 @@ public abstract class Decl implements IDecl {
         else
           anonymousType = TypeRef.JAVA_LANG_OBJECT;
       } else {
-        if (!SLUtility.isValidJavaIdentifier(f_name))
+        if (!SLUtility.isValidJavaIdentifier(f_name) && !"[]".equals(f_name))
           throw new IllegalArgumentException(I18N.err(275, f_name));
       }
 
