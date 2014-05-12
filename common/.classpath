@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry exported="true" kind="lib" path="lib/runtime/asm-5.0.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/runtime/asm-commons-5.0.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/runtime/promises-5.2.0.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
@@ -9,8 +11,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/runtime/derby.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/runtime/antlr-runtime-3.1-sl.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/runtime/ant.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/runtime/asm-4.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/runtime/asm-commons-4.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/runtime/jsr166y.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/runtime/extra166y.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/runtime/trove-3.0.3.jar" sourcepath="lib/runtime/trove-3.0.3-src.jar"/>
