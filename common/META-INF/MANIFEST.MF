@@ -250,12 +250,12 @@ Bundle-ClassPath: .,
  lib/runtime/commons-lang3-3.1.jar,
  lib/runtime/collections-generic-4.0.jar,
  lib/runtime/derby.jar,
- lib/runtime/antlr-runtime-3.1-sl.jar,
  lib/runtime/ant.jar,
  lib/runtime/promises-5.2.0.jar,
  lib/runtime/jsr166y.jar,
  lib/runtime/extra166y.jar,
  lib/runtime/trove-3.0.3.jar,
  lib/runtime/asm-5.0.2.jar,
- lib/runtime/asm-commons-5.0.2.jar
+ lib/runtime/asm-commons-5.0.2.jar,
+ lib/runtime/antlr-3.5.2-runtime.jar
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

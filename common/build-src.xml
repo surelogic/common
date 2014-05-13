@@ -19,7 +19,7 @@
 			<mkdir dir="@{outputdir}" />
 			<antlr3 target="@{target}" outputdirectory="@{outputdir}" libdirectory="@{outputdir}">
 				<classpath>
-					<pathelement location="${antlr-lib}/antlr-3.1.jar" />
+					<pathelement location="${antlr-lib}/antlr-3.5.2-complete-no-st3.jar" />
 				</classpath>
 			</antlr3>
 		</sequential>

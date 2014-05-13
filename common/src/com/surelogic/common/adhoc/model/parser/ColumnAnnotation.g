@@ -11,13 +11,13 @@ package com.surelogic.common.adhoc.model.parser;
 
 @parser::members {
 private final ColumnAnnotation f_column = new ColumnAnnotation();
-
+/*
 @Override
 protected void mismatch(IntStream input, int ttype, BitSet follow)
 		throws RecognitionException {
 	throw new MismatchedTokenException(ttype, input);
 }
-
+*/
 @Override
 public Object recoverFromMismatchedSet(IntStream input,
 		RecognitionException e, BitSet follow) throws RecognitionException {
