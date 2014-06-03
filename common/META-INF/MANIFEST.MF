@@ -247,7 +247,6 @@ Export-Package: com.surelogic,
  org.objectweb.asm.commons,
  org.objectweb.asm.signature
 Bundle-ClassPath: .,
- lib/runtime/commons-lang3-3.1.jar,
  lib/runtime/collections-generic-4.0.jar,
  lib/runtime/derby.jar,
  lib/runtime/ant.jar,
@@ -257,5 +256,6 @@ Bundle-ClassPath: .,
  lib/runtime/trove-3.0.3.jar,
  lib/runtime/asm-5.0.2.jar,
  lib/runtime/asm-commons-5.0.2.jar,
- lib/runtime/antlr-3.5.2-runtime.jar
+ lib/runtime/antlr-3.5.2-runtime.jar,
+ lib/runtime/commons-lang3-3.3.2.jar
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
