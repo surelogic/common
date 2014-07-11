@@ -56,6 +56,9 @@ public class JavaBuild {
 								+ p.getElementName()
 								+ " due to some compilation errors.  Please fix (or do a clean build).");
 						return null;
+					}					
+					if (!scanner.projectIsOk(l, p)) {
+						return null;
 					}
 				}
 			} catch(IllegalStateException e) {

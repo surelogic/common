@@ -25,6 +25,7 @@ import com.surelogic.common.core.EclipseUtility;
 import com.surelogic.common.core.JDTUtility;
 import com.surelogic.common.java.*;
 import com.surelogic.common.jobs.*;
+import com.surelogic.common.logging.IErrorListener;
 import com.surelogic.common.logging.SLLogger;
 
 /**
@@ -62,6 +63,13 @@ public abstract class AbstractJavaScanner<PS extends JavaProjectSet<P>, P extend
 	protected abstract void markAsRunning(File runDir);	
 	protected abstract AbstractAnalysisJob<PS> makeAnalysisJob(PS projects, File target, File zips, boolean useSeparateJVM);
 
+	/**
+	 * May call IErrorListener if false
+	 */
+	protected boolean projectIsOk(IErrorListener l, IJavaProject p) {
+		return true;
+	}	
+	
 	protected void scheduleScanForExecution(PS projects, SLJob copy) throws Exception {
 		EclipseUtility.toEntireWorkspaceJob(copy).schedule();
 	}
@@ -317,6 +325,6 @@ public abstract class AbstractJavaScanner<PS extends JavaProjectSet<P>, P extend
 			startScan(projects, monitor, runRemote);
 			return SLStatus.OK_STATUS;
 		}
-	}	
+	}
 }
 
