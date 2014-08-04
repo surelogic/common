@@ -302,7 +302,7 @@ public abstract class ProjectInfo<P extends ISLJavaProject> {
 					final String qname = computeQualifiedName(icu);
 
 					// TODO Used when there's no project info
-					config.addFile(new JavaSourceFile(qname, f, path, false, project.getName()));
+					config.addFile(new JavaSourceFile(qname, f, path, false, config.getProject()));
 
 					if (!added) {
 						added = true;
