@@ -48,6 +48,7 @@ public class JavaClassPath<PS extends JavaProjectSet<?>> implements IJavacClassP
 	 */
 	public final void map(String destProj, IJavaFile file) {
 	  if (useBinaries && file.isSource()) {
+		  //System.out.println("Ignoring "+destProj+" : "+file.getQualifiedName());
 		  return; // ignore
 	  }
 	  final Pair<String,String> key = Pair.getInstance(destProj, file.getQualifiedName());
@@ -57,11 +58,22 @@ public class JavaClassPath<PS extends JavaProjectSet<?>> implements IJavacClassP
 				System.out.println("Mapping "+key.second()+" to "+file.getFile());
 			}
 			*/
+			/*
+			System.out.println("Mapping "+destProj+" : "+file.getQualifiedName());
+			if ("com.surelogic.common.ref.Decl".equals(file.getQualifiedName())) {
+				System.out.println();
+			}
+			*/
 			classToFile.put(key, file);		
 		}
 	}
 	
 	protected final boolean isMapped(String destProj, String qname) {
+		/*
+		if ("com.surelogic.common.ref.Decl".equals(qname)) {
+			System.out.println("Checking if mapped for "+destProj+": "+qname);
+		}
+		*/
 		final Pair<String,String> key = Pair.getInstance(destProj, qname);
 		return classToFile.containsKey(key);
 	}
