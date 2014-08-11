@@ -644,7 +644,7 @@ public final class AdHocManager {
    * @throws IllegalArgumentException
    *           if the passed result is not managed by this manager.
    */
-  public boolean setSelectedResult(final AdHocQueryResult result) {
+  public boolean setSelectedResult(@Nullable final AdHocQueryResult result) {
     if (result != null && !f_results.contains(result)) {
       throw new IllegalArgumentException(I18N.err(126, "setSelectedResult", result));
     }
