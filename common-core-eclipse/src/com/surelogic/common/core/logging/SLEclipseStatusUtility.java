@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 
+import org.apache.commons.lang3.SystemUtils;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Plugin;
@@ -30,9 +31,9 @@ import com.surelogic.common.logging.SLLogger;
  * Rational requirements.
  */
 public final class SLEclipseStatusUtility {
-	public static final int LOW_MEM_THRESHOLD = SLUtility.is64bit ? 768 : 512;
-	public static final int LOW_PERMGEN_THRESHOLD = SLUtility.is64bit ? 256
-			: 128;
+	public static final int LOW_MEM_THRESHOLD = SLUtility.is64bit ? 768 : 512;	
+	public static final int LOW_PERMGEN_THRESHOLD = SystemUtils.IS_JAVA_1_8 ? 0 : // This doesn't apply to Java 8
+			SLUtility.is64bit ? 256 : 128;
 
 	private static final String MAX_PERM_SIZE = "-XX:MaxPermSize=";
 
