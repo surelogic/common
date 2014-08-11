@@ -1,9 +1,12 @@
 package com.surelogic.common.ui.adhoc.views.explorer;
 
+import org.apache.commons.lang3.SystemUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.StyledCellLabelProvider;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -72,16 +75,34 @@ public final class QueryResultExplorerMediator extends AdHocManagerAdapter imple
     f_queryHistoryTree.setContentProvider(f_contentProvider);
     f_queryHistoryTree.setLabelProvider(new ResultExplorerCellLabelProvide());
 
-    f_queryHistoryTree.getTree().addListener(SWT.Selection, new Listener() {
-      @Override
-      public void handleEvent(final Event event) {
-        final AdHocQueryResult selectedResult = getQueryHistoryTreeSelection();
-        f_manager.setSelectedResult(selectedResult);
-        if (selectedResult != null)
-          f_manager.setQuerydoc(selectedResult.getQueryFullyBound().getQuery());
-      }
-    });
-
+    if (SystemUtils.IS_OS_MAC_OSX) {
+      /*
+       * Strange issue on Mac where the selection hangs Eclipse upon changing
+       * the selected query using the explorer view. Does not ever happen on
+       * Windows or Linux. This workaround, using the mouse up instead of
+       * selection, appears to mostly work around the issue (it is far less
+       * frequent).
+       */
+      f_queryHistoryTree.getTree().addListener(SWT.MouseUp, new Listener() {
+        @Override
+        public void handleEvent(final Event event) {
+          final AdHocQueryResult selectedResult = getQueryHistoryTreeSelection(null);
+          f_manager.setSelectedResult(selectedResult);
+          if (selectedResult != null)
+            f_manager.setQuerydoc(selectedResult.getQueryFullyBound().getQuery());
+        }
+      });
+    } else {
+      f_queryHistoryTree.addSelectionChangedListener(new ISelectionChangedListener() {
+        @Override
+        public void selectionChanged(SelectionChangedEvent event) {
+          final AdHocQueryResult selectedResult = getQueryHistoryTreeSelection(event);
+          f_manager.setSelectedResult(selectedResult);
+          if (selectedResult != null)
+            f_manager.setQuerydoc(selectedResult.getQueryFullyBound().getQuery());
+        }
+      });
+    }
     f_manager.addObserver(this);
   }
 
@@ -135,8 +156,8 @@ public final class QueryResultExplorerMediator extends AdHocManagerAdapter imple
   }
 
   @Nullable
-  AdHocQueryResult getQueryHistoryTreeSelection() {
-    final IStructuredSelection s = (IStructuredSelection) f_queryHistoryTree.getSelection();
+  AdHocQueryResult getQueryHistoryTreeSelection(@Nullable SelectionChangedEvent event) {
+    final IStructuredSelection s = (IStructuredSelection) (event == null ? f_queryHistoryTree.getSelection() : event.getSelection());
     if (!s.isEmpty()) {
       final Object o = s.getFirstElement();
       if (o instanceof AdHocQueryResult)
