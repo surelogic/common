@@ -4,9 +4,7 @@ import org.apache.commons.lang3.SystemUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.StyledCellLabelProvider;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -86,17 +84,23 @@ public final class QueryResultExplorerMediator extends AdHocManagerAdapter imple
       f_queryHistoryTree.getTree().addListener(SWT.MouseUp, new Listener() {
         @Override
         public void handleEvent(final Event event) {
-          final AdHocQueryResult selectedResult = getQueryHistoryTreeSelection(null);
+          final AdHocQueryResult selectedResult = getQueryHistoryTreeSelection();
           f_manager.setSelectedResult(selectedResult);
           if (selectedResult != null)
             f_manager.setQuerydoc(selectedResult.getQueryFullyBound().getQuery());
         }
       });
     } else {
-      f_queryHistoryTree.addSelectionChangedListener(new ISelectionChangedListener() {
+      /*
+       * This odd use of the tree directly to set the listener is because we
+       * don't want to be called back if we programmatically set the selection.
+       * The listener on the TreeViewer calls back regardless of how the
+       * selection was set.
+       */
+      f_queryHistoryTree.getTree().addListener(SWT.Selection, new Listener() {
         @Override
-        public void selectionChanged(SelectionChangedEvent event) {
-          final AdHocQueryResult selectedResult = getQueryHistoryTreeSelection(event);
+        public void handleEvent(final Event event) {
+          final AdHocQueryResult selectedResult = getQueryHistoryTreeSelection();
           f_manager.setSelectedResult(selectedResult);
           if (selectedResult != null)
             f_manager.setQuerydoc(selectedResult.getQueryFullyBound().getQuery());
@@ -156,8 +160,8 @@ public final class QueryResultExplorerMediator extends AdHocManagerAdapter imple
   }
 
   @Nullable
-  AdHocQueryResult getQueryHistoryTreeSelection(@Nullable SelectionChangedEvent event) {
-    final IStructuredSelection s = (IStructuredSelection) (event == null ? f_queryHistoryTree.getSelection() : event.getSelection());
+  AdHocQueryResult getQueryHistoryTreeSelection() {
+    final IStructuredSelection s = (IStructuredSelection) f_queryHistoryTree.getSelection();
     if (!s.isEmpty()) {
       final Object o = s.getFirstElement();
       if (o instanceof AdHocQueryResult)
