@@ -136,6 +136,9 @@ public class JarEntry extends AbstractClassPathEntry {
 						continue;
 					}
 					String qname = convertClassToQname(name);
+					if (!SLUtility.isValidDotSeparatedJavaIdentifier(qname)) {
+						continue;
+					}
 					int lastDot  = qname.lastIndexOf('.');
 					String pkg   = lastDot < 0 ? "" : qname.substring(0, lastDot);
 					jp.addPackage(pkg, Config.Type.BINARY);
