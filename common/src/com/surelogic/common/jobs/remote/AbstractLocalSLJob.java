@@ -2,6 +2,7 @@ package com.surelogic.common.jobs.remote;
 
 import java.io.*;
 import java.util.*;
+import java.util.concurrent.CancellationException;
 import java.util.logging.*;
 
 import org.apache.commons.lang3.SystemUtils;
@@ -247,6 +248,9 @@ public abstract class AbstractLocalSLJob<C extends ILocalConfig> extends Abstrac
 				}
 				throw (RemoteSLJobException) e;
 			}
+			else if (e instanceof CancellationException) {
+				return SLStatus.createCancelStatus(e);
+			}
 			reportException(e);
 		}
 		if (log != null) {
@@ -363,6 +367,9 @@ public abstract class AbstractLocalSLJob<C extends ILocalConfig> extends Abstrac
 										memorySize);
 							}
 							throw new RuntimeException(e.errorMsg);
+						case CANCELLED:
+							printErr(Level.WARNING, "Cancelling run: "+getRest(line));
+							throw new CancellationException(getRest(line));
 						case DONE:							
 							println(line);							
 							tasks.pop();
@@ -410,12 +417,15 @@ public abstract class AbstractLocalSLJob<C extends ILocalConfig> extends Abstrac
 			if (e instanceof RemoteSLJobException) {
 				throw (RemoteSLJobException) e;
 			}
+			else if (e instanceof CancellationException) {
+				throw (CancellationException) e;
+			}
 			reportException(e);
 		}
 	}
 
     private String getRest(String line) {
-    	if (XUtil.testing) {
+    	if (true) {
     		final int comma = line.indexOf(',');
     		return line.substring(comma+1);
     	} 

@@ -52,6 +52,11 @@ public final class SierraScanCrashReport {
     public void reportScanCrash(SLStatus status, File scanLog) {
 			status.logTo(SLLogger.getLogger());
 		}
+		
+		@Override
+		public void reportScanCancellation(String msg) {
+			SLLogger.getLogger().info(msg);
+		}
 	};
 
 	private final AtomicReference<IScanCrashReporter> f_reporter = new AtomicReference<IScanCrashReporter>(

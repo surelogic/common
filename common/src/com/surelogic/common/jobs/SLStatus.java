@@ -327,6 +327,10 @@ public final class SLStatus {
    * Used to indicate that something was canceled.
    */
   public static final SLStatus CANCEL_STATUS = new SLStatus(SLSeverity.CANCEL, OK, "Canceled", null);
+  
+  public static SLStatus createCancelStatus(Throwable exception) {
+	  return new SLStatus(SLSeverity.CANCEL, OK, "Canceled", exception);
+  }
 
   /**
    * Used to indicate that something completed successfully.

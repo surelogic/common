@@ -26,4 +26,6 @@ public interface IScanCrashReporter {
 	 *            {@code null}, but reporters should check that the file exists.
 	 */
 	void reportScanCrash(SLStatus status, File scanLog);
+
+	void reportScanCancellation(String msg);
 }

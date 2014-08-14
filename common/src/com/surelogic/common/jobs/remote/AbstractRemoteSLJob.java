@@ -5,6 +5,7 @@ package com.surelogic.common.jobs.remote;
 
 import java.io.*;
 import java.net.*;
+import java.util.concurrent.CancellationException;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -154,6 +155,8 @@ public abstract class AbstractRemoteSLJob {
 			case ERROR:
 				if (status.getException() == null) {
 					mon.failed(status.getMessage());
+				} else if (status.getException() instanceof CancellationException) {
+					mon.cancel(status.getException().getMessage());
 				} else {
 					mon.failed(status.getMessage(), status.getException());
 				}
@@ -235,8 +238,12 @@ public abstract class AbstractRemoteSLJob {
 			this.out = out;
 		}
 
+		public void cancel(String message) {
+			out.println("##" + Remote.CANCELLED + ", " + message);
+		}
+
 		@Override
-    public void begin() {
+		public void begin() {
 			throw new IllegalStateException(
 					"begin() can't be used in this context");
 		}
