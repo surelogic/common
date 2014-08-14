@@ -29,6 +29,7 @@ public abstract class AbstractAnalysisJob<P extends JavaProjectSet<?>> extends A
 	protected abstract void handleSuccess();
 	protected abstract void handleFailure();
 	protected abstract void handleCrash(SLProgressMonitor monitor, SLStatus status);
+	protected abstract void handleCancel(SLStatus e);
 	
 	/**
 	 * Called after analysis, no matter what happens
@@ -73,6 +74,8 @@ public abstract class AbstractAnalysisJob<P extends JavaProjectSet<?>> extends A
 					 */
 				} else if (status != SLStatus.CANCEL_STATUS && status.getSeverity() == SLSeverity.ERROR) {
 					handleCrash(monitor, status);
+				} else if (status.getSeverity() == SLSeverity.CANCEL) {					
+					handleCancel(status);
 				}
 			} else {
 				ok = analyzeInVM();
