@@ -14,6 +14,7 @@ import org.eclipse.ui.progress.UIJob;
 import com.surelogic.common.core.logging.SLEclipseStatusUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.logging.IErrorListener;
+import com.surelogic.common.logging.SLLogger;
 import com.surelogic.common.ui.jobs.SLUIJob;
 
 public final class BalloonUtility {
@@ -73,6 +74,7 @@ public final class BalloonUtility {
 		@Override
 		public void reportError(String title, String message) {
 			showMessage(title, message);
+			SLLogger.getLogger().info(message);
 		}
 	};
 }
