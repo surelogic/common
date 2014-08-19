@@ -32,6 +32,7 @@ public final class CommonImages {
   public static final String DECR_BUGLINK = "decr/buglink.gif";
   public static final String DECR_CONSISTENT = "decr/consistent.gif";
   public static final String DECR_CONSTRUCTOR = "decr/constructor.gif";
+  public static final String DECR_COUNT = "decr/count.gif";
   public static final String DECR_DELTA = "decr/delta.gif";
   public static final String DECR_ERROR = "decr/error.gif";
   public static final String DECR_FINAL = "decr/final.gif";
@@ -85,6 +86,7 @@ public final class CommonImages {
   public static final String IMG_ASTERISK_ORANGE_25 = "asterisk_orange_25.gif";
   public static final String IMG_ASTERISK_ORANGE_50 = "asterisk_orange_50.gif";
   public static final String IMG_ASTERISK_ORANGE_75 = "asterisk_orange_75.gif";
+  public static final String IMG_BOOKMARK = "bookmark.gif";
   public static final String IMG_CATEGORY = "category.gif";
   public static final String IMG_CHANGELOG_OLD_SCAN_ONLY = "changelog_old_scan_only.gif";
   public static final String IMG_CHANGELOG_ONLY = "changelog_only.gif";
@@ -154,6 +156,7 @@ public final class CommonImages {
   public static final String IMG_HAPPENS_BEFORE = "happens_before.gif";
   public static final String IMG_HIERARCHICAL = "hierarchical.gif";
   public static final String IMG_IMPORT = "import.gif";
+  public static final String IMG_INDEX_CARD = "index_card.gif";
   public static final String IMG_INFO = "info.gif";
   public static final String IMG_INTERFACE_DEFAULT = "interface_default.gif";
   public static final String IMG_INTERFACE_PRIVATE = "interface_private.gif";
@@ -234,6 +237,7 @@ public final class CommonImages {
   public static final String IMG_SAVE_EDIT = "save_edit.gif";
   public static final String IMG_SAVEALL_EDIT = "saveall_edit.gif";
   public static final String IMG_SAVEAS_EDIT = "saveas_edit.gif";
+  public static final String IMG_SCROLL = "scroll.gif";
   public static final String IMG_SIERRA_DISCONNECT = "sierra_disconnect.gif";
   public static final String IMG_SIERRA_INVESTIGATE_DOT = "sierra_investigate_dot.gif";
   public static final String IMG_SIERRA_INVESTIGATE = "sierra_investigate.gif";
@@ -255,6 +259,9 @@ public final class CommonImages {
   public static final String IMG_SORT_DOWN = "sort_down.gif";
   public static final String IMG_SORT_UP = "sort_up.gif";
   public static final String IMG_SUGGESTIONS_WARNINGS = "suggestions_warnings.gif";
+  public static final String IMG_TASK_COMPLETE = "task_complete.gif";
+  public static final String IMG_TASK_NEW = "task_new.gif";
+  public static final String IMG_TASK_UNCHANGED = "task_unchanged.gif";
   public static final String IMG_THREAD = "thread.gif";
   public static final String IMG_THRESHOLD_ABOVE = "threshold_above.gif";
   public static final String IMG_THRESHOLD_BELOW = "threshold_below.gif";
