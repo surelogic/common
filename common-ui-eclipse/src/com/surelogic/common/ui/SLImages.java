@@ -4,12 +4,16 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.DecorationOverlayIcon;
 import org.eclipse.jface.viewers.IDecoration;
@@ -26,6 +30,7 @@ import com.surelogic.common.SLUtility;
 import com.surelogic.common.adhoc.AdHocDecl;
 import com.surelogic.common.adhoc.AdHocQueryType;
 import com.surelogic.common.i18n.I18N;
+import com.surelogic.common.logging.SLLogger;
 import com.surelogic.common.ref.IDecl;
 import com.surelogic.common.ref.IJavaRef;
 
@@ -1161,8 +1166,78 @@ public final class SLImages {
     }
   }
 
+  public static Image getImageFor(@Nullable IType type) {
+    if (type == null)
+      return getImage(CommonImages.IMG_UNKNOWN);
+
+    try {
+      final int flags = type.getFlags();
+      if (type.isAnnotation()) {
+        if (Flags.isPackageDefault(flags)) {
+          return getImage(CommonImages.IMG_ANNOTATION_DEFAULT);
+        } else if (Flags.isPrivate(flags)) {
+          return getImage(CommonImages.IMG_ANNOTATION_PRIVATE);
+        } else if (Flags.isProtected(flags)) {
+          return getImage(CommonImages.IMG_ANNOTATION_PROTECTED);
+        } else {
+          return getImage(CommonImages.IMG_ANNOTATION);
+        }
+      } else if (type.isClass()) {
+        String imageName = CommonImages.IMG_CLASS;
+        if (Flags.isPackageDefault(flags) || type.isAnonymous()) {
+          // this is how Eclipse does it
+          imageName = CommonImages.IMG_CLASS_DEFAULT;
+        } else if (Flags.isPrivate(flags)) {
+          imageName = CommonImages.IMG_CLASS_PRIVATE;
+        } else if (Flags.isProtected(flags)) {
+          imageName = CommonImages.IMG_CLASS_PROTECTED;
+        }
+        String topRight = null;
+        if (Flags.isStatic(flags) && Flags.isAbstract(flags))
+          topRight = CommonImages.DECR_STATIC_ABSTRACT;
+        else if (Flags.isStatic(flags) && Flags.isFinal(flags))
+          topRight = CommonImages.DECR_STATIC_FINAL;
+        else if (Flags.isStatic(flags))
+          topRight = CommonImages.DECR_STATIC;
+        else if (Flags.isFinal(flags))
+          topRight = CommonImages.DECR_FINAL;
+        else if (Flags.isAbstract(flags))
+          topRight = CommonImages.DECR_ABSTRACT;
+        if (topRight == null)
+          return getImage(imageName);
+        else
+          return getDecoratedImage(imageName, new ImageDescriptor[] { null, getImageDescriptor(topRight), null, null, null });
+      } else if (type.isEnum()) {
+        if (Flags.isPackageDefault(flags)) {
+          return getImage(CommonImages.IMG_ENUM_DEFAULT);
+        } else if (Flags.isPrivate(flags)) {
+          return getImage(CommonImages.IMG_ENUM_PRIVATE);
+        } else if (Flags.isProtected(flags)) {
+          return getImage(CommonImages.IMG_ENUM_PROTECTED);
+        } else {
+          return getImage(CommonImages.IMG_ENUM);
+        }
+      } else if (type.isInterface()) {
+        if (Flags.isPackageDefault(flags)) {
+          return getImage(CommonImages.IMG_INTERFACE_DEFAULT);
+        } else if (Flags.isPrivate(flags)) {
+          return getImage(CommonImages.IMG_INTERFACE_PRIVATE);
+        } else if (Flags.isProtected(flags)) {
+          return getImage(CommonImages.IMG_INTERFACE_PROTECTED);
+        } else {
+          return getImage(CommonImages.IMG_INTERFACE);
+        }
+      }
+    } catch (JavaModelException e) {
+      SLLogger.getLogger().log(Level.WARNING, I18N.err(319, type), e);
+    }
+    return getImage(CommonImages.IMG_UNKNOWN);
+  }
+
   @NonNull
   public static Image getImageFor(@Nullable IDecl decl) {
+    if (decl == null)
+      return getImage(CommonImages.IMG_UNKNOWN);
     switch (decl.getKind()) {
     case ANNOTATION: {
       String imageName = CommonImages.IMG_ANNOTATION;

@@ -11,10 +11,12 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.ISourceReference;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.ui.JavaUI;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.ide.IDE;
 
 import com.surelogic.NonNull;
+import com.surelogic.Nullable;
 import com.surelogic.common.Pair;
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.core.JDTUtility;
@@ -26,6 +28,10 @@ import com.surelogic.common.ref.IDecl;
 import com.surelogic.common.ref.IJavaRef;
 
 public class JDTUIUtility {
+
+  public static Image getImageFor(@Nullable IType jdtType) {
+    return SLImages.getImageFor(jdtType);
+  }
 
   /**
    * Tries to open the specified Java element in the editor and highlight the
@@ -93,7 +99,7 @@ public class JDTUIUtility {
     }
     return false;
   }
-  
+
   /**
    * Tries to open the specified Java code reference in the editor and highlight
    * the referenced code.
@@ -117,7 +123,7 @@ public class JDTUIUtility {
       final IEditorPart editorPart = JavaUI.openInEditor(element, false, true);
       if (editorPart == null)
         return false;
-      //tryToHighlightHelper(javaRef, element, pair.second(), editorPart);
+      // tryToHighlightHelper(javaRef, element, pair.second(), editorPart);
       return true;
     } catch (final Exception e) {
       SLLogger.getLogger().log(Level.SEVERE, I18N.err(132, element, DeclUtil.toString(decl)), e);
