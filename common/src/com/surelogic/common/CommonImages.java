@@ -256,6 +256,8 @@ public final class CommonImages {
   public static final String IMG_SIERRA_STAMP_SMALL = "sierra_stamp_small.gif";
   public static final String IMG_SIERRA_STAMP = "sierra_stamp.png";
   public static final String IMG_SIERRA_SYNC = "sierra_sync.gif";
+  public static final String IMG_SIGNED_NO = "signed_no.gif";
+  public static final String IMG_SIGNED_YES = "signed_yes.gif";
   public static final String IMG_SORT_DOWN = "sort_down.gif";
   public static final String IMG_SORT_UP = "sort_up.gif";
   public static final String IMG_SUGGESTIONS_WARNINGS = "suggestions_warnings.gif";
