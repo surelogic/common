@@ -11,7 +11,11 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.jdt.core.Flags;
+import org.eclipse.jdt.core.IField;
+import org.eclipse.jdt.core.IInitializer;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IMember;
+import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -1166,36 +1170,124 @@ public final class SLImages {
     }
   }
 
-  public static Image getImageFor(@Nullable IType type) {
-    if (type == null)
+  /**
+   * Gets an appropriate image for IType, IMethod, IInitializer, and IField JDT
+   * elements.
+   * 
+   * @param jdtDecl
+   *          a JDT declaration.
+   * @return an appropriate image or the unknown image if none can be
+   *         determined.
+   */
+  @NonNull
+  public static Image getImageFor(@Nullable IMember jdtDecl) {
+    if (jdtDecl == null)
       return getImage(CommonImages.IMG_UNKNOWN);
 
     try {
-      final int flags = type.getFlags();
-      if (type.isAnnotation()) {
-        if (Flags.isPackageDefault(flags)) {
-          return getImage(CommonImages.IMG_ANNOTATION_DEFAULT);
-        } else if (Flags.isPrivate(flags)) {
-          return getImage(CommonImages.IMG_ANNOTATION_PRIVATE);
-        } else if (Flags.isProtected(flags)) {
-          return getImage(CommonImages.IMG_ANNOTATION_PROTECTED);
-        } else {
-          return getImage(CommonImages.IMG_ANNOTATION);
+      final int flags = jdtDecl.getFlags();
+      if (jdtDecl instanceof IType) {
+        final IType type = (IType) jdtDecl;
+        if (type.isAnnotation()) {
+          if (Flags.isPackageDefault(flags)) {
+            return getImage(CommonImages.IMG_ANNOTATION_DEFAULT);
+          } else if (Flags.isPrivate(flags)) {
+            return getImage(CommonImages.IMG_ANNOTATION_PRIVATE);
+          } else if (Flags.isProtected(flags)) {
+            return getImage(CommonImages.IMG_ANNOTATION_PROTECTED);
+          } else {
+            return getImage(CommonImages.IMG_ANNOTATION);
+          }
+        } else if (type.isClass()) {
+          String imageName = CommonImages.IMG_CLASS;
+          if (Flags.isPackageDefault(flags) || type.isAnonymous()) {
+            // this is how Eclipse does it
+            imageName = CommonImages.IMG_CLASS_DEFAULT;
+          } else if (Flags.isPrivate(flags)) {
+            imageName = CommonImages.IMG_CLASS_PRIVATE;
+          } else if (Flags.isProtected(flags)) {
+            imageName = CommonImages.IMG_CLASS_PROTECTED;
+          }
+          String topRight = null;
+          if (Flags.isStatic(flags) && Flags.isAbstract(flags))
+            topRight = CommonImages.DECR_STATIC_ABSTRACT;
+          else if (Flags.isStatic(flags) && Flags.isFinal(flags))
+            topRight = CommonImages.DECR_STATIC_FINAL;
+          else if (Flags.isStatic(flags))
+            topRight = CommonImages.DECR_STATIC;
+          else if (Flags.isFinal(flags))
+            topRight = CommonImages.DECR_FINAL;
+          else if (Flags.isAbstract(flags))
+            topRight = CommonImages.DECR_ABSTRACT;
+          if (topRight == null)
+            return getImage(imageName);
+          else
+            return getDecoratedImage(imageName, new ImageDescriptor[] { null, getImageDescriptor(topRight), null, null, null });
+        } else if (type.isEnum()) {
+          if (Flags.isPackageDefault(flags)) {
+            return getImage(CommonImages.IMG_ENUM_DEFAULT);
+          } else if (Flags.isPrivate(flags)) {
+            return getImage(CommonImages.IMG_ENUM_PRIVATE);
+          } else if (Flags.isProtected(flags)) {
+            return getImage(CommonImages.IMG_ENUM_PROTECTED);
+          } else {
+            return getImage(CommonImages.IMG_ENUM);
+          }
+        } else if (type.isInterface()) {
+          if (Flags.isPackageDefault(flags)) {
+            return getImage(CommonImages.IMG_INTERFACE_DEFAULT);
+          } else if (Flags.isPrivate(flags)) {
+            return getImage(CommonImages.IMG_INTERFACE_PRIVATE);
+          } else if (Flags.isProtected(flags)) {
+            return getImage(CommonImages.IMG_INTERFACE_PROTECTED);
+          } else {
+            return getImage(CommonImages.IMG_INTERFACE);
+          }
         }
-      } else if (type.isClass()) {
-        String imageName = CommonImages.IMG_CLASS;
-        if (Flags.isPackageDefault(flags) || type.isAnonymous()) {
-          // this is how Eclipse does it
-          imageName = CommonImages.IMG_CLASS_DEFAULT;
+      } else if (jdtDecl instanceof IInitializer) {
+        String topRight = Flags.isStatic(flags) ? CommonImages.DECR_STATIC : null;
+        String topLeft = jdtDecl.isBinary() ? CommonImages.DECR_IMPLICIT : null;
+        if (topRight == null && topLeft == null)
+          return getImage(CommonImages.IMG_METHOD_PRIVATE);
+        else
+          return getDecoratedImage(CommonImages.IMG_METHOD_PRIVATE, new ImageDescriptor[] { getImageDescriptor(topLeft),
+              getImageDescriptor(topRight), null, null, null });
+      } else if (jdtDecl instanceof IField) {
+        String imageName = CommonImages.IMG_FIELD_PUBLIC;
+        if (Flags.isPackageDefault(flags)) {
+          imageName = CommonImages.IMG_FIELD_DEFAULT;
         } else if (Flags.isPrivate(flags)) {
-          imageName = CommonImages.IMG_CLASS_PRIVATE;
+          imageName = CommonImages.IMG_FIELD_PRIVATE;
         } else if (Flags.isProtected(flags)) {
-          imageName = CommonImages.IMG_CLASS_PROTECTED;
+          imageName = CommonImages.IMG_FIELD_PROTECTED;
         }
         String topRight = null;
-        if (Flags.isStatic(flags) && Flags.isAbstract(flags))
-          topRight = CommonImages.DECR_STATIC_ABSTRACT;
-        else if (Flags.isStatic(flags) && Flags.isFinal(flags))
+        if (Flags.isStatic(flags) && Flags.isFinal(flags))
+          topRight = CommonImages.DECR_STATIC_FINAL;
+        else if (Flags.isStatic(flags) && Flags.isVolatile(flags))
+          topRight = CommonImages.DECR_STATIC_VOLATILE;
+        else if (Flags.isStatic(flags))
+          topRight = CommonImages.DECR_STATIC;
+        else if (Flags.isFinal(flags))
+          topRight = CommonImages.DECR_FINAL;
+        else if (Flags.isVolatile(flags))
+          topRight = CommonImages.DECR_VOLATILE;
+        if (topRight == null)
+          return getImage(imageName);
+        else
+          return getDecoratedImage(imageName, new ImageDescriptor[] { null, getImageDescriptor(topRight), null, null, null });
+      } else if (jdtDecl instanceof IMethod) {
+        final IMethod decl = (IMethod) jdtDecl;
+        String imageName = CommonImages.IMG_METHOD_PUBLIC;
+        if (Flags.isPackageDefault(flags)) {
+          imageName = CommonImages.IMG_METHOD_DEFAULT;
+        } else if (Flags.isPrivate(flags)) {
+          imageName = CommonImages.IMG_METHOD_PRIVATE;
+        } else if (Flags.isProtected(flags)) {
+          imageName = CommonImages.IMG_METHOD_PROTECTED;
+        }
+        String topRight = null;
+        if (Flags.isStatic(flags) && Flags.isFinal(flags))
           topRight = CommonImages.DECR_STATIC_FINAL;
         else if (Flags.isStatic(flags))
           topRight = CommonImages.DECR_STATIC;
@@ -1203,37 +1295,29 @@ public final class SLImages {
           topRight = CommonImages.DECR_FINAL;
         else if (Flags.isAbstract(flags))
           topRight = CommonImages.DECR_ABSTRACT;
-        if (topRight == null)
+        if (decl.isConstructor())
+          topRight = CommonImages.DECR_CONSTRUCTOR;
+        String topLeft = decl.isBinary() ? CommonImages.DECR_IMPLICIT : null;
+        if (topRight == null && topLeft == null)
           return getImage(imageName);
         else
-          return getDecoratedImage(imageName, new ImageDescriptor[] { null, getImageDescriptor(topRight), null, null, null });
-      } else if (type.isEnum()) {
-        if (Flags.isPackageDefault(flags)) {
-          return getImage(CommonImages.IMG_ENUM_DEFAULT);
-        } else if (Flags.isPrivate(flags)) {
-          return getImage(CommonImages.IMG_ENUM_PRIVATE);
-        } else if (Flags.isProtected(flags)) {
-          return getImage(CommonImages.IMG_ENUM_PROTECTED);
-        } else {
-          return getImage(CommonImages.IMG_ENUM);
-        }
-      } else if (type.isInterface()) {
-        if (Flags.isPackageDefault(flags)) {
-          return getImage(CommonImages.IMG_INTERFACE_DEFAULT);
-        } else if (Flags.isPrivate(flags)) {
-          return getImage(CommonImages.IMG_INTERFACE_PRIVATE);
-        } else if (Flags.isProtected(flags)) {
-          return getImage(CommonImages.IMG_INTERFACE_PROTECTED);
-        } else {
-          return getImage(CommonImages.IMG_INTERFACE);
-        }
+          return getDecoratedImage(imageName, new ImageDescriptor[] { getImageDescriptor(topLeft), getImageDescriptor(topRight),
+              null, null, null });
       }
     } catch (JavaModelException e) {
-      SLLogger.getLogger().log(Level.WARNING, I18N.err(319, type), e);
+      SLLogger.getLogger().log(Level.WARNING, I18N.err(319, jdtDecl), e);
     }
     return getImage(CommonImages.IMG_UNKNOWN);
   }
 
+  /**
+   * Gets an appropriate image for the passed IDecl.
+   * 
+   * @param decl
+   *          a declaration.
+   * @return an appropriate image or the unknown image if none can be
+   *         determined.
+   */
   @NonNull
   public static Image getImageFor(@Nullable IDecl decl) {
     if (decl == null)
@@ -1367,8 +1451,6 @@ public final class SLImages {
     }
     case INITIALIZER:
       String topRight = decl.isStatic() ? CommonImages.DECR_STATIC : null;
-      if (decl.isStatic())
-        topRight = CommonImages.DECR_STATIC;
       String topLeft = decl.isImplicit() ? CommonImages.DECR_IMPLICIT : null;
       if (topRight == null && topLeft == null)
         return getImage(CommonImages.IMG_METHOD_PRIVATE);

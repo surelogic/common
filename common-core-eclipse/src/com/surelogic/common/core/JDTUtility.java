@@ -80,7 +80,7 @@ public final class JDTUtility {
   public static final ILocalVariable[] NO_LOCAL_VARS = new ILocalVariable[0];
   public static final IAccessRule[] NO_RULES = new IAccessRule[0];
   public static final IClasspathAttribute[] NO_ATTRIBUTES = new IClasspathAttribute[0];
-  
+
   /**
    * Adds an entry to the classpath of the passed Eclipse Java project. The
    * entry is placed as the last entry in the project's classpath.
@@ -413,7 +413,9 @@ public final class JDTUtility {
    * @return the Java element associated with the passed information or
    *         {@code null} if no Java element can be found.
    */
-  public static IType findIType(final String projectName, final String packageName, final String typeName) {
+  @Nullable
+  public static IType findIType(@Nullable final String projectName, @Nullable final String packageName,
+      @NonNull final String typeName) {
     try {
       final int occurrenceCount = getAnonymousOccurrenceCount(typeName);
       final String baseTypeName = stripOffAnonymousOccurranceCount(typeName);
@@ -441,8 +443,76 @@ public final class JDTUtility {
           }
         }
       }
-    } catch (final Exception e) {
+    } catch (final CoreException e) {
       SLLogger.getLogger().log(Level.SEVERE, I18N.err(135, packageName, typeName, projectName), e);
+    }
+    return null;
+  }
+
+  /**
+   * Gets the {@link IType} element associated with the passed information or
+   * {@code null} if it cannot be found. This is useful if all you have is the
+   * simple type name and nothing else. In particular, Sierra uses this.
+   * <p>
+   * This method may not be precise if lots of elements in open projects and
+   * packages have the same name. It could return the wrong one.
+   * 
+   * @param typeName
+   *          the type name, this type may be a nested type of the form
+   *          <code>Outer$Inner</code> or <code>Outer$Inner$InnerInner</code> or
+   *          <code>Outer.Inner</code> or <code>Outer.Inner.InnerInner</code>
+   *          (to any depth).
+   * @return the Java element associated with the passed information or
+   *         {@code null} if no Java element can be found.
+   */
+  @Nullable
+  public static IType findIType(@NonNull final String typeName) {
+    try {
+      final int occurrenceCount = getAnonymousOccurrenceCount(typeName);
+      final String baseTypeName = stripOffAnonymousOccurranceCount(typeName);
+      final String className = baseTypeName.replace("$", ".");
+
+      final IWorkspaceRoot wsRoot = ResourcesPlugin.getWorkspace().getRoot();
+      final IJavaModel model = JavaCore.create(wsRoot);
+      if (model != null) {
+        IType type = lookupName(model, className);
+        if (type != null && type.exists()) {
+          if (occurrenceCount > 0) {
+            return lookupAnonymous(type, occurrenceCount);
+          } else {
+            return type;
+          }
+        }
+      }
+    } catch (final CoreException e) {
+      SLLogger.getLogger().log(Level.SEVERE, I18N.err(314, typeName), e);
+    }
+    return null;
+  }
+
+  /**
+   * Recursive helper for {@link #findIType(String)}
+   */
+  @Nullable
+  private static IType lookupName(@NonNull final IJavaElement je, @NonNull final String name) throws JavaModelException {
+    if (name.equals(je.getElementName())) {
+      if (je instanceof IType) {
+        return (IType) je;
+      }
+    }
+    if (je instanceof IParent) {
+      for (IJavaElement child : ((IParent) je).getChildren()) {
+        // skip Jars and such
+        if (child instanceof IPackageFragmentRoot) {
+          if (((IPackageFragmentRoot) child).isArchive())
+            continue;
+        }
+        if (child instanceof IField)
+          continue;
+        IType result = lookupName(child, name);
+        if (result != null)
+          return result;
+      }
     }
     return null;
   }
@@ -492,9 +562,9 @@ public final class JDTUtility {
 
   /**
    * Tries to find the corresponding {@link IJavaElement} to the passed
-   * {@link IDecl}. The Eclipse Java element is returned if it can be found,
-   * and a confidence from 1 to 0 is found, where 1 indicates a perfect match
-   * and 0 indicates no match.
+   * {@link IDecl}. The Eclipse Java element is returned if it can be found, and
+   * a confidence from 1 to 0 is found, where 1 indicates a perfect match and 0
+   * indicates no match.
    * 
    * @param decl
    *          a Java code reference.
@@ -504,9 +574,9 @@ public final class JDTUtility {
    */
   @NonNull
   public static Pair<IJavaElement, Double> findJavaElement(final IDecl decl) {
-	  return findJavaElement(decl, null, DeclUtil.toString(decl));
+    return findJavaElement(decl, null, DeclUtil.toString(decl));
   }
-  
+
   @NonNull
   private static Pair<IJavaElement, Double> findJavaElement(final IDecl decl, String projectName, Object context) {
     try {
@@ -541,14 +611,14 @@ public final class JDTUtility {
             return new Pair<IJavaElement, Double>(cf, Double.valueOf(1)); // package-info.class
         }
       }
-      //System.out.println(" found (" + confidence + ") -> " + best);
+      // System.out.println(" found (" + confidence + ") -> " + best);
       return new Pair<IJavaElement, Double>(best, Double.valueOf(confidence));
     } catch (Exception e) {
       SLLogger.getLogger().log(Level.WARNING, I18N.err(156, context), e);
     }
     return new Pair<IJavaElement, Double>(null, Double.valueOf(0));
   }
-  
+
   /**
    * This class matches up an {@link IDecl} to a corresponding
    * {@link IJavaElement}, whenever possible.
@@ -1052,9 +1122,9 @@ public final class JDTUtility {
    *         {@code null} if there is no Java project using that name.
    */
   public static IJavaProject getJavaProject(final String projectName) {
-	if (projectName.indexOf('/') >= 0) {
-		return null;
-	}
+    if (projectName.indexOf('/') >= 0) {
+      return null;
+    }
     final IWorkspace ws = ResourcesPlugin.getWorkspace();
     final IWorkspaceRoot wsRoot = ws.getRoot();
     final IJavaModel model = JavaCore.create(wsRoot);
