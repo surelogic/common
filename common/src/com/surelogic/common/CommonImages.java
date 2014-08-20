@@ -32,7 +32,7 @@ public final class CommonImages {
   public static final String DECR_BUGLINK = "decr/buglink.gif";
   public static final String DECR_CONSISTENT = "decr/consistent.gif";
   public static final String DECR_CONSTRUCTOR = "decr/constructor.gif";
-  public static final String DECR_COUNT = "decr/count.gif";
+  public static final String DECR_COUNT = "decr/count.png";
   public static final String DECR_DELTA = "decr/delta.gif";
   public static final String DECR_ERROR = "decr/error.gif";
   public static final String DECR_FINAL = "decr/final.gif";
