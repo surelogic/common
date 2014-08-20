@@ -537,6 +537,18 @@ public class EclipseUtility {
   }
 
   /**
+   * Gets the {@link File} for the Sierra scans directory.
+   * 
+   * @return the Sierra scans directory.
+   * @throws Exception
+   *           if something goes wrong.
+   */
+  @NonNull
+  public static File getSierraScanDirectory() {
+    return new File(getSierraDataDirectory(), FileUtility.SIERRA_SCAN_PATH_FRAGMENT);
+  }
+
+  /**
    * Try to create an appropriate IFile object
    */
   public static IFile resolveIFile(String path) {

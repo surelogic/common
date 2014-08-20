@@ -54,7 +54,7 @@ public final class FileUtility {
    * The string name of the JSecure data directory.
    */
   public static final String JSECURE_DATA_PATH_FRAGMENT = ".jsecure-data";
-  
+
   /**
    * The string name of the JSure data directory.
    */
@@ -69,6 +69,12 @@ public final class FileUtility {
    * The string name of the Sierra data directory.
    */
   public static final String SIERRA_DATA_PATH_FRAGMENT = ".sierra-data";
+
+  /**
+   * The string name of the Sierra scans directory (under the Sierra data
+   * directory)
+   */
+  public static final String SIERRA_SCAN_PATH_FRAGMENT = "scans";
 
   /**
    * The string name of the Flashlight data directory.
