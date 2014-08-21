@@ -345,18 +345,42 @@ public class CascadingList extends ScrolledComposite {
     return f_columns.size();
   }
 
+  /**
+   * Implemented to be notified of structural changes to this cascading list.
+   */
   public interface ICascadingListObserver {
+    /**
+     * Invoked when a structural change, such as a column being added or
+     * removed, is made to a {@link CascadingList} control.
+     * 
+     * @param cascadingList
+     *          a cascading list control
+     * @see CascadingList#addObserver(ICascadingListObserver)
+     * @see CascadingList#removeObserver(ICascadingListObserver)
+     */
     void notify(CascadingList cascadingList);
   }
 
   private final Set<ICascadingListObserver> f_observers = new CopyOnWriteArraySet<ICascadingListObserver>();
 
+  /**
+   * Adds an observer for changes to the structure of this control.
+   * 
+   * @param o
+   *          an observer
+   */
   public void addObserver(final ICascadingListObserver o) {
     if (o == null)
       return;
     f_observers.add(o);
   }
 
+  /**
+   * Removes an observer for changes to the structure of this control.
+   * 
+   * @param o
+   *          an observer
+   */
   public void removeObserver(final ICascadingListObserver o) {
     f_observers.remove(o);
   }
