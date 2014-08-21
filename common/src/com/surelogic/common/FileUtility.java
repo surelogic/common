@@ -708,9 +708,24 @@ public final class FileUtility {
    *           if something goes wrong.
    */
   public static String getStreamContentsAsString(InputStream input) throws IOException {
-    return getReaderContentsAsString(new InputStreamReader(input));
+    return getReaderContentsAsString_private(new InputStreamReader(input));
   }
 
+  private static String getReaderContentsAsString_private(Reader reader) throws IOException {
+	  final StringBuilder b = new StringBuilder();
+	  final BufferedReader r = new BufferedReader(reader);
+	  final char[] buf = new char[1024];
+	  while (true) {
+		  final int read = r.read(buf);
+		  if (read < 0) {
+			  break;
+		  }
+		  b.append(buf, 0, read);
+	  }
+	  r.close();
+	  return b.toString();
+  }
+  
   /**
    * Reads the text contents of the passed reader and returns it
    * 
