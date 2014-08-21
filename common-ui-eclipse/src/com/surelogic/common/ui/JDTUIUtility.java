@@ -187,6 +187,54 @@ public class JDTUIUtility {
 
   /**
    * Tries to open the specified Java file in the editor and highlight the given
+   * range of line numbers. If the line number is 0 then the entire passed Java
+   * element is highlighted. If the two line numbers are the same then
+   * {@link #tryToOpenInEditor(String, String, String, int)} is invoked.
+   * <p>
+   * The method can take the range in either order, start to end or end to
+   * start.
+   * 
+   * @param projectName
+   *          the project name the file is contained within. For example,
+   *          <code>JEdit</code>.
+   * @param packageName
+   *          the package name the file is contained within. For example,
+   *          <code>com.surelogic.sierra</code>. the package name is
+   *          "(default package)" or null then the class is contained within the
+   *          default package.
+   * @param typeName
+   *          the type name, this type may be a nested type of the form
+   *          <code>Outer$Inner</code> or <code>Outer$Inner$InnerInner</code> or
+   *          <code>Outer.Inner</code> or <code>Outer.Inner.InnerInner</code>
+   *          (to any depth).
+   * @param lineNumber0
+   *          the line number to highlight (start or end).
+   * @param lineNumber1
+   *          the line number to highlight (start or end).
+   * @return {@code true} if it was possible to open the editor, {@code false}
+   *         otherwise.
+   */
+  public static boolean tryToOpenInEditor(final String projectName, final String packageName, final String typeName,
+      final int lineNumber0, final int lineNumber1) {
+    if (lineNumber1 == lineNumber0)
+      tryToOpenInEditor(projectName, packageName, typeName, lineNumber0);
+    // check order and use locals to do the actual highlight
+    final int start, end;
+    if (lineNumber1 < lineNumber0) {
+      start = lineNumber1;
+      end = lineNumber0;
+    } else {
+      start = lineNumber0;
+      end = lineNumber1;
+    }
+
+    // TODO
+
+    return false;
+  }
+
+  /**
+   * Tries to open the specified Java file in the editor and highlight the given
    * line number. If the line number is 0 then the entire passed Java element is
    * highlighted.
    * 
