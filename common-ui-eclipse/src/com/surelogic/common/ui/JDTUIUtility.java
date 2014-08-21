@@ -3,6 +3,7 @@ package com.surelogic.common.ui;
 import java.util.logging.Level;
 
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IField;
@@ -11,12 +12,14 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.ISourceReference;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.ui.JavaUI;
+import org.eclipse.jface.text.IDocument;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.*;
 import org.eclipse.ui.ide.IDE;
 
 import com.surelogic.NonNull;
 import com.surelogic.Nullable;
+import com.surelogic.common.FileUtility;
 import com.surelogic.common.Pair;
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.core.JDTUtility;
@@ -26,6 +29,7 @@ import com.surelogic.common.logging.SLLogger;
 import com.surelogic.common.ref.DeclUtil;
 import com.surelogic.common.ref.IDecl;
 import com.surelogic.common.ref.IJavaRef;
+import com.surelogic.common.ui.text.StringDocument;
 
 public class JDTUIUtility {
 
@@ -54,9 +58,9 @@ public class JDTUIUtility {
         if (lineNumber > 1) { // only move if not the first line
           final IMarker location = ResourcesPlugin.getWorkspace().getRoot().createMarker(SLUtility.ECLIPSE_MARKER_TYPE_NAME);
           if (location != null) {
-            location.setAttribute(IMarker.LINE_NUMBER, lineNumber);
+            location.setAttribute(IMarker.LINE_NUMBER, lineNumber);            
             IDE.gotoMarker(editorPart, location);
-            location.delete();
+            location.delete();            
             return true;
           }
         } else {
@@ -69,6 +73,67 @@ public class JDTUIUtility {
     return false;
   }
 
+  /**
+   * Tries to open the specified Java element in the editor and highlight the
+   * given line number. If the line number is 0 then the entire passed Java
+   * element is highlighted.
+   * 
+   * @param element
+   *          a Java element, may be {@code null}.
+   * @param lineNumber
+   *          the line number to highlight, or the passed Java element if
+   *          {@code lineNumber <= 0}.
+   * @return {@code true} if it was possible to open an editor, {@code false}
+   *         otherwise. A result of {@code false} might indicate that the file
+   *         was opened in an external editor.
+   */
+  public static boolean tryToOpenInEditor(final IJavaElement element, final int lineNumber0, final int lineNumber1) {
+	// check order and use locals to do the actual highlight
+	final int start, end;
+	if (lineNumber1 < lineNumber0) {
+		start = lineNumber1;
+		end = lineNumber0;
+	} else {
+		start = lineNumber0;
+		end = lineNumber1;
+	}
+    if (element instanceof ISourceReference) {
+        try {
+          final IEditorPart editorPart = JavaUI.openInEditor(element, false, true);
+
+          if (start > 1) { // only move if not the first line
+            final IMarker location = ResourcesPlugin.getWorkspace().getRoot().createMarker(SLUtility.ECLIPSE_MARKER_TYPE_NAME);
+            if (location != null) {
+              if (editorPart.getEditorInput() instanceof IStorageEditorInput) {
+            	final IStorageEditorInput in = (IStorageEditorInput) editorPart.getEditorInput();            	
+            	final IDocument doc = makeDocumentFromContents(in.getStorage());
+            	// Adjusted from 1-based to 0-based
+            	int startOffset = doc.getLineOffset(start-1);
+            	int endOffset = doc.getLineOffset(end-1);
+            	location.setAttribute(IMarker.CHAR_START, startOffset);
+            	location.setAttribute(IMarker.CHAR_END, endOffset);
+              } else {
+            	location.setAttribute(IMarker.LINE_NUMBER, start);            
+              }
+              IDE.gotoMarker(editorPart, location);
+              location.delete();            
+              return true;
+            }
+          } else {
+            return editorPart != null;
+          }
+        } catch (final Exception e) {
+          SLLogger.getLogger().log(Level.SEVERE, I18N.err(132, element, "line " + start+'-'+end), e);
+        }
+      }
+      return false;
+  }  
+  
+  private static IDocument makeDocumentFromContents(IStorage stor) throws Exception {
+	  String contents = FileUtility.getStreamContentsAsString(stor.getContents());
+	  return new StringDocument(contents);
+  }
+  
   /**
    * Tries to open the specified Java code reference in the editor and highlight
    * the referenced code.
@@ -216,21 +281,12 @@ public class JDTUIUtility {
    */
   public static boolean tryToOpenInEditor(final String projectName, final String packageName, final String typeName,
       final int lineNumber0, final int lineNumber1) {
-    if (lineNumber1 == lineNumber0)
-      return tryToOpenInEditor(projectName, packageName, typeName, lineNumber0);
-    // check order and use locals to do the actual highlight
-    final int start, end;
-    if (lineNumber1 < lineNumber0) {
-      start = lineNumber1;
-      end = lineNumber0;
+	final IType element = JDTUtility.findIType(projectName, packageName, typeName);
+    if (lineNumber1 == lineNumber0) {
+      return tryToOpenInEditor(element, lineNumber0);
     } else {
-      start = lineNumber0;
-      end = lineNumber1;
+      return tryToOpenInEditor(element, lineNumber0, lineNumber1);
     }
-
-    // TODO
-
-    return false;
   }
 
   /**
