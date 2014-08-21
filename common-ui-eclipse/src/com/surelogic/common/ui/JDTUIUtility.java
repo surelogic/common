@@ -217,7 +217,7 @@ public class JDTUIUtility {
   public static boolean tryToOpenInEditor(final String projectName, final String packageName, final String typeName,
       final int lineNumber0, final int lineNumber1) {
     if (lineNumber1 == lineNumber0)
-      tryToOpenInEditor(projectName, packageName, typeName, lineNumber0);
+      return tryToOpenInEditor(projectName, packageName, typeName, lineNumber0);
     // check order and use locals to do the actual highlight
     final int start, end;
     if (lineNumber1 < lineNumber0) {
