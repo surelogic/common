@@ -241,6 +241,7 @@ public final class CommonImages {
   public static final String IMG_SIERRA_DISCONNECT = "sierra_disconnect.gif";
   public static final String IMG_SIERRA_INVESTIGATE_DOT = "sierra_investigate_dot.gif";
   public static final String IMG_SIERRA_INVESTIGATE = "sierra_investigate.gif";
+  public static final String IMG_SIERRA_LOAD_SCAN = "sierra_load_scan.gif";
   public static final String IMG_SIERRA_LOGO = "sierra_logo.gif";
   public static final String IMG_SIERRA_POWERED_BY_SURELOGIC_REALLY_SHORT = "sierra_powered_by_surelogic_really_short.png";
   public static final String IMG_SIERRA_POWERED_BY_SURELOGIC_SHORT = "sierra_powered_by_surelogic_short.png";
