@@ -50,6 +50,7 @@ import org.eclipse.core.runtime.jobs.IJobManager;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.core.runtime.preferences.DefaultScope;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.framework.Bundle;
 import org.osgi.service.prefs.BackingStoreException;
@@ -69,7 +70,6 @@ import com.surelogic.common.license.SLLicenseProduct;
 import com.surelogic.common.license.SLLicenseUtility;
 import com.surelogic.common.logging.SLLogger;
 
-@SuppressWarnings("deprecation")
 @Utility
 public class EclipseUtility {
 
@@ -98,8 +98,8 @@ public class EclipseUtility {
    */
   static void persistPreferences() {
     try {
-      (new DefaultScope()).getNode(PREFERENCES_NODE).flush();
-      (new InstanceScope()).getNode(PREFERENCES_NODE).flush();
+      DefaultScope.INSTANCE.getNode(PREFERENCES_NODE).flush();
+      InstanceScope.INSTANCE.getNode(PREFERENCES_NODE).flush();
     } catch (BackingStoreException e) {
       SLLogger.getLogger().log(Level.SEVERE, I18N.err(218, PREFERENCES_NODE), e);
     }
@@ -149,15 +149,15 @@ public class EclipseUtility {
   }
 
   public static void setBooleanPreference(String key, boolean value) {
-    (new InstanceScope()).getNode(PREFERENCES_NODE).putBoolean(key, value);
+    InstanceScope.INSTANCE.getNode(PREFERENCES_NODE).putBoolean(key, value);
   }
 
   public static boolean getDefaultBooleanPreference(String key) {
-    return (new DefaultScope()).getNode(PREFERENCES_NODE).getBoolean(key, BOOLEAN_DEFAULT_DEFAULT);
+    return DefaultScope.INSTANCE.getNode(PREFERENCES_NODE).getBoolean(key, BOOLEAN_DEFAULT_DEFAULT);
   }
 
   public static void setDefaultBooleanPreference(String key, boolean value) {
-    (new DefaultScope()).getNode(PREFERENCES_NODE).putBoolean(key, value);
+    DefaultScope.INSTANCE.getNode(PREFERENCES_NODE).putBoolean(key, value);
   }
 
   /*
@@ -169,15 +169,15 @@ public class EclipseUtility {
   }
 
   public static void setDoublePreference(String key, double value) {
-    (new InstanceScope()).getNode(PREFERENCES_NODE).putDouble(key, value);
+    InstanceScope.INSTANCE.getNode(PREFERENCES_NODE).putDouble(key, value);
   }
 
   public static double getDefaultDoublePreference(String key) {
-    return (new DefaultScope()).getNode(PREFERENCES_NODE).getDouble(key, DOUBLE_DEFAULT_DEFAULT);
+    return DefaultScope.INSTANCE.getNode(PREFERENCES_NODE).getDouble(key, DOUBLE_DEFAULT_DEFAULT);
   }
 
   public static void setDefaultDoublePreference(String key, double value) {
-    (new DefaultScope()).getNode(PREFERENCES_NODE).putDouble(key, value);
+    DefaultScope.INSTANCE.getNode(PREFERENCES_NODE).putDouble(key, value);
   }
 
   /*
@@ -189,15 +189,15 @@ public class EclipseUtility {
   }
 
   public static void setFloatPreference(String key, float value) {
-    (new InstanceScope()).getNode(PREFERENCES_NODE).putFloat(key, value);
+    InstanceScope.INSTANCE.getNode(PREFERENCES_NODE).putFloat(key, value);
   }
 
   public static float getDefaultFloatPreference(String key) {
-    return (new DefaultScope()).getNode(PREFERENCES_NODE).getFloat(key, FLOAT_DEFAULT_DEFAULT);
+    return DefaultScope.INSTANCE.getNode(PREFERENCES_NODE).getFloat(key, FLOAT_DEFAULT_DEFAULT);
   }
 
   public static void setDefaultFloatPreference(String key, float value) {
-    (new DefaultScope()).getNode(PREFERENCES_NODE).putFloat(key, value);
+    DefaultScope.INSTANCE.getNode(PREFERENCES_NODE).putFloat(key, value);
   }
 
   /*
@@ -209,15 +209,15 @@ public class EclipseUtility {
   }
 
   public static void setIntPreference(String key, int value) {
-    (new InstanceScope()).getNode(PREFERENCES_NODE).putInt(key, value);
+    InstanceScope.INSTANCE.getNode(PREFERENCES_NODE).putInt(key, value);
   }
 
   public static int getDefaultIntPreference(String key) {
-    return (new DefaultScope()).getNode(PREFERENCES_NODE).getInt(key, INT_DEFAULT_DEFAULT);
+    return DefaultScope.INSTANCE.getNode(PREFERENCES_NODE).getInt(key, INT_DEFAULT_DEFAULT);
   }
 
   public static void setDefaultIntPreference(String key, int value) {
-    (new DefaultScope()).getNode(PREFERENCES_NODE).putInt(key, value);
+    DefaultScope.INSTANCE.getNode(PREFERENCES_NODE).putInt(key, value);
   }
 
   /*
@@ -229,15 +229,15 @@ public class EclipseUtility {
   }
 
   public static void setLongPreference(String key, long value) {
-    (new InstanceScope()).getNode(PREFERENCES_NODE).putLong(key, value);
+    InstanceScope.INSTANCE.getNode(PREFERENCES_NODE).putLong(key, value);
   }
 
   public static long getDefaultLongPreference(String key) {
-    return (new DefaultScope()).getNode(PREFERENCES_NODE).getLong(key, LONG_DEFAULT_DEFAULT);
+    return DefaultScope.INSTANCE.getNode(PREFERENCES_NODE).getLong(key, LONG_DEFAULT_DEFAULT);
   }
 
   public static void setDefaultLongPreference(String key, long value) {
-    (new DefaultScope()).getNode(PREFERENCES_NODE).putLong(key, value);
+    DefaultScope.INSTANCE.getNode(PREFERENCES_NODE).putLong(key, value);
   }
 
   /*
@@ -255,15 +255,15 @@ public class EclipseUtility {
      */
     if (value == null)
       value = STRING_DEFAULT_DEFAULT;
-    (new InstanceScope()).getNode(PREFERENCES_NODE).put(key, value);
+    InstanceScope.INSTANCE.getNode(PREFERENCES_NODE).put(key, value);
   }
 
   public static String getDefaultStringPreference(String key) {
-    return (new DefaultScope()).getNode(PREFERENCES_NODE).get(key, STRING_DEFAULT_DEFAULT);
+    return DefaultScope.INSTANCE.getNode(PREFERENCES_NODE).get(key, STRING_DEFAULT_DEFAULT);
   }
 
   public static void setDefaultStringPreference(String key, String value) {
-    (new DefaultScope()).getNode(PREFERENCES_NODE).put(key, value);
+    DefaultScope.INSTANCE.getNode(PREFERENCES_NODE).put(key, value);
   }
 
   /*
@@ -284,11 +284,11 @@ public class EclipseUtility {
       encodedList = ""; // null is not allowed
     else
       encodedList = SLUtility.encodeStringList(value);
-    (new InstanceScope()).getNode(PREFERENCES_NODE).put(key, encodedList);
+    InstanceScope.INSTANCE.getNode(PREFERENCES_NODE).put(key, encodedList);
   }
 
   public static List<String> getDefaultStringListPreference(String key) {
-    final String encodedList = (new DefaultScope()).getNode(PREFERENCES_NODE).get(key, null);
+    final String encodedList = DefaultScope.INSTANCE.getNode(PREFERENCES_NODE).get(key, null);
     if (encodedList == null)
       return STRING_LIST_DEFAULT_DEFAULT;
     else
@@ -301,7 +301,31 @@ public class EclipseUtility {
       encodedList = null;
     else
       encodedList = SLUtility.encodeStringList(value);
-    (new DefaultScope()).getNode(PREFERENCES_NODE).put(key, encodedList);
+    DefaultScope.INSTANCE.getNode(PREFERENCES_NODE).put(key, encodedList);
+  }
+
+  /*
+   * Observing preference API
+   */
+
+  /**
+   * Adds a listener to the instance scope of the preferences we use.
+   * 
+   * @param value
+   *          the preference change listener to register
+   */
+  public static void addPreferenceChangeListener(@NonNull IPreferenceChangeListener value) {
+    InstanceScope.INSTANCE.getNode(PREFERENCES_NODE).addPreferenceChangeListener(value);
+  }
+
+  /**
+   * Removes a listener to the instance scope of the preferences we use.
+   * 
+   * @param value
+   *          the preference change listener to remove
+   */
+  public static void removePreferenceChangeListener(@NonNull IPreferenceChangeListener value) {
+    InstanceScope.INSTANCE.getNode(PREFERENCES_NODE).removePreferenceChangeListener(value);
   }
 
   /**
