@@ -14,10 +14,6 @@ public class CommonJVMPrefs {
     public static Properties getJvmPrefs() {
         URL url = Thread.currentThread().getContextClassLoader()
                 .getResource(PATH);
-        if (url == null) {
-            // This can happen when the context class loader is bad, as with ant
-            url = new Object().getClass().getClassLoader().getResource(PATH);
-        }
         Properties prefs = new Properties();
         try {
             prefs.load(url.openStream());
