@@ -14,6 +14,9 @@ public class CommonJVMPrefs {
     public static Properties getJvmPrefs() {
         URL url = Thread.currentThread().getContextClassLoader()
                 .getResource(PATH);
+        if (url == null) {
+            url = CommonJVMPrefs.class.getResource(PATH);
+        }
         Properties prefs = new Properties();
         try {
             prefs.load(url.openStream());
