@@ -245,8 +245,8 @@ public final class AdornedTreeTableModel {
               cellImageSymbolicName = row[imageDefColI];
             }
           } else {
-            // Do we need to null out the image name because the
-            // text is blank?
+            // Do we need to null out the image
+            // name because the text is blank?
             if (!adornedColumnAnnotationInfo[adornedColI].getShowIconWhenEmpty()) {
               if (cellText == null || "".equals(cellText)) {
                 cellImageSymbolicName = null;
@@ -366,16 +366,19 @@ public final class AdornedTreeTableModel {
           final String rowImageSymbolicName = rowTreeCell.getImageSymbolicName();
           @Nullable
           final String possibleChildImageSymbolicName = possibleChild.getRow()[columnIndex].getImageSymbolicName();
-          final boolean rowImageSymbolicNameMatches = rowImageSymbolicName != null
-              && rowImageSymbolicName.equals(possibleChildImageSymbolicName);
-          if (rowTextMatches && rowImageSymbolicNameMatches) {
-            /*
-             * Match by text and image name -- needed to deal with intrinsic and
-             * util.concurrent locks which are shown in Flashlight by only
-             * changing the icon.
-             */
-            i.remove();
-            childrenOfRow.add(possibleChild);
+          final boolean rowHasImage = rowImageSymbolicName != null;
+          final boolean bothNull = rowImageSymbolicName == null && possibleChildImageSymbolicName == null;
+          final boolean rowImageSymbolicNameMatches = rowHasImage && rowImageSymbolicName.equals(possibleChildImageSymbolicName);
+          if (rowTextMatches) {
+            if (bothNull || (rowHasImage && rowImageSymbolicNameMatches)) {
+              /*
+               * Match by text and image name -- needed to deal with intrinsic
+               * and util.concurrent locks which are shown in Flashlight by only
+               * changing the icon.
+               */
+              i.remove();
+              childrenOfRow.add(possibleChild);
+            }
           } else if (possibleChildText == null) {
             /*
              * It is not good that this is null, so we stick all of them at this
