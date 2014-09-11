@@ -27,7 +27,6 @@ public class CommonJVMPrefs {
             SLLogger.getLogger().log(Level.WARNING, "Problem loading " + PATH,
                     e);
         }
-        System.out.println("Loading JVM prefs from " + PATH);
         return prefs;
     }
 }
