@@ -4,6 +4,7 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 import com.surelogic.*;
+import com.surelogic.common.SLUtility;
 
 /**
  * Manages a resource bundle of strings based upon the locale for SureLogic
@@ -509,7 +510,7 @@ public final class I18N {
     final int start = b.indexOf(NUM);
     if (start == -1)
       return false;
-    b.replace(start, start + NUM.length(), Integer.toString(count));
+    b.replace(start, start + NUM.length(), SLUtility.toStringHumanWithCommas(count));
     return true;
   }
 }
