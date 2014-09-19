@@ -96,7 +96,7 @@ public final class EclipseColorUtility {
 
   public static Color getCompoundScheme1Color0() {
     if (f_compoundScheme1Color0 == null) {
-      f_compoundScheme1Color0 = new Color(EclipseUIUtility.getDisplay(), 204, 152, 28);
+      f_compoundScheme1Color0 = new Color(EclipseUIUtility.getDisplay(), 106, 56, 114);
       EclipseUIUtility.disposeExec(new Runnable() {
         @Override
         public void run() {
@@ -141,7 +141,7 @@ public final class EclipseColorUtility {
 
   public static Color getCompoundScheme1Color3() {
     if (f_compoundScheme1Color3 == null) {
-      f_compoundScheme1Color3 = new Color(EclipseUIUtility.getDisplay(), 124, 255, 242);
+      f_compoundScheme1Color3 = new Color(EclipseUIUtility.getDisplay(), 102, 144, 196);
       EclipseUIUtility.disposeExec(new Runnable() {
         @Override
         public void run() {
