@@ -953,7 +953,7 @@ public abstract class Decl implements IDecl {
       if (parent != null)
         throw new IllegalArgumentException(I18N.err(274, f_name, parent));
 
-      if (f_name == null || "".equals(f_name)) {
+      if (f_name == null || "".equals(f_name) || SLUtility.JAVA_DEFAULT_PACKAGE.equals(f_name)) {
         f_name = SLUtility.JAVA_DEFAULT_PACKAGE;
       } else {
         if (!SLUtility.isValidDotSeparatedJavaIdentifier(f_name))
