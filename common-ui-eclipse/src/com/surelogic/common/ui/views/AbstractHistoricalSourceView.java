@@ -255,13 +255,13 @@ public abstract class AbstractHistoricalSourceView extends ViewPart {
   protected abstract ISourceZipFileHandles findSources(String run);
 
   protected static void tryToOpenInEditor(final Class<?> viewClass, final String run, final String pkg, final String type,
-      int lineNumber) {
+      int lineNumber, String proj) {
     final AbstractHistoricalSourceView view = (AbstractHistoricalSourceView) EclipseUIUtility.showView(viewClass.getName(), null,
         IWorkbenchPage.VIEW_CREATE);
     // System.out.println("View = "+view);
     if (view != null) {
       final ISourceZipFileHandles sources = view.findSources(run);
-      final boolean loaded = view.showSourceFile(sources, pkg == null || pkg.length() == 0 ? type : pkg + '.' + type);
+      final boolean loaded = view.showSourceFile(sources, proj, pkg == null || pkg.length() == 0 ? type : pkg + '.' + type);
       // System.out.println("Loading "+type+": "+loaded);
       if (loaded) {
         /*
