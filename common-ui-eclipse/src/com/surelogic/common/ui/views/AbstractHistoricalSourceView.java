@@ -52,6 +52,7 @@ public abstract class AbstractHistoricalSourceView extends ViewPart {
   private StyledText f_source;
   private JavaSyntaxHighlighter f_highlighter;
   private ISourceZipFileHandles f_lastSources = null;
+  private String f_lastProj = null;
   private String f_lastType = null;
 
   private Label f_sourceLabel;
@@ -155,39 +156,55 @@ public abstract class AbstractHistoricalSourceView extends ViewPart {
    * @return true if the view is populated
    */
   private boolean showSourceFile(final ISourceZipFileHandles sources, String qname) {
+	return showSourceFile(sources, null, qname);
+  }
+  
+  private boolean showSourceFile(final ISourceZipFileHandles sources, String proj, String qname) {
     if (qname == null) {
       return false;
     }
     // FIXME We use ANON_ONWARDS, b/c we don't record any type location info
     // about types defined within an anonymous class
     qname = ANON_ONWARDS.matcher(qname).replaceFirst("");
-    if (f_lastSources == sources && f_lastType == qname) {
+    
+    if (f_lastSources == sources && f_lastProj == proj && f_lastType == qname) {
       return true; // Should be populated from before
     }
+    if (proj != null) {
+      return findSourceFile(sources, proj, qname, sources.getSourceZipForProject(proj));
+    }
     for (final File f : sources.getSourceZips()) {
-      try {
-        final ZipFile zf = new ZipFile(f);
-        try {
-          final Map<String, String> fileMap = AbstractJavaZip.readClassMappings(zf);
-          if (fileMap != null) {
-            final String path = fileMap.get(qname);
-            if (path != null) {
-              populate(zf, path);
-              f_lastSources = sources;
-              f_lastType = qname;
-              return true;
-            }
-          }
-        } finally {
-          zf.close();
-        }
-      } catch (final Exception e) {
-        SLLogger.getLogger().log(Level.WARNING, "Unexcepted exception trying to read a source file", e);
+      if (findSourceFile(sources, proj, qname, f)) {
+    	return true;
       }
     }
     return false;
   }
-
+  
+  private boolean findSourceFile(final ISourceZipFileHandles sources, String proj, String qname, File f) {
+      try {
+          final ZipFile zf = new ZipFile(f);
+          try {
+            final Map<String, String> fileMap = AbstractJavaZip.readClassMappings(zf);
+            if (fileMap != null) {
+              final String path = fileMap.get(qname);
+              if (path != null) {
+                populate(zf, path);
+                f_lastSources = sources;
+                f_lastProj = proj;
+                f_lastType = qname;
+                return true;
+              }
+            }
+          } finally {
+            zf.close();
+          }
+      } catch (final Exception e) {
+          SLLogger.getLogger().log(Level.WARNING, "Unexcepted exception trying to read a source file", e);
+      }
+      return false;
+  }
+  
   private void populate(final ZipFile zf, final String path) throws IOException {
     final ZipEntry ze = zf.getEntry(path);
     InputStream in = zf.getInputStream(ze);
