@@ -534,7 +534,7 @@ public final class DeclUtil {
 
       @Override
       public boolean visitLambda(IDeclLambda node) {
-        b.append(".lambda\u00ab");
+        b.append(".(lambda " + node.getPosition() + ")\u00ab");
         final List<IDeclParameter> parameters = node.getParameters();
         if (parameters.isEmpty())
           b.append("()");
