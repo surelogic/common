@@ -7,7 +7,7 @@ import com.surelogic.NonNull;
 import com.surelogic.Nullable;
 
 @Immutable
-final class DeclLambda extends Decl implements IDeclType {
+final class DeclLambda extends Decl implements IDeclLambda {
 
   final int f_declPosition;
   final TypeRef f_functionalInterfaceType;

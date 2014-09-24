@@ -201,10 +201,6 @@ public interface IDecl {
    * {@link Kind#CONSTRUCTOR}, {@link Kind#LAMBDA}, or {@link Kind#METHOD}. If
    * this is meaningless for the declaration, an empty array is returned. The
    * returned set is a copy and may be safely mutated.
-   * <p>
-   * Note that for a lambda expression the declaration will only contain
-   * parameters if explicit types were given in the declaration of parameters
-   * within the Java source code.
    * 
    * @return a possibly empty list of the formal parameter types, in order.
    * 

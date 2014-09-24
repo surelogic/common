@@ -790,10 +790,6 @@ public abstract class Decl implements IDecl {
      * that is the same as setting the parent of the {@link ParameterBuilder} to
      * this, i.e., <tt>o.addParameterType(p)</tt> has the same effect as
      * <tt>p.setParent(o)</tt>.
-     * <p>
-     * Note that for a lambda expression the declaration will only contain
-     * parameters if explicit types were given in the declaration of parameters
-     * within the Java source code.
      * 
      * @param value
      *          a parameter builder. Ignored if {@code null}.
@@ -1164,7 +1160,7 @@ public abstract class Decl implements IDecl {
         throw new IllegalArgumentException(I18N.err(272, f_name));
 
       final Kind parentKind = parent.getKind();
-      if (!(parentKind == Kind.CONSTRUCTOR || parentKind == Kind.METHOD))
+      if (!(HAS_PARAMETERS.contains(parentKind)))
         throw new IllegalArgumentException(I18N.err(277, f_name, parentKind));
 
       return new DeclParameter(parent, f_childBuilders, f_name, f_position, f_typeOf, f_isFinal);

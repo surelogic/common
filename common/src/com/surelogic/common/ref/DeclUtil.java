@@ -14,10 +14,10 @@ import com.surelogic.common.ref.IJavaRef.Within;
 
 @Utility
 public final class DeclUtil {
-  private DeclUtil() { 
-	  // To prevent instantiation
+  private DeclUtil() {
+    // To prevent instantiation
   }
-	  
+
   /**
    * Generates the most likely simple file name that the passed declaration is
    * within.
@@ -530,6 +530,18 @@ public final class DeclUtil {
           b.append("static ");
         }
         b.append("initializer)");
+      }
+
+      @Override
+      public boolean visitLambda(IDeclLambda node) {
+        b.append(".lambda\u00ab");
+        final List<IDeclParameter> parameters = node.getParameters();
+        if (parameters.isEmpty())
+          b.append("()");
+        else
+          visitParameters(parameters);
+        b.append(" -> {...} : ").append(node.getTypeOf().getFullyQualified()).append('\u00bb');
+        return false;
       }
 
       @Override
@@ -1072,6 +1084,12 @@ public final class DeclUtil {
       }
       return b.toString();
     }
+    case LAMBDA:
+      final StringBuilder b = new StringBuilder();
+      b.append(toStringParametersHelper(decl.getParameters(), false, false, false));
+      b.append(" -> {...} : ");
+      b.append(decl.getTypeOf().getCompact());
+      return b.toString();
     case FIELD:
     case PARAMETER:
       return decl.getName() + " : " + decl.getTypeOf().getCompact();
@@ -1219,7 +1237,7 @@ public final class DeclUtil {
    *          a type parameter declaration.
    * @return a string representing the passed type parameter declaration.
    */
-  private static String toStringTypeParameterHelper(IDeclTypeParameter typeParameter) {
+  static String toStringTypeParameterHelper(IDeclTypeParameter typeParameter) {
     final StringBuilder b = new StringBuilder();
     b.append(typeParameter.getName());
     final List<TypeRef> bounds = typeParameter.getBounds();
