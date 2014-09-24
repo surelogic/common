@@ -1,8 +1,7 @@
 package com.surelogic.common.concurrent;
 
 import java.io.IOException;
-
-import jsr166y.RecursiveAction;
+import java.util.concurrent.RecursiveAction;
 
 public abstract class RecursiveIOAction extends RecursiveAction {
 	private static final long serialVersionUID = 1L;
