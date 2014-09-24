@@ -176,6 +176,23 @@ public abstract class DeclVisitor {
   }
 
   /**
+   * Visits a lambda declaration.
+   * <p>
+   * The default implementation does nothing but return {@code true}. Subclasses
+   * may reimplement.
+   * 
+   * @param node
+   *          the node to visit where <tt>node.getKind() ==
+   *          {@link IDecl.Kind#LAMBDA}</tt>.
+   * @return {@code true} if the parameters of this lambda should be visited
+   *         (this includes calling {@link #visitParameters(List)}),
+   *         {@code false} otherwise.
+   */
+  public boolean visitLambda(IDeclLambda node) {
+    return true;
+  }
+
+  /**
    * Visits a method declaration.
    * <p>
    * The default implementation does nothing but return {@code true}. Subclasses
@@ -316,6 +333,19 @@ public abstract class DeclVisitor {
    *          {@link IDecl.Kind#INTERFACE}</tt>.
    */
   public void endVisitInterface(IDeclType node) {
+    // by default do nothing
+  }
+
+  /**
+   * End of the visit for a lambda declaration.
+   * <p>
+   * The default implementation does nothing. Subclasses may reimplement.
+   * 
+   * @param node
+   *          the node to visit where <tt>node.getKind() ==
+   *          {@link IDecl.Kind#LAMBDA}</tt>.
+   */
+  public void endVisitLambda(IDeclLambda node) {
     // by default do nothing
   }
 
