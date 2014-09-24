@@ -68,6 +68,8 @@ public final class SLUtility {
 
   public static final String OBJECT = "Object";
   public static final String JAVA_LANG_OBJECT = "java.lang.Object";
+  public static final String RUNNABLE = "Runnable";
+  public static final String JAVA_LANG_RUNNABLE = "java.lang.Runnable";
   public static final String JAVA_LANG = "java.lang";
 
   public static final String SLASH_STAR_COMMENT_START = "/*";
@@ -438,8 +440,7 @@ public final class SLUtility {
    *          a string.
    * @return <tt>value</tt> if <tt>(value != null)</tt>, <tt>""</tt> otherwise.
    */
-  public static @NonNull
-  String nullToEmpty(String value) {
+  public static @NonNull String nullToEmpty(String value) {
     if (value == null)
       return "";
     else

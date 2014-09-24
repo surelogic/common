@@ -29,6 +29,7 @@ import com.surelogic.common.SLUtility;
  * <li>{@link Decl.FieldBuilder}</li>
  * <li>{@link Decl.InitializerBuilder}</li>
  * <li>{@link Decl.InterfaceBuilder}</li>
+ * <li>{@link Decl.LambdaBuilder}</li>
  * <li>{@link Decl.MethodBuilder}</li>
  * <li>{@link Decl.PackageBuilder}</li>
  * <li>{@link Decl.ParameterBuilder}</li>
@@ -37,7 +38,7 @@ import com.surelogic.common.SLUtility;
  * 
  * @see DeclUtil
  */
-@Immutable(appliesTo=Part.Instance)
+@Immutable(appliesTo = Part.Instance)
 public interface IDecl {
 
   /**
@@ -45,7 +46,7 @@ public interface IDecl {
    */
   @Immutable
   enum Kind {
-    ANNOTATION, CLASS, CONSTRUCTOR, ENUM, FIELD, INITIALIZER, INTERFACE, METHOD, PACKAGE, PARAMETER, TYPE_PARAMETER
+    ANNOTATION, CLASS, CONSTRUCTOR, ENUM, FIELD, INITIALIZER, INTERFACE, LAMBDA, METHOD, PACKAGE, PARAMETER, TYPE_PARAMETER
   }
 
   /*
@@ -57,8 +58,8 @@ public interface IDecl {
   public static final EnumSet<IDecl.Kind> IS_PKG_OR_TYPE = EnumSet.of(IDecl.Kind.ANNOTATION, IDecl.Kind.CLASS, IDecl.Kind.ENUM,
       IDecl.Kind.INTERFACE, IDecl.Kind.PACKAGE);
   public static final EnumSet<IDecl.Kind> HAS_CONTROL_FLOW = EnumSet.of(IDecl.Kind.CONSTRUCTOR, IDecl.Kind.INITIALIZER,
-      IDecl.Kind.METHOD);
-  public static final EnumSet<IDecl.Kind> HAS_PARAMETERS = EnumSet.of(IDecl.Kind.CONSTRUCTOR, IDecl.Kind.METHOD);
+      IDecl.Kind.LAMBDA, IDecl.Kind.METHOD);
+  public static final EnumSet<IDecl.Kind> HAS_PARAMETERS = EnumSet.of(IDecl.Kind.CONSTRUCTOR, IDecl.Kind.LAMBDA, IDecl.Kind.METHOD);
   public static final EnumSet<IDecl.Kind> HAS_TYPE_PARAMETERS = EnumSet.of(IDecl.Kind.CLASS, IDecl.Kind.INTERFACE,
       IDecl.Kind.CONSTRUCTOR, IDecl.Kind.METHOD);
   public static final EnumSet<IDecl.Kind> IS_PARAMETER = EnumSet.of(IDecl.Kind.PARAMETER, IDecl.Kind.TYPE_PARAMETER);
@@ -126,7 +127,8 @@ public interface IDecl {
    * {@link Kind#PARAMETER}, or (b) the return type for a {@link Kind#METHOD}.
    * In the case of a {@link Kind#METHOD} a return value of {@code null}
    * indicates the return type of the method is <tt>void</tt>. For an anonymous
-   * class this returns the type of the anonymous class expression. If this is
+   * class this returns the type of the anonymous class expression. For a lambda
+   * expression its functional interface type is returned. If this is
    * meaningless for the declaration {@code null} is returned.
    * 
    * @return the type of this declaration, {@link null} if none.
@@ -196,9 +198,13 @@ public interface IDecl {
 
   /**
    * Gets the ordered list, first to last, of the parameter declarations for a
-   * {@link Kind#CONSTRUCTOR} or {@link Kind#METHOD}. If this is meaningless for
-   * the declaration, an empty array is returned. The returned set is a copy and
-   * may be safely mutated.
+   * {@link Kind#CONSTRUCTOR}, {@link Kind#LAMBDA}, or {@link Kind#METHOD}. If
+   * this is meaningless for the declaration, an empty array is returned. The
+   * returned set is a copy and may be safely mutated.
+   * <p>
+   * Note that for a lambda expression the declaration will only contain
+   * parameters if explicit types were given in the declaration of parameters
+   * within the Java source code.
    * 
    * @return a possibly empty list of the formal parameter types, in order.
    * 
@@ -215,11 +221,17 @@ public interface IDecl {
    * For anonymous classes, indicated by {@link Kind#CLASS} with
    * {@link Visibility#ANONYMOUS}, this value indicates the zero-based position
    * of an anonymous class declaration within the immediate enclosing
-   * declaration. If this is meaningless for the declaration, -1 is returned.
+   * declaration.
+   * <p>
+   * For lambda expressions, indicated by {@link Kind#LAMBDA}, this this value
+   * indicates the zero-based position of the lambda expression within the
+   * immediate enclosing declaration.
+   * <p>
+   * If this is meaningless for the declaration, -1 is returned.
    * 
    * @return the zero-based position number of this parameter or the zero-based
-   *         position of this anonymous class within the immediate enclosing
-   *         declaration, or -1.
+   *         position of this anonymous class or lambda expression within the
+   *         immediate enclosing declaration, or -1.
    */
   int getPosition();
 

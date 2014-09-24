@@ -14,6 +14,7 @@ import com.surelogic.common.i18n.I18N;
 public final class TypeRef {
 
   public static final TypeRef JAVA_LANG_OBJECT = new TypeRef(SLUtility.JAVA_LANG_OBJECT, SLUtility.OBJECT);
+  public static final TypeRef JAVA_LANG_RUNNABLE = new TypeRef(SLUtility.JAVA_LANG_RUNNABLE, SLUtility.RUNNABLE);
 
   private final String f_fullyQualified;
   private final String f_compact;

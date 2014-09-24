@@ -9,7 +9,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import com.surelogic.*;
+import com.surelogic.Immutable;
+import com.surelogic.NonNull;
+import com.surelogic.NotThreadSafe;
+import com.surelogic.Nullable;
+import com.surelogic.Vouch;
 import com.surelogic.common.Pair;
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
@@ -196,13 +200,13 @@ public abstract class Decl implements IDecl {
     }
 
     /**
-     * Sets the zero-based position of an anonymous class declaration within the
-     * immediate enclosing declaration. This only applies to anonymous class
+     * Sets the zero-based position of this anonymous class declaration within
+     * the immediate enclosing declaration. This only applies to anonymous class
      * declarations and is otherwise ignored.
      * 
      * @param value
-     *          the zero-based position of an anonymous class declaration within
-     *          the immediate enclosing declaration.
+     *          the zero-based position of this anonymous class declaration
+     *          within the immediate enclosing declaration.
      * @return this builder.
      */
     public ClassBuilder setAnonymousDeclPosition(int value) {
@@ -337,7 +341,7 @@ public abstract class Decl implements IDecl {
      * <tt>p.setParent(o)</tt>.
      * 
      * @param value
-     *          a type parameter builder. Ignored if {@code null}.
+     *          a parameter builder. Ignored if {@code null}.
      * @return this builder.
      */
     public ConstructorBuilder addParameter(ParameterBuilder value) {
@@ -724,6 +728,109 @@ public abstract class Decl implements IDecl {
    * Constructs method {@link IDecl} instances.
    */
   @NotThreadSafe
+  public static final class LambdaBuilder extends DeclBuilder {
+
+    int f_declPosition;
+    TypeRef f_functionalInterfaceTypeOf;
+
+    /**
+     * Constructs a lambda declaration builder.
+     * <p>
+     * By default the lambda has no arguments. It is declared at position 0
+     * within the immediate enclosing declaration and uses the functional
+     * interface type <tt>java.lang.Runnable</tt>.
+     */
+    public LambdaBuilder() {
+      f_name = "";
+    }
+
+    /**
+     * Sets the parent of this declaration.
+     * 
+     * @param value
+     *          the parent of this declaration.
+     * @return this builder.
+     */
+    @Override
+    public LambdaBuilder setParent(DeclBuilder value) {
+      super.setParent(value);
+      return this;
+    }
+
+    /**
+     * Sets the zero-based position of this lambda declaration within the
+     * immediate enclosing declaration.
+     * 
+     * @param value
+     *          the zero-based position of this lambda declaration within the
+     *          immediate enclosing declaration.
+     * @return this builder.
+     */
+    public LambdaBuilder setDeclPosition(int value) {
+      f_declPosition = value;
+      return this;
+    }
+
+    /**
+     * Sets the functional interface type for this lambda expression. If this
+     * value is not set for anonymous class then <tt>java.lang.Runnable</tt> is
+     * used as a default (really only useful for testing).
+     * 
+     * @param value
+     *          the functional interface type for this lambda expression.
+     * @return this builder.
+     */
+    public LambdaBuilder setFunctionalInterfaceTypeOf(TypeRef value) {
+      f_functionalInterfaceTypeOf = value;
+      return this;
+    }
+
+    /**
+     * Adds a parameter to this lambda declaration. This is a convenience method
+     * that is the same as setting the parent of the {@link ParameterBuilder} to
+     * this, i.e., <tt>o.addParameterType(p)</tt> has the same effect as
+     * <tt>p.setParent(o)</tt>.
+     * <p>
+     * Note that for a lambda expression the declaration will only contain
+     * parameters if explicit types were given in the declaration of parameters
+     * within the Java source code.
+     * 
+     * @param value
+     *          a parameter builder. Ignored if {@code null}.
+     * @return this builder.
+     */
+    public LambdaBuilder addParameter(ParameterBuilder value) {
+      if (value != null)
+        value.setParent(this);
+      return this;
+    }
+
+    @Override
+    public IDecl buildInternal(IDecl parent) {
+      if (parent == null)
+        throw new IllegalArgumentException(I18N.err(272, f_name));
+
+      if (f_functionalInterfaceTypeOf == null)
+        f_functionalInterfaceTypeOf = TypeRef.JAVA_LANG_RUNNABLE;
+
+      final Set<Integer> usedParmPositions = new HashSet<Integer>();
+      for (DeclBuilder b : f_childBuilders) {
+        if (b instanceof ParameterBuilder) {
+          final Integer position = Integer.valueOf(((ParameterBuilder) b).f_position);
+          if (usedParmPositions.contains(position))
+            throw new IllegalArgumentException(I18N.err(283, position));
+          usedParmPositions.add(position);
+        }
+      }
+
+      return new DeclLambda(parent, f_childBuilders, f_name, f_declPosition, f_functionalInterfaceTypeOf);
+    }
+  }
+
+  /**
+   * Constructs method {@link IDecl} instances.
+   */
+  @NotThreadSafe
   public static final class MethodBuilder extends DeclBuilder {
 
     Visibility f_visibility = Visibility.PUBLIC;
@@ -866,7 +973,7 @@ public abstract class Decl implements IDecl {
      * <tt>p.setParent(o)</tt>.
      * 
      * @param value
-     *          a type parameter builder. Ignored if {@code null}.
+     *          a parameter builder. Ignored if {@code null}.
      * @return this builder.
      */
     public MethodBuilder addParameter(ParameterBuilder value) {
@@ -1233,7 +1340,7 @@ public abstract class Decl implements IDecl {
       return f_declaration;
     }
 
-    private final IDecl buildHelper(IDecl parent) {
+    final IDecl buildHelper(IDecl parent) {
       final IDecl stash = buildInternal(parent);
       f_declaration = stash;
       return stash;
@@ -1683,6 +1790,7 @@ public abstract class Decl implements IDecl {
         visitor.endVisitTypes(new ArrayList<IDeclType>(types));
         break;
       case CONSTRUCTOR:
+      case LAMBDA:
       case METHOD:
       case FIELD:
       case INITIALIZER:
@@ -1727,6 +1835,12 @@ public abstract class Decl implements IDecl {
         acceptHelperForParameters(node, visitor);
       }
       visitor.endVisitInterface((IDeclType) node);
+      break;
+    case LAMBDA:
+      if (visitor.visitLambda((IDeclLambda) node)) {
+        acceptHelperForParameters(node, visitor);
+      }
+      visitor.endVisitLambda((IDeclLambda) node);
       break;
     case METHOD:
       if (visitor.visitMethod((IDeclFunction) node)) {
@@ -1895,6 +2009,11 @@ public abstract class Decl implements IDecl {
     case INTERFACE:
       add(NAME, decl.getName(), b);
       addV(VISIBILITY, decl.getVisibility(), b);
+      break;
+    case LAMBDA:
+      if (decl.getPosition() > 0)
+        add(POSITION, Integer.toString(decl.getPosition()), b);
+      addT(TYPE, decl.getTypeOf(), b);
       break;
     case METHOD:
       add(NAME, decl.getName(), b);
@@ -2157,6 +2276,18 @@ public abstract class Decl implements IDecl {
         interfaceBuilder.setVisibility(Visibility.valueOf(pair.second()));
       }
       thisDeclBuilder = interfaceBuilder;
+      break;
+    case LAMBDA:
+      final LambdaBuilder lambdaBuilder = new LambdaBuilder();
+      pair = parseEqualsPair(b);
+      if (isFor(POSITION, pair)) {
+        lambdaBuilder.setDeclPosition(Integer.parseInt(pair.second()));
+        pair = parseEqualsPair(b);
+      }
+      if (isFor(TYPE, pair)) {
+        lambdaBuilder.setFunctionalInterfaceTypeOf(TypeRef.parseEncodedForPersistence(pair.second()));
+      }
+      thisDeclBuilder = lambdaBuilder;
       break;
     case METHOD:
       pair = parseEqualsPair(b);
