@@ -10,12 +10,17 @@ import com.surelogic.Nullable;
 final class DeclLambda extends Decl implements IDeclLambda {
 
   final int f_declPosition;
-  final TypeRef f_functionalInterfaceType;
+  @Nullable
+  final TypeRef f_returnTypeOf;
+  @NonNull
+  final TypeRef f_functionalInterfaceTypeOf;
 
-  DeclLambda(IDecl parent, List<Decl.DeclBuilder> childBuilders, String name, int declPosition, TypeRef functionalInterfaceType) {
+  DeclLambda(IDecl parent, List<Decl.DeclBuilder> childBuilders, String name, int declPosition, TypeRef returnTypeOf,
+      TypeRef functionalInterfaceTypeOf) {
     super(parent, childBuilders, name);
     f_declPosition = declPosition;
-    f_functionalInterfaceType = functionalInterfaceType;
+    f_returnTypeOf = returnTypeOf;
+    f_functionalInterfaceTypeOf = functionalInterfaceTypeOf;
   }
 
   @Override
@@ -32,6 +37,11 @@ final class DeclLambda extends Decl implements IDeclLambda {
   @Override
   @Nullable
   public TypeRef getTypeOf() {
-    return f_functionalInterfaceType;
+    return f_returnTypeOf;
+  }
+
+  @Override
+  public TypeRef getLambdaFunctionalInterfaceTypeOf() {
+    return f_functionalInterfaceTypeOf;
   }
 }

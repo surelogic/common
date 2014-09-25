@@ -179,6 +179,11 @@ public final class AdHocDecl implements IDecl {
   }
 
   @Override
+  public TypeRef getLambdaFunctionalInterfaceTypeOf() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
   @NonNull
   public Visibility getVisibility() {
     return f_visibility;

@@ -731,14 +731,16 @@ public abstract class Decl implements IDecl {
   public static final class LambdaBuilder extends DeclBuilder {
 
     int f_declPosition;
+    TypeRef f_returnTypeOf;
     TypeRef f_functionalInterfaceTypeOf;
 
     /**
      * Constructs a lambda declaration builder.
      * <p>
      * By default the lambda has no arguments. It is declared at position 0
-     * within the immediate enclosing declaration and uses the functional
-     * interface type <tt>java.lang.Runnable</tt>.
+     * within the immediate enclosing declaration. It has no functional
+     * interface type set and the method the lambda invokes has a return type of
+     * {@code void}.
      */
     public LambdaBuilder() {
       f_name = "";
@@ -768,6 +770,22 @@ public abstract class Decl implements IDecl {
      */
     public LambdaBuilder setDeclPosition(int value) {
       f_declPosition = value;
+      return this;
+    }
+
+    /**
+     * Sets the return type of the method this lambda invokes, a value of
+     * {@code null} indicates <tt>void</tt>. This is not the same as the
+     * functional interface type for this lambda expression, it is the type
+     * returned by the single method within the functional interface.
+     * 
+     * @param value
+     *          the return type of the method this lambda invokes, a value of
+     *          {@code null} indicates <tt>void</tt>.
+     * @return this builder.
+     */
+    public LambdaBuilder setReturnTypeOf(TypeRef value) {
+      f_returnTypeOf = value;
       return this;
     }
 
@@ -807,7 +825,7 @@ public abstract class Decl implements IDecl {
         throw new IllegalArgumentException(I18N.err(272, f_name));
 
       if (f_functionalInterfaceTypeOf == null)
-        f_functionalInterfaceTypeOf = TypeRef.JAVA_LANG_RUNNABLE;
+        throw new IllegalArgumentException(I18N.err(322));
 
       final Set<Integer> usedParmPositions = new HashSet<Integer>();
       for (DeclBuilder b : f_childBuilders) {
@@ -819,7 +837,7 @@ public abstract class Decl implements IDecl {
         }
       }
 
-      return new DeclLambda(parent, f_childBuilders, f_name, f_declPosition, f_functionalInterfaceTypeOf);
+      return new DeclLambda(parent, f_childBuilders, f_name, f_declPosition, f_returnTypeOf, f_functionalInterfaceTypeOf);
     }
   }
 
@@ -899,9 +917,6 @@ public abstract class Decl implements IDecl {
      *          the return type of this method, a value of {@code null}
      *          indicates <tt>void</tt>.
      * @return this builder.
-     * @throws IllegalArgumentException
-     *           if the passed declaration is non-{@code null} and not a
-     *           <tt>class</tt>, <tt>enum</tt>, or <tt>interface</tt>.
      */
     public MethodBuilder setReturnTypeOf(TypeRef value) {
       f_returnTypeOf = value;
@@ -1475,6 +1490,12 @@ public abstract class Decl implements IDecl {
   }
 
   @Override
+  @Nullable
+  public TypeRef getLambdaFunctionalInterfaceTypeOf() {
+    return null;
+  }
+
+  @Override
   @NonNull
   public Visibility getVisibility() {
     return Visibility.NA;
@@ -1968,6 +1989,7 @@ public abstract class Decl implements IDecl {
   private static final String IMPLICIT = "implicit";
   private static final String VOLATILE = "volatile";
   private static final String TYPE = "type";
+  private static final String FUNCTIONAL_INTERFACE_TYPE = "functional-interface-type";
   private static final String POSITION = "position";
   private static final String BOUNDS = "bounds";
 
@@ -2055,6 +2077,7 @@ public abstract class Decl implements IDecl {
       if (decl.getPosition() > 0)
         add(POSITION, Integer.toString(decl.getPosition()), b);
       addT(TYPE, decl.getTypeOf(), b);
+      addT(FUNCTIONAL_INTERFACE_TYPE, decl.getLambdaFunctionalInterfaceTypeOf(), b);
       break;
     case METHOD:
       add(NAME, decl.getName(), b);
@@ -2327,6 +2350,10 @@ public abstract class Decl implements IDecl {
         pair = parseEqualsPair(b);
       }
       if (isFor(TYPE, pair)) {
+        lambdaBuilder.setReturnTypeOf(TypeRef.parseEncodedForPersistence(pair.second()));
+        pair = parseEqualsPair(b);
+      }
+      if (isFor(FUNCTIONAL_INTERFACE_TYPE, pair)) {
         lambdaBuilder.setFunctionalInterfaceTypeOf(TypeRef.parseEncodedForPersistence(pair.second()));
       }
       thisDeclBuilder = lambdaBuilder;

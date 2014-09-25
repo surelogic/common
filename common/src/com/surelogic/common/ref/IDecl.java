@@ -124,17 +124,33 @@ public interface IDecl {
 
   /**
    * Gets (a) the type of this for a {@link Kind#FIELD} or
-   * {@link Kind#PARAMETER}, or (b) the return type for a {@link Kind#METHOD}.
-   * In the case of a {@link Kind#METHOD} a return value of {@code null}
-   * indicates the return type of the method is <tt>void</tt>. For an anonymous
-   * class this returns the type of the anonymous class expression. For a lambda
-   * expression its functional interface type is returned. If this is
-   * meaningless for the declaration {@code null} is returned.
+   * {@link Kind#PARAMETER}, or (b) the return type for a {@link Kind#METHOD} or
+   * {@link Kind#LAMBDA}. In the case of a {@link Kind#METHOD} or
+   * {@link Kind#LAMBDA} a result of {@code null} indicates the return type of
+   * the method is <tt>void</tt>. For an anonymous class this returns the type
+   * of the anonymous class expression. If this is meaningless for the
+   * declaration {@code null} is returned.
+   * <p>
+   * Note that for a lambda this method returns the return type of the single
+   * method within the functional interface that the lambda is an instance of.
+   * To determine what the type of the functional interface is use
+   * {@link #getLambdaFunctionalInterfaceTypeOf()}.
    * 
    * @return the type of this declaration, {@link null} if none.
    */
   @Nullable
   TypeRef getTypeOf();
+
+  /**
+   * Gets the functional interface type of this lambda. A lambda is an instance
+   * of a functional interface, such as {@link Runnable}. If this is meaningless
+   * for the declaration, {@code null} is returned.
+   * 
+   * @return the functional interface type of this lambda, or {@code null} if
+   *         the declaration is not a lambda.
+   */
+  @Nullable
+  TypeRef getLambdaFunctionalInterfaceTypeOf();
 
   /**
    * Gets the visibility of this declaration. If this is meaningless for the

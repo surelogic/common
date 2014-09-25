@@ -534,13 +534,21 @@ public final class DeclUtil {
 
       @Override
       public boolean visitLambda(IDeclLambda node) {
-        b.append(".(lambda " + node.getPosition() + ")\u00ab");
+        b.append(".lambda " + node.getPosition() + "\u00ab");
         final List<IDeclParameter> parameters = node.getParameters();
         if (parameters.isEmpty())
           b.append("()");
         else
           visitParameters(parameters);
-        b.append(" -> {...} : ").append(node.getTypeOf().getFullyQualified()).append('\u00bb');
+        b.append(" -> {");
+        final TypeRef returnType = node.getTypeOf();
+        if (returnType == null)
+          b.append("void");
+        else
+          b.append(returnType.getCompact());
+        b.append("} : ");
+        b.append(node.getLambdaFunctionalInterfaceTypeOf().getCompact());
+        b.append('\u00bb');
         return false;
       }
 
@@ -1089,8 +1097,14 @@ public final class DeclUtil {
     case LAMBDA:
       final StringBuilder b = new StringBuilder();
       b.append(toStringParametersHelper(decl.getParameters(), false, false, false));
-      b.append(" -> {...} : ");
-      b.append(decl.getTypeOf().getCompact());
+      b.append(" -> {");
+      final TypeRef returnType = decl.getTypeOf();
+      if (returnType == null)
+        b.append("void");
+      else
+        b.append(returnType.getCompact());
+      b.append("} : ");
+      b.append(decl.getLambdaFunctionalInterfaceTypeOf().getCompact());
       return b.toString();
     case FIELD:
     case PARAMETER:

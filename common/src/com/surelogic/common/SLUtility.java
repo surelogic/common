@@ -68,8 +68,6 @@ public final class SLUtility {
 
   public static final String OBJECT = "Object";
   public static final String JAVA_LANG_OBJECT = "java.lang.Object";
-  public static final String RUNNABLE = "Runnable";
-  public static final String JAVA_LANG_RUNNABLE = "java.lang.Runnable";
   public static final String JAVA_LANG = "java.lang";
 
   public static final String SLASH_STAR_COMMENT_START = "/*";
