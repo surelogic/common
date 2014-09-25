@@ -1263,6 +1263,7 @@ public abstract class Decl implements IDecl {
 
   public static abstract class DeclBuilder {
 
+    boolean f_alreadyBuilt = false;
     DeclBuilder f_parent;
     final List<DeclBuilder> f_childBuilders = new ArrayList<DeclBuilder>();
     String f_name;
@@ -1338,10 +1339,15 @@ public abstract class Decl implements IDecl {
      * Builds an appropriate {@link IDecl} instance by finding the root builder
      * and constructing a declaration tree from the root out. Throws an
      * exception if something goes wrong.
+     * <p>
+     * You cannot reuse builders, if this method is called twice on the same
+     * builder an {@link IllegalStateException} will be thrown.
      * 
      * @return a {@link IDecl} instance for this builder.
      * @throws IllegalArgumentException
      *           if something goes wrong.
+     * @throws IllegalStateException
+     *           if this method has already been invoked.
      */
     public final IDecl build() {
       // find the root
@@ -1356,6 +1362,17 @@ public abstract class Decl implements IDecl {
     }
 
     final IDecl buildHelper(IDecl parent) {
+      /*
+       * This is where the check for a double call to build() needs to be done
+       * because the recursive build is done by both the build method and the
+       * constructor of the Decl superclass (which calls this method on its
+       * children).
+       */
+      if (f_alreadyBuilt)
+        throw new IllegalStateException(I18N.err(321, this.getClass().getSimpleName(), f_name));
+      else
+        f_alreadyBuilt = true;
+
       final IDecl stash = buildInternal(parent);
       f_declaration = stash;
       return stash;
@@ -1555,6 +1572,8 @@ public abstract class Decl implements IDecl {
       return false;
     if (!SLUtility.nullSafeEquals(isImplicit(), o.isImplicit()))
       return false;
+    if (!SLUtility.nullSafeEquals(isDefault(), o.isDefault()))
+      return false;
     if (getPosition() != o.getPosition())
       return false;
     if (!SLUtility.nullSafeEquals(getBounds(), o.getBounds()))
@@ -1628,6 +1647,7 @@ public abstract class Decl implements IDecl {
     result = prime * result + Boolean.valueOf(isFinal()).hashCode();
     result = prime * result + Boolean.valueOf(isAbstract()).hashCode();
     result = prime * result + Boolean.valueOf(isImplicit()).hashCode();
+    result = prime * result + Boolean.valueOf(isDefault()).hashCode();
     result = prime * result + getPosition();
     result = prime * result + ((getBounds() == null) ? 0 : getBounds().hashCode());
     /*
@@ -1944,6 +1964,7 @@ public abstract class Decl implements IDecl {
   private static final String STATIC = "static";
   private static final String FINAL = "final";
   private static final String ABSTRACT = "abstract";
+  private static final String DEFAULT = "default";
   private static final String IMPLICIT = "implicit";
   private static final String VOLATILE = "volatile";
   private static final String TYPE = "type";
@@ -2042,6 +2063,7 @@ public abstract class Decl implements IDecl {
       addB(FINAL, decl.isFinal(), b);
       addB(ABSTRACT, decl.isAbstract(), b);
       addB(IMPLICIT, decl.isImplicit(), b);
+      addB(DEFAULT, decl.isDefault(), b);
       addT(TYPE, decl.getTypeOf(), b);
       break;
     case PACKAGE:
@@ -2333,6 +2355,10 @@ public abstract class Decl implements IDecl {
       }
       if (isFor(IMPLICIT, pair)) {
         methodBuilder.setIsImplicit(Boolean.valueOf(pair.second()));
+        pair = parseEqualsPair(b);
+      }
+      if (isFor(DEFAULT, pair)) {
+        methodBuilder.setIsDefault(Boolean.valueOf(pair.second()));
         pair = parseEqualsPair(b);
       }
       if (isFor(TYPE, pair))

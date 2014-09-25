@@ -282,6 +282,7 @@ public interface IDecl {
    * <li>{@link #isFinal()}</li>
    * <li>{@link #isAbstract()}</li>
    * <li>{@link #isImplicit()}</li>
+   * <li>{@link #isDefault()}</li>
    * <li>{@link #getPosition()}</li>
    * <li>{@link #getBounds()}</li>
    * </ul>
