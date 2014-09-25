@@ -186,7 +186,7 @@ public final class CommonImages {
   public static final String IMG_JSURE_QUICK_REF = "jsure_quick_ref.png";
   public static final String IMG_JSURE_RE_VERIFY = "jsure_re_verify.gif";
   public static final String IMG_JSURE_VERIFY = "jsure_verify.gif";
-  public static final String IMG_LAMBDA = "lambda.gif";
+  public static final String IMG_LAMBDA = "lambda.png";
   public static final String IMG_LEFT_ARROW_SMALL = "left_arrow_small.gif";
   public static final String IMG_LEFT = "left.gif";
   public static final String IMG_LIBRARY = "library.gif";
