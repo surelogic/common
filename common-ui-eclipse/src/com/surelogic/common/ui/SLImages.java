@@ -81,7 +81,7 @@ public final class SLImages {
    * </ul>
    * <p>
    */
-  private static final Map<String, Image> CACHEKEY_TO_IMAGE = new HashMap<String, Image>();
+  static final Map<String, Image> CACHEKEY_TO_IMAGE = new HashMap<String, Image>();
 
   /**
    * Adds the passed image to the cache under the passed key.
@@ -1386,7 +1386,9 @@ public final class SLImages {
       default:
       }
       String topRight = null;
-      if (decl.isStatic() && decl.isFinal())
+      if (decl.isDefault())
+        topRight = CommonImages.DECR_DEFAULT;
+      else if (decl.isStatic() && decl.isFinal())
         topRight = CommonImages.DECR_STATIC_FINAL;
       else if (decl.isStatic())
         topRight = CommonImages.DECR_STATIC;
@@ -1483,6 +1485,8 @@ public final class SLImages {
         return getImage(CommonImages.IMG_PARAMETER);
     case TYPE_PARAMETER:
       return getImage(CommonImages.IMG_TYPE_PARAMETER);
+    case LAMBDA:
+      return getImage(CommonImages.IMG_LAMBDA);
     }
     return getImage(CommonImages.IMG_UNKNOWN);
   }
