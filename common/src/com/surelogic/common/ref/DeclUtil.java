@@ -554,6 +554,8 @@ public final class DeclUtil {
           b.append("abstract ");
         if (node.isFinal())
           b.append("final ");
+        if (node.isDefault())
+          b.append("default ");
         final List<IDeclTypeParameter> typeParameters = node.getTypeParameters();
         if (!typeParameters.isEmpty()) {
           visitTypeParameters(typeParameters);
