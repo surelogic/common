@@ -88,6 +88,8 @@ public final class AdHocDecl implements IDecl {
         f_kind = Kind.INITIALIZER;
       else if ("IN".equalsIgnoreCase(dt))
         f_kind = Kind.INTERFACE;
+      else if ("LA".equalsIgnoreCase(dt))
+        f_kind = Kind.LAMBDA;
       else if ("ME".equalsIgnoreCase(dt))
         f_kind = Kind.METHOD;
       else if ("PK".equalsIgnoreCase(dt))
