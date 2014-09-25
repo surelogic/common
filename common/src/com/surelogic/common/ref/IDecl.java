@@ -197,6 +197,16 @@ public interface IDecl {
   boolean isVolatile();
 
   /**
+   * Gets if this declaration is declared to be <i>default</i>. This only
+   * applies to method declarations within an interface in Java 8. If this is
+   * meaningless for the declaration, {@code false} is returned.
+   * 
+   * @return {@code true} if this declaration is declared to be <i>default</i>,
+   *         {@code false} otherwise.
+   */
+  boolean isDefault();
+
+  /**
    * Gets the ordered list, first to last, of the parameter declarations for a
    * {@link Kind#CONSTRUCTOR}, {@link Kind#LAMBDA}, or {@link Kind#METHOD}. If
    * this is meaningless for the declaration, an empty array is returned. The

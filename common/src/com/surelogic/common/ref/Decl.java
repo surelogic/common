@@ -835,12 +835,14 @@ public abstract class Decl implements IDecl {
     boolean f_isFinal = false;
     boolean f_isAbstract = false;
     boolean f_isImplicit = false;
+    boolean f_isDefault = false;
 
     /**
      * Constructs a method declaration builder.
      * <p>
      * By default the method has no arguments. It is <tt>public</tt>, not
-     * <tt>static</tt>, not <tt>final</tt>, and not <tt>abstract</tt>.
+     * <tt>static</tt>, not <tt>final</tt>, not <tt>abstract</tt>, and not
+     * <tt>default</tt>.
      * 
      * @param name
      *          the method name, such as <tt>processStuff</tt>.
@@ -963,6 +965,20 @@ public abstract class Decl implements IDecl {
     }
 
     /**
+     * Sets if this declaration is declared to be <i>default</i>. This flag only
+     * applies to method declarations within an interface in Java 8.
+     * 
+     * @param value
+     *          {@code true} if this declaration is declared to be
+     *          <i>default</i>, {@code false} otherwise.
+     * @return this builder.
+     */
+    public MethodBuilder setIsDefault(boolean value) {
+      f_isDefault = value;
+      return this;
+    }
+
+    /**
      * Adds a parameter to this declaration. This is a convenience method that
      * is the same as setting the parent of the {@link ParameterBuilder} to
      * this, i.e., <tt>o.addParameterType(p)</tt> has the same effect as
@@ -992,6 +1008,9 @@ public abstract class Decl implements IDecl {
       if (f_isAbstract && f_isStatic)
         throw new IllegalArgumentException(I18N.err(280, f_name));
 
+      if (f_isDefault && parent.getKind() != Kind.INTERFACE)
+        throw new IllegalArgumentException(I18N.err(320, f_name));
+
       final Set<Integer> usedParmPositions = new HashSet<Integer>();
       final Set<Integer> usedTypeParmPositions = new HashSet<Integer>();
       for (DeclBuilder b : f_childBuilders) {
@@ -1009,7 +1028,7 @@ public abstract class Decl implements IDecl {
       }
 
       return new DeclMethod(parent, f_childBuilders, f_name, f_visibility, f_returnTypeOf, f_isStatic, f_isFinal, f_isAbstract,
-          f_isImplicit);
+          f_isImplicit, f_isDefault);
     }
   }
 
@@ -1466,6 +1485,11 @@ public abstract class Decl implements IDecl {
 
   @Override
   public boolean isVolatile() {
+    return false;
+  }
+
+  @Override
+  public boolean isDefault() {
     return false;
   }
 

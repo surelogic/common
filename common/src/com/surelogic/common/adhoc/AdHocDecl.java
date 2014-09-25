@@ -26,7 +26,7 @@ import com.surelogic.common.ref.TypeRef;
  * <li>{@link IDecl#isImplicit()}</li>
  * <li>{@link IDecl#isStatic()}</li>
  * <li>{@link IDecl#isVolatile()}</li>
- * </ul>
+ * <li>{@link IDecl#isDefault()}</li>
  */
 @Immutable
 public final class AdHocDecl implements IDecl {
@@ -40,6 +40,7 @@ public final class AdHocDecl implements IDecl {
   private final boolean f_isImplicit;
   private final boolean f_isStatic;
   private final boolean f_isVolatile;
+  private final boolean f_isDefault;
 
   /**
    * Constructs an instance using the passed encoded string. The encoded string
@@ -65,6 +66,7 @@ public final class AdHocDecl implements IDecl {
       f_kind = Kind.CLASS;
       f_visibility = Visibility.PUBLIC;
       f_isAbstract = false;
+      f_isDefault = false;
       f_isFinal = false;
       f_isImplicit = false;
       f_isStatic = false;
@@ -100,6 +102,7 @@ public final class AdHocDecl implements IDecl {
       if (!b.startsWith(":") || b.length() < 3) {
         f_visibility = Visibility.PUBLIC;
         f_isAbstract = false;
+        f_isDefault = false;
         f_isFinal = false;
         f_isImplicit = false;
         f_isStatic = false;
@@ -124,6 +127,7 @@ public final class AdHocDecl implements IDecl {
         b = b.substring(3, b.length());
         if (!b.startsWith(":") || b.length() < 2) {
           f_isAbstract = false;
+          f_isDefault = false;
           f_isFinal = false;
           f_isImplicit = false;
           f_isStatic = false;
@@ -132,6 +136,7 @@ public final class AdHocDecl implements IDecl {
           // Modifiers
           final String mods = b.substring(1);
           f_isAbstract = mods.contains("A") || mods.contains("a");
+          f_isDefault = mods.contains("D") || mods.contains("d");
           f_isFinal = mods.contains("F") || mods.contains("f");
           f_isImplicit = mods.contains("I") || mods.contains("i");
           f_isStatic = mods.contains("S") || mods.contains("s");
@@ -200,6 +205,11 @@ public final class AdHocDecl implements IDecl {
   @Override
   public boolean isVolatile() {
     return f_isVolatile;
+  }
+
+  @Override
+  public boolean isDefault() {
+    return f_isDefault;
   }
 
   @Override
