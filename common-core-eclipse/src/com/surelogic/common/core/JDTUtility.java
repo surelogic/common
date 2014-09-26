@@ -66,6 +66,7 @@ import com.surelogic.common.ref.DeclVisitor;
 import com.surelogic.common.ref.IDecl;
 import com.surelogic.common.ref.IDeclField;
 import com.surelogic.common.ref.IDeclFunction;
+import com.surelogic.common.ref.IDeclLambda;
 import com.surelogic.common.ref.IDeclPackage;
 import com.surelogic.common.ref.IDeclParameter;
 import com.surelogic.common.ref.IDeclType;
@@ -818,6 +819,46 @@ public final class JDTUtility {
                 return false;
               }
             }
+          }
+        }
+      }
+      return false;
+    }
+
+    @Override
+    public boolean visitLambda(IDeclLambda node) {
+      /*
+       * TODO this is completely untested but seems reasonable once we get
+       * output from JSure it should be wrung out.
+       */
+      lookedForCount++;
+      int lambdaDeclCount = 0;
+      for (IJavaElement ije : getChildren(current)) {
+        if (ije instanceof IMethod) {
+          final IMethod im = (IMethod) ije;
+          if (isLambdaMethod(im)) {
+            if (node.getPosition() == lambdaDeclCount) {
+              final String[] paramTypes = im.getParameterTypes();
+              final List<IDeclParameter> nodeParams = node.getParameters();
+              if (nodeParams.size() == paramTypes.length) {
+                boolean matches = true;
+                for (int i = 0; i < paramTypes.length; i++) {
+                  final String eclipseTypeSig = paramTypes[i];
+                  final String imType = Signature.getSignatureSimpleName(eclipseTypeSig);
+                  // heuristic match (not exact with arrays at the very least)
+                  if (!nodeParams.get(i).getTypeOf().getFullyQualified().contains(imType)) {
+                    matches = false;
+                    break;
+                  }
+                }
+                if (matches) {
+                  foundCount++;
+                  current = im;
+                  return false;
+                }
+              }
+            }
+            lambdaDeclCount++;
           }
         }
       }
@@ -1718,7 +1759,7 @@ public final class JDTUtility {
    *          an Eclipse Java model method
    * @return {@code true} if the method is a lambda, {@code false} otherwise.
    */
-  public boolean isLambdaMethod(IMethod m) {
+  public static boolean isLambdaMethod(IMethod m) {
     try {
       Class<?> c = Class.forName("org.eclipse.jdt.core.IMethod");
       if (c.isInstance(m)) {
