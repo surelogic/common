@@ -1707,6 +1707,31 @@ public final class JDTUtility {
     }
   }
 
+  /**
+   * <b>Remove this method when we support Eclipse 4.4 and above.</b>
+   * <p>
+   * This is a hack to check if the passed Eclipse method is a lambda. The
+   * <tt>isLambdaMethod()</tt> method was not added to Eclipse until the 4.4
+   * release.
+   * 
+   * @param m
+   *          an Eclipse Java model method
+   * @return {@code true} if the method is a lambda, {@code false} otherwise.
+   */
+  public boolean isLambdaMethod(IMethod m) {
+    try {
+      Class<?> c = Class.forName("org.eclipse.jdt.core.IMethod");
+      if (c.isInstance(m)) {
+        Method gp = c.getDeclaredMethod("isLambdaMethod");
+        final Boolean result = (Boolean) gp.invoke(m);
+        return result.booleanValue();
+      }
+    } catch (Exception probablyInEclipseLessThan44) {
+      // ignore
+    }
+    return false;
+  }
+
   private JDTUtility() {
     // utility
   }
