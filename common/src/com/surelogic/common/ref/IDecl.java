@@ -106,7 +106,20 @@ public interface IDecl {
    * The name returned for the default package is
    * {@link SLUtility#JAVA_DEFAULT_PACKAGE}.
    * <p>
-   * The name returned for an anonymous class is the empty string.
+   * The name returned for an anonymous class is the simple name of the class
+   * followed by a dollar sign then the the zero-based position of the anonymous
+   * class declaration within the immediate enclosing declaration. For example,
+   * <tt>Runnable$4</tt>, or <tt>ActionListener$0</tt>. This convention is
+   * slightly different than standard Java/Eclipse naming where the number is a
+   * position within the compilation unit not the immediately enclosing
+   * declaration.
+   * <p>
+   * The name returned for a lambda is <tt>lambda</tt> followed by a dollar sign
+   * then the the zero-based position of the lambda declaration within the
+   * immediate enclosing declaration. For example, <tt>lambda$0</tt>, or
+   * <tt>lambda$2</tt>. This convention is slightly different than standard
+   * Java/Eclipse naming where the number is a position within the compilation
+   * unit not the immediately enclosing declaration.
    * <p>
    * The name returned for a constructor is the simple name of its enclosing
    * type.
@@ -236,9 +249,9 @@ public interface IDecl {
   List<IDeclParameter> getParameters();
 
   /**
-   * Gets the zero-based position number of a parameter declaration&mdash;this
-   * information is only meaningful for {@link Kind#PARAMETER},
-   * {@link Kind#TYPE_PARAMETER}
+   * For parameter lists, indicated by {@link Kind#PARAMETER} or
+   * {@link Kind#TYPE_PARAMETER}, this method gets the zero-based position
+   * number of the declaration.
    * <p>
    * For anonymous classes, indicated by {@link Kind#CLASS} with
    * {@link Visibility#ANONYMOUS}, this value indicates the zero-based position

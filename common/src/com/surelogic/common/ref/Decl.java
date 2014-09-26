@@ -235,13 +235,13 @@ public abstract class Decl implements IDecl {
       // anonymous classes
       if (f_visibility == Visibility.ANONYMOUS) {
         f_isStatic = false;
-        f_name = "";
         if (f_anonymousDeclPosition >= 0)
           anonymousDeclPosition = f_anonymousDeclPosition;
         if (f_anonymousType != null)
           anonymousType = f_anonymousType;
         else
           anonymousType = TypeRef.JAVA_LANG_OBJECT;
+        f_name = anonymousType.getCompact() + "$" + anonymousDeclPosition;
       } else {
         if (!SLUtility.isValidJavaIdentifier(f_name) && !"[]".equals(f_name))
           throw new IllegalArgumentException(I18N.err(275, f_name));
@@ -743,7 +743,7 @@ public abstract class Decl implements IDecl {
      * {@code void}.
      */
     public LambdaBuilder() {
-      f_name = "";
+      f_name = "lambda$";
     }
 
     /**
@@ -821,8 +821,14 @@ public abstract class Decl implements IDecl {
 
     @Override
     public IDecl buildInternal(IDecl parent) {
+      int declPosition = 0;
       if (parent == null)
         throw new IllegalArgumentException(I18N.err(272, f_name));
+
+      if (f_declPosition >= 0)
+        declPosition = f_declPosition;
+
+      f_name = f_name + declPosition; // e.g., lambda$0
 
       if (f_functionalInterfaceTypeOf == null)
         throw new IllegalArgumentException(I18N.err(322));
@@ -837,7 +843,7 @@ public abstract class Decl implements IDecl {
         }
       }
 
-      return new DeclLambda(parent, f_childBuilders, f_name, f_declPosition, f_returnTypeOf, f_functionalInterfaceTypeOf);
+      return new DeclLambda(parent, f_childBuilders, f_name, declPosition, f_returnTypeOf, f_functionalInterfaceTypeOf);
     }
   }
 
