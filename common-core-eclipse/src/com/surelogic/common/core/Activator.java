@@ -13,57 +13,56 @@ import com.surelogic.common.logging.SLLogger;
  */
 public class Activator extends Plugin {
 
-	private static Activator plugin;
+  private static Activator plugin;
 
-	public Activator() {
-		if (plugin != null)
-			throw new IllegalStateException(Activator.class.getName()
-					+ " instance already exits, it should be a singleton.");
-		plugin = this;
-	}
+  public Activator() {
+    if (plugin != null)
+      throw new IllegalStateException(Activator.class.getName() + " instance already exits, it should be a singleton.");
+    plugin = this;
+  }
 
-	@Override
-	public void start(BundleContext context) throws Exception {
-		super.start(context);
+  @Override
+  public void start(BundleContext context) throws Exception {
+    super.start(context);
 
-		/*
-		 * Configure the SLLogger to write to the Eclipse log.
-		 * 
-		 * The EclipseHandler also adjusts the Level of logging based upon the
-		 * debug trace settings for this plug-in.
-		 */
-		SLLogger.addHandler(new EclipseHandler());
+    /*
+     * Configure the SLLogger to write to the Eclipse log.
+     * 
+     * The EclipseHandler also adjusts the Level of logging based upon the debug
+     * trace settings for this plug-in.
+     */
+    SLLogger.addHandler(new EclipseHandler());
 
-		CommonCorePreferencesUtility.initializeDefaultScope();
-	}
+    CommonCorePreferencesUtility.initializeDefaultScope();
+  }
 
-	@Override
-	public void stop(BundleContext context) throws Exception {
-		try {
-			EclipseUtility.persistPreferences();
-		} finally {
-			super.stop(context);
-		}
-		plugin = null;
-	}
+  @Override
+  public void stop(BundleContext context) throws Exception {
+    try {
+      EclipseUtility.persistPreferences();
+    } finally {
+      super.stop(context);
+    }
+    plugin = null;
+  }
 
-	/**
-	 * Returns the shared instance.
-	 * 
-	 * @return the shared instance.
-	 */
-	public static Activator getDefault() {
-		return plugin;
-	}
+  /**
+   * Returns the shared instance.
+   * 
+   * @return the shared instance.
+   */
+  public static Activator getDefault() {
+    return plugin;
+  }
 
-	/**
-	 * Gets the identifier for this plug in.
-	 * 
-	 * @return an identifier, such as <tt>com.surelogic.common</tt>. In rare
-	 *         cases, for example bad plug in XML, it may be {@code null}.
-	 * @see Bundle#getSymbolicName()
-	 */
-	public String getPlugInId() {
-		return plugin.getBundle().getSymbolicName();
-	}
+  /**
+   * Gets the identifier for this plug in.
+   * 
+   * @return an identifier, such as <tt>com.surelogic.common</tt>. In rare
+   *         cases, for example bad plug in XML, it may be {@code null}.
+   * @see Bundle#getSymbolicName()
+   */
+  public String getPlugInId() {
+    return plugin.getBundle().getSymbolicName();
+  }
 }

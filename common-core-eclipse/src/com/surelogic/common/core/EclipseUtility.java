@@ -732,6 +732,40 @@ public class EclipseUtility {
   }
 
   /**
+   * Gets the major, minor, and dot version of the passed activator as read from
+   * its bundle headers.
+   * <p>
+   * So for a real release, such as <tt>3.1.1.201001151440</tt>, this call
+   * returns <tt>3.1.1</tt>.
+   * <p>
+   * However, in a development or meta-Eclipse the complete version string
+   * similar to <tt>12.45.6.qualifier</tt>, this call again returns
+   * <tt>12.45.6</tt>.
+   * 
+   * @param activator
+   *          a plug-in to query.
+   * @return a string that represents the major, minor, and dot version of the
+   *         passed activator, such as <tt>4.4.2</tt>.
+   */
+  public static String getMajorMinorDotVersion(final Plugin activator) {
+    String result = getVersion(activator);
+    int counter = 0;
+    int endIndex = 0;
+    for (int index = 0; index < result.length(); index++) {
+      if (result.charAt(index) == '.') {
+        counter++;
+        // we need to save the position of the third period
+        if (counter == 3)
+          endIndex = index;
+      }
+    }
+    if (counter < 3)
+      return result;
+    else
+      return result.substring(0, endIndex);
+  }
+
+  /**
    * Gets the date that the version of the passed activator was released or
    * today's date.
    * <p>
@@ -769,7 +803,6 @@ public class EclipseUtility {
     } catch (ParseException ignore) {
     }
     return new Date();
-
   }
 
   /**
