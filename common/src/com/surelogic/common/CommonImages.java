@@ -252,6 +252,7 @@ public final class CommonImages {
   public static final String IMG_SIERRA_SCAN_CLASS = "sierra_scan_class.gif";
   public static final String IMG_SIERRA_SCAN_DELTA = "sierra_scan_delta.gif";
   public static final String IMG_SIERRA_SCAN_PKG = "sierra_scan_pkg.gif";
+  public static final String IMG_SIERRA_RE_SCAN = "sierra_re_scan.gif";
   public static final String IMG_SIERRA_SCAN = "sierra_scan.gif";
   public static final String IMG_SIERRA_SERVER_GRAY = "sierra_server_gray.gif";
   public static final String IMG_SIERRA_SERVER_LOCAL = "sierra_server_local.gif";
