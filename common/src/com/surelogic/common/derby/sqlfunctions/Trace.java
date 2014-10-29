@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package com.surelogic.common.derby.sqlfunctions;
 
@@ -17,9 +17,9 @@ import com.surelogic.common.jdbc.SingleRowHandler;
  * should be available only in flashlight-common, but due to some class loading
  * issues it needs to be in common, i.e., the same project that exports the
  * derby.jar.
- * 
+ *
  * @author nathan
- * 
+ *
  */
 public class Trace {
     final long parentId;
@@ -135,7 +135,7 @@ public class Trace {
 
     /**
      * Produce a stack trace beginning with the given trace id.
-     * 
+     *
      * @param traceId
      * @return
      */

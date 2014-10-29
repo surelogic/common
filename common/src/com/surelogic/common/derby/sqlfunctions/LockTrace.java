@@ -100,7 +100,7 @@ public class LockTrace {
 
     /**
      * Produce a stack trace beginning with the given trace id.
-     * 
+     *
      * @param traceId
      * @return
      */

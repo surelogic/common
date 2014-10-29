@@ -9,10 +9,13 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.jdbc.BooleanResultHandler;
+import com.surelogic.common.jdbc.DBConnection;
 import com.surelogic.common.jdbc.DBQuery;
 import com.surelogic.common.jdbc.DBTransaction;
 import com.surelogic.common.jdbc.DefaultConnection;
@@ -33,9 +36,9 @@ import com.surelogic.flashlight.common.RollupIndirectAccessesResultSet;
  * Some useful functions used in the Flashlight tool. This class should be
  * available only in flashlight-common, but due to some class loading issues it
  * needs to be in common, i.e., the same project that exports the derby.jar.
- * 
+ *
  * @author nathan
- * 
+ *
  */
 public final class Functions {
 
@@ -43,10 +46,50 @@ public final class Functions {
         // No instance
     }
 
+    private static class MergedTraceResultSet implements InvocationHandler {
+        private final Iterator<MergedTrace> traces;
+        private MergedTrace trace;
+
+        MergedTraceResultSet(final List<MergedTrace> traces) {
+            this.traces = traces.iterator();
+        }
+
+        static ResultSet create(final List<MergedTrace> traces) {
+            return (ResultSet) Proxy.newProxyInstance(ResultSet.class
+                    .getClassLoader(), new Class[] { ResultSet.class },
+                    new MergedTraceResultSet(traces));
+        }
+
+        @Override
+        public Object invoke(final Object proxy, final Method method,
+                final Object[] args) throws Throwable {
+            final String methodName = method.getName();
+            if ("next".equals(methodName)) {
+                if (traces.hasNext()) {
+                    trace = traces.next();
+                    return true;
+                } else {
+                    return false;
+                }
+            } else if ("close".equals(methodName)) {
+                while (traces.hasNext()) {
+                    traces.next();
+                }
+                trace = null;
+                return null;
+            } else if (methodName.startsWith("get")) {
+                return trace.get((Integer) args[0]);
+            } else if (methodName.equals("wasNull")) {
+                return trace.wasNull();
+            }
+            throw new UnsupportedOperationException(method.getName());
+        }
+
+    }
+
     private static class TraceResultSet implements InvocationHandler {
         private final Iterator<Trace> traces;
         private Trace trace;
-        private boolean wasNull;
 
         TraceResultSet(final List<Trace> traces) {
             this.traces = traces.iterator();
@@ -330,10 +373,45 @@ public final class Functions {
                 });
     }
 
+    public static ResultSet mixedLockAndStackTrace(final long stackTraceId,
+            final long lockTraceId) {
+        DBConnection conn = DefaultConnection.getInstance();
+
+        LinkedList<Trace> stackTrace = conn.withDefault(Trace
+                .stackTrace(stackTraceId));
+        LinkedList<LockTrace> lockTrace = conn.withDefault(LockTrace
+                .lockTrace(lockTraceId));
+        List<MergedTrace> merged = new LinkedList<MergedTrace>();
+        for (Trace t : stackTrace) {
+            merged.add(new MergedTrace(t));
+        }
+        for (Iterator<LockTrace> descIter = lockTrace.descendingIterator(); descIter
+                .hasNext();) {
+            LockTrace t = descIter.next();
+            LinkedList<Trace> lockStackTrace = conn.withDefault(Trace
+                    .stackTrace(t.traceId));
+            Trace toInsert = lockStackTrace.get(0);
+            MergedTrace newEntry = new MergedTrace(toInsert, t.type, t.lockId);
+            ListIterator<MergedTrace> traceIter = merged.listIterator(merged
+                    .size());
+            ListIterator<Trace> lockIter = lockStackTrace
+                    .listIterator(lockStackTrace.size());
+            for (MergedTrace stack = traceIter.previous(); (stack.isLock || lockIter
+                    .hasPrevious() && stack.matches(lockIter.previous()))
+                    && traceIter.hasPrevious(); stack = traceIter.previous()) {
+            }
+            if (traceIter.hasNext()) {
+                traceIter.next();
+            }
+            traceIter.add(newEntry);
+        }
+        return MergedTraceResultSet.create(merged);
+    }
+
     /**
      * Returns a <em>table</em> representing the stack trace belonging to this
      * trace id.
-     * 
+     *
      * @param traceId
      * @return
      */
@@ -345,7 +423,7 @@ public final class Functions {
     /**
      * Returns a <em>table</em> representing the lock trace belonging to this
      * trace id.
-     * 
+     *
      * @param traceId
      * @return
      */
@@ -476,7 +554,7 @@ public final class Functions {
      * Returns the actual lock id when passed an id from the lock table. This
      * will often be the same as the id passed in, but will be different if the
      * lock is a r/w lock.
-     * 
+     *
      * @param id
      * @return
      */
@@ -501,7 +579,7 @@ public final class Functions {
     /**
      * Returns a more human-readable representation of the object with the given
      * id.
-     * 
+     *
      * @param id
      * @return
      */
