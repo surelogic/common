@@ -97,8 +97,8 @@ public abstract class ProjectInfo<P extends ISLJavaProject> {
 
 		final File location = EclipseUtility.resolveIPath(project.getLocation());
 		Config config = new ZippedConfig(project.getName(), location, false, containsJavaLangObject(jp));
-		projects.add(config);
 		setOptions(config);
+		projects.add(config);
 
 		for (IResource res : getRemovedResources()) {
 			final File f = res.getLocation().toFile();
