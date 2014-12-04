@@ -451,6 +451,18 @@ public abstract class AbstractQueryResultsView extends ViewPart {
             }
             // avoid scroll bar position being to the right
             table.showColumn(table.getColumn(0));
+            /*
+             * Bug on OSX 10.10: the header view hides the first row of the table
+             * view, initially. We remove the header then, later, put it back.
+             */
+            if (SystemUtils.IS_OS_MAC_OSX && SystemUtils.OS_VERSION.startsWith("10.10")) {
+              table.setHeaderVisible(false);
+              table.getDisplay().asyncExec(new Runnable(){
+                public void run() {
+                  table.setHeaderVisible(true);
+                }
+              });
+            }
         } else {
             /*
              * TREE / TREE-TABLE
