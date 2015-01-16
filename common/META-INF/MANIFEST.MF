@@ -247,7 +247,7 @@ Export-Package: com.surelogic,
  org.objectweb.asm.signature,
  org.objectweb.asm.tree
 Bundle-ClassPath: .,
- lib/runtime/promises-5.5.1.jar,
+ lib/runtime/promises-5.6.0.jar,
  lib/runtime/collections-generic-4.0.jar,
  lib/runtime/derby.jar,
  lib/runtime/ant.jar,
