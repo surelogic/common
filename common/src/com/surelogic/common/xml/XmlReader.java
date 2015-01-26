@@ -51,7 +51,7 @@ public abstract class XmlReader extends DefaultHandler {
       stream = new FileInputStream(location);
       
       if (location.getName().endsWith(FileUtility.GZIP_SUFFIX)) {
-    	  stream = new GZIPInputStream(stream);
+    	  stream = new GZIPInputStream(stream, 65536);
       }       
     } catch (FileNotFoundException e) {
       return;
