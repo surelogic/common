@@ -49,10 +49,15 @@ public abstract class XmlReader extends DefaultHandler {
     InputStream stream;
     try {
       stream = new FileInputStream(location);
-      
+
       if (location.getName().endsWith(FileUtility.GZIP_SUFFIX)) {
-    	  stream = new GZIPInputStream(stream, 65536);
-      }       
+        /*
+         * There appear to be problems using the gzip stream without changing
+         * the buffer size. The below ~65K buffer seems to fix the load issues
+         * that JSure experienced intermittently with .gz files.
+         */
+        stream = new GZIPInputStream(stream, 65536);
+      }
     } catch (FileNotFoundException e) {
       return;
     }
