@@ -45,7 +45,9 @@ import com.surelogic.common.logging.SLLogger;
 public abstract class AbstractLocalSLJob<C extends ILocalConfig> extends
 AbstractSLJob {
     public static final String COMMON_PLUGIN_ID = "com.surelogic.common";
-
+    protected static final boolean usePrivateJRE = false;
+    protected static final String JRE_HOME = "/home/edwin/work/jre1.7.0_75/";
+    
     protected static final Logger LOG = SLLogger.getLogger();
     private static final int FIRST_LINES = 3;
 
@@ -228,6 +230,9 @@ AbstractSLJob {
             this.topMonitor = topMonitor;
 
             CommandlineJava cmdj = new CommandlineJava();
+            if (usePrivateJRE) {
+            	cmdj.setVm(JRE_HOME+"bin/java");
+            }
             setupJVM(cmdj);
 
             println("Starting process:");
@@ -562,6 +567,9 @@ AbstractSLJob {
 
     private void examineFirstLines(String[] firstLines) {
         for (String line : firstLines) {
+        	if (line == null) {
+        		continue;
+        	}
             if (line.startsWith("Could not reserve enough space")
                     || line.startsWith("Invalid maximum heap size")) {
                 throw newException(
