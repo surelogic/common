@@ -43,10 +43,12 @@ public class RollupIndirectAccessesResultSet implements InvocationHandler {
             set.close();
             hb.finished();
             return null;
-        } else if (methodName.startsWith("get")) {
+        } else if (methodName.startsWith("get") && args != null) {
             Object o = block.get((Integer) args[0]);
             wasNull = o == null;
             return o;
+        } else if (methodName.equals("getWarnings")) {
+            return null;
         } else if (methodName.equals("wasNull")) {
             return wasNull;
         }

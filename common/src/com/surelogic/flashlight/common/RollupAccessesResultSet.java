@@ -18,9 +18,9 @@ import com.surelogic.common.jdbc.QB;
  * {@link Functions#accessSummary(long, long)}. It produces a summary of access
  * blocks along with accompanying information on whether or not a happens-before
  * relationship exists between contiguous access blocks.
- * 
+ *
  * @author nathan
- * 
+ *
  */
 public class RollupAccessesResultSet implements InvocationHandler {
 
@@ -78,10 +78,12 @@ public class RollupAccessesResultSet implements InvocationHandler {
             set.close();
             hb.finished();
             return null;
-        } else if (methodName.startsWith("get")) {
+        } else if (methodName.startsWith("get") && args != null) {
             Object o = block.get((Integer) args[0]);
             wasNull = o == null;
             return o;
+        } else if (methodName.equals("getWarnings")) {
+            return null;
         } else if (methodName.equals("wasNull")) {
             return wasNull;
         }
@@ -168,7 +170,7 @@ public class RollupAccessesResultSet implements InvocationHandler {
                                     a.ts, a.threadId);
                     return new AccessBlock(a, isStatic, isFinal, isFinal
                             || hasHappensBefore ? HappensBeforeState.YES
-                            : HappensBeforeState.NO, nextWrite, nextWriteThread);
+                                    : HappensBeforeState.NO, nextWrite, nextWriteThread);
                 }
             }
             return null;

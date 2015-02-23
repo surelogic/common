@@ -77,8 +77,10 @@ public final class Functions {
                 }
                 trace = null;
                 return null;
-            } else if (methodName.startsWith("get")) {
+            } else if (methodName.startsWith("get") && args != null) {
                 return trace.get((Integer) args[0]);
+            } else if (methodName.equals("getWarnings")) {
+                return null;
             } else if (methodName.equals("wasNull")) {
                 return trace.wasNull();
             }
@@ -119,8 +121,10 @@ public final class Functions {
                 }
                 trace = null;
                 return null;
-            } else if (methodName.startsWith("get")) {
+            } else if (methodName.startsWith("get") && args != null) {
                 return trace.get((Integer) args[0]);
+            } else if (methodName.equals("getWarnings")) {
+                return null;
             } else if (methodName.equals("wasNull")) {
                 return trace.wasNull();
             }
@@ -159,8 +163,10 @@ public final class Functions {
                 }
                 trace = null;
                 return null;
-            } else if (methodName.startsWith("get")) {
+            } else if (methodName.startsWith("get") && args != null) {
                 return trace.get((Integer) args[0]);
+            } else if (methodName.equals("getWarnings")) {
+                return null;
             } else if (methodName.startsWith("wasNull")) {
                 return false;
             }
@@ -541,8 +547,10 @@ public final class Functions {
                 edges = null;
                 edge = null;
                 return null;
-            } else if (methodName.startsWith("get")) {
+            } else if (methodName.startsWith("get") && args != null) {
                 return edge.get((Integer) args[0]);
+            } else if (methodName.equals("getWarnings")) {
+                return null;
             } else if (methodName.equals("wasNull")) {
                 return edge.wasNull();
             }

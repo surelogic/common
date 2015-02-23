@@ -39,7 +39,7 @@ public class InstanceAccessesResultSet implements InvocationHandler {
 
     public static ResultSet create(Connection conn, long receiverId,
             Timestamp begin, Timestamp end, long fieldId, long secondFieldId)
-            throws SQLException {
+                    throws SQLException {
         PreparedStatement st = conn.prepareStatement(QB
                 .get("Accesses.prep.selectAccessesInBlockByFields"));
         st.setLong(1, receiverId);
@@ -67,10 +67,12 @@ public class InstanceAccessesResultSet implements InvocationHandler {
         } else if ("close".equals(methodName)) {
             set.close();
             return null;
-        } else if (methodName.startsWith("get")) {
+        } else if (methodName.startsWith("get") && args != null) {
             Object o = block.get((Integer) args[0]);
             wasNull = o == null;
             return o;
+        } else if (methodName.equals("getWarnings")) {
+            return null;
         } else if (methodName.equals("wasNull")) {
             return wasNull;
         }
