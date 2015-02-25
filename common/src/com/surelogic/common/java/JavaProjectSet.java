@@ -397,7 +397,7 @@ public class JavaProjectSet<P extends ISLJavaProject> implements Iterable<P> {
   /**
    * @return true if they have the same projects
    */
-  public boolean matchProjects(JavaProjectSet<P> other) {
+  public boolean matchProjects(JavaProjectSet<?> other) {
     return projects.keySet().equals(other.projects.keySet());
   }
 
@@ -483,5 +483,9 @@ public class JavaProjectSet<P extends ISLJavaProject> implements Iterable<P> {
     fileMap.clear();
     // ordering.clear();
     // projects.clear();
+  }
+  
+  public void setMonitor(SLProgressMonitor m) {
+	// TODO what to do here?
   }
 }
