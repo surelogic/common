@@ -22,8 +22,9 @@ public abstract class AbstractAnalysisJob<P extends JavaProjectSet<?>> extends A
 
 	/**
 	 * Run in the same VM
+	 * @param monitor 
 	 */
-	protected abstract boolean analyzeInVM() throws Exception;
+	protected abstract boolean analyzeInVM(SLProgressMonitor monitor) throws Exception;
 	protected abstract AbstractLocalSLJob<?> makeLocalJob() throws Exception;
 	
 	protected abstract void handleSuccess();
@@ -60,25 +61,9 @@ public abstract class AbstractAnalysisJob<P extends JavaProjectSet<?>> extends A
 			init(monitor);
 
 			if (useSeparateJVM) {
-				AbstractLocalSLJob<?> job = makeLocalJob();
-				SLStatus status = job.run(monitor);
-				if (status == SLStatus.OK_STATUS) {
-					ok = true;
-
-					/*
-					 * // Normally done by Javac, but needs to be repeated // locally if
-					 * (oldProjects != null && noConflict) { final Projects merged =
-					 * projects.merge(oldProjects); ProjectsDrop.ensureDrop(merged); //
-					 * System.out.println("Merged projects: "+merged.getLabel()); } else
-					 * { ProjectsDrop.ensureDrop(projects); }
-					 */
-				} else if (status != SLStatus.CANCEL_STATUS && status.getSeverity() == SLSeverity.ERROR) {
-					handleCrash(monitor, status);
-				} else if (status.getSeverity() == SLSeverity.CANCEL) {					
-					handleCancel(status);
-				}
+				ok = runAsLocalJob(monitor);
 			} else {
-				ok = analyzeInVM();
+				ok = analyzeInVM(monitor);
 			}
 			if (ok) {
 				handleSuccess();
@@ -97,5 +82,25 @@ public abstract class AbstractAnalysisJob<P extends JavaProjectSet<?>> extends A
 		finish(monitor);
 
 		return SLStatus.OK_STATUS;
+	}
+
+	protected boolean runAsLocalJob(SLProgressMonitor monitor) throws Exception {
+		AbstractLocalSLJob<?> job = makeLocalJob();
+		SLStatus status = job.run(monitor);
+		if (status == SLStatus.OK_STATUS) {
+			/*
+			 * // Normally done by Javac, but needs to be repeated // locally if
+			 * (oldProjects != null && noConflict) { final Projects merged =
+			 * projects.merge(oldProjects); ProjectsDrop.ensureDrop(merged); //
+			 * System.out.println("Merged projects: "+merged.getLabel()); } else
+			 * { ProjectsDrop.ensureDrop(projects); }
+			 */
+			return true;
+		} else if (status != SLStatus.CANCEL_STATUS && status.getSeverity() == SLSeverity.ERROR) {
+			handleCrash(monitor, status);
+		} else if (status.getSeverity() == SLSeverity.CANCEL) {					
+			handleCancel(status);
+		}
+		return false;
 	}
 }
