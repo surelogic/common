@@ -315,8 +315,9 @@ AbstractSLJob {
             if (TestCode.SCAN_CANCELLED.equals(testCode)) {
                 cancel(remoteVM, pout);
             }
-            topMonitor.begin(work);
-
+            if (!XUtil.testing) {
+            	topMonitor.begin(work);
+            }
             // Used to help detect imminent OOM issues
             int numConsecutiveGCs = 0;
             String line = br.readLine();
