@@ -258,19 +258,42 @@ public class HappensBeforeAnalysis {
         }
     }
 
+    private static class Possible {
+        private final Timestamp ts;
+        private final long target;
+
+        Possible(long target, Timestamp ts) {
+            this.target = target;
+            this.ts = ts;
+        }
+    }
+
     public boolean happensBeforeThread(Timestamp write, long writeThread,
             Timestamp read, long readThread) throws SQLException {
         int idx = 1;
         hbSt.setLong(idx++, writeThread);
-        hbSt.setLong(idx++, readThread);
         hbSt.setTimestamp(idx++, write);
         hbSt.setTimestamp(idx++, read);
         final ResultSet hbSet = hbSt.executeQuery();
+        List<Possible> possibles = new ArrayList<Possible>();
         try {
-            return hbSet.next();
+            while (hbSet.next()) {
+                long target = hbSet.getLong(1);
+                Timestamp ts = hbSet.getTimestamp(2);
+                if (target == readThread) {
+                    return true;
+                }
+                possibles.add(new Possible(target, ts));
+            }
         } finally {
             hbSet.close();
         }
+        for (Possible p : possibles) {
+            if (happensBeforeThread(p.ts, p.target, read, readThread)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public boolean happensBeforeCollection(Timestamp write, long writeThread,
@@ -382,9 +405,9 @@ public class HappensBeforeAnalysis {
      * Determines whether or not a happens-before relationship exists between
      * two threads, typically from a write in one thread to a read in another
      * thread. The first timestamp must always be earlier than the second.
-     * 
+     *
      * @param isStatic
-     * 
+     *
      * @param write
      * @param writeThread
      * @param read
@@ -418,7 +441,8 @@ public class HappensBeforeAnalysis {
             try {
                 if (set.next()) {
                     list.add(new HBEdge(new HBNode(write, set.getLong(1)),
-                            null, EdgeType.WRITE_IN_THREAD));
+                            null, EdgeType.WRITE_IN_THREAD, readThread,
+                            writeThread));
                 }
             } finally {
                 set.close();
@@ -531,7 +555,7 @@ public class HappensBeforeAnalysis {
             HBNode targetTrace = targets.get(source);
             if (targetTrace != null && targetTrace.ts.after(sourceTrace.ts)) {
                 list.add(new HBEdge(sourceTrace, targetTrace,
-                        EdgeType.COLLECTION));
+                        EdgeType.COLLECTION, writeThread, readThread));
             }
         }
 
@@ -580,7 +604,7 @@ public class HappensBeforeAnalysis {
                     if (targetNode != null
                             && sourceNode.getTs().before(targetNode.getTs())) {
                         list.add(new HBEdge(sourceNode, targetNode,
-                                EdgeType.LOCK));
+                                EdgeType.LOCK, writeThread, readThread));
                     }
                 }
             } finally {
@@ -591,26 +615,48 @@ public class HappensBeforeAnalysis {
         }
     }
 
-    private void addHappensBeforeThread(Timestamp write, long writeThread,
+    static class ToCheck {
+        private final long thread;
+        private final HBNode node;
+
+        ToCheck(HBNode node, long thread) {
+            this.node = node;
+            this.thread = thread;
+        }
+    }
+
+    private boolean addHappensBeforeThread(Timestamp write, long writeThread,
             Timestamp read, long readThread, List<HBEdge> list)
             throws SQLException {
         int idx = 1;
         hbTraceSt.setLong(idx++, writeThread);
-        hbTraceSt.setLong(idx++, readThread);
         hbTraceSt.setTimestamp(idx++, write);
         hbTraceSt.setTimestamp(idx++, read);
         final ResultSet hbTraceSet = hbTraceSt.executeQuery();
+        List<ToCheck> toCheck = new ArrayList<ToCheck>();
         try {
             while (hbTraceSet.next()) {
                 Timestamp ts = hbTraceSet.getTimestamp(1);
                 long trace = hbTraceSet.getLong(2);
                 String id = hbTraceSet.getString(3);
+                long targetThread = hbTraceSet.getLong(4);
                 HBNode node = new HBNode(id, ts, trace);
-                list.add(new HBEdge(node, null, EdgeType.THREAD));
+                toCheck.add(new ToCheck(node, targetThread));
             }
         } finally {
             hbTraceSet.close();
         }
+        boolean added = false;
+        for (ToCheck tc : toCheck) {
+            if (tc.thread == readThread
+                    || addHappensBeforeThread(tc.node.ts, tc.thread, read,
+                            readThread, list)) {
+                list.add(new HBEdge(tc.node, null, EdgeType.THREAD,
+                        writeThread, tc.thread));
+                added = true;
+            }
+        }
+        return added;
     }
 
     private void addHappensBeforeVolatile(Timestamp write, long writeThread,
@@ -656,7 +702,8 @@ public class HappensBeforeAnalysis {
                     HBNode targetNode = targets.get(sourceId);
                     if (targetNode != null
                             && sourceNode.getTs().before(targetNode.getTs())) {
-                        list.add(new HBEdge(sourceNode, targetNode, edgeType));
+                        list.add(new HBEdge(sourceNode, targetNode, edgeType,
+                                writeThread, readThread));
                     }
                 }
             } finally {
@@ -685,7 +732,7 @@ public class HappensBeforeAnalysis {
                         hbSet.getLong(idx++));
                 list.add(new HBEdge(className(hbSet.getString(idx++),
                         hbSet.getString(idx++)), source, target,
-                        EdgeType.CLASS_INITIALIZATION));
+                        EdgeType.CLASS_INITIALIZATION, writeThread, readThread));
             }
         } finally {
             hbSet.close();
@@ -725,6 +772,7 @@ public class HappensBeforeAnalysis {
         public long getTrace() {
             return trace;
         }
+
     }
 
     enum EdgeType {
@@ -752,6 +800,8 @@ public class HappensBeforeAnalysis {
         final String id;
         final String sourceMethod;
         final String targetMethod;
+        final long sourceThread;
+        final long targetThread;
 
         public EdgeType getType() {
             return type;
@@ -765,23 +815,28 @@ public class HappensBeforeAnalysis {
             return target;
         }
 
-        HBEdge(HBNode source, HBNode target, EdgeType type) throws SQLException {
+        HBEdge(HBNode source, HBNode target, EdgeType type, long sourceThread,
+                long targetThread) throws SQLException {
             id = type.displayId(source.getId());
             this.source = source;
             this.target = target;
             this.type = type;
             targetMethod = getTargetMethod();
             sourceMethod = getSourceMethod();
+            this.sourceThread = sourceThread;
+            this.targetThread = targetThread;
         }
 
-        HBEdge(String id, HBNode source, HBNode target, EdgeType type)
-                throws SQLException {
+        HBEdge(String id, HBNode source, HBNode target, EdgeType type,
+                long sourceThread, long targetThread) throws SQLException {
             this.id = type.displayId(id);
             this.source = source;
             this.target = target;
             this.type = type;
             targetMethod = getTargetMethod();
             sourceMethod = getSourceMethod();
+            this.sourceThread = sourceThread;
+            this.targetThread = targetThread;
         }
 
         String getTargetMethod() throws SQLException {
@@ -866,12 +921,16 @@ public class HappensBeforeAnalysis {
                 wasNull = target == null;
                 return target == null ? null : target.getTs();
             case 5:
+                return sourceThread;
+            case 6:
+                return targetThread;
+            case 7:
                 wasNull = sourceMethod == null;
                 return sourceMethod;
-            case 6:
+            case 8:
                 wasNull = targetMethod == null;
                 return targetMethod;
-            case 7:
+            case 9:
                 wasNull = id == null;
                 return id;
             default:
