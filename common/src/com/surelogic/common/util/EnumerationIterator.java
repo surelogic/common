@@ -1,6 +1,6 @@
 package com.surelogic.common.util;
 
-import java.util.Enumeration;
+import java.util.*;
 
 /**
  * An Iterator created around an underlying 
@@ -34,5 +34,10 @@ extends AbstractRemovelessIterator<T>
   public T next()
   {
     return enumeration.nextElement();
+  }
+  
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  public static <T> Iteratable<T> create(Enumeration<T> e) {
+	 return new EnumerationIterator(e);
   }
 }
