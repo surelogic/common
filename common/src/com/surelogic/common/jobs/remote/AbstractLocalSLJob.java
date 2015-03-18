@@ -462,6 +462,8 @@ AbstractSLJob {
     }
 
     protected final void setupJVM(CommandlineJava cmdj) {
+        cmdj.createVmArgument().setValue("-D"+RemoteSLJobConstants.RUNNING_REMOTELY + "=true");
+        
         if (testCode != null) {
             cmdj.createVmArgument().setValue(
                     "-D" + RemoteSLJobConstants.TEST_CODE_PROPERTY + "="
