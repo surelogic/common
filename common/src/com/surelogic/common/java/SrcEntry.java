@@ -63,6 +63,7 @@ public class SrcEntry extends AbstractClassPathEntry {
 					}
 				}
 				System.out.println(jp.getName()+": Done initializing with "+zipFile);
+				zf.close();
 			} catch(ZipException e) {
 				System.out.println("Zip exception with "+zipFile);
 			}
