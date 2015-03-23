@@ -9,6 +9,8 @@ import org.eclipse.core.resources.*;
 
 import com.surelogic.common.FileUtility;
 import com.surelogic.common.regression.RegressionUtility;
+import com.surelogic.common.tool.IResults;
+import com.surelogic.common.tool.IResultsHub;
 
 /**
  * Export the Drop-Sea results as XML to the specified file name

@@ -28,6 +28,8 @@ import com.surelogic.common.java.JavaProjectSet;
 import com.surelogic.common.jobs.AbstractSLJob;
 import com.surelogic.common.jobs.SLProgressMonitor;
 import com.surelogic.common.jobs.SLStatus;
+import com.surelogic.common.tool.IResults;
+import com.surelogic.common.tool.IResultsHub;
 
 /**
  * Reads the script line by line

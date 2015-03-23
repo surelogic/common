@@ -5,6 +5,10 @@ package com.surelogic.common.core.scripting;
 
 import java.io.*;
 
+import com.surelogic.common.tool.IResults;
+import com.surelogic.common.tool.IResultsDiff;
+import com.surelogic.common.tool.IResultsHub;
+
 /**
  * @author ethan
  */
