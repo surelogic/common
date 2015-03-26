@@ -301,7 +301,7 @@ AbstractSLJob {
                     break;
                 }
             }
-            println("First line = " + firstLine);
+            println("\nFirst line in REMOTE vm = " + firstLine);
 
             if (firstLine == null) {
                 throw newException(RemoteSLJobConstants.ERROR_NO_OUTPUT_FROM_JOB);
@@ -462,6 +462,7 @@ AbstractSLJob {
     }
 
     protected final void setupJVM(CommandlineJava cmdj) {
+    	println("LOCAL vm : "+System.getProperty("java.version"));
         cmdj.createVmArgument().setValue("-D"+RemoteSLJobConstants.RUNNING_REMOTELY + "=true");
         
         if (testCode != null) {
