@@ -51,10 +51,6 @@ public abstract class AbstractJavaScanner<PS extends JavaProjectSet<P>, P extend
 		
 		final File dataDir = getDataDirectory();
 		final PS oldProjects = useSeparateJVM ? null : null;// (Projects)
-		// ProjectsDrop.getProjects();
-		if (oldProjects != null) {
-			System.out.println("Old projects = " + oldProjects.getLabel());
-		}
 		newProjects.computeScan(dataDir, oldProjects);
 		return dataDir;
 	}

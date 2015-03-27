@@ -28,6 +28,8 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.binary.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
 import com.surelogic.NonNull;
@@ -1492,8 +1494,15 @@ public final class SLUtility {
     return null;
   }
 
-  public static <T> List<T> list(T... elements) {
-    List<T> l = new ArrayList<T>();
+  /**
+   * Creates a list of the passed elements.
+   * 
+   * @param elements
+   *          elements for the list.
+   * @return a new list
+   */
+  public static <T> ArrayList<T> list(@SuppressWarnings("unchecked") T... elements) {
+    final ArrayList<T> l = new ArrayList<T>();
     for (T e : elements) {
       l.add(e);
     }
@@ -1557,6 +1566,30 @@ public final class SLUtility {
     pw.flush();
     sw.flush();
     return sw.toString();
+  }
+
+  /**
+   * Decodes a Base64 encoded string to a normal string. This method uses the
+   * Apache Commons Codec library.
+   * 
+   * @param s
+   *          the encoded string.
+   * @return the decoded string.
+   */
+  public static String decodeBase64(String s) {
+    return StringUtils.newStringUtf8(Base64.decodeBase64(s));
+  }
+
+  /**
+   * Encodes a normal string to a Base64 encoded string. This method uses the
+   * Apache Commons Codec library.
+   * 
+   * @param s
+   *          the normal string.
+   * @return the encoded string.
+   */
+  public static String encodeBase64(String s) {
+    return Base64.encodeBase64String(StringUtils.getBytesUtf8(s));
   }
 
   private SLUtility() {
