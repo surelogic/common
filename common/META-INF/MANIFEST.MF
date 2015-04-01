@@ -57,6 +57,10 @@ Export-Package: com.surelogic,
  gnu.trove.stack,
  gnu.trove.stack.array,
  gnu.trove.strategy,
+ javax.servlet,
+ javax.servlet.annotation,
+ javax.servlet.descriptor,
+ javax.servlet.http,
  org.antlr.runtime,
  org.antlr.runtime.debug,
  org.antlr.runtime.misc,
@@ -269,5 +273,6 @@ Bundle-ClassPath: .,
  lib/runtime/asm-tree-5.0.2.jar,
  lib/runtime/antlr-3.5.2-runtime.jar,
  lib/runtime/commons-lang3-3.3.2.jar,
- lib/runtime/commons-codec-1.10.jar
+ lib/runtime/commons-codec-1.10.jar,
+ lib/runtime/servlet-api-3.1.jar
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
