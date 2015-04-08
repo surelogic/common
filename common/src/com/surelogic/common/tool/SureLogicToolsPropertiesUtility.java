@@ -27,6 +27,7 @@ public class SureLogicToolsPropertiesUtility {
 
     public static final String SCAN_EXCLUDE_SOURCE_FOLDER = "scan.exclude.source.folder";
     public static final String SCAN_EXCLUDE_SOURCE_PACKAGE = "scan.exclude.source.package";
+    public static final String SCAN_EXCLUDE_SOURCE_CLASSES = "scan.exclude.source.classes";
     public static final String SCAN_SOURCE_FOLDER_AS_BYTECODE = "scan.source.folder.as.bytecode";
     public static final String SCAN_SOURCE_PACKAGE_AS_BYTECODE = "scan.source.package.as.bytecode";
 
