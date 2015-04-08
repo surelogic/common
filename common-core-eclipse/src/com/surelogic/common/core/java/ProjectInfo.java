@@ -299,7 +299,7 @@ public abstract class ProjectInfo<P extends ISLJavaProject> {
 					 * t.getFullyQualifiedName(); config.addFile(new
 					 * JavaSourceFile(qname, f, path)); }
 					 */
-					final String qname = computeQualifiedName(icu);
+					final String qname = JDTUtility.computeQualifiedName(icu);
 
 					// TODO Used when there's no project info
 					config.addFile(new JavaSourceFile(qname, f, path, false, config.getProject()));
@@ -506,7 +506,7 @@ public abstract class ProjectInfo<P extends ISLJavaProject> {
 				config.addPackage(pd.getElementName());
 			}
 			if (f.exists()) {
-				qname = computeQualifiedName(icu);
+				qname = JDTUtility.computeQualifiedName(icu);
 			} else { // Removed
 				qname = f.getName();
 			}
@@ -515,41 +515,6 @@ public abstract class ProjectInfo<P extends ISLJavaProject> {
 		}
 		return files;
 	}    
-
-	public static String computeQualifiedName(ICompilationUnit icu) throws JavaModelException {
-		String qname = null;
-		for (IType t : icu.getTypes()) {
-			qname = t.getFullyQualifiedName();
-			/*
-			 * if (qname.endsWith("SingleSignOnEntry")) {
-			 * System.out.println("Looking at "+qname); }
-			 */
-			final int flags = t.getFlags();
-			if (Flags.isPublic(flags)) {
-				// This is the only public top-level type
-				break;
-			} else {
-				// System.out.println("Got a non-public type: "+qname);
-			}
-		}
-		if (qname == null) {
-			// Backup method: unreliable since the qname may not match the
-			// filename
-			String pkg = null;
-			for (IPackageDeclaration pd : icu.getPackageDeclarations()) {
-				pkg = pd.getElementName();
-				break;
-			}
-			qname = icu.getElementName();
-			if (qname.endsWith(".java")) {
-				qname = qname.substring(0, qname.length() - 5);
-			}
-			if (pkg != null) {
-				qname = pkg + '.' + qname;
-			}
-		}
-		return qname;
-	}
 	
 	/**
 	 * @return true if the given project contains java.lang.Object in source form
