@@ -41,6 +41,15 @@ import com.surelogic.common.i18n.I18N;
  */
 public final class SLUtility {
   public static final boolean is64bit = SystemUtils.OS_ARCH.indexOf("64") >= 0;
+
+  /**
+   * This defines the url to get to the serviceability servlets on the website.
+   * Normally the default is used (an alias to surelogic.com), but for testing a
+   * system property can be set
+   * <code>-Dservices.website.url=http://test.com:8080</code>
+   */
+  public static final String SERVICES_WEBSITE_URL = System.getProperty("services.website.url", "http://services.surelogic.com");
+
   /**
    * This is a very JDT friendly constant&mdash;many Eclipse methods recognize
    * this particular name.
