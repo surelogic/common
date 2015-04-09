@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure_9_0.dtd">
+
+<Configure class="org.eclipse.jetty.servlet.ServletContextHandler">
+  <Set name="contextPath">/bugzilla</Set>
+  <Set name="resourceBase">/../../git/bugzilla/html</Set>
+  <Call name="addServlet">
+    <New class="org.eclipse.jetty.servlets.CGI">
+      <Set name="path">/usr/local/bin:/bin:/usr/bin</Set>
+      <Set name="cgibinResourceBase">/../../git/bugzilla/html</Set>
+    </New>
+  </Call>
+</Configure>
