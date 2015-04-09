@@ -24,7 +24,8 @@
 		<delete quiet="true" dir="${build}" />
 		<mkdir dir="${build}" />
 		<mkdir dir="${build.bin}" />
-		<echo>Compiling common...</echo>
+		<echo>Creating generated source code and compiling 'common' project...</echo>
+		<ant antfile="build-src.xml" dir="${common}" inheritAll="false" />
 		<path id="common.class.path">
 			<fileset dir="${common}/lib/runtime">
 				<include name="*.jar" />
@@ -32,7 +33,7 @@
 		</path>
 		<javac srcdir="${common}/src" destdir="${build.bin}"
 			classpathref="common.class.path" includeAntRuntime="false" />
-		<echo>Compiling surelogic-web-site...</echo>
+		<echo>Compiling 'surelogic-web-site' project...</echo>
 		<path id="web.site.class.path">
 			<pathelement location="${common}/bin" />
 			<fileset dir="${common}/lib/runtime">
