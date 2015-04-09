@@ -1,30 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project default="build-root-war" name="sierra-web-server">
 
-	<!-- Note we tacitly assume you have built sierra-web-portal -->
-
+	<property name="publish.cgi.resources" value="${lib}" />
+	<property name="publish.jetty.base" value="${basedir}/../../../website/jetty.base" />
 	<property name="common" location="${basedir}/../common" />
 
 	<property name="src" location="${basedir}/src" />
 	<property name="lib" location="${basedir}/lib" />
 	<property name="www" location="${basedir}/site/www" />
-	<property name="cgi.resources" value="${lib}" />
-
-	<property name="built-gwt-portal"
-		location="${sierra-web-portal}/build/${gwt.module.sierra}" />
+	<property name="jetty.base" value="${basedir}/site/jetty.base" />
 
 	<property name="build" location="${basedir}/build" />
 	<property name="build.bin" location="${build}/bin-for-war" />
 	<property name="root.war" location="${build}/root.war" />
 
-	<property name="gwt.module" value="com.surelogic.sierra.gwt.SierraPortal" />
+	<target name="publish">
+		<echo>Jetty should be shutdown before a publish...</echo>
+		<echo>(pausing just a second so you can ^C if Jetty is running)</echo>
+		<sleep seconds="4" />
+		<delete quiet="true" dir="${publish.jetty.base}" />
+		<copy todir="${publish.jetty.base}">
+			<fileset dir="${jetty.base}" />
+			<fileset file="root.war" />
+		</copy>
+	</target>
 
 	<target name="build-root-war">
 		<echo>Cleaning up for SureLogic web server build</echo>
 		<delete quiet="true" dir="${build}" />
 		<mkdir dir="${build}" />
 		<mkdir dir="${build.bin}" />
-		<echo>Creating generated source code and compiling 'common' project...</echo>
+		<echo>Creating generated source code and compiling 'common' project...
+		</echo>
 		<ant antfile="build-src.xml" dir="${common}" inheritAll="false" />
 		<path id="common.class.path">
 			<fileset dir="${common}/lib/runtime">
