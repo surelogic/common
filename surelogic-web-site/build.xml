@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project default="build-root-war" name="sierra-web-server">
+
+	<!-- Note we tacitly assume you have built sierra-web-portal -->
+
+	<property name="common" location="${basedir}/../common" />
+
+	<property name="src" location="${basedir}/src" />
+	<property name="lib" location="${basedir}/lib" />
+	<property name="www" location="${basedir}/site/www" />
+	<property name="cgi.resources" value="${lib}" />
+
+	<property name="built-gwt-portal"
+		location="${sierra-web-portal}/build/${gwt.module.sierra}" />
+
+	<property name="build" location="${basedir}/build" />
+	<property name="build.bin" location="${build}/bin-for-war" />
+	<property name="root.war" location="${build}/root.war" />
+
+	<property name="gwt.module" value="com.surelogic.sierra.gwt.SierraPortal" />
+
+	<target name="build-root-war">
+		<echo>Cleaning up for SureLogic web server build</echo>
+		<delete quiet="true" dir="${build}" />
+		<mkdir dir="${build}" />
+		<mkdir dir="${build.bin}" />
+		<echo>Compiling common...</echo>
+		<path id="common.class.path">
+			<fileset dir="${common}/lib/runtime">
+				<include name="*.jar" />
+			</fileset>
+		</path>
+		<javac srcdir="${common}/src" destdir="${build.bin}"
+			classpathref="common.class.path" includeAntRuntime="false" />
+		<echo>Compiling surelogic-web-site...</echo>
+		<path id="web.site.class.path">
+			<pathelement location="${common}/bin" />
+			<fileset dir="${common}/lib/runtime">
+				<include name="*.jar" />
+			</fileset>
+			<fileset dir="${lib}">
+				<include name="*.jar" />
+			</fileset>
+		</path>
+		<javac srcdir="${src}" destdir="${build.bin}" classpathref="web.site.class.path"
+			includeAntRuntime="false" />
+		<echo>WAR build of SureLogic web server into ${sl.war}</echo>
+		<war destfile="${root.war}" webxml="${lib}/web.xml">
+			<classes dir="${build.bin}" />
+			<lib dir="${common}/lib/runtime">
+				<include name="*.jar" />
+			</lib>
+			<lib dir="${lib}">
+				<include name="*.jar" />
+			</lib>
+			<fileset dir="${www}">
+				<exclude name="**/template.html" />
+			</fileset>
+			<fileset dir="${cgi.resources}">
+				<exclude name="**/localconfig" />
+				<exclude name="**/*.cgi" />
+				<exclude name="**/*.pm" />
+				<exclude name="**/*.pl" />
+			</fileset>
+		</war>
+	</target>
+</project>

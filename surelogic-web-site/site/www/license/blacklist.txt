@@ -1,0 +1,9 @@
+#
+# SureLogic license id blacklist
+#
+# Last updated: Oct 2008
+#
+# Tim's test entry
+e2783eb6-bc80-44be-8bc7-636c3028479c
+
+# Real entries

@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure_9_0.dtd">
+
+<Configure class="org.eclipse.jetty.servlet.ServletContextHandler">
+  <Set name="contextPath">/scratch2</Set>
+  <Set name="resourceBase">../static/www</Set>
+  <Call name="addServlet">
+    <Arg>org.eclipse.jetty.servlet.DefaultServlet</Arg>
+    <Arg>/</Arg>
+  </Call>
+</Configure>
+
+

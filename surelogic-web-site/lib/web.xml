@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
+	http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+
+	<welcome-file-list>
+		<welcome-file>index.html</welcome-file>
+	</welcome-file-list>
+
+	<!-- JSP Configuration -->
+	<jsp-config>
+		<jsp-property-group>
+			<description>Property group for common configuration for all the JSP's</description>
+			<url-pattern>*.jsp</url-pattern>
+			<el-ignored>false</el-ignored>
+			<page-encoding>UTF-8</page-encoding>
+			<scripting-invalid>false</scripting-invalid>
+		</jsp-property-group>
+	</jsp-config>
+
+	<!-- Bugzilla CGI Bin -->
+	<servlet>
+		<servlet-name>Bugzilla CGI</servlet-name>
+		<servlet-class>org.eclipse.jetty.servlets.CGI</servlet-class>
+		<init-param>
+			<param-name>Path</param-name>
+			<param-value>/usr/local/bin:/bin:/usr/bin</param-value>	
+		</init-param>
+		<init-param>
+			<param-name>cgibinResourceBase</param-name>
+			<param-value>/home/jetty/cgi</param-value>
+		</init-param>
+		<!-- 
+		<init-param>
+			<param-name>commandPrefix</param-name>
+			<param-value>/usr/bin/perl </param-value>
+		</init-param>
+		-->
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>Bugzilla CGI</servlet-name>
+		<url-pattern>*.cgi</url-pattern>
+	</servlet-mapping>
+
+	<!-- Flashlight trial license generation -->
+	<servlet>
+		<servlet-name>Flashlight Evaluation</servlet-name>
+		<servlet-class>com.surelogic.server.flashlight.EvaluationLicenseServlet</servlet-class>
+		<init-param>
+			<param-name>fromAddress</param-name>
+			<param-value>support@surelogic.com</param-value>
+		</init-param>
+		<init-param>
+			<param-name>emailServerHost</param-name>
+			<param-value>aspmx.l.google.com</param-value>
+		</init-param>
+		<init-param>
+			<param-name>emailServerPort</param-name>
+			<param-value>25</param-value>
+	</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>Flashlight Evaluation</servlet-name>
+		<url-pattern>test/fl/evaluation-license</url-pattern>
+	</servlet-mapping>
+	
+	<!-- Checkout Servlets -->
+
+	<!-- Web Payments Standard Instant Payment Notification-->
+	<servlet>
+		<servlet-name>IPN</servlet-name>
+		<servlet-class>
+			com.surelogic.server.flashlight.InstantPaymentNotification	
+		</servlet-class>
+		<init-param>
+			<param-name>fromAddress</param-name>
+			<param-value>support@surelogic.com</param-value>
+		</init-param>
+		<init-param>
+			<param-name>emailServerHost</param-name>
+			<param-value>aspmx.l.google.com</param-value>
+		</init-param>
+		<init-param>
+			<param-name>emailServerPort</param-name>
+			<param-value>25</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>IPN</servlet-name>
+		<url-pattern>/test/fl/ipn</url-pattern>
+	</servlet-mapping>
+	<servlet>
+		<servlet-name>Cancelled</servlet-name>
+		<servlet-class>
+			com.surelogic.server.flashlight.CancelledServlet
+		</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>Cancelled</servlet-name>
+		<url-pattern>/test/fl/cancelled</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>Completed</servlet-name>
+		<servlet-class>
+			com.surelogic.server.flashlight.CompletedServlet
+		</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>Completed</servlet-name>
+		<url-pattern>/test/fl/completed</url-pattern>
+	</servlet-mapping>
+
+	<!-- Support Request servlet configuration -->
+	<servlet>
+		<servlet-name>Support Request</servlet-name>
+		<servlet-class>
+			com.surelogic.server.serviceability.SupportRequestServlet</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>Support Request</servlet-name>
+		<url-pattern>/services/supportRequest</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>License Request</servlet-name>
+		<servlet-class>
+			com.surelogic.server.serviceability.LicenseRequestServlet</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>License Request</servlet-name>
+		<url-pattern>/services/licenseRequest</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>Admin Request</servlet-name>
+		<servlet-class>com.surelogic.server.serviceability.AdminServlet</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>Admin Request</servlet-name>
+		<url-pattern>/services/admin</url-pattern>
+	</servlet-mapping>
+	
+	<servlet>
+		<servlet-name>License Admin Request</servlet-name>
+		<servlet-class>com.surelogic.server.serviceability.LicenseAdminServlet</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>License Admin Request</servlet-name>
+		<url-pattern>/services/license</url-pattern>
+	</servlet-mapping>
+
+
+	<servlet>
+		<servlet-name>License Log</servlet-name>
+		<servlet-class>com.surelogic.server.serviceability.LogServlet</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>License Log</servlet-name>
+		<url-pattern>/services/log</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>License Search</servlet-name>
+		<servlet-class>com.surelogic.server.serviceability.LicenseSearchServlet</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>License Search</servlet-name>
+		<url-pattern>/services/search</url-pattern>
+	</servlet-mapping>
+
+	<servlet>
+		<servlet-name>Blacklist</servlet-name>
+		<servlet-class>com.surelogic.server.serviceability.BlacklistServlet</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>Blacklist</servlet-name>
+		<url-pattern>/services/blacklist</url-pattern>
+	</servlet-mapping>
+
+
+	<filter>
+		<description>
+			Hardcoded password that hides the license servlets
+		</description>
+		<filter-name>Security Filter</filter-name>
+		<filter-class>
+			com.surelogic.server.serviceability.SecurityFilter
+		</filter-class>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>Security Filter</filter-name>
+		<url-pattern>/services/license</url-pattern>
+		<url-pattern>/services/admin</url-pattern>
+		<url-pattern>/services/log</url-pattern>
+		<url-pattern>/services/search</url-pattern>
+		<url-pattern>/services/blacklist</url-pattern>
+	</filter-mapping>
+
+	<listener>
+		<listener-class>
+			com.surelogic.server.serviceability.EmailContextListener
+		</listener-class>
+	</listener>
+	<context-param>
+		<param-name>toAddress</param-name>
+		<param-value>support@surelogic.com</param-value>
+	</context-param>
+	<context-param>
+		<param-name>fromAddress</param-name>
+		<param-value>support@surelogic.com</param-value>
+	</context-param>
+	<context-param>
+		<param-name>emailServerHost</param-name>
+		<param-value>aspmx.l.google.com</param-value>
+	</context-param>
+	<context-param>
+		<param-name>emailServerPort</param-name>
+		<param-value>25</param-value>
+	</context-param>
+	<context-param>
+		<param-name>bugzillaPassword</param-name>
+		<param-value>sl!ftw</param-value>
+	</context-param>
+	<context-param>
+		<param-name>bugzillaURL</param-name>
+		<param-value>http://surelogic.com/bugzilla/</param-value>
+	</context-param>
+	<listener>
+		<listener-class>
+			com.surelogic.server.jdbc.NetworkServerContextListener
+		</listener-class>
+	</listener>
+</web-app>
