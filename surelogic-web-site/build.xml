@@ -21,8 +21,9 @@
 		<delete quiet="true" dir="${publish.jetty.base}" />
 		<copy todir="${publish.jetty.base}">
 			<fileset dir="${jetty.base}" />
-			<fileset file="root.war" />
 		</copy>
+		<copy file="${root.war}" todir="${publish.jetty.base}/webapps" />
+		<echo>Publish completed...Jetty may now be restarted...</echo>
 	</target>
 
 	<target name="build-root-war">
