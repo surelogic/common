@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure_9_0.dtd">
+
+<Configure id="Server" class="org.eclipse.jetty.server.Server">
+
+	<Call name="setProperty" class="java.lang.System">
+		<Arg>derby.storage.pageCacheSize</Arg>
+		<Arg>10000</Arg>
+	</Call>
+	<Call name="setProperty" class="java.lang.System">
+		<Arg>derby.storage.pageSize</Arg>
+		<Arg>8192</Arg>
+	</Call>
+	<Call name="setProperty" class="java.lang.System">
+		<Arg>surelogic.services.db.location</Arg>
+		<Arg>../db</Arg>
+	</Call>
+
+</Configure>
