@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project default="build-root-war" name="sierra-web-server">
 
-	<property name="publish.cgi.resources" value="${lib}" />
-	<property name="publish.jetty.base" value="${basedir}/../../../website/jetty.base" />
+	<property name="publish.jetty.base" location="${basedir}/../../../website/jetty.base" />
 	<property name="common" location="${basedir}/../common" />
 
 	<property name="src" location="${basedir}/src" />
 	<property name="lib" location="${basedir}/lib" />
 	<property name="www" location="${basedir}/site/www" />
 	<property name="jetty.base" value="${basedir}/site/jetty.base" />
+
+	<property name="cgi.resources" location="${lib}" />
 
 	<property name="build" location="${basedir}/build" />
 	<property name="build.bin" location="${build}/bin-for-war" />
@@ -39,8 +40,13 @@
 				<include name="*.jar" />
 			</fileset>
 		</path>
-		<javac srcdir="${common}/src" destdir="${build.bin}"
-			classpathref="common.class.path" includeAntRuntime="false" />
+		<javac srcdir="${common}/src" destdir="${build.bin}" classpathref="common.class.path" includeAntRuntime="false" />
+		<copy todir="${build.bin}">
+			<fileset dir="${common}/src">
+				<exclude name="**/*.java" />
+				<exclude name="**/.gitignore" />
+			</fileset>
+		</copy>
 		<echo>Compiling 'surelogic-web-site' project...</echo>
 		<path id="web.site.class.path">
 			<pathelement location="${common}/bin" />
@@ -51,8 +57,13 @@
 				<include name="*.jar" />
 			</fileset>
 		</path>
-		<javac srcdir="${src}" destdir="${build.bin}" classpathref="web.site.class.path"
-			includeAntRuntime="false" />
+		<javac srcdir="${src}" destdir="${build.bin}" classpathref="web.site.class.path" includeAntRuntime="false" />
+		<copy todir="${build.bin}">
+			<fileset dir="${src}">
+				<exclude name="**/*.java" />
+				<exclude name="**/.gitignore" />
+			</fileset>
+		</copy>
 		<echo>WAR build of SureLogic web server into ${sl.war}</echo>
 		<war destfile="${root.war}" webxml="${lib}/web.xml">
 			<classes dir="${build.bin}" />
