@@ -23,9 +23,6 @@ public class LicenseAdminServlet extends HttpServlet {
   private static final String YES = "yes";
   private static final String NO = "no";
 
-  /**
-	 * 
-	 */
   private static final long serialVersionUID = -7449790315955833400L;
 
   @Override

@@ -37,9 +37,6 @@ import com.surelogic.common.logging.SLLogger;
 import com.surelogic.server.jdbc.ServicesDBConnection;
 
 public class LicenseRequestServlet extends HttpServlet {
-  /**
-	 * 
-	 */
   private static final long serialVersionUID = 6357187305188901382L;
 
   static final Logger LOG = SLLogger.getLoggerFor(LicenseRequestServlet.class);
@@ -105,10 +102,7 @@ public class LicenseRequestServlet extends HttpServlet {
    * support/use license, we also check the install date to make sure that the
    * license is not being installed past the deadline.
    * 
-   * 
-   * 
    * @author nathan
-   * 
    */
   private static class Install implements DBQuery<String> {
 

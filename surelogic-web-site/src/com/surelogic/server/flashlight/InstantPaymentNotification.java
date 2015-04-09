@@ -87,7 +87,6 @@ public class InstantPaymentNotification extends HttpServlet {
   volatile String lastPost = "None";
   private static final long serialVersionUID = -6559521396125186934L;
 
-  @SuppressWarnings("unchecked")
   @Override
   protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
     final Map<String, String[]> paramMap = req.getParameterMap();

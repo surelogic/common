@@ -21,75 +21,57 @@ import com.surelogic.server.jdbc.ServicesDBConnection;
 
 public class BlacklistServlet extends HttpServlet {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-	@Override
-	protected void doGet(final HttpServletRequest req,
-			final HttpServletResponse resp) throws ServletException,
-			IOException {
-		handle(req, resp);
-	}
+  @Override
+  protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+    handle(req, resp);
+  }
 
-	@Override
-	protected void doPost(final HttpServletRequest req,
-			final HttpServletResponse resp) throws ServletException,
-			IOException {
-		handle(req, resp);
-	}
+  @Override
+  protected void doPost(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+    handle(req, resp);
+  }
 
-	private void handle(final HttpServletRequest req,
-			final HttpServletResponse resp) throws IOException {
-		ServicesDBConnection.getInstance().withReadOnly(
-				new BlacklistQuery(resp.getWriter()));
-	}
+  private void handle(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+    ServicesDBConnection.getInstance().withReadOnly(new BlacklistQuery(resp.getWriter()));
+  }
 
-	private static class BlacklistQuery extends HTMLQuery {
+  private static class BlacklistQuery extends HTMLQuery {
 
-		BlacklistQuery(final PrintWriter writer) {
-			super(writer);
-		}
+    BlacklistQuery(final PrintWriter writer) {
+      super(writer);
+    }
 
-		@Override
-		public void doPerform(final Query q) {
-			prequel("License Blacklist");
-			writer
-					.println("<h3><a href=\"admin\">To License Overview</a></h3>");
-			writer
-					.println("<h3><a href=\"log\">To Recent License Activity</a></h3>");
-			writer.println("<h3><a href=\"search\">To License Search</a></h3>");
-			tableBegin();
-			tableRow(DATE.th("Latest Activity"), STRING.th("License"), STRING
-					.th("Holder"), STRING.th("Product"), NUMBER.th("Installs"),
-					NUMBER.th("Renewals"), NUMBER.th("Removals"), NUMBER
-							.th("Blacklists"), NUMBER.th("Too Many Installs"));
-			q.prepared("WebServices.listBlacklistedUUIDs",
-					new NullRowHandler() {
-						@Override
-						protected void doHandle(final Row r) {
-							Date latest = r.nextTimestamp();
-							String uuid = r.nextString();
-							SLLicenseProduct p = SLLicenseProduct.fromString(r
-									.nextString());
-							String holder = r.nextString();
-							String installs = r.nextString();
-							String renewals = r.nextString();
-							String removals = r.nextString();
-							String blacklisted = r.nextString();
-							String tooMany = r.nextString();
-							tableRow(DATE.td(latest), STRING.td(uuid(uuid)),
-									STRING.td(holder), STRING.td(p.toString()),
-									NUMBER.td(installs), NUMBER.td(renewals),
-									NUMBER.td(removals),
-									NUMBER.td(blacklisted), NUMBER.td(tooMany));
-						}
-					}).call();
-			tableEnd();
-			finish();
-		}
+    @Override
+    public void doPerform(final Query q) {
+      prequel("License Blacklist");
+      writer.println("<h3><a href=\"admin\">To License Overview</a></h3>");
+      writer.println("<h3><a href=\"log\">To Recent License Activity</a></h3>");
+      writer.println("<h3><a href=\"search\">To License Search</a></h3>");
+      tableBegin();
+      tableRow(DATE.th("Latest Activity"), STRING.th("License"), STRING.th("Holder"), STRING.th("Product"), NUMBER.th("Installs"),
+          NUMBER.th("Renewals"), NUMBER.th("Removals"), NUMBER.th("Blacklists"), NUMBER.th("Too Many Installs"));
+      q.prepared("WebServices.listBlacklistedUUIDs", new NullRowHandler() {
+        @Override
+        protected void doHandle(final Row r) {
+          Date latest = r.nextTimestamp();
+          String uuid = r.nextString();
+          SLLicenseProduct p = SLLicenseProduct.fromString(r.nextString());
+          String holder = r.nextString();
+          String installs = r.nextString();
+          String renewals = r.nextString();
+          String removals = r.nextString();
+          String blacklisted = r.nextString();
+          String tooMany = r.nextString();
+          tableRow(DATE.td(latest), STRING.td(uuid(uuid)), STRING.td(holder), STRING.td(p.toString()), NUMBER.td(installs),
+              NUMBER.td(renewals), NUMBER.td(removals), NUMBER.td(blacklisted), NUMBER.td(tooMany));
+        }
+      }).call();
+      tableEnd();
+      finish();
+    }
 
-	}
+  }
 
 }

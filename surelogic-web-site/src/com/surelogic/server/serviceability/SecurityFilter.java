@@ -26,78 +26,74 @@ import com.surelogic.common.SLUtility;
  */
 public class SecurityFilter implements Filter {
 
-	public void destroy() {
-		// Do Nothing
-	}
+  public void destroy() {
+    // Do Nothing
+  }
 
-	public void doFilter(final ServletRequest request,
-			final ServletResponse response, final FilterChain chain)
-			throws IOException, ServletException {
-		doFilter((HttpServletRequest) request, (HttpServletResponse) response,
-				chain);
-	}
+  public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain) throws IOException,
+      ServletException {
+    doFilter((HttpServletRequest) request, (HttpServletResponse) response, chain);
+  }
 
-	private void doFilter(final HttpServletRequest request,
-			final HttpServletResponse response, final FilterChain chain)
-			throws IOException, ServletException {
+  private void doFilter(final HttpServletRequest request, final HttpServletResponse response, final FilterChain chain)
+      throws IOException, ServletException {
 
-		// Get the Authorization header, if one was supplied
-		boolean authenticated = false;
-		final String authHeader = request.getHeader("Authorization");
-		if (authHeader != null) {
-			final StringTokenizer st = new StringTokenizer(authHeader);
-			if (st.hasMoreTokens()) {
-				final String basic = st.nextToken();
+    // Get the Authorization header, if one was supplied
+    boolean authenticated = false;
+    final String authHeader = request.getHeader("Authorization");
+    if (authHeader != null) {
+      final StringTokenizer st = new StringTokenizer(authHeader);
+      if (st.hasMoreTokens()) {
+        final String basic = st.nextToken();
 
-				// We only handle HTTP Basic authentication
+        // We only handle HTTP Basic authentication
 
-				if (basic.equalsIgnoreCase("Basic")) {
-					final String credentials = st.nextToken();
+        if (basic.equalsIgnoreCase("Basic")) {
+          final String credentials = st.nextToken();
 
-					final String userPass = SLUtility.decodeBase64(credentials);
+          final String userPass = SLUtility.decodeBase64(credentials);
 
-					// The decoded string is in the form
-					// "userID:password".
+          // The decoded string is in the form
+          // "userID:password".
 
-					final int p = userPass.indexOf(':');
-					if (p != -1) {
-						final String userID = userPass.substring(0, p);
-						final String password = userPass.substring(p + 1);
+          final int p = userPass.indexOf(':');
+          if (p != -1) {
+            final String userID = userPass.substring(0, p);
+            final String password = userPass.substring(p + 1);
 
-						// Validate user ID and password
-						// and set valid true true if valid.
-						// In this example, we simply check
-						// that neither field is blank
+            // Validate user ID and password
+            // and set valid true true if valid.
+            // In this example, we simply check
+            // that neither field is blank
 
-						authenticated = "SL".equals(userID)
-								&& "FTW".equals(password);
-					}
-				}
-			}
-		}
+            authenticated = "SL".equals(userID) && "FTW".equals(password);
+          }
+        }
+      }
+    }
 
-		// If the user was not validated, fail with a
-		// 401 status code (UNAUTHORIZED) and
-		// pass back a WWW-Authenticate header for
-		// this servlet.
-		//
-		// Note that this is the normal situation the
-		// first time you access the page. The client
-		// web browser will prompt for userID and password
-		// and cache them so that it doesn't have to
-		// prompt you again.
-		if (!authenticated) {
-			final String s = "Basic realm=\"Login Test Servlet Users\"";
-			response.setHeader("WWW-Authenticate", s);
-			response.setStatus(401);
-		} else {
-			chain.doFilter(request, response);
-		}
+    // If the user was not validated, fail with a
+    // 401 status code (UNAUTHORIZED) and
+    // pass back a WWW-Authenticate header for
+    // this servlet.
+    //
+    // Note that this is the normal situation the
+    // first time you access the page. The client
+    // web browser will prompt for userID and password
+    // and cache them so that it doesn't have to
+    // prompt you again.
+    if (!authenticated) {
+      final String s = "Basic realm=\"Login Test Servlet Users\"";
+      response.setHeader("WWW-Authenticate", s);
+      response.setStatus(401);
+    } else {
+      chain.doFilter(request, response);
+    }
 
-	}
+  }
 
-	public void init(final FilterConfig arg0) throws ServletException {
-		// Do nothing
-	}
+  public void init(final FilterConfig arg0) throws ServletException {
+    // Do nothing
+  }
 
 }
