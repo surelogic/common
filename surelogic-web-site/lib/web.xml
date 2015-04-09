@@ -19,30 +19,6 @@
 		</jsp-property-group>
 	</jsp-config>
 
-	<!-- Bugzilla CGI Bin -->
-	<servlet>
-		<servlet-name>Bugzilla CGI</servlet-name>
-		<servlet-class>org.eclipse.jetty.servlets.CGI</servlet-class>
-		<init-param>
-			<param-name>Path</param-name>
-			<param-value>/usr/local/bin:/bin:/usr/bin</param-value>	
-		</init-param>
-		<init-param>
-			<param-name>cgibinResourceBase</param-name>
-			<param-value>/home/jetty/cgi</param-value>
-		</init-param>
-		<!-- 
-		<init-param>
-			<param-name>commandPrefix</param-name>
-			<param-value>/usr/bin/perl </param-value>
-		</init-param>
-		-->
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>Bugzilla CGI</servlet-name>
-		<url-pattern>*.cgi</url-pattern>
-	</servlet-mapping>
-
 	<!-- Flashlight trial license generation -->
 	<servlet>
 		<servlet-name>Flashlight Evaluation</servlet-name>
@@ -229,7 +205,7 @@
 	</context-param>
 	<context-param>
 		<param-name>bugzillaPassword</param-name>
-		<param-value>sl!ftw</param-value>
+		<param-value>sl!ftw.1r1466</param-value>
 	</context-param>
 	<context-param>
 		<param-name>bugzillaURL</param-name>
