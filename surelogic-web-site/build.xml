@@ -68,7 +68,7 @@
         <exclude name="**/.gitignore" />
       </fileset>
     </copy>
-    <echo>WAR build of SureLogic web server into ${sl.war}</echo>
+    <echo>WAR build of SureLogic web site into ${root.war}</echo>
     <war destfile="${root.war}" webxml="${lib}/web.xml">
       <classes dir="${build.bin}" />
       <lib dir="${common}/lib/runtime">
