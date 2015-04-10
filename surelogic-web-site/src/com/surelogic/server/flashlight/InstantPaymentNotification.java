@@ -4,9 +4,6 @@ import static com.surelogic.common.jdbc.Nulls.coerce;
 
 import java.io.File;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.security.PrivateKey;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -56,6 +53,7 @@ import com.surelogic.common.license.SLLicenseType;
 import com.surelogic.common.license.SignedSLLicense;
 import com.surelogic.common.license.SignedSLLicenseNetCheck;
 import com.surelogic.common.logging.SLLogger;
+import com.surelogic.server.SiteUtil;
 import com.surelogic.server.jdbc.ServicesDBConnection;
 
 /**
@@ -228,7 +226,7 @@ public class InstantPaymentNotification extends HttpServlet {
         final SLLicense license = new SLLicense(UUID.randomUUID(), toEmail, type.getLicenseProduct(), type.getDurationInDays(),
             installBefore, SLLicenseType.SUPPORT, 1, true);
 
-        final SignedSLLicense sLicense = SignedSLLicense.getInstance(license, getKey());
+        final SignedSLLicense sLicense = SignedSLLicense.getInstance(license, SiteUtil.getKey());
         final SignedSLLicenseNetCheck sLicenseNetCheck;
         if (!license.performNetCheck()) {
           /*
@@ -237,7 +235,7 @@ public class InstantPaymentNotification extends HttpServlet {
           final Calendar cal = Calendar.getInstance();
           cal.add(Calendar.DATE, license.getDurationInDays());
           final SLLicenseNetCheck nc = new SLLicenseNetCheck(license.getUuid(), cal.getTime());
-          sLicenseNetCheck = SignedSLLicenseNetCheck.getInstance(nc, getKey());
+          sLicenseNetCheck = SignedSLLicenseNetCheck.getInstance(nc, SiteUtil.getKey());
         } else {
           sLicenseNetCheck = null;
         }
@@ -311,27 +309,6 @@ public class InstantPaymentNotification extends HttpServlet {
         }
       }
     }
-  }
-
-  private PrivateKey getKey() {
-    try {
-      Class<?> pkUtility = Class.forName("com.surelogic.key.SLPrivateKeyUtility");
-      Method getKey = pkUtility.getMethod("getKey", new Class<?>[0]);
-      return (PrivateKey) getKey.invoke(pkUtility, new Object[] {});
-    } catch (ClassNotFoundException e) {
-      log.log(Level.SEVERE, e.getMessage(), e);
-    } catch (SecurityException e) {
-      log.log(Level.SEVERE, e.getMessage(), e);
-    } catch (NoSuchMethodException e) {
-      log.log(Level.SEVERE, e.getMessage(), e);
-    } catch (IllegalArgumentException e) {
-      log.log(Level.SEVERE, e.getMessage(), e);
-    } catch (IllegalAccessException e) {
-      log.log(Level.SEVERE, e.getMessage(), e);
-    } catch (InvocationTargetException e) {
-      log.log(Level.SEVERE, e.getMessage(), e);
-    }
-    throw new IllegalStateException("The server failed in an unexpected fashion. Check server logs.");
   }
 
   /**

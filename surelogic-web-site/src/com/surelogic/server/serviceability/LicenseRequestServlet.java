@@ -1,8 +1,6 @@
 package com.surelogic.server.serviceability;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.security.PrivateKey;
 import java.sql.Timestamp;
 import java.util.Calendar;
@@ -34,6 +32,7 @@ import com.surelogic.common.license.SLLicenseType;
 import com.surelogic.common.license.SignedSLLicense;
 import com.surelogic.common.license.SignedSLLicenseNetCheck;
 import com.surelogic.common.logging.SLLogger;
+import com.surelogic.server.SiteUtil;
 import com.surelogic.server.jdbc.ServicesDBConnection;
 
 public class LicenseRequestServlet extends HttpServlet {
@@ -149,32 +148,13 @@ public class LicenseRequestServlet extends HttpServlet {
           return fail(I18N.msg(INSTALLLIMIT, license.getProduct(), uuid, license.getMaxActive()));
         }
       }
-      return genKey(check);
+      return performNetCheck(check);
     }
 
-    private String genKey(final SLLicenseNetCheck check) {
-      try {
-        Class<?> pkUtility = Class.forName("com.surelogic.key.SLPrivateKeyUtility");
-        Method getInstance = SignedSLLicenseNetCheck.class.getMethod("getInstance", new Class<?>[] { SLLicenseNetCheck.class,
-            PrivateKey.class });
-        Method getKey = pkUtility.getMethod("getKey", new Class<?>[0]);
-        final SignedSLLicenseNetCheck signed = (SignedSLLicenseNetCheck) getInstance.invoke(SignedSLLicenseNetCheck.class, check,
-            getKey.invoke(pkUtility, new Object[] {}));
-        return signed.getSignedHexString();
-      } catch (ClassNotFoundException e) {
-        LOG.log(Level.SEVERE, e.getMessage(), e);
-      } catch (SecurityException e) {
-        LOG.log(Level.SEVERE, e.getMessage(), e);
-      } catch (NoSuchMethodException e) {
-        LOG.log(Level.SEVERE, e.getMessage(), e);
-      } catch (IllegalArgumentException e) {
-        LOG.log(Level.SEVERE, e.getMessage(), e);
-      } catch (IllegalAccessException e) {
-        LOG.log(Level.SEVERE, e.getMessage(), e);
-      } catch (InvocationTargetException e) {
-        LOG.log(Level.SEVERE, e.getMessage(), e);
-      }
-      throw new IllegalStateException("The server failed in an unexpected fashion. Check server logs.");
+    private String performNetCheck(final SLLicenseNetCheck check) {
+      final PrivateKey key = SiteUtil.getKey();
+      final SignedSLLicenseNetCheck signed = SignedSLLicenseNetCheck.getInstance(check, key);
+      return signed.getSignedHexString();
     }
   }
 
