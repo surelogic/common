@@ -6,7 +6,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import com.surelogic.common.logging.SLLogger;
 import com.surelogic.server.serviceability.Email.EmailConfig;
 
 public class EmailContextListener implements ServletContextListener {
@@ -29,7 +28,7 @@ public class EmailContextListener implements ServletContextListener {
     final String from = config.getInitParameter("fromAddress");
     final String to = config.getInitParameter("toAddress");
 
-    SLLogger.getLogger().info("Setting up Bugzilla properties");
+    //SLLogger.getLogger().info("Setting up Bugzilla properties");
     final Properties bugProps = new Properties();
     bugProps.setProperty("bugzillaUser", to);
     bugProps.setProperty("bugzillaPassword", config.getInitParameter("bugzillaPassword"));

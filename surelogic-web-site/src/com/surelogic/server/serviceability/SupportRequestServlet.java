@@ -1,12 +1,6 @@
 package com.surelogic.server.serviceability;
 
 import static com.surelogic.common.serviceability.ServiceabilityConstants.TITLE_PREFIX;
-import static com.surelogic.server.serviceability.BugzillaConstants.COMPONENT;
-import static com.surelogic.server.serviceability.BugzillaConstants.DESCRIPTION;
-import static com.surelogic.server.serviceability.BugzillaConstants.ID;
-import static com.surelogic.server.serviceability.BugzillaConstants.PRODUCT;
-import static com.surelogic.server.serviceability.BugzillaConstants.SUMMARY;
-import static com.surelogic.server.serviceability.BugzillaConstants.VERSION;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -89,6 +83,25 @@ import com.surelogic.server.jdbc.ServicesDBConnection;
  */
 public class SupportRequestServlet extends HttpServlet {
   private static final long serialVersionUID = -890724069440107378L;
+
+  public static final String ID = "id";
+
+  // Required - The name of the product the bug is being filed against.
+  public static final String PRODUCT = "product";
+
+  // Required - The name of a component in the product above.
+  public static final String COMPONENT = "component";
+
+  // Required - A brief description of the bug being filed.
+  public static final String SUMMARY = "summary";
+
+  // Required - A version of the product above; the version the bug was found
+  // in.
+  public static final String VERSION = "version";
+
+  // Defaulted - The initial description for this bug. Some Bugzilla
+  // installations require this to not be blank.
+  public static final String DESCRIPTION = "description";
 
   /**
    * Line-feed used when building email body.
@@ -197,7 +210,7 @@ public class SupportRequestServlet extends HttpServlet {
       emailSubject.append(from == null ? "" : " from " + from);
       Email.sendEmail(emailSubject.toString(), emailBodyText, null, sendBCC);
 
-      log("Checking if related to licenses");
+      //log("Checking if related to licenses");
       if (!isLicenseRelated(requestFields)) {
         handleBugzilla(requestFields, bugzillaDescription, logContents);
       }
