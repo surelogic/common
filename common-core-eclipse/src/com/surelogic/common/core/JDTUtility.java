@@ -269,21 +269,11 @@ public final class JDTUtility {
     String result = "unknown";
     final IProduct product = Platform.getProduct();
     if (product != null) {
-      final String description = product.getDescription();
-      if (description != null) {
-        int index = description.indexOf("ersion");
-        if (index != -1) {
-          index = description.indexOf('\n', index);
-          if (index != -1) {
-            result = description.substring(0, index);
-            result = result.replaceAll("[\r\n]", " ");
-          }
-        }
-      }
+      result = product.getName();
     }
     final String eclipseBuildId = System.getProperty("eclipse.buildId");
     if (eclipseBuildId != null) {
-      result = result + " (Build id: " + eclipseBuildId + ")";
+      result = result + " " + eclipseBuildId;
     }
     return result;
   }
@@ -1775,68 +1765,70 @@ public final class JDTUtility {
     return false;
   }
 
-  public static List<ICompilationUnit> applyToolsFilter(List<ICompilationUnit> cus, SureLogicToolsFilter filter) throws JavaModelException {
-	  return applyToolsFilter(cus, filter, true);
+  public static List<ICompilationUnit> applyToolsFilter(List<ICompilationUnit> cus, SureLogicToolsFilter filter)
+      throws JavaModelException {
+    return applyToolsFilter(cus, filter, true);
   }
-  
-  public static List<ICompilationUnit> applyToolsFilter(List<ICompilationUnit> cus, SureLogicToolsFilter filter, boolean excludeIfMatched) throws JavaModelException {
-	  final List<ICompilationUnit> rv = new ArrayList<ICompilationUnit>();
-	  for (ICompilationUnit icu : cus) {
-		  // Check if legal
-		  final String name = icu.getElementName();
-		  if (!SLUtility.PACKAGE_INFO_JAVA.equals(name) && !SLUtility.isValidJavaIdentifier(name.substring(0, name.length()-5))) {
-			  continue;
-		  }
 
-		  final IPath path = icu.getResource().getFullPath();
-		  String packageName = "";
-		  for (IPackageDeclaration pd : icu.getPackageDeclarations()) {
-			  packageName = pd.getElementName();
-			  //config.addPackage(pd.getElementName());
-		  }
-		  boolean filterMatchesTreatAsBinary = filter.matches(path.toFile().getAbsolutePath(), packageName);
-		  if (filterMatchesTreatAsBinary != excludeIfMatched) {
-			  rv.add(icu);
-		  }
-	  }
-	  return rv;
+  public static List<ICompilationUnit> applyToolsFilter(List<ICompilationUnit> cus, SureLogicToolsFilter filter,
+      boolean excludeIfMatched) throws JavaModelException {
+    final List<ICompilationUnit> rv = new ArrayList<ICompilationUnit>();
+    for (ICompilationUnit icu : cus) {
+      // Check if legal
+      final String name = icu.getElementName();
+      if (!SLUtility.PACKAGE_INFO_JAVA.equals(name) && !SLUtility.isValidJavaIdentifier(name.substring(0, name.length() - 5))) {
+        continue;
+      }
+
+      final IPath path = icu.getResource().getFullPath();
+      String packageName = "";
+      for (IPackageDeclaration pd : icu.getPackageDeclarations()) {
+        packageName = pd.getElementName();
+        // config.addPackage(pd.getElementName());
+      }
+      boolean filterMatchesTreatAsBinary = filter.matches(path.toFile().getAbsolutePath(), packageName);
+      if (filterMatchesTreatAsBinary != excludeIfMatched) {
+        rv.add(icu);
+      }
+    }
+    return rv;
   }
 
   public static String computeQualifiedName(ICompilationUnit icu) throws JavaModelException {
-	  String qname = null;
-	  for (IType t : icu.getTypes()) {
-		  qname = t.getFullyQualifiedName();
-		  /*
-		   * if (qname.endsWith("SingleSignOnEntry")) {
-		   * System.out.println("Looking at "+qname); }
-		   */
-		  final int flags = t.getFlags();
-		  if (Flags.isPublic(flags)) {
-			  // This is the only public top-level type
-			  break;
-		  } else {
-			  // System.out.println("Got a non-public type: "+qname);
-		  }
-	  }
-	  if (qname == null) {
-		  // Backup method: unreliable since the qname may not match the
-		  // filename
-		  String pkg = null;
-		  for (IPackageDeclaration pd : icu.getPackageDeclarations()) {
-			  pkg = pd.getElementName();
-			  break;
-		  }
-		  qname = icu.getElementName();
-		  if (qname.endsWith(".java")) {
-			  qname = qname.substring(0, qname.length() - 5);
-		  }
-		  if (pkg != null) {
-			  qname = pkg + '.' + qname;
-		  }
-	  }
-	  return qname;
+    String qname = null;
+    for (IType t : icu.getTypes()) {
+      qname = t.getFullyQualifiedName();
+      /*
+       * if (qname.endsWith("SingleSignOnEntry")) {
+       * System.out.println("Looking at "+qname); }
+       */
+      final int flags = t.getFlags();
+      if (Flags.isPublic(flags)) {
+        // This is the only public top-level type
+        break;
+      } else {
+        // System.out.println("Got a non-public type: "+qname);
+      }
+    }
+    if (qname == null) {
+      // Backup method: unreliable since the qname may not match the
+      // filename
+      String pkg = null;
+      for (IPackageDeclaration pd : icu.getPackageDeclarations()) {
+        pkg = pd.getElementName();
+        break;
+      }
+      qname = icu.getElementName();
+      if (qname.endsWith(".java")) {
+        qname = qname.substring(0, qname.length() - 5);
+      }
+      if (pkg != null) {
+        qname = pkg + '.' + qname;
+      }
+    }
+    return qname;
   }
-  
+
   private JDTUtility() {
     // utility
   }
