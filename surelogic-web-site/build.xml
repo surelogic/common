@@ -32,16 +32,20 @@
     <echo>Publish completed...Jetty may now be restarted...</echo>
   </target>
 
-  <target name="bugzilla-hack">
+  <target name="bugzilla">
     <echo>This should be run after running checkstup.pl</echo>
+    <echo>It creates 'hack' for static content in Jetty</echo>
     <echo>(pausing just a second so you can ^C if not)</echo>
     <sleep seconds="4" />
     <delete quiet="true" dir="${bugzilla.hack}" />
     <mkdir dir="${bugzilla.hack}" />
     <copy todir="${bugzilla.hack}">
       <fileset dir="${bugzilla.html}">
+        <exclude name="localconfig" />
+        <exclude name="README" />
+        <exclude name="LICENSE" />
         <exclude name="lib/**" />
-        <exclude name="**/localconfig" />
+        <exclude name="contrib/**" />
         <exclude name="**/*.cgi" />
         <exclude name="**/*.pm" />
         <exclude name="**/*.pl" />
