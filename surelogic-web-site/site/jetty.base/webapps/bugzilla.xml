@@ -19,7 +19,7 @@
   <Set name="contextPath">/bugzilla</Set>
   <Set name="resourceBase"><Ref refid="root" /></Set>
   <Set name="welcomeFiles">
-    <Array type="string">
+    <Array type="String">
       <Item>index.cgi</Item>
     </Array>
   </Set>
