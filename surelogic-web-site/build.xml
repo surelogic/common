@@ -49,6 +49,7 @@
         <exclude name="**/*.cgi" />
         <exclude name="**/*.pm" />
         <exclude name="**/*.pl" />
+        <exclude name="**/.*" />
       </fileset>
     </copy>
   </target>
