@@ -16,6 +16,7 @@
 
   <property name="bugzilla.base" location="${basedir}/../../bugzilla" />
   <property name="bugzilla.static" location="${basedir}/../../bugzilla-static" />
+  <property name="bugzilla.index" location="${basedir}/../../../java/bugzilla-index.html" />
 
   <target name="publish">
     <echo>Jetty should be shutdown before a publish...</echo>
@@ -53,6 +54,7 @@
         <exclude name="**/.*" />
       </fileset>
     </copy>
+  <copy file="${bugzilla.index}" toFile="${bugzilla.static}/index.html" />
   </target>
 
   <target name="build-root-war">
