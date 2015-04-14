@@ -243,7 +243,7 @@ public final class SLLicenseUtility {
     final Map<String, String> param = new HashMap<String, String>();
     param.put(I18N.msg("common.serviceability.licenserequest.req"), I18N.msg("common.serviceability.licenserequest.req.actrew"));
     param.put(I18N.msg("common.serviceability.licenserequest.license"), l);
-    final URL url = new URL(I18N.msg("common.serviceability.licenserequest.url", SLUtility.SERVICES_WEBSITE_URL));
+    final URL url = new URL(I18N.msg("common.serviceability.licenserequest.url", SLUtility.SERVICEABILITY_URL));
     final String response = SLUtility.sendPostToUrl(url, param);
     final List<SignedSLLicenseNetCheck> licenseNetChecks = SLLicensePersistence.readLicenseNetChecksFromString(response);
     final String[] rLines = SLUtility.separateLines(response);
@@ -313,7 +313,7 @@ public final class SLLicenseUtility {
     final Map<String, String> param = new HashMap<String, String>();
     param.put(I18N.msg("common.serviceability.licenserequest.req"), I18N.msg("common.serviceability.licenserequest.req.remove"));
     param.put(I18N.msg("common.serviceability.licenserequest.license"), l);
-    final URL url = new URL(I18N.msg("common.serviceability.licenserequest.url", SLUtility.SERVICES_WEBSITE_URL));
+    final URL url = new URL(I18N.msg("common.serviceability.licenserequest.url", SLUtility.SERVICEABILITY_URL));
     SLUtility.sendPostToUrl(url, param);
   }
 

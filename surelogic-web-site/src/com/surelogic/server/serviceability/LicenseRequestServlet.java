@@ -317,7 +317,7 @@ public class LicenseRequestServlet extends HttpServlet {
     Email.adminEmail(
         event.toString(),
         I18N.msg(LOGEMAIL, license.getHolder(), license.getProduct().toString(), time.toString(), ip, uuid,
-            I18N.msg(LICENSEURL, SLUtility.SERVICES_WEBSITE_URL, uuid), event.toString()));
+            I18N.msg(LICENSEURL, SLUtility.SERVICEABILITY_URL, uuid), event.toString()));
   }
 
   void remove(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {

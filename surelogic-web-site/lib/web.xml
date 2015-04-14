@@ -205,11 +205,7 @@
 	</context-param>
 	<context-param>
 		<param-name>bugzillaPassword</param-name>
-		<param-value>sl!ftw.1r1466</param-value>
-	</context-param>
-	<context-param>
-		<param-name>bugzillaURL</param-name>
-		<param-value>http://surelogic.com/bugzilla/</param-value>
+		<param-value>sl!ftw</param-value>
 	</context-param>
 	<listener>
 		<listener-class>

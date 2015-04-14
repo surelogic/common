@@ -6,6 +6,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
+import com.surelogic.common.SLUtility;
 import com.surelogic.server.serviceability.Email.EmailConfig;
 
 public class EmailContextListener implements ServletContextListener {
@@ -32,7 +33,7 @@ public class EmailContextListener implements ServletContextListener {
     final Properties bugProps = new Properties();
     bugProps.setProperty("bugzillaUser", to);
     bugProps.setProperty("bugzillaPassword", config.getInitParameter("bugzillaPassword"));
-    bugProps.setProperty("bugzillaURL", config.getInitParameter("bugzillaURL"));
+    bugProps.setProperty("bugzillaURL", SLUtility.SERVICEABILITY_URL + "/bugzilla/");
 
     Email.start(new EmailConfig(jmProps, from, to, bugProps));
   }

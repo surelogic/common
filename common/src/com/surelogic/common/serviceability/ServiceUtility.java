@@ -16,7 +16,7 @@ import com.surelogic.common.jobs.SLStatus;
 
 @Utility
 public final class ServiceUtility {
-  final static String f_serviceLocation = I18N.msg("common.serviceability.supportrequest.url", SLUtility.SERVICES_WEBSITE_URL);
+  final static String f_serviceLocation = I18N.msg("common.serviceability.supportrequest.url", SLUtility.SERVICEABILITY_URL);
 
   /**
    * Constructs a job that sends a message over the Internet to SureLogic.

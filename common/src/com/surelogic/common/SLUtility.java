@@ -44,11 +44,10 @@ public final class SLUtility {
 
   /**
    * This defines the url to get to the serviceability servlets on the website.
-   * Normally the default is used (an alias to surelogic.com), but for testing a
-   * system property can be set
-   * <code>-Dservices.website.url=http://test.com:8080</code>
+   * Normally the default is used , but for testing a system property can be set
+   * <code>-Dserviceability.url=http://test.com:8080</code>
    */
-  public static final String SERVICES_WEBSITE_URL = System.getProperty("services.website.url", "http://services.surelogic.com");
+  public static final String SERVICEABILITY_URL = System.getProperty("serviceability.url", "http://surelogic.com");
 
   /**
    * This is a very JDT friendly constant&mdash;many Eclipse methods recognize
