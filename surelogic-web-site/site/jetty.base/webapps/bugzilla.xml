@@ -29,6 +29,10 @@
           <Arg>dirAllowed</Arg>
           <Arg>false</Arg>
         </Call>
+         <Call name="setInitParameter">
+          <Arg>resourceBase</Arg>
+          <Arg><Property name="jetty.base" default="."/>/../../git/bugzilla/hack</Arg>
+        </Call>
       </New>
     </Arg>
     <Arg>/</Arg>
