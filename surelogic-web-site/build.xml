@@ -14,6 +14,10 @@
   <property name="build.bin" location="${build}/bin-for-war" />
   <property name="root.war" location="${build}/root.war" />
 
+  <property name="bugzilla.base" location="${basedir}/../../bugzilla" />
+  <property name="bugzilla.html" location="${bugzilla.base}/html" />
+  <property name="bugzilla.hack" location="${bugzilla.base}/hack" />
+
   <target name="publish">
     <echo>Jetty should be shutdown before a publish...</echo>
     <echo>(pausing just a second so you can ^C if Jetty is running)
@@ -26,6 +30,23 @@
     <copy file="${root.war}" todir="${publish.jetty.base}/webapps" />
     <copy file="${key.jar}" todir="${publish.jetty.base}/lib/ext" />
     <echo>Publish completed...Jetty may now be restarted...</echo>
+  </target>
+
+  <target name="bugzilla-after-checksetup">
+    <echo>This should be run after running checkstup.pl</echo>
+    <echo>(pausing just a second so you can ^C if not)</echo>
+    <sleep seconds="4" />
+    <delete quiet="true" dir="${bugzilla.hack}" />
+    <mkdir dir="${bugzilla.hack}" />
+    <copy todir="${bugzilla.hack}">
+      <fileset dir="${bugzilla.html}">
+        <exclude name="lib" />
+        <exclude name="**/localconfig" />
+        <exclude name="**/*.cgi" />
+        <exclude name="**/*.pm" />
+        <exclude name="**/*.pl" />
+      </fileset>
+    </copy>
   </target>
 
   <target name="build-root-war">
