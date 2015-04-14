@@ -5,6 +5,10 @@
   <New id="root" class="java.lang.String">
     <Arg><Property name="jetty.base" default="."/>/../../git/bugzilla/html</Arg>
   </New>
+  
+  <New id="hack" class="java.lang.String">
+    <Arg><Property name="jetty.base" default="."/>/../../git/bugzilla/hack</Arg>
+  </New>
 
   <Set name="contextPath">/bugzilla</Set>
   <Set name="resourceBase">
@@ -31,7 +35,7 @@
         </Call>
          <Call name="setInitParameter">
           <Arg>resourceBase</Arg>
-          <Arg><Property name="jetty.base" default="."/>/../../git/bugzilla/hack</Arg>
+          <Arg><Ref refid="hack" /></Arg>
         </Call>
       </New>
     </Arg>
