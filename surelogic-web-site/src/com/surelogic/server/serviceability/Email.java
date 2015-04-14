@@ -139,22 +139,15 @@ public class Email {
      */
     private final String to;
 
-    private final Properties bugzillaProps;
-
-    public EmailConfig(final Properties javaMailProperties, final String from, final String to, final Properties bugProps) {
+    public EmailConfig(final Properties javaMailProperties, final String from, final String to) {
       super();
       this.javaMailProperties = javaMailProperties;
       this.from = from;
       this.to = to;
-      bugzillaProps = bugProps;
     }
 
     public Properties getJavaMailProperties() {
       return javaMailProperties;
-    }
-
-    public Properties getBugzillaProperties() {
-      return bugzillaProps;
     }
 
     public String getFrom() {
