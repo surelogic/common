@@ -41,9 +41,16 @@
     <copy includeEmptyDirs="false" todir="${bugzilla.static}">
       <fileset dir="${bugzilla.base}">
         <exclude name="localconfig" />
+        <exclude name="README" />
+        <exclude name="MANIFEST.SKIP" />
+        <exclude name="LICENSE" />
+        <exclude name="Build.PL" />
         <exclude name="**/*.cgi" />
         <exclude name="**/*.pm" />
         <exclude name="**/*.pl" />
+        <exclude name="lib/**" />
+        <exclude name="contrib/**" />
+        <exclude name="**/.*" />
       </fileset>
     </copy>
   </target>
