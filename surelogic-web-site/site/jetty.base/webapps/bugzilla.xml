@@ -50,10 +50,6 @@
           <Arg>resourceBase</Arg>
           <Arg><Ref refid="static" /></Arg>
         </Call>
-        <Call name="setInitParameter">
-          <Arg>redirectWelcome</Arg>
-          <Arg>true</Arg>
-        </Call>
       </New>
     </Arg>
     <Arg>/</Arg>
