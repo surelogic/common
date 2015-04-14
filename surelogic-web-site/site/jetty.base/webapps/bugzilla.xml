@@ -19,6 +19,15 @@
       <Item>index.cgi</Item>
     </Array>
   </Set>
+  
+  <Call name="addServlet">
+    <Arg>org.eclipse.jetty.servlets.CGI</Arg>
+    <Arg>*.cgi</Arg>
+    <Call name="setInitParameter">
+      <Arg>Path</Arg>
+      <Arg>/usr/local/bin:/bin:/usr/bin</Arg>
+    </Call>
+  </Call>
 
   <Call name="addServlet">
     <Arg>
@@ -40,15 +49,6 @@
       </New>
     </Arg>
     <Arg>/</Arg>
-  </Call>
-
-  <Call name="addServlet">
-    <Arg>org.eclipse.jetty.servlets.CGI</Arg>
-    <Arg>*.cgi</Arg>
-    <Call name="setInitParameter">
-      <Arg>Path</Arg>
-      <Arg>/usr/local/bin:/bin:/usr/bin</Arg>
-    </Call>
   </Call>
 
 </Configure>
