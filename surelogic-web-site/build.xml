@@ -15,8 +15,7 @@
   <property name="root.war" location="${build}/root.war" />
 
   <property name="bugzilla.base" location="${basedir}/../../bugzilla" />
-  <property name="bugzilla.html" location="${bugzilla.base}/html" />
-  <property name="bugzilla.hack" location="${bugzilla.base}/hack" />
+  <property name="bugzilla.static" location="${basedir}/../../bugzilla-static" />
 
   <target name="publish">
     <echo>Jetty should be shutdown before a publish...</echo>
@@ -37,19 +36,14 @@
     <echo>It creates 'hack' for static content in Jetty</echo>
     <echo>(pausing just a second so you can ^C if not)</echo>
     <sleep seconds="4" />
-    <delete quiet="true" dir="${bugzilla.hack}" />
-    <mkdir dir="${bugzilla.hack}" />
-    <copy includeEmptyDirs="false" todir="${bugzilla.hack}">
-      <fileset dir="${bugzilla.html}">
+    <delete quiet="true" dir="${bugzilla.static}" />
+    <mkdir dir="${bugzilla.static}" />
+    <copy includeEmptyDirs="false" todir="${bugzilla.static}">
+      <fileset dir="${bugzilla.base}">
         <exclude name="localconfig" />
-        <exclude name="README" />
-        <exclude name="LICENSE" />
-        <exclude name="lib/**" />
-        <exclude name="contrib/**" />
         <exclude name="**/*.cgi" />
         <exclude name="**/*.pm" />
         <exclude name="**/*.pl" />
-        <exclude name="**/.*" />
       </fileset>
     </copy>
   </target>

@@ -3,11 +3,11 @@
 <Configure class="org.eclipse.jetty.servlet.ServletContextHandler">
 
   <New id="root" class="java.lang.String">
-    <Arg><Property name="jetty.base" default="."/>/../../git/bugzilla/html</Arg>
+    <Arg><Property name="jetty.base" default="."/>/../../git/bugzilla</Arg>
   </New>
   
-  <New id="hack" class="java.lang.String">
-    <Arg><Property name="jetty.base" default="."/>/../../git/bugzilla/hack</Arg>
+  <New id="static" class="java.lang.String">
+    <Arg><Property name="jetty.base" default="."/>/../../git/bugzilla-static</Arg>
   </New>
 
   <Set name="contextPath">/bugzilla</Set>
@@ -44,7 +44,7 @@
         </Call>
          <Call name="setInitParameter">
           <Arg>resourceBase</Arg>
-          <Arg><Ref refid="hack" /></Arg>
+          <Arg><Ref refid="static" /></Arg>
         </Call>
       </New>
     </Arg>
