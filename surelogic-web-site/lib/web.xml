@@ -19,75 +19,6 @@
 		</jsp-property-group>
 	</jsp-config>
 
-	<!-- Flashlight trial license generation -->
-	<servlet>
-		<servlet-name>Flashlight Evaluation</servlet-name>
-		<servlet-class>com.surelogic.server.flashlight.EvaluationLicenseServlet</servlet-class>
-		<init-param>
-			<param-name>fromAddress</param-name>
-			<param-value>support@surelogic.com</param-value>
-		</init-param>
-		<init-param>
-			<param-name>emailServerHost</param-name>
-			<param-value>aspmx.l.google.com</param-value>
-		</init-param>
-		<init-param>
-			<param-name>emailServerPort</param-name>
-			<param-value>25</param-value>
-	</init-param>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>Flashlight Evaluation</servlet-name>
-		<url-pattern>test/fl/evaluation-license</url-pattern>
-	</servlet-mapping>
-	
-	<!-- Checkout Servlets -->
-
-	<!-- Web Payments Standard Instant Payment Notification-->
-	<servlet>
-		<servlet-name>IPN</servlet-name>
-		<servlet-class>
-			com.surelogic.server.flashlight.InstantPaymentNotification	
-		</servlet-class>
-		<init-param>
-			<param-name>fromAddress</param-name>
-			<param-value>support@surelogic.com</param-value>
-		</init-param>
-		<init-param>
-			<param-name>emailServerHost</param-name>
-			<param-value>aspmx.l.google.com</param-value>
-		</init-param>
-		<init-param>
-			<param-name>emailServerPort</param-name>
-			<param-value>25</param-value>
-		</init-param>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>IPN</servlet-name>
-		<url-pattern>/test/fl/ipn</url-pattern>
-	</servlet-mapping>
-	<servlet>
-		<servlet-name>Cancelled</servlet-name>
-		<servlet-class>
-			com.surelogic.server.flashlight.CancelledServlet
-		</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>Cancelled</servlet-name>
-		<url-pattern>/test/fl/cancelled</url-pattern>
-	</servlet-mapping>
-
-	<servlet>
-		<servlet-name>Completed</servlet-name>
-		<servlet-class>
-			com.surelogic.server.flashlight.CompletedServlet
-		</servlet-class>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>Completed</servlet-name>
-		<url-pattern>/test/fl/completed</url-pattern>
-	</servlet-mapping>
-
 	<!-- Support Request servlet configuration -->
 	<servlet>
 		<servlet-name>Support Request</servlet-name>
@@ -202,10 +133,6 @@
 	<context-param>
 		<param-name>emailServerPort</param-name>
 		<param-value>25</param-value>
-	</context-param>
-	<context-param>
-		<param-name>bugzillaPassword</param-name>
-		<param-value>sl!ftw</param-value>
 	</context-param>
 	<listener>
 		<listener-class>

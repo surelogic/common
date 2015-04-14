@@ -7,6 +7,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 
+import javax.mail.Address;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
@@ -15,6 +16,7 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.ServletConfig;
 
+import com.surelogic.Nullable;
 import com.surelogic.common.logging.SLLogger;
 
 public class Email {
@@ -42,7 +44,7 @@ public class Email {
    * @param content
    */
   static void adminEmail(final String subject, final String content) {
-    sendEmail(subject, content, null, false);
+    sendEmail(subject, content, null, null, false);
   }
 
   /**
@@ -53,11 +55,15 @@ public class Email {
    * @param content
    *          the content of the request
    * @param to
-   *          the email address of the target
+   *          the email address of the target, null for <tt>config.getTo()</tt>
+   * @param replyTo
+   *          the email address to reply to, this is ignored if the address
+   *          invalid or null
    * @param sendBCC
    *          whether or not to send as a blind carbon-copy
    */
-  static void sendEmail(final String subject, final String content, final String to, final boolean sendBCC) {
+  static void sendEmail(final String subject, final String content, @Nullable final String to, @Nullable final String replyTo,
+      final boolean sendBCC) {
     executor.execute(new Runnable() {
       @Override
       public void run() {
@@ -81,6 +87,15 @@ public class Email {
           msg.setSubject(subject);
           msg.setSentDate(new Date());
           msg.setContent(content, "text/plain");
+          // attempt to setup the reply to
+          if (replyTo != null) {
+            try {
+              final Address[] rt = InternetAddress.parse(replyTo);
+              msg.setReplyTo(rt);
+            } catch (Exception ignore) {
+              // just ignore, probably the user gave us a bad email address
+            }
+          }
 
           // transmit the email
           Transport.send(msg);
