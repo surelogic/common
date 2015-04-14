@@ -39,7 +39,7 @@
     <sleep seconds="4" />
     <delete quiet="true" dir="${bugzilla.hack}" />
     <mkdir dir="${bugzilla.hack}" />
-    <copy todir="${bugzilla.hack}">
+    <copy includeEmptyDirs="false" todir="${bugzilla.hack}">
       <fileset dir="${bugzilla.html}">
         <exclude name="localconfig" />
         <exclude name="README" />
