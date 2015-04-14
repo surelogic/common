@@ -4,15 +4,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/common"/>
 	<classpathentry kind="lib" path="lib/javax.mail-1.5.2.jar"/>
-	<classpathentry kind="lib" path="lib/commons-httpclient-3.1.jar"/>
-	<classpathentry kind="lib" path="lib/commons-logging-1.2.jar"/>
 	<classpathentry kind="lib" path="lib/derbynet-10.11.1.1.jar"/>
 	<classpathentry kind="lib" path="lib/derbytools-10.11.1.1.jar"/>
-	<classpathentry kind="lib" path="lib/httpcore-4.0.jar"/>
-	<classpathentry kind="lib" path="lib/httpcore-nio-4.0.jar"/>
-	<classpathentry kind="lib" path="lib/log4j-1.2.15.jar"/>
-	<classpathentry kind="lib" path="lib/ws-commons-util-1.0.2.jar"/>
-	<classpathentry kind="lib" path="lib/xmlrpc-client-3.1.2.jar"/>
-	<classpathentry kind="lib" path="lib/xmlrpc-common-3.1.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
