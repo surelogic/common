@@ -40,7 +40,7 @@
     <mkdir dir="${bugzilla.hack}" />
     <copy todir="${bugzilla.hack}">
       <fileset dir="${bugzilla.html}">
-        <exclude name="lib" />
+        <exclude name="lib/**" />
         <exclude name="**/localconfig" />
         <exclude name="**/*.cgi" />
         <exclude name="**/*.pm" />
