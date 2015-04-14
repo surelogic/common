@@ -3,23 +3,27 @@
 <Configure class="org.eclipse.jetty.servlet.ServletContextHandler">
 
   <New id="root" class="java.lang.String">
-    <Arg><Property name="jetty.base" default="."/>/../../git/bugzilla</Arg>
+    <Arg>
+      <Property name="jetty.base" default="." />
+      /../../git/bugzilla
+    </Arg>
   </New>
-  
+
   <New id="static" class="java.lang.String">
-    <Arg><Property name="jetty.base" default="."/>/../../git/bugzilla-static</Arg>
+    <Arg>
+      <Property name="jetty.base" default="." />
+      /../../git/bugzilla-static
+    </Arg>
   </New>
 
   <Set name="contextPath">/bugzilla</Set>
-  <Set name="resourceBase">
-    <Ref refid="root" />
-  </Set>
+  <Set name="resourceBase"><Ref refid="root" /></Set>
   <Set name="welcomeFiles">
     <Array type="string">
       <Item>index.cgi</Item>
     </Array>
   </Set>
-  
+
   <Call name="addServlet">
     <Arg>org.eclipse.jetty.servlets.CGI</Arg>
     <Arg>*.cgi</Arg>
@@ -42,9 +46,13 @@
           <Arg>dirAllowed</Arg>
           <Arg>false</Arg>
         </Call>
-         <Call name="setInitParameter">
+        <Call name="setInitParameter">
           <Arg>resourceBase</Arg>
           <Arg><Ref refid="static" /></Arg>
+        </Call>
+        <Call name="setInitParameter">
+          <Arg>redirectWelcome</Arg>
+          <Arg>true</Arg>
         </Call>
       </New>
     </Arg>
