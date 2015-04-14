@@ -32,7 +32,7 @@
     <echo>Publish completed...Jetty may now be restarted...</echo>
   </target>
 
-  <target name="bugzilla-after-checksetup">
+  <target name="bugzilla-hack">
     <echo>This should be run after running checkstup.pl</echo>
     <echo>(pausing just a second so you can ^C if not)</echo>
     <sleep seconds="4" />
