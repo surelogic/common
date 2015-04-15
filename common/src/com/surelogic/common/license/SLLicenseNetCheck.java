@@ -9,7 +9,7 @@ import com.surelogic.common.i18n.I18N;
  * Represents a net check for a particular license. The clients pair these
  * instances with {@link SLLicense} instances if the license required a net
  * check to be installed. The digitally signed data that is used to construct
- * instances is constructed by the www.surelogic.com server as an affirmative
+ * instances is constructed by the surelogic.com server as an affirmative
  * answer to installing or renewing a particular license.
  */
 public final class SLLicenseNetCheck {

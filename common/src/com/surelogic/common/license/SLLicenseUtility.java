@@ -237,7 +237,7 @@ public final class SLLicenseUtility {
     }
 
     /*
-     * Build the message to send to www.surelogic.com.
+     * Build the message to send to surelogic.com.
      */
     final String l = SLLicensePersistence.toSignedHexString(licenses, true);
     final Map<String, String> param = new HashMap<String, String>();
