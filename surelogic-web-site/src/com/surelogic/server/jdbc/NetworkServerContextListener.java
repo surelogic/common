@@ -30,9 +30,6 @@ public final class NetworkServerContextListener implements ServletContextListene
   @Override
   public void contextInitialized(final ServletContextEvent event) {
     try {
-      System.out.println("Starting Network Server");
-      System.setProperty("derby.drda.startNetworkServer", "true");
-      System.setProperty("derby.drda.portNumber", "13375");
       ServicesDBConnection.getInstance().bootAndCheckSchema();
 
     } catch (final Exception e) {
