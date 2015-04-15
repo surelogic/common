@@ -30,15 +30,6 @@ public final class NetworkServerContextListener implements ServletContextListene
   @Override
   public void contextInitialized(final ServletContextEvent event) {
     try {
-      System.out.println("Starting Network Server");
-      System.setProperty("derby.drda.startNetworkServer", "true");
-      System.setProperty("derby.drda.portNumber", "13375");
-      /*
-       * By default Derby only listens on localhost for connections (backup for
-       * this website). The below statement can be used to enable network
-       * connections but is not secure. (but might be useful for testing)
-       */
-      System.setProperty("derby.drda.host", "ps416375.dreamhostps.com");
       ServicesDBConnection.getInstance().bootAndCheckSchema();
 
     } catch (final Exception e) {
