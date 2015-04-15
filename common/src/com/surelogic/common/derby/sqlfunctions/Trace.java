@@ -160,7 +160,7 @@ public class Trace {
         };
     }
 
-    private static class TraceRowHandler implements RowHandler<Trace> {
+    static class TraceRowHandler implements RowHandler<Trace> {
 
         @Override
         public Trace handle(final Row r) {

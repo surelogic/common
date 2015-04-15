@@ -23,7 +23,7 @@ public class LockTrace {
     final int atLine;
     final long traceId;
 
-    private LockTrace(long lockTraceId, long parentId, long lockId,
+    LockTrace(long lockTraceId, long parentId, long lockId,
             long traceId, LockType type, String packageName, String className,
             String classCode, String location, String locationCode, int atLine) {
         this.lockTraceId = lockTraceId;
@@ -125,7 +125,7 @@ public class LockTrace {
         };
     }
 
-    private static class LockTraceRowHandler implements RowHandler<LockTrace> {
+    static class LockTraceRowHandler implements RowHandler<LockTrace> {
 
         @Override
         public LockTrace handle(Row r) {
