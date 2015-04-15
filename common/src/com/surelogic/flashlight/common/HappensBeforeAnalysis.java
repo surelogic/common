@@ -46,6 +46,8 @@ public class HappensBeforeAnalysis {
     private final PreparedStatement traceMethodCalledSt;
     private final TLongObjectMap<Timestamp> targetsCache;
     private final TLongObjectMap<Timestamp> sourcesCache;
+    private final Map<Obj, Timestamp> objTargetsCache;
+    private final Map<Obj, Timestamp> objSourcesCache;
     private final Map<LockId, Timestamp> lockTargetsCache;
     private final Map<LockId, Timestamp> lockSourcesCache;
 
@@ -96,6 +98,8 @@ public class HappensBeforeAnalysis {
                 .get("Accesses.trace.traceMethodCalled"));
         targetsCache = new TLongObjectHashMap<Timestamp>();
         sourcesCache = new TLongObjectHashMap<Timestamp>();
+        objSourcesCache = new HashMap<Obj, Timestamp>();
+        objTargetsCache = new HashMap<Obj, Timestamp>();
         lockTargetsCache = new HashMap<LockId, Timestamp>();
         lockSourcesCache = new HashMap<LockId, Timestamp>();
     }
@@ -244,7 +248,7 @@ public class HappensBeforeAnalysis {
 
     public boolean happensBeforeClassInitialization(Timestamp write,
             long writeThread, Timestamp read, long readThread)
-            throws SQLException {
+                    throws SQLException {
         int idx = 1;
         hbClassInitSt.setLong(idx++, writeThread);
         hbClassInitSt.setTimestamp(idx++, write);
@@ -313,27 +317,38 @@ public class HappensBeforeAnalysis {
                 long targetColl = -1;
                 long targetObj = -1;
                 Timestamp targetTs = null;
+                String targetId = null;
                 sourceLoop: while (hbCollSourceSet.next()) {
                     long sourceColl = hbCollSourceSet.getLong(1);
                     long sourceObj = hbCollSourceSet.getLong(2);
                     Timestamp sourceTs = hbCollSourceSet.getTimestamp(3);
-                    if (sourceObj == targetObj && sourceColl == targetColl) {
+                    String sourceId = hbCollSourceSet.getString(4);
+                    if (sourceObj == targetObj && sourceColl == targetColl
+                            && sourceId.equals(targetId)) {
                         if (sourceTs.before(targetTs)) {
                             return true;
                         }
                     } else if (sourceObj > targetObj || sourceObj == targetObj
-                            && sourceColl > targetColl) {
+                            && sourceColl > targetColl
+                            || sourceObj == targetObj
+                            && sourceColl == targetColl
+                            && sourceId.compareTo(targetId) > 0) {
                         while (hbCollTargetSet.next()) {
                             targetColl = hbCollTargetSet.getLong(1);
                             targetObj = hbCollTargetSet.getLong(2);
                             targetTs = hbCollTargetSet.getTimestamp(3);
+                            targetId = hbCollTargetSet.getString(4);
                             if (targetObj == sourceObj
                                     && targetColl == sourceColl
+                                    && targetId.equals(sourceId)
                                     && sourceTs.before(targetTs)) {
                                 return true;
                             } else if (sourceObj < targetObj
                                     || sourceObj == targetObj
-                                    && sourceColl <= targetColl) {
+                                    && sourceColl <= targetColl
+                                    || sourceObj == targetObj
+                                    && sourceColl == targetColl
+                                    && sourceId.compareTo(targetId) <= 0) {
                                 continue sourceLoop;
                             }
                         }
@@ -353,8 +368,80 @@ public class HappensBeforeAnalysis {
 
     public boolean happensBeforeObject(Timestamp write, long writeThread,
             Timestamp read, long readThread) throws SQLException {
-        return happensBefore(hbObjSourceSt, hbObjTargetSt, write, writeThread,
-                read, readThread);
+        PreparedStatement sourceSt = hbObjSourceSt;
+        PreparedStatement targetSt = hbObjTargetSt;
+        sourceSt.setLong(1, writeThread);
+        sourceSt.setTimestamp(2, write);
+        sourceSt.setTimestamp(3, read);
+        final ResultSet sourceSet = sourceSt.executeQuery();
+        try {
+            if (!sourceSet.next()) {
+                return false;
+            }
+            targetSt.setLong(1, readThread);
+            targetSt.setTimestamp(2, write);
+            targetSt.setTimestamp(3, read);
+            final ResultSet targetSet = targetSt.executeQuery();
+            try {
+                if (!targetSet.next()) {
+                    return false;
+                }
+                final Map<Obj, Timestamp> sources = genObjSources(sourceSet);
+                sourceSet.close();
+                if (sources.isEmpty()) {
+                    return false;
+                }
+                final Map<Obj, Timestamp> targets = genObjTargets(targetSet);
+                targetSet.close();
+                if (targets.isEmpty()) {
+                    return false;
+                }
+                for (Entry<Obj, Timestamp> sourceEntry : sources.entrySet()) {
+                    Timestamp targetTs = targets.get(sourceEntry.getKey());
+                    if (targetTs != null
+                            && sourceEntry.getValue().before(targetTs)) {
+                        return true;
+                    }
+                }
+            } finally {
+                targetSet.close();
+            }
+        } finally {
+            sourceSet.close();
+        }
+        return false;
+    }
+
+    private Map<Obj, Timestamp> genObjTargets(ResultSet set)
+            throws SQLException {
+        objTargetsCache.clear();
+        do {
+            long o = set.getLong(1);
+            Timestamp targetTs = set.getTimestamp(2);
+            String id = set.getString(3);
+            Obj targetObj = new Obj(o, id);
+            Timestamp ts = objTargetsCache.get(targetObj);
+            if (ts == null || ts.before(targetTs)) {
+                objTargetsCache.put(targetObj, targetTs);
+            }
+        } while (set.next());
+        return objTargetsCache;
+    }
+
+    private Map<Obj, Timestamp> genObjSources(ResultSet set)
+            throws SQLException {
+        objSourcesCache.clear();
+        do {
+            long o = set.getLong(1);
+            Timestamp sourceTs = set.getTimestamp(2);
+            String id = set.getString(3);
+            Obj sourceObj = new Obj(o, id);
+            Timestamp ts = objSourcesCache.get(sourceObj);
+            if (ts == null || ts.after(sourceTs)) {
+                objSourcesCache.put(sourceObj, sourceTs);
+            }
+        } while (set.next());
+        return objSourcesCache;
     }
 
     public boolean happensBeforeLock(Timestamp write, long writeThread,
@@ -461,13 +548,62 @@ public class HappensBeforeAnalysis {
         return list;
     }
 
+    static class Obj {
+        final long obj;
+        final String id;
+
+        public Obj(long obj, String id) {
+            super();
+            this.obj = obj;
+            this.id = id;
+        }
+
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + (id == null ? 0 : id.hashCode());
+            result = prime * result + (int) (obj ^ obj >>> 32);
+            return result;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            Obj other = (Obj) obj;
+            if (id == null) {
+                if (other.id != null) {
+                    return false;
+                }
+            } else if (!id.equals(other.id)) {
+                return false;
+            }
+            if (this.obj != other.obj) {
+                return false;
+            }
+            return true;
+        }
+
+    }
+
     static class Coll {
         final long coll;
         final long obj;
+        final String id;
 
-        public Coll(long coll, long obj) {
+        public Coll(long coll, long obj, String id) {
+            super();
             this.coll = coll;
             this.obj = obj;
+            this.id = id;
         }
 
         @Override
@@ -475,6 +611,7 @@ public class HappensBeforeAnalysis {
             final int prime = 31;
             int result = 1;
             result = prime * result + (int) (coll ^ coll >>> 32);
+            result = prime * result + (id == null ? 0 : id.hashCode());
             result = prime * result + (int) (obj ^ obj >>> 32);
             return result;
         }
@@ -494,6 +631,13 @@ public class HappensBeforeAnalysis {
             if (coll != other.coll) {
                 return false;
             }
+            if (id == null) {
+                if (other.id != null) {
+                    return false;
+                }
+            } else if (!id.equals(other.id)) {
+                return false;
+            }
             if (this.obj != other.obj) {
                 return false;
             }
@@ -504,7 +648,7 @@ public class HappensBeforeAnalysis {
 
     private void addHappensBeforeCollection(Timestamp write, long writeThread,
             Timestamp read, long readThread, List<HBEdge> list)
-            throws SQLException {
+                    throws SQLException {
         int idx = 1;
         hbCollSourceTraceSt.setLong(idx++, writeThread);
         hbCollSourceTraceSt.setTimestamp(idx++, write);
@@ -519,7 +663,7 @@ public class HappensBeforeAnalysis {
                 Timestamp sourceTs = hbCollSourceSet.getTimestamp(3);
                 long sourceTrace = hbCollSourceSet.getLong(4);
                 String id = hbCollSourceSet.getString(5);
-                final Coll source = new Coll(sourceColl, sourceObj);
+                final Coll source = new Coll(sourceColl, sourceObj, id);
                 final HBNode trace = sources.get(source);
                 if (trace == null || trace.ts.after(sourceTs)) {
                     sources.put(source, new HBNode(id, sourceTs, sourceTrace));
@@ -540,7 +684,7 @@ public class HappensBeforeAnalysis {
                 Timestamp targetTs = hbCollTargetSet.getTimestamp(3);
                 long targetTrace = hbCollTargetSet.getLong(4);
                 String id = hbCollTargetSet.getString(5);
-                final Coll target = new Coll(targetColl, targetObj);
+                final Coll target = new Coll(targetColl, targetObj, id);
                 final HBNode trace = targets.get(target);
                 if (trace == null || trace.ts.before(targetTs)) {
                     targets.put(target, new HBNode(id, targetTs, targetTrace));
@@ -563,14 +707,90 @@ public class HappensBeforeAnalysis {
 
     private void addHappensBeforeObject(Timestamp write, long writeThread,
             Timestamp read, long readThread, List<HBEdge> list)
-            throws SQLException {
+                    throws SQLException {
         addHappensBefore(hbObjSourceTraceSt, hbObjTargetTraceSt, write,
                 writeThread, read, readThread, list, EdgeType.OBJECT);
+        hbObjSourceTraceSt.setLong(1, writeThread);
+        hbObjSourceTraceSt.setTimestamp(2, write);
+        hbObjSourceTraceSt.setTimestamp(3, read);
+        final ResultSet sourceSet = hbObjSourceTraceSt.executeQuery();
+        try {
+            if (!sourceSet.next()) {
+                return;
+            }
+            hbObjTargetTraceSt.setLong(1, readThread);
+            hbObjTargetTraceSt.setTimestamp(2, write);
+            hbObjTargetTraceSt.setTimestamp(3, read);
+            final ResultSet targetSet = hbObjTargetTraceSt.executeQuery();
+            try {
+                if (!targetSet.next()) {
+                    return;
+                }
+                final Map<Obj, HBNode> sources = genSourceObjNodes(sourceSet);
+                sourceSet.close();
+                if (sources.isEmpty()) {
+                    return;
+                }
+                final Map<Obj, HBNode> targets = genTargetObjNodes(targetSet);
+                targetSet.close();
+                if (targets.isEmpty()) {
+                    return;
+                }
+                for (Entry<Obj, HBNode> source : sources.entrySet()) {
+                    Obj sourceId = source.getKey();
+                    HBNode sourceNode = source.getValue();
+                    HBNode targetNode = targets.get(sourceId);
+                    if (targetNode != null
+                            && sourceNode.getTs().before(targetNode.getTs())) {
+                        list.add(new HBEdge(sourceNode, targetNode,
+                                EdgeType.OBJECT, writeThread, readThread));
+                    }
+                }
+            } finally {
+                targetSet.close();
+            }
+        } finally {
+            sourceSet.close();
+        }
+    }
+
+    private Map<Obj, HBNode> genTargetObjNodes(ResultSet set)
+            throws SQLException {
+        Map<Obj, HBNode> map = new HashMap<Obj, HBNode>();
+        do {
+            long o = set.getLong(1);
+            Timestamp targetTs = set.getTimestamp(2);
+            long trace = set.getLong(3);
+            String id = set.getString(4);
+            Obj targetId = new Obj(o, id);
+            HBNode node = map.get(targetId);
+            if (node == null || node.getTs().before(targetTs)) {
+                map.put(targetId, new HBNode(id, targetTs, trace));
+            }
+        } while (set.next());
+        return map;
+    }
+
+    private Map<Obj, HBNode> genSourceObjNodes(ResultSet set)
+            throws SQLException {
+        Map<Obj, HBNode> map = new HashMap<Obj, HBNode>();
+        do {
+            long o = set.getLong(1);
+            Timestamp sourceTs = set.getTimestamp(2);
+            long trace = set.getLong(3);
+            String id = set.getString(4);
+            Obj sourceId = new Obj(o, id);
+            HBNode node = map.get(sourceId);
+            if (node == null || node.getTs().after(sourceTs)) {
+                map.put(sourceId, new HBNode(id, sourceTs, trace));
+            }
+        } while (set.next());
+        return map;
     }
 
     private void addHappensBeforeLock(Timestamp write, long writeThread,
             Timestamp read, long readThread, List<HBEdge> list)
-            throws SQLException {
+                    throws SQLException {
         hbLockSourceTraceSt.setLong(1, writeThread);
         hbLockSourceTraceSt.setTimestamp(2, write);
         hbLockSourceTraceSt.setTimestamp(3, read);
@@ -627,7 +847,7 @@ public class HappensBeforeAnalysis {
 
     private boolean addHappensBeforeThread(Timestamp write, long writeThread,
             Timestamp read, long readThread, List<HBEdge> list)
-            throws SQLException {
+                    throws SQLException {
         int idx = 1;
         hbTraceSt.setLong(idx++, writeThread);
         hbTraceSt.setTimestamp(idx++, write);
@@ -661,7 +881,7 @@ public class HappensBeforeAnalysis {
 
     private void addHappensBeforeVolatile(Timestamp write, long writeThread,
             Timestamp read, long readThread, List<HBEdge> list)
-            throws SQLException {
+                    throws SQLException {
         addHappensBefore(hbVolWriteTraceSt, hbVolReadTraceSt, write,
                 writeThread, read, readThread, list, EdgeType.VOLATILE);
     }
@@ -716,7 +936,7 @@ public class HappensBeforeAnalysis {
 
     private void addHappensBeforeClassInit(Timestamp write, long writeThread,
             Timestamp read, long readThread, List<HBEdge> list)
-            throws SQLException {
+                    throws SQLException {
         int idx = 1;
         hbClassInitTraceSt.setLong(idx++, writeThread);
         hbClassInitTraceSt.setTimestamp(idx++, write);
@@ -778,9 +998,9 @@ public class HappensBeforeAnalysis {
     enum EdgeType {
         VOLATILE("Volatile write/read of %s"), WRITE_IN_THREAD(
                 "The previous write was in this thread"), OBJECT("%s"), THREAD(
-                "%s"), COLLECTION("%s"), CLASS_INITIALIZATION(
-                "Class initialization of %s"), LOCK(
-                "%s lock release to lock acquisition");
+                        "%s"), COLLECTION("%s"), CLASS_INITIALIZATION(
+                                "Class initialization of %s"), LOCK(
+                                        "%s lock release to lock acquisition");
 
         private final String desc;
 
