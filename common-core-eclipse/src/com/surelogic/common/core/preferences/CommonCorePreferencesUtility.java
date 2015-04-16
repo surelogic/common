@@ -12,7 +12,6 @@ public final class CommonCorePreferencesUtility {
 
   public static void initializeDefaultScope() {
     if (f_initializationNeeded.compareAndSet(true, false)) {
-      EclipseUtility.setDefaultBooleanPreference(WARN_LOW_MEMORY, true);
 
       EclipseUtility.setDefaultIntPreference(QEDITOR_SASH_LHS_WEIGHT, 40);
       EclipseUtility.setDefaultIntPreference(QEDITOR_SASH_RHS_WEIGHT, 60);
@@ -39,17 +38,8 @@ public final class CommonCorePreferencesUtility {
   public static final String QMENU_SHOW_EMPTY_QUERIES = PREFIX + "qmenu.show.empty.queries";
   public static final String QMENU_SHOW_UNRUNNABLE_QUERIES = PREFIX + "qmenu.show.unrunnable.queries";
 
-  private static final String WARN_LOW_MEMORY = PREFIX + "warnLowMemory";
   private static final String SERVICEABILITY_EMAIL = PREFIX + "serviceability.email";
   private static final String SERVICEABILITY_NAME = PREFIX + "serviceability.name";
-
-  public static boolean warnAboutLowMaximumMemory() {
-    return EclipseUtility.getBooleanPreference(WARN_LOW_MEMORY);
-  }
-
-  public static void setWarnAboutLowMaximumMemory(boolean value) {
-    EclipseUtility.setBooleanPreference(WARN_LOW_MEMORY, value);
-  }
 
   public static String getServicabilityEmail() {
     return EclipseUtility.getStringPreference(SERVICEABILITY_EMAIL);
