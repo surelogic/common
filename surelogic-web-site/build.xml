@@ -32,31 +32,6 @@
     <echo>Publish completed...Jetty may now be restarted...</echo>
   </target>
 
-  <target name="bugzilla">
-    <echo>This should be run after running checkstup.pl</echo>
-    <echo>It creates 'hack' for static content in Jetty</echo>
-    <echo>(pausing just a second so you can ^C if not)</echo>
-    <sleep seconds="4" />
-    <delete quiet="true" dir="${bugzilla.static}" />
-    <mkdir dir="${bugzilla.static}" />
-    <copy includeEmptyDirs="false" todir="${bugzilla.static}">
-      <fileset dir="${bugzilla.base}">
-        <exclude name="localconfig" />
-        <exclude name="README" />
-        <exclude name="MANIFEST.SKIP" />
-        <exclude name="LICENSE" />
-        <exclude name="Build.PL" />
-        <exclude name="**/*.cgi" />
-        <exclude name="**/*.pm" />
-        <exclude name="**/*.pl" />
-        <exclude name="lib/**" />
-        <exclude name="contrib/**" />
-        <exclude name="**/.*" />
-      </fileset>
-    </copy>
-  <copy file="${bugzilla.index}" toFile="${bugzilla.static}/index.html" />
-  </target>
-
   <target name="build-root-war">
     <echo>Cleaning up for SureLogic web server build</echo>
     <delete quiet="true" dir="${build}" />
