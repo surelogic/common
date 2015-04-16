@@ -19,6 +19,7 @@ Export-Package: com.surelogic.common.core,
  com.surelogic.common.core.java,
  com.surelogic.common.core.jobs,
  com.surelogic.common.core.logging,
- com.surelogic.common.core.preferences
+ com.surelogic.common.core.preferences,
+ com.surelogic.common.core.scripting
 Bundle-ClassPath: .
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
