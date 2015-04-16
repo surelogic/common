@@ -42,10 +42,10 @@ public final class ExportResultDataDialog extends Dialog {
 
 	private final AdHocQueryResultSqlData data;
 
-	private Text f_exportFilenameText;
-	private Button f_csvFormat;
-	private Button f_htmlFormat;
-	private Button f_htmlTreeFormat;
+	Text f_exportFilenameText;
+	Button f_csvFormat;
+	Button f_htmlFormat;
+	Button f_htmlTreeFormat;
 
 	public ExportResultDataDialog(final Shell parent,
 			final AdHocQueryResultSqlData data) {
@@ -176,7 +176,7 @@ public final class ExportResultDataDialog extends Dialog {
 		super.okPressed();
 	}
 
-	private void changeFileExtension(final String from, final String to) {
+	void changeFileExtension(final String from, final String to) {
 		final StringBuilder b = new StringBuilder(
 				f_exportFilenameText.getText());
 		if (b.toString().endsWith(from)) {

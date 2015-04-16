@@ -27,7 +27,7 @@ public class LotsOfSavedQueriesDialog extends MessageDialog {
 		return dialog.f_rememberMyDecision;
 	}
 
-	private boolean f_rememberMyDecision = false;
+	boolean f_rememberMyDecision = false;
 
 	private LotsOfSavedQueriesDialog(final Shell shell) {
 		super(shell, I18N.msg("adhoc.query.dialog.lotsOfSavedQueries.title"),
