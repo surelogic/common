@@ -926,7 +926,7 @@ public class EclipseUtility {
       }
       proj.create(description, new NullProgressMonitor());
       proj.open(new NullProgressMonitor());
-      SLLogger.getLogger().info("Created and opened project '" + proj + "'");
+      SLLogger.getLogger().fine("Created and opened project '" + proj + "'");
     }
     return proj;
   }
