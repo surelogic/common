@@ -31,6 +31,7 @@ import com.surelogic.common.CommonImages;
 import com.surelogic.common.ILifecycle;
 import com.surelogic.common.Pair;
 import com.surelogic.common.adhoc.AdHocCategory;
+import com.surelogic.common.adhoc.AdHocIdentity;
 import com.surelogic.common.adhoc.AdHocManager;
 import com.surelogic.common.adhoc.AdHocManagerAdapter;
 import com.surelogic.common.adhoc.AdHocQuery;
@@ -332,7 +333,7 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
          */
         final List<AdHocQuery> rootQueries = f_manager.getRootQueryList();
         final List<AdHocQuery> rootQueriesNotInACategory = new ArrayList<AdHocQuery>(rootQueries);
-        final List<AdHocCategory> categories = f_manager.getCategoryList();
+        final List<AdHocCategory> categories = f_manager.getCategoryListUsingSort(AdHocIdentity.BY_DESCRIPTION);
 
         final List<AdHocCategory> emptyCategories = new ArrayList<AdHocCategory>();
 

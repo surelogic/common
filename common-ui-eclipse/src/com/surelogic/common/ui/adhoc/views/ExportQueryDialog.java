@@ -23,6 +23,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
+import com.surelogic.common.adhoc.AdHocIdentity;
 import com.surelogic.common.adhoc.AdHocManager;
 import com.surelogic.common.adhoc.AdHocPersistence;
 import com.surelogic.common.adhoc.AdHocQuery;
@@ -62,7 +63,7 @@ public final class ExportQueryDialog extends Dialog {
     final Table queryTable = new Table(queryGroup, SWT.CHECK);
     queryTable.setEnabled(false);
 
-    for (final AdHocQuery query : f_manager.getQueryList()) {
+    for (final AdHocQuery query : f_manager.getQueryListUsingSort(AdHocIdentity.BY_DESCRIPTION)) {
       final TableItem item = new TableItem(queryTable, SWT.NONE);
       item.setText(query.getDescription());
       item.setData(query);

@@ -3,6 +3,7 @@ package com.surelogic.common.adhoc;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -274,21 +275,25 @@ public final class AdHocManager {
   }
 
   /**
-   * Gets a list of the queries owned by this manager sorted by their sort hint
-   * and description.
+   * Gets a new list of all the queries owned by this manager sorted by the
+   * passed comparator. The comparator passed will usually be one of those
+   * defined in {@link AdHocIdentity}. If you pass {@code null} then the
+   * resulting list will not be sorted.
    * 
-   * @return a list of the queries owned by this manager sorted by their sort
-   *         hint and description.
+   * @param c
+   *          a comparator to use for the sort or {@code null} for no sort.
+   * @return a sorted list of all the queries owned by this manager.
    */
-  public List<AdHocQuery> getQueryList() {
+  public ArrayList<AdHocQuery> getQueryListUsingSort(@Nullable final Comparator<? super AdHocQuery> c) {
     final ArrayList<AdHocQuery> result = new ArrayList<AdHocQuery>(f_queries);
-    Collections.sort(result, AdHocIdentity.BY_HINT_DESCRIPTION);
+    if (c != null)
+      Collections.sort(result, c);
     return result;
   }
 
   /**
    * Gets a list of the root visible queries owned by this manager sorted by
-   * their description.
+   * their description (then id).
    * 
    * @return a list of the root visible queries owned by this manager sorted by
    *         their description.
@@ -296,7 +301,7 @@ public final class AdHocManager {
    * @see AdHocQuery#showAtRootOfQueryMenu()
    */
   public List<AdHocQuery> getRootQueryList() {
-    final List<AdHocQuery> result = getQueryList();
+    final List<AdHocQuery> result = getQueryListUsingSort(AdHocIdentity.BY_DESCRIPTION);
     for (final Iterator<AdHocQuery> i = result.iterator(); i.hasNext();) {
       final AdHocQuery query = i.next();
       if (!query.showAtRootOfQueryMenu()) {
@@ -433,15 +438,19 @@ public final class AdHocManager {
   }
 
   /**
-   * Gets a list of categories owned by this manager sorted by their sort hint
-   * and description.
+   * Gets a new list of all the categories owned by this manager sorted by the
+   * passed comparator. The comparator passed will usually be one of those
+   * defined in {@link AdHocIdentity}. If you pass {@code null} then the
+   * resulting list will not be sorted.
    * 
-   * @return a list of categories owned by this manager sorted by their sort
-   *         hint and description.
+   * @param c
+   *          a comparator to use for the sort or {@code null} for no sort.
+   * @return a sorted list of all the categories owned by this manager.
    */
-  public List<AdHocCategory> getCategoryList() {
+  public ArrayList<AdHocCategory> getCategoryListUsingSort(@Nullable final Comparator<? super AdHocCategory> c) {
     final ArrayList<AdHocCategory> result = new ArrayList<AdHocCategory>(f_categories);
-    Collections.sort(result, AdHocIdentity.BY_HINT_DESCRIPTION);
+    if (c != null)
+      Collections.sort(result, c);
     return result;
   }
 

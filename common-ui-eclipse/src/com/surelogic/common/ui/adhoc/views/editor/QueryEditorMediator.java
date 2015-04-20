@@ -52,6 +52,7 @@ import org.eclipse.ui.progress.UIJob;
 
 import com.surelogic.common.CommonImages;
 import com.surelogic.common.ILifecycle;
+import com.surelogic.common.adhoc.AdHocIdentity;
 import com.surelogic.common.adhoc.AdHocManager;
 import com.surelogic.common.adhoc.AdHocManagerAdapter;
 import com.surelogic.common.adhoc.AdHocQuery;
@@ -394,7 +395,7 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
     f_addSubQuery.addListener(SWT.Selection, new Listener() {
       @Override
       public void handleEvent(final Event event) {
-        final List<AdHocQuery> available = f_manager.getQueryList();
+        final List<AdHocQuery> available = f_manager.getQueryListUsingSort(AdHocIdentity.BY_DESCRIPTION);
         available.remove(f_edit);
         available.removeAll(f_edit.getSubQueries());
         if (available.isEmpty()) {
@@ -549,7 +550,7 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
     f_queryList.removeAll();
     f_queryTree.removeAll();
 
-    for (final AdHocQuery query : f_manager.getQueryList()) {
+    for (final AdHocQuery query : f_manager.getQueryListUsingSort(AdHocIdentity.BY_DESCRIPTION)) {
       addQueryToList(query);
       addQueryToTree(query, null, new HashSet<AdHocQuery>());
     }
@@ -557,7 +558,7 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
     /*
      * Intersect the selections with the remaining set of queries.
      */
-    f_selections.retainAll(f_manager.getQueryList());
+    f_selections.retainAll(f_manager.getQueryListUsingSort(null));
     setQueryListSelections();
     setQueryTreeSelections();
     updateSelectionPane();

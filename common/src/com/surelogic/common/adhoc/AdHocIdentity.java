@@ -35,6 +35,31 @@ public interface AdHocIdentity {
    */
   int getSortHint();
 
+  /*
+   * The comparators below use the identifier as last resort for sorting and to
+   * make sure output to a file is done in the same order each time.
+   */
+
+  public static final Comparator<AdHocIdentity> BY_DESCRIPTION = new Comparator<AdHocIdentity>() {
+    @Override
+    public int compare(AdHocIdentity o1, AdHocIdentity o2) {
+      if (o1 == null && o2 == null)
+        return 0;
+      else if (o1 == null && o2 != null)
+        return -1;
+      else if (o1 != null && o2 == null)
+        return 1;
+      else {
+        int result = String.CASE_INSENSITIVE_ORDER.compare(o1.getDescription(), o2.getDescription());
+        if (result == 0) {
+          // use id as last resort
+          return o1.getId().compareTo(o2.getId());
+        } else
+          return result;
+      }
+    }
+  };
+
   public static final Comparator<AdHocIdentity> BY_HINT_DESCRIPTION = new Comparator<AdHocIdentity>() {
     @Override
     public int compare(AdHocIdentity o1, AdHocIdentity o2) {
@@ -49,21 +74,7 @@ public interface AdHocIdentity {
       else if (o1.getSortHint() < o2.getSortHint())
         return 1;
       else
-        return String.CASE_INSENSITIVE_ORDER.compare(o1.getDescription(), o2.getDescription());
-    }
-  };
-
-  public static final Comparator<AdHocIdentity> BY_DESCRIPTION = new Comparator<AdHocIdentity>() {
-    @Override
-    public int compare(AdHocIdentity o1, AdHocIdentity o2) {
-      if (o1 == null && o2 == null)
-        return 0;
-      else if (o1 == null && o2 != null)
-        return -1;
-      else if (o1 != null && o2 == null)
-        return 1;
-      else
-        return String.CASE_INSENSITIVE_ORDER.compare(o1.getDescription(), o2.getDescription());
+        return BY_DESCRIPTION.compare(o1, o2);
     }
   };
 }

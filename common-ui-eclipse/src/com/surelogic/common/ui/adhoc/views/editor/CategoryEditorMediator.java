@@ -33,6 +33,7 @@ import org.eclipse.ui.progress.UIJob;
 import com.surelogic.common.CommonImages;
 import com.surelogic.common.ILifecycle;
 import com.surelogic.common.adhoc.AdHocCategory;
+import com.surelogic.common.adhoc.AdHocIdentity;
 import com.surelogic.common.adhoc.AdHocManager;
 import com.surelogic.common.adhoc.AdHocManagerAdapter;
 import com.surelogic.common.adhoc.AdHocQuery;
@@ -233,14 +234,14 @@ public final class CategoryEditorMediator extends AdHocManagerAdapter implements
 
     f_categoryList.removeAll();
 
-    for (final AdHocCategory category : f_manager.getCategoryList()) {
+    for (final AdHocCategory category : f_manager.getCategoryListUsingSort(AdHocIdentity.BY_DESCRIPTION)) {
       addCategoryToList(category);
     }
 
     /*
      * Intersect the selections with the remaining set of queries.
      */
-    f_selections.retainAll(f_manager.getCategoryList());
+    f_selections.retainAll(f_manager.getCategoryListUsingSort(null));
     setCategoryListSelections();
     updateSelectionPane();
 
@@ -300,7 +301,7 @@ public final class CategoryEditorMediator extends AdHocManagerAdapter implements
 
       f_queryTable.setRedraw(false);
       f_queryTable.removeAll();
-      for (final AdHocQuery query : f_manager.getQueryList()) {
+      for (final AdHocQuery query : f_manager.getQueryListUsingSort(AdHocIdentity.BY_DESCRIPTION)) {
         if (query.showAtRootOfQueryMenu()) {
           final TableItem item = new TableItem(f_queryTable, SWT.NONE);
           item.setData(query);

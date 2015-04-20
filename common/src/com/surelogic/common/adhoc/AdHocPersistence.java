@@ -74,13 +74,13 @@ public final class AdHocPersistence {
    *          the file to export into.
    */
   public static void exportDiffFile(final AdHocManager manager, final File saveFile) {
-    final List<AdHocQuery> queries = manager.getQueryList();
+    final List<AdHocQuery> queries = manager.getQueryListUsingSort(AdHocIdentity.BY_DESCRIPTION);
     for (final Iterator<AdHocQuery> iter = queries.iterator(); iter.hasNext();) {
       if (!iter.next().isChanged()) {
         iter.remove();
       }
     }
-    final List<AdHocCategory> categories = manager.getCategoryList();
+    final List<AdHocCategory> categories = manager.getCategoryListUsingSort(AdHocIdentity.BY_DESCRIPTION);
     for (final Iterator<AdHocCategory> iter = categories.iterator(); iter.hasNext();) {
       if (!iter.next().isChanged()) {
         iter.remove();
@@ -107,8 +107,8 @@ public final class AdHocPersistence {
    */
   public static void exportDefaultFile(final AdHocManager manager, @Nullable List<AdHocQuery> queries, final File saveFile) {
     if (queries == null)
-      queries = manager.getQueryList();
-    export(queries, manager.getCategoryList(), saveFile, true);
+      queries = manager.getQueryListUsingSort(null);
+    export(queries, manager.getCategoryListUsingSort(null), saveFile, true);
   }
 
   /**
