@@ -1,89 +1,85 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project default="build-root-war" name="sierra-web-server">
 
-  <property name="publish.jetty.base" location="${basedir}/../../../website/jetty.base" />
-  <property name="key.jar" location="${basedir}/../../../java/surelogic-key.jar" />
-  <property name="common" location="${basedir}/../common" />
+	<property name="publish.jetty.base" location="${basedir}/../../../website/jetty.base" />
+	<property name="key.jar" location="${basedir}/../../../java/surelogic-key.jar" />
+	<property name="common" location="${basedir}/../common" />
 
-  <property name="src" location="${basedir}/src" />
-  <property name="lib" location="${basedir}/lib" />
-  <property name="www" location="${basedir}/site/www" />
-  <property name="jetty.base" value="${basedir}/site/jetty.base" />
+	<property name="src" location="${basedir}/src" />
+	<property name="lib" location="${basedir}/lib" />
+	<property name="www" location="${basedir}/site/www" />
+	<property name="jetty.base" value="${basedir}/site/jetty.base" />
 
-  <property name="build" location="${basedir}/build" />
-  <property name="build.bin" location="${build}/bin-for-war" />
-  <property name="root.war" location="${build}/root.war" />
+	<property name="build" location="${basedir}/build" />
+	<property name="build.bin" location="${build}/bin-for-war" />
+	<property name="root.war" location="${build}/root.war" />
 
-  <property name="bugzilla.base" location="${basedir}/../../bugzilla" />
-  <property name="bugzilla.static" location="${basedir}/../../bugzilla-static" />
-  <property name="bugzilla.index" location="${basedir}/../../../java/bugzilla-index.html" />
+	<property name="bugzilla.base" location="${basedir}/../../bugzilla" />
+	<property name="bugzilla.static" location="${basedir}/../../bugzilla-static" />
+	<property name="bugzilla.index" location="${basedir}/../../../java/bugzilla-index.html" />
 
-  <target name="publish">
-    <echo>Jetty should be shutdown before a publish...</echo>
-    <echo>(pausing just a second so you can ^C if Jetty is running)
+	<target name="publish">
+		<echo>Jetty should be shutdown before a publish...</echo>
+		<echo>(pausing just a second so you can ^C if Jetty is running)
     </echo>
-    <sleep seconds="4" />
-    <delete quiet="true" dir="${publish.jetty.base}" />
-    <copy todir="${publish.jetty.base}">
-      <fileset dir="${jetty.base}" />
-    </copy>
-    <copy file="${root.war}" todir="${publish.jetty.base}/webapps" />
-    <copy file="${key.jar}" todir="${publish.jetty.base}/lib/ext" />
-    <echo>Publish completed...Jetty may now be restarted...</echo>
-  </target>
+		<sleep seconds="4" />
+		<delete quiet="true" dir="${publish.jetty.base}" />
+		<copy todir="${publish.jetty.base}">
+			<fileset dir="${jetty.base}" />
+		</copy>
+		<copy file="${root.war}" todir="${publish.jetty.base}/webapps" />
+		<copy file="${key.jar}" todir="${publish.jetty.base}/lib/ext" />
+		<echo>Publish completed...Jetty may now be restarted...</echo>
+	</target>
 
-  <target name="build-root-war">
-    <echo>Cleaning up for SureLogic web server build</echo>
-    <delete quiet="true" dir="${build}" />
-    <mkdir dir="${build}" />
-    <mkdir dir="${build.bin}" />
-    <echo>Creating generated source code and compiling 'common'
-      project...
-    </echo>
-    <ant antfile="build-src.xml" dir="${common}" inheritAll="false" />
-    <path id="common.class.path">
-      <fileset dir="${common}/lib/runtime">
-        <include name="*.jar" />
-      </fileset>
-    </path>
-    <javac srcdir="${common}/src" destdir="${build.bin}"
-      classpathref="common.class.path" includeAntRuntime="false" />
-    <copy todir="${build.bin}">
-      <fileset dir="${common}/src">
-        <exclude name="**/*.java" />
-        <exclude name="**/.gitignore" />
-      </fileset>
-    </copy>
-    <echo>Compiling 'surelogic-web-site' project...</echo>
-    <path id="web.site.class.path">
-      <pathelement location="${common}/bin" />
-      <fileset dir="${common}/lib/runtime">
-        <include name="*.jar" />
-      </fileset>
-      <fileset dir="${lib}">
-        <include name="*.jar" />
-      </fileset>
-    </path>
-    <javac srcdir="${src}" destdir="${build.bin}" classpathref="web.site.class.path"
-      includeAntRuntime="false" />
-    <copy todir="${build.bin}">
-      <fileset dir="${src}">
-        <exclude name="**/*.java" />
-        <exclude name="**/.gitignore" />
-      </fileset>
-    </copy>
-    <echo>WAR build of SureLogic web site into ${root.war}</echo>
-    <war destfile="${root.war}" webxml="${lib}/web.xml">
-      <classes dir="${build.bin}" />
-      <lib dir="${common}/lib/runtime">
-        <include name="*.jar" />
-      </lib>
-      <lib dir="${lib}">
-        <include name="*.jar" />
-      </lib>
-      <fileset dir="${www}">
-        <exclude name="**/template.html" />
-      </fileset>
-    </war>
-  </target>
+	<target name="build-root-war">
+		<echo>Cleaning up for SureLogic web server build</echo>
+		<delete quiet="true" dir="${build}" />
+		<mkdir dir="${build}" />
+		<mkdir dir="${build.bin}" />
+		<echo>Creating generated source code and compiling 'common' project...</echo>
+		<ant antfile="build-src.xml" dir="${common}" inheritAll="false" />
+		<path id="common.class.path">
+			<fileset dir="${common}/lib/runtime">
+				<include name="*.jar" />
+			</fileset>
+		</path>
+		<javac srcdir="${common}/src" destdir="${build.bin}" classpathref="common.class.path" includeAntRuntime="false" />
+		<copy todir="${build.bin}">
+			<fileset dir="${common}/src">
+				<exclude name="**/*.java" />
+				<exclude name="**/.gitignore" />
+			</fileset>
+		</copy>
+		<echo>Compiling 'surelogic-web-site' project...</echo>
+		<path id="web.site.class.path">
+			<pathelement location="${common}/bin" />
+			<fileset dir="${common}/lib/runtime">
+				<include name="*.jar" />
+			</fileset>
+			<fileset dir="${lib}">
+				<include name="*.jar" />
+			</fileset>
+		</path>
+		<javac srcdir="${src}" destdir="${build.bin}" classpathref="web.site.class.path" includeAntRuntime="false" />
+		<copy todir="${build.bin}">
+			<fileset dir="${src}">
+				<exclude name="**/*.java" />
+				<exclude name="**/.gitignore" />
+			</fileset>
+		</copy>
+		<echo>WAR build of SureLogic web site into ${root.war}</echo>
+		<war destfile="${root.war}" webxml="${lib}/web.xml">
+			<classes dir="${build.bin}" />
+			<lib dir="${common}/lib/runtime">
+				<include name="*.jar" />
+			</lib>
+			<lib dir="${lib}">
+				<include name="*.jar" />
+			</lib>
+			<fileset dir="${www}">
+				<exclude name="**/template.html" />
+			</fileset>
+		</war>
+	</target>
 </project>
