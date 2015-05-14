@@ -157,9 +157,9 @@ public final class Entities {
     }
 
     synchronized void setEscape(String esc) {
-    	escapeValueOrNullForUnicode = esc;
+      escapeValueOrNullForUnicode = esc;
     }
-    
+
     synchronized String getEscapeValue() {
       if (escapeValueOrNullForUnicode != null)
         return escapeValueOrNullForUnicode;
@@ -225,7 +225,7 @@ public final class Entities {
     return null;
   }
 
-  private static String getUnicodeEscapeFor(char value) {
+  static String getUnicodeEscapeFor(char value) {
     return "&#x" + Integer.toHexString(value) + ";";
   }
 
