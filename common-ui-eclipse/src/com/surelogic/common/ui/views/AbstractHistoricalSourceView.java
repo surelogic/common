@@ -346,6 +346,7 @@ public abstract class AbstractHistoricalSourceView extends ViewPart {
   }
 
   private static int computeLineFromMethod(final String source, final String type, final String method) {
+    @SuppressWarnings("deprecation")
     ASTParser parser = ASTParser.newParser(AST.JLS3);
     parser.setSource(source.toCharArray());
     parser.setUnitName("temp____");
@@ -368,6 +369,7 @@ public abstract class AbstractHistoricalSourceView extends ViewPart {
   }
 
   private static int computeLineFromField(final String source, final String type, final String field) {
+    @SuppressWarnings("deprecation")
     ASTParser parser = ASTParser.newParser(AST.JLS3);
     parser.setUnitName("temp____");
     parser.setProject(null);
