@@ -123,7 +123,7 @@ public final class SLStatus {
    * @throws IllegalArgumentException
    *           if the severity or the message are {@code null}.
    */
-  private SLStatus(final SLSeverity severity, final int code, final String message, final Throwable exception) {
+  SLStatus(final SLSeverity severity, final int code, final String message, final Throwable exception) {
     if (severity == null)
       throw new IllegalArgumentException(I18N.err(44, "severity"));
     if (message == null)
@@ -327,9 +327,9 @@ public final class SLStatus {
    * Used to indicate that something was canceled.
    */
   public static final SLStatus CANCEL_STATUS = new SLStatus(SLSeverity.CANCEL, OK, "Canceled", null);
-  
+
   public static SLStatus createCancelStatus(Throwable exception) {
-	  return new SLStatus(SLSeverity.CANCEL, OK, "Canceled", exception);
+    return new SLStatus(SLSeverity.CANCEL, OK, "Canceled", exception);
   }
 
   /**
