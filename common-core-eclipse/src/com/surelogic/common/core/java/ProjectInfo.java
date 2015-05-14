@@ -170,7 +170,7 @@ public abstract class ProjectInfo<P extends ISLJavaProject> {
 					// TODO what if there's more than one?
 					pathToBin = jp.getOutputLocation().makeRelativeTo(projectPath).toString();	
 				}								
-				config.addToClassPath(new SrcEntry(config, pathToSrc, pathToBin));
+				config.addToClassPath(new SrcEntry(true /*does this make sense?*/, config, pathToSrc, pathToBin));
 				break;
 			case IClasspathEntry.CPE_LIBRARY:
 				// System.out.println("Adding "+cpe.getPath()+" for "+p.getName());

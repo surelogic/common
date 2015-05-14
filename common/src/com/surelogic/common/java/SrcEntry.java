@@ -22,8 +22,8 @@ public class SrcEntry extends AbstractClassPathEntry {
 	private final String projectRelativePathToSrc;
 	private final String projectRelativePathToBin;
 	
-	public SrcEntry(Config c, String pathToSrc, String pathToBin) {
-		super(true); // TODO is this right?
+	public SrcEntry(boolean exported, Config c, String pathToSrc, String pathToBin) {
+		super(exported); 
 		project = c;
 		projectRelativePathToSrc = pathToSrc;
 		projectRelativePathToBin = pathToBin;
