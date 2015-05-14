@@ -54,7 +54,7 @@ public final class StringComparators {
    *         result will be {@code null}.
    */
   @Nullable
-  private static Long safeParseLong(String value) {
+  static Long safeParseLong(String value) {
     if (value == null)
       return null;
     value = value.trim();

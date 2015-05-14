@@ -21,10 +21,10 @@ public class JarredClassFile extends AbstractJavaBinaryFile {
 	*/
 
 	public InputStream getStream() throws IOException {
-		final ZipFile zf = new ZipFile(file);
+		@SuppressWarnings("resource")
+    final ZipFile zf = new ZipFile(file);
 		final ZipEntry e = zf.getEntry(pathInJar);
 		return zf.getInputStream(e);
-		// TODO how to close the file?
 	}
 	
 	public Type getType() {

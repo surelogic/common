@@ -34,6 +34,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import com.surelogic.NonNull;
+import com.surelogic.Nullable;
 import com.surelogic.Utility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.logging.SLLogger;
@@ -551,18 +552,28 @@ public final class FileUtility {
   public static final File[] noFiles = new File[0];
 
   /**
-   * @return the MD5 hash of the copied data
+   * @return the MD5 hash of the copied data, or a empty array if
+   *         {@code computeHash} is false, or {@code null} if something goes
+   *         wrong and the copy fails.
    */
+  @Nullable
   public static byte[] copyToStream(final boolean computeHash, final String source, InputStream is, final String target,
       final OutputStream os, final boolean closeOutput) {
+
+    final MessageDigest md;
+    try {
+      md = computeHash ? MessageDigest.getInstance("MD5") : null;
+    } catch (NoSuchAlgorithmException e) {
+      SLLogger.getLogger().log(Level.SEVERE, I18N.err(112, source, target), e);
+      return null;
+    }
     try {
       try {
-        final MessageDigest md = computeHash ? MessageDigest.getInstance("MD5") : null;
-        is = new BufferedInputStream(is, 8192);
+        final BufferedInputStream bis = new BufferedInputStream(is, 8192);
 
         final byte[] buf = new byte[8192];
         int num;
-        while ((num = is.read(buf)) >= 0) {
+        while ((num = bis.read(buf)) >= 0) {
           os.write(buf, 0, num);
           if (computeHash) {
             md.update(buf, 0, num);
@@ -581,10 +592,7 @@ public final class FileUtility {
           }
         }
       }
-    } catch (NoSuchAlgorithmException e) {
-      // TODO what error message
-      SLLogger.getLogger().log(Level.SEVERE, I18N.err(112, source, target), e);
-    } catch (final IOException e) {
+    } catch (IOException e) {
       SLLogger.getLogger().log(Level.SEVERE, I18N.err(112, source, target), e);
     }
     return null;
@@ -712,20 +720,20 @@ public final class FileUtility {
   }
 
   private static String getReaderContentsAsString_private(Reader reader) throws IOException {
-	  final StringBuilder b = new StringBuilder();
-	  final BufferedReader r = new BufferedReader(reader);
-	  final char[] buf = new char[1024];
-	  while (true) {
-		  final int read = r.read(buf);
-		  if (read < 0) {
-			  break;
-		  }
-		  b.append(buf, 0, read);
-	  }
-	  r.close();
-	  return b.toString();
+    final StringBuilder b = new StringBuilder();
+    final BufferedReader r = new BufferedReader(reader);
+    final char[] buf = new char[1024];
+    while (true) {
+      final int read = r.read(buf);
+      if (read < 0) {
+        break;
+      }
+      b.append(buf, 0, read);
+    }
+    r.close();
+    return b.toString();
   }
-  
+
   /**
    * Reads the text contents of the passed reader and returns it
    * 
@@ -830,6 +838,7 @@ public final class FileUtility {
 
   public static OutputStream getOutputStream(final File file) throws IOException {
     // Create a writeable file channel
+    @SuppressWarnings("resource")
     final FileChannel channel = new RandomAccessFile(file, "rw").getChannel();
 
     // Create an output stream on the channel
@@ -839,6 +848,7 @@ public final class FileUtility {
 
   public static InputStream getInputStream(final File file) throws IOException {
     // Create a readable file channel
+    @SuppressWarnings("resource")
     final FileChannel channel = new RandomAccessFile(file, "r").getChannel();
 
     // Create an inputstream on the channel
@@ -853,6 +863,7 @@ public final class FileUtility {
      * roChannel.map(FileChannel.MapMode.READ_ONLY, 0, (int)roChannel.size());
      */
     // Create a read-write memory-mapped file
+    @SuppressWarnings("resource")
     final FileChannel rwChannel = new RandomAccessFile(file, "rw").getChannel();
     final ByteBuffer wrBuf = rwChannel.map(FileChannel.MapMode.READ_WRITE, 0, (int) rwChannel.size());
     /*

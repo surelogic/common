@@ -76,7 +76,7 @@ public class Graph {
     }
   }
 
-  private Graph() {
+  Graph() {
     // only via builder
   }
 
