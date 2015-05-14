@@ -38,8 +38,8 @@ public abstract class AbstractJavaZip<T> {
 	}
 	
 	protected static class TempInfo {
-		final Map<String, Map<String, String>> fileMap = new TreeMap<String, Map<String, String>>();
-		final Map<String, FileInfo> fileInfo = new HashMap<String, FileInfo>();
+		final Map<String, Map<String, String>> fileMap = new TreeMap<>();
+		final Map<String, FileInfo> fileInfo = new HashMap<>();
 		
 		void generateFileInfo(ZipOutputStream out) throws IOException {
 			PrintWriter pw;
@@ -171,7 +171,7 @@ public abstract class AbstractJavaZip<T> {
 				if (info.fileMap.containsKey(packageName)) {
 					classNameToSource = info.fileMap.get(packageName);
 				} else {
-					classNameToSource = new TreeMap<String, String>();
+					classNameToSource = new TreeMap<>();
 					info.fileMap.put(packageName, classNameToSource);
 				}
 
@@ -295,7 +295,7 @@ public abstract class AbstractJavaZip<T> {
 		final String pkg = line.substring(start, end);
 
 		// Read classes
-		final Map<String, String> map = new HashMap<String, String>();
+		final Map<String, String> map = new HashMap<>();
 		while ((line = br.readLine()) != null) {
 			if (line.contains(PACKAGE_TAG)) {
 				break; // Done with the package
@@ -317,7 +317,7 @@ public abstract class AbstractJavaZip<T> {
 
 	private static Map<String, Map<String, String>> readFileList(
 			final BufferedReader br) throws IOException {
-		final Map<String, Map<String, String>> fileMap = new HashMap<String, Map<String, String>>();
+		final Map<String, Map<String, String>> fileMap = new HashMap<>();
 		matchInLine(br, SRCFILES_TAG);
 		String line;
 		while ((line = br.readLine()) != null) {
@@ -355,7 +355,7 @@ public abstract class AbstractJavaZip<T> {
 
 	private static Map<String, String> readClassMappings(final BufferedReader br)
 			throws IOException {
-		final Map<String, String> map = new HashMap<String, String>();
+		final Map<String, String> map = new HashMap<>();
 		String line;
 		while ((line = br.readLine()) != null) {
 			final int separator = line.indexOf('=');

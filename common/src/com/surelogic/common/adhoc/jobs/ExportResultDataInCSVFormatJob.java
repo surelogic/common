@@ -39,7 +39,7 @@ public class ExportResultDataInCSVFormatJob extends ExportResultDataJob {
 
 	@Override
 	protected void writeRow(final PrintWriter writer, final Cell[] row) {
-		final List<String> list = new ArrayList<String>(row.length);
+		final List<String> list = new ArrayList<>(row.length);
 		for (final Cell c : row) {
 			list.add(c.getText());
 		}

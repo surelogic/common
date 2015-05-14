@@ -64,7 +64,7 @@ public class LibResources {
    */
   @NonNull
   public static ArrayList<Class<?>> getPromiseClasses() {
-    ArrayList<Class<?>> result = new ArrayList<Class<?>>();
+    ArrayList<Class<?>> result = new ArrayList<>();
     try {
       final String pfx = "com/surelogic/";
       final String ext = ".class";

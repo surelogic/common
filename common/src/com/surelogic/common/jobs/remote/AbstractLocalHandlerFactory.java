@@ -11,7 +11,7 @@ implements IClientHandlerFactory {
 	private final Console console;
 	
 	// Jobs waiting for their handlers
-	private LinkedList<T> queue = new LinkedList<T>();
+	private LinkedList<T> queue = new LinkedList<>();
 	
 	protected AbstractLocalHandlerFactory(String name, int startingPort) {
 		console = new Console(name, this, startingPort);

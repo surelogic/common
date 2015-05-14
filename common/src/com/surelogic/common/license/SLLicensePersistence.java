@@ -612,7 +612,7 @@ public final class SLLicensePersistence {
 		if (license == null)
 			throw new IllegalArgumentException(I18N.err(44, "license"));
 
-		final List<PossiblyActivatedSLLicense> licenses = new ArrayList<PossiblyActivatedSLLicense>();
+		final List<PossiblyActivatedSLLicense> licenses = new ArrayList<>();
 		licenses.add(license);
 		writeLicensesToFile(newFile, licenses);
 	}
@@ -862,7 +862,7 @@ public final class SLLicensePersistence {
 		 */
 		final List<SignedSLLicenseNetCheck> licenseNetChecks = readLicenseNetChecksFromString(s);
 
-		final List<PossiblyActivatedSLLicense> result = new ArrayList<PossiblyActivatedSLLicense>();
+		final List<PossiblyActivatedSLLicense> result = new ArrayList<>();
 
 		for (SignedSLLicenseNetCheck licenseNetCheck : licenseNetChecks) {
 			final SignedSLLicense associatedLicense = lookupLicense(licenses,
@@ -915,7 +915,7 @@ public final class SLLicensePersistence {
 		/*
 		 * Extract the set of signed license from the file contents.
 		 */
-		final List<SignedSLLicense> result = new ArrayList<SignedSLLicense>();
+		final List<SignedSLLicense> result = new ArrayList<>();
 		int fromIndex = 0;
 		while (true) {
 			final int index = b.indexOf(BEGIN_LICENSE, fromIndex);
@@ -954,7 +954,7 @@ public final class SLLicensePersistence {
 		/*
 		 * Extract the set of signed license from the file contents.
 		 */
-		final List<SignedSLLicenseNetCheck> result = new ArrayList<SignedSLLicenseNetCheck>();
+		final List<SignedSLLicenseNetCheck> result = new ArrayList<>();
 		int fromIndex = 0;
 		while (true) {
 			final int index = b.indexOf(BEGIN_NET_CHECK, fromIndex);

@@ -105,7 +105,7 @@ public final class JDTUtility {
       throw new IllegalArgumentException(I18N.err(44, "path"));
     try {
       final IClasspathEntry[] orig = javaProject.getRawClasspath();
-      final List<IClasspathEntry> entries = new ArrayList<IClasspathEntry>();
+      final List<IClasspathEntry> entries = new ArrayList<>();
 
       for (IClasspathEntry e : orig) {
         entries.add(e);
@@ -142,7 +142,7 @@ public final class JDTUtility {
       throw new IllegalArgumentException(I18N.err(44, "path"));
     try {
       final IClasspathEntry[] orig = javaProject.getRawClasspath();
-      final List<IClasspathEntry> entries = new ArrayList<IClasspathEntry>();
+      final List<IClasspathEntry> entries = new ArrayList<>();
 
       boolean removed = false;
       for (IClasspathEntry e : orig) {
@@ -541,7 +541,7 @@ public final class JDTUtility {
   @NonNull
   public static Pair<IJavaElement, Double> findJavaElement(final IJavaRef javaRef) {
     if (javaRef == null)
-      return new Pair<IJavaElement, Double>(null, Double.valueOf(0));
+      return new Pair<>(null, Double.valueOf(0));
     // System.out.println("findJavaElementOrNull(" + javaRef + ")");
 
     final IDecl decl = javaRef.getDeclaration();
@@ -590,7 +590,7 @@ public final class JDTUtility {
         }
       }
       if (best == null)
-        return new Pair<IJavaElement, Double>(null, Double.valueOf(0));
+        return new Pair<>(null, Double.valueOf(0));
       /*
        * Special case for package-info files (a better answer).
        */
@@ -605,11 +605,11 @@ public final class JDTUtility {
         }
       }
       // System.out.println(" found (" + confidence + ") -> " + best);
-      return new Pair<IJavaElement, Double>(best, Double.valueOf(confidence));
+      return new Pair<>(best, Double.valueOf(confidence));
     } catch (Exception e) {
       SLLogger.getLogger().log(Level.WARNING, I18N.err(156, context), e);
     }
-    return new Pair<IJavaElement, Double>(null, Double.valueOf(0));
+    return new Pair<>(null, Double.valueOf(0));
   }
 
   /**
@@ -635,7 +635,7 @@ public final class JDTUtility {
      * roots.
      */
     @NonNull
-    List<IPackageFragment> packageMatches = new ArrayList<IPackageFragment>();
+    List<IPackageFragment> packageMatches = new ArrayList<>();
 
     public JavaElementMatcher(IJavaProject projectToSearch) {
       current = projectToSearch;
@@ -954,7 +954,7 @@ public final class JDTUtility {
     }
 
     List<IJavaElement> getChildren(IJavaElement e) {
-      List<IJavaElement> result = new ArrayList<IJavaElement>();
+      List<IJavaElement> result = new ArrayList<>();
       try {
         if (e instanceof IParent) {
           for (IJavaElement child : ((IParent) e).getChildren()) {
@@ -986,7 +986,7 @@ public final class JDTUtility {
    *           if something goes wrong.
    */
   private static List<IJavaProject> getProjectsToSearchByName(@Nullable final String projectNameOrNull) throws JavaModelException {
-    final List<IJavaProject> result = new ArrayList<IJavaProject>();
+    final List<IJavaProject> result = new ArrayList<>();
     final IWorkspaceRoot wsRoot = ResourcesPlugin.getWorkspace().getRoot();
     final IJavaModel model = JavaCore.create(wsRoot);
     if (model != null) {
@@ -1048,7 +1048,7 @@ public final class JDTUtility {
    *           if something goes wrong.
    */
   private static IType lookupAnonymous(final IType within, final int occurrenceCount) throws JavaModelException {
-    final List<IType> anonymousTypes = new ArrayList<IType>();
+    final List<IType> anonymousTypes = new ArrayList<>();
     for (final IJavaElement child : within.getChildren()) {
       queryListOfAnonymous(child, anonymousTypes);
     }
@@ -1097,7 +1097,7 @@ public final class JDTUtility {
    * @return a list of names for all the open Java projects in the workspace.
    */
   public static List<String> getJavaProjectNames() {
-    final List<String> projectNames = new ArrayList<String>();
+    final List<String> projectNames = new ArrayList<>();
     for (final IJavaProject project : getJavaProjects()) {
       final String projectName = project.getElementName();
       if (projectName != null) {
@@ -1113,7 +1113,7 @@ public final class JDTUtility {
    * @return a list of all the open Java projects in the workspace.
    */
   public static List<IJavaProject> getJavaProjects() {
-    final List<IJavaProject> projectNames = new ArrayList<IJavaProject>();
+    final List<IJavaProject> projectNames = new ArrayList<>();
     try {
       final IWorkspace ws = ResourcesPlugin.getWorkspace();
       final IWorkspaceRoot wsRoot = ws.getRoot();
@@ -1138,7 +1138,7 @@ public final class JDTUtility {
 
   public static List<IProject> getProjects() {
     List<IJavaProject> projs = getJavaProjects();
-    List<IProject> rv = new ArrayList<IProject>();
+    List<IProject> rv = new ArrayList<>();
     for (IJavaProject p : projs) {
       rv.add(p.getProject());
     }
@@ -1306,7 +1306,7 @@ public final class JDTUtility {
     if (elements.isEmpty()) {
       return Collections.emptyList();
     }
-    final List<String> errors = new ArrayList<String>();
+    final List<String> errors = new ArrayList<>();
     for (final IJavaElement elt : elements) {
       if (monitor.isCanceled()) {
         return Collections.emptyList();
@@ -1349,7 +1349,7 @@ public final class JDTUtility {
 
   private static Map<IJavaProject, Boolean> projectsUpToDate(final IWorkspaceRoot root, final IJavaProject[] projects)
       throws JavaModelException {
-    final Map<IJavaProject, Boolean> status = new HashMap<IJavaProject, Boolean>();
+    final Map<IJavaProject, Boolean> status = new HashMap<>();
     for (final IJavaProject p : projects) {
       status.put(p, null);
     }
@@ -1359,7 +1359,7 @@ public final class JDTUtility {
 
   private static Map<IJavaProject, Boolean> projectsUpToDate(final IWorkspaceRoot root, final Iterable<IJavaProject> projects)
       throws JavaModelException {
-    final Map<IJavaProject, Boolean> status = new HashMap<IJavaProject, Boolean>();
+    final Map<IJavaProject, Boolean> status = new HashMap<>();
     for (final IJavaProject p : projects) {
       status.put(p, null);
     }
@@ -1393,7 +1393,7 @@ public final class JDTUtility {
 
   private static void projectsUpToDate(final IWorkspaceRoot root, final Map<IJavaProject, Boolean> status)
       throws JavaModelException {
-    final List<IJavaProject> projs = new ArrayList<IJavaProject>(status.size());
+    final List<IJavaProject> projs = new ArrayList<>(status.size());
     for (final Map.Entry<IJavaProject, Boolean> e : status.entrySet()) {
       projs.add(e.getKey());
       e.setValue(null);
@@ -1554,7 +1554,7 @@ public final class JDTUtility {
 
   public static boolean compUnitsUpToDate(final Collection<ICompilationUnit> elements) {
     // FIX too conservative?
-    final List<IJavaProject> projects = new ArrayList<IJavaProject>();
+    final List<IJavaProject> projects = new ArrayList<>();
     for (final ICompilationUnit icu : elements) {
       final IJavaProject p = icu.getJavaProject();
       if (!projects.contains(p)) {
@@ -1569,7 +1569,7 @@ public final class JDTUtility {
    */
   static class NewerThanCollector extends AbstractChecker {
     final Map<IJavaProject, Date> cutoffs;
-    final Set<ICompilationUnit> units = new HashSet<ICompilationUnit>();
+    final Set<ICompilationUnit> units = new HashSet<>();
     long cutoff = 0;
 
     NewerThanCollector(final Map<IJavaProject, Date> times) {
@@ -1619,7 +1619,7 @@ public final class JDTUtility {
   public static Collection<ICompilationUnit> modifiedCompUnits(final Map<IJavaProject, Date> times, final IProgressMonitor monitor) {
     final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
     try {
-      final Map<IJavaProject, Boolean> status = new HashMap<IJavaProject, Boolean>();
+      final Map<IJavaProject, Boolean> status = new HashMap<>();
       for (final IJavaProject p : times.keySet()) {
         status.put(p, null);
       }
@@ -1644,7 +1644,7 @@ public final class JDTUtility {
    */
   public static boolean projectUpdatedSince(final IJavaProject jp, final long time) {
     final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
-    final Map<IJavaProject, Boolean> status = new HashMap<IJavaProject, Boolean>();
+    final Map<IJavaProject, Boolean> status = new HashMap<>();
     try {
       return !checkProject(root, status, jp, new AbstractChecker() {
         private boolean updated = false;
@@ -1708,7 +1708,7 @@ public final class JDTUtility {
    * @throws JavaModelException
    */
   public static Collection<IJavaProject> getAllRequiredProjects(List<IJavaProject> selected) {
-    final Set<IJavaProject> required = new HashSet<IJavaProject>();
+    final Set<IJavaProject> required = new HashSet<>();
     for (IJavaProject p : selected) {
       getAllRequiredProjects(required, p);
     }
@@ -1772,7 +1772,7 @@ public final class JDTUtility {
 
   public static List<ICompilationUnit> applyToolsFilter(List<ICompilationUnit> cus, SureLogicToolsFilter filter,
       boolean excludeIfMatched) throws JavaModelException {
-    final List<ICompilationUnit> rv = new ArrayList<ICompilationUnit>();
+    final List<ICompilationUnit> rv = new ArrayList<>();
     for (ICompilationUnit icu : cus) {
       // Check if legal
       final String name = icu.getElementName();

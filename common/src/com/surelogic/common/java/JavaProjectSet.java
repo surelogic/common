@@ -18,11 +18,11 @@ public class JavaProjectSet<P extends ISLJavaProject> implements Iterable<P> {
   private final IJavaFactory<P> factory;
   protected SLProgressMonitor monitor;
   // private final Map<String,Object> options = new HashMap<String, Object>();
-  protected final Map<String, P> projects = new HashMap<String, P>();
+  protected final Map<String, P> projects = new HashMap<>();
   // In dependency order
-  private final List<P> ordering = new ArrayList<P>();
+  private final List<P> ordering = new ArrayList<>();
   // To project names
-  private final Map<File, String> fileMap = new HashMap<File, String>();
+  private final Map<File, String> fileMap = new HashMap<>();
 
   private final Date date;
   protected final File location;
@@ -55,7 +55,7 @@ public class JavaProjectSet<P extends ISLJavaProject> implements Iterable<P> {
     add(cfg);
     location = cfg.getLocation();
     isAuto = false;
-    args = new HashMap<String, Object>();
+    args = new HashMap<>();
     date = new Date();
   }
 
@@ -113,7 +113,7 @@ public class JavaProjectSet<P extends ISLJavaProject> implements Iterable<P> {
   }
 
   public ArrayList<String> getSourceProjectNamesAlpha() {
-    final ArrayList<String> srcProjects = new ArrayList<String>();
+    final ArrayList<String> srcProjects = new ArrayList<>();
     for (P p : projects.values()) {
       if (p.getConfig().getBoolOption(Config.AS_SOURCE)) {
         srcProjects.add(p.getName());
@@ -311,7 +311,7 @@ public class JavaProjectSet<P extends ISLJavaProject> implements Iterable<P> {
    * @return the source folders, or an empty list if none.
    */
   private List<String> getSourceFoldersFor(String prop) {
-    List<String> folders = new ArrayList<String>();
+    List<String> folders = new ArrayList<>();
     for (Config c : getConfigs()) {
       String[] here = c.getListOption(prop);
       for (String p : here) {
@@ -325,7 +325,7 @@ public class JavaProjectSet<P extends ISLJavaProject> implements Iterable<P> {
   }
 
   private List<String> getSourcePackageSpecFor(String prop) {
-    List<String> pkgs = new ArrayList<String>();
+    List<String> pkgs = new ArrayList<>();
     for (Config c : getConfigs()) {
       String[] here = c.getListOption(prop);
       for (String p : here) {

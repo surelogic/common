@@ -140,7 +140,7 @@ public final class AdHocQueryResultSqlData extends AdHocQueryResult {
    * @return variable values defined by selection of a row. May be empty.
    */
   public Map<String, String> getTopVariableValues() {
-    final Map<String, String> result = new HashMap<String, String>();
+    final Map<String, String> result = new HashMap<>();
     if (f_selectedRowIndex != -1) {
       /*
        * Add in all the variable values from the selected row index.

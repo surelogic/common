@@ -83,7 +83,7 @@ public class TextArchiver extends FileRunner {
 
 		// Find separator for the first file
 		String line = findSeparator(br);
-		List<String> warnings = new ArrayList<String>();
+		final List<String> warnings = new ArrayList<>();
 		
 		// Should be either SEPARATOR or null
 		while (line != null) {			

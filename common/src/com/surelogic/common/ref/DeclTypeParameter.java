@@ -26,6 +26,6 @@ final class DeclTypeParameter extends DeclWithPosition implements IDeclTypeParam
   @Override
   @NonNull
   public List<TypeRef> getBounds() {
-    return new ArrayList<TypeRef>(f_bounds);
+    return new ArrayList<>(f_bounds);
   }
 }

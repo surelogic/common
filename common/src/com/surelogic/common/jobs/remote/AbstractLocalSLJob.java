@@ -56,7 +56,7 @@ public abstract class AbstractLocalSLJob<C extends ILocalConfig> extends Abstrac
   protected final int memorySize;
   private final int port; // <=0 if just using System.in/out
   protected final SLStatus.Builder status = new SLStatus.Builder();
-  private final Stack<SubSLProgressMonitor> tasks = new Stack<SubSLProgressMonitor>();
+  private final Stack<SubSLProgressMonitor> tasks = new Stack<>();
   private SLProgressMonitor topMonitor;
   private Process remoteVM;
   @InRegion("LocalState")
@@ -156,7 +156,7 @@ public abstract class AbstractLocalSLJob<C extends ILocalConfig> extends Abstrac
     sb.append(": ").append(msg).append('\n');
 
     // Reconstitute stack trace
-    final List<StackTraceElement> trace = new ArrayList<StackTraceElement>();
+    final List<StackTraceElement> trace = new ArrayList<>();
     final String exception = br.readLine();
     // printErr(exception);
 

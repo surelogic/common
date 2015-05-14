@@ -12,6 +12,6 @@ public class IteratorUtil {
   public static final Object noElement = new Object();
 
   public static <T> Iteratable<T> makeIteratable(Collection<T> allResults) {
-	  return new SimpleIteratable<T>(allResults.iterator());
+    return new SimpleIteratable<>(allResults.iterator());
   }
 }

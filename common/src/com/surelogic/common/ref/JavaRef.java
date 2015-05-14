@@ -605,11 +605,11 @@ public class JavaRef implements IJavaRef {
    */
   private static Pair<Integer, String> getEncodeVersion(@NonNull String encodedForPersistence) {
     if (encodedForPersistence.startsWith(ENCODE_V1))
-      return new Pair<Integer, String>(1, encodedForPersistence.substring(ENCODE_V1.length()));
+      return new Pair<>(1, encodedForPersistence.substring(ENCODE_V1.length()));
     else if (encodedForPersistence.startsWith(ENCODE_V2))
-      return new Pair<Integer, String>(2, encodedForPersistence.substring(ENCODE_V2.length()));
+      return new Pair<>(2, encodedForPersistence.substring(ENCODE_V2.length()));
     else if (encodedForPersistence.startsWith(ENCODE_V3))
-      return new Pair<Integer, String>(3, encodedForPersistence.substring(ENCODE_V3.length()));
-    return new Pair<Integer, String>(-1, encodedForPersistence);
+      return new Pair<>(3, encodedForPersistence.substring(ENCODE_V3.length()));
+    return new Pair<>(-1, encodedForPersistence);
   }
 }

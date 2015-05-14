@@ -35,7 +35,7 @@ public final class SLLicenseManager {
 
   private final String f_pluginLicenseFile = "/lib/.surelogic-licenses";
 
-  private final List<PossiblyActivatedSLLicense> f_licenses = new ArrayList<PossiblyActivatedSLLicense>();
+  private final List<PossiblyActivatedSLLicense> f_licenses = new ArrayList<>();
 
   /**
    * Gets a copy of the list of possibly installed licenses.
@@ -44,7 +44,7 @@ public final class SLLicenseManager {
    */
   public List<PossiblyActivatedSLLicense> getLicenses() {
     synchronized (SLLicenseManager.class) {
-      return new ArrayList<PossiblyActivatedSLLicense>(f_licenses);
+      return new ArrayList<>(f_licenses);
     }
   }
 
@@ -86,7 +86,7 @@ public final class SLLicenseManager {
    *          a license to add to the set managed by this class.
    */
   public void install(PossiblyActivatedSLLicense license) {
-    List<PossiblyActivatedSLLicense> licenses = new ArrayList<PossiblyActivatedSLLicense>();
+    List<PossiblyActivatedSLLicense> licenses = new ArrayList<>();
     licenses.add(license);
     install(licenses);
   }
@@ -107,7 +107,7 @@ public final class SLLicenseManager {
    *           renew a managed license.
    */
   public void activateOrRenew(List<SignedSLLicenseNetCheck> licenseNetChecks) {
-    final List<PossiblyActivatedSLLicense> licensesToAddOrUpdate = new ArrayList<PossiblyActivatedSLLicense>();
+    final List<PossiblyActivatedSLLicense> licensesToAddOrUpdate = new ArrayList<>();
     for (SignedSLLicenseNetCheck nc : licenseNetChecks) {
       final PossiblyActivatedSLLicense license = getLicense(nc.getLicenseNetCheck().getUuid());
       if (license == null) {
@@ -156,7 +156,7 @@ public final class SLLicenseManager {
    *          a license to remove from the set managed by this class.
    */
   public void remove(PossiblyActivatedSLLicense license) {
-    List<PossiblyActivatedSLLicense> licenses = new ArrayList<PossiblyActivatedSLLicense>();
+    List<PossiblyActivatedSLLicense> licenses = new ArrayList<>();
     licenses.add(license);
     install(licenses);
   }

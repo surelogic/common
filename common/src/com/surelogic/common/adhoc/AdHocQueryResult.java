@@ -60,7 +60,7 @@ public abstract class AdHocQueryResult {
   }
 
   @NonNull
-  private final Set<AdHocQueryResult> f_children = new HashSet<AdHocQueryResult>();
+  private final Set<AdHocQueryResult> f_children = new HashSet<>();
 
   protected void addChild(final AdHocQueryResult child) {
     f_children.add(child);
@@ -82,7 +82,7 @@ public abstract class AdHocQueryResult {
    *         result.
    */
   public final Set<AdHocQueryResult> getChildren() {
-    return new HashSet<AdHocQueryResult>(f_children);
+    return new HashSet<>(f_children);
   }
 
   /**
@@ -95,7 +95,7 @@ public abstract class AdHocQueryResult {
    * @see AdHocQueryResultTimeComparator
    */
   public final List<AdHocQueryResult> getChildrenList() {
-    final ArrayList<AdHocQueryResult> result = new ArrayList<AdHocQueryResult>(f_children);
+    final ArrayList<AdHocQueryResult> result = new ArrayList<>(f_children);
     Collections.sort(result, AdHocQueryResultTimeComparator.getInstance());
     return result;
   }
@@ -160,7 +160,7 @@ public abstract class AdHocQueryResult {
      * Make a copy of the set of children because we are going to delete them
      * and we don't want to throw a concurrent modification exception.
      */
-    final Set<AdHocQueryResult> children = new HashSet<AdHocQueryResult>(f_children);
+    final Set<AdHocQueryResult> children = new HashSet<>(f_children);
     for (final AdHocQueryResult child : children) {
       child.delete();
     }

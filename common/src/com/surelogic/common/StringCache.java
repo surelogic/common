@@ -13,7 +13,7 @@ import com.surelogic.ThreadSafe;
  */
 @ThreadSafe
 public class StringCache {
-  private final ConcurrentMap<String, String> f_stringCache = new ConcurrentHashMap<String, String>();
+  private final ConcurrentMap<String, String> f_stringCache = new ConcurrentHashMap<>();
 
   /**
    * This call tries to share, via an alias, strings if the string has been

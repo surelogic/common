@@ -8,8 +8,8 @@ import java.util.*;
  * @author Edwin
  */
 public final class Commands implements ScriptCommands {
-  private final Map<String, ICommand> commands = new HashMap<String,ICommand>();
-  
+  private final Map<String, ICommand> commands = new HashMap<>();
+
   public Commands() {
     commands.put(TOUCH_FILE, new TouchFile());
     commands.put("saveFile", new SaveFile());
@@ -22,21 +22,21 @@ public final class Commands implements ScriptCommands {
     commands.put("cleanProject", new CleanProject());
     commands.put(CLOSE_PROJECT, new CloseProject());
     commands.put(PATCH_FILE, new PatchFile());
-    //commands.put(EXPORT_RESULTS, new AbstractExportResults());
-    //commands.put(COMPARE_RESULTS, new AbstractCompareResults());
+    // commands.put(EXPORT_RESULTS, new AbstractExportResults());
+    // commands.put(COMPARE_RESULTS, new AbstractCompareResults());
     commands.put(DELETE_FILE, new DeleteFile());
     commands.put(IMPORT, new Import());
   }
-  
+
   public ICommand get(String name) {
     ICommand c = commands.get(name);
     if (c == null) {
-      throw new UnsupportedOperationException("No command matching "+name);
-      //return NullCommand.prototype;
+      throw new UnsupportedOperationException("No command matching " + name);
+      // return NullCommand.prototype;
     }
     return c;
   }
-  
+
   public ICommand put(String name, ICommand c) {
     ICommand old = commands.put(name, c);
     return old;

@@ -45,7 +45,7 @@ public final class JavaSourceFile extends AbstractJavaFile {
 	}
 
 	public Pair<URI, String> getLocation() {
-		return new Pair<URI, String>(file.toURI(), relativePath);
+		return new Pair<>(file.toURI(), relativePath);
 	}
 
 	public void outputToXML(XmlCreator.Builder proj) {

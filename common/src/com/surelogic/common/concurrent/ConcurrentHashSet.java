@@ -13,7 +13,7 @@ public class ConcurrentHashSet<T> extends AbstractSet<T> {
 		this(16);
 	}
 	public ConcurrentHashSet(int capacity) {
-		map = new ConcurrentHashMap<T,T>(capacity);
+		map = new ConcurrentHashMap<>(capacity);
 	}
 
 	@Override

@@ -28,7 +28,7 @@ public final class LazyPreparedStatementConnection implements InvocationHandler 
 
   public LazyPreparedStatementConnection(final Connection conn) {
     this.conn = conn;
-    statements = new HashSet<PreparedStatement>();
+    statements = new HashSet<>();
   }
 
   public static CancellableConnection wrap(final Connection conn) {

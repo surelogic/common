@@ -26,7 +26,7 @@ import com.surelogic.common.logging.SLLogger;
  * 
  * <pre>
  * public void reportScanCrash(SLStatus status, File scanLog) {
- * 	status.logTo(SLLogger.getLogger());
+ *   status.logTo(SLLogger.getLogger());
  * }
  * </pre>
  * 
@@ -37,52 +37,51 @@ import com.surelogic.common.logging.SLLogger;
 @Singleton
 public final class JSureScanCrashReport {
 
-	private static final JSureScanCrashReport INSTANCE = new JSureScanCrashReport();
+  private static final JSureScanCrashReport INSTANCE = new JSureScanCrashReport();
 
-	public static JSureScanCrashReport getInstance() {
-		return INSTANCE;
-	}
+  public static JSureScanCrashReport getInstance() {
+    return INSTANCE;
+  }
 
-	private JSureScanCrashReport() {
-		// singleton
-	}
+  private JSureScanCrashReport() {
+    // singleton
+  }
 
-	static private final IScanCrashReporter f_defaultReporter = new IScanCrashReporter() {
-		@Override
+  static private final IScanCrashReporter f_defaultReporter = new IScanCrashReporter() {
+    @Override
     public void reportScanCrash(SLStatus status, File scanLog) {
-			status.logTo(SLLogger.getLogger());
-		}
+      status.logTo(SLLogger.getLogger());
+    }
 
-		@Override
-		public void reportScanCancellation(String msg) {
-			SLLogger.getLogger().info(msg);
-		}
-	};
+    @Override
+    public void reportScanCancellation(String msg) {
+      SLLogger.getLogger().info(msg);
+    }
+  };
 
-	private final AtomicReference<IScanCrashReporter> f_reporter = new AtomicReference<IScanCrashReporter>(
-			f_defaultReporter);
+  private final AtomicReference<IScanCrashReporter> f_reporter = new AtomicReference<>(f_defaultReporter);
 
-	/**
-	 * Gets the reporter for scan crashes. Will never be {@code null}.
-	 * 
-	 * @return the non-{@code null} reporter for scan crashes.
-	 */
-	public IScanCrashReporter getReporter() {
-		return f_reporter.get();
-	}
+  /**
+   * Gets the reporter for scan crashes. Will never be {@code null}.
+   * 
+   * @return the non-{@code null} reporter for scan crashes.
+   */
+  public IScanCrashReporter getReporter() {
+    return f_reporter.get();
+  }
 
-	/**
-	 * Sets the reporter for scan crashes. A value of {@code null} resets the
-	 * reporter to the default.
-	 * 
-	 * @param reporter
-	 *            a reporter or {@code null} to reset to the default.
-	 * @return the old reporter.
-	 */
-	public IScanCrashReporter setReporter(IScanCrashReporter reporter) {
-		if (reporter == null)
-			reporter = f_defaultReporter;
+  /**
+   * Sets the reporter for scan crashes. A value of {@code null} resets the
+   * reporter to the default.
+   * 
+   * @param reporter
+   *          a reporter or {@code null} to reset to the default.
+   * @return the old reporter.
+   */
+  public IScanCrashReporter setReporter(IScanCrashReporter reporter) {
+    if (reporter == null)
+      reporter = f_defaultReporter;
 
-		return f_reporter.getAndSet(reporter);
-	}
+    return f_reporter.getAndSet(reporter);
+  }
 }

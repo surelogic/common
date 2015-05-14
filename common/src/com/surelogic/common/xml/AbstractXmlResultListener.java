@@ -26,13 +26,13 @@ public abstract class AbstractXmlResultListener implements IXmlResultListener {
 			this.ref  = ref;
 		}
 	}
-	private static final List<Ref> DEFINED = Collections.<Ref>emptyList();
-	private static final List<Ref> OMITTED = new ArrayList<Ref>(0); 
+	private static final List<Ref> DEFINED = Collections.emptyList();
+	private static final List<Ref> OMITTED = new ArrayList<>(0); 
 
 	/**
 	 * Pool of unresolved references
 	 */
-	private final Map<String,List<Ref>> references = new HashMap<String,List<Ref>>();
+	private final Map<String,List<Ref>> references = new HashMap<>();
 	
 	/**
 	 * Process any unresolved references to this entity
@@ -71,7 +71,7 @@ public abstract class AbstractXmlResultListener implements IXmlResultListener {
 	private void processRef(String from, int fromId, Entity toRef) {
 		List<Ref> refs = references.get(toRef.getId());
 		if (refs == null) {
-			refs = new ArrayList<Ref>();
+			refs = new ArrayList<>();
 			references.put(toRef.getId(), refs);
 		}
 		else if (refs == DEFINED) {

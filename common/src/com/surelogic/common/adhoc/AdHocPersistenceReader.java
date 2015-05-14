@@ -51,7 +51,7 @@ public final class AdHocPersistenceReader extends DefaultHandler {
    * Ignore list for queries that occur more than once but aren't actually
    * newer.
    */
-  private final Set<String> f_subQueryIgnoreList = new HashSet<String>();
+  private final Set<String> f_subQueryIgnoreList = new HashSet<>();
 
   @Override
   public void startElement(final String uri, final String localName, final String name, final Attributes attributes)

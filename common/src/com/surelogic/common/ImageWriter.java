@@ -15,7 +15,7 @@ public class ImageWriter {
 
 	private final static String IMAGE_FOLDER = "image_files";
 
-	private final Set<String> f_images = new HashSet<String>();
+	private final Set<String> f_images = new HashSet<>();
 	private final File f_imageDir;
 	private final String f_folderName;
 

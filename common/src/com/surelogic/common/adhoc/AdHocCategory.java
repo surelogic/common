@@ -274,7 +274,7 @@ public final class AdHocCategory implements AdHocIdentity {
   /**
    * The set of queries in this category.
    */
-  private final Set<AdHocQuery> f_queries = new HashSet<AdHocQuery>();
+  private final Set<AdHocQuery> f_queries = new HashSet<>();
 
   /**
    * Checks if this category contains the passed query.
@@ -363,7 +363,7 @@ public final class AdHocCategory implements AdHocIdentity {
    * @return the set of queries in this category.
    */
   public Set<AdHocQuery> getQueries() {
-    return new HashSet<AdHocQuery>(f_queries);
+    return new HashSet<>(f_queries);
   }
 
   /**
@@ -376,7 +376,7 @@ public final class AdHocCategory implements AdHocIdentity {
    * @see AdHocObjectDescriptionComparator
    */
   public List<AdHocQuery> getQueryList() {
-    final ArrayList<AdHocQuery> result = new ArrayList<AdHocQuery>(f_queries);
+    final ArrayList<AdHocQuery> result = new ArrayList<>(f_queries);
     Collections.sort(result, AdHocIdentity.BY_HINT_DESCRIPTION);
     return result;
   }

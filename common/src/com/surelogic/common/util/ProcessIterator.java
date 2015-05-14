@@ -4,33 +4,34 @@ import java.util.Iterator;
 import static com.surelogic.common.util.IteratorUtil.noElement;
 
 /**
- * An Iterator wrapper that can both filter and expand objects
- * (for example, if they are Iterators) in the original Iterator.
+ * An Iterator wrapper that can both filter and expand objects (for example, if
+ * they are Iterators) in the original Iterator.
  */
 
-public abstract class ProcessIterator<T> extends SimpleRemovelessIterator<T>
-{
-  private final Iterator<T> iterator;  /** Iterator to wrap. */
+public abstract class ProcessIterator<T> extends SimpleRemovelessIterator<T> {
+  private final Iterator<T> iterator;
+  /** Iterator to wrap. */
 
   // null means we're done
-  private Iterator<T> nestedIter = new EmptyIterator<T>(); 
+  private Iterator<T> nestedIter = new EmptyIterator<>();
 
   /**
-   * Create a new iterator wrapped around an
-   * existing iterator.
-   * @param iter The iterator to wrap.
+   * Create a new iterator wrapped around an existing iterator.
+   * 
+   * @param iter
+   *          The iterator to wrap.
    */
-  public ProcessIterator( final Iterator<T> iter ) {
+  public ProcessIterator(final Iterator<T> iter) {
     iterator = iter;
   }
 
   @Override
   protected Object computeNext() {
     while (nestedIter != null) {
-      while(nestedIter.hasNext()) {
+      while (nestedIter.hasNext()) {
         Object o = select(nestedIter.next());
         if (o == notSelected) {
-          // get more nodes to check 
+          // get more nodes to check
           continue;
         }
         return o;
@@ -45,10 +46,13 @@ public abstract class ProcessIterator<T> extends SimpleRemovelessIterator<T>
   }
 
   @SuppressWarnings("unchecked")
-  protected Iterator<T> getNextIter(Object o) { return (Iterator<T>) o; }
+  protected Iterator<T> getNextIter(Object o) {
+    return (Iterator<T>) o;
+  }
 
-  protected Object select(Object o) { return o; }
+  protected Object select(Object o) {
+    return o;
+  }
 
   protected final Object notSelected = new Object();
 }
-

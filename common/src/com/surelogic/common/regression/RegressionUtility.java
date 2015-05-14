@@ -161,7 +161,7 @@ public class RegressionUtility {
   }
 
   public static Set<String> readLinesAsSet(File lines) throws IOException {
-    final Set<String> cus = new HashSet<String>();
+    final Set<String> cus = new HashSet<>();
     final BufferedReader br = new BufferedReader(new FileReader(lines));
     try {
       String line;

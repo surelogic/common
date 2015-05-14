@@ -172,7 +172,7 @@ public final class Entities {
    * Escapes defined by this.
    */
   @UniqueInRegion("EntitiesState")
-  private final ArrayList<EscapePair> f_escapes = new ArrayList<EscapePair>();
+  private final ArrayList<EscapePair> f_escapes = new ArrayList<>();
   /**
    * {@code true} indicates that whitespace should be escaped.
    */

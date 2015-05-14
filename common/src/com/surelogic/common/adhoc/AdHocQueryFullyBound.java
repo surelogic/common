@@ -75,7 +75,7 @@ public final class AdHocQueryFullyBound {
    * @return the set of variable values for this query.
    */
   public Map<String, String> getVariableValues() {
-    return new HashMap<String, String>(f_variableValues);
+    return new HashMap<>(f_variableValues);
   }
 
   /**
@@ -99,6 +99,6 @@ public final class AdHocQueryFullyBound {
    * @return the set of top variable values for this query.
    */
   public Map<String, String> getTopVariableValues() {
-    return new HashMap<String, String>(f_topVariableValues);
+    return new HashMap<>(f_topVariableValues);
   }
 }

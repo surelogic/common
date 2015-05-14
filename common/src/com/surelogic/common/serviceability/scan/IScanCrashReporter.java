@@ -15,17 +15,16 @@ import com.surelogic.common.jobs.SLStatus;
 @ThreadSafe
 public interface IScanCrashReporter {
 
-	/**
-	 * Reports a analysis scan crash. Can be invoked from any thread context.
-	 * 
-	 * @param status
-	 *            the status built up about the scan filter. Cannot be
-	 *            {@code null}.
-	 * @param scanLog
-	 *            the log file for the scan within the scan directory. Cannot be
-	 *            {@code null}, but reporters should check that the file exists.
-	 */
-	void reportScanCrash(SLStatus status, File scanLog);
+  /**
+   * Reports a analysis scan crash. Can be invoked from any thread context.
+   * 
+   * @param status
+   *          the status built up about the scan filter. Cannot be {@code null}.
+   * @param scanLog
+   *          the log file for the scan within the scan directory. Cannot be
+   *          {@code null}, but reporters should check that the file exists.
+   */
+  void reportScanCrash(SLStatus status, File scanLog);
 
-	void reportScanCancellation(String msg);
+  void reportScanCancellation(String msg);
 }

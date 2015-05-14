@@ -185,7 +185,7 @@ public final class TypeRef {
   static List<TypeRef> parseListEncodedForPersistence(final String value) {
     if (value == null)
       throw new IllegalArgumentException(I18N.err(44, "value"));
-    final List<TypeRef> result = new ArrayList<TypeRef>();
+    final List<TypeRef> result = new ArrayList<>();
     final StringBuilder b = new StringBuilder(value.trim());
     while (true) {
       final int sepIndex = b.indexOf(";");

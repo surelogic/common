@@ -19,18 +19,18 @@ public class Graph {
   @NotThreadSafe
   public static class Builder {
 
-    final ArrayList<Pair<String, String>> f_labelEdges = new ArrayList<Pair<String, String>>();
+    final ArrayList<Pair<String, String>> f_labelEdges = new ArrayList<>();
 
     public void addEdge(@NonNull String fromNodeLabel, @NonNull String toNodeLabel) {
       if (fromNodeLabel == null)
         throw new IllegalArgumentException(I18N.err(44, "fromNodeLabel"));
       if (toNodeLabel == null)
         throw new IllegalArgumentException(I18N.err(44, "toNodeLabel"));
-      Pair<String, String> labelEdge = new Pair<String, String>(fromNodeLabel, toNodeLabel);
+      Pair<String, String> labelEdge = new Pair<>(fromNodeLabel, toNodeLabel);
       f_labelEdges.add(labelEdge);
     }
 
-    final ArrayList<String> f_fixedNodeLabels = new ArrayList<String>();
+    final ArrayList<String> f_fixedNodeLabels = new ArrayList<>();
 
     public void fixPostionOf(@NonNull String nodeLabel) {
       if (nodeLabel == null)
@@ -83,7 +83,7 @@ public class Graph {
   /**
    * Nodes in this graph.
    */
-  final ArrayList<Node> f_nodes = new ArrayList<Node>();
+  final ArrayList<Node> f_nodes = new ArrayList<>();
 
   /**
    * Gets an iterator over the nodes in this graph.
@@ -133,7 +133,7 @@ public class Graph {
   /**
    * Edges in this graph.
    */
-  final ArrayList<Edge> f_edges = new ArrayList<Edge>();
+  final ArrayList<Edge> f_edges = new ArrayList<>();
 
   /**
    * Gets an iterator over the edges in this graph.

@@ -22,7 +22,7 @@ import com.surelogic.common.jobs.SLStatus;
  */
 public final class SLLicenseUtility {
 
-  private static final Set<ILicenseObserver> f_observers = new CopyOnWriteArraySet<ILicenseObserver>();
+  private static final Set<ILicenseObserver> f_observers = new CopyOnWriteArraySet<>();
 
   /**
    * Adds a license check observer.
@@ -47,7 +47,7 @@ public final class SLLicenseUtility {
   }
 
   @Vouch("ThreadSafe")
-  private static final Map<SLLicenseProduct, Date> f_knownReleaseDates = new ConcurrentHashMap<SLLicenseProduct, Date>();
+  private static final Map<SLLicenseProduct, Date> f_knownReleaseDates = new ConcurrentHashMap<>();
 
   /**
    * Sets the release date for the passed product. This method would typically
@@ -240,7 +240,7 @@ public final class SLLicenseUtility {
      * Build the message to send to surelogic.com.
      */
     final String l = SLLicensePersistence.toSignedHexString(licenses, true);
-    final Map<String, String> param = new HashMap<String, String>();
+    final Map<String, String> param = new HashMap<>();
     param.put(I18N.msg("common.serviceability.licenserequest.req"), I18N.msg("common.serviceability.licenserequest.req.actrew"));
     param.put(I18N.msg("common.serviceability.licenserequest.license"), l);
     final URL url = new URL(I18N.msg("common.serviceability.licenserequest.url", SLUtility.SERVICEABILITY_URL));
@@ -296,7 +296,7 @@ public final class SLLicenseUtility {
      * This is a best effort attempt so we should not get bother the user if for
      * any reason the notification fails.
      */
-    List<PossiblyActivatedSLLicense> notifyList = new ArrayList<PossiblyActivatedSLLicense>();
+    List<PossiblyActivatedSLLicense> notifyList = new ArrayList<>();
     for (PossiblyActivatedSLLicense license : licenses) {
       if (license.isActivated() && license.getSignedSLLicense().getLicense().performNetCheck()) {
         notifyList.add(license);
@@ -310,7 +310,7 @@ public final class SLLicenseUtility {
      * Perform notification message to the server.
      */
     final String l = SLLicensePersistence.toSignedHexString(notifyList, true);
-    final Map<String, String> param = new HashMap<String, String>();
+    final Map<String, String> param = new HashMap<>();
     param.put(I18N.msg("common.serviceability.licenserequest.req"), I18N.msg("common.serviceability.licenserequest.req.remove"));
     param.put(I18N.msg("common.serviceability.licenserequest.license"), l);
     final URL url = new URL(I18N.msg("common.serviceability.licenserequest.url", SLUtility.SERVICEABILITY_URL));

@@ -10,7 +10,7 @@ public class JavaProject implements ISLJavaProject {
 	private final JavaProjectSet<? extends JavaProject> parent;
 	protected final Config config;
 	protected final String name;	
-	private final Map<File,File> mappedJars = new HashMap<File, File>();
+	private final Map<File,File> mappedJars = new HashMap<>();
 	boolean active = true;
 	final boolean containsJavaLangObject;
 	

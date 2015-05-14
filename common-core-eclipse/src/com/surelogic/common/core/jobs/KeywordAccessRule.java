@@ -14,7 +14,7 @@ public final class KeywordAccessRule implements ISchedulingRule {
   private final Set<String> keywords;
 
   private KeywordAccessRule(final String[] args) {
-    keywords = new HashSet<String>(Arrays.asList(args));
+    keywords = new HashSet<>(Arrays.asList(args));
   }
 
   public static ISchedulingRule getInstance(final String... keywords) {
@@ -40,7 +40,7 @@ public final class KeywordAccessRule implements ISchedulingRule {
       return true;
     }
     if (rule instanceof KeywordAccessRule) {
-      final HashSet<String> intersect = new HashSet<String>(keywords);
+      final HashSet<String> intersect = new HashSet<>(keywords);
       intersect.retainAll(((KeywordAccessRule) rule).keywords);
       return !intersect.isEmpty();
     }

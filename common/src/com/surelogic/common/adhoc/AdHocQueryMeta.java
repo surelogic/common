@@ -342,7 +342,7 @@ public final class AdHocQueryMeta {
    *         no variables are used.
    */
   private static Set<String> getVariablesHelper(@NonNull final String text) {
-    final Set<String> variableSet = new HashSet<String>();
+    final Set<String> variableSet = new HashSet<>();
     final BufferedReader sr = new BufferedReader(new StringReader(text));
     try {
       String line;

@@ -18,7 +18,7 @@ import com.surelogic.*;
 @AnnotationBounds(referenceObject = {"K", "V"}, threadSafe = {"K", "V"})
 public class ConcurrentMultiHashMap<K,V> implements MultiMap<K,V> {
 	@Vouch("ThreadSafe")
-	private final ConcurrentMap<K,Collection<V>> map = new ConcurrentHashMap<K,Collection<V>>();
+	private final ConcurrentMap<K,Collection<V>> map = new ConcurrentHashMap<>();
 
 	private Collection<V> getOrEmpty(Object key) {
 		Collection<V> values = map.get(key);
@@ -94,7 +94,7 @@ public class ConcurrentMultiHashMap<K,V> implements MultiMap<K,V> {
 	 * Can be overridden to change how it responded to duplicates
 	 */
 	protected Collection<V> newCollection() {
-		return new Vector<V>(1);
+		return new Vector<>(1);
 	}
 	
 	@Override

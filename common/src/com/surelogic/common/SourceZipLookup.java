@@ -16,7 +16,7 @@ import java.util.zip.ZipFile;
  * @author Edwin
  */
 public class SourceZipLookup<T> {
-	private final Map<String,Mappings> projects = new HashMap<String, Mappings>();
+	private final Map<String,Mappings> projects = new HashMap<>();
 	
 	public SourceZipLookup(Iterable<File> zips) throws IOException {
 		for (final File f : zips) {
@@ -96,7 +96,7 @@ public class SourceZipLookup<T> {
 			final ZipEntry ze = zf.getEntry(path);
 			InputStream in = zf.getInputStream(ze);
 			BufferedReader br = new BufferedReader(new InputStreamReader(in));
-			List<String> lines = new ArrayList<String>();
+			final List<String> lines = new ArrayList<>();
 			String line;
 			while ((line = br.readLine()) != null) {
 				lines.add(line);

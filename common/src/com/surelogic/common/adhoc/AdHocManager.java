@@ -44,7 +44,7 @@ public final class AdHocManager {
   /**
    * A map from know data sources to their associated query manager.
    */
-  private static final ConcurrentMap<IAdHocDataSource, AdHocManager> f_dataSourceToManager = new ConcurrentHashMap<IAdHocDataSource, AdHocManager>();
+  private static final ConcurrentMap<IAdHocDataSource, AdHocManager> f_dataSourceToManager = new ConcurrentHashMap<>();
 
   /**
    * Creates, if necessary, and returns a manager for the given data source.
@@ -145,7 +145,7 @@ public final class AdHocManager {
    * list, !<i>x</i> {@code getId().equals(}<i>y</i>{@code getId())} unless
    * <i>x</i>==<i>y</i>.
    */
-  private final Set<AdHocQuery> f_queries = new HashSet<AdHocQuery>();
+  private final Set<AdHocQuery> f_queries = new HashSet<>();
 
   /**
    * Generates an identifier that is not used as the identifier for any query or
@@ -256,7 +256,7 @@ public final class AdHocManager {
    * Gets the set of top-level queries owned by this manager.
    */
   public Set<AdHocQuery> getTopLevelQueries() {
-    final Set<AdHocQuery> queries = new HashSet<AdHocQuery>(f_queries.size());
+    final Set<AdHocQuery> queries = new HashSet<>(f_queries.size());
     for (AdHocQuery q : f_queries) {
       if (q.showAtRootOfQueryMenu()) {
         queries.add(q);
@@ -271,7 +271,7 @@ public final class AdHocManager {
    * @return the set of queries owned by this manager.
    */
   public Set<AdHocQuery> getQueries() {
-    return new HashSet<AdHocQuery>(f_queries);
+    return new HashSet<>(f_queries);
   }
 
   /**
@@ -285,7 +285,7 @@ public final class AdHocManager {
    * @return a sorted list of all the queries owned by this manager.
    */
   public ArrayList<AdHocQuery> getQueryListUsingSort(@Nullable final Comparator<? super AdHocQuery> c) {
-    final ArrayList<AdHocQuery> result = new ArrayList<AdHocQuery>(f_queries);
+    final ArrayList<AdHocQuery> result = new ArrayList<>(f_queries);
     if (c != null)
       Collections.sort(result, c);
     return result;
@@ -342,7 +342,7 @@ public final class AdHocManager {
        * We need to delete
        */
       boolean resultDeleted = false;
-      final Set<AdHocQueryResult> copy = new HashSet<AdHocQueryResult>(f_results);
+      final Set<AdHocQueryResult> copy = new HashSet<>(f_results);
       for (final AdHocQueryResult result : copy) {
         if (result.getQueryFullyBound().getQuery() == query) {
           result.delete();
@@ -361,7 +361,7 @@ public final class AdHocManager {
    * list, !<i>x</i> {@code getId().equals(}<i>y</i>{@code getId())} unless
    * <i>x</i>==<i>y</i>.
    */
-  private final Set<AdHocCategory> f_categories = new HashSet<AdHocCategory>();
+  private final Set<AdHocCategory> f_categories = new HashSet<>();
 
   /**
    * Gets, or creates if necessary, the category identified by the passed id.
@@ -434,7 +434,7 @@ public final class AdHocManager {
    * @return the set of categories owned by this manager.
    */
   public Set<AdHocCategory> getCategories() {
-    return new HashSet<AdHocCategory>(f_categories);
+    return new HashSet<>(f_categories);
   }
 
   /**
@@ -448,7 +448,7 @@ public final class AdHocManager {
    * @return a sorted list of all the categories owned by this manager.
    */
   public ArrayList<AdHocCategory> getCategoryListUsingSort(@Nullable final Comparator<? super AdHocCategory> c) {
-    final ArrayList<AdHocCategory> result = new ArrayList<AdHocCategory>(f_categories);
+    final ArrayList<AdHocCategory> result = new ArrayList<>(f_categories);
     if (c != null)
       Collections.sort(result, c);
     return result;
@@ -470,7 +470,7 @@ public final class AdHocManager {
   /**
    * The set of results owned by this manager.
    */
-  private final Set<AdHocQueryResult> f_results = new HashSet<AdHocQueryResult>();
+  private final Set<AdHocQueryResult> f_results = new HashSet<>();
 
   /**
    * Gets the number of results owned by this manager.
@@ -518,7 +518,7 @@ public final class AdHocManager {
    * @return the set of results know by this manager. This set may be empty.
    */
   public Set<AdHocQueryResult> getResults() {
-    return new HashSet<AdHocQueryResult>(f_results);
+    return new HashSet<>(f_results);
   }
 
   /**
@@ -531,7 +531,7 @@ public final class AdHocManager {
    * @see AdHocQueryResultTimeComparator
    */
   public List<AdHocQueryResult> getResultList() {
-    final ArrayList<AdHocQueryResult> result = new ArrayList<AdHocQueryResult>(f_results);
+    final ArrayList<AdHocQueryResult> result = new ArrayList<>(f_results);
     Collections.sort(result, AdHocQueryResultTimeComparator.getInstance());
     return result;
   }
@@ -593,7 +593,7 @@ public final class AdHocManager {
    * {@link AdHocQueryResult#delete()} on each.
    */
   public void deleteAllResults() {
-    final Set<AdHocQueryResult> results = new HashSet<AdHocQueryResult>(f_results);
+    final Set<AdHocQueryResult> results = new HashSet<>(f_results);
     for (final AdHocQueryResult result : results) {
       result.delete();
     }
@@ -612,7 +612,7 @@ public final class AdHocManager {
    *          flashlight database
    */
   public void deleteAllResults(final DBConnection f_database) {
-    final Set<AdHocQueryResult> results = new HashSet<AdHocQueryResult>(f_results);
+    final Set<AdHocQueryResult> results = new HashSet<>(f_results);
     for (final AdHocQueryResult result : results) {
       if (f_database.equals(result.getDB())) {
         result.delete();
@@ -688,13 +688,13 @@ public final class AdHocManager {
       all = getGlobalVariableValues();
       top = Collections.emptyMap();
     }
-    return new Pair<Map<String, String>, Map<String, String>>(all, top);
+    return new Pair<>(all, top);
   }
 
   /**
    * Stores this manager's set of global variable definitions.
    */
-  private final Map<String, String> f_globalVariableValues = new HashMap<String, String>();
+  private final Map<String, String> f_globalVariableValues = new HashMap<>();
 
   /**
    * Gets this manager's set of global variable values.
@@ -707,7 +707,7 @@ public final class AdHocManager {
    *         empty map, but it will not be {@code null}.
    */
   public Map<String, String> getGlobalVariableValues() {
-    return new HashMap<String, String>(f_globalVariableValues);
+    return new HashMap<>(f_globalVariableValues);
   }
 
   /**
@@ -770,7 +770,7 @@ public final class AdHocManager {
   /**
    * This manager's set of observers.
    */
-  private final CopyOnWriteArraySet<IAdHocManagerObserver> f_observers = new CopyOnWriteArraySet<IAdHocManagerObserver>();
+  private final CopyOnWriteArraySet<IAdHocManagerObserver> f_observers = new CopyOnWriteArraySet<>();
 
   /**
    * Adds an observer of this manager.

@@ -326,7 +326,7 @@ public final class ColumnAnnotation {
     f_showValue = stripSingleQuotes(value);
   }
 
-  private final Set<Integer> f_onSet = new HashSet<Integer>();
+  private final Set<Integer> f_onSet = new HashSet<>();
 
   public Set<Integer> getOnSet() {
     return f_onSet;

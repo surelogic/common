@@ -395,7 +395,7 @@ public final class SLUtility {
       final String typePart = value.substring(slashIndex + 1);
       if ("".equals(typePart))
         return EMPTY_STRING_ARRAY;
-      List<String> result = new ArrayList<String>();
+      final List<String> result = new ArrayList<>();
       int lastDotIndex = 0;
       while (true) {
         int dotIndex = typePart.indexOf('.', lastDotIndex);
@@ -1286,7 +1286,7 @@ public final class SLUtility {
     if (s == null) {
       return SLUtility.EMPTY_STRING_ARRAY;
     }
-    List<String> result = new ArrayList<String>();
+    final List<String> result = new ArrayList<>();
 
     final BufferedReader r = new BufferedReader(new StringReader(s));
     while (true) {
@@ -1402,7 +1402,7 @@ public final class SLUtility {
   private static final String ENCODED_FORMAT = "%0" + ENCODED_STRING_LENGTH_LENGTH + "d%s";
 
   public static List<String> decodeStringList(String value) {
-    final List<String> result = new ArrayList<String>();
+    final List<String> result = new ArrayList<>();
     int at = 0;
     while (true) {
       if (value.length() < at + ENCODED_STRING_LENGTH_LENGTH)
@@ -1510,7 +1510,7 @@ public final class SLUtility {
    * @return a new list
    */
   public static <T> ArrayList<T> list(@SuppressWarnings("unchecked") T... elements) {
-    final ArrayList<T> l = new ArrayList<T>();
+    final ArrayList<T> l = new ArrayList<>();
     for (T e : elements) {
       l.add(e);
     }

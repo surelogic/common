@@ -336,7 +336,7 @@ public final class AdHocQuery implements AdHocIdentity {
    */
   @NonNull
   public static HashMap<String, AdHocQueryMeta> getMetaFromString(final String sqlText) {
-    final HashMap<String, AdHocQueryMeta> result = new HashMap<String, AdHocQueryMeta>();
+    final HashMap<String, AdHocQueryMeta> result = new HashMap<>();
     if (sqlText == null)
       return result;
     String strippedCommentText = SLUtility.extractTextFromWholeLineCommentBlock(sqlText, "--");
@@ -404,7 +404,7 @@ public final class AdHocQuery implements AdHocIdentity {
    * Holds meta information about this query. It is obtained from the query
    * comments so it needs to be update any time {@link #f_sql} changes.
    */
-  private final Map<String, AdHocQueryMeta> f_nameToMeta = new HashMap<String, AdHocQueryMeta>();
+  private final Map<String, AdHocQueryMeta> f_nameToMeta = new HashMap<>();
 
   /**
    * Gets the SQL text of this query.
@@ -450,7 +450,7 @@ public final class AdHocQuery implements AdHocIdentity {
    */
   @NonNull
   public HashMap<String, AdHocQueryMeta> getMeta() {
-    return new HashMap<String, AdHocQueryMeta>(f_nameToMeta);
+    return new HashMap<>(f_nameToMeta);
   }
 
   /**
@@ -591,7 +591,7 @@ public final class AdHocQuery implements AdHocIdentity {
    * The set of queries that can be executed based upon a selected row of the
    * result of this query.
    */
-  private final List<AdHocSubQuery> f_subQueries = new ArrayList<AdHocSubQuery>();
+  private final List<AdHocSubQuery> f_subQueries = new ArrayList<>();
 
   /**
    * Adds a sub-query to this query if it is a query managed by the same query
@@ -679,7 +679,7 @@ public final class AdHocQuery implements AdHocIdentity {
    * @return the sub-query aggregates for this query.
    */
   public ArrayList<AdHocSubQuery> getSubQueryList() {
-    return new ArrayList<AdHocSubQuery>(f_subQueries);
+    return new ArrayList<>(f_subQueries);
   }
 
   /**
@@ -691,7 +691,7 @@ public final class AdHocQuery implements AdHocIdentity {
    *         hint and description that this query is a sub-query of.
    */
   public ArrayList<AdHocQuery> getUsedByList() {
-    ArrayList<AdHocQuery> result = new ArrayList<AdHocQuery>(getManager().getQueries());
+    ArrayList<AdHocQuery> result = new ArrayList<>(getManager().getQueries());
     for (Iterator<AdHocQuery> iterator = result.iterator(); iterator.hasNext();) {
       final AdHocQuery query = iterator.next();
       /*
@@ -954,7 +954,7 @@ public final class AdHocQuery implements AdHocIdentity {
   @NonNull
   public Set<String> getVariables() {
     final String sql = f_sql;
-    final Set<String> variableSet = new HashSet<String>();
+    final Set<String> variableSet = new HashSet<>();
     final BufferedReader sr = new BufferedReader(new StringReader(sql));
     try {
       String line;

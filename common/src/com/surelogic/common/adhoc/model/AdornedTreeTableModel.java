@@ -70,7 +70,7 @@ public final class AdornedTreeTableModel {
     Arrays.fill(columnJustification, Justification.LEFT);
     final boolean[] isColumnVisible = new boolean[columnLabels.length];
     Arrays.fill(isColumnVisible, true);
-    final List<String> cl = new ArrayList<String>();
+    final List<String> cl = new ArrayList<>();
     for (int i = 0; i < columnLabels.length; i++) {
       String columnLabel = columnLabels[i];
       boolean dividerFound = false;
@@ -324,7 +324,7 @@ public final class AdornedTreeTableModel {
     final String modelTreePartColumnLabel;
     if (asTreeTable) {
       final LinkedList<IndexedRowOfCells> rowsLeft = IndexedRowOfCells.toList(adornedRows);
-      final List<TreeCell> root = new LinkedList<TreeCell>();
+      final List<TreeCell> root = new LinkedList<>();
       recursiveTreeTableBuilder(root, null, 0, lastTreeIndex, rowsLeft);
       addNonLeafColumnSummaries(getAllNonLeaf(root), adornedColumnAnnotationInfo, lastTreeIndex, adornedRows);
       modelTreePart = root.toArray(new TreeCell[root.size()]);
@@ -354,7 +354,7 @@ public final class AdornedTreeTableModel {
     } else {
       while (!rowsLeft.isEmpty()) {
         final IndexedRowOfCells row = rowsLeft.remove();
-        final LinkedList<IndexedRowOfCells> childrenOfRow = new LinkedList<IndexedRowOfCells>();
+        final LinkedList<IndexedRowOfCells> childrenOfRow = new LinkedList<>();
         childrenOfRow.add(row);
         final NonLeafTreeCell rowTreeCell = addNonLeaf(root, parent, row.getRow()[columnIndex]);
         for (final Iterator<IndexedRowOfCells> i = rowsLeft.iterator(); i.hasNext();) {
@@ -432,7 +432,7 @@ public final class AdornedTreeTableModel {
 
   private static void addNonLeafColumnSummaries(final List<NonLeafTreeCell> nonLeafCells,
       final ColumnAnnotation[] adornedColumnAnnotationInfo, final int lastTreeIndex, final Cell[][] adornedRows) {
-    final Set<Pair<Cell, String>> cellsToReplaceText = new HashSet<Pair<Cell, String>>();
+    final Set<Pair<Cell, String>> cellsToReplaceText = new HashSet<>();
     for (final NonLeafTreeCell nonLeafCell : nonLeafCells) {
       for (int colI = lastTreeIndex; colI < adornedColumnAnnotationInfo.length; colI++) {
         final ColumnAnnotation info = adornedColumnAnnotationInfo[colI];
@@ -492,7 +492,7 @@ public final class AdornedTreeTableModel {
               final boolean distinct = info.countDistinct();
               final boolean allowEmptyValues = !info.countNonempty();
               final String replaceValueWith = info.getCountReplaceValueWith();
-              final Set<String> distinctFound = new HashSet<String>();
+              final Set<String> distinctFound = new HashSet<>();
               int countTotal = 0;
               for (final LeafTreeCell leaf : nonLeafCell.getLeaves()) {
                 final Cell adornedCell = adornedRows[leaf.getRowIndex()][colI];
@@ -507,7 +507,7 @@ public final class AdornedTreeTableModel {
                     countTotal++;
                 }
                 if (replaceValueWith != null) {
-                  cellsToReplaceText.add(new Pair<Cell, String>(adornedCell, replaceValueWith));
+                  cellsToReplaceText.add(new Pair<>(adornedCell, replaceValueWith));
                 }
               }
               final String simpleText = Long.toString(countTotal);
@@ -571,19 +571,19 @@ public final class AdornedTreeTableModel {
         startsWithANumber = true;
       } else {
         if (startsWithANumber)
-          return new Pair<Long, String>(result, value.substring(i));
+          return new Pair<>(result, value.substring(i));
         else
           return null;
       }
     }
     if (startsWithANumber)
-      return new Pair<Long, String>(result, "");
+      return new Pair<>(result, "");
     else
       return null;
   }
 
   private static List<NonLeafTreeCell> getAllNonLeaf(final List<TreeCell> root) {
-    final List<NonLeafTreeCell> result = new ArrayList<NonLeafTreeCell>();
+    final List<NonLeafTreeCell> result = new ArrayList<>();
     for (final TreeCell cell : root) {
       if (cell instanceof NonLeafTreeCell) {
         getAllNonLeafHelper((NonLeafTreeCell) cell, result);
@@ -884,7 +884,7 @@ public final class AdornedTreeTableModel {
    * @return the set of variables.
    */
   public Map<String, String> getVariablesFor(final int rowIndex) {
-    final Map<String, String> result = new HashMap<String, String>();
+    final Map<String, String> result = new HashMap<>();
     final Cell[] row = f_rows[rowIndex];
     for (int colI = 0; colI < row.length; colI++) {
       final String key = f_columnLabels[colI];
@@ -927,7 +927,7 @@ public final class AdornedTreeTableModel {
       throw new IllegalArgumentException(I18N.err(44, "cell"));
     }
 
-    final Map<String, String> result = new HashMap<String, String>();
+    final Map<String, String> result = new HashMap<>();
     final Set<LeafTreeCell> leaves = cell.getLeaves();
     if (leaves.isEmpty()) {
       return result; // empty

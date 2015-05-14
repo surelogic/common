@@ -25,128 +25,115 @@ import java.util.Map;
 // mechanism here.
 public class ConnectionQuery implements Query {
 
-	private final Connection conn;
+  private final Connection conn;
 
-	private final Map<String, PreparedStatement> map;
+  private final Map<String, PreparedStatement> map;
 
-	public ConnectionQuery(Connection conn) {
-		this.conn = conn;
-		map = new HashMap<String, PreparedStatement>();
-	}
+  public ConnectionQuery(Connection conn) {
+    this.conn = conn;
+    map = new HashMap<>();
+  }
 
-	@Override
+  @Override
   public Queryable<Void> prepared(String key) {
-		return new QueryablePreparedStatement<Void>(findOrCreate(key),
-				new EmptyResultHandler());
-	}
+    return new QueryablePreparedStatement<>(findOrCreate(key), new EmptyResultHandler());
+  }
 
-	@Override
+  @Override
   public <T> Queryable<List<T>> prepared(String key, RowHandler<T> rh) {
-		return new QueryablePreparedStatement<List<T>>(findOrCreate(key),
-				new ResultRowHandler<T>(rh));
-	}
+    return new QueryablePreparedStatement<>(findOrCreate(key), new ResultRowHandler<>(rh));
+  }
 
-	@Override
+  @Override
   public <T> Queryable<T> prepared(String key, ResultHandler<T> rh) {
-		return new QueryablePreparedStatement<T>(findOrCreate(key), rh);
-	}
+    return new QueryablePreparedStatement<>(findOrCreate(key), rh);
+  }
 
-	@Override
+  @Override
   public <T> Queryable<T> prepared(String key, KeyHandler<T> kh) {
-		return new QueryableKeyedStatement<T>(findOrCreateKeyed(key, kh
-				.keyNames()), kh);
-	}
+    return new QueryableKeyedStatement<>(findOrCreateKeyed(key, kh.keyNames()), kh);
+  }
 
-	@Override
+  @Override
   public Queryable<Void> statement(String key) {
-		return new QueryableStatement<Void>(conn, key, new EmptyResultHandler());
+    return new QueryableStatement<>(conn, key, new EmptyResultHandler());
 
-	}
+  }
 
-	@Override
+  @Override
   public <T> Queryable<T> statement(String key, ResultHandler<T> rh) {
-		return new QueryableStatement<T>(conn, key, rh);
-	}
+    return new QueryableStatement<>(conn, key, rh);
+  }
 
-	@Override
+  @Override
   public <T> Queryable<List<T>> statement(String key, RowHandler<T> rh) {
-		return new QueryableStatement<List<T>>(conn, key,
-				new ResultRowHandler<T>(rh));
-	}
+    return new QueryableStatement<>(conn, key, new ResultRowHandler<>(rh));
+  }
 
-	/**
-	 * Returns a record backed by prepared statements associated w/ this JDBC
-	 * Connection. If the name of the record is {@code foo}, then the following
-	 * keys will be looked up:
-	 * 
-	 * <pre>
-	 * foo.select            - The select statement by natural key
-	 * foo.delete            - The delete statement by primary key
-	 * foo.insert            - The insert statement
-	 * foo.update (optional) - An update statement by primary key
-	 * foo.generated         - Whether or not this record has an auto-generated primary key
-	 * </pre>
-	 */
-	@Override
+  /**
+   * Returns a record backed by prepared statements associated w/ this JDBC
+   * Connection. If the name of the record is {@code foo}, then the following
+   * keys will be looked up:
+   * 
+   * <pre>
+   * foo.select            - The select statement by natural key
+   * foo.delete            - The delete statement by primary key
+   * foo.insert            - The insert statement
+   * foo.update (optional) - An update statement by primary key
+   * foo.generated         - Whether or not this record has an auto-generated primary key
+   * </pre>
+   */
+  @Override
   public <T extends Record<?>> T record(Class<T> record) {
-		if (!Record.class.isAssignableFrom(record)) {
-			throw new IllegalArgumentException(
-					"Parameter must implement Record");
-		}
-		final String keyBase = record.getSimpleName();
-		final String select = QB.get(keyBase + ".select");
-		final String delete = QB.get(keyBase + ".delete");
-		final String insert = QB.get(keyBase + ".insert");
-		final boolean generated = Boolean.valueOf(QB
-				.get(keyBase + ".generated"));
-		try {
-			if (UpdatableRecord.class.isAssignableFrom(record)) {
-				final String update = QB.get(keyBase + ".update");
-				return record.getConstructor(UpdateRecordMapper.class)
-						.newInstance(
-								new UpdateBaseMapper(conn, insert, select,
-										delete, update, generated));
-			} else {
-				return record.getConstructor(RecordMapper.class)
-						.newInstance(
-								new BaseMapper(conn, insert, select, delete,
-										generated));
-			}
-		} catch (final Exception e) {
-			throw new IllegalStateException("Record " + record
-					+ " was not instantiable", e);
-		}
-	}
+    if (!Record.class.isAssignableFrom(record)) {
+      throw new IllegalArgumentException("Parameter must implement Record");
+    }
+    final String keyBase = record.getSimpleName();
+    final String select = QB.get(keyBase + ".select");
+    final String delete = QB.get(keyBase + ".delete");
+    final String insert = QB.get(keyBase + ".insert");
+    final boolean generated = Boolean.valueOf(QB.get(keyBase + ".generated"));
+    try {
+      if (UpdatableRecord.class.isAssignableFrom(record)) {
+        final String update = QB.get(keyBase + ".update");
+        return record.getConstructor(UpdateRecordMapper.class).newInstance(
+            new UpdateBaseMapper(conn, insert, select, delete, update, generated));
+      } else {
+        return record.getConstructor(RecordMapper.class).newInstance(new BaseMapper(conn, insert, select, delete, generated));
+      }
+    } catch (final Exception e) {
+      throw new IllegalStateException("Record " + record + " was not instantiable", e);
+    }
+  }
 
-	private PreparedStatement findOrCreate(String key) {
-		PreparedStatement st = map.get(key);
-		if (st == null) {
-			try {
-				st = conn.prepareStatement(QB.get(key));
-				map.put(key, st);
-			} catch (final SQLException e) {
-				throw new StatementException(e);
-			}
-		}
-		return st;
-	}
+  private PreparedStatement findOrCreate(String key) {
+    PreparedStatement st = map.get(key);
+    if (st == null) {
+      try {
+        st = conn.prepareStatement(QB.get(key));
+        map.put(key, st);
+      } catch (final SQLException e) {
+        throw new StatementException(e);
+      }
+    }
+    return st;
+  }
 
-	private PreparedStatement findOrCreateKeyed(String key, String[] keys) {
-		PreparedStatement st = map.get(key);
-		if (st == null) {
-			try {
-				if (JDBCUtils.getDb(conn) == DBType.ORACLE) {
-					st = conn.prepareStatement(QB.get(key), keys);
-				} else {
-					st = conn.prepareStatement(QB.get(key),
-							Statement.RETURN_GENERATED_KEYS);
-				}
-				map.put(key, st);
-			} catch (final SQLException e) {
-				throw new StatementException(e);
-			}
-		}
-		return st;
-	}
+  private PreparedStatement findOrCreateKeyed(String key, String[] keys) {
+    PreparedStatement st = map.get(key);
+    if (st == null) {
+      try {
+        if (JDBCUtils.getDb(conn) == DBType.ORACLE) {
+          st = conn.prepareStatement(QB.get(key), keys);
+        } else {
+          st = conn.prepareStatement(QB.get(key), Statement.RETURN_GENERATED_KEYS);
+        }
+        map.put(key, st);
+      } catch (final SQLException e) {
+        throw new StatementException(e);
+      }
+    }
+    return st;
+  }
 
 }

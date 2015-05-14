@@ -61,7 +61,7 @@ public final class Derby {
 			throw new IllegalArgumentException("sqlFile must be non-null");
 		}
 
-		final List<StringBuilder> result = new ArrayList<StringBuilder>();
+		final List<StringBuilder> result = new ArrayList<>();
 
 		try {
 			final InputStream is = sqlFile.openStream();

@@ -55,14 +55,14 @@ public class XmlCreator {
    * Q: how to write the output incrementally?
    */
   public class Builder {
-    final Map<String, String> attributes = new HashMap<String, String>();
+    final Map<String, String> attributes = new HashMap<>();
 
     final int indent;
     boolean firstAttr = true;
     String name;
 
     // TODO will this take up too much memory to keep everything around?
-    final List<Builder> nested = new ArrayList<Builder>(0);
+    final List<Builder> nested = new ArrayList<>(0);
 
     Builder(int indent) {
       this.indent = indent;
@@ -95,16 +95,16 @@ public class XmlCreator {
     }
 
     public void endWithContents(String contents) {
-        if (nested.isEmpty()) {
-            Entities.closeStart(sb, false, false);        	
-        } else {
-        	Entities.indent(sb, indent);
-        }
-        sb.append(contents);
-        Entities.end(name, sb, nested.isEmpty() ? 0 : indent);
-        flushBuffer();
+      if (nested.isEmpty()) {
+        Entities.closeStart(sb, false, false);
+      } else {
+        Entities.indent(sb, indent);
+      }
+      sb.append(contents);
+      Entities.end(name, sb, nested.isEmpty() ? 0 : indent);
+      flushBuffer();
     }
-    
+
     public void end() {
       if (nested.isEmpty()) {
         Entities.closeStart(sb, true, true);

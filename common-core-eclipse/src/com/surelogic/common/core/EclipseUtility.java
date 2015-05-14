@@ -417,14 +417,14 @@ public class EclipseUtility {
     String deps = d.get("Require-Bundle");
     if (deps != null) {
       String lastId = null;
-      List<String> ids = new ArrayList<String>();
+      final List<String> ids = new ArrayList<>();
       List<String> optional = null;
       final StringTokenizer st = new StringTokenizer(deps, ";, ");
       while (st.hasMoreTokens()) {
         String id = st.nextToken();
         if ("resolution:=optional".equals(id) && lastId != null) {
           if (optional == null) {
-            optional = new ArrayList<String>();
+            optional = new ArrayList<>();
           }
           optional.add(lastId);
         }
@@ -1113,7 +1113,7 @@ public class EclipseUtility {
     if (type == null) {
       return Collections.emptyList();
     }
-    final List<T> result = new ArrayList<T>();
+    final List<T> result = new ArrayList<>();
     for (SLJob jobInEclipse : f_jobsPassedToEclipse) {
       getThroughAggregateJobByTypeHelper(jobInEclipse, type, result);
     }
@@ -1151,7 +1151,7 @@ public class EclipseUtility {
     if (name == null) {
       return Collections.emptyList();
     }
-    final List<SLJob> result = new ArrayList<SLJob>();
+    final List<SLJob> result = new ArrayList<>();
     for (SLJob jobInEclipse : f_jobsPassedToEclipse) {
       getThroughAggregateJobByNameHelper(jobInEclipse, name, result);
     }
@@ -1173,7 +1173,7 @@ public class EclipseUtility {
    * Tracks {@link SLJob} instances wrapped to Eclipse jobs. The
    * {@link SLJobChangeAdapter} manages the contents of this list.
    */
-  static final CopyOnWriteArraySet<SLJob> f_jobsPassedToEclipse = new CopyOnWriteArraySet<SLJob>();
+  static final CopyOnWriteArraySet<SLJob> f_jobsPassedToEclipse = new CopyOnWriteArraySet<>();
 
   /**
    * An Eclipse job change adapter that updates the set of jobs passed to

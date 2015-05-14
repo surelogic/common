@@ -245,7 +245,7 @@ public final class Functions {
 
         @Override
         public String handle(Result result) {
-            List<CountInfo> counts = new ArrayList<CountInfo>();
+            final List<CountInfo> counts = new ArrayList<>();
             CountInfo info = null;
             for (Row r : result) {
                 String thread = r.nextString();
@@ -387,7 +387,7 @@ public final class Functions {
                 .stackTrace(stackTraceId));
         LinkedList<LockTrace> lockTrace = conn.withDefault(LockTrace
                 .lockTrace(lockTraceId));
-        List<MergedTrace> merged = new LinkedList<MergedTrace>();
+        List<MergedTrace> merged = new LinkedList<>();
         for (Trace t : stackTrace) {
             merged.add(new MergedTrace(t));
         }

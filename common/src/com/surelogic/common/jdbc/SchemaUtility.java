@@ -323,7 +323,7 @@ public final class SchemaUtility {
 			throw new IllegalArgumentException("sqlFile must be non-null");
 		}
 
-		final List<StringBuilder> result = new ArrayList<StringBuilder>();
+		final List<StringBuilder> result = new ArrayList<>();
 
 		final InputStream is = sqlScript.openStream();
 		final InputStreamReader isr = new InputStreamReader(is);

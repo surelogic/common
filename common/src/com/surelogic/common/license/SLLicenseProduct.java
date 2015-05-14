@@ -77,7 +77,7 @@ public enum SLLicenseProduct {
    * further description of supporting a fromString operation.
    */
   @Vouch("Immutable")
-  private static final Map<String, SLLicenseProduct> stringToEnum = new HashMap<String, SLLicenseProduct>();
+  private static final Map<String, SLLicenseProduct> stringToEnum = new HashMap<>();
   static {
     for (SLLicenseProduct type : values()) {
       stringToEnum.put(type.toString(), type);

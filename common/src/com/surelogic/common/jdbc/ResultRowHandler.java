@@ -13,7 +13,7 @@ class ResultRowHandler<T> implements ResultHandler<List<T>> {
 
 	@Override
   public List<T> handle(Result result) {
-		final List<T> list = new ArrayList<T>();
+		final List<T> list = new ArrayList<>();
 		for (final Row row : result) {
 			list.add(rh.handle(row));
 		}

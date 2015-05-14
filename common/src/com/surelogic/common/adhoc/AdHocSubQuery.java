@@ -152,7 +152,7 @@ public final class AdHocSubQuery {
    */
   @NonNull
   public static HashSet<AdHocQuery> querySetHelper(final Collection<AdHocSubQuery> mutable) {
-    final HashSet<AdHocQuery> result = new HashSet<AdHocQuery>();
+    final HashSet<AdHocQuery> result = new HashSet<>();
     for (final AdHocSubQuery item : mutable) {
       result.add(item.getQuery());
     }
@@ -167,7 +167,7 @@ public final class AdHocSubQuery {
    *          a mutable list of sub-query aggregates.
    */
   public static void sortByDescriptionHelper(final List<AdHocSubQuery> mutable) {
-    final ArrayList<AdHocSubQuery> copy = new ArrayList<AdHocSubQuery>(mutable);
+    final ArrayList<AdHocSubQuery> copy = new ArrayList<>(mutable);
     final ArrayList<AdHocQuery> queries = queryListSortedByDescriptionHelper(mutable);
     mutable.clear();
     for (final AdHocQuery query : queries) {
@@ -186,7 +186,7 @@ public final class AdHocSubQuery {
    *          a mutable list of sub-query aggregates.
    */
   public static void sortByHintDescriptionHelper(final List<AdHocSubQuery> mutable) {
-    final ArrayList<AdHocSubQuery> copy = new ArrayList<AdHocSubQuery>(mutable);
+    final ArrayList<AdHocSubQuery> copy = new ArrayList<>(mutable);
     final ArrayList<AdHocQuery> queries = queryListSortedByHintDescriptionHelper(mutable);
     mutable.clear();
     for (final AdHocQuery query : queries) {
@@ -207,7 +207,7 @@ public final class AdHocSubQuery {
    */
   @NonNull
   public static ArrayList<AdHocQuery> queryListSortedByDescriptionHelper(final Collection<AdHocSubQuery> mutable) {
-    final ArrayList<AdHocQuery> queries = new ArrayList<AdHocQuery>();
+    final ArrayList<AdHocQuery> queries = new ArrayList<>();
     for (final AdHocSubQuery item : mutable) {
       queries.add(item.getQuery());
     }
@@ -225,7 +225,7 @@ public final class AdHocSubQuery {
    */
   @NonNull
   public static ArrayList<AdHocQuery> queryListSortedByHintDescriptionHelper(final Collection<AdHocSubQuery> mutable) {
-    final ArrayList<AdHocQuery> queries = new ArrayList<AdHocQuery>();
+    final ArrayList<AdHocQuery> queries = new ArrayList<>();
     for (final AdHocSubQuery item : mutable) {
       queries.add(item.getQuery());
     }

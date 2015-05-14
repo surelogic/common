@@ -60,7 +60,7 @@ public class ZippedConfig extends Config {
 		props.load(zf.getInputStream(mapping));
 
 		// Reverse mapping
-		final Map<String, List<String>> path2qnames = new HashMap<String, List<String>>();
+		final Map<String, List<String>> path2qnames = new HashMap<>();
 
 		// Needed to keep javac from dying on a bad qualified name
 		boolean pathsContainDot = false;
@@ -80,7 +80,7 @@ public class ZippedConfig extends Config {
 			}
 			List<String> l = path2qnames.get(path);
 			if (l == null) {
-				l = new ArrayList<String>();
+				l = new ArrayList<>();
 				path2qnames.put(path, l);
 			}
 			l.add((String) e.getKey());
@@ -91,7 +91,7 @@ public class ZippedConfig extends Config {
 		 * for(JavaSourceFile f : getFiles()) {
 		 * System.out.println(getProject()+": "+f.relativePath); }
 		 */
-		final List<JavaSourceFile> srcFiles = new ArrayList<JavaSourceFile>();
+		final List<JavaSourceFile> srcFiles = new ArrayList<>();
 		final UnzipCallback callback = new UnzipCallback() {
 			@Override
 			public void unzipped(ZipEntry ze, File f) {

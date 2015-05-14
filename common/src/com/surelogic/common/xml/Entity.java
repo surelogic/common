@@ -50,14 +50,14 @@ public class Entity {
   public Entity(String name, Attributes a) {
     this.name = name;
     if (a != null) {
-      attributes = new HashMap<String, String>(a.getLength(), 1.0f);
+      attributes = new HashMap<>(a.getLength(), 1.0f);
       for (int i = 0; i < a.getLength(); i++) {
         final String aName = a.getQName(i);
         final String aValue = a.getValue(i);
         attributes.put(aName, aValue);
       }
     } else {
-      attributes = new HashMap<String, String>(4, 1.0f);
+      attributes = new HashMap<>(4, 1.0f);
     }
     id = attributes.get(XmlReader.ID_ATTR);
   }
@@ -65,10 +65,10 @@ public class Entity {
   public Entity(String name, Map<String, String> a) {
     this.name = name;
     if (a != null) {
-      attributes = new HashMap<String, String>(a.size(), 1.0f);
+      attributes = new HashMap<>(a.size(), 1.0f);
       attributes.putAll(a);
     } else {
-      attributes = new HashMap<String, String>(4, 1.0f);
+      attributes = new HashMap<>(4, 1.0f);
     }
     id = attributes.get(XmlReader.ID_ATTR);
   }
@@ -92,7 +92,7 @@ public class Entity {
 
   public void addRef(Entity e) {
     if (refs.isEmpty()) {
-      refs = new ArrayList<Entity>(1);
+      refs = new ArrayList<>(1);
     }
     refs.add(e);
   }
@@ -126,11 +126,11 @@ public class Entity {
   public final String getAttributeByAliasIfPossible(String value) {
     return DeclUtil.aliasIfPossible(attributes.get(value));
   }
-	
+
   public IJavaRef parsePersistedRef(String encode) {
-	  return JavaRef.parseEncodedForPersistence(encode);
-  }	  
-	
+    return JavaRef.parseEncodedForPersistence(encode);
+  }
+
   public boolean hasRefs() {
     return !refs.isEmpty();
   }

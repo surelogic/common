@@ -35,7 +35,7 @@ public final class SLProgressMonitorWrapper implements SLProgressMonitor {
    * subtask is finished. The name of the currently running subtask is found in
    * {@link #f_currentSubTask}.
    */
-  private final LinkedList<String> f_enclosingSubTasks = new LinkedList<String>();
+  private final LinkedList<String> f_enclosingSubTasks = new LinkedList<>();
 
   /**
    * The name of the currently running subtask, or {@code ""} if no subtask is
@@ -46,7 +46,7 @@ public final class SLProgressMonitorWrapper implements SLProgressMonitor {
   /**
    * Progress monitor observers
    */
-  private final CopyOnWriteArrayList<SLProgressMonitorObserver> f_observers = new CopyOnWriteArrayList<SLProgressMonitorObserver>();
+  private final CopyOnWriteArrayList<SLProgressMonitorObserver> f_observers = new CopyOnWriteArrayList<>();
 
   private void notifyObservers(int percentage) {
     // System.out.println("percent done = " + percentage + "%");

@@ -146,7 +146,7 @@ public class Trace {
                 final Queryable<Trace> getTrace = q.prepared(
                         "Trace.selectById",
                         SingleRowHandler.from(new TraceRowHandler()));
-                final LinkedList<Trace> traces = new LinkedList<Trace>();
+                final LinkedList<Trace> traces = new LinkedList<>();
                 if (traceId != -1) {
                     Trace t = getTrace.call(traceId);
                     traces.add(t);

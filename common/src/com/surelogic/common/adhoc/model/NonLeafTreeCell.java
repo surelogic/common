@@ -36,7 +36,7 @@ public final class NonLeafTreeCell extends TreeCell {
    * We mutate the children only during the construction of an
    * {@link AdornedTreeTableModel}.
    */
-  private final List<TreeCell> f_children = new ArrayList<TreeCell>();
+  private final List<TreeCell> f_children = new ArrayList<>();
 
   /**
    * Gets the children of this tree cell or an empty list if the tree cell has
@@ -63,7 +63,7 @@ public final class NonLeafTreeCell extends TreeCell {
   void addColumnSummary(NonLeafColumnSummaryCell columnSummary) {
     assert columnSummary != null;
     if (f_columnSummaries == null) {
-      f_columnSummaries = new ArrayList<NonLeafColumnSummaryCell>();
+      f_columnSummaries = new ArrayList<>();
     }
     f_columnSummaries.add(columnSummary);
   }
@@ -95,7 +95,7 @@ public final class NonLeafTreeCell extends TreeCell {
    *         it will not be {@code null}.
    */
   public Set<LeafTreeCell> getLeaves() {
-    final Set<LeafTreeCell> result = new HashSet<LeafTreeCell>();
+    final Set<LeafTreeCell> result = new HashSet<>();
     getLeavesHelper(getChildren(), result);
     return result;
   }

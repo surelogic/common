@@ -41,7 +41,7 @@ public abstract class XmlReader extends DefaultHandler {
     listener = (IXmlResultListener) this;
   }
 
-  private final Stack<Entity> inside = new Stack<Entity>();
+  private final Stack<Entity> inside = new Stack<>();
 
   private final IXmlResultListener listener;
 

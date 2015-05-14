@@ -21,7 +21,7 @@ class IndexedRowOfCells {
 	 *         indices.
 	 */
 	static LinkedList<IndexedRowOfCells> toList(Cell[][] rows) {
-		final LinkedList<IndexedRowOfCells> result = new LinkedList<IndexedRowOfCells>();
+		final LinkedList<IndexedRowOfCells> result = new LinkedList<>();
 		for (int rowIndex = 0; rowIndex < rows.length; rowIndex++) {
 			final Cell[] row = rows[rowIndex];
 			result.add(new IndexedRowOfCells(rowIndex, row));

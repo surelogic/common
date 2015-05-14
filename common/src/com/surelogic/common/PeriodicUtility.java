@@ -11,7 +11,7 @@ import com.surelogic.Vouch;
  */
 public class PeriodicUtility {
   @Vouch("ThreadSafe")
-  static final CopyOnWriteArraySet<Runnable> handlers = new CopyOnWriteArraySet<Runnable>();
+  static final CopyOnWriteArraySet<Runnable> handlers = new CopyOnWriteArraySet<>();
 
   static {
     final Runnable r = new Runnable() {

@@ -28,7 +28,7 @@ import com.surelogic.common.logging.SLLogger;
 public enum MemoryWarningSystem {
   INSTANCE;
 
-  final CopyOnWriteArrayList<Listener> listeners = new CopyOnWriteArrayList<Listener>();
+  final CopyOnWriteArrayList<Listener> listeners = new CopyOnWriteArrayList<>();
 
   @ReferenceObject
   public interface Listener {

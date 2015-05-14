@@ -9,19 +9,19 @@ import org.eclipse.jdt.core.*;
  * from a project
  */
 public class JavaProjectResources {
-    public interface Filter {
-        
-    }
-    
-	//TODO why are all these public -- seems like a bad API
-	public final IJavaProject project;
-	public final Filter filter;
-	
-	public final List<IResource> resources = new ArrayList<IResource>();
-    public final List<ICompilationUnit> cus = new ArrayList<ICompilationUnit>();
-    
-    JavaProjectResources(IJavaProject p, Filter f) {
-    	project = p;
-    	filter = f;
-    }
+  public interface Filter {
+
+  }
+
+  // TODO why are all these public -- seems like a bad API
+  public final IJavaProject project;
+  public final Filter filter;
+
+  public final List<IResource> resources = new ArrayList<>();
+  public final List<ICompilationUnit> cus = new ArrayList<>();
+
+  JavaProjectResources(IJavaProject p, Filter f) {
+    project = p;
+    filter = f;
+  }
 }

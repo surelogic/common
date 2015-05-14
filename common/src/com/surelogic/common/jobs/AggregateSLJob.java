@@ -18,7 +18,7 @@ public final class AggregateSLJob extends AbstractSLJob {
   private final CopyOnWriteArrayList<SLJob> f_jobs;
 
   public List<SLJob> getAggregatedJobs() {
-    return new ArrayList<SLJob>(f_jobs);
+    return new ArrayList<>(f_jobs);
   }
 
   public AggregateSLJob(String name, List<SLJob> jobs) {
@@ -27,7 +27,7 @@ public final class AggregateSLJob extends AbstractSLJob {
       throw new IllegalArgumentException(I18N.err(44, "jobs"));
     if (jobs.isEmpty())
       throw new IllegalArgumentException(I18N.err(155, AggregateSLJob.class.getName()));
-    f_jobs = new CopyOnWriteArrayList<SLJob>(jobs);
+    f_jobs = new CopyOnWriteArrayList<>(jobs);
   }
 
   @Override

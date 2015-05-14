@@ -33,7 +33,7 @@ public abstract class AbstractSLJob implements SLJob {
     return f_name;
   }
 
-  private final CopyOnWriteArrayList<SLProgressMonitorObserver> f_observers = new CopyOnWriteArrayList<SLProgressMonitorObserver>();
+  private final CopyOnWriteArrayList<SLProgressMonitorObserver> f_observers = new CopyOnWriteArrayList<>();
 
   @Override
   public final void addObserver(final SLProgressMonitorObserver observer) {
@@ -52,7 +52,7 @@ public abstract class AbstractSLJob implements SLJob {
   @Override
   @NonNull
   public Collection<SLProgressMonitorObserver> getObservers() {
-    return new ArrayList<SLProgressMonitorObserver>(f_observers);
+    return new ArrayList<>(f_observers);
   }
 
   /**

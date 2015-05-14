@@ -261,7 +261,7 @@ public abstract class Decl implements IDecl {
       if (f_isAbstract && f_isFinal)
         throw new IllegalArgumentException(I18N.err(276, f_name));
 
-      final Set<Integer> usedTypeParmPositions = new HashSet<Integer>();
+      final Set<Integer> usedTypeParmPositions = new HashSet<>();
       for (DeclBuilder b : f_childBuilders) {
         if (b instanceof TypeParameterBuilder) {
           final Integer position = Integer.valueOf(((TypeParameterBuilder) b).f_position);
@@ -372,8 +372,8 @@ public abstract class Decl implements IDecl {
       if (parent == null)
         throw new IllegalArgumentException(I18N.err(272, f_name));
 
-      final Set<Integer> usedParmPositions = new HashSet<Integer>();
-      final Set<Integer> usedTypeParmPositions = new HashSet<Integer>();
+      final Set<Integer> usedParmPositions = new HashSet<>();
+      final Set<Integer> usedTypeParmPositions = new HashSet<>();
       for (DeclBuilder b : f_childBuilders) {
         if (b instanceof ParameterBuilder) {
           final Integer position = Integer.valueOf(((ParameterBuilder) b).f_position);
@@ -710,7 +710,7 @@ public abstract class Decl implements IDecl {
       if (f_visibility == Visibility.NA)
         f_visibility = Visibility.PUBLIC;
 
-      final Set<Integer> usedTypeParmPositions = new HashSet<Integer>();
+      final Set<Integer> usedTypeParmPositions = new HashSet<>();
       for (DeclBuilder b : f_childBuilders) {
         if (b instanceof TypeParameterBuilder) {
           final Integer position = Integer.valueOf(((TypeParameterBuilder) b).f_position);
@@ -833,7 +833,7 @@ public abstract class Decl implements IDecl {
       if (f_functionalInterfaceTypeOf == null)
         throw new IllegalArgumentException(I18N.err(322));
 
-      final Set<Integer> usedParmPositions = new HashSet<Integer>();
+      final Set<Integer> usedParmPositions = new HashSet<>();
       for (DeclBuilder b : f_childBuilders) {
         if (b instanceof ParameterBuilder) {
           final Integer position = Integer.valueOf(((ParameterBuilder) b).f_position);
@@ -1032,8 +1032,8 @@ public abstract class Decl implements IDecl {
       if (f_isDefault && parent.getKind() != Kind.INTERFACE)
         throw new IllegalArgumentException(I18N.err(320, f_name));
 
-      final Set<Integer> usedParmPositions = new HashSet<Integer>();
-      final Set<Integer> usedTypeParmPositions = new HashSet<Integer>();
+      final Set<Integer> usedParmPositions = new HashSet<>();
+      final Set<Integer> usedTypeParmPositions = new HashSet<>();
       for (DeclBuilder b : f_childBuilders) {
         if (b instanceof ParameterBuilder) {
           final Integer position = Integer.valueOf(((ParameterBuilder) b).f_position);
@@ -1214,7 +1214,7 @@ public abstract class Decl implements IDecl {
   public static final class TypeParameterBuilder extends DeclBuilder {
 
     int f_position;
-    List<TypeRef> f_bounds = new ArrayList<TypeRef>();
+    List<TypeRef> f_bounds = new ArrayList<>();
 
     /**
      * Constructs a type parameter declaration builder.
@@ -1286,7 +1286,7 @@ public abstract class Decl implements IDecl {
 
     boolean f_alreadyBuilt = false;
     DeclBuilder f_parent;
-    final List<DeclBuilder> f_childBuilders = new ArrayList<DeclBuilder>();
+    final List<DeclBuilder> f_childBuilders = new ArrayList<>();
     String f_name;
 
     /**
@@ -1454,7 +1454,7 @@ public abstract class Decl implements IDecl {
     if (name == null)
       throw new IllegalArgumentException(I18N.err(44, "name"));
     f_name = DeclUtil.aliasIfPossible(name);
-    final List<IDecl> children = new ArrayList<IDecl>();
+    final List<IDecl> children = new ArrayList<>();
     for (Decl.DeclBuilder childBuilder : childBuilders) {
       children.add(childBuilder.buildHelper(this));
     }
@@ -1476,7 +1476,7 @@ public abstract class Decl implements IDecl {
     if (f_children == null)
       return Collections.emptyList();
     else {
-      final List<IDecl> result = new ArrayList<IDecl>();
+      final List<IDecl> result = new ArrayList<>();
       for (IDecl decl : f_children)
         result.add(decl);
       return result;
@@ -1546,7 +1546,7 @@ public abstract class Decl implements IDecl {
     for (IDecl decl : f_children) {
       if (decl instanceof IDeclParameter) {
         if (work == null)
-          work = new ArrayList<IDeclParameter>();
+          work = new ArrayList<>();
         work.add((IDeclParameter) decl);
       }
     }
@@ -1564,7 +1564,7 @@ public abstract class Decl implements IDecl {
   @Override
   @NonNull
   public final List<IDeclTypeParameter> getTypeParameters() {
-    List<IDeclTypeParameter> work = new ArrayList<IDeclTypeParameter>();
+    List<IDeclTypeParameter> work = new ArrayList<>();
     for (IDecl decl : getChildren()) {
       if (decl instanceof DeclTypeParameter)
         work.add((IDeclTypeParameter) decl);
@@ -1808,7 +1808,7 @@ public abstract class Decl implements IDecl {
 
   @Override
   public void acceptThisToRoot(@NonNull DeclVisitor visitor) {
-    LinkedList<Decl> nodes = new LinkedList<Decl>();
+    LinkedList<Decl> nodes = new LinkedList<>();
     Decl addMe = this;
     while (addMe != null) {
       nodes.addLast(addMe);
@@ -1822,7 +1822,7 @@ public abstract class Decl implements IDecl {
 
   @Override
   public void acceptRootToThis(@NonNull DeclVisitor visitor) {
-    LinkedList<Decl> nodes = new LinkedList<Decl>();
+    LinkedList<Decl> nodes = new LinkedList<>();
     Decl pushMe = this;
     while (pushMe != null) {
       nodes.addFirst(pushMe);
@@ -1842,7 +1842,7 @@ public abstract class Decl implements IDecl {
       case CLASS:
       case ENUM:
       case INTERFACE:
-        final LinkedList<IDeclType> types = new LinkedList<IDeclType>();
+        final LinkedList<IDeclType> types = new LinkedList<>();
         types.add((IDeclType) next);
         while (!nodes.isEmpty() && nodes.peek() instanceof IDeclType) {
           if (fromRootToThis)
@@ -1850,11 +1850,11 @@ public abstract class Decl implements IDecl {
           else
             types.addFirst((IDeclType) nodes.pop());
         }
-        if (visitor.visitTypes(new ArrayList<IDeclType>(types))) {
+        if (visitor.visitTypes(new ArrayList<>(types))) {
           for (IDecl type : types)
             acceptHelperForNode(type, visitor, true);
         }
-        visitor.endVisitTypes(new ArrayList<IDeclType>(types));
+        visitor.endVisitTypes(new ArrayList<>(types));
         break;
       case CONSTRUCTOR:
       case LAMBDA:
@@ -1931,21 +1931,21 @@ public abstract class Decl implements IDecl {
   private void acceptHelperForParameters(@NonNull final IDecl node, @NonNull final DeclVisitor visitor) {
     if (IDecl.HAS_TYPE_PARAMETERS.contains(node.getKind())) {
       final List<IDeclTypeParameter> typePparameters = node.getTypeParameters();
-      if (visitor.visitTypeParameters(new ArrayList<IDeclTypeParameter>(typePparameters))) {
+      if (visitor.visitTypeParameters(new ArrayList<>(typePparameters))) {
         for (IDeclTypeParameter p : typePparameters) {
           acceptHelperForNode(p, visitor, false);
         }
       }
-      visitor.endVisitTypeParameters(new ArrayList<IDeclTypeParameter>(typePparameters));
+      visitor.endVisitTypeParameters(new ArrayList<>(typePparameters));
     }
     if (IDecl.HAS_PARAMETERS.contains(node.getKind())) {
       final List<IDeclParameter> parameters = node.getParameters();
-      if (visitor.visitParameters(new ArrayList<IDeclParameter>(parameters))) {
+      if (visitor.visitParameters(new ArrayList<>(parameters))) {
         for (IDeclParameter p : parameters) {
           acceptHelperForNode(p, visitor, false);
         }
       }
-      visitor.endVisitParameters(new ArrayList<IDeclParameter>(parameters));
+      visitor.endVisitParameters(new ArrayList<>(parameters));
     }
   }
 
@@ -2574,6 +2574,6 @@ public abstract class Decl implements IDecl {
       throw new IllegalArgumentException("Failed to find a name=value pair (e.g., static=true) in: " + pair);
     final String name = pair.substring(0, index);
     final String value = pair.substring(index + 1);
-    return new Pair<String, String>(name, value);
+    return new Pair<>(name, value);
   }
 }

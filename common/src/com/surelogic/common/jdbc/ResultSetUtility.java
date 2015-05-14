@@ -85,7 +85,7 @@ public final class ResultSetUtility {
 
         final ResultSetMetaData meta = rs.getMetaData();
         final int columnCount = meta.getColumnCount();
-        ArrayList<String[]> rowList = new ArrayList<String[]>();
+        final ArrayList<String[]> rowList = new ArrayList<>();
         boolean limited = false;
         while (rs.next()) {
             final String[] rowContent = new String[columnCount];

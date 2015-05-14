@@ -84,7 +84,7 @@ public final class SLStatus {
   /**
    * Child status objects.
    */
-  private final CopyOnWriteArrayList<SLStatus> f_children = new CopyOnWriteArrayList<SLStatus>();
+  private final CopyOnWriteArrayList<SLStatus> f_children = new CopyOnWriteArrayList<>();
 
   /**
    * Adds a child status object to this status. Children of this status are
@@ -104,7 +104,7 @@ public final class SLStatus {
    *         copy and can be mutated by the caller.
    */
   public List<SLStatus> getChildren() {
-    return new ArrayList<SLStatus>(f_children);
+    return new ArrayList<>(f_children);
   }
 
   /**
@@ -346,7 +346,7 @@ public final class SLStatus {
    */
   @NotThreadSafe
   public static class Builder {
-    private final List<SLStatus> f_children = new ArrayList<SLStatus>();
+    private final List<SLStatus> f_children = new ArrayList<>();
 
     /**
      * Adds a status object to this builder. It will become a child of the

@@ -1293,7 +1293,7 @@ public final class DeclUtil {
   }
 
   @Nullable
-  private static final AtomicReference<StringCache> f_stringCache = new AtomicReference<StringCache>();
+  private static final AtomicReference<StringCache> f_stringCache = new AtomicReference<>();
 
   /**
    * Sets a string cache to help alias common strings. If <tt>o</tt> is a

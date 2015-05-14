@@ -18,7 +18,7 @@ import com.surelogic.common.i18n.I18N;
 public final class SloppyWrapper<T extends IDecl> {
 
   public static <T extends IDecl> SloppyWrapper<T> getInstance(@NonNull T decl) {
-    return new SloppyWrapper<T>(decl);
+    return new SloppyWrapper<>(decl);
   }
 
   public SloppyWrapper(@NonNull T decl) {
