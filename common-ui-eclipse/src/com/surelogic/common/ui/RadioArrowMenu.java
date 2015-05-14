@@ -21,8 +21,8 @@ import org.eclipse.swt.widgets.Listener;
 import com.surelogic.common.CommonImages;
 
 public final class RadioArrowMenu {
-  List<Object> f_choices = new ArrayList<Object>();
-  final Map<Object, Composite> f_choiceToComposite = new HashMap<Object, Composite>();
+  List<Object> f_choices = new ArrayList<>();
+  final Map<Object, Composite> f_choiceToComposite = new HashMap<>();
   Object f_selectedChoice = null;
   Object f_focusChoice = null;
   boolean f_enabled = true;
@@ -239,7 +239,7 @@ public final class RadioArrowMenu {
     void goNext(RadioArrowMenu menu);
   }
 
-  final Set<IRadioMenuObserver> f_selectionObservers = new CopyOnWriteArraySet<IRadioMenuObserver>();
+  final Set<IRadioMenuObserver> f_selectionObservers = new CopyOnWriteArraySet<>();
 
   public void addObserver(IRadioMenuObserver o) {
     if (o == null)

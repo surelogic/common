@@ -51,11 +51,11 @@ public final class VariableValueDialog extends Dialog {
 		}
 	}
 
-	final Map<String, Text> f_variableToText = new HashMap<String, Text>();
+	final Map<String, Text> f_variableToText = new HashMap<>();
 
-	final Map<String, String> f_workValues = new HashMap<String, String>();
+	final Map<String, String> f_workValues = new HashMap<>();
 
-	final Map<String, String> f_enteredValues = new HashMap<String, String>();
+	final Map<String, String> f_enteredValues = new HashMap<>();
 
 	final boolean f_readOnly;
 
@@ -126,7 +126,7 @@ public final class VariableValueDialog extends Dialog {
 		 * order. This is annoying, but the keys to Properties are of type
 		 * Object rather than type String so it is necessary.
 		 */
-		List<String> variables = new ArrayList<String>();
+		List<String> variables = new ArrayList<>();
 		for (Object o : f_workValues.keySet()) {
 			String key = o.toString();
 			variables.add(key);

@@ -53,61 +53,59 @@ import com.surelogic.common.ui.EclipseUIUtility;
 import com.surelogic.common.ui.SLImages;
 
 /**
- * Dialog box for selecting Java types from a given project.  Had to write this
- * because the built-in type selection dialog in Eclipse belongs to an 
- * internal package (stupid).  
+ * Dialog box for selecting Java types from a given project. Had to write this
+ * because the built-in type selection dialog in Eclipse belongs to an internal
+ * package (stupid).
  * 
- * <p>The Java project passed to the constructor bounds the type search to the
- * classes visible within that project.  
+ * <p>
+ * The Java project passed to the constructor bounds the type search to the
+ * classes visible within that project.
  * 
- * <p>The {@link #getResult()} method returns an array of {@link #IType} objects.
+ * <p>
+ * The {@link #getResult()} method returns an array of {@link #IType} objects.
  * 
- * <p>The type search is performed in a separate thread.  An ongoing search
- * can be canceled by pressing the search cancel button, or by starting a new 
- * search.
+ * <p>
+ * The type search is performed in a separate thread. An ongoing search can be
+ * canceled by pressing the search cancel button, or by starting a new search.
  * 
- * <p>(Implementation note: don't forget to kill the current search before
- * exiting the dialog!)
+ * <p>
+ * (Implementation note: don't forget to kill the current search before exiting
+ * the dialog!)
  */
 public class TypeSelectionDialog extends SelectionDialog {
-  private static final Image IMG_ANNOTATION =
-    SLImages.getImage(CommonImages.IMG_ANNOTATION);
-  private static final Image IMG_CLASS =
-    SLImages.getImage(CommonImages.IMG_CLASS);
-  private static final Image IMG_INTERFACE =
-    SLImages.getImage(CommonImages.IMG_INTERFACE);
-  private static final Image IMG_ENUM =
-    SLImages.getImage(CommonImages.IMG_ENUM);
+  static final Image IMG_ANNOTATION = SLImages.getImage(CommonImages.IMG_ANNOTATION);
+  static final Image IMG_CLASS = SLImages.getImage(CommonImages.IMG_CLASS);
+  static final Image IMG_INTERFACE = SLImages.getImage(CommonImages.IMG_INTERFACE);
+  static final Image IMG_ENUM = SLImages.getImage(CommonImages.IMG_ENUM);
 
   // Final field, initialized in constructor
-  private final IJavaProject searchRoot;
+  final IJavaProject searchRoot;
 
-  /* Final field, the contents are accessed in both the UI thread and the
-   * search thread
+  /*
+   * Final field, the contents are accessed in both the UI thread and the search
+   * thread
    */
-  private final List<IType> types =
-    Collections.synchronizedList(new ArrayList<IType>());
+  final List<IType> types = Collections.synchronizedList(new ArrayList<IType>());
 
   // Widgets, only used in the UI thread
-  private TableViewer typesViewer;
-  private ProgressBar progressBar;
-  private Label statusLabel;
-  private Text searchText = null;
-  private Button cancelButton = null;
-  
-  /* Accessed in both the UI and search threads.  Content of the
-   * progress monitor needs to be thread safe.
+  TableViewer typesViewer;
+  ProgressBar progressBar;
+  Label statusLabel;
+  Text searchText = null;
+  Button cancelButton = null;
+
+  /*
+   * Accessed in both the UI and search threads. Content of the progress monitor
+   * needs to be thread safe.
    */
-  private volatile IProgressMonitor currentProgressMonitor = null;
-  private volatile Thread searchThread = null;
-  
-  
-  
+  volatile IProgressMonitor currentProgressMonitor = null;
+  volatile Thread searchThread = null;
+
   public TypeSelectionDialog(final Shell parentShell, final IJavaProject root) {
     super(parentShell);
     setTitle("Choose Java Type");
     setHelpAvailable(false);
-    
+
     searchRoot = root;
   }
 
@@ -128,10 +126,9 @@ public class TypeSelectionDialog extends SelectionDialog {
     super.createButtonsForButtonBar(parent);
     getOkButton().setEnabled(false);
   }
-  
+
   public void createSearchArea(final Composite parent) {
-    final Composite searchArea = createNamedGroup(
-        parent, "Enter Java type search pattern (wild card '*' allowed):", 1);
+    final Composite searchArea = createNamedGroup(parent, "Enter Java type search pattern (wild card '*' allowed):", 1);
     searchArea.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
     final GridLayout searchAreaLayout = (GridLayout) searchArea.getLayout();
 
@@ -161,8 +158,9 @@ public class TypeSelectionDialog extends SelectionDialog {
         }
       }
     });
-    
-    // If CANCEL flag on text field is not supported, add an explicit cancel button
+
+    // If CANCEL flag on text field is not supported, add an explicit cancel
+    // button
     if ((searchText.getStyle() & SWT.CANCEL) == 0) {
       searchAreaLayout.numColumns = 2;
       cancelButton = createPushButton(searchArea, "Cancel");
@@ -175,17 +173,16 @@ public class TypeSelectionDialog extends SelectionDialog {
       });
     }
   }
-  
+
   public void createStatusArea(final Composite parent) {
-    final Composite statusArea = createNamedGroup(
-        parent, "Search status", 1);
+    final Composite statusArea = createNamedGroup(parent, "Search status", 1);
     statusArea.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-    
+
     statusLabel = new Label(statusArea, SWT.NONE);
     statusLabel.setFont(statusArea.getFont());
     statusLabel.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
     statusLabel.setText("Enter search pattern");
-    
+
     progressBar = new ProgressBar(statusArea, SWT.HORIZONTAL | SWT.SMOOTH);
     progressBar.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
     progressBar.setMinimum(0);
@@ -193,9 +190,8 @@ public class TypeSelectionDialog extends SelectionDialog {
     progressBar.setSelection(0);
     progressBar.setEnabled(false);
   }
-  
-  private static Group createNamedGroup(Composite parent, String name,
-      int columns) {
+
+  private static Group createNamedGroup(Composite parent, String name, int columns) {
     final Group outer = new Group(parent, SWT.NONE);
     outer.setFont(parent.getFont());
     GridLayout gridLayout = new GridLayout();
@@ -212,10 +208,10 @@ public class TypeSelectionDialog extends SelectionDialog {
       button.setText(label);
     }
     GridData gd = new GridData();
-    button.setLayoutData(gd); 
-    return button;  
+    button.setLayoutData(gd);
+    return button;
   }
-  
+
   public void createListArea(final Composite parent) {
     typesViewer = new TableViewer(parent);
     typesViewer.getControl().setLayoutData(new GridData(GridData.FILL_BOTH));
@@ -226,8 +222,11 @@ public class TypeSelectionDialog extends SelectionDialog {
       public Object[] getElements(Object inputElement) {
         return ((java.util.List<IType>) inputElement).toArray();
       }
+
       @Override
-      public void dispose() { /* do nothing */ }
+      public void dispose() { /* do nothing */
+      }
+
       @Override
       public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
         /* do nothing */
@@ -263,18 +262,17 @@ public class TypeSelectionDialog extends SelectionDialog {
       public void dispose() {
         // Do nothing
       }
-    
+
       @Override
-      public boolean isLabelProperty(final Object element,
-          final String property) {
+      public boolean isLabelProperty(final Object element, final String property) {
         return false;
       }
-    
+
       @Override
       public void addListener(final ILabelProviderListener listener) {
         // Do nothing
       }
-    
+
       @Override
       public void removeListener(final ILabelProviderListener listener) {
         // Do Nothing
@@ -282,6 +280,7 @@ public class TypeSelectionDialog extends SelectionDialog {
     });
     typesViewer.addSelectionChangedListener(new ISelectionChangedListener() {
       @Override
+      @SuppressWarnings("synthetic-access")
       public void selectionChanged(final SelectionChangedEvent event) {
         final ISelection selection = event.getSelection();
         if (selection.isEmpty()) {
@@ -291,29 +290,28 @@ public class TypeSelectionDialog extends SelectionDialog {
           setResult(((StructuredSelection) selection).toList());
           getOkButton().setEnabled(true);
         }
-      }      
-    });    
+      }
+    });
     typesViewer.setComparator(new ViewerComparator());
     typesViewer.setInput(types);
   }
 
-  private void startSearch(final String pattern) {
-    /* Disable searchText to prevent another search without 
-     * an explicit cancel.
+  void startSearch(final String pattern) {
+    /*
+     * Disable searchText to prevent another search without an explicit cancel.
      */
     searchText.setEditable(false);
-    
+
     searchThread = new Thread() {
       @Override
       public void run() {
-        final SearchPattern sp = SearchPattern.createPattern(
-            pattern, IJavaSearchConstants.TYPE, IJavaSearchConstants.DECLARATIONS,
+        final SearchPattern sp = SearchPattern.createPattern(pattern, IJavaSearchConstants.TYPE, IJavaSearchConstants.DECLARATIONS,
             SearchPattern.R_PATTERN_MATCH);
-        if (sp == null) return;
-        
-        final IJavaSearchScope scope = 
-          SearchEngine.createJavaSearchScope(new IJavaElement[] { searchRoot });
-        
+        if (sp == null)
+          return;
+
+        final IJavaSearchScope scope = SearchEngine.createJavaSearchScope(new IJavaElement[] { searchRoot });
+
         final SearchRequestor requestor = new SearchRequestor() {
           @Override
           public void beginReporting() {
@@ -321,13 +319,14 @@ public class TypeSelectionDialog extends SelectionDialog {
               @Override
               public void run() {
                 progressBar.setEnabled(true);
-                if (cancelButton != null) cancelButton.setEnabled(true);
+                if (cancelButton != null)
+                  cancelButton.setEnabled(true);
                 types.clear();
                 typesViewer.refresh();
               }
             });
           }
-          
+
           @Override
           public void endReporting() {
             EclipseUIUtility.asyncExec(new Runnable() {
@@ -336,7 +335,8 @@ public class TypeSelectionDialog extends SelectionDialog {
                 progressBar.setMaximum(1);
                 progressBar.setSelection(0);
                 progressBar.setEnabled(false);
-                if (cancelButton != null) cancelButton.setEnabled(false);
+                if (cancelButton != null)
+                  cancelButton.setEnabled(false);
                 if (currentProgressMonitor.isCanceled()) {
                   statusLabel.setText("Search canceled");
                 } else {
@@ -344,11 +344,12 @@ public class TypeSelectionDialog extends SelectionDialog {
                 }
                 currentProgressMonitor = null;
                 searchText.setEditable(true);
-                searchText.setEnabled(true); // may have been disabled via a cancel
+                searchText.setEnabled(true); // may have been disabled via a
+                                             // cancel
               }
             });
           }
-          
+
           @Override
           public void acceptSearchMatch(final SearchMatch match) throws CoreException {
             EclipseUIUtility.asyncExec(new Runnable() {
@@ -360,15 +361,14 @@ public class TypeSelectionDialog extends SelectionDialog {
               }
             });
           }
-          
+
         };
-        
+
         currentProgressMonitor = new MyProgressMonitor();
         final SearchEngine engine = new SearchEngine();
         try {
-          engine.search(sp,
-              new SearchParticipant[] { SearchEngine.getDefaultSearchParticipant() },
-              scope, requestor, currentProgressMonitor);
+          engine.search(sp, new SearchParticipant[] { SearchEngine.getDefaultSearchParticipant() }, scope, requestor,
+              currentProgressMonitor);
         } catch (final OperationCanceledException e) {
           // do nothing
         } catch (final CoreException e) {
@@ -383,14 +383,15 @@ public class TypeSelectionDialog extends SelectionDialog {
     searchThread.start();
     statusLabel.setText("Searching...");
   }
-  
-  private void cancelSearch() {
+
+  void cancelSearch() {
     statusLabel.setText("Cancel pending...");
-    if (cancelButton != null) cancelButton.setEnabled(false);
+    if (cancelButton != null)
+      cancelButton.setEnabled(false);
     currentProgressMonitor.setCanceled(true);
   }
 
-  private void killCurrentSearch() {
+  void killCurrentSearch() {
     if (currentProgressMonitor != null) {
       cancelSearch();
     }
@@ -405,22 +406,21 @@ public class TypeSelectionDialog extends SelectionDialog {
     }
   }
 
-
   @Override
   protected void buttonPressed(final int buttonId) {
     /* Stop the search before we close the dialog */
-    killCurrentSearch();    
+    killCurrentSearch();
     super.buttonPressed(buttonId);
   }
 
-  
-  
   private final class MyProgressMonitor implements IProgressMonitor {
-    private boolean canceled = false;
-    private int currentWork = 0;
-    
-    public MyProgressMonitor() { super(); }
-    
+    boolean canceled = false;
+    int currentWork = 0;
+
+    public MyProgressMonitor() {
+      super();
+    }
+
     @Override
     public void beginTask(final String name, final int totalWork) {
       EclipseUIUtility.asyncExec(new Runnable() {
@@ -430,7 +430,7 @@ public class TypeSelectionDialog extends SelectionDialog {
         }
       });
     }
-    
+
     @Override
     public void internalWorked(final double work) {
       EclipseUIUtility.asyncExec(new Runnable() {
@@ -444,17 +444,28 @@ public class TypeSelectionDialog extends SelectionDialog {
     @Override
     public void worked(final int work) {
       internalWorked(work);
-    }    
+    }
 
     @Override
-    public void done() { /* don't care */ }
+    public void done() { /* don't care */
+    }
+
     @Override
-    public synchronized boolean isCanceled() { return canceled; }
+    public synchronized boolean isCanceled() {
+      return canceled;
+    }
+
     @Override
-    public synchronized void setCanceled(final boolean value) { canceled = value; }
+    public synchronized void setCanceled(final boolean value) {
+      canceled = value;
+    }
+
     @Override
-    public void setTaskName(final String name) { /* don't care */ }
+    public void setTaskName(final String name) { /* don't care */
+    }
+
     @Override
-    public void subTask(final String name) { /* don't care */ }
+    public void subTask(final String name) { /* don't care */
+    }
   }
 }

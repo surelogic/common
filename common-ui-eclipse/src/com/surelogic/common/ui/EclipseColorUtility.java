@@ -8,7 +8,7 @@ import com.surelogic.Utility;
 @Utility
 public final class EclipseColorUtility {
 
-  private static Color f_subtleTextColor;
+  static Color f_subtleTextColor;
 
   public static Color getSubtleTextColor() {
     if (f_subtleTextColor == null) {
@@ -23,7 +23,7 @@ public final class EclipseColorUtility {
     return f_subtleTextColor;
   }
 
-  private static Color f_diffHighlightColorNewChanged;
+  static Color f_diffHighlightColorNewChanged;
 
   public static Color getDiffHighlightColorNewChanged() {
     if (f_diffHighlightColorNewChanged == null) {
@@ -38,7 +38,7 @@ public final class EclipseColorUtility {
     return f_diffHighlightColorNewChanged;
   }
 
-  private static Color f_diffHighlightColorObsolete;
+  static Color f_diffHighlightColorObsolete;
 
   public static Color getDiffHighlightColorObsolete() {
     if (f_diffHighlightColorObsolete == null) {
@@ -53,7 +53,7 @@ public final class EclipseColorUtility {
     return f_diffHighlightColorObsolete;
   }
 
-  private static Color f_slightlyDarkerBackgroundColor;
+  static Color f_slightlyDarkerBackgroundColor;
 
   public static Color getSlightlyDarkerBackgroundColor() {
     if (f_slightlyDarkerBackgroundColor == null) {
@@ -68,7 +68,7 @@ public final class EclipseColorUtility {
     return f_slightlyDarkerBackgroundColor;
   }
 
-  private static Color f_QueryMenuSubtleColor;
+  static Color f_QueryMenuSubtleColor;
 
   public static Color getQueryMenuSubtleColor() {
     if (f_QueryMenuSubtleColor == null) {
@@ -83,7 +83,7 @@ public final class EclipseColorUtility {
     return f_QueryMenuSubtleColor;
   }
 
-  private static Color f_QueryMenuGrayColor;
+  static Color f_QueryMenuGrayColor;
 
   public static Color getQueryMenuGrayColor() {
     if (f_QueryMenuGrayColor == null) {
@@ -92,7 +92,7 @@ public final class EclipseColorUtility {
     return f_QueryMenuGrayColor;
   }
 
-  private static Color f_compoundScheme1Color0;
+  static Color f_compoundScheme1Color0;
 
   public static Color getCompoundScheme1Color0() {
     if (f_compoundScheme1Color0 == null) {
@@ -107,7 +107,7 @@ public final class EclipseColorUtility {
     return f_compoundScheme1Color0;
   }
 
-  private static Color f_compoundScheme1Color1;
+  static Color f_compoundScheme1Color1;
 
   public static Color getCompoundScheme1Color1() {
     if (f_compoundScheme1Color1 == null) {
@@ -122,7 +122,7 @@ public final class EclipseColorUtility {
     return f_compoundScheme1Color1;
   }
 
-  private static Color f_compoundScheme1Color2;
+  static Color f_compoundScheme1Color2;
 
   public static Color getCompoundScheme1Color2() {
     if (f_compoundScheme1Color2 == null) {
@@ -137,7 +137,7 @@ public final class EclipseColorUtility {
     return f_compoundScheme1Color2;
   }
 
-  private static Color f_compoundScheme1Color3;
+  static Color f_compoundScheme1Color3;
 
   public static Color getCompoundScheme1Color3() {
     if (f_compoundScheme1Color3 == null) {
@@ -152,7 +152,7 @@ public final class EclipseColorUtility {
     return f_compoundScheme1Color3;
   }
 
-  private static Color f_compoundScheme1Color4;
+  static Color f_compoundScheme1Color4;
 
   public static Color getCompoundScheme1Color4() {
     if (f_compoundScheme1Color4 == null) {
@@ -167,7 +167,7 @@ public final class EclipseColorUtility {
     return f_compoundScheme1Color4;
   }
 
-  private static Color f_analogousScheme1Color0;
+  static Color f_analogousScheme1Color0;
 
   public static Color getAnalogousScheme1Color0() {
     if (f_analogousScheme1Color0 == null) {
@@ -182,7 +182,7 @@ public final class EclipseColorUtility {
     return f_analogousScheme1Color0;
   }
 
-  private static Color f_analogousScheme1Color1;
+  static Color f_analogousScheme1Color1;
 
   public static Color getAnalogousScheme1Color1() {
     if (f_analogousScheme1Color1 == null) {
@@ -197,7 +197,7 @@ public final class EclipseColorUtility {
     return f_analogousScheme1Color1;
   }
 
-  private static Color f_analogousScheme1Color2;
+  static Color f_analogousScheme1Color2;
 
   public static Color getAnalogousScheme1Color2() {
     if (f_analogousScheme1Color2 == null) {
@@ -212,7 +212,7 @@ public final class EclipseColorUtility {
     return f_analogousScheme1Color2;
   }
 
-  private static Color f_analogousScheme1Color3;
+  static Color f_analogousScheme1Color3;
 
   public static Color getAnalogousScheme1Color3() {
     if (f_analogousScheme1Color3 == null) {
@@ -227,7 +227,7 @@ public final class EclipseColorUtility {
     return f_analogousScheme1Color3;
   }
 
-  private static Color f_analogousScheme1Color4;
+  static Color f_analogousScheme1Color4;
 
   public static Color getAnalogousScheme1Color4() {
     if (f_analogousScheme1Color4 == null) {

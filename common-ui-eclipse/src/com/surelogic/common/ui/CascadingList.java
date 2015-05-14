@@ -68,9 +68,9 @@ public class CascadingList extends ScrolledComposite {
   /**
    * The ordered list of columns currently displayed by this cascading list.
    */
-  private final List<Composite> f_columns = new LinkedList<Composite>();
+  private final List<Composite> f_columns = new LinkedList<>();
 
-  private final Set<Composite> f_noSpaceBeforeColumns = new HashSet<Composite>();
+  private final Set<Composite> f_noSpaceBeforeColumns = new HashSet<>();
 
   /**
    * Sets the application defined widget data associated with the column to be
@@ -361,7 +361,7 @@ public class CascadingList extends ScrolledComposite {
     void notify(CascadingList cascadingList);
   }
 
-  private final Set<ICascadingListObserver> f_observers = new CopyOnWriteArraySet<ICascadingListObserver>();
+  private final Set<ICascadingListObserver> f_observers = new CopyOnWriteArraySet<>();
 
   /**
    * Adds an observer for changes to the structure of this control.
@@ -423,7 +423,7 @@ public class CascadingList extends ScrolledComposite {
    * in this viewer. It ensures that all the vertical scrollbars don't jump to
    * the top each time the finer is manipulated.
    */
-  private final Map<ScrolledComposite, Point> f_columnViewportToOrigin = new HashMap<ScrolledComposite, Point>();
+  private final Map<ScrolledComposite, Point> f_columnViewportToOrigin = new HashMap<>();
 
   private void rememberColumnViewportOrigins() {
     f_columnViewportToOrigin.clear();
@@ -532,12 +532,12 @@ public class CascadingList extends ScrolledComposite {
     }
   }
 
-  private int f_xPosStartOfLast = 0;
+  int f_xPosStartOfLast = 0;
 
-  private Animator f_animator = null;
-  private final Interpolator f_interpolator = new SplineInterpolator(0.82, 0.18, 0.18, 0.82);
+  Animator f_animator = null;
+  final Interpolator f_interpolator = new SplineInterpolator(0.82, 0.18, 0.18, 0.82);
 
-  private class CLTimingTarget extends TimingTargetAdapter {
+  class CLTimingTarget extends TimingTargetAdapter {
 
     final int f_sX;
     final int f_tX;

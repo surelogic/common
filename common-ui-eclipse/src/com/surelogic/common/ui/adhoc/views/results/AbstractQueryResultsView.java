@@ -805,7 +805,7 @@ public abstract class AbstractQueryResultsView extends ViewPart {
                 if (selectedC != null) {
                     NonLeafTreeCell nltc = selectedC;
 
-                    final List<String> cells = new ArrayList<String>();
+                    final List<String> cells = new ArrayList<>();
                     while (nltc != null) {
                         cells.add(0, nltc.getText());
                         nltc = nltc.getParent();

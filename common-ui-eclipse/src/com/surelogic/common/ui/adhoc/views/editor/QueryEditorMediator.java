@@ -101,7 +101,7 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
   final Table f_subQueryTable;
   final Table f_usedByTable;
 
-  final Set<AdHocQuery> f_selections = new HashSet<AdHocQuery>();
+  final Set<AdHocQuery> f_selections = new HashSet<>();
   AdHocQuery f_edit = null;
   boolean f_filterTree = false;
 
@@ -482,7 +482,7 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
      * Remember what queries are selected.
      */
     final Item[] selections = widget == f_queryList ? f_queryList.getSelection() : f_queryTree.getSelection();
-    final Set<AdHocQuery> newSelections = new HashSet<AdHocQuery>();
+    final Set<AdHocQuery> newSelections = new HashSet<>();
     for (final Item item : selections) {
       if (item.getData() instanceof AdHocQuery) {
         newSelections.add((AdHocQuery) item.getData());
@@ -507,7 +507,7 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
   }
 
   private void setQueryListSelections() {
-    final ArrayList<TableItem> items = new ArrayList<TableItem>();
+    final ArrayList<TableItem> items = new ArrayList<>();
     for (final TableItem item : f_queryList.getItems()) {
       if (item.getData() instanceof AdHocQuery) {
         final AdHocQuery query = (AdHocQuery) item.getData();
@@ -520,7 +520,7 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
   }
 
   private void setQueryTreeSelections() {
-    final List<TreeItem> items = new ArrayList<TreeItem>();
+    final List<TreeItem> items = new ArrayList<>();
     for (final TreeItem item : f_queryTree.getItems()) {
       setQueryTreeSelectionsHelper(item, items);
     }
@@ -598,7 +598,7 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
     } else {
       item = new TreeItem(parent, SWT.NONE);
     }
-    final Set<AdHocQuery> newSet = new HashSet<AdHocQuery>(ancestorSet);
+    final Set<AdHocQuery> newSet = new HashSet<>(ancestorSet);
     newSet.add(query);
     item.setText(query.getDescription());
     item.setImage(getImageForQuery(query));
@@ -818,7 +818,7 @@ public final class QueryEditorMediator extends AdHocManagerAdapter implements IL
     }
   }
 
-  private final ArrayList<Runnable> f_defaultPrioritySubQuerySaveChanges = new ArrayList<Runnable>();
+  private final ArrayList<Runnable> f_defaultPrioritySubQuerySaveChanges = new ArrayList<>();
 
   private void savePossibleDefaultPrioritySubQueryChanges() {
     for (Runnable r : f_defaultPrioritySubQuerySaveChanges)

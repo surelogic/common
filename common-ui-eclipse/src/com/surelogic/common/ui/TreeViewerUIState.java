@@ -96,7 +96,7 @@ public final class TreeViewerUIState {
     });
   }
 
-  private static void updateTreeViewerState(final TreeViewer treeViewer) {
+  static void updateTreeViewerState(final TreeViewer treeViewer) {
     if (treeViewer != null && !treeViewer.getControl().isDisposed()) {
       final TreeViewerUIState contentsState = new TreeViewerUIState(treeViewer);
       treeViewer.setData(KEY, contentsState);
@@ -177,12 +177,12 @@ public final class TreeViewerUIState {
   /**
    * Saved tree paths to expanded nodes.
    */
-  private final List<LinkedList<String>> f_expandedPaths = new ArrayList<LinkedList<String>>();
+  final List<LinkedList<String>> f_expandedPaths = new ArrayList<>();
 
   /**
    * Saved tree paths to selected nodes.
    */
-  private final List<LinkedList<String>> f_selectedPaths = new ArrayList<LinkedList<String>>();
+  final List<LinkedList<String>> f_selectedPaths = new ArrayList<>();
 
   private TreeViewerUIState() {
     // only for persistence
@@ -237,7 +237,7 @@ public final class TreeViewerUIState {
 
   private void savePathsToList(final TreePath[] treePaths, final ILabelProvider lp, final List<LinkedList<String>> to) {
     for (TreePath path : treePaths) {
-      final LinkedList<String> stringPath = new LinkedList<String>();
+      final LinkedList<String> stringPath = new LinkedList<>();
       to.add(stringPath);
       for (int i = 0; i < path.getSegmentCount(); i++) {
         final Object element = path.getSegment(i);
@@ -343,7 +343,7 @@ public final class TreeViewerUIState {
   private static final MatchCallback f_restoreSelectedNodes = new MatchCallback() {
     @Override
     public void onMatch(TreeViewer treeViewer, TreePath treePath) {
-      final List<TreePath> result = new ArrayList<TreePath>();
+      final List<TreePath> result = new ArrayList<>();
       result.add(treePath);
       // Handle multi-select by merging this selection with the existing one
       final ITreeSelection existing = (ITreeSelection) treeViewer.getSelection();
@@ -381,7 +381,7 @@ public final class TreeViewerUIState {
     if (parent == null) {
       // at the root
       elements = tcp.getElements(null);
-      treePath = new ArrayList<Object>();
+      treePath = new ArrayList<>();
     } else {
       elements = tcp.getChildren(parent);
     }
@@ -444,10 +444,10 @@ public final class TreeViewerUIState {
 
   // PERSISTENCE
 
-  private static final String TOP = TreeViewerUIState.class.getSimpleName();
-  private static final String EXPANDED_PATH = "expandedPath";
-  private static final String SELECTED_PATH = "selectedPath";
-  private static final String ELEMENT = "element";
+  static final String TOP = TreeViewerUIState.class.getSimpleName();
+  static final String EXPANDED_PATH = "expandedPath";
+  static final String SELECTED_PATH = "selectedPath";
+  static final String ELEMENT = "element";
 
   /**
    * Loads saved tree viewer state from the passed file. If the file doesn't
@@ -501,7 +501,7 @@ public final class TreeViewerUIState {
     LinkedList<String> f_path = null;
     StringBuilder f_element = null;
 
-    private StateReader(TreeViewerUIState state) {
+    StateReader(TreeViewerUIState state) {
       f_state = state;
     }
 
@@ -510,9 +510,9 @@ public final class TreeViewerUIState {
       if (name.equals(TOP)) {
         // nothing to do until there is more than one file version
       } else if (name.equals(EXPANDED_PATH)) {
-        f_path = new LinkedList<String>();
+        f_path = new LinkedList<>();
       } else if (name.equals(SELECTED_PATH)) {
-        f_path = new LinkedList<String>();
+        f_path = new LinkedList<>();
       } else if (name.equals(ELEMENT)) {
         f_element = new StringBuilder();
       }

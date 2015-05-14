@@ -26,106 +26,105 @@ import org.eclipse.swt.widgets.Layout;
  */
 public class PageBook extends Composite {
 
-	/**
-	 * <p>
-	 * [Issue: This class should be declared private.]
-	 * </p>
-	 */
-	public class PageBookLayout extends Layout {
+  /**
+   * <p>
+   * [Issue: This class should be declared private.]
+   * </p>
+   */
+  public class PageBookLayout extends Layout {
 
-		@Override
-		protected Point computeSize(Composite composite, int wHint, int hHint,
-				boolean flushCache) {
-			if (wHint != SWT.DEFAULT && hHint != SWT.DEFAULT) {
-				return new Point(wHint, hHint);
-			}
+    @Override
+    protected Point computeSize(Composite composite, int wHint, int hHint, boolean flushCache) {
+      if (wHint != SWT.DEFAULT && hHint != SWT.DEFAULT) {
+        return new Point(wHint, hHint);
+      }
 
-			Point result;
-			if (currentPage != null) {
-				result = currentPage.computeSize(wHint, hHint, flushCache);
-			} else {
-				// Rectangle rect= composite.getClientArea();
-				// result= new Point(rect.width, rect.height);
-				result = new Point(0, 0);
-			}
-			if (wHint != SWT.DEFAULT) {
-				result.x = wHint;
-			}
-			if (hHint != SWT.DEFAULT) {
-				result.y = hHint;
-			}
-			return result;
-		}
+      Point result;
+      if (currentPage != null) {
+        result = currentPage.computeSize(wHint, hHint, flushCache);
+      } else {
+        // Rectangle rect= composite.getClientArea();
+        // result= new Point(rect.width, rect.height);
+        result = new Point(0, 0);
+      }
+      if (wHint != SWT.DEFAULT) {
+        result.x = wHint;
+      }
+      if (hHint != SWT.DEFAULT) {
+        result.y = hHint;
+      }
+      return result;
+    }
 
-		@Override
-		protected void layout(Composite composite, boolean flushCache) {
-			if (currentPage != null) {
-				currentPage.setBounds(composite.getClientArea());
-			}
-		}
-	}
+    @Override
+    protected void layout(Composite composite, boolean flushCache) {
+      if (currentPage != null) {
+        currentPage.setBounds(composite.getClientArea());
+      }
+    }
+  }
 
-	/**
-	 * The current control; <code>null</code> if none.
-	 */
-	private Control currentPage = null;
+  /**
+   * The current control; <code>null</code> if none.
+   */
+  Control currentPage = null;
 
-	/**
-	 * Gets the current page being shown, or <code>null</code> if none.
-	 * 
-	 * @return the page being shown, or <code>null</code> if none.
-	 */
-	public Control getPage() {
-		return currentPage;
-	}
+  /**
+   * Gets the current page being shown, or <code>null</code> if none.
+   * 
+   * @return the page being shown, or <code>null</code> if none.
+   */
+  public Control getPage() {
+    return currentPage;
+  }
 
-	/**
-	 * Creates a new empty pagebook.
-	 * 
-	 * @param parent
-	 *            the parent composite
-	 * @param style
-	 *            the SWT style bits
-	 */
-	public PageBook(Composite parent, int style) {
-		super(parent, style);
-		setLayout(new PageBookLayout());
-	}
+  /**
+   * Creates a new empty pagebook.
+   * 
+   * @param parent
+   *          the parent composite
+   * @param style
+   *          the SWT style bits
+   */
+  public PageBook(Composite parent, int style) {
+    super(parent, style);
+    setLayout(new PageBookLayout());
+  }
 
-	/**
-	 * Shows the given page. This method has no effect if the given page is not
-	 * contained in this pagebook.
-	 * 
-	 * @param page
-	 *            the page to show
-	 */
-	public void showPage(Control page) {
+  /**
+   * Shows the given page. This method has no effect if the given page is not
+   * contained in this pagebook.
+   * 
+   * @param page
+   *          the page to show
+   */
+  public void showPage(Control page) {
 
-		if (page == null) {
-			return;
-		}
-		if (page == currentPage) {
-			return;
-		}
-		if (page.getParent() != this) {
-			return;
-		}
+    if (page == null) {
+      return;
+    }
+    if (page == currentPage) {
+      return;
+    }
+    if (page.getParent() != this) {
+      return;
+    }
 
-		Control oldPage = currentPage;
-		currentPage = page;
+    Control oldPage = currentPage;
+    currentPage = page;
 
-		// show new page
-		if (!page.isDisposed()) {
-		  page.setVisible(true);
-		  layout(true);
-		  // if (fRequestFocusOnShowPage)
-		  // page.setFocus();
-		}
+    // show new page
+    if (!page.isDisposed()) {
+      page.setVisible(true);
+      layout(true);
+      // if (fRequestFocusOnShowPage)
+      // page.setFocus();
+    }
 
-		// hide old *after* new page has been made visible in order to avoid
-		// flashing
-		if (oldPage != null && !oldPage.isDisposed()) {
-			oldPage.setVisible(false);
-		}
-	}
+    // hide old *after* new page has been made visible in order to avoid
+    // flashing
+    if (oldPage != null && !oldPage.isDisposed()) {
+      oldPage.setVisible(false);
+    }
+  }
 }

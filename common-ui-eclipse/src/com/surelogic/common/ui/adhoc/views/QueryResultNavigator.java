@@ -221,7 +221,7 @@ public final class QueryResultNavigator extends AdHocManagerAdapter implements I
     return f_exportAction;
   }
 
-  private final Set<IAction> f_enableWhenAResultExists = new CopyOnWriteArraySet<IAction>();
+  private final Set<IAction> f_enableWhenAResultExists = new CopyOnWriteArraySet<>();
 
   public void addEnableWhenAResultExists(IAction action) {
     if (action != null) {
@@ -229,7 +229,7 @@ public final class QueryResultNavigator extends AdHocManagerAdapter implements I
     }
   }
 
-  private final Set<IAction> f_enableWhenAResultIsSelected = new CopyOnWriteArraySet<IAction>();
+  private final Set<IAction> f_enableWhenAResultIsSelected = new CopyOnWriteArraySet<>();
 
   public void addEnableWhenAResultIsSelected(IAction action) {
     if (action != null) {
@@ -237,7 +237,7 @@ public final class QueryResultNavigator extends AdHocManagerAdapter implements I
     }
   }
 
-  private final Set<IAction> f_enableEnableWhenResultHasData = new CopyOnWriteArraySet<IAction>();
+  private final Set<IAction> f_enableEnableWhenResultHasData = new CopyOnWriteArraySet<>();
 
   public void addEnableWhenResultHasData(IAction action) {
     if (action != null) {
@@ -245,7 +245,7 @@ public final class QueryResultNavigator extends AdHocManagerAdapter implements I
     }
   }
 
-  private final Set<IAction> f_enableEnableWhenResultIsATree = new CopyOnWriteArraySet<IAction>();
+  private final Set<IAction> f_enableEnableWhenResultIsATree = new CopyOnWriteArraySet<>();
 
   public void addEnableWhenResultIsATree(IAction action) {
     if (action != null) {

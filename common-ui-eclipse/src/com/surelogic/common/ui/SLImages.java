@@ -81,7 +81,7 @@ public final class SLImages {
    * </ul>
    * <p>
    */
-  static final Map<String, Image> CACHEKEY_TO_IMAGE = new HashMap<String, Image>();
+  static final Map<String, Image> CACHEKEY_TO_IMAGE = new HashMap<>();
 
   /**
    * Adds the passed image to the cache under the passed key.
@@ -1516,6 +1516,6 @@ public final class SLImages {
    */
   @NonNull
   public static HashMap<String, Image> getCopyOfImageCache() {
-    return new HashMap<String, Image>(CACHEKEY_TO_IMAGE);
+    return new HashMap<>(CACHEKEY_TO_IMAGE);
   }
 }

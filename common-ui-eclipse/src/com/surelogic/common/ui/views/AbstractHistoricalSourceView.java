@@ -49,19 +49,19 @@ public abstract class AbstractHistoricalSourceView extends ViewPart {
   public static final String OLD = "(old)";
 
   // FIX replace with SourceViewer?
-  private StyledText f_source;
-  private JavaSyntaxHighlighter f_highlighter;
-  private ISourceZipFileHandles f_lastSources = null;
-  private String f_lastProj = null;
-  private String f_lastType = null;
+  StyledText f_source;
+  JavaSyntaxHighlighter f_highlighter;
+  ISourceZipFileHandles f_lastSources = null;
+  String f_lastProj = null;
+  String f_lastType = null;
 
-  private Label f_sourceLabel;
-  private Date f_sourceCopyTime = null;
+  Label f_sourceLabel;
+  Date f_sourceCopyTime = null;
 
   /**
    * Internal class for informing this window when fonts change.
    */
-  private class FontChangeListener implements IPropertyChangeListener {
+  class FontChangeListener implements IPropertyChangeListener {
     @Override
     public void propertyChange(PropertyChangeEvent event) {
       if (f_source != null) {
@@ -145,20 +145,20 @@ public abstract class AbstractHistoricalSourceView extends ViewPart {
   /*
    * Pattern matching an anonymous class in a type signature
    */
-  private static final Pattern ANON = Pattern.compile("[.$]\\d+");
+  static final Pattern ANON = Pattern.compile("[.$]\\d+");
   /*
    * Pattern matching an anonymous class in a type signature, as well as
    * everything that follows
    */
-  private static final Pattern ANON_ONWARDS = Pattern.compile("[.$]\\d.*");
+  static final Pattern ANON_ONWARDS = Pattern.compile("[.$]\\d.*");
 
   /**
    * @return true if the view is populated
    */
   private boolean showSourceFile(final ISourceZipFileHandles sources, String qname) {
-	return showSourceFile(sources, null, qname);
+    return showSourceFile(sources, null, qname);
   }
-  
+
   private boolean showSourceFile(final ISourceZipFileHandles sources, String proj, String qname) {
     if (qname == null) {
       return false;
@@ -166,7 +166,7 @@ public abstract class AbstractHistoricalSourceView extends ViewPart {
     // FIXME We use ANON_ONWARDS, b/c we don't record any type location info
     // about types defined within an anonymous class
     qname = ANON_ONWARDS.matcher(qname).replaceFirst("");
-    
+
     if (f_lastSources == sources && f_lastProj == proj && f_lastType == qname) {
       return true; // Should be populated from before
     }
@@ -175,36 +175,36 @@ public abstract class AbstractHistoricalSourceView extends ViewPart {
     }
     for (final File f : sources.getSourceZips()) {
       if (findSourceFile(sources, proj, qname, f)) {
-    	return true;
+        return true;
       }
     }
     return false;
   }
-  
+
   private boolean findSourceFile(final ISourceZipFileHandles sources, String proj, String qname, File f) {
+    try {
+      final ZipFile zf = new ZipFile(f);
       try {
-          final ZipFile zf = new ZipFile(f);
-          try {
-            final Map<String, String> fileMap = AbstractJavaZip.readClassMappings(zf);
-            if (fileMap != null) {
-              final String path = fileMap.get(qname);
-              if (path != null) {
-                populate(zf, path);
-                f_lastSources = sources;
-                f_lastProj = proj;
-                f_lastType = qname;
-                return true;
-              }
-            }
-          } finally {
-            zf.close();
+        final Map<String, String> fileMap = AbstractJavaZip.readClassMappings(zf);
+        if (fileMap != null) {
+          final String path = fileMap.get(qname);
+          if (path != null) {
+            populate(zf, path);
+            f_lastSources = sources;
+            f_lastProj = proj;
+            f_lastType = qname;
+            return true;
           }
-      } catch (final Exception e) {
-          SLLogger.getLogger().log(Level.WARNING, "Unexcepted exception trying to read a source file", e);
+        }
+      } finally {
+        zf.close();
       }
-      return false;
+    } catch (final Exception e) {
+      SLLogger.getLogger().log(Level.WARNING, "Unexcepted exception trying to read a source file", e);
+    }
+    return false;
   }
-  
+
   private void populate(final ZipFile zf, final String path) throws IOException {
     final ZipEntry ze = zf.getEntry(path);
     InputStream in = zf.getInputStream(ze);
@@ -353,7 +353,6 @@ public abstract class AbstractHistoricalSourceView extends ViewPart {
     parser.setKind(ASTParser.K_COMPILATION_UNIT);
     parser.setStatementsRecovery(true);
     CompilationUnit cu = (CompilationUnit) parser.createAST(null);
-    @SuppressWarnings("unchecked")
     List<AbstractTypeDeclaration> decls = cu.types();
     for (AbstractTypeDeclaration decl : decls) {
       // decl.accept(new ASTVisitorRecorder());
@@ -377,7 +376,6 @@ public abstract class AbstractHistoricalSourceView extends ViewPart {
     parser.setSource(source.toCharArray());
 
     CompilationUnit cu = (CompilationUnit) parser.createAST(null);
-    @SuppressWarnings("unchecked")
     List<AbstractTypeDeclaration> decls = cu.types();
     for (AbstractTypeDeclaration decl : decls) {
       // decl.accept(new ASTVisitorRecorder());
@@ -414,11 +412,11 @@ public abstract class AbstractHistoricalSourceView extends ViewPart {
     protected final LinkedList<String> currentType;
 
     TypeVisitor(final String type) {
-      typeList = new LinkedList<String>();
+      typeList = new LinkedList<>();
       for (String typePart : ANON.matcher(type).replaceAll("").split("[.$]")) {
         typeList.addFirst(typePart);
       }
-      currentType = new LinkedList<String>();
+      currentType = new LinkedList<>();
     }
 
     @Override

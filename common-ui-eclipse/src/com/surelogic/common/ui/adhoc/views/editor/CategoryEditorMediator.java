@@ -62,7 +62,7 @@ public final class CategoryEditorMediator extends AdHocManagerAdapter implements
   final Spinner f_sortHint;
   final Table f_queryTable;
 
-  final Set<AdHocCategory> f_selections = new HashSet<AdHocCategory>();
+  final Set<AdHocCategory> f_selections = new HashSet<>();
   AdHocCategory f_edit = null;
 
   CategoryEditorMediator(AbstractCategoryEditorView view, SashForm sash, Composite lhs, Table categoryList,
@@ -255,7 +255,7 @@ public final class CategoryEditorMediator extends AdHocManagerAdapter implements
   }
 
   private void setCategoryListSelections() {
-    final ArrayList<TableItem> items = new ArrayList<TableItem>();
+    final ArrayList<TableItem> items = new ArrayList<>();
     for (final TableItem item : f_categoryList.getItems()) {
       if (item.getData() instanceof AdHocCategory) {
         final AdHocCategory query = (AdHocCategory) item.getData();
@@ -327,7 +327,7 @@ public final class CategoryEditorMediator extends AdHocManagerAdapter implements
      * Remember what categories are selected.
      */
     final Item[] selections = f_categoryList.getSelection();
-    final Set<AdHocCategory> newSelections = new HashSet<AdHocCategory>();
+    final Set<AdHocCategory> newSelections = new HashSet<>();
     for (final Item item : selections) {
       if (item.getData() instanceof AdHocCategory) {
         newSelections.add((AdHocCategory) item.getData());

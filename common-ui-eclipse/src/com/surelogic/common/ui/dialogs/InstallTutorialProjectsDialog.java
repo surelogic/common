@@ -150,7 +150,7 @@ public class InstallTutorialProjectsDialog extends TitleAreaDialog {
     /*
      * Construct the list of projects to import.
      */
-    final List<URL> projectList = new ArrayList<URL>();
+    final List<URL> projectList = new ArrayList<>();
     int i = 0;
     for (final URL project : projects) {
       if (projectTree.getItem(i++).getChecked()) {

@@ -332,10 +332,10 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
          * top-level query
          */
         final List<AdHocQuery> rootQueries = f_manager.getRootQueryList();
-        final List<AdHocQuery> rootQueriesNotInACategory = new ArrayList<AdHocQuery>(rootQueries);
+        final List<AdHocQuery> rootQueriesNotInACategory = new ArrayList<>(rootQueries);
         final List<AdHocCategory> categories = f_manager.getCategoryListUsingSort(AdHocIdentity.BY_DESCRIPTION);
 
-        final List<AdHocCategory> emptyCategories = new ArrayList<AdHocCategory>();
+        final List<AdHocCategory> emptyCategories = new ArrayList<>();
 
         for (AdHocCategory category : categories) {
           final List<AdHocQuery> catQueries = category.getQueryList();
@@ -535,7 +535,7 @@ public final class QueryMenuMediator extends AdHocManagerAdapter implements ILif
   }
 
   List<Table> getTables() {
-    final List<Table> result = new ArrayList<Table>();
+    final List<Table> result = new ArrayList<>();
     for (Control child : f_content.getChildren()) {
       if (child instanceof Table)
         result.add((Table) child);

@@ -388,7 +388,7 @@ public final class EclipseUIUtility {
    * @return the list of dirty editors for this launch to save, never null
    */
   public static IResource[] getScopedDirtyResources(IProject[] projects) {
-    final Set<IResource> dirtyres = new HashSet<IResource>();
+    final Set<IResource> dirtyres = new HashSet<>();
     IWorkbenchWindow[] windows = PlatformUI.getWorkbench().getWorkbenchWindows();
     for (int l = 0; l < windows.length; l++) {
       IWorkbenchPage[] pages = windows[l].getPages();

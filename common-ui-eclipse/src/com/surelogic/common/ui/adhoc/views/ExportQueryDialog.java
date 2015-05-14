@@ -174,7 +174,7 @@ public final class ExportQueryDialog extends Dialog {
       if (f_exportAllToggle.getSelection()) {
         selectedQueries = null;
       } else {
-        selectedQueries = new ArrayList<AdHocQuery>();
+        selectedQueries = new ArrayList<>();
         for (final TableItem item : f_queryTable.getItems()) {
           if (item.getChecked())
             selectedQueries.add((AdHocQuery) item.getData());

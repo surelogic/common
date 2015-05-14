@@ -53,20 +53,20 @@ public final class JavaProjectSelectionDialog extends Dialog {
       f_label = label;
       f_shellTitle = shellTitle;
       f_shellImage = shellImage;
-      f_initiallySelectedJavaProjects = new CopyOnWriteArrayList<IJavaProject>(initiallySelectedJavaProjects);
+      f_initiallySelectedJavaProjects = new CopyOnWriteArrayList<>(initiallySelectedJavaProjects);
       f_alwaysChooseFromDialogPreferenceConstant = alwaysChooseFromDialogPreferenceConstant;
       f_prvUsrSelProjectListPreferenceConstant = previousUserSelectedProjectListPreferenceConstant;
     }
   }
 
-  private final Configuration f_configuration;
-  private final List<IJavaProject> f_openJavaProjects;
-  private Table f_projectTable;
+  final Configuration f_configuration;
+  final List<IJavaProject> f_openJavaProjects;
+  Table f_projectTable;
   /**
    * Aliased and visible to the static call
    * {@link #getProjects(String, String, Image, List)}.
    */
-  private final List<IJavaProject> f_selectedProjects;
+  final List<IJavaProject> f_selectedProjects;
 
   /**
    * Opens the dialog and gets projects from the user if necessary based upon
@@ -122,7 +122,7 @@ public final class JavaProjectSelectionDialog extends Dialog {
           }
         }
 
-        final List<IJavaProject> mutableProjectList = new ArrayList<IJavaProject>();
+        final List<IJavaProject> mutableProjectList = new ArrayList<>();
         final UIJob job = new SLUIJob() {
           @Override
           public IStatus runInUIThread(final IProgressMonitor monitor) {
@@ -142,7 +142,7 @@ public final class JavaProjectSelectionDialog extends Dialog {
         } else {
           // persist this selection (if any)
           if (config.f_prvUsrSelProjectListPreferenceConstant != null) {
-            List<String> usrSel = new ArrayList<String>();
+            List<String> usrSel = new ArrayList<>();
             for (final IJavaProject javaProject : mutableProjectList) {
               String projectName = javaProject.getElementName();
               if (projectName != null && projectName.length() > 0) {
@@ -158,8 +158,8 @@ public final class JavaProjectSelectionDialog extends Dialog {
     return config.f_initiallySelectedJavaProjects;
   }
 
-  private JavaProjectSelectionDialog(final Shell parentShell, final Configuration config,
-      final List<IJavaProject> openJavaProjects, final List<IJavaProject> mutableProjectList) {
+  JavaProjectSelectionDialog(final Shell parentShell, final Configuration config, final List<IJavaProject> openJavaProjects,
+      final List<IJavaProject> mutableProjectList) {
     super(parentShell);
     this.f_configuration = config;
     setShellStyle(getShellStyle() | SWT.RESIZE | SWT.MAX);
@@ -264,7 +264,7 @@ public final class JavaProjectSelectionDialog extends Dialog {
     return contents;
   }
 
-  private final void setOKState() {
+  final void setOKState() {
     /*
      * Remember what is checked.
      */
@@ -282,7 +282,7 @@ public final class JavaProjectSelectionDialog extends Dialog {
     }
   }
 
-  private void selectAll() {
+  void selectAll() {
     if (f_projectTable != null && !f_projectTable.isDisposed()) {
       for (final TableItem item : f_projectTable.getItems()) {
         item.setChecked(true);
@@ -291,7 +291,7 @@ public final class JavaProjectSelectionDialog extends Dialog {
     }
   }
 
-  private void deselectAll() {
+  void deselectAll() {
     if (f_projectTable != null && !f_projectTable.isDisposed()) {
       for (final TableItem item : f_projectTable.getItems()) {
         item.setChecked(false);

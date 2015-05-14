@@ -39,9 +39,9 @@ public class AddSubQueryDialog extends Dialog {
 
   private Table f_subQueryTable;
 
-  private final List<AdHocQuery> f_queries = new ArrayList<AdHocQuery>();
+  private final List<AdHocQuery> f_queries = new ArrayList<>();
 
-  private final Set<AdHocQuery> f_selectedQueries = new HashSet<AdHocQuery>();
+  private final Set<AdHocQuery> f_selectedQueries = new HashSet<>();
 
   /**
    * Gets the set of queries that the user selected to become sub-queries.

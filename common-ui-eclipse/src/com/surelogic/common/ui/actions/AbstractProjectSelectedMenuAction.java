@@ -26,106 +26,103 @@ import com.surelogic.common.ui.handlers.AbstractProjectSelectedMenuHandler;
  * Use {@link AbstractProjectSelectedMenuHandler} and the Eclipse command API.
  */
 @Deprecated
-public abstract class AbstractProjectSelectedMenuAction implements
-		IObjectActionDelegate, IWorkbenchWindowActionDelegate {
+public abstract class AbstractProjectSelectedMenuAction implements IObjectActionDelegate, IWorkbenchWindowActionDelegate {
 
-	protected abstract void runActionOn(List<IJavaProject> selectedProjects);
+  protected abstract void runActionOn(List<IJavaProject> selectedProjects);
 
-	private IStructuredSelection f_currentSelection = null;
+  private IStructuredSelection f_currentSelection = null;
 
-	@Override
+  @Override
   public void setActivePart(IAction action, IWorkbenchPart targetPart) {
-		// Nothing to do
-	}
+    // Nothing to do
+  }
 
-	@Override
+  @Override
   public final void run(IAction action) {
-		/*
-		 * Beware the action parameter may be null.
-		 */
-		if (f_currentSelection != null) {
-			final IWorkspaceRoot root = ResourcesPlugin.getWorkspace()
-					.getRoot();
-			final IJavaModel javaModel = JavaCore.create(root);
-			final List<IJavaProject> selectedProjects = new ArrayList<IJavaProject>();
-			for (Object selection : f_currentSelection.toArray()) {
-				final IJavaProject javaProject;
-				outer: if (selection instanceof IJavaProject) {
-					javaProject = (IJavaProject) selection;
-				} else if (selection instanceof IProject) {
-					IProject p = (IProject) selection;
-					try {
-						for (IJavaProject jp : javaModel.getJavaProjects()) {
-							if (p.equals(jp.getProject())) {
-								javaProject = jp;
-								break outer;
-							}
-						}
-					} catch (JavaModelException e) {
-						// Do nothing
-					}
-					continue;
-				} else
-					continue;
+    /*
+     * Beware the action parameter may be null.
+     */
+    if (f_currentSelection != null) {
+      final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+      final IJavaModel javaModel = JavaCore.create(root);
+      final List<IJavaProject> selectedProjects = new ArrayList<>();
+      for (Object selection : f_currentSelection.toArray()) {
+        final IJavaProject javaProject;
+        outer: if (selection instanceof IJavaProject) {
+          javaProject = (IJavaProject) selection;
+        } else if (selection instanceof IProject) {
+          IProject p = (IProject) selection;
+          try {
+            for (IJavaProject jp : javaModel.getJavaProjects()) {
+              if (p.equals(jp.getProject())) {
+                javaProject = jp;
+                break outer;
+              }
+            }
+          } catch (JavaModelException e) {
+            // Do nothing
+          }
+          continue;
+        } else
+          continue;
 
-				selectedProjects.add(javaProject);
-			}
-			runHelper(selectedProjects);
-		} else {
-			runHelper(Collections.<IJavaProject> emptyList());
-		}
-	}
+        selectedProjects.add(javaProject);
+      }
+      runHelper(selectedProjects);
+    } else {
+      runHelper(Collections.<IJavaProject> emptyList());
+    }
+  }
 
-	@Override
+  @Override
   public void selectionChanged(IAction action, ISelection selection) {
-		if (selection instanceof IStructuredSelection) {
-			f_currentSelection = (IStructuredSelection) selection;
-		} else {
-			f_currentSelection = null;
-		}
-	}
+    if (selection instanceof IStructuredSelection) {
+      f_currentSelection = (IStructuredSelection) selection;
+    } else {
+      f_currentSelection = null;
+    }
+  }
 
-	@Override
+  @Override
   public void dispose() {
-		// Nothing to do
-	}
+    // Nothing to do
+  }
 
-	@Override
+  @Override
   public void init(IWorkbenchWindow window) {
-		// Nothing to do
-	}
+    // Nothing to do
+  }
 
-	protected static List<String> getNames(final List<IJavaProject> projects) {
-		List<String> names = new ArrayList<String>();
-		for (IJavaProject jp : projects) {
-			names.add(jp.getElementName());
-		}
-		return names;
-	}
+  protected static List<String> getNames(final List<IJavaProject> projects) {
+    List<String> names = new ArrayList<>();
+    for (IJavaProject jp : projects) {
+      names.add(jp.getElementName());
+    }
+    return names;
+  }
 
-	public void run() {
-		run((IAction) null);
-	}
+  public void run() {
+    run((IAction) null);
+  }
 
-	public void run(List<IJavaProject> projects) {
-		if (projects == null || projects.isEmpty()) {
-			return;
-		}
-		runHelper(projects);
-	}
+  public void run(List<IJavaProject> projects) {
+    if (projects == null || projects.isEmpty()) {
+      return;
+    }
+    runHelper(projects);
+  }
 
-	private void runHelper(final List<IJavaProject> selectedProjects) {
-		List<IJavaProject> projects = selectedProjects;
-		// Need a dialog?
-		final JavaProjectSelectionDialog.Configuration info = getDialogInfo(projects);
-		if (info != null) {
-			projects = JavaProjectSelectionDialog.getProjects(info);
-		}
-		runActionOn(projects);
-	}
+  private void runHelper(final List<IJavaProject> selectedProjects) {
+    List<IJavaProject> projects = selectedProjects;
+    // Need a dialog?
+    final JavaProjectSelectionDialog.Configuration info = getDialogInfo(projects);
+    if (info != null) {
+      projects = JavaProjectSelectionDialog.getProjects(info);
+    }
+    runActionOn(projects);
+  }
 
-	protected JavaProjectSelectionDialog.Configuration getDialogInfo(
-			List<IJavaProject> selectedProjects) {
-		return null;
-	}
+  protected JavaProjectSelectionDialog.Configuration getDialogInfo(List<IJavaProject> selectedProjects) {
+    return null;
+  }
 }

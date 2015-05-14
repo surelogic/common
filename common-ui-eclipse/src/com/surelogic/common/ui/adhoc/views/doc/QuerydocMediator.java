@@ -82,7 +82,7 @@ public class QuerydocMediator extends AdHocManagerAdapter implements ILifecycle 
     HTMLPrinter.addPageEpilog(buffer);
     String result = buffer.toString();
     Matcher m = IMAGE_PATTERN.matcher(text.toString());
-    final Set<String> images = new HashSet<String>();
+    final Set<String> images = new HashSet<>();
     while (m.find()) {
       images.add(m.group(1));
     }
@@ -95,7 +95,7 @@ public class QuerydocMediator extends AdHocManagerAdapter implements ILifecycle 
     return result;
   }
 
-  private final Map<String, File> fileMap = new HashMap<String, File>();
+  private final Map<String, File> fileMap = new HashMap<>();
 
   public File getImageFile(String imageName) {
     synchronized (fileMap) {

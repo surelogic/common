@@ -42,7 +42,7 @@ public abstract class AbstractProjectSelectedMenuHandler extends
 			final IWorkspaceRoot root = ResourcesPlugin.getWorkspace()
 					.getRoot();
 			final IJavaModel javaModel = JavaCore.create(root);
-			final List<IJavaProject> selectedProjects = new ArrayList<IJavaProject>();
+			final List<IJavaProject> selectedProjects = new ArrayList<>();
 			for (Object selection : structuredSelection.toArray()) {
 				final IJavaProject javaProject;
 				outer: if (selection instanceof IJavaProject) {

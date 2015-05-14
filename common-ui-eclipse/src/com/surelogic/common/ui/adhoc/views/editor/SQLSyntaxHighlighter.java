@@ -49,7 +49,7 @@ public class SQLSyntaxHighlighter implements LineStyleListener {
   @Override
   public void lineGetStyle(LineStyleEvent event) {
     f_event = event;
-    f_result = new ArrayList<StyleRange>();
+    f_result = new ArrayList<>();
     int upToIndex = highlightComment(0);
     if (upToIndex != 0) {
       for (String word : SQL_RESERVED_WORDS) {

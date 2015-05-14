@@ -27,7 +27,7 @@ public final class TreeUtility {
    */
   @NonNull
   public static ArrayList<TreeItem> getTreeItemsDeep(final Tree tree) {
-    final ArrayList<TreeItem> result = new ArrayList<TreeItem>();
+    final ArrayList<TreeItem> result = new ArrayList<>();
     for (TreeItem ti : tree.getItems()) {
       getItems_Helper(ti, result);
     }
@@ -114,7 +114,7 @@ public final class TreeUtility {
   }
 
   private static ArrayList<TreeItem> getExpansionState_Internal(final Tree tree, final ArrayList<TreeItem> items) {
-    final ArrayList<TreeItem> result = new ArrayList<TreeItem>();
+    final ArrayList<TreeItem> result = new ArrayList<>();
     for (final TreeItem ti : items) {
       if (ti.getExpanded()) {
         result.add(ti);
