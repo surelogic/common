@@ -788,10 +788,24 @@ public final class FileUtility {
   }
 
   /**
-   * Zip up the given directory into the given zipfile
+   * Zip up the given directory into the given zipfile. The files in the passed
+   * directory appear at the root of the archive.
    */
   public static void zipDir(final File srcDir, final File zipFile) throws IOException {
     zipDirAndMore(srcDir, srcDir, zipFile).close();
+  }
+
+  /**
+   * Zip up the given directory into the given zipfile. The files in the passed
+   * directory appear in the last directory of the passed dir in the archive
+   * (e.g., /user/local/boop/(files) would appear as /boop/(files) in the
+   * archive).
+   */
+  public static void zipDirKeepDir(final File srcDir, final File zipFile) throws IOException {
+    File baseDir = srcDir.getParentFile();
+    if (baseDir == null)
+      baseDir = srcDir;
+    zipDirAndMore(baseDir, srcDir, zipFile).close();
   }
 
   /**
