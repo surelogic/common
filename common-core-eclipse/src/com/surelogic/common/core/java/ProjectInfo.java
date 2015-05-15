@@ -1,19 +1,41 @@
 package com.surelogic.common.core.java;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
-import org.eclipse.core.resources.*;
+import org.eclipse.core.resources.IContainer;
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.jdt.core.*;
+import org.eclipse.jdt.core.IClasspathContainer;
+import org.eclipse.jdt.core.IClasspathEntry;
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IPackageDeclaration;
+import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.JavaModelException;
 
 import com.surelogic.common.Pair;
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.core.EclipseUtility;
 import com.surelogic.common.core.JDTUtility;
-import com.surelogic.common.java.*;
+import com.surelogic.common.java.Config;
+import com.surelogic.common.java.IClassPathEntry;
+import com.surelogic.common.java.ISLJavaProject;
+import com.surelogic.common.java.JarEntry;
+import com.surelogic.common.java.JavaProjectSet;
+import com.surelogic.common.java.JavaSourceFile;
+import com.surelogic.common.java.SrcEntry;
 import com.surelogic.common.tool.SureLogicToolsFilter;
 import com.surelogic.common.tool.SureLogicToolsPropertiesUtility;
 
@@ -121,7 +143,7 @@ public abstract class ProjectInfo<P extends ISLJavaProject> {
        * ModuleRules.clearAsNeededPatterns();
        */
 
-      final IFile propsFile = jp.getProject().getFile(SureLogicToolsPropertiesUtility.PROPS_FILE);
+      final IFile propsFile = jp.getProject().getFile(SLUtility.SL_TOOLS_PROPS_FILE);
       config.initFromSureLogicToolsProps(propsFile.getLocation().toFile());
       setProjectSpecificProperties(config);
     }

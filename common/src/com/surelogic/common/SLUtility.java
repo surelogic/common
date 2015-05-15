@@ -89,6 +89,8 @@ public final class SLUtility {
   public static final String VIEW_PERSISTENCE_PREFIX = "view-state_";
   public static final String DOT_XML = ".xml";
 
+  public static final String SL_TOOLS_PROPS_FILE = "surelogic-tools.properties";
+
   /*
    * Constants for special ad hoc query meta variables
    */
