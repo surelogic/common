@@ -122,13 +122,7 @@ public abstract class ProjectInfo<P extends ISLJavaProject> {
        */
 
       final IFile propsFile = jp.getProject().getFile(SureLogicToolsPropertiesUtility.PROPS_FILE);
-      final Properties props = SureLogicToolsPropertiesUtility.readFileOrNull(propsFile.getLocation().toFile());
-      if (props != null) {
-        for (Map.Entry<Object, Object> p : props.entrySet()) {
-          // System.out.println("Tool set "+p.getKey()+" = "+p.getValue());
-          config.setOption(p.getKey().toString(), p.getValue());
-        }
-      }
+      config.initFromSureLogicToolsProps(propsFile.getLocation().toFile());
       setProjectSpecificProperties(config);
     }
     // Reordered to avoid conflicts

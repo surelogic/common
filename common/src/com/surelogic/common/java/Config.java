@@ -9,10 +9,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.logging.SLLogger;
+import com.surelogic.common.tool.SureLogicToolsPropertiesUtility;
 import com.surelogic.common.util.*;
 import com.surelogic.common.xml.XmlCreator;
 
@@ -523,5 +525,17 @@ public class Config extends AbstractClassPathEntry {
     pathMapping.clear();
     pkgs.clear();
     removed.clear();
+  }
+  
+  public void initFromSureLogicToolsProps(File location) {
+	if (location != null) {
+		final Properties props = SureLogicToolsPropertiesUtility.readFileOrNull(location);
+		if (props != null) {
+			for (Map.Entry<Object, Object> p : props.entrySet()) {
+				// System.out.println("Tool set "+p.getKey()+" = "+p.getValue());
+				this.setOption(p.getKey().toString(), p.getValue());
+			}
+		}
+	}
   }
 }
