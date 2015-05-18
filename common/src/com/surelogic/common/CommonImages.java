@@ -139,12 +139,12 @@ public final class CommonImages {
   public static final String IMG_FIELD_PROTECTED = "field_protected.gif";
   public static final String IMG_FIELD_PUBLIC = "field_public.gif";
   public static final String IMG_FILE = "file.gif";
+  public static final String IMG_FILE_DRUM = "file_drum.gif";
   public static final String IMG_FILTER = "filter.gif";
   public static final String IMG_FINDBUGS_FINDING = "findbugs_finding.gif";
   public static final String IMG_FL_COMP_UNIT = "fl_comp_unit.gif";
   public static final String IMG_FL_LOGO = "fl_logo.gif";
   public static final String IMG_FL_PREP_DATA = "fl_prep_data.gif";
-  public static final String IMG_FL_RUN_VIEW = "fl_run_view.gif";
   public static final String IMG_FL_RUN_CONTROL = "fl_run_control.gif";
   public static final String IMG_FLASHLIGHT_OVERVIEW_BANNER = "flashlight_overview_banner.png";
   public static final String IMG_FOLDER = "folder.gif";
