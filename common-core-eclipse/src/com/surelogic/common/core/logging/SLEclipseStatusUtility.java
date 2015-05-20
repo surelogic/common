@@ -17,6 +17,7 @@ import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.jobs.SLSeverity;
 import com.surelogic.common.jobs.SLStatus;
 import com.surelogic.common.license.ILicenseObserver;
+import com.surelogic.common.license.SLLicenseProduct;
 import com.surelogic.common.license.SLLicenseUtility;
 import com.surelogic.common.logging.SLLogger;
 
@@ -61,13 +62,13 @@ public final class SLEclipseStatusUtility {
   public static class LogOutputLicenseObserver implements ILicenseObserver {
 
     @Override
-    public void notifyNoLicenseFor(String productName) {
-      SLLogger.getLogger().log(Level.SEVERE, I18N.msg("common.touch.license.noLicense", productName));
+    public void notifyNoLicenseFor(SLLicenseProduct product) {
+      SLLogger.getLogger().log(Level.SEVERE, I18N.msg("common.touch.license.noLicense", product.toString()));
     }
 
     @Override
-    public void notifyExpiration(String productName, Date expiration) {
-      SLLogger.getLogger().warning(I18N.msg("common.touch.license.expiration", productName, expiration));
+    public void notifyExpiration(SLLicenseProduct product, Date expiration) {
+      SLLogger.getLogger().warning(I18N.msg("common.touch.license.expiration", product.toString(), expiration));
     }
   }
 

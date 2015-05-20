@@ -10,7 +10,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-import com.surelogic.*;
+import com.surelogic.Vouch;
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.jobs.SLJob;
@@ -130,7 +130,7 @@ public final class SLLicenseUtility {
      */
     if (best == null) {
       for (ILicenseObserver o : f_observers) {
-        o.notifyNoLicenseFor(product.toString());
+        o.notifyNoLicenseFor(product);
       }
       return false;
     }
@@ -140,7 +140,7 @@ public final class SLLicenseUtility {
      */
     if (best.isCloseToBeingExpired()) {
       for (ILicenseObserver o : f_observers) {
-        o.notifyExpiration(product.toString(), best.getSignedSLLicenseNetCheck().getLicenseNetCheck().getDate());
+        o.notifyExpiration(product, best.getSignedSLLicenseNetCheck().getLicenseNetCheck().getDate());
       }
     }
     return true;

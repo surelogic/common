@@ -140,6 +140,7 @@ public final class CommonImages {
   public static final String IMG_FIELD_PUBLIC = "field_public.gif";
   public static final String IMG_FILE = "file.gif";
   public static final String IMG_FILE_DRUM = "file_drum.gif";
+  public static final String IMG_FILE_SAVEAS = "file_saveas.gif";
   public static final String IMG_FILTER = "filter.gif";
   public static final String IMG_FINDBUGS_FINDING = "findbugs_finding.gif";
   public static final String IMG_FL_COMP_UNIT = "fl_comp_unit.gif";
@@ -262,6 +263,7 @@ public final class CommonImages {
   public static final String IMG_SIERRA_SYNC = "sierra_sync.gif";
   public static final String IMG_SIGNED_NO = "signed_no.gif";
   public static final String IMG_SIGNED_YES = "signed_yes.gif";
+  public static final String IMG_SL = "sl.gif";
   public static final String IMG_SORT_DOWN = "sort_down.gif";
   public static final String IMG_SORT_UP = "sort_up.gif";
   public static final String IMG_SUGGESTIONS_WARNINGS = "suggestions_warnings.gif";

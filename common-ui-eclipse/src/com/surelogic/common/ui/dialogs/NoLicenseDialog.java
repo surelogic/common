@@ -14,6 +14,7 @@ import org.eclipse.ui.progress.UIJob;
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.license.ILicenseObserver;
+import com.surelogic.common.license.SLLicenseProduct;
 import com.surelogic.common.ui.EclipseUIUtility;
 import com.surelogic.common.ui.jobs.SLUIJob;
 
@@ -35,12 +36,13 @@ public final class NoLicenseDialog implements ILicenseObserver {
   }
 
   @Override
-  public void notifyNoLicenseFor(final String subject) {
+  public void notifyNoLicenseFor(final SLLicenseProduct product) {
+    final String subject = product.toString();
     final UIJob job = new SLUIJob() {
       @Override
       public IStatus runInUIThread(IProgressMonitor monitor) {
         if (f_toEclipseLog != null)
-          f_toEclipseLog.notifyNoLicenseFor(subject);
+          f_toEclipseLog.notifyNoLicenseFor(product);
         final String title = I18N.msg("common.manage.licenses.dialog.noLicense.title");
         final String msg = I18N.msg("common.manage.licenses.dialog.noLicense.msg", subject);
         final Shell shell = EclipseUIUtility.getShell();
@@ -61,7 +63,8 @@ public final class NoLicenseDialog implements ILicenseObserver {
   final Set<String> f_alreadyNotified = new HashSet<>();
 
   @Override
-  public void notifyExpiration(final String subject, final Date expiration) {
+  public void notifyExpiration(final SLLicenseProduct product, final Date expiration) {
+    final String subject = product.toString();
     final UIJob job = new SLUIJob() {
       @Override
       public IStatus runInUIThread(IProgressMonitor monitor) {
@@ -71,7 +74,7 @@ public final class NoLicenseDialog implements ILicenseObserver {
         if (!f_alreadyNotified.contains(subject)) {
           f_alreadyNotified.add(subject);
           if (f_toEclipseLog != null)
-            f_toEclipseLog.notifyExpiration(subject, expiration);
+            f_toEclipseLog.notifyExpiration(product, expiration);
           final String title = I18N.msg("common.manage.licenses.dialog.expiration.title");
           final String msg = I18N.msg("common.manage.licenses.dialog.expiration.msg", subject, SLUtility.toStringDay(expiration));
           final Shell shell = EclipseUIUtility.getShell();
