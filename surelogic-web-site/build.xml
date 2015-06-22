@@ -90,9 +90,6 @@
 			<lib dir="${lib}">
 				<include name="*.jar" />
 			</lib>
-			<fileset dir="${www}">
-				<exclude name="**/template.html" />
-			</fileset>
 		</war>
 	</target>
 </project>
