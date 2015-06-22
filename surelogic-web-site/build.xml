@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project default="build-root-war" name="sierra-web-server">
 
+	<property name="publish.apache.base" location="/var/www/sl" />
+	<property name="publish.apache.site" location="${publish.apache.base}/site" />
+
 	<property name="publish.jetty.base" location="${basedir}/../../../website/jetty.base" />
 	<property name="key.jar" location="${basedir}/../../../java/surelogic-key.jar" />
 	<property name="common" location="${basedir}/../common" />
@@ -18,10 +21,20 @@
 	<property name="bugzilla.static" location="${basedir}/../../bugzilla-static" />
 	<property name="bugzilla.index" location="${basedir}/../../../java/bugzilla-index.html" />
 
+	<target name="publish-apache">
+		<echo>apache2 should be shutdown before a publish...</echo>
+		<echo>(pausing just a second so you can ^C if Jetty is running)</echo>
+		<sleep seconds="4" />
+		<delete quiet="true" dir="${publish.apache.site}" />
+		<copy todir="${publish.apache.site}">
+			<fileset dir="${www}" />
+		</copy>
+		<echo>Publish completed...apache2 may now be restarted...</echo>
+	</target>
+
 	<target name="publish">
 		<echo>Jetty should be shutdown before a publish...</echo>
-		<echo>(pausing just a second so you can ^C if Jetty is running)
-    </echo>
+		<echo>(pausing just a second so you can ^C if Jetty is running)</echo>
 		<sleep seconds="4" />
 		<delete quiet="true" dir="${publish.jetty.base}" />
 		<copy todir="${publish.jetty.base}">
