@@ -21,21 +21,28 @@
 	<property name="bugzilla.static" location="${basedir}/../../bugzilla-static" />
 	<property name="bugzilla.index" location="${basedir}/../../../java/bugzilla-index.html" />
 
-	<target name="publish-apache">
-		<echo>apache2 and jetty-surelogic should be shutdown before a publish...</echo>
-		<echo>(pausing just a second so you can ^C if Jetty is running)</echo>
+	<target name="publish-site">
+		<echo>apache2 should be shutdown before this publish...</echo>
+		<echo>(pausing just a second so you can ^C if Apache is running)</echo>
 		<sleep seconds="4" />
 		<delete quiet="true" dir="${publish.apache.site}" />
 		<copy todir="${publish.apache.site}">
 			<fileset dir="${www}" />
 		</copy>
+		<echo>Publish completed...apache2 may now be restarted...</echo>
+	</target>
+		
+	<target name="publish-war">
+			<echo>jetty-surelogic should be shutdown before this publish...</echo>
+			<echo>(pausing just a second so you can ^C if Jetty is running)</echo>
+			<sleep seconds="4" />
 		<delete quiet="true" dir="${publish.jetty.base}" />
 		<copy todir="${publish.jetty.base}">
 			<fileset dir="${jetty.base}" />
 		</copy>
 		<copy file="${root.war}" todir="${publish.jetty.base}/webapps" />
 		<copy file="${key.jar}" todir="${publish.jetty.base}/lib/ext" />
-		<echo>Publish completed...apache2 and jetty-surelogic may now be restarted...</echo>
+		<echo>Publish completed...jetty-surelogic may now be restarted...</echo>
 	</target>
 
 	<target name="build-root-war">
