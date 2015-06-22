@@ -21,7 +21,7 @@
 	<property name="bugzilla.static" location="${basedir}/../../bugzilla-static" />
 	<property name="bugzilla.index" location="${basedir}/../../../java/bugzilla-index.html" />
 
-	<target name="publish-site">
+	<target name="publish-apache">
 		<echo>apache2 should be shutdown before this publish...</echo>
 		<echo>(pausing just a second so you can ^C if Apache is running)</echo>
 		<sleep seconds="4" />
@@ -32,7 +32,7 @@
 		<echo>Publish completed...apache2 may now be restarted...</echo>
 	</target>
 		
-	<target name="publish-war">
+	<target name="publish-jetty">
 			<echo>jetty-surelogic should be shutdown before this publish...</echo>
 			<echo>(pausing just a second so you can ^C if Jetty is running)</echo>
 			<sleep seconds="4" />
@@ -57,7 +57,7 @@
 				<include name="*.jar" />
 			</fileset>
 		</path>
-		<javac srcdir="${common}/src" destdir="${build.bin}" classpathref="common.class.path" source="1.7" target="1.7" includeAntRuntime="false" />
+		<javac srcdir="${common}/src" destdir="${build.bin}" classpathref="common.class.path" source="1.8" target="1.8" includeAntRuntime="false" />
 		<copy todir="${build.bin}">
 			<fileset dir="${common}/src">
 				<exclude name="**/*.java" />
@@ -74,7 +74,7 @@
 				<include name="*.jar" />
 			</fileset>
 		</path>
-		<javac srcdir="${src}" destdir="${build.bin}" classpathref="web.site.class.path" source="1.7" target="1.7" includeAntRuntime="false" />
+		<javac srcdir="${src}" destdir="${build.bin}" classpathref="web.site.class.path" source="1.8" target="1.8" includeAntRuntime="false" />
 		<copy todir="${build.bin}">
 			<fileset dir="${src}">
 				<exclude name="**/*.java" />
