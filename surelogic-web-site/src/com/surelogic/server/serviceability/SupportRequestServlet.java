@@ -101,7 +101,7 @@ public class SupportRequestServlet extends HttpServlet {
 
       // Copy the support request contents to an email body, and parse
       // request fields into a Map
-      final Map<String, String> requestFields = new HashMap<String, String>();
+      final Map<String, String> requestFields = new HashMap<>();
       final BufferedReader rd = req.getReader();
       try {
         String line;

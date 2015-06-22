@@ -25,7 +25,7 @@ public class Email {
    * This servlet's configuration, set up in the {@link #init(ServletConfig)}
    * method.
    */
-  static final AtomicReference<EmailConfig> emailConfig = new AtomicReference<EmailConfig>();
+  static final AtomicReference<EmailConfig> emailConfig = new AtomicReference<>();
   private static ExecutorService executor;
 
   static void start(final EmailConfig config) {

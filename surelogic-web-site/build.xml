@@ -57,7 +57,7 @@
 				<include name="*.jar" />
 			</fileset>
 		</path>
-		<javac srcdir="${common}/src" destdir="${build.bin}" classpathref="common.class.path" includeAntRuntime="false" />
+		<javac srcdir="${common}/src" destdir="${build.bin}" classpathref="common.class.path" source="1.7" target="1.7" includeAntRuntime="false" />
 		<copy todir="${build.bin}">
 			<fileset dir="${common}/src">
 				<exclude name="**/*.java" />
@@ -74,7 +74,7 @@
 				<include name="*.jar" />
 			</fileset>
 		</path>
-		<javac srcdir="${src}" destdir="${build.bin}" classpathref="web.site.class.path" includeAntRuntime="false" />
+		<javac srcdir="${src}" destdir="${build.bin}" classpathref="web.site.class.path" source="1.7" target="1.7" includeAntRuntime="false" />
 		<copy todir="${build.bin}">
 			<fileset dir="${src}">
 				<exclude name="**/*.java" />
