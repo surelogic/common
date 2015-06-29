@@ -429,6 +429,32 @@ public final class FileUtility {
     }
   }
 
+  /**
+   * Deletes all the files in the passed directory with the passed prefix. This
+   * is useful to clear out log files or other timestamped files.
+   * 
+   * @param dir
+   *          the directory to delete files from. This is the only place
+   *          examined (this method is not recursive).
+   * @param prefix
+   *          the prefix to match files with.
+   */
+  public static void deleteFilesWithPrefix(final File dir, final String prefix) {
+    if (!dir.isDirectory())
+      return;
+    final File[] files = dir.listFiles(new FilenameFilter() {
+      @Override
+      public boolean accept(final File dir, final String name) {
+        return name.startsWith(prefix);
+      }
+    });
+    for (final File file : files) {
+      if (!file.delete()) {
+        SLLogger.getLogger().log(Level.SEVERE, I18N.err(11, file.getAbsolutePath()));
+      }
+    }
+  }
+
   public static class TempFileFilter implements FilenameFilter {
     final String prefix;
     final String suffix;
