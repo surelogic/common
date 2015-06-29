@@ -358,27 +358,46 @@ public class EclipseUtility {
    * Gets the directory where the passed plug-in identifier is located. Works
    * for both directories and Jar files.
    * 
-   * @param plugInId
+   * @param pluginId
    *          the id of an installed plug-in.
    * @return the path to the plug-in or Jar.
+   * 
+   * @throws IllegalArgumentException
+   *           if the Eclipse platform doesn't know about the passed plugin
+   *           identifier, the file or directory doesn't exist.
    */
-  public static String getDirectoryOf(final String plugInId) {
-    final Bundle bundle = Platform.getBundle(plugInId);
-    if (bundle == null) {
-      throw new IllegalStateException("null bundle returned for " + plugInId);
-    }
-
-    final URL relativeURL = bundle.getEntry("");
+  public static File getInstallationDirectoryOf(final String pluginId) {
     try {
-      URL commonPathURL = FileLocator.resolve(relativeURL);
-      final String commonDirectory = commonPathURL.getPath();
-      if (commonDirectory.startsWith("file:") && commonDirectory.endsWith(".jar!/")) {
-        // Jar file
-        return commonDirectory.substring(5, commonDirectory.length() - 2);
-      }
-      return commonDirectory;
+      URL commonPathURL = getInstallationURLOf(pluginId);
+      File result = new File(commonPathURL.toURI());
+      return result;
     } catch (Exception e) {
-      throw new IllegalStateException("failed to resolve a path for the URL " + relativeURL);
+      throw new IllegalArgumentException(I18N.err(344, pluginId), e);
+    }
+  }
+
+  /**
+   * Gets the URL where the passed plug-in identifier is located. Works for both
+   * directories and Jar files.
+   * 
+   * @param pluginId
+   *          the id of an installed plug-in.
+   * @return the path to the plug-in or Jar.
+   * 
+   * @throws IllegalArgumentException
+   *           if the Eclipse platform doesn't know about the passed plugin
+   *           identifier, or there is some problem determining the URL.
+   */
+  public static URL getInstallationURLOf(final String pluginId) {
+    final Bundle bundle = Platform.getBundle(pluginId);
+    if (bundle == null) {
+      throw new IllegalArgumentException(I18N.err(343, pluginId));
+    }
+    try {
+      URL result = FileLocator.resolve(bundle.getEntry("/"));
+      return result;
+    } catch (Exception e) {
+      throw new IllegalArgumentException(I18N.err(344, pluginId), e);
     }
   }
 

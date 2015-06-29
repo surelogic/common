@@ -16,7 +16,9 @@ import com.surelogic.common.logging.SLLogger;
 public final class ConfigHelper {
   public final boolean debug;
   private final ILocalConfig config;
-  // avoid duplicate entries
+  /**
+   * A set is used to avoid duplicate entries
+   */
   private final Set<File> path = new HashSet<>();
 
   public ConfigHelper(boolean debug, ILocalConfig config) {
@@ -24,79 +26,67 @@ public final class ConfigHelper {
     this.config = config;
   }
 
-  String getPluginDir(final String pluginId) {
-    return getPluginDir(pluginId, true);
-  }
-
-  File getPluginDirAsFile(final String pluginId) {
-    return new File(getPluginDir(pluginId));
-  }
-
-  public String getPluginDir(final String pluginId, boolean required) {
-    final String pluginDir = config.getPluginDir(pluginId, required);
-    if (debug) {
-      System.out.println(pluginId + " = " + pluginDir);
-    }
-    // usedPlugins.add(pluginId);
-    return pluginDir;
-  }
-
   /**
    * Adds a plugin directory or (packed) Jar to the classpath. This needs to
    * handle meta-workspace, release, Ant, and Maven.
+   * <p>
+   * If it finds a <tt>bin</tt> directory it assumes it is in a meta-workspace.
+   * In the packaged release the classpath starts at the root of the plugin. We
+   * also look for a <tt>bin.jar</tt> file which may be used in Ant. Even if we
+   * add the <tt>bin</tt> or <tt>bin.jar</tt> file to the classpath the plugin
+   * directory is always added for resource loading outside the code hierarchy.
+   * <p>
+   * If the plugin is not located in a directory it is in a Jar (a packaged
+   * Eclipse release). In this case just the Jar is added to the classpath.
    * 
    * @param pluginId
    *          the plugin id.
    */
   public void addPluginToPath(final String pluginId) {
-    final String pluginDirStr = getPluginDir(pluginId);
-    final File pluginDir = new File(pluginDirStr);
+    final File pluginDir = config.getPluginDirectory(pluginId);
     if (pluginDir.isDirectory()) {
       final File pluginDirBin = new File(pluginDir, "bin");
       boolean inMetaWorkspace = pluginDirBin.isDirectory();
       if (inMetaWorkspace)
         addToPath(pluginDirBin);
+      final File pluginJar = new File(pluginDir, "bin.jar");
+      boolean inAntOrSimilar = pluginJar.isFile();
+      if (inAntOrSimilar) {
+        addToPath(pluginJar);
+      }
     }
     addToPath(pluginDir);
   }
 
   /**
-   * @return true if found
+   * Adds a series of required Jars to the classpath, the plugin must be
+   * unpacked.
+   * 
+   * @param pluginId
+   *          the plugin id.
+   * @param jars
+   *          a list of paths relative to the root directory of the plugin to
+   *          add.
+   * 
+   * @return {@code true} if all passed Jars exist and are added, {@code false}
+   *         otherwise.
    */
   public boolean addPluginJarsToPath(final String pluginId, String... jars) {
-    return addPluginJarsToPath(pluginId, false, jars);
-  }
-
-  /**
-   * Adds a series of Jars to the classpath, the plugin must be unpacked.
-   * 
-   * @param exclusive
-   *          If true, try each of the jars in sequence until one exists
-   * @return true if found
-   */
-  private boolean addPluginJarsToPath(final String pluginId, boolean exclusive, String... jars) {
-    boolean rv = true;
-    final String pluginDirStr = getPluginDir(pluginId);
-    if (pluginDirStr != null) {
-      File pluginDir = new File(pluginDirStr);
-      if (pluginDir.exists() && !pluginDir.isDirectory() && pluginDirStr.endsWith(".jar")) {
-        final File dirInAnt = pluginDir.getParentFile();
-        // When we have a jar, we are in Ant, so go up one level
-        pluginDir = dirInAnt;
-      }
+    final File pluginDir = config.getPluginDirectory(pluginId);
+    boolean result = true;
+    if (pluginDir.isDirectory()) {
       for (String jar : jars) {
-        boolean exists = addToPath(new File(pluginDir, jar).getAbsolutePath(), !exclusive);
-        if (exclusive && exists) {
-          return true;
-        }
-        rv = rv && exists;
+        result = result && addToPath(new File(pluginDir, jar).getAbsolutePath(), true);
       }
+      return result;
+    } else {
+      SLLogger.getLogger().warning("Attempted to add Jars to a plugin " + pluginDir.getAbsolutePath() + " that is not unpacked:");
+      return false;
     }
-    return rv;
   }
 
   public void addAllPluginJarsToPath(final String pluginId, String libPath) {
-    findJarsAndAddToPathIn(new File(getPluginDirAsFile(pluginId), libPath));
+    findJarsAndAddToPathIn(new File(config.getPluginDirectory(pluginId), libPath));
   }
 
   public boolean addToPath(String name) {
