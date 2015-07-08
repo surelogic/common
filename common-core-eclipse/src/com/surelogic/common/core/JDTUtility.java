@@ -598,10 +598,10 @@ public final class JDTUtility {
         for (IPackageFragment pkg : pkgs) {
           final ICompilationUnit cu = pkg.getCompilationUnit(SLUtility.PACKAGE_INFO + ".java");
           if (cu != null && cu.exists())
-            return new Pair<IJavaElement, Double>(cu, Double.valueOf(1)); // package-info.java
+            return new Pair<>(cu, Double.valueOf(1)); // package-info.java
           final IClassFile cf = pkg.getClassFile(SLUtility.PACKAGE_INFO + ".class");
           if (cf != null && cf.exists())
-            return new Pair<IJavaElement, Double>(cf, Double.valueOf(1)); // package-info.class
+            return new Pair<>(cf, Double.valueOf(1)); // package-info.class
         }
       }
       // System.out.println(" found (" + confidence + ") -> " + best);
