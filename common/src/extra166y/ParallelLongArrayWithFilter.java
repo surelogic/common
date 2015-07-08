@@ -18,6 +18,7 @@ import java.lang.reflect.Array;
  * this class may be constructed only via prefix methods of
  * ParallelLongArray or its other prefix classes.
  */
+@SuppressWarnings("all")
 public abstract class ParallelLongArrayWithFilter extends ParallelLongArrayWithLongMapping {
     ParallelLongArrayWithFilter
         (ForkJoinPool ex, int origin, int fence, long[] array) {

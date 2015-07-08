@@ -17,6 +17,7 @@ import java.lang.reflect.Array;
  * Instances of this class may be constructed only via prefix
  * methods of ParallelArray or its other prefix classes.
  */
+@SuppressWarnings("all")
 public abstract class ParallelArrayWithFilter<T>
     extends ParallelArrayWithMapping<T,T> {
     ParallelArrayWithFilter(ForkJoinPool ex, int origin, int fence, T[] array) {

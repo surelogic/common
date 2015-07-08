@@ -15,6 +15,7 @@ import java.lang.reflect.Array;
  * Shared internal execution support for ParallelArray and
  * specializations.
  */
+@SuppressWarnings("all")
 class PAS {
     private PAS() {} // all-static, non-instantiable
 

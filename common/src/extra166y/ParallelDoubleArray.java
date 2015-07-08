@@ -17,6 +17,7 @@ import java.lang.reflect.Array;
  * ParallelArray}, but specialized for scalar doubles. It additionally
  * provides a few methods specific to numerical values.
  */
+@SuppressWarnings("all")
 public class ParallelDoubleArray extends AbstractParallelAnyArray.DUPap {
     // Same internals as ParallelArray, but specialized for doubles
     AsList listView; // lazily constructed

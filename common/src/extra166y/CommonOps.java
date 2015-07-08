@@ -13,6 +13,7 @@ import java.util.*;
  * A collection of static factory methods providing commonly useful
  * implementations of operations.
  */
+@SuppressWarnings("all")
 public class CommonOps {
     private CommonOps() {} // disable construction
 

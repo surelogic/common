@@ -2,8 +2,6 @@ package com.surelogic.common.ui.refactor;
 
 import java.util.*;
 
-import org.apache.commons.collections15.*;
-import org.apache.commons.collections15.multimap.MultiHashMap;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.AST;
@@ -40,6 +38,8 @@ import org.eclipse.jdt.core.dom.rewrite.ListRewrite;
 import org.eclipse.text.edits.TextEdit;
 import org.eclipse.text.edits.TextEditGroup;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import com.surelogic.common.AnnotationConstants;
 import com.surelogic.common.logging.SLLogger;
 import com.surelogic.common.ref.*;
@@ -119,7 +119,7 @@ public class PromisesAnnotationRewriter {
 
   private class AnnotationVisitor extends ASTVisitor {
     private final Map<SloppyWrapper<IDecl>, List<AnnotationDescription>> targetMap;
-    private final MultiMap<SloppyWrapper<IDeclType>, IDecl> createMap;
+    private final Multimap<SloppyWrapper<IDeclType>, IDecl> createMap;
     private final TextEditGroup editGroup;
     private final boolean isAssumption;
     private final Set<String> imports;
@@ -127,12 +127,13 @@ public class PromisesAnnotationRewriter {
     public AnnotationVisitor(final Collection<AnnotationDescription> descs, final TextEditGroup editGroup,
         final boolean isAssumption) {
       targetMap = new HashMap<>();
-      createMap = new MultiHashMap<>();
+      createMap = ArrayListMultimap.create();
 
       for (final AnnotationDescription desc : descs) {
         final IDecl target = isAssumption ? desc.getAssumptionTarget() : desc.getTarget();
         if (!isAssumption && target.isImplicit()) {
-          // We need to create the declaration before adding the annotation
+          // We need to create the declaration before adding the
+          // annotation
           if (target.getKind() == Kind.CONSTRUCTOR) {
             createMap.put(SloppyWrapper.getInstance((IDeclType) target.getParent()), target);
           } else {
@@ -164,7 +165,7 @@ public class PromisesAnnotationRewriter {
     }
 
     private void checkForDeclsToCreate(AbstractTypeDeclaration node, IDeclType type) {
-      final SloppyWrapper<IDecl> wrapper = SloppyWrapper.getInstance((IDecl) type);
+      final SloppyWrapper<IDeclType> wrapper = SloppyWrapper.getInstance(type);
       final Collection<IDecl> decls = createMap.get(wrapper);
       if (decls == null || decls.isEmpty()) {
         return;
@@ -197,7 +198,8 @@ public class PromisesAnnotationRewriter {
           List<AnnotationDescription> annos = findTargets(decl);
           rewriteNode(md, md.getModifiersProperty(), annos, decl);
         } else {
-          // Convert annos on the implicit method into a scoped promise on the
+          // Convert annos on the implicit method into a scoped
+          // promise on the
           // enclosing type
           final List<AnnotationDescription> annos = findTargets(decl);
           for (AnnotationDescription a : annos) {

@@ -140,6 +140,7 @@ import java.lang.reflect.Array;
  * }
  * </pre>
  */
+@SuppressWarnings("all")
 public class ParallelArray<T> extends AbstractParallelAnyArray.OUPap<T> implements Iterable<T> {
     /*
      * See classes PAS and AbstractParallelAnyArray for most of the underlying parallel execution

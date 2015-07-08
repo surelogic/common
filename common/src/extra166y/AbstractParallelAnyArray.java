@@ -15,6 +15,7 @@ import java.lang.reflect.Array;
  * Abstract class serving as the basis of parallel
  * array classes across types.
  */
+@SuppressWarnings("all")
 public abstract class AbstractParallelAnyArray {
     /*
      * This class and its subclasses (most of which are defined here

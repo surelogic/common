@@ -57,6 +57,7 @@ import java.lang.reflect.Array;
  * }
  * </pre>
  */
+@SuppressWarnings("all")
 public class ParallelLongArray extends AbstractParallelAnyArray.LUPap {
     // Same internals as ParallelArray, but specialized for longs
     AsList listView;
