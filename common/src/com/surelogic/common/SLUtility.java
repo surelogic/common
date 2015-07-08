@@ -28,10 +28,10 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.binary.StringUtils;
 import org.apache.commons.lang3.SystemUtils;
 
+import com.google.common.base.Charsets;
+import com.google.common.io.BaseEncoding;
 import com.surelogic.NonNull;
 import com.surelogic.Nullable;
 import com.surelogic.common.i18n.I18N;
@@ -266,7 +266,8 @@ public final class SLUtility {
    * identifiers.
    * <p>
    * Examples that would return {@code true}: <tt>java.lang</tt>,
-   * <tt>java.util</tt>, <tt>Map.Entry</tt>, <tt>java.util.concurrent.locks</tt>, <tt>ClassInDefaultPkg</tt>, <tt>edu.afit.smallworld</tt>
+   * <tt>java.util</tt>, <tt>Map.Entry</tt>, <tt>java.util.concurrent.locks</tt>
+   * , <tt>ClassInDefaultPkg</tt>, <tt>edu.afit.smallworld</tt>
    * 
    * @param value
    *          a series of dot-separated Java identifiers.
@@ -1452,7 +1453,8 @@ public final class SLUtility {
    *           if <tt>timestamp</tt> is null.
    */
   @NonNull
-  public static String getScanDirectoryName(@Nullable String firstProjectNameOrNull, boolean moreProjects, @NonNull Date timestamp) {
+  public static String getScanDirectoryName(@Nullable String firstProjectNameOrNull, boolean moreProjects,
+      @NonNull Date timestamp) {
     if (timestamp == null)
       throw new IllegalArgumentException(I18N.err(44, "timestamp"));
 
@@ -1587,7 +1589,7 @@ public final class SLUtility {
    * @return the decoded string.
    */
   public static String decodeBase64(String s) {
-    return StringUtils.newStringUtf8(Base64.decodeBase64(s));
+    return new String(BaseEncoding.base64().decode(s), Charsets.UTF_8);
   }
 
   /**
@@ -1599,7 +1601,7 @@ public final class SLUtility {
    * @return the encoded string.
    */
   public static String encodeBase64(String s) {
-    return Base64.encodeBase64String(StringUtils.getBytesUtf8(s));
+    return BaseEncoding.base64().encode(s.getBytes(Charsets.UTF_8));
   }
 
   private SLUtility() {
