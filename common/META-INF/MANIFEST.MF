@@ -260,15 +260,15 @@ Export-Package: com.google.common.annotations,
  org.objectweb.asm.signature,
  org.objectweb.asm.tree
 Bundle-ClassPath: .,
- lib/runtime/promises-5.6.0.jar,
  lib/runtime/derby-10.11.1.1.jar,
- lib/runtime/ant-1.9.4.jar,
+ lib/runtime/ant-1.9.6.jar,
  lib/runtime/guava-18.0.jar,
  lib/runtime/trove-3.0.3.jar,
- lib/runtime/asm-5.0.2.jar,
- lib/runtime/asm-commons-5.0.2.jar,
- lib/runtime/asm-tree-5.0.2.jar,
  lib/runtime/antlr-3.5.2-runtime.jar,
+ lib/runtime/asm-5.0.4.jar,
+ lib/runtime/asm-commons-5.0.4.jar,
+ lib/runtime/asm-tree-5.0.4.jar,
  lib/runtime/commons-lang3-3.4.jar,
- lib/runtime/servlet-api-3.1.jar
+ lib/runtime/javax.servlet-api-3.1.0.jar,
+ lib/runtime/promises-5.6.0.jar
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
