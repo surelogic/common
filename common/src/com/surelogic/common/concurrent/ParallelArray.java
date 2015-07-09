@@ -12,6 +12,27 @@ import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.logging.SLLogger;
 
+/**
+ * This class allows parallel tasks to be run on an encapsulated list of
+ * elements. Tasks are passed via a {@link Procedure} to one of the
+ * {@code apply} methods.
+ * <p>
+ * <i>ParallelArray</i> is a bad name for this class: it isn't an array, it uses
+ * a collection under the hood. However, in spirit it functions in a similar
+ * manner to Doug Lea's {@code ParallelArray} on
+ * <a href="http://g.oswego.edu/dl/concurrency-interest/">Doug Lea's
+ * concurrency-interest web page</a> in the package extra166y.
+ * <p>
+ * All operations on the encapsulated list are done via {@link #asList()}. For
+ * example to add an element, {@code elt}, to the {@link ParallelArray}
+ * {@code pa} you write {@code pa.asList().add(elt)}. {@link #asList()} returns
+ * a reference to the encapsulated list that can be mutated freely.
+ * <p>
+ * The encapsulated list is a thread safe collection.
+ *
+ * @param <E>
+ *          the type to run a task on in parallel.
+ */
 public final class ParallelArray<E> {
 
   private final ArrayList<E> f_elements;
@@ -28,40 +49,12 @@ public final class ParallelArray<E> {
     f_elements = new ArrayList<>(c);
   }
 
-  public boolean add(E e) {
-    return f_elements.add(e);
-  }
-
-  public boolean addAll(Collection<? extends E> c) {
-    return f_elements.addAll(c);
-  }
-
   /**
-   * Returns the number of elements in this list.
+   * Returns a reference to the encapsulated list for queries and mutations. Any
+   * changes are see by this.
    * 
-   * @return the number of elements in this list
+   * @return a mutable list encapsulated by this.
    */
-  public int size() {
-    return f_elements.size();
-  }
-
-  /**
-   * Returns {@code true} if this list contains no elements.
-   * 
-   * @return {@code true} if this list contains no elements.
-   */
-  public boolean isEmpty() {
-    return f_elements.isEmpty();
-  }
-
-  /**
-   * Removes all of the elements from this list. The list will be empty after
-   * this call returns
-   */
-  public void clear() {
-    f_elements.clear();
-  }
-
   public List<E> asList() {
     return f_elements;
   }
@@ -72,6 +65,10 @@ public final class ParallelArray<E> {
    * <p>
    * An {@code ExecutorService} is used to run the procedure on each element.
    * The executor is constructed and shutdown within this method.
+   * <p>
+   * Information is output to the log every 5 seconds, or any time the blocked
+   * thread is interrupted while this method waits for the encapsulated
+   * {@code ExecutorService} to shutdown.
    * 
    * @param procedure
    *          the procedure
@@ -120,7 +117,13 @@ public final class ParallelArray<E> {
    * blocks until all elements are processed.
    * <p>
    * An {@code ExecutorService} is used to run the procedure on each element.
-   * The executor is constructed and shutdown within this method.
+   * The executor is constructed and shutdown within this method. In particular
+   * this should kill all the thread and clear out any thread-local data that
+   * was setup by the procedure.
+   * <p>
+   * Information is output to the log every 5 seconds, or any time the blocked
+   * thread is interrupted while this method waits for the encapsulated
+   * {@code ExecutorService} to shutdown.
    * 
    * @param procedure
    *          the procedure
