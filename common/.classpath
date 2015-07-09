@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry exported="true" kind="lib" path="lib/runtime/commons-lang3-3.4.jar" sourcepath="lib/runtime-src-for-javadoc-in-eclipse/commons-lang3-3.4-src.zip"/>
-	<classpathentry exported="true" kind="lib" path="lib/runtime/guava-18.0.jar" sourcepath="lib/runtime-src-for-javadoc-in-eclipse/guava-18.0-sources.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/runtime/ant-1.9.6.jar" sourcepath="lib/build/for-javadoc-in-ecilpse/apache-ant-1.9.6-src.zip"/>
+	<classpathentry exported="true" kind="lib" path="lib/runtime/commons-lang3-3.4.jar" sourcepath="lib/build/for-javadoc-in-ecilpse/commons-lang3-3.4-src.zip"/>
+	<classpathentry exported="true" kind="lib" path="lib/runtime/guava-18.0.jar" sourcepath="lib/build/for-javadoc-in-ecilpse/guava-18.0-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/runtime/servlet-api-3.1.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
 	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry exported="true" kind="lib" path="lib/runtime/promises-5.6.0.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/runtime/derby-10.11.1.1.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/runtime/ant-1.9.4.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/runtime/trove-3.0.3.jar" sourcepath="lib/runtime-src-for-javadoc-in-eclipse/trove-3.0.3-src.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/runtime/trove-3.0.3.jar" sourcepath="lib/build/for-javadoc-in-ecilpse/trove-3.0.3-src.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/runtime/asm-5.0.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/runtime/asm-commons-5.0.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/runtime/asm-tree-5.0.2.jar" sourcepath="/ASM 5.0.2/src"/>
