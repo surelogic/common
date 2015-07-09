@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry exported="true" kind="lib" path="lib/runtime/hppc-0.7.1.jar" sourcepath="lib/build/for-javadoc-in-ecilpse/hppc-0.7.1-src.zip.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/runtime/javax.servlet-api-3.1.0.jar" sourcepath="lib/build/for-javadoc-in-ecilpse/javax.servlet-api-3.1.0-sources.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/runtime/asm-5.0.4.jar" sourcepath="lib/build/for-javadoc-in-ecilpse/asm-5.0.4src.zip"/>
 	<classpathentry exported="true" kind="lib" path="lib/runtime/asm-commons-5.0.4.jar" sourcepath="lib/build/for-javadoc-in-ecilpse/asm-5.0.4src.zip"/>
