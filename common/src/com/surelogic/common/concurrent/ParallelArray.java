@@ -67,8 +67,9 @@ public final class ParallelArray<E> {
    * The executor is constructed and shutdown within this method.
    * <p>
    * Information is output to the log every 5 seconds, or any time the blocked
-   * thread is interrupted while this method waits for the encapsulated
-   * {@code ExecutorService} to shutdown.
+   * thread is interrupted, while this method waits for the encapsulated
+   * {@code ExecutorService} to shutdown (presumably it is finishing up its
+   * tasks).
    * 
    * @param procedure
    *          the procedure
@@ -90,15 +91,12 @@ public final class ParallelArray<E> {
         }
       });
     s.shutdown();
-    boolean doneWaiting = false;
     InterruptedException ifInterrupted = null;
     while (true) {
       try {
-        doneWaiting = s.awaitTermination(5, TimeUnit.SECONDS);
-        if (doneWaiting)
+        if (s.awaitTermination(5, TimeUnit.SECONDS))
           break;
       } catch (InterruptedException e) {
-        doneWaiting = false;
         ifInterrupted = e;
       }
       final String duration = SLUtility.toStringDurationMS(System.nanoTime() - start, TimeUnit.NANOSECONDS);
@@ -108,6 +106,12 @@ public final class ParallelArray<E> {
         SLLogger.getLogger().log(Level.INFO, I18N.err(350, duration), ifInterrupted);
         ifInterrupted = null;
       }
+    }
+    // output how may elements were process and how long it took (fine logging
+    // only)
+    if (SLLogger.getLogger().isLoggable(Level.FINE)) {
+      final String duration = SLUtility.toStringDurationMS(System.nanoTime() - start, TimeUnit.NANOSECONDS);
+      SLLogger.getLogger().log(Level.FINE, I18N.err(351, f_elements.size(), duration));
     }
   }
 
@@ -122,8 +126,9 @@ public final class ParallelArray<E> {
    * was setup by the procedure.
    * <p>
    * Information is output to the log every 5 seconds, or any time the blocked
-   * thread is interrupted while this method waits for the encapsulated
-   * {@code ExecutorService} to shutdown.
+   * thread is interrupted, while this method waits for the encapsulated
+   * {@code ExecutorService} to shutdown (presumably it is finishing up its
+   * tasks).
    * 
    * @param procedure
    *          the procedure
