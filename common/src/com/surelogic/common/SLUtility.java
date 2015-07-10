@@ -90,6 +90,8 @@ public final class SLUtility {
   public static final String DOT_XML = ".xml";
 
   public static final String SL_TOOLS_PROPS_FILE = "surelogic-tools.properties";
+  
+  public static final String LOG_NAME = "log.txt";
 
   /*
    * Constants for special ad hoc query meta variables

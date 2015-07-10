@@ -10,12 +10,12 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
+import com.surelogic.common.SLUtility;
 import com.surelogic.common.jobs.*;
 import com.surelogic.common.logging.*;
 
 public abstract class AbstractRemoteSLJob {
-  public static final String LOG_NAME = "log.txt";
-  public static final String LOG_SUFFIX = "." + LOG_NAME;
+  public static final String LOG_SUFFIX = "." + SLUtility.LOG_NAME;
   private static final String CANCEL = "##" + Local.CANCEL;
   private InputStream in;
   protected PrintStream out;

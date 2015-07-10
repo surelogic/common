@@ -3,6 +3,7 @@ package com.surelogic.common.jobs.remote;
 import java.io.File;
 import java.util.logging.Level;
 
+import com.surelogic.common.SLUtility;
 import com.surelogic.common.XUtil;
 import com.surelogic.common.logging.SLLogger;
 
@@ -28,7 +29,7 @@ public abstract class AbstractLocalConfig implements ILocalConfig {
 	}
 	
 	public final String getLogPath() {
-		return new File(runDir, AbstractRemoteSLJob.LOG_NAME).getAbsolutePath();
+		return new File(runDir, SLUtility.LOG_NAME).getAbsolutePath();
 	}
 	
 	public final String getRunDirectory() {
