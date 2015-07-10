@@ -1,9 +1,5 @@
 package com.surelogic.flashlight.common;
 
-import gnu.trove.map.TLongObjectMap;
-import gnu.trove.map.hash.TLongObjectHashMap;
-import gnu.trove.procedure.TLongObjectProcedure;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -16,6 +12,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.carrotsearch.hppc.LongObjectMap;
+import com.carrotsearch.hppc.LongObjectScatterMap;
+import com.carrotsearch.hppc.predicates.LongObjectPredicate;
 import com.surelogic.common.jdbc.QB;
 
 public class HappensBeforeAnalysis {
@@ -44,12 +43,12 @@ public class HappensBeforeAnalysis {
   final PreparedStatement hbLookupAccess;
   final PreparedStatement isFinalSt;
   final PreparedStatement traceMethodCalledSt;
-  final TLongObjectMap<Timestamp> targetsCache;
-  final TLongObjectMap<Timestamp> sourcesCache;
-  final Map<Obj, Timestamp> objTargetsCache;
-  final Map<Obj, Timestamp> objSourcesCache;
-  final Map<LockId, Timestamp> lockTargetsCache;
-  final Map<LockId, Timestamp> lockSourcesCache;
+  final LongObjectMap<Timestamp> targetsCache = new LongObjectScatterMap<>();
+  final LongObjectMap<Timestamp> sourcesCache = new LongObjectScatterMap<>();
+  final Map<Obj, Timestamp> objTargetsCache = new HashMap<>();
+  final Map<Obj, Timestamp> objSourcesCache = new HashMap<>();
+  final Map<LockId, Timestamp> lockTargetsCache = new HashMap<>();
+  final Map<LockId, Timestamp> lockSourcesCache = new HashMap<>();
 
   public HappensBeforeAnalysis(Connection conn) throws SQLException {
     hbSt = conn.prepareStatement(QB.get("Accesses.happensBefore"));
@@ -75,12 +74,6 @@ public class HappensBeforeAnalysis {
     hbClassInitTraceSt = conn.prepareStatement(QB.get("Accesses.trace.happensBeforeClassInit"));
     hbLookupAccess = conn.prepareStatement(QB.get("Accesses.trace.happensBeforeLookupAccess"));
     traceMethodCalledSt = conn.prepareStatement(QB.get("Accesses.trace.traceMethodCalled"));
-    targetsCache = new TLongObjectHashMap<>();
-    sourcesCache = new TLongObjectHashMap<>();
-    objSourcesCache = new HashMap<>();
-    objTargetsCache = new HashMap<>();
-    lockTargetsCache = new HashMap<>();
-    lockSourcesCache = new HashMap<>();
   }
 
   public void finished() throws SQLException {
@@ -134,24 +127,30 @@ public class HappensBeforeAnalysis {
         if (!targetSet.next()) {
           return false;
         }
-        final TLongObjectMap<Timestamp> sources = genSources(sourceSet);
+        final LongObjectMap<Timestamp> sources = genSources(sourceSet);
         sourceSet.close();
         if (sources.isEmpty()) {
           return false;
         }
-        final TLongObjectMap<Timestamp> targets = genTargets(targetSet);
+        final LongObjectMap<Timestamp> targets = genTargets(targetSet);
         targetSet.close();
         if (targets.isEmpty()) {
           return false;
         }
-        boolean found = !sources.forEachEntry(new TLongObjectProcedure<Timestamp>() {
+        class WithResult implements LongObjectPredicate<Timestamp> {
 
-          @Override
-          public boolean execute(long field, Timestamp sourceTs) {
+          boolean result = true;
+
+          public boolean apply(long field, Timestamp sourceTs) {
             Timestamp targetTs = targets.get(field);
-            return targetTs == null || !sourceTs.before(targetTs);
+            result = targetTs == null || !sourceTs.before(targetTs);
+            return result;
           }
-        });
+
+        }
+        final WithResult pred = new WithResult();
+        sources.forEach(pred);
+        boolean found = !pred.result;
         return found;
       } finally {
         targetSet.close();
@@ -178,7 +177,7 @@ public class HappensBeforeAnalysis {
     return lockSourcesCache;
   }
 
-  TLongObjectMap<Timestamp> genSources(ResultSet set) throws SQLException {
+  LongObjectMap<Timestamp> genSources(ResultSet set) throws SQLException {
     sourcesCache.clear();
     do {
       long targetField = set.getLong(1);
@@ -204,7 +203,7 @@ public class HappensBeforeAnalysis {
     return lockTargetsCache;
   }
 
-  TLongObjectMap<Timestamp> genTargets(ResultSet set) throws SQLException {
+  LongObjectMap<Timestamp> genTargets(ResultSet set) throws SQLException {
     targetsCache.clear();
     do {
       long targetField = set.getLong(1);
@@ -295,8 +294,8 @@ public class HappensBeforeAnalysis {
             if (sourceTs.before(targetTs)) {
               return true;
             }
-          } else if (sourceObj > targetObj || sourceObj == targetObj && sourceColl > targetColl || sourceObj == targetObj
-              && sourceColl == targetColl && sourceId.compareTo(targetId) > 0) {
+          } else if (sourceObj > targetObj || sourceObj == targetObj && sourceColl > targetColl
+              || sourceObj == targetObj && sourceColl == targetColl && sourceId.compareTo(targetId) > 0) {
             while (hbCollTargetSet.next()) {
               targetColl = hbCollTargetSet.getLong(1);
               targetObj = hbCollTargetSet.getLong(2);
@@ -304,8 +303,8 @@ public class HappensBeforeAnalysis {
               targetId = hbCollTargetSet.getString(4);
               if (targetObj == sourceObj && targetColl == sourceColl && targetId.equals(sourceId) && sourceTs.before(targetTs)) {
                 return true;
-              } else if (sourceObj < targetObj || sourceObj == targetObj && sourceColl <= targetColl || sourceObj == targetObj
-                  && sourceColl == targetColl && sourceId.compareTo(targetId) <= 0) {
+              } else if (sourceObj < targetObj || sourceObj == targetObj && sourceColl <= targetColl
+                  || sourceObj == targetObj && sourceColl == targetColl && sourceId.compareTo(targetId) <= 0) {
                 continue sourceLoop;
               }
             }
@@ -910,8 +909,8 @@ public class HappensBeforeAnalysis {
   }
 
   enum EdgeType {
-    VOLATILE("Volatile write/read of %s"), WRITE_IN_THREAD("The previous write was in this thread"), OBJECT("%s"), THREAD("%s"), COLLECTION(
-        "%s"), CLASS_INITIALIZATION("Class initialization of %s"), LOCK("%s lock release to lock acquisition");
+    VOLATILE("Volatile write/read of %s"), WRITE_IN_THREAD("The previous write was in this thread"), OBJECT("%s"), THREAD(
+        "%s"), COLLECTION("%s"), CLASS_INITIALIZATION("Class initialization of %s"), LOCK("%s lock release to lock acquisition");
 
     private final String desc;
 
