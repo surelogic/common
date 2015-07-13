@@ -480,22 +480,6 @@ public class EclipseUtility {
   }
 
   /**
-   * Gets a reference to a file in the Eclipse workspace if it is possible to
-   * obtain such a reference. The passed path must be in the Eclipse workspace.
-   * 
-   * @param path
-   *          a path within the Eclipse workspace.
-   * @return a file within the Eclipse workspace, or {@code null} if it was not
-   *         possible to find a file.
-   */
-  public static IFile getIFileWherePossible(IPath path) {
-    if (path == null)
-      throw new IllegalArgumentException(I18N.err(44, "path"));
-
-    return null;
-  }
-
-  /**
    * Gets the path to the open Eclipse workspace.
    * 
    * @return the path to the open Eclipse workspace.
