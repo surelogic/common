@@ -30,4 +30,8 @@ public class JarredClassFile extends AbstractJavaBinaryFile {
 	public Type getType() {
 		return Type.CLASS_FROM_JAR;
 	}
+	
+	public String toString() {
+		return file.getAbsolutePath()+'/'+pathInJar;
+	}
 }
