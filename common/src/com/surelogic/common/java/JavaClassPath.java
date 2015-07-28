@@ -7,6 +7,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.surelogic.Nullable;
 import com.surelogic.common.Pair;
+import com.surelogic.common.logging.SLLogger;
 
 public class JavaClassPath<PS extends JavaProjectSet<?>> implements IJavacClassParser {
   private final Multimap<ISLJavaProject, Config> initialized = ArrayListMultimap.create();
@@ -62,6 +63,9 @@ public class JavaClassPath<PS extends JavaProjectSet<?>> implements IJavacClassP
        * System.out.println(); }
        */
       classToFile.put(key, file);
+    } else {
+      final IJavaFile old = classToFile.get(key);
+      SLLogger.getLogger().warning(file+" overrides "+old+" for type '"+file.getQualifiedName()+"' in "+destProj);
     }
   }
 
