@@ -374,6 +374,8 @@ public abstract class ProjectInfo<P extends ISLJavaProject> {
                 config.addJar(f, true);
                 projects.mapToProject(f, path);
               }
+              final int version = JDTUtility.getMajorJavaSourceVersionFromJVM();
+              config.setOption(Config.SOURCE_LEVEL, version);              
               setDefaultJRE(path);
               jcp = projects.add(config);
             }
