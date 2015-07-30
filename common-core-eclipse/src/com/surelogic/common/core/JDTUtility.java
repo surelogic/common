@@ -319,6 +319,14 @@ public final class JDTUtility {
     return Integer.parseInt(javaVersion.substring(2, 3));
   }
 
+  public static int getMajorJavaSourceVersionFromJVM() {
+	final String javaVersion = System.getProperty("java.version");
+	if (!javaVersion.startsWith("1.")) {
+		throw new IllegalStateException("Unknown Java version: "+javaVersion);
+	}
+	return Integer.parseInt(javaVersion.substring(2, 3));
+  }
+  
   /**
    * Gets the {@link ICompilationUnit} associated with the passed information or
    * {@code null} if neither can be found.
