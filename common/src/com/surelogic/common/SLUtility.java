@@ -8,6 +8,7 @@ import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
+import java.net.NetworkInterface;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
@@ -22,11 +23,13 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 
 import org.apache.commons.lang3.SystemUtils;
 
@@ -35,6 +38,7 @@ import com.google.common.io.BaseEncoding;
 import com.surelogic.NonNull;
 import com.surelogic.Nullable;
 import com.surelogic.common.i18n.I18N;
+import com.surelogic.common.logging.SLLogger;
 
 /**
  * A utility with SureLogic common code.
@@ -90,7 +94,7 @@ public final class SLUtility {
   public static final String DOT_XML = ".xml";
 
   public static final String SL_TOOLS_PROPS_FILE = "surelogic-tools.properties";
-  
+
   public static final String LOG_NAME = "log.txt";
 
   /*
@@ -100,6 +104,47 @@ public final class SLUtility {
   public static final String ADHOC_META_PARTIAL_ROW = "(meta-partial-row)";
 
   public static final String ADHOC_META_VALUE = "defined";
+
+  /**
+   * This method returns a list of the string version of all non-loopback,
+   * non-system hardware addresses on the computer. There might be more than on,
+   * for example, if the computer has both wired and wireless network
+   * capability.
+   * 
+   * @return a list of the mac addresses used by the computer the method is
+   *         invoked on. The list may be empty.
+   */
+  @NonNull
+  public static List<String> getMacAddressesOfThisMachine() {
+    final List<String> result = new ArrayList<>();
+    try {
+      for (Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces(); e.hasMoreElements();) {
+        final NetworkInterface ni = e.nextElement();
+        if (ni.isLoopback())
+          continue;
+
+        @Nullable
+        final byte[] mac = ni.getHardwareAddress();
+        if (mac == null)
+          continue;
+        if (mac.length == 8) {
+          // check for odd Microsoft-used mac addresses (zeros ended by 0xe0)
+          boolean zeroEzero = mac[0] == 0 && mac[1] == 0 && mac[2] == 0 && mac[03] == 0 && mac[4] == 0 && mac[5] == 0 && mac[6] == 0
+              && mac[7] == (byte) 0xe0;
+          if (zeroEzero)
+            continue;
+        }
+        final StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < mac.length; i++) {
+          sb.append(String.format("%02x%s", mac[i], (i < mac.length - 1) ? "-" : ""));
+        }
+        result.add(sb.toString());
+      }
+    } catch (Exception e) {
+      SLLogger.getLogger().log(Level.WARNING, "Failure obtaining MAC addresses of this machine", e);
+    }
+    return result;
+  }
 
   /**
    * This is a hack to remove the package from type names in the
