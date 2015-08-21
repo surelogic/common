@@ -40,6 +40,7 @@
 		<copy todir="${publish.jetty.base}">
 			<fileset dir="${jetty.base}" />
 		</copy>
+		<mkdir dir="${publish.jetty.base}/logs"/>
 		<copy file="${root.war}" todir="${publish.jetty.base}/webapps" />
 		<copy file="${key.jar}" todir="${publish.jetty.base}/lib/ext" />
 		<echo>Publish completed...jetty-surelogic may now be restarted...</echo>
