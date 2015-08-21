@@ -85,7 +85,7 @@
 
 	<filter>
 		<description>
-			Hardcoded password that hides the license servlets
+			Security for the information at /services/admin
 		</description>
 		<filter-name>Security Filter</filter-name>
 		<filter-class>
