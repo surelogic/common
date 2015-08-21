@@ -229,7 +229,6 @@ public final class SLLicenseManager {
       f_licenses.addAll(SLLicensePersistence.readLicensesFromFile(f_licenseFile));
     }
     forThisMachineHelper(); // remove if not activated on this computer
-    System.out.println(f_licenses);
   }
 
   private void pluginLoadHelper() {
