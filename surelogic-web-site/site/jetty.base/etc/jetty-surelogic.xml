@@ -15,5 +15,10 @@
 		<Arg>surelogic.services.db.location</Arg>
 		<Arg>../db</Arg>
 	</Call>
+  
+  <Call name="setProperty" class="java.lang.System">
+    <Arg>derby.stream.error.file</Arg>
+    <Arg>../logs/derby.log</Arg>
+  </Call>
 
 </Configure>
