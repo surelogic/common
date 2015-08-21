@@ -110,13 +110,17 @@ public final class SLUtility {
    * non-system hardware addresses on the computer. There might be more than on,
    * for example, if the computer has both wired and wireless network
    * capability.
+   * <p>
+   * For example, my desktop returns
+   * <tt>[60-a4-4c-61-20-40, 08-00-27-00-68-fb]</tt> if <tt>toString()</tt> is
+   * invoked on the result of this method.
    * 
    * @return a list of the mac addresses used by the computer the method is
    *         invoked on. The list may be empty.
    */
   @NonNull
-  public static List<String> getMacAddressesOfThisMachine() {
-    final List<String> result = new ArrayList<>();
+  public static ArrayList<String> getMacAddressesOfThisMachine() {
+    final ArrayList<String> result = new ArrayList<>();
     try {
       for (Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces(); e.hasMoreElements();) {
         final NetworkInterface ni = e.nextElement();
@@ -143,6 +147,7 @@ public final class SLUtility {
     } catch (Exception e) {
       SLLogger.getLogger().log(Level.WARNING, "Failure obtaining MAC addresses of this machine", e);
     }
+    result.trimToSize();
     return result;
   }
 
