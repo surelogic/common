@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import com.google.common.collect.ImmutableSet;
 import com.surelogic.NonNull;
+import com.surelogic.Nullable;
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
 
@@ -26,6 +27,7 @@ public final class SLLicenseNetCheck {
    * The identify of the license license this net check refers to. May not be
    * <tt>null</tt>.
    */
+  @NonNull
   private final UUID f_uuid;
 
   /**
@@ -34,6 +36,7 @@ public final class SLLicenseNetCheck {
    * @return the non-<tt>null</tt> {@link UUID} the license this net check
    *         refers to.
    */
+  @NonNull
   public UUID getUuid() {
     return f_uuid;
   }
@@ -41,6 +44,7 @@ public final class SLLicenseNetCheck {
   /**
    * The license expiration date or renewal deadline.
    */
+  @NonNull
   private final Date f_date;
 
   /**
@@ -58,6 +62,7 @@ public final class SLLicenseNetCheck {
    * 
    * @see SLUtility#getMacAddressesOfThisMachine()
    */
+  @NonNull
   private final ImmutableSet<String> f_macAddresses;;
 
   /**
@@ -74,6 +79,36 @@ public final class SLLicenseNetCheck {
   }
 
   /**
+   * Checks if the set of MAC addresses from the machine that registered this
+   * license contains at least one of the passed MAC addresses.
+   * <p>
+   * A special case is if the set of MAC addresses from the machine that
+   * registered this license is <i>empty</i> then this method always returns
+   * {@code true}.
+   * 
+   * @param macAddresses
+   *          the set of MAC addresses of the machine of interest. Empty or
+   *          {@code null} indicates no MAC addresses.
+   * @return {@code true} if the this net check was done from a machine with at
+   *         least one of the passed MAC addresses (or the set of MAC addresses
+   *         from the machine that registered this license is <i>empty</i>),
+   *         {@code false} otherwise.
+   */
+  public boolean containsAtLeastOneMacAddress(@Nullable Iterable<String> macAddresses) {
+    /*
+     * Handle the special case of no network card on the registered machine.
+     */
+    if (f_macAddresses.isEmpty())
+      return true;
+
+    if (macAddresses != null)
+      for (String ma : macAddresses)
+        if (f_macAddresses.contains(ma))
+          return true;
+    return false;
+  }
+
+  /**
    * Constructs a new SureLogic license.
    * 
    * @param uuid
@@ -82,7 +117,7 @@ public final class SLLicenseNetCheck {
    * @param date
    *          a non-<tt>null</tt> license expiration date or renewal deadline.
    */
-  public SLLicenseNetCheck(final UUID uuid, final Date date, final Iterable<String> macAddresses) {
+  public SLLicenseNetCheck(final @NonNull UUID uuid, final @NonNull Date date, final @Nullable Iterable<String> macAddresses) {
     if (uuid == null)
       throw new IllegalArgumentException(I18N.err(44, "uuid"));
     f_uuid = uuid;

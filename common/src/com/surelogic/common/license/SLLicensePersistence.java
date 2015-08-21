@@ -176,10 +176,10 @@ public final class SLLicensePersistence {
   private static final String TYPE_LABEL = "type=";
   private static final String UUID_LABEL = "id=";
 
-  private static final String BEGIN_LICENSE = "[sl-#v1.0#(7da";
+  private static final String BEGIN_LICENSE = "[sl-#v2.0#(7da";
   private static final String END_LICENSE = "7e1da)]";
 
-  private static final String BEGIN_NET_CHECK = "[sl-nc-#v1.0#(5f0";
+  private static final String BEGIN_NET_CHECK = "[sl-nc-#v2.0#(5f0";
   private static final String END_NET_CHECK = "6ae)]";
 
   private static final String MIDDLE = "O";
@@ -420,9 +420,10 @@ public final class SLLicensePersistence {
     /*
      * Read in as many MAC addresses as are listed. There may be none.
      */
+    int occurrence = 1;
     final ArrayList<String> macAddresses = new ArrayList<>();
     while (true) {
-      final String macAddress = getValue(value, MACADDRESS_LABEL);
+      final String macAddress = getValue(value, MACADDRESS_LABEL, occurrence++);
       if (macAddress == null)
         break;
       macAddresses.add(macAddress);
@@ -439,6 +440,27 @@ public final class SLLicensePersistence {
       return null;
     }
     return result;
+  }
+
+  /**
+   * A helper method to extract a particular value for a particular key from a
+   * property-file like string containing key-value pairs.
+   * <p>
+   * This method extracts the first occurrence of the key-value pair in the
+   * string and simply returns
+   * 
+   * <pre>
+   * getValue(s, key, 1);
+   * </pre>
+   * 
+   * @param s
+   *          a string containing key-value pairs.
+   * @param key
+   *          a key (including the <tt>=</tt> character).
+   * @see #getValue(String, String, int)
+   */
+  private static String getValue(final String s, final String key) {
+    return getValue(s, key, 1);
   }
 
   /**
@@ -464,12 +486,21 @@ public final class SLLicensePersistence {
    *          a string containing key-value pairs.
    * @param key
    *          a key (including the <tt>=</tt> character).
+   * @param occurrence
+   *          the occurrence number of the key in <tt>s</tt>. One-based, so
+   *          <tt>1</tt> indicates the first, <tt>2</tt> the second, and so on.
+   *          {@code null} is returned if no such occurrence exists.
    * @return the value, or {@code null} if the key is not found in <tt>s</tt>.
    */
-  private static String getValue(final String s, final String key) {
-    final int keyIndex = s.indexOf(key);
-    if (keyIndex == -1)
-      return null;
+  private static String getValue(final String s, final String key, int occurrence) {
+    if (occurrence <= 0)
+      occurrence = 1; // assume they want the first occurrence
+    int keyIndex = -1; // will be bumped up to 0 below
+    while (occurrence-- >= 1) {
+      keyIndex = s.indexOf(key, keyIndex + 1);
+      if (keyIndex == -1)
+        return null;
+    }
     final int valueIndex = keyIndex + key.length();
     final int eolIndex = s.indexOf(SEP, valueIndex);
     if (eolIndex == -1)

@@ -15,6 +15,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableSet;
+import com.surelogic.NonNull;
+import com.surelogic.Nullable;
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.jdbc.DBQuery;
@@ -40,6 +44,9 @@ public class LicenseRequestServlet extends HttpServlet {
 
   static final Logger LOG = SLLogger.getLoggerFor(LicenseRequestServlet.class);
 
+  private static final String PARAM_LIC = "common.serviceability.licenserequest.license";
+  private static final String PARAM_MAC = "common.serviceability.licenserequest.macAddresses";
+
   private static final String ACK = "common.serviceability.licenserequest.resp.failure.success";
   private static final String LOGEMAIL = "common.serviceability.licenserequest.logEmail";
   private static final String REQ = "common.serviceability.licenserequest.req";
@@ -52,9 +59,9 @@ public class LicenseRequestServlet extends HttpServlet {
   private static final String LICENSEURL = "common.serviceability.licenseadmin.url";
 
   enum NetCheckEvent {
-    INSTALL_SUCCESS("Successful install", "INSTALL_COUNT"), RENEW_SUCCESS("Successful renewal", "RENEWAL_COUNT"), INSTALL_BLACKLISTED(
-        "Failed install - on blacklist", "BLACKLIST_COUNT"), INSTALL_LIMIT_EXCEEDED("Failed install - too many installs",
-        "TOO_MANY_COUNT"), REMOVAL_SUCCESS("Successful removal", "REMOVAL_COUNT");
+    INSTALL_SUCCESS("Successful install", "INSTALL_COUNT"), RENEW_SUCCESS("Successful renewal",
+        "RENEWAL_COUNT"), INSTALL_BLACKLISTED("Failed install - on blacklist", "BLACKLIST_COUNT"), INSTALL_LIMIT_EXCEEDED(
+            "Failed install - too many installs", "TOO_MANY_COUNT"), REMOVAL_SUCCESS("Successful removal", "REMOVAL_COUNT");
 
     final String value;
     final String column;
@@ -91,105 +98,17 @@ public class LicenseRequestServlet extends HttpServlet {
   }
 
   /**
-   * Tries to install/renew a {@link PossiblyActivatedSLLicense}. Returns the
-   * signed hex string representation of the {@link SLLicenseNetCheck}, or null
-   * if the install failed for some reason. The date encoded in the
-   * {@link SLLicenseNetCheck} is the expiration/renewal date for the license.
-   * 
-   * Several checks may be performed during an install/renew. All licenses are
-   * checked against the blacklist, and denied if their uuid shows up. For a
-   * support/use license, we also check the install date to make sure that the
-   * license is not being installed past the deadline.
-   * 
-   * @author nathan
-   */
-  private static class Install implements DBQuery<String> {
-
-    private final PossiblyActivatedSLLicense sl;
-    private final Timestamp now;
-    private final String ip;
-
-    Install(final PossiblyActivatedSLLicense sl, final Timestamp now, final String ip) {
-      this.sl = sl;
-      this.now = now;
-      this.ip = ip;
-    }
-
-    @Override
-    public String perform(final Query q) {
-      final SignedSLLicense signedLicense = sl.getSignedSLLicense();
-      final SLLicense license = signedLicense.getLicense();
-      final UUID uuid = license.getUuid();
-      if (checkBlacklist(q, signedLicense)) {
-        // This license has been blacklisted
-        logCheck(q, now, ip, license, NetCheckEvent.INSTALL_BLACKLISTED);
-        return fail(I18N.msg(BLACKLISTED, license.getProduct(), uuid));
-      }
-      if ((license.getType() == SLLicenseType.SUPPORT || license.getType() == SLLicenseType.USE) && sl.isPastInstallBeforeDate()) {
-        return fail(I18N.msg(EXPIRED, license.getProduct(), uuid, SLUtility.toStringHumanDay(license.getInstallBeforeDate())));
-      }
-      final SLLicenseNetCheck check = new SLLicenseNetCheck(uuid, calculateNetcheckDate(license));
-      LicenseInfo info = getAndInitInfo(q, license);
-      if (license.getType() == SLLicenseType.PERPETUAL && sl.isActivated()) {
-        // This is a renewal
-        if (info.getInstalls() == 0) {
-          // We are probably missing some data, or have a
-          // badly behaving client. We'll go ahead and tick the
-          // install count as well.
-          logCheck(q, now, ip, license, NetCheckEvent.INSTALL_SUCCESS);
-        }
-        logCheck(q, now, ip, license, NetCheckEvent.RENEW_SUCCESS);
-      } else {
-        // This is an install
-        if (info.isInstallAvailable()) {
-          logCheck(q, now, ip, license, NetCheckEvent.INSTALL_SUCCESS);
-        } else {
-          logCheck(q, now, ip, license, NetCheckEvent.INSTALL_LIMIT_EXCEEDED);
-          return fail(I18N.msg(INSTALLLIMIT, license.getProduct(), uuid, license.getMaxActive()));
-        }
-      }
-      return performNetCheck(check);
-    }
-
-    private String performNetCheck(final SLLicenseNetCheck check) {
-      final PrivateKey key = SiteUtil.getKey();
-      final SignedSLLicenseNetCheck signed = SignedSLLicenseNetCheck.getInstance(check, key);
-      return signed.getSignedHexString();
-    }
-  }
-
-  private void install(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-    final String licStr = req.getParameter(I18N.msg("common.serviceability.licenserequest.license"));
-    final Timestamp now = new Timestamp(System.currentTimeMillis());
-    final String ip = req.getRemoteAddr();
-    if (licStr != null) {
-      final List<PossiblyActivatedSLLicense> licenses = SLLicensePersistence.readPossiblyActivatedLicensesFromString(licStr);
-      final ServicesDBConnection conn = ServicesDBConnection.getInstance();
-      for (final PossiblyActivatedSLLicense sl : licenses) {
-        String result;
-        try {
-          result = conn.withTransaction(new Install(sl, now, ip));
-        } catch (TransactionException e) {
-          result = fail(I18N.msg(SERVERERROR));
-        }
-        resp.getWriter().println(result);
-      }
-    } else {
-      LOG.info("No license token provided to an install request");
-    }
-  }
-
-  /**
    * Check to see if a license has been blacklisted.
    * 
    * @param license
    * @return true if the license has been blacklisted
    */
   static boolean checkBlacklist(final Query q, final SignedSLLicense license) {
-    return q.prepared("WebServices.checkBlacklist", new StringResultHandler()).call(license.getLicense().getUuid().toString()) != null;
+    return q.prepared("WebServices.checkBlacklist", new StringResultHandler())
+        .call(license.getLicense().getUuid().toString()) != null;
   }
 
-  private static class LicenseInfo {
+  static class LicenseInfo {
     public LicenseInfo(final int maxInstallCount, final int installCount, final int renewCount, final int removeCount,
         final int blacklistcount, final int tooManyCount) {
       this.maxInstalls = maxInstallCount;
@@ -211,27 +130,22 @@ public class LicenseRequestServlet extends HttpServlet {
       return installs;
     }
 
-    @SuppressWarnings("unused")
     public int getMaxInstalls() {
       return maxInstalls;
     }
 
-    @SuppressWarnings("unused")
     public int getRenewals() {
       return renewals;
     }
 
-    @SuppressWarnings("unused")
     public int getRemovals() {
       return removals;
     }
 
-    @SuppressWarnings("unused")
     public int getBlacklisted() {
       return blacklisted;
     }
 
-    @SuppressWarnings("unused")
     public int getTooManyInstalls() {
       return tooManyInstalls;
     }
@@ -247,10 +161,14 @@ public class LicenseRequestServlet extends HttpServlet {
    * information is not already in the database, then a new entry is created.
    * 
    * @param q
+   *          a query.
    * @param license
-   * @return
+   *          the license.
+   * @return the install count information for a particular license. If the
+   *         information is not already in the database, then a new entry is
+   *         created.
    */
-  static LicenseInfo getAndInitInfo(final Query q, final SLLicense license) {
+  static LicenseInfo getAndInitInfo(@NonNull final Query q, @NonNull final SLLicense license) {
     final String uuid = license.getUuid().toString();
     Integer maxInstalls = q.prepared("WebServices.selectLicenseInfoById", new ResultHandler<Integer>() {
       @Override
@@ -314,36 +232,128 @@ public class LicenseRequestServlet extends HttpServlet {
     final String uuid = license.getUuid().toString();
     q.prepared("WebServices.logNetCheck").call(time, ip, uuid.toString(), event.value);
     q.statement("WebServices.updateCheckCount").call(event.getColumn(), uuid.toString());
-    Email.adminEmail(
-        event.toString(),
-        I18N.msg(LOGEMAIL, license.getHolder(), license.getProduct().toString(), time.toString(), ip, uuid,
-            I18N.msg(LICENSEURL, SLUtility.SERVICEABILITY_URL, uuid), event.toString()));
+    Email.adminEmail(event.toString(), I18N.msg(LOGEMAIL, license.getHolder(), license.getProduct().toString(), time.toString(), ip,
+        uuid, I18N.msg(LICENSEURL, SLUtility.SERVICEABILITY_URL, uuid), event.toString()));
   }
 
-  void remove(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-    final String licStr = req.getParameter(I18N.msg("common.serviceability.licenserequest.license"));
+  /**
+   * Tries to install/renew a {@link PossiblyActivatedSLLicense}. Returns the
+   * signed hex string representation of the {@link SLLicenseNetCheck}, or null
+   * if the install failed for some reason. The date encoded in the
+   * {@link SLLicenseNetCheck} is the expiration/renewal date for the license.
+   * 
+   * Several checks may be performed during an install/renew. All licenses are
+   * checked against the blacklist, and denied if their uuid shows up. For a
+   * support/use license, we also check the install date to make sure that the
+   * license is not being installed past the deadline.
+   */
+  static class Install implements DBQuery<String> {
+
+    @NonNull
+    private final PossiblyActivatedSLLicense sl;
+    @NonNull
+    private final Timestamp now;
+    @NonNull
+    private final String ip;
+    @NonNull
+    private final ImmutableSet<String> clientMacAddresses;
+
+    Install(@NonNull PossiblyActivatedSLLicense sl, @NonNull Timestamp now, @NonNull String ip,
+        @NonNull ImmutableSet<String> clientMacAddresses) {
+      this.sl = sl;
+      this.now = now;
+      this.ip = ip;
+      this.clientMacAddresses = clientMacAddresses;
+    }
+
+    @Override
+    public String perform(final Query q) {
+      final SignedSLLicense signedLicense = sl.getSignedSLLicense();
+      final SLLicense license = signedLicense.getLicense();
+      final UUID uuid = license.getUuid();
+      if (checkBlacklist(q, signedLicense)) {
+        // This license has been blacklisted
+        logCheck(q, now, ip, license, NetCheckEvent.INSTALL_BLACKLISTED);
+        return fail(I18N.msg(BLACKLISTED, license.getProduct(), uuid));
+      }
+      if ((license.getType() == SLLicenseType.SUPPORT || license.getType() == SLLicenseType.USE) && sl.isPastInstallBeforeDate()) {
+        return fail(I18N.msg(EXPIRED, license.getProduct(), uuid, SLUtility.toStringHumanDay(license.getInstallBeforeDate())));
+      }
+      final SLLicenseNetCheck check = new SLLicenseNetCheck(uuid, calculateNetcheckDate(license), clientMacAddresses);
+      LicenseInfo info = getAndInitInfo(q, license);
+      if (license.getType() == SLLicenseType.PERPETUAL && sl.isActivated()) {
+        // This is a renewal
+        if (info.getInstalls() == 0) {
+          // We are probably missing some data, or have a
+          // badly behaving client. We'll go ahead and tick the
+          // install count as well.
+          logCheck(q, now, ip, license, NetCheckEvent.INSTALL_SUCCESS);
+        }
+        logCheck(q, now, ip, license, NetCheckEvent.RENEW_SUCCESS);
+      } else {
+        // This is an install
+        if (info.isInstallAvailable()) {
+          logCheck(q, now, ip, license, NetCheckEvent.INSTALL_SUCCESS);
+        } else {
+          logCheck(q, now, ip, license, NetCheckEvent.INSTALL_LIMIT_EXCEEDED);
+          return fail(I18N.msg(INSTALLLIMIT, license.getProduct(), uuid, license.getMaxActive()));
+        }
+      }
+      return performNetCheck(check);
+    }
+
+    private String performNetCheck(final SLLicenseNetCheck check) {
+      final PrivateKey key = SiteUtil.getKey();
+      final SignedSLLicenseNetCheck signed = SignedSLLicenseNetCheck.getInstance(check, key);
+      return signed.getSignedHexString();
+    }
+  }
+
+  void install(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+    @Nullable
+    final String licStr = req.getParameter(I18N.msg(PARAM_LIC));
+    @Nullable
+    final String macAddressesParam = req.getParameter(I18N.msg(PARAM_MAC));
+    final ImmutableSet<String> clientMacAddresses;
+    if (macAddressesParam != null) {
+      clientMacAddresses = ImmutableSet.copyOf(Splitter.on(',').trimResults().omitEmptyStrings().split(macAddressesParam));
+    } else
+      clientMacAddresses = ImmutableSet.of();
+    @NonNull
     final Timestamp now = new Timestamp(System.currentTimeMillis());
+    @NonNull
     final String ip = req.getRemoteAddr();
     if (licStr != null) {
       final List<PossiblyActivatedSLLicense> licenses = SLLicensePersistence.readPossiblyActivatedLicensesFromString(licStr);
       final ServicesDBConnection conn = ServicesDBConnection.getInstance();
       for (final PossiblyActivatedSLLicense sl : licenses) {
-        final String result = conn.withTransaction(new Remove(sl, now, ip));
+        String result;
+        try {
+          result = conn.withTransaction(new Install(sl, now, ip, clientMacAddresses));
+        } catch (TransactionException e) {
+          result = fail(I18N.msg(SERVERERROR));
+        }
         resp.getWriter().println(result);
       }
     } else {
       LOG.info("No license token provided to an install request");
     }
-
   }
 
-  private static class Remove implements DBQuery<String> {
+  /**
+   * Tries to remove a {@link PossiblyActivatedSLLicense} in the server
+   * database.
+   */
+  static class Remove implements DBQuery<String> {
 
+    @NonNull
     private final String ip;
+    @NonNull
     private final Timestamp now;
+    @NonNull
     private final PossiblyActivatedSLLicense sl;
 
-    public Remove(final PossiblyActivatedSLLicense sl, final Timestamp now, final String ip) {
+    public Remove(@NonNull PossiblyActivatedSLLicense sl, @NonNull Timestamp now, @NonNull String ip) {
       this.sl = sl;
       this.now = now;
       this.ip = ip;
@@ -367,4 +377,19 @@ public class LicenseRequestServlet extends HttpServlet {
     return calendar.getTime();
   }
 
+  void remove(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+    final String licStr = req.getParameter(I18N.msg("common.serviceability.licenserequest.license"));
+    final Timestamp now = new Timestamp(System.currentTimeMillis());
+    final String ip = req.getRemoteAddr();
+    if (licStr != null) {
+      final List<PossiblyActivatedSLLicense> licenses = SLLicensePersistence.readPossiblyActivatedLicensesFromString(licStr);
+      final ServicesDBConnection conn = ServicesDBConnection.getInstance();
+      for (final PossiblyActivatedSLLicense sl : licenses) {
+        final String result = conn.withTransaction(new Remove(sl, now, ip));
+        resp.getWriter().println(result);
+      }
+    } else {
+      LOG.info("No license token provided to an install request");
+    }
+  }
 }

@@ -10,6 +10,10 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
+import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableSet;
+import com.surelogic.NonNull;
+import com.surelogic.Nullable;
 import com.surelogic.Vouch;
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
@@ -97,14 +101,16 @@ public final class SLLicenseUtility {
    * @return {@code true} if a license exists that allows use of
    *         <tt>product</tt>, {@code false} otherwise.
    */
-  public static boolean validate(final SLLicenseProduct product) {
+  public static boolean validate(@NonNull final SLLicenseProduct product) {
     if (product == null)
       throw new IllegalArgumentException(I18N.err(44, "product"));
+
+    final ImmutableSet<String> myMacAddresses = SLUtility.getMacAddressesOfThisMachine();
 
     List<PossiblyActivatedSLLicense> licenses = SLLicenseManager.getInstance().getLicenses();
     PossiblyActivatedSLLicense best = null;
     for (PossiblyActivatedSLLicense license : licenses) {
-      if (license.licensesUseOf(product)) {
+      if (license.licensesUseOf(product, myMacAddresses)) {
         if (best == null) {
           /*
            * No license has been found yet, so this one is the best one (and
@@ -214,14 +220,21 @@ public final class SLLicenseUtility {
    * need to be installed locally.
    * 
    * @param licenses
-   *          the licenses to activate.
+   *          the licenses to activate. If {@code null} or empty this method
+   *          simply returns.
+   * @param macAddresses
+   *          the MAC addresses of this machine, used to prevent moving
+   *          activated license files. May be empty (or {@code null} which means
+   *          empty).
    * @throws Exception
    *           should anything go wrong.
    */
-  public static void tryToActivateRenewLicenses(final List<PossiblyActivatedSLLicense> licenses) throws Exception {
-    if (licenses.isEmpty()) {
+  public static void tryToActivateRenewLicenses(@Nullable List<PossiblyActivatedSLLicense> licenses,
+      @Nullable Iterable<String> macAddresses) throws Exception {
+    if (licenses == null || licenses.isEmpty())
       return;
-    }
+    if (macAddresses == null)
+      macAddresses = ImmutableSet.of();
     /*
      * Check that either (1) each license is not activated or (2) that it is a
      * perpetual license.
@@ -243,6 +256,7 @@ public final class SLLicenseUtility {
     final Map<String, String> param = new HashMap<>();
     param.put(I18N.msg("common.serviceability.licenserequest.req"), I18N.msg("common.serviceability.licenserequest.req.actrew"));
     param.put(I18N.msg("common.serviceability.licenserequest.license"), l);
+    param.put(I18N.msg("common.serviceability.licenserequest.macAddresses"), Joiner.on(',').skipNulls().join(macAddresses));
     final URL url = new URL(I18N.msg("common.serviceability.licenserequest.url", SLUtility.SERVICEABILITY_URL));
     final String response = SLUtility.sendPostToUrl(url, param);
     final List<SignedSLLicenseNetCheck> licenseNetChecks = SLLicensePersistence.readLicenseNetChecksFromString(response);
