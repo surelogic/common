@@ -121,7 +121,7 @@
 	</context-param>
 	<context-param>
 		<param-name>emailSecret</param-name>
-		<param-value>lara.croft</param-value>
+		<param-value>bGFyYS5jcm9mdA==</param-value>
 	</context-param>
 
 </web-app>

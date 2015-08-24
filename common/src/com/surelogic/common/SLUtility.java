@@ -1612,8 +1612,7 @@ public final class SLUtility {
   }
 
   /**
-   * Decodes a Base64 encoded string to a normal string. This method uses the
-   * Apache Commons Codec library.
+   * Decodes a Base64 encoded string to a normal string.
    * 
    * @param s
    *          the encoded string.
@@ -1622,10 +1621,13 @@ public final class SLUtility {
   public static String decodeBase64(String s) {
     return new String(BaseEncoding.base64().decode(s), Charsets.UTF_8);
   }
+  
+  public static void main(String[] args) {
+    System.out.println(encodeBase64("lara.croft"));
+  }
 
   /**
-   * Encodes a normal string to a Base64 encoded string. This method uses the
-   * Apache Commons Codec library.
+   * Encodes a normal string to a Base64 encoded string.
    * 
    * @param s
    *          the normal string.
