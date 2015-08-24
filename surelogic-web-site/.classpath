@@ -3,8 +3,8 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/common"/>
-	<classpathentry kind="lib" path="lib/javax.mail-1.5.2.jar"/>
 	<classpathentry kind="lib" path="lib/derbynet-10.11.1.1.jar"/>
 	<classpathentry kind="lib" path="lib/derbytools-10.11.1.1.jar"/>
+	<classpathentry kind="lib" path="lib/javax.mail-1.5.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
