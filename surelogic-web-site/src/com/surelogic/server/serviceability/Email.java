@@ -8,8 +8,10 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 
 import javax.mail.Address;
+import javax.mail.Authenticator;
 import javax.mail.Message;
 import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
@@ -69,9 +71,24 @@ public class Email {
       public void run() {
         final EmailConfig config = emailConfig.get();
         try {
+          Authenticator auth;
+          final String user = "tim.halloran@surelogic.com";
+          final String pass = "lara.croft";
+          if ((user != null) && (user.length() > 0)) {
+            auth = new Authenticator() {
+
+              @Override
+              protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(user, pass);
+              }
+
+            };
+          } else {
+            auth = null;
+          }
           // get the email receiver config and create a JavaMail
           // session
-          final Session session = Session.getInstance(config.getJavaMailProperties());
+          final Session session = Session.getInstance(config.getJavaMailProperties(), auth);
 
           // create and populate a JavaMail email
           final MimeMessage msg = new MimeMessage(session);

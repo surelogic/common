@@ -78,6 +78,7 @@ public enum SLLicenseProduct {
    */
   @Vouch("Immutable")
   private static final Map<String, SLLicenseProduct> stringToEnum = new HashMap<>();
+
   static {
     for (SLLicenseProduct type : values()) {
       stringToEnum.put(type.toString(), type);

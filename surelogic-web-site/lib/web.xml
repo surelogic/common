@@ -8,11 +8,19 @@
 		<welcome-file>index.html</welcome-file>
 	</welcome-file-list>
 
-	<!-- Support Request servlet configuration -->
+    <servlet>
+      <servlet-name>Free License Request</servlet-name>
+      <servlet-class>com.surelogic.server.serviceability.FreeLicenseServlet</servlet-class>
+    </servlet>
+  
+    <servlet-mapping>
+      <servlet-name>Free License Request</servlet-name>
+      <url-pattern>/services/freeRequest</url-pattern>
+    </servlet-mapping>
+  
 	<servlet>
 		<servlet-name>Support Request</servlet-name>
-		<servlet-class>
-			com.surelogic.server.serviceability.SupportRequestServlet</servlet-class>
+		<servlet-class>com.surelogic.server.serviceability.SupportRequestServlet</servlet-class>
 	</servlet>
 
 	<servlet-mapping>
@@ -22,8 +30,7 @@
 
 	<servlet>
 		<servlet-name>License Request</servlet-name>
-		<servlet-class>
-			com.surelogic.server.serviceability.LicenseRequestServlet</servlet-class>
+		<servlet-class>com.surelogic.server.serviceability.LicenseRequestServlet</servlet-class>
 	</servlet>
 
 	<servlet-mapping>
@@ -50,7 +57,6 @@
 		<servlet-name>License Admin Request</servlet-name>
 		<url-pattern>/services/license</url-pattern>
 	</servlet-mapping>
-
 
 	<servlet>
 		<servlet-name>License Log</servlet-name>
@@ -85,7 +91,7 @@
 
 	<filter>
 		<description>
-			Hardcoded password that hides the license servlets
+			Security for the information at /services/admin
 		</description>
 		<filter-name>Security Filter</filter-name>
 		<filter-class>
@@ -113,11 +119,11 @@
 	</context-param>
 	<context-param>
 		<param-name>fromAddress</param-name>
-		<param-value>support@surelogic.com</param-value>
+		<param-value>tim.halloran@surelogic.com</param-value>
 	</context-param>
 	<context-param>
 		<param-name>emailServerHost</param-name>
-		<param-value>aspmx.l.google.com</param-value>
+		<param-value>smtp.gmail.com</param-value>
 	</context-param>
 	<context-param>
 		<param-name>emailServerPort</param-name>

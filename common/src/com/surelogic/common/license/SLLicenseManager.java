@@ -4,12 +4,16 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Level;
 
+import com.google.common.collect.ImmutableSet;
 import com.surelogic.common.FileUtility;
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
+import com.surelogic.common.logging.SLLogger;
 
 /**
  * Manages the contents of the <tt>~/.surelogic-licenses</tt> file. This class
@@ -200,6 +204,18 @@ public final class SLLicenseManager {
     }
   }
 
+  private void forThisMachineHelper() {
+    final ImmutableSet<String> macAddresses = SLUtility.getMacAddressesOfThisMachine();
+    for (Iterator<PossiblyActivatedSLLicense> iterator = f_licenses.iterator(); iterator.hasNext();) {
+      PossiblyActivatedSLLicense license = iterator.next();
+      if (license.isActivated()
+          && !license.getSignedSLLicenseNetCheck().getLicenseNetCheck().containsAtLeastOneMacAddress(macAddresses)) {
+        iterator.remove();
+        SLLogger.getLogger().log(Level.WARNING, I18N.err(352, macAddresses, license));
+      }
+    }
+  }
+
   /**
    * Loads the persisted license data from the <tt>~/.surelogic-licenses</tt>
    * file.
@@ -212,6 +228,7 @@ public final class SLLicenseManager {
     if (f_licenseFile.exists()) {
       f_licenses.addAll(SLLicensePersistence.readLicensesFromFile(f_licenseFile));
     }
+    forThisMachineHelper(); // remove if not activated on this computer
   }
 
   private void pluginLoadHelper() {

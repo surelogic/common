@@ -21,9 +21,9 @@ import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +34,7 @@ import java.util.logging.Level;
 import org.apache.commons.lang3.SystemUtils;
 
 import com.google.common.base.Charsets;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.io.BaseEncoding;
 import com.surelogic.NonNull;
 import com.surelogic.Nullable;
@@ -110,13 +111,17 @@ public final class SLUtility {
    * non-system hardware addresses on the computer. There might be more than on,
    * for example, if the computer has both wired and wireless network
    * capability.
+   * <p>
+   * For example, my desktop returns
+   * <tt>[60-a4-4c-61-20-40, 08-00-27-00-68-fb]</tt> if <tt>toString()</tt> is
+   * invoked on the result of this method.
    * 
-   * @return a list of the mac addresses used by the computer the method is
+   * @return a set of the mac addresses used by the computer the method is
    *         invoked on. The list may be empty.
    */
   @NonNull
-  public static List<String> getMacAddressesOfThisMachine() {
-    final List<String> result = new ArrayList<>();
+  public static ImmutableSet<String> getMacAddressesOfThisMachine() {
+    final HashSet<String> result = new HashSet<>();
     try {
       for (Enumeration<NetworkInterface> e = NetworkInterface.getNetworkInterfaces(); e.hasMoreElements();) {
         final NetworkInterface ni = e.nextElement();
@@ -143,7 +148,7 @@ public final class SLUtility {
     } catch (Exception e) {
       SLLogger.getLogger().log(Level.WARNING, "Failure obtaining MAC addresses of this machine", e);
     }
-    return result;
+    return ImmutableSet.copyOf(result);
   }
 
   /**
@@ -799,27 +804,6 @@ public final class SLUtility {
   public static int getCurrentMaxMemorySizeInMb() {
     final Runtime rt = Runtime.getRuntime();
     return SLUtility.safeLongToInt(SLUtility.byteToMByte(rt.maxMemory()));
-  }
-
-  /**
-   * Creates a comma separated list of strings from the passed collection by
-   * invoking {@link #toString()} on each element.
-   * 
-   * @param values
-   *          the values to form the list.
-   * @return a comma separated list.
-   */
-  public static <T> String toStringCommaSeparatedList(Collection<T> values) {
-    final StringBuilder b = new StringBuilder();
-    boolean first = true;
-    for (T value : values) {
-      if (first)
-        first = false;
-      else
-        b.append(", ");
-      b.append(value == null ? "null" : value.toString());
-    }
-    return b.toString();
   }
 
   /**
