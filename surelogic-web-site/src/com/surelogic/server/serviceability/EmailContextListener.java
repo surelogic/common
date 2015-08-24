@@ -23,6 +23,9 @@ public class EmailContextListener implements ServletContextListener {
     jmProps.setProperty("mail.transport.protocol", "smtp");
     jmProps.setProperty("mail.smtp.host", config.getInitParameter("emailServerHost"));
     jmProps.setProperty("mail.smtp.port", config.getInitParameter("emailServerPort"));
+    jmProps.setProperty("mail.smtp.starttls.enable", "true");
+    jmProps.setProperty("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+    jmProps.setProperty("mail.smtp.auth", "true");
 
     // create and store the EmailConfig
     final String from = config.getInitParameter("fromAddress");
