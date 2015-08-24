@@ -232,7 +232,7 @@ public class LicenseRequestServlet extends HttpServlet {
     final String uuid = license.getUuid().toString();
     q.prepared("WebServices.logNetCheck").call(time, ip, uuid.toString(), event.value);
     q.statement("WebServices.updateCheckCount").call(event.getColumn(), uuid.toString());
-    Email.adminEmail(event.toString(), I18N.msg(LOGEMAIL, license.getHolder(), license.getProduct().toString(), time.toString(), ip,
+    Email.sendSupportEmail(event.toString(), I18N.msg(LOGEMAIL, license.getHolder(), license.getProduct().toString(), time.toString(), ip,
         uuid, I18N.msg(LICENSEURL, SLUtility.SERVICEABILITY_URL, uuid), event.toString()));
   }
 

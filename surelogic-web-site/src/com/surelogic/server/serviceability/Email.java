@@ -44,7 +44,7 @@ public class Email {
    * @param subject
    * @param content
    */
-  static void adminEmail(final String subject, final String content) {
+  static void sendSupportEmail(final String subject, final String content) {
     sendEmail(subject, content, null);
   }
 
