@@ -123,7 +123,7 @@
 	</context-param>
 	<context-param>
 		<param-name>emailServerHost</param-name>
-		<param-value>smtp.google.com</param-value>
+		<param-value>smtp.gmail.com</param-value>
 	</context-param>
 	<context-param>
 		<param-name>emailServerPort</param-name>
