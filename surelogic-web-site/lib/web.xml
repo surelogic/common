@@ -45,7 +45,7 @@
 
 	<servlet-mapping>
 		<servlet-name>Admin Request</servlet-name>
-		<url-pattern>/services/admin</url-pattern>
+		<url-pattern>/services/admin/home</url-pattern>
 	</servlet-mapping>
 	
 	<servlet>
