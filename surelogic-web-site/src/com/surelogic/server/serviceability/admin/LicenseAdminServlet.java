@@ -1,8 +1,8 @@
-package com.surelogic.server.serviceability;
+package com.surelogic.server.serviceability.admin;
 
-import static com.surelogic.server.serviceability.HTMLQuery.HeaderType.DATE;
-import static com.surelogic.server.serviceability.HTMLQuery.HeaderType.NUMBER;
-import static com.surelogic.server.serviceability.HTMLQuery.HeaderType.STRING;
+import static com.surelogic.server.serviceability.admin.HTMLQuery.HeaderType.DATE;
+import static com.surelogic.server.serviceability.admin.HTMLQuery.HeaderType.NUMBER;
+import static com.surelogic.server.serviceability.admin.HTMLQuery.HeaderType.STRING;
 
 import java.io.IOException;
 import java.io.PrintWriter;

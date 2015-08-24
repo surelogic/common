@@ -1,4 +1,4 @@
-package com.surelogic.server.serviceability;
+package com.surelogic.server.serviceability.admin;
 
 import java.io.IOException;
 import java.util.StringTokenizer;
@@ -20,9 +20,6 @@ import com.surelogic.common.SLUtility;
  * a <code>401 - UNAUTHORIZED</code> response is sent. Otherwise, the filter
  * sets a request attribute named <code>SierraUser</code> to contain a valid
  * {@link User}.
- * 
- * @author nathan
- * 
  */
 public class SecurityFilter implements Filter {
 
@@ -30,8 +27,8 @@ public class SecurityFilter implements Filter {
     // Do Nothing
   }
 
-  public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain) throws IOException,
-      ServletException {
+  public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain)
+      throws IOException, ServletException {
     doFilter((HttpServletRequest) request, (HttpServletResponse) response, chain);
   }
 

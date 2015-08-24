@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-public class FreeLicenseServlet extends HttpServlet {
+public class CreateLicenseRequestServlet extends HttpServlet {
 
   private static final long serialVersionUID = 5071297227487022607L;
 

@@ -1,4 +1,4 @@
-package com.surelogic.server.serviceability;
+package com.surelogic.server.serviceability.admin;
 
 import java.io.PrintWriter;
 import java.net.InetAddress;

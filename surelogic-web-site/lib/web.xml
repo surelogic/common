@@ -9,13 +9,13 @@
 	</welcome-file-list>
 
     <servlet>
-      <servlet-name>Free License Request</servlet-name>
-      <servlet-class>com.surelogic.server.serviceability.FreeLicenseServlet</servlet-class>
+      <servlet-name>Create License Request</servlet-name>
+      <servlet-class>com.surelogic.server.serviceability.CreateLicenseRequestServlet</servlet-class>
     </servlet>
   
     <servlet-mapping>
-      <servlet-name>Free License Request</servlet-name>
-      <url-pattern>/services/freeRequest</url-pattern>
+      <servlet-name>Create License Request</servlet-name>
+      <url-pattern>/services/createLicenseRequest</url-pattern>
     </servlet-mapping>
   
 	<servlet>
@@ -40,7 +40,7 @@
 
 	<servlet>
 		<servlet-name>Admin Request</servlet-name>
-		<servlet-class>com.surelogic.server.serviceability.AdminServlet</servlet-class>
+		<servlet-class>com.surelogic.server.serviceability.admin.AdminServlet</servlet-class>
 	</servlet>
 
 	<servlet-mapping>
@@ -50,7 +50,7 @@
 	
 	<servlet>
 		<servlet-name>License Admin Request</servlet-name>
-		<servlet-class>com.surelogic.server.serviceability.LicenseAdminServlet</servlet-class>
+		<servlet-class>com.surelogic.server.serviceability.admin.LicenseAdminServlet</servlet-class>
 	</servlet>
 
 	<servlet-mapping>
@@ -60,7 +60,7 @@
 
 	<servlet>
 		<servlet-name>License Log</servlet-name>
-		<servlet-class>com.surelogic.server.serviceability.LogServlet</servlet-class>
+		<servlet-class>com.surelogic.server.serviceability.admin.LogServlet</servlet-class>
 	</servlet>
 
 	<servlet-mapping>
@@ -70,7 +70,7 @@
 
 	<servlet>
 		<servlet-name>License Search</servlet-name>
-		<servlet-class>com.surelogic.server.serviceability.LicenseSearchServlet</servlet-class>
+		<servlet-class>com.surelogic.server.serviceability.admin.LicenseSearchServlet</servlet-class>
 	</servlet>
 
 	<servlet-mapping>
@@ -80,7 +80,7 @@
 
 	<servlet>
 		<servlet-name>Blacklist</servlet-name>
-		<servlet-class>com.surelogic.server.serviceability.BlacklistServlet</servlet-class>
+		<servlet-class>com.surelogic.server.serviceability.admin.BlacklistServlet</servlet-class>
 	</servlet>
 
 	<servlet-mapping>
