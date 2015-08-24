@@ -22,10 +22,11 @@ public class FreeLicenseServlet extends HttpServlet {
   }
 
   private void handle(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-    final String email = req.getParameter("email").trim();
+    String email = req.getParameter("email");
     boolean emailLooksValid = email != null && email.contains("@") && email.length() <= 254;
 
     if (emailLooksValid) {
+      email = email.trim();
       Email.sendEmail("Test of CL", "some content", email, "info@surelogic.com", false);
       resp.getWriter().println("Success email sent to " + email);
     } else {
