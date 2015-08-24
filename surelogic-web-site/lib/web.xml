@@ -127,7 +127,7 @@
 	</context-param>
 	<context-param>
 		<param-name>emailServerPort</param-name>
-		<param-value>25</param-value>
+		<param-value>587</param-value>
 	</context-param>
 	<listener>
 		<listener-class>
