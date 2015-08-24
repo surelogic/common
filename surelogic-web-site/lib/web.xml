@@ -119,7 +119,7 @@
 	</context-param>
 	<context-param>
 		<param-name>fromAddress</param-name>
-		<param-value>support@surelogic.com</param-value>
+		<param-value>tim.halloran@surelogic.com</param-value>
 	</context-param>
 	<context-param>
 		<param-name>emailServerHost</param-name>
