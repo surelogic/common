@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import com.surelogic.Immutable;
 import com.surelogic.NonNull;
+import com.surelogic.Nullable;
 import com.surelogic.Unique;
 import com.surelogic.Vouch;
 import com.surelogic.common.i18n.I18N;
@@ -88,18 +89,22 @@ public final class SLLicense {
    */
   @Vouch("Immutable")
   @Unique
-  @NonNull
+  @Nullable
   private final Date f_installBeforeDate;
 
   /**
    * Gets installation deadline, or install before date, for this license.
    * Installations and activations after this date will fail.
    * 
-   * @return the non-<tt>null</tt> installation deadline for this license.
+   * @return the installation deadline for this license, or <tt>null</tt> to
+   *         indicate no deadline.
    */
-  @NonNull
+  @Nullable
   public Date getInstallBeforeDate() {
-    return new Date(f_installBeforeDate.getTime());
+    if (f_installBeforeDate == null)
+      return null;
+    else
+      return new Date(f_installBeforeDate.getTime());
   }
 
   /**
@@ -166,7 +171,8 @@ public final class SLLicense {
    *          the license duration in days from installation until expiration or
    *          renewal. This value must be greater than one.
    * @param installBeforeDate
-   *          the non-<tt>null</tt> installation deadline for this license.
+   *          the installation deadline for this license, may be <tt>null</tt>
+   *          to indicate no deadline.
    * @param type
    *          a non-<tt>null</tt> type for the license.
    * @param maxActive
@@ -180,7 +186,7 @@ public final class SLLicense {
    *           if any of the parameters are null that should not be.
    */
   public SLLicense(final @NonNull UUID uuid, final @NonNull String holder, final @NonNull SLLicenseProduct product,
-      final int durationInDays, final @NonNull @Unique Date installBeforeDate, final @NonNull SLLicenseType type,
+      final int durationInDays, final @Nullable @Unique Date installBeforeDate, final @NonNull SLLicenseType type,
       final int maxActive, final boolean performNetCheck) {
     if (uuid == null) {
       throw new IllegalArgumentException(I18N.err(44, "uuid"));
@@ -198,9 +204,6 @@ public final class SLLicense {
       throw new IllegalArgumentException(I18N.err(196, durationInDays));
     }
     f_durationInDays = durationInDays;
-    if (installBeforeDate == null) {
-      throw new IllegalArgumentException(I18N.err(44, "installBeforeDate"));
-    }
     f_installBeforeDate = installBeforeDate;
     if (type == null) {
       throw new IllegalArgumentException(I18N.err(44, "type"));
