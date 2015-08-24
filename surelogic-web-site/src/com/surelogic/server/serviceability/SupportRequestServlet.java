@@ -169,7 +169,7 @@ public class SupportRequestServlet extends HttpServlet {
       emailSubject.append(subject == null ? "No Subject" : subject);
       final String from = requestFields.get("from");
       emailSubject.append(from == null ? "" : " from " + from);
-      Email.sendEmail(emailSubject.toString(), emailBodyText, null, tryToGetEmail(requestFields), false);
+      Email.sendEmail(emailSubject.toString(), emailBodyText, null, tryToGetEmail(requestFields));
     } catch (final Exception e) {
       SLLogger.getLogger().log(Level.SEVERE, "Error processing support request from: " + remoteLocation.toString(), e);
     }

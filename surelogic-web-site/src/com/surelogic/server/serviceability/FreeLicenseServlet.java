@@ -27,7 +27,7 @@ public class FreeLicenseServlet extends HttpServlet {
 
     if (emailLooksValid) {
       email = email.trim();
-      Email.sendEmail("Test of CL", "some content", email, "info@surelogic.com", false);
+      Email.sendEmail("Test of CL", "some content", email);
       resp.getWriter().println("Success email sent to " + email);
     } else {
       resp.getWriter().println("Problem...Please press the back button and check your information.");

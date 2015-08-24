@@ -16,27 +16,26 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import javax.servlet.ServletConfig;
 
+import com.surelogic.NonNull;
 import com.surelogic.Nullable;
 import com.surelogic.common.logging.SLLogger;
 
 public class Email {
 
-  /**
-   * This servlet's configuration, set up in the {@link #init(ServletConfig)}
-   * method.
-   */
-  static final AtomicReference<EmailConfig> emailConfig = new AtomicReference<>();
-  private static ExecutorService executor;
+  static final AtomicReference<ExecutorService> executor = new AtomicReference<>(null);
+  static final AtomicReference<String> emailAs = new AtomicReference<>(null);
+  static final AtomicReference<String> emailSecret = new AtomicReference<>(null);
 
-  static void start(final EmailConfig config) {
-    emailConfig.set(config);
-    executor = Executors.newSingleThreadExecutor();
+  static void start(String as, String secret) {
+    executor.set(Executors.newSingleThreadExecutor());
+    emailAs.set(as);
+    emailSecret.set(secret);
   }
 
   static void stop() {
-    executor.shutdown();
+    final ExecutorService toStop = executor.getAndSet(null);
+    toStop.shutdown();
   }
 
   /**
@@ -46,64 +45,78 @@ public class Email {
    * @param content
    */
   static void adminEmail(final String subject, final String content) {
-    sendEmail(subject, content, null, null, false);
+    sendEmail(subject, content, null);
   }
 
   /**
-   * Sends an email using the {@link EmailConfig} settings.
+   * Sends an email constructed from the passed information. This returns
+   * immediately, it does not block. The email is sent on a background thread.
    * 
    * @param subject
    *          the subject for the email
    * @param content
    *          the content of the request
    * @param to
-   *          the email address of the target, null for <tt>config.getTo()</tt>
+   *          the email address to send the message to or
+   *          <tt>support@surelogic.com</tt> if null.
+   */
+  static void sendEmail(@NonNull final String subject, @NonNull final String content, @Nullable final String to) {
+    sendEmail(subject, content, to, null);
+  }
+
+  /**
+   * Sends an email constructed from the passed information. This returns
+   * immediately, it does not block. The email is sent on a background thread.
+   * 
+   * @param subject
+   *          the subject for the email
+   * @param content
+   *          the content of the request
+   * @param to
+   *          the email address to send the message to or
+   *          <tt>support@surelogic.com</tt> if null.
    * @param replyTo
    *          the email address to reply to, this is ignored if the address
-   *          invalid or null
-   * @param sendBCC
-   *          whether or not to send as a blind carbon-copy
+   *          invalid or null.
    */
-  static void sendEmail(final String subject, final String content, @Nullable final String to, @Nullable final String replyTo,
-      final boolean sendBCC) {
-    executor.execute(new Runnable() {
+  static void sendEmail(@NonNull final String subject, @NonNull final String content, @Nullable final String to,
+      @Nullable final String replyTo) {
+    final String actualTo = to != null ? to : "support@surelogic.com";
+    executor.get().execute(new Runnable() {
       @Override
       public void run() {
-        final EmailConfig config = emailConfig.get();
         try {
+          final Properties props = new Properties();
+          props.setProperty("mail.transport.protocol", "smtp");
+          props.setProperty("mail.smtp.host", "smtp.gmail.com");
+          props.put("mail.smtp.port", 587);
+          props.setProperty("mail.smtp.starttls.enable", "true");
+          props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+          props.put("mail.smtp.auth", "true");
           Authenticator auth;
-          final String user = "tim.halloran@surelogic.com";
-          final String pass = "lara.croft";
-          if ((user != null) && (user.length() > 0)) {
+          final String from = emailAs.get();
+          final String secret = emailSecret.get();
+          if ((from != null) && (from.length() > 0)) {
             auth = new Authenticator() {
-
               @Override
               protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(user, pass);
+                return new PasswordAuthentication(from, secret);
               }
 
             };
           } else {
             auth = null;
           }
-          // get the email receiver config and create a JavaMail
-          // session
-          final Session session = Session.getInstance(config.getJavaMailProperties(), auth);
+          final Session session = Session.getInstance(props, auth);
 
           // create and populate a JavaMail email
           final MimeMessage msg = new MimeMessage(session);
-          msg.setFrom(new InternetAddress(config.getFrom()));
-          if (to == null) {
-            msg.setRecipient(Message.RecipientType.TO, new InternetAddress(config.getTo()));
-          } else {
-            msg.setRecipient(Message.RecipientType.TO, new InternetAddress(to));
-            if (sendBCC) {
-              msg.setRecipient(Message.RecipientType.BCC, new InternetAddress(config.getTo()));
-            }
-          }
+          msg.setFrom(new InternetAddress(from));
+          msg.setRecipient(Message.RecipientType.TO, new InternetAddress(actualTo));
           msg.setSubject(subject);
           msg.setSentDate(new Date());
           msg.setContent(content, "text/plain");
+
           // attempt to setup the reply to
           if (replyTo != null) {
             try {
@@ -118,61 +131,10 @@ public class Email {
           Transport.send(msg);
         } catch (final MessagingException me) {
           final StringBuilder msg = new StringBuilder("Error emailing support request to: ");
-          if (to != null) {
-            msg.append(to);
-            if (sendBCC) {
-              msg.append(", ").append(config.getTo());
-            }
-          } else {
-            msg.append(config.getTo());
-          }
+          msg.append(actualTo);
           SLLogger.getLogger().log(Level.WARNING, msg.toString(), me);
         }
       }
     });
-  }
-
-  /**
-   * Created in {@link SupportRequestServlet#init(ServletConfig)} to store
-   * parameters needed to relay support requests via email. This class is
-   * thread-safe, but should be considered immutable and not modified after
-   * initial construction.
-   * 
-   */
-  static final class EmailConfig {
-    /**
-     * Properties needed to send emails via JavaMail.
-     */
-    private final Properties javaMailProperties;
-
-    /**
-     * The email's sender.
-     */
-
-    private final String from;
-
-    /**
-     * The email's recipient.
-     */
-    private final String to;
-
-    public EmailConfig(final Properties javaMailProperties, final String from, final String to) {
-      super();
-      this.javaMailProperties = javaMailProperties;
-      this.from = from;
-      this.to = to;
-    }
-
-    public Properties getJavaMailProperties() {
-      return javaMailProperties;
-    }
-
-    public String getFrom() {
-      return from;
-    }
-
-    public String getTo() {
-      return to;
-    }
   }
 }
