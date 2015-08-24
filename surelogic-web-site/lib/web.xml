@@ -55,7 +55,7 @@
 
 	<servlet-mapping>
 		<servlet-name>License Admin Request</servlet-name>
-		<url-pattern>/services/license</url-pattern>
+		<url-pattern>/services/admin/license</url-pattern>
 	</servlet-mapping>
 
 	<servlet>
@@ -65,7 +65,7 @@
 
 	<servlet-mapping>
 		<servlet-name>License Log</servlet-name>
-		<url-pattern>/services/log</url-pattern>
+		<url-pattern>/services/admin/log</url-pattern>
 	</servlet-mapping>
 
 	<servlet>
@@ -75,7 +75,7 @@
 
 	<servlet-mapping>
 		<servlet-name>License Search</servlet-name>
-		<url-pattern>/services/search</url-pattern>
+		<url-pattern>/services/admin/search</url-pattern>
 	</servlet-mapping>
 
 	<servlet>
@@ -85,7 +85,7 @@
 
 	<servlet-mapping>
 		<servlet-name>Blacklist</servlet-name>
-		<url-pattern>/services/blacklist</url-pattern>
+		<url-pattern>/services/admin/blacklist</url-pattern>
 	</servlet-mapping>
 
 
@@ -101,11 +101,7 @@
 
 	<filter-mapping>
 		<filter-name>Security Filter</filter-name>
-		<url-pattern>/services/license</url-pattern>
-		<url-pattern>/services/admin</url-pattern>
-		<url-pattern>/services/log</url-pattern>
-		<url-pattern>/services/search</url-pattern>
-		<url-pattern>/services/blacklist</url-pattern>
+		<url-pattern>/services/admin/*</url-pattern>
 	</filter-mapping>
 
 	<listener>

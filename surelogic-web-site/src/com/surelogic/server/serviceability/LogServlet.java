@@ -55,8 +55,8 @@ public class LogServlet extends HttpServlet {
     public void doPerform(final Query q) {
       prequel("Recent License Activity");
       writer.println("<h3><a href=\"admin\">To License Overview</a></h3>");
-      writer.println("<h3><a href=\"search\">To Blacklist</a></h3>");
-      writer.println("<h3><a href=\"search\">To License Search</a></h3>");
+      writer.println("<h3><a href=\"admin/search\">To Blacklist</a></h3>");
+      writer.println("<h3><a href=\"admin/search\">To License Search</a></h3>");
       tableBegin();
       tableRow(DATE.th("Date"), STRING.th("IP"), STRING.th("License"), STRING.th("Event"));
       long latest = q.prepared("WebServices.selectNetChecksBefore", new ResultHandler<Long>() {
@@ -75,7 +75,7 @@ public class LogServlet extends HttpServlet {
           return latest;
         }
       }).call(new Timestamp(time));
-      tableRow(STRING.td(""), STRING.td(""), STRING.td(""), STRING.td("<a href=\"log?%s=%d\">Next</a>", TIME, latest));
+      tableRow(STRING.td(""), STRING.td(""), STRING.td(""), STRING.td("<a href=\"admin/log?%s=%d\">Next</a>", TIME, latest));
       tableEnd();
       finish();
     }

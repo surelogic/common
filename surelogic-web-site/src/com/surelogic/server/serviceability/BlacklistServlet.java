@@ -47,8 +47,8 @@ public class BlacklistServlet extends HttpServlet {
     public void doPerform(final Query q) {
       prequel("License Blacklist");
       writer.println("<h3><a href=\"admin\">To License Overview</a></h3>");
-      writer.println("<h3><a href=\"log\">To Recent License Activity</a></h3>");
-      writer.println("<h3><a href=\"search\">To License Search</a></h3>");
+      writer.println("<h3><a href=\"admin/log\">To Recent License Activity</a></h3>");
+      writer.println("<h3><a href=\"admin/search\">To License Search</a></h3>");
       tableBegin();
       tableRow(DATE.th("Latest Activity"), STRING.th("License"), STRING.th("Holder"), STRING.th("Product"), NUMBER.th("Installs"),
           NUMBER.th("Renewals"), NUMBER.th("Removals"), NUMBER.th("Blacklists"), NUMBER.th("Too Many Installs"));

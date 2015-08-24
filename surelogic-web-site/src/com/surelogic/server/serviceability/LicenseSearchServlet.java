@@ -49,8 +49,8 @@ public class LicenseSearchServlet extends HttpServlet {
     public void doPerform(final Query q) {
       prequel("License Search");
       writer.println("<h3><a href=\"admin\">To License Overview</a></h3>");
-      writer.println("<h3><a href=\"log\">To Recent License Activity</a></h3>");
-      writer.println("<h3><a href=\"search\">To Blacklist</a></h3>");
+      writer.println("<h3><a href=\"admin/log\">To Recent License Activity</a></h3>");
+      writer.println("<h3><a href=\"admin/search\">To Blacklist</a></h3>");
       writer.println(String.format(
           "<form name=\"search\" method=\"post\"><p>Search: <input type=\"test\" name=\"search\" value=\"%s\" /></p></form>",
           search == null ? "" : search));

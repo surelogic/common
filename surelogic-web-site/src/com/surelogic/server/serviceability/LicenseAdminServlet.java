@@ -108,9 +108,9 @@ public class LicenseAdminServlet extends HttpServlet {
     public void doPerform(final Query q) {
       prequel(String.format("License %s", uuid));
       writer.println("<h3><a href=\"admin\">To License Overview</a></h3>");
-      writer.println("<h3><a href=\"log\">To Recent License Activity</a></h3>");
-      writer.println("<h3><a href=\"search\">To Blacklist</a></h3>");
-      writer.println("<h3><a href=\"search\">To License Search</a></h3>");
+      writer.println("<h3><a href=\"admin/log\">To Recent License Activity</a></h3>");
+      writer.println("<h3><a href=\"admin/search\">To Blacklist</a></h3>");
+      writer.println("<h3><a href=\"admin/search\">To License Search</a></h3>");
       writer.print("<form action=\"license\" method=\"post\" ><input type=\"hidden\" name=\"uuid\" value=\"");
       writer.print(uuid);
       writer.println("\" />");
@@ -163,7 +163,7 @@ public class LicenseAdminServlet extends HttpServlet {
 
     String blacklistLink(final String blString) {
       boolean blacklist = YES.equals(blString);
-      return String.format("<a href=\"license?uuid=%s&blacklist=%s\">%s</a>", uuid, blacklist ? NO : YES,
+      return String.format("<a href=\"admin/license?uuid=%s&blacklist=%s\">%s</a>", uuid, blacklist ? NO : YES,
           blacklist ? "Remove from Blacklist" : "Add to Blacklist");
     }
   }
