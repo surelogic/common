@@ -1,7 +1,7 @@
 package com.surelogic.server.serviceability;
 
 import java.io.IOException;
-import java.util.Date;
+import java.sql.Timestamp;
 import java.util.UUID;
 
 import javax.servlet.ServletException;
@@ -9,12 +9,16 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.surelogic.NonNull;
 import com.surelogic.common.SLUtility;
+import com.surelogic.common.jdbc.DBQuery;
+import com.surelogic.common.jdbc.Query;
 import com.surelogic.common.license.SLLicense;
 import com.surelogic.common.license.SLLicenseProduct;
 import com.surelogic.common.license.SLLicenseType;
 import com.surelogic.common.license.SignedSLLicense;
 import com.surelogic.server.SiteUtil;
+import com.surelogic.server.jdbc.ServicesDBConnection;
 
 public class CreateLicenseRequestServlet extends HttpServlet {
 
@@ -75,22 +79,31 @@ public class CreateLicenseRequestServlet extends HttpServlet {
 
     final boolean communityLicense = req.getParameter(PARAM_COMMUNITY) != null;
     final String licenseType = communityLicense ? "Community" : "Trial";
-    
-    String holder = name + " (" + email + ") " + licenseType + " License";
-    if (companyEntered)
-      holder += " " +company;
-    else
-      company = "Personal Copy";
 
-    int durationInDays = 90;
-    Date installBeforeDate = new Date();
-    SLLicenseType type = SLLicenseType.PERPETUAL;
-    int installationLimit = 2;
+    final String holder = name + " (" + email + ") " + licenseType + " License" + (companyEntered ? " : " + company : "");
+    final String emailForDb = email;
+    final String nameForDb = name;
+    final String companyForDb = companyEntered ? company : "Personal Copy";
+    final int durationInDays = communityLicense ? 2 : 60;
+    final SLLicenseType type = communityLicense ? SLLicenseType.PERPETUAL : SLLicenseType.USE;
+    final int installationLimit = communityLicense ? 4 : 2;
 
-    final SLLicense license = new SLLicense(UUID.randomUUID(), holder, SLLicenseProduct.ALL_TOOLS, durationInDays,
-        installBeforeDate, type, installationLimit, true);
+    final SLLicense license = new SLLicense(UUID.randomUUID(), holder, SLLicenseProduct.ALL_TOOLS, durationInDays, null, type,
+        installationLimit, true);
     final SignedSLLicense sLicense = SignedSLLicense.getInstance(license, SiteUtil.getKey());
     final String licenseHexString = SLUtility.wrap(sLicense.getSignedHexString(), 50);
+
+    @NonNull
+    final Timestamp now = new Timestamp(System.currentTimeMillis());
+
+    final ServicesDBConnection conn = ServicesDBConnection.getInstance();
+    conn.withTransaction(new DBQuery<Void>() {
+      public Void perform(Query q) {
+        q.prepared("WebServices.insertLicenseWebRequest").call(license.getUuid().toString(), now, emailForDb, nameForDb,
+            companyForDb, licenseType);
+        return null;
+      }
+    });
 
     if (emailLooksValid) {
       email = email.trim();
