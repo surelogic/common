@@ -374,7 +374,6 @@ public class EclipseUtility {
     	throw new IllegalArgumentException(I18N.err(343, pluginId));
       }
       File result = FileLocator.getBundleFile(bundle);
-      SLLogger.getLogger().severe(pluginId+" = "+result);
       return result;
     } catch (Exception e) {
       throw new IllegalArgumentException(I18N.err(344, pluginId), e);
