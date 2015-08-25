@@ -63,7 +63,7 @@ public class CreateLicenseRequestServlet extends HttpServlet {
       return;
     }
 
-    String company = req.getParameter(PARAM_NAME);
+    String company = req.getParameter(PARAM_COMPANY);
     company = company == null ? "" : company.trim();
     boolean companyLooksValid = company.length() <= 100;
     if (!companyLooksValid) {
@@ -78,7 +78,7 @@ public class CreateLicenseRequestServlet extends HttpServlet {
     final boolean communityLicense = req.getParameter(PARAM_COMMUNITY) != null;
     final String licenseType = communityLicense ? "Community" : "Trial";
 
-    final String holder = name + " (" + email + ") " + licenseType + " License" + (companyEntered ? " : " + company : "");
+    final String holder = name + " (" + email + ") " + licenseType + " License" + (companyEntered ? " for " + company : "");
     final String emailForDb = email;
     final String nameForDb = name;
     final String companyForDb = companyEntered ? company : "Personal Copy";
@@ -89,7 +89,7 @@ public class CreateLicenseRequestServlet extends HttpServlet {
     final SLLicense license = new SLLicense(UUID.randomUUID(), holder, SLLicenseProduct.ALL_TOOLS, durationInDays, null, type,
         installationLimit, true);
     final SignedSLLicense sLicense = SignedSLLicense.getInstance(license, SiteUtil.getKey());
-    final String licenseHexString = SLUtility.wrap(sLicense.getSignedHexString(), 50);
+    final String licenseHexString = SLUtility.wrap(sLicense.getSignedHexString(), 58);
 
     final ServicesDBConnection conn = ServicesDBConnection.getInstance();
     conn.withTransaction(new DBQuery<Void>() {
