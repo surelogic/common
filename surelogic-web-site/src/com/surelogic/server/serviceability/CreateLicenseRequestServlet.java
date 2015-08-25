@@ -2,6 +2,8 @@ package com.surelogic.server.serviceability;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.UUID;
 
 import javax.servlet.ServletException;
@@ -9,9 +11,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.surelogic.Nullable;
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.jdbc.DBQuery;
+import com.surelogic.common.jdbc.NullRowHandler;
 import com.surelogic.common.jdbc.Query;
+import com.surelogic.common.jdbc.Row;
 import com.surelogic.common.license.SLLicense;
 import com.surelogic.common.license.SLLicenseProduct;
 import com.surelogic.common.license.SLLicenseType;
@@ -101,17 +106,47 @@ public class CreateLicenseRequestServlet extends HttpServlet {
     final String licenseHexString = SLUtility.wrap(sLicense.getSignedHexString(), 58);
 
     final ServicesDBConnection conn = ServicesDBConnection.getInstance();
-    conn.withTransaction(new DBQuery<Void>() {
-      public Void perform(Query q) {
-        q.prepared("WebServices.insertLicenseWebRequest").call(license.getUuid().toString(), emailForDb, nameForDb, companyForDb,
-            licenseType);
-        return null;
+    final AllowLicenseHandler allowLicense = new AllowLicenseHandler();
+    final String result = conn.withTransaction(new DBQuery<String>() {
+      public String perform(Query q) {
+        q.prepared("WebServices.getLatestLicenseWebRequest", allowLicense).call(emailForDb);
+        if (allowLicense.result) {
+          q.prepared("WebServices.insertLicenseWebRequest").call(license.getUuid().toString(), emailForDb, nameForDb, companyForDb,
+              licenseType);
+          return "okay";
+        } else
+          return "failed due to previous trial";
       }
     });
 
+    if (result.startsWith("failed")) {
+      out.println(PROBLEM);
+      out.println(
+          emailForDb + " obtained a previous license on " + (new SimpleDateFormat("dd MMM yyyy")).format(allowLicense.last));
+      out.println(GO_BACK);
+      return;
+    }
+
     Email.sendEmail("Your SureLogic " + licenseType + " License", "Your license:\n\n" + licenseHexString, email);
     out.println(SUCCESS);
-    out.println("<p>Your " + licenseType + " License has been emailed to " + emailForDb + " please check your inbox.</p>");
+    out.println("<p>We appreciate your interest in SureLogic.</p>");
+    out.println(
+        "<p>Your " + licenseType + " License has been emailed to " + emailForDb + " &mdash; keep an eye on your inbox.</p>");
     out.println("<p><a href=\"http://surelogic.com\">Return to the SureLogic website</a></p></html>");
+  }
+
+  static class AllowLicenseHandler extends NullRowHandler {
+    boolean result = false;
+    @Nullable
+    Timestamp last = null;
+
+    @Override
+    protected void doHandle(Row r) {
+      final Timestamp t = r.nextTimestamp();
+      if (t == null)
+        result = true;
+      else
+        last = t;
+    }
   }
 }
