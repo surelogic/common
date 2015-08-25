@@ -1,6 +1,7 @@
 package com.surelogic.server.serviceability;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.UUID;
 
 import javax.servlet.ServletException;
@@ -26,7 +27,9 @@ public class CreateLicenseRequestServlet extends HttpServlet {
   static final String PARAM_COMMUNITY = "community";
 
   static final String PROBLEM = "<h3>There is a problem with your request</h3>";
-  static final String GO_BACK = "<p>Please press the back button and fix your information";
+  static final String GO_BACK = "<p>Please press the back button and fix your information</p></html>";
+
+  static final String SUCCESS = "<h3>Thanks!</h3>";
 
   private static final long serialVersionUID = 5071297227487022607L;
 
@@ -41,13 +44,20 @@ public class CreateLicenseRequestServlet extends HttpServlet {
   }
 
   private void handle(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+    resp.setContentType("text/html");
+    final PrintWriter out = resp.getWriter();
+
+    out.println("<html>");
+    out.println("<head>");
+    out.println("<title>SureLogic License Request</title>");
+    out.println("</head>");
     String email = req.getParameter(PARAM_EMAIL);
     email = email == null ? "" : email.trim();
     boolean emailLooksValid = email.contains("@") && email.length() > 2 && email.length() <= 254;
     if (!emailLooksValid) {
-      resp.getWriter().println(PROBLEM);
-      resp.getWriter().println("The email address you provided <tt>" + email + "</tt> is not syntactically valid.");
-      resp.getWriter().println(GO_BACK);
+      out.println(PROBLEM);
+      out.println("The email address you provided <tt>" + email + "</tt> is not syntactically valid.");
+      out.println(GO_BACK);
       return;
     }
     email = email.trim();
@@ -56,10 +66,9 @@ public class CreateLicenseRequestServlet extends HttpServlet {
     name = name == null ? "" : name.trim();
     boolean nameLooksValid = name.length() > 2 && name.length() <= 100;
     if (!nameLooksValid) {
-      resp.getWriter().println(PROBLEM);
-      resp.getWriter()
-          .println("The name you provided <tt>" + name + "</tt> is not valid. Your entry must be less than 100 characters.");
-      resp.getWriter().println(GO_BACK);
+      out.println(PROBLEM);
+      out.println("The name you provided <tt>" + name + "</tt> is not valid. Your entry must be less than 100 characters.");
+      out.println(GO_BACK);
       return;
     }
 
@@ -67,10 +76,10 @@ public class CreateLicenseRequestServlet extends HttpServlet {
     company = company == null ? "" : company.trim();
     boolean companyLooksValid = company.length() <= 100;
     if (!companyLooksValid) {
-      resp.getWriter().println(PROBLEM);
-      resp.getWriter().println(
+      out.println(PROBLEM);
+      out.println(
           "The company you provided <tt>" + company + "</tt> is is not valid. Your entry must be less than 100 characters.");
-      resp.getWriter().println(GO_BACK);
+      out.println(GO_BACK);
       return;
     }
     boolean companyEntered = company.length() > 0;
@@ -78,7 +87,7 @@ public class CreateLicenseRequestServlet extends HttpServlet {
     final boolean communityLicense = req.getParameter(PARAM_COMMUNITY) != null;
     final String licenseType = communityLicense ? "Community" : "Trial";
 
-    final String holder = name + " (" + email + ") " + licenseType + " License" + (companyEntered ? " for " + company : "");
+    final String holder = name + " (" + email + ") " + (companyEntered ? company + " " : "") + licenseType + " License";
     final String emailForDb = email;
     final String nameForDb = name;
     final String companyForDb = companyEntered ? company : "Personal Copy";
@@ -100,12 +109,9 @@ public class CreateLicenseRequestServlet extends HttpServlet {
       }
     });
 
-    if (emailLooksValid) {
-      email = email.trim();
-      Email.sendEmail("Test of CL", "Your license:\n\n" + licenseHexString, email);
-      resp.getWriter().println("Success email sent to " + email);
-    } else {
-      resp.getWriter().println("Problem...Please press the back button and check your information.");
-    }
+    Email.sendEmail("Your SureLogic " + licenseType + " License", "Your license:\n\n" + licenseHexString, email);
+    out.println(SUCCESS);
+    out.println("<p>Your " + licenseType + " License has been emailed to " + emailForDb + " please check your inbox.</p>");
+    out.println("<p><a href=\"http://surelogic.com\">Return to the SureLogic website</a></p></html>");
   }
 }
