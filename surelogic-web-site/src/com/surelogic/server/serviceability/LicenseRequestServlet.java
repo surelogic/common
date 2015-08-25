@@ -286,7 +286,7 @@ public class LicenseRequestServlet extends HttpServlet {
         return fail(I18N.msg(EXPIRED, license.getProduct(), uuid, SLUtility.toStringHumanDay(license.getInstallBeforeDate())));
       }
       final SLLicenseNetCheck check = new SLLicenseNetCheck(uuid, calculateNetcheckDate(license), clientMacAddresses);
-      LicenseInfo info = getAndInitInfo(q, license);
+      final LicenseInfo info = getAndInitInfo(q, license);
       if (license.getType() == SLLicenseType.PERPETUAL && sl.isActivated()) {
         // This is a renewal
         if (info.getInstalls() == 0) {
