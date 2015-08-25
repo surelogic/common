@@ -23,6 +23,9 @@ import com.surelogic.common.SLUtility;
  */
 public class SecurityFilter implements Filter {
 
+  static private final String UID = "c2w=";
+  static private final String SECRET = "ZnR3LjEyMw==";
+
   public void destroy() {
     // Do Nothing
   }
@@ -63,7 +66,7 @@ public class SecurityFilter implements Filter {
             // In this example, we simply check
             // that neither field is blank
 
-            authenticated = "SL".equals(userID) && "FTW".equals(password);
+            authenticated = SLUtility.decodeBase64(UID).equalsIgnoreCase(userID) && SLUtility.decodeBase64(SECRET).equals(password);
           }
         }
       }

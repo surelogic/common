@@ -9,8 +9,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.surelogic.common.SLUtility;
 import com.surelogic.common.license.SLLicense;
-import com.surelogic.common.license.SLLicensePersistence;
 import com.surelogic.common.license.SLLicenseProduct;
 import com.surelogic.common.license.SLLicenseType;
 import com.surelogic.common.license.SignedSLLicense;
@@ -83,8 +83,7 @@ public class CreateLicenseRequestServlet extends HttpServlet {
     final SLLicense license = new SLLicense(UUID.randomUUID(), holder, SLLicenseProduct.ALL_TOOLS, durationInDays,
         installBeforeDate, type, installationLimit, true);
     final SignedSLLicense sLicense = SignedSLLicense.getInstance(license, SiteUtil.getKey());
-
-    String licenseHexString = sLicense.getSignedHexString();
+    final String licenseHexString = SLUtility.wrap(sLicense.getSignedHexString(), 50);
 
     if (emailLooksValid) {
       email = email.trim();
