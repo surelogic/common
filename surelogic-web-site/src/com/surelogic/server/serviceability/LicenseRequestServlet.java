@@ -190,9 +190,13 @@ public class LicenseRequestServlet extends HttpServlet {
       q.prepared("WebServices.insertCheckCount").call(uuid);
       @Nullable
       final Date installBeforeDate = license.getInstallBeforeDate();
-      q.prepared("WebServices.insertLicenseInfo").call(uuid, license.getProduct().toString(), license.getHolder(),
-          license.getDurationInDays(), installBeforeDate != null ? new Timestamp(installBeforeDate.getTime()) : null,
-          license.getType().toString(), license.getMaxActive());
+      if (installBeforeDate != null)
+        q.prepared("WebServices.insertLicenseInfo").call(uuid, license.getProduct().toString(), license.getHolder(),
+            license.getDurationInDays(), new Timestamp(installBeforeDate.getTime()), license.getType().toString(),
+            license.getMaxActive());
+      else
+        q.prepared("WebServices.insertLicenseInfoNoInstallDeadline").call(uuid, license.getProduct().toString(),
+            license.getHolder(), license.getDurationInDays(), license.getType().toString(), license.getMaxActive());
       maxInstalls = license.getMaxActive();
       return new LicenseInfo(maxInstalls, 0, 0, 0, 0, 0);
     }
@@ -278,7 +282,7 @@ public class LicenseRequestServlet extends HttpServlet {
         logCheck(q, now, ip, license, NetCheckEvent.INSTALL_BLACKLISTED);
         return fail(I18N.msg(BLACKLISTED, license.getProduct(), uuid));
       }
-      if ((license.getType() == SLLicenseType.SUPPORT || license.getType() == SLLicenseType.USE) && sl.isPastInstallBeforeDate()) {
+      if (sl.isPastInstallBeforeDate()) {
         return fail(I18N.msg(EXPIRED, license.getProduct(), uuid, SLUtility.toStringHumanDay(license.getInstallBeforeDate())));
       }
       final SLLicenseNetCheck check = new SLLicenseNetCheck(uuid, calculateNetcheckDate(license), clientMacAddresses);
