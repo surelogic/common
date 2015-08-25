@@ -1,7 +1,6 @@
 package com.surelogic.server.serviceability;
 
 import java.io.IOException;
-import java.sql.Timestamp;
 import java.util.UUID;
 
 import javax.servlet.ServletException;
@@ -9,7 +8,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.surelogic.NonNull;
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.jdbc.DBQuery;
 import com.surelogic.common.jdbc.Query;
@@ -93,14 +91,11 @@ public class CreateLicenseRequestServlet extends HttpServlet {
     final SignedSLLicense sLicense = SignedSLLicense.getInstance(license, SiteUtil.getKey());
     final String licenseHexString = SLUtility.wrap(sLicense.getSignedHexString(), 50);
 
-    @NonNull
-    final Timestamp now = new Timestamp(System.currentTimeMillis());
-
     final ServicesDBConnection conn = ServicesDBConnection.getInstance();
     conn.withTransaction(new DBQuery<Void>() {
       public Void perform(Query q) {
-        q.prepared("WebServices.insertLicenseWebRequest").call(license.getUuid().toString(), now, emailForDb, nameForDb,
-            companyForDb, licenseType);
+        q.prepared("WebServices.insertLicenseWebRequest").call(license.getUuid().toString(), emailForDb, nameForDb, companyForDb,
+            licenseType);
         return null;
       }
     });
