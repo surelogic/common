@@ -71,7 +71,5 @@ public class BlacklistServlet extends HttpServlet {
       tableEnd();
       finish();
     }
-
   }
-
 }

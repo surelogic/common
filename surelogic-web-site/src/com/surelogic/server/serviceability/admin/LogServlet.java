@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.surelogic.Nullable;
 import com.surelogic.common.jdbc.Query;
 import com.surelogic.common.jdbc.Result;
 import com.surelogic.common.jdbc.ResultHandler;
@@ -42,7 +43,7 @@ public class LogServlet extends HttpServlet {
 
     final long time;
 
-    public LogQuery(final PrintWriter writer, final String time) {
+    public LogQuery(final PrintWriter writer, @Nullable final String time) {
       super(writer);
       if (time == null) {
         this.time = System.currentTimeMillis();

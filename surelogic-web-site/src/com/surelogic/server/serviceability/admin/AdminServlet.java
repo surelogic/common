@@ -70,7 +70,5 @@ public class AdminServlet extends HttpServlet {
       tableEnd();
       finish();
     }
-
   }
-
 }
