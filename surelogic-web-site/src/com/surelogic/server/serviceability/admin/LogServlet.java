@@ -58,7 +58,7 @@ public class LogServlet extends HttpServlet {
       writer.println("<h3><a href=\"search\">To Blacklist</a></h3>");
       writer.println("<h3><a href=\"search\">To License Search</a></h3>");
       tableBegin();
-      tableRow(DATE.th("Date"), STRING.th("IP"), STRING.th("License"), STRING.th("Event"));
+      tableRow(DATE.th("Date"), STRING.th("IP"), STRING.th("License"), STRING.th("Event"), STRING.th("Holder"));
       long latest = q.prepared("WebServices.selectNetChecksBefore", new ResultHandler<Long>() {
         @Override
         public Long handle(final Result result) {
@@ -70,12 +70,14 @@ public class LogServlet extends HttpServlet {
             }
             Timestamp t = r.nextTimestamp();
             latest = t.getTime();
-            tableRow(DATE.td(t), STRING.td(ip(r.nextString())), STRING.td(uuid(r.nextString())), STRING.td(r.nextString()));
+            tableRow(DATE.td(t), STRING.td(ip(r.nextString())), STRING.td(uuid(r.nextString())), STRING.td(r.nextString()),
+                STRING.td(r.nextString()));
           }
           return latest;
         }
       }).call(new Timestamp(time));
-      tableRow(STRING.td(""), STRING.td(""), STRING.td(""), STRING.td("<a href=\"log?%s=%d\">Next</a>", TIME, latest));
+      tableRow(STRING.td(""), STRING.td(""), STRING.td(""), STRING.td(""),
+          STRING.td("<a href=\"log?%s=%d\">Next</a>", TIME, latest));
       tableEnd();
       finish();
     }
