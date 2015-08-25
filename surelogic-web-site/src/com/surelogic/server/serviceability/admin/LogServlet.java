@@ -1,7 +1,7 @@
-package com.surelogic.server.serviceability;
+package com.surelogic.server.serviceability.admin;
 
-import static com.surelogic.server.serviceability.HTMLQuery.HeaderType.DATE;
-import static com.surelogic.server.serviceability.HTMLQuery.HeaderType.STRING;
+import static com.surelogic.server.serviceability.admin.HTMLQuery.HeaderType.DATE;
+import static com.surelogic.server.serviceability.admin.HTMLQuery.HeaderType.STRING;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.surelogic.Nullable;
 import com.surelogic.common.jdbc.Query;
 import com.surelogic.common.jdbc.Result;
 import com.surelogic.common.jdbc.ResultHandler;
@@ -42,7 +43,7 @@ public class LogServlet extends HttpServlet {
 
     final long time;
 
-    public LogQuery(final PrintWriter writer, final String time) {
+    public LogQuery(final PrintWriter writer, @Nullable final String time) {
       super(writer);
       if (time == null) {
         this.time = System.currentTimeMillis();
@@ -54,11 +55,11 @@ public class LogServlet extends HttpServlet {
     @Override
     public void doPerform(final Query q) {
       prequel("Recent License Activity");
-      writer.println("<h3><a href=\"admin\">To License Overview</a></h3>");
-      writer.println("<h3><a href=\"search\">To Blacklist</a></h3>");
+      writer.println("<h3><a href=\"home\">To License Overview</a></h3>");
+      writer.println("<h3><a href=\"blacklist\">To Blacklist</a></h3>");
       writer.println("<h3><a href=\"search\">To License Search</a></h3>");
       tableBegin();
-      tableRow(DATE.th("Date"), STRING.th("IP"), STRING.th("License"), STRING.th("Event"));
+      tableRow(DATE.th("Date"), STRING.th("IP"), STRING.th("License"), STRING.th("Event"), STRING.th("Holder"));
       long latest = q.prepared("WebServices.selectNetChecksBefore", new ResultHandler<Long>() {
         @Override
         public Long handle(final Result result) {
@@ -70,12 +71,14 @@ public class LogServlet extends HttpServlet {
             }
             Timestamp t = r.nextTimestamp();
             latest = t.getTime();
-            tableRow(DATE.td(t), STRING.td(ip(r.nextString())), STRING.td(uuid(r.nextString())), STRING.td(r.nextString()));
+            tableRow(DATE.td(t), STRING.td(ip(r.nextString())), STRING.td(uuid(r.nextString())), STRING.td(r.nextString()),
+                STRING.td(r.nextString()));
           }
           return latest;
         }
       }).call(new Timestamp(time));
-      tableRow(STRING.td(""), STRING.td(""), STRING.td(""), STRING.td("<a href=\"log?%s=%d\">Next</a>", TIME, latest));
+      tableRow(STRING.td(""), STRING.td(""), STRING.td(""), STRING.td(""),
+          STRING.td("<a href=\"log?%s=%d\">Next</a>", TIME, latest));
       tableEnd();
       finish();
     }

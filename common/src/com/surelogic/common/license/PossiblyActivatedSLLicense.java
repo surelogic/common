@@ -84,7 +84,8 @@ public final class PossiblyActivatedSLLicense {
     } else {
       b.append(SLUtility.NO);
       final SLLicense license = getSignedSLLicense().getLicense();
-      if (license.getType() != SLLicenseType.PERPETUAL) {
+      final boolean deadline = license.getInstallBeforeDate() != null && license.getType() != SLLicenseType.PERPETUAL;
+      if (deadline) {
         final String date = SLUtility.toStringHumanDay(license.getInstallBeforeDate());
         b.append(" (activate before ").append(date).append(")");
       }
@@ -169,18 +170,22 @@ public final class PossiblyActivatedSLLicense {
   }
 
   /**
-   * Flags if this license is past its installation deadline.
+   * Flags if this license is past its installation deadline if it has one. if
+   * checking a perpetual license this method always returns {@code false}.
    * 
    * @return {@code true} if this license is past its installation deadline,
-   *         {@code false} otherwise.
+   *         {@code false} otherwise (does not have a deadline or this license
+   *         is perpetual).
    */
   public boolean isPastInstallBeforeDate() {
-    final Date now = new Date();
     final SLLicense license = f_license.getLicense();
-    if (license.getType() != SLLicenseType.PERPETUAL) {
-      final Date deadline = license.getInstallBeforeDate();
-      final boolean pastDeadline = now.after(deadline);
-      return pastDeadline;
+    final Date deadline = license.getInstallBeforeDate();
+    if (deadline != null) {
+      final Date now = new Date();
+      if (license.getType() != SLLicenseType.PERPETUAL) {
+        final boolean pastDeadline = now.after(deadline);
+        return pastDeadline;
+      }
     }
     return false;
   }

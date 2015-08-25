@@ -1612,8 +1612,7 @@ public final class SLUtility {
   }
 
   /**
-   * Decodes a Base64 encoded string to a normal string. This method uses the
-   * Apache Commons Codec library.
+   * Decodes a Base64 encoded string to a normal string.
    * 
    * @param s
    *          the encoded string.
@@ -1624,8 +1623,7 @@ public final class SLUtility {
   }
 
   /**
-   * Encodes a normal string to a Base64 encoded string. This method uses the
-   * Apache Commons Codec library.
+   * Encodes a normal string to a Base64 encoded string.
    * 
    * @param s
    *          the normal string.

@@ -1,11 +1,10 @@
-package com.surelogic.server.serviceability;
+package com.surelogic.server.serviceability.admin;
 
-import static com.surelogic.server.serviceability.HTMLQuery.HeaderType.DATE;
-import static com.surelogic.server.serviceability.HTMLQuery.HeaderType.NUMBER;
-import static com.surelogic.server.serviceability.HTMLQuery.HeaderType.STRING;
+import static com.surelogic.server.serviceability.admin.HTMLQuery.HeaderType.DATE;
+import static com.surelogic.server.serviceability.admin.HTMLQuery.HeaderType.NUMBER;
+import static com.surelogic.server.serviceability.admin.HTMLQuery.HeaderType.STRING;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.Date;
 
 import javax.servlet.ServletException;
@@ -19,9 +18,9 @@ import com.surelogic.common.jdbc.Row;
 import com.surelogic.common.license.SLLicenseProduct;
 import com.surelogic.server.jdbc.ServicesDBConnection;
 
-public class BlacklistServlet extends HttpServlet {
+public class AdminServlet extends HttpServlet {
 
-  private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 4932431513021134383L;
 
   @Override
   protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
@@ -34,25 +33,25 @@ public class BlacklistServlet extends HttpServlet {
   }
 
   private void handle(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-    ServicesDBConnection.getInstance().withReadOnly(new BlacklistQuery(resp.getWriter()));
+    ServicesDBConnection.getInstance().withReadOnly(new AdminQuery(req, resp));
   }
 
-  private static class BlacklistQuery extends HTMLQuery {
+  private static class AdminQuery extends HTMLQuery {
 
-    BlacklistQuery(final PrintWriter writer) {
-      super(writer);
+    public AdminQuery(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+      super(resp.getWriter());
     }
 
     @Override
     public void doPerform(final Query q) {
-      prequel("License Blacklist");
-      writer.println("<h3><a href=\"admin\">To License Overview</a></h3>");
+      prequel("License Overview");
       writer.println("<h3><a href=\"log\">To Recent License Activity</a></h3>");
+      writer.println("<h3><a href=\"blacklist\">To Blacklist</a></h3>");
       writer.println("<h3><a href=\"search\">To License Search</a></h3>");
       tableBegin();
       tableRow(DATE.th("Latest Activity"), STRING.th("License"), STRING.th("Holder"), STRING.th("Product"), NUMBER.th("Installs"),
           NUMBER.th("Renewals"), NUMBER.th("Removals"), NUMBER.th("Blacklists"), NUMBER.th("Too Many Installs"));
-      q.prepared("WebServices.listBlacklistedUUIDs", new NullRowHandler() {
+      q.prepared("WebServices.licenseSummary", new NullRowHandler() {
         @Override
         protected void doHandle(final Row r) {
           Date latest = r.nextTimestamp();
@@ -71,7 +70,5 @@ public class BlacklistServlet extends HttpServlet {
       tableEnd();
       finish();
     }
-
   }
-
 }

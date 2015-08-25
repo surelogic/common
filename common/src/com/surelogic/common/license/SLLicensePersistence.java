@@ -203,7 +203,9 @@ public final class SLLicensePersistence {
     b.append(HOLDER_LABEL).append(license.getHolder()).append(SEP);
     b.append(PRODUCT_LABEL).append(license.getProduct().toString()).append(SEP);
     b.append(DURATION_LABEL).append(Integer.toString(license.getDurationInDays())).append(SEP);
-    b.append(INSTALLATION_DEADLINE_LABEL).append(SLUtility.toStringDay(license.getInstallBeforeDate())).append(SEP);
+    final Date installBeforeDate = license.getInstallBeforeDate();
+    if (installBeforeDate != null)
+      b.append(INSTALLATION_DEADLINE_LABEL).append(SLUtility.toStringDay(installBeforeDate)).append(SEP);
     b.append(TYPE_LABEL).append(license.getType().toString()).append(SEP);
     b.append(MAXACTIVE_LABEL).append(Integer.toString(license.getMaxActive())).append(SEP);
     b.append(PERFORMNETCHECK_LABEL).append(Boolean.toString(license.performNetCheck())).append(SEP);

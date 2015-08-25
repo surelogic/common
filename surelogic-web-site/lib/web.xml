@@ -1,137 +1,119 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
 	http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
 
-	<welcome-file-list>
-		<welcome-file>index.html</welcome-file>
-	</welcome-file-list>
+  <welcome-file-list>
+    <welcome-file>index.html</welcome-file>
+  </welcome-file-list>
 
-    <servlet>
-      <servlet-name>Free License Request</servlet-name>
-      <servlet-class>com.surelogic.server.serviceability.FreeLicenseServlet</servlet-class>
-    </servlet>
-  
-    <servlet-mapping>
-      <servlet-name>Free License Request</servlet-name>
-      <url-pattern>/services/freeRequest</url-pattern>
-    </servlet-mapping>
-  
-	<servlet>
-		<servlet-name>Support Request</servlet-name>
-		<servlet-class>com.surelogic.server.serviceability.SupportRequestServlet</servlet-class>
-	</servlet>
+  <servlet>
+    <servlet-name>Create License Request</servlet-name>
+    <servlet-class>com.surelogic.server.serviceability.CreateLicenseRequestServlet</servlet-class>
+  </servlet>
 
-	<servlet-mapping>
-		<servlet-name>Support Request</servlet-name>
-		<url-pattern>/services/supportRequest</url-pattern>
-	</servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>Create License Request</servlet-name>
+    <url-pattern>/services/createLicenseRequest</url-pattern>
+  </servlet-mapping>
 
-	<servlet>
-		<servlet-name>License Request</servlet-name>
-		<servlet-class>com.surelogic.server.serviceability.LicenseRequestServlet</servlet-class>
-	</servlet>
+  <servlet>
+    <servlet-name>Support Request</servlet-name>
+    <servlet-class>com.surelogic.server.serviceability.SupportRequestServlet</servlet-class>
+  </servlet>
 
-	<servlet-mapping>
-		<servlet-name>License Request</servlet-name>
-		<url-pattern>/services/licenseRequest</url-pattern>
-	</servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>Support Request</servlet-name>
+    <url-pattern>/services/supportRequest</url-pattern>
+  </servlet-mapping>
 
-	<servlet>
-		<servlet-name>Admin Request</servlet-name>
-		<servlet-class>com.surelogic.server.serviceability.AdminServlet</servlet-class>
-	</servlet>
+  <servlet>
+    <servlet-name>License Request</servlet-name>
+    <servlet-class>com.surelogic.server.serviceability.LicenseRequestServlet</servlet-class>
+  </servlet>
 
-	<servlet-mapping>
-		<servlet-name>Admin Request</servlet-name>
-		<url-pattern>/services/admin</url-pattern>
-	</servlet-mapping>
-	
-	<servlet>
-		<servlet-name>License Admin Request</servlet-name>
-		<servlet-class>com.surelogic.server.serviceability.LicenseAdminServlet</servlet-class>
-	</servlet>
+  <servlet-mapping>
+    <servlet-name>License Request</servlet-name>
+    <url-pattern>/services/licenseRequest</url-pattern>
+  </servlet-mapping>
 
-	<servlet-mapping>
-		<servlet-name>License Admin Request</servlet-name>
-		<url-pattern>/services/license</url-pattern>
-	</servlet-mapping>
+  <servlet>
+    <servlet-name>Admin Request</servlet-name>
+    <servlet-class>com.surelogic.server.serviceability.admin.AdminServlet</servlet-class>
+  </servlet>
 
-	<servlet>
-		<servlet-name>License Log</servlet-name>
-		<servlet-class>com.surelogic.server.serviceability.LogServlet</servlet-class>
-	</servlet>
+  <servlet-mapping>
+    <servlet-name>Admin Request</servlet-name>
+    <url-pattern>/services/admin/home</url-pattern>
+  </servlet-mapping>
 
-	<servlet-mapping>
-		<servlet-name>License Log</servlet-name>
-		<url-pattern>/services/log</url-pattern>
-	</servlet-mapping>
+  <servlet>
+    <servlet-name>License Admin Request</servlet-name>
+    <servlet-class>com.surelogic.server.serviceability.admin.LicenseAdminServlet</servlet-class>
+  </servlet>
 
-	<servlet>
-		<servlet-name>License Search</servlet-name>
-		<servlet-class>com.surelogic.server.serviceability.LicenseSearchServlet</servlet-class>
-	</servlet>
+  <servlet-mapping>
+    <servlet-name>License Admin Request</servlet-name>
+    <url-pattern>/services/admin/license</url-pattern>
+  </servlet-mapping>
 
-	<servlet-mapping>
-		<servlet-name>License Search</servlet-name>
-		<url-pattern>/services/search</url-pattern>
-	</servlet-mapping>
+  <servlet>
+    <servlet-name>License Log</servlet-name>
+    <servlet-class>com.surelogic.server.serviceability.admin.LogServlet</servlet-class>
+  </servlet>
 
-	<servlet>
-		<servlet-name>Blacklist</servlet-name>
-		<servlet-class>com.surelogic.server.serviceability.BlacklistServlet</servlet-class>
-	</servlet>
+  <servlet-mapping>
+    <servlet-name>License Log</servlet-name>
+    <url-pattern>/services/admin/log</url-pattern>
+  </servlet-mapping>
 
-	<servlet-mapping>
-		<servlet-name>Blacklist</servlet-name>
-		<url-pattern>/services/blacklist</url-pattern>
-	</servlet-mapping>
+  <servlet>
+    <servlet-name>License Search</servlet-name>
+    <servlet-class>com.surelogic.server.serviceability.admin.LicenseSearchServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>License Search</servlet-name>
+    <url-pattern>/services/admin/search</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>Blacklist</servlet-name>
+    <servlet-class>com.surelogic.server.serviceability.admin.BlacklistServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>Blacklist</servlet-name>
+    <url-pattern>/services/admin/blacklist</url-pattern>
+  </servlet-mapping>
 
 
-	<filter>
-		<description>
-			Security for the information at /services/admin
-		</description>
-		<filter-name>Security Filter</filter-name>
-		<filter-class>
-			com.surelogic.server.serviceability.SecurityFilter
-		</filter-class>
-	</filter>
+  <filter>
+    <description>Security for the admin interface</description>
+    <filter-name>Security Filter</filter-name>
+    <filter-class>com.surelogic.server.serviceability.admin.SecurityFilter</filter-class>
+  </filter>
 
-	<filter-mapping>
-		<filter-name>Security Filter</filter-name>
-		<url-pattern>/services/license</url-pattern>
-		<url-pattern>/services/admin</url-pattern>
-		<url-pattern>/services/log</url-pattern>
-		<url-pattern>/services/search</url-pattern>
-		<url-pattern>/services/blacklist</url-pattern>
-	</filter-mapping>
+  <filter-mapping>
+    <filter-name>Security Filter</filter-name>
+    <url-pattern>/services/admin/*</url-pattern>
+  </filter-mapping>
 
-	<listener>
-		<listener-class>
-			com.surelogic.server.serviceability.EmailContextListener
-		</listener-class>
-	</listener>
-	<context-param>
-		<param-name>toAddress</param-name>
-		<param-value>support@surelogic.com</param-value>
-	</context-param>
-	<context-param>
-		<param-name>fromAddress</param-name>
-		<param-value>tim.halloran@surelogic.com</param-value>
-	</context-param>
-	<context-param>
-		<param-name>emailServerHost</param-name>
-		<param-value>smtp.gmail.com</param-value>
-	</context-param>
-	<context-param>
-		<param-name>emailServerPort</param-name>
-		<param-value>25</param-value>
-	</context-param>
-	<listener>
-		<listener-class>
-			com.surelogic.server.jdbc.NetworkServerContextListener
-		</listener-class>
-	</listener>
+  <listener>
+    <listener-class>com.surelogic.server.serviceability.EmailContextListener</listener-class>
+  </listener>
+  <listener>
+    <listener-class>com.surelogic.server.jdbc.NetworkServerContextListener</listener-class>
+  </listener>
+
+  <context-param>
+    <param-name>emailAs</param-name>
+    <param-value>tim.halloran@surelogic.com</param-value>
+  </context-param>
+  <context-param>
+    <param-name>emailSecret</param-name>
+    <param-value>bGFyYS5jcm9mdA==</param-value>
+  </context-param>
+
 </web-app>

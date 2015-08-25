@@ -1,8 +1,8 @@
-package com.surelogic.server.serviceability;
+package com.surelogic.server.serviceability.admin;
 
-import static com.surelogic.server.serviceability.HTMLQuery.HeaderType.DATE;
-import static com.surelogic.server.serviceability.HTMLQuery.HeaderType.NUMBER;
-import static com.surelogic.server.serviceability.HTMLQuery.HeaderType.STRING;
+import static com.surelogic.server.serviceability.admin.HTMLQuery.HeaderType.DATE;
+import static com.surelogic.server.serviceability.admin.HTMLQuery.HeaderType.NUMBER;
+import static com.surelogic.server.serviceability.admin.HTMLQuery.HeaderType.STRING;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -107,9 +107,9 @@ public class LicenseAdminServlet extends HttpServlet {
     @Override
     public void doPerform(final Query q) {
       prequel(String.format("License %s", uuid));
-      writer.println("<h3><a href=\"admin\">To License Overview</a></h3>");
+      writer.println("<h3><a href=\"home\">To License Overview</a></h3>");
       writer.println("<h3><a href=\"log\">To Recent License Activity</a></h3>");
-      writer.println("<h3><a href=\"search\">To Blacklist</a></h3>");
+      writer.println("<h3><a href=\"blacklist\">To Blacklist</a></h3>");
       writer.println("<h3><a href=\"search\">To License Search</a></h3>");
       writer.print("<form action=\"license\" method=\"post\" ><input type=\"hidden\" name=\"uuid\" value=\"");
       writer.print(uuid);
@@ -122,16 +122,12 @@ public class LicenseAdminServlet extends HttpServlet {
 
         @Override
         protected void doHandle(final Row r) {
-          tableRow(
+          tableRow(STRING.td(r.nextString()), STRING.td(r.nextString()), NUMBER.td(r.nextString()), DATE.td(r.nextTimestamp()),
               STRING.td(r.nextString()),
-              STRING.td(r.nextString()),
-              NUMBER.td(r.nextString()),
-              DATE.td(r.nextTimestamp()),
-              STRING.td(r.nextString()),
-              NUMBER.td(String
-                  .format(
-                      "<input style=\"text-align: right\" type=\"text\" name=\"installs\" value=\"%d\" /><input type=\"submit\" value=\"Change\" />",
-                      r.nextInt())), STRING.td(blacklistLink(r.nextString())));
+              NUMBER.td(String.format(
+                  "<input style=\"text-align: right\" type=\"text\" name=\"installs\" value=\"%d\" /><input type=\"submit\" value=\"Change\" />",
+                  r.nextInt())),
+              STRING.td(blacklistLink(r.nextString())));
         }
       }).call(uuid);
       tableEnd();
