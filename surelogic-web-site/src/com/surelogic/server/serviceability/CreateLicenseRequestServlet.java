@@ -40,40 +40,47 @@ public class CreateLicenseRequestServlet extends HttpServlet {
 
   private void handle(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
     String email = req.getParameter(PARAM_EMAIL);
-    boolean emailLooksValid = email != null && email.contains("@") && email.length() <= 254;
+    email = email == null ? "" : email.trim();
+    boolean emailLooksValid = email.contains("@") && email.length() > 2 && email.length() <= 254;
     if (!emailLooksValid) {
       resp.getWriter().println(PROBLEM);
-      resp.getWriter().println("The email address you provided <tt>" + email + "</tt> is not valid.");
+      resp.getWriter().println("The email address you provided <tt>" + email + "</tt> is not syntactically valid.");
       resp.getWriter().println(GO_BACK);
       return;
     }
     email = email.trim();
 
     String name = req.getParameter(PARAM_NAME);
-    boolean nameLooksValid = name != null && name.length() > 2 && name.length() <= 100;
+    name = name == null ? "" : name.trim();
+    boolean nameLooksValid = name.length() > 2 && name.length() <= 100;
     if (!nameLooksValid) {
       resp.getWriter().println(PROBLEM);
-      resp.getWriter().println("The name you provided <tt>" + name + "</tt> is not valid. (It must be less than 100 characters.)");
+      resp.getWriter()
+          .println("The name you provided <tt>" + name + "</tt> is not valid. Your entry must be less than 100 characters.");
       resp.getWriter().println(GO_BACK);
       return;
     }
-    name = name.trim();
 
     String company = req.getParameter(PARAM_NAME);
-    boolean companyLooksValid = company == null || (company != null && company.length() <= 100);
+    company = company == null ? "" : company.trim();
+    boolean companyLooksValid = company.length() <= 100;
     if (!companyLooksValid) {
       resp.getWriter().println(PROBLEM);
-      resp.getWriter()
-          .println("The company you provided <tt>" + company + "</tt> is is not valid. (It must be less than 100 characters.)");
+      resp.getWriter().println(
+          "The company you provided <tt>" + company + "</tt> is is not valid. Your entry must be less than 100 characters.");
       resp.getWriter().println(GO_BACK);
       return;
     }
-    company = company == null ? "" : company.trim();
+    boolean companyEntered = company.length() > 0;
 
     final boolean communityLicense = req.getParameter(PARAM_COMMUNITY) != null;
-
-    final String holder = name + " (" + email + (company == null ? ")" : ") " + company)
-        + (communityLicense ? " - Community License" : " - Trial License");
+    final String licenseType = communityLicense ? "Community" : "Trial";
+    
+    String holder = name + " (" + email + ") " + licenseType + " License";
+    if (companyEntered)
+      holder += " " +company;
+    else
+      company = "Personal Copy";
 
     int durationInDays = 90;
     Date installBeforeDate = new Date();
