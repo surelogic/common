@@ -105,19 +105,19 @@ public final class PossiblyActivatedSLLicense {
   }
 
   /**
-   * Flags if this license is within two weeks of expiration. The type of the
+   * Flags if this license is within a week of expiration. The type of the
    * license is not taken into consideration just the date in the license net
    * check. This method returns {@code false} if the license has not been
    * activated.
    * 
-   * @return {@code true} if this license is within two weeks of expiration,
-   *         {@code false} otherwise.
+   * @return {@code true} if this license is close to expiration, {@code false}
+   *         otherwise.
    */
   public boolean isCloseToBeingExpired() {
     final Calendar cal = Calendar.getInstance();
-    cal.add(Calendar.DAY_OF_MONTH, 14);
-    final Date inTwoWeeks = cal.getTime();
-    return isExpiredOn(inTwoWeeks);
+    cal.add(Calendar.DAY_OF_MONTH, 7);
+    final Date inAWeek = cal.getTime();
+    return isExpiredOn(inAWeek);
   }
 
   /**
