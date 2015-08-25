@@ -55,7 +55,7 @@ public class LogServlet extends HttpServlet {
     public void doPerform(final Query q) {
       prequel("Recent License Activity");
       writer.println("<h3><a href=\"home\">To License Overview</a></h3>");
-      writer.println("<h3><a href=\"search\">To Blacklist</a></h3>");
+      writer.println("<h3><a href=\"blacklist\">To Blacklist</a></h3>");
       writer.println("<h3><a href=\"search\">To License Search</a></h3>");
       tableBegin();
       tableRow(DATE.th("Date"), STRING.th("IP"), STRING.th("License"), STRING.th("Event"), STRING.th("Holder"));

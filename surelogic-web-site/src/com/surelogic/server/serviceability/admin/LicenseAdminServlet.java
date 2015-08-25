@@ -109,7 +109,7 @@ public class LicenseAdminServlet extends HttpServlet {
       prequel(String.format("License %s", uuid));
       writer.println("<h3><a href=\"home\">To License Overview</a></h3>");
       writer.println("<h3><a href=\"log\">To Recent License Activity</a></h3>");
-      writer.println("<h3><a href=\"search\">To Blacklist</a></h3>");
+      writer.println("<h3><a href=\"blacklist\">To Blacklist</a></h3>");
       writer.println("<h3><a href=\"search\">To License Search</a></h3>");
       writer.print("<form action=\"license\" method=\"post\" ><input type=\"hidden\" name=\"uuid\" value=\"");
       writer.print(uuid);

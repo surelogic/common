@@ -50,7 +50,7 @@ public class LicenseSearchServlet extends HttpServlet {
       prequel("License Search");
       writer.println("<h3><a href=\"home\">To License Overview</a></h3>");
       writer.println("<h3><a href=\"log\">To Recent License Activity</a></h3>");
-      writer.println("<h3><a href=\"search\">To Blacklist</a></h3>");
+      writer.println("<h3><a href=\"blacklist\">To Blacklist</a></h3>");
       writer.println(String.format(
           "<form name=\"search\" method=\"post\"><p>Search: <input type=\"test\" name=\"search\" value=\"%s\" /></p></form>",
           search == null ? "" : search));

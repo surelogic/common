@@ -46,7 +46,7 @@ public class AdminServlet extends HttpServlet {
     public void doPerform(final Query q) {
       prequel("License Overview");
       writer.println("<h3><a href=\"log\">To Recent License Activity</a></h3>");
-      writer.println("<h3><a href=\"search\">To Blacklist</a></h3>");
+      writer.println("<h3><a href=\"blacklist\">To Blacklist</a></h3>");
       writer.println("<h3><a href=\"search\">To License Search</a></h3>");
       tableBegin();
       tableRow(DATE.th("Latest Activity"), STRING.th("License"), STRING.th("Holder"), STRING.th("Product"), NUMBER.th("Installs"),
