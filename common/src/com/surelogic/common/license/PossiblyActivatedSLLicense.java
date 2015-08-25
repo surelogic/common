@@ -84,7 +84,8 @@ public final class PossiblyActivatedSLLicense {
     } else {
       b.append(SLUtility.NO);
       final SLLicense license = getSignedSLLicense().getLicense();
-      if (license.getInstallBeforeDate() != null || license.getType() != SLLicenseType.PERPETUAL) {
+      final boolean deadline = license.getInstallBeforeDate() != null && license.getType() != SLLicenseType.PERPETUAL;
+      if (deadline) {
         final String date = SLUtility.toStringHumanDay(license.getInstallBeforeDate());
         b.append(" (activate before ").append(date).append(")");
       }
