@@ -188,9 +188,11 @@ public class LicenseRequestServlet extends HttpServlet {
     if (maxInstalls == null) {
       // No license yet
       q.prepared("WebServices.insertCheckCount").call(uuid);
+      @Nullable
+      final Date installBeforeDate = license.getInstallBeforeDate();
       q.prepared("WebServices.insertLicenseInfo").call(uuid, license.getProduct().toString(), license.getHolder(),
-          license.getDurationInDays(), new Timestamp(license.getInstallBeforeDate().getTime()), license.getType().toString(),
-          license.getMaxActive());
+          license.getDurationInDays(), installBeforeDate != null ? new Timestamp(installBeforeDate.getTime()) : null,
+          license.getType().toString(), license.getMaxActive());
       maxInstalls = license.getMaxActive();
       return new LicenseInfo(maxInstalls, 0, 0, 0, 0, 0);
     }
@@ -232,8 +234,8 @@ public class LicenseRequestServlet extends HttpServlet {
     final String uuid = license.getUuid().toString();
     q.prepared("WebServices.logNetCheck").call(time, ip, uuid.toString(), event.value);
     q.statement("WebServices.updateCheckCount").call(event.getColumn(), uuid.toString());
-    Email.sendSupportEmail(event.toString(), I18N.msg(LOGEMAIL, license.getHolder(), license.getProduct().toString(), time.toString(), ip,
-        uuid, I18N.msg(LICENSEURL, SLUtility.SERVICEABILITY_URL, uuid), event.toString()));
+    Email.sendSupportEmail(event.toString(), I18N.msg(LOGEMAIL, license.getHolder(), license.getProduct().toString(),
+        time.toString(), ip, uuid, I18N.msg(LICENSEURL, SLUtility.SERVICEABILITY_URL, uuid), event.toString()));
   }
 
   /**
