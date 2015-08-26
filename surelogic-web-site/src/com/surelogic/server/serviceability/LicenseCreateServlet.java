@@ -116,10 +116,13 @@ public class LicenseCreateServlet extends HttpServlet {
     final ServicesDBConnection conn = ServicesDBConnection.getInstance();
     final String result = conn.withTransaction(new DBQuery<String>() {
       public String perform(Query q) {
-        // Restrict multiple trial licenses by email
+        /*
+         * Restrict multiple trial licenses by email address. This check ignores
+         * any community licenses provided to the email.
+         */
         if (!communityLicense) {
           final List<Timestamp> result = q.prepared("WebServices.getLatestLicenseWebRequest", new AllowLicenseHandler())
-              .call(emailForDb);
+              .call(emailForDb, licenseType);
           result.remove(null); // so list will be empty if no previous trial
           if (!result.isEmpty()) {
             final Timestamp lastTrialRequestTimestamp = result.get(0);
