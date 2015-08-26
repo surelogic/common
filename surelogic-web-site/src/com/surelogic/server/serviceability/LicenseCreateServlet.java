@@ -25,7 +25,7 @@ import com.surelogic.common.license.SignedSLLicense;
 import com.surelogic.server.SiteUtil;
 import com.surelogic.server.jdbc.ServicesDBConnection;
 
-public class CreateLicenseServlet extends HttpServlet {
+public class LicenseCreateServlet extends HttpServlet {
 
   /*
    * Duration of licenses. The duration for community license is for renewal
@@ -136,7 +136,7 @@ public class CreateLicenseServlet extends HttpServlet {
     }
 
     final String subject = I18N.msg("web.license.email.subject", licenseType);
-    final String text = I18N.msg("web.license.email", nameForDb, emailForDb, companyForDb, licenseType, licenseHexString);
+    final String text = I18N.msg("web.license.email", nameForDb, license, licenseHexString);
     Email.sendEmail(subject, text, emailForDb);
     out.println(I18N.msg("web.license.success", licenseType, emailForDb, SLUtility.SERVICEABILITY_SERVER));
   }
