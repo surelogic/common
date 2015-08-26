@@ -58,7 +58,7 @@
 				<include name="*.jar" />
 			</fileset>
 		</path>
-		<javac srcdir="${common}/src" destdir="${build.bin}" classpathref="common.class.path" source="1.8" target="1.8" includeAntRuntime="false" />
+		<javac srcdir="${common}/src" destdir="${build.bin}" classpathref="common.class.path" debug="true" source="1.8" target="1.8" includeAntRuntime="false" />
 		<copy todir="${build.bin}">
 			<fileset dir="${common}/src">
 				<exclude name="**/*.java" />
