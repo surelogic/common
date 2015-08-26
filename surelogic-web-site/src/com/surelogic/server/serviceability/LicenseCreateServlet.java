@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -119,6 +121,8 @@ public class LicenseCreateServlet extends HttpServlet {
         /*
          * Restrict multiple trial licenses by email address. This check ignores
          * any community licenses provided to the email.
+         * 
+         * If the trial was over a year ago allow a new trial license.
          */
         if (!communityLicense) {
           final List<Timestamp> result = q.prepared("WebServices.getLatestLicenseWebRequest", new AllowLicenseHandler())
@@ -126,9 +130,19 @@ public class LicenseCreateServlet extends HttpServlet {
           result.remove(null); // so list will be empty if no previous trial
           if (!result.isEmpty()) {
             final Timestamp lastTrialRequestTimestamp = result.get(0);
-            final String pastLicenseDate = (new SimpleDateFormat("dd MMM yyyy")).format(lastTrialRequestTimestamp);
-            // return date of the most recent trial license for this email
-            return pastLicenseDate;
+            final Calendar cal = Calendar.getInstance();
+            cal.add(Calendar.YEAR, -1);
+            final Date aYearAgo = cal.getTime();
+            if (aYearAgo.before(lastTrialRequestTimestamp)) {
+              /*
+               * Too soon for a new trial
+               * 
+               * We return date of the most recent trial license to display in
+               * the message to the user
+               */
+              final String pastLicenseDate = (new SimpleDateFormat("dd MMM yyyy")).format(lastTrialRequestTimestamp);
+              return pastLicenseDate;
+            }
           }
         }
         q.prepared("WebServices.insertLicenseWebRequest").call(license.getUuid().toString(), emailForDb, nameForDb, companyForDb,
