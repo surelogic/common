@@ -136,7 +136,8 @@ public class LicenseCreateServlet extends HttpServlet {
     }
 
     final String subject = I18N.msg("web.license.email.subject", licenseType);
-    final String text = I18N.msg("web.license.email", nameForDb, license, licenseHexString);
+    final String downloadUrl = I18N.msg("web.download.url", SLUtility.SERVICEABILITY_SERVER);
+    final String text = I18N.msg("web.license.email", nameForDb, holder, downloadUrl, licenseHexString);
     Email.sendEmail(subject, text, emailForDb);
     out.println(I18N.msg("web.license.success", licenseType, emailForDb, SLUtility.SERVICEABILITY_SERVER));
   }
