@@ -74,7 +74,7 @@ public class SupportRequestServlet extends HttpServlet {
    */
   @Override
   protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
-    final String redirectUrl = resp.encodeRedirectURL(SLUtility.SERVICEABILITY_URL);
+    final String redirectUrl = resp.encodeRedirectURL(SLUtility.SERVICEABILITY_SERVER);
     resp.sendRedirect(redirectUrl);
   }
 

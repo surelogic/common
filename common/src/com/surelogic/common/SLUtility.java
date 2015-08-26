@@ -48,11 +48,11 @@ public final class SLUtility {
   public static final boolean is64bit = SystemUtils.OS_ARCH.indexOf("64") >= 0;
 
   /**
-   * This defines the url to get to the serviceability servlets on the website.
-   * Normally the default is used , but for testing a system property can be set
-   * <code>-Dserviceability.url=http://test.com:8080</code>
+   * This defines the server to get to the serviceability servlets on the
+   * SureLogic website. Normally the default is used , but for testing a system
+   * property can be set <code>-Dserviceability.url=http://test.com:8080</code>
    */
-  public static final String SERVICEABILITY_URL = System.getProperty("serviceability.url", "http://surelogic.com");
+  public static final String SERVICEABILITY_SERVER = System.getProperty("serviceability.url", "http://surelogic.com");
 
   /**
    * This is a very JDT friendly constant&mdash;many Eclipse methods recognize

@@ -8,7 +8,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -40,9 +39,8 @@ import com.surelogic.server.SiteUtil;
 import com.surelogic.server.jdbc.ServicesDBConnection;
 
 public class LicenseRequestServlet extends HttpServlet {
-  private static final long serialVersionUID = 6357187305188901382L;
 
-  static final Logger LOG = SLLogger.getLoggerFor(LicenseRequestServlet.class);
+  private static final long serialVersionUID = 6357187305188901382L;
 
   enum NetCheckEvent {
     INSTALL_SUCCESS("Successful install", "INSTALL_COUNT"), RENEW_SUCCESS("Successful renewal",
@@ -72,7 +70,8 @@ public class LicenseRequestServlet extends HttpServlet {
     handleRequest(req, resp);
   }
 
-  void handleRequest(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+  private void handleRequest(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+    SLLogger.getLogger().info("SureLogic license netcheck: " + req.getRequestURL());
     final String typeStr = req.getParameter(I18N.msg("web.check.param.req"));
     if (I18N.msg("web.check.param.req.value.actrew").equals(typeStr)) {
       install(req, resp);
@@ -139,7 +138,6 @@ public class LicenseRequestServlet extends HttpServlet {
     boolean isInstallAvailable() {
       return installs - removals < maxInstalls;
     }
-
   }
 
   /**
@@ -200,7 +198,7 @@ public class LicenseRequestServlet extends HttpServlet {
           return new LicenseInfo(max, installCount, renewCount, removeCount, blacklistcount, tooManyCount);
         }
         // No row was found
-        LOG.log(Level.SEVERE, String.format("The server did not find a row in LICENSE_NETCHECK_COUNTS for %s.", uuid));
+        SLLogger.getLogger().log(Level.SEVERE, I18N.err(354, uuid));
         throw new IllegalStateException();
       }
     }).call(uuid);
@@ -225,7 +223,7 @@ public class LicenseRequestServlet extends HttpServlet {
     q.prepared("WebServices.logNetCheck").call(time, ip, uuid.toString(), event.value);
     q.statement("WebServices.updateCheckCount").call(event.getColumn(), uuid.toString());
     Email.sendSupportEmail(event.toString(), I18N.msg("web.check.logEmail", license.getHolder(), license.getProduct().toString(),
-        time.toString(), ip, uuid, I18N.msg("web.admin.license.url", SLUtility.SERVICEABILITY_URL, uuid), event.toString()));
+        time.toString(), ip, uuid, I18N.msg("web.admin.license.url", SLUtility.SERVICEABILITY_SERVER, uuid), event.toString()));
   }
 
   /**
@@ -328,9 +326,8 @@ public class LicenseRequestServlet extends HttpServlet {
         }
         resp.getWriter().println(result);
       }
-    } else {
-      LOG.info("No license token provided to an install request");
-    }
+    } else
+      SLLogger.getLogger().info(I18N.err(353, "install/renew", req.getRequestURI()));
   }
 
   /**
@@ -338,13 +335,12 @@ public class LicenseRequestServlet extends HttpServlet {
    * database.
    */
   static class Remove implements DBQuery<String> {
-
     @NonNull
-    private final String ip;
+    final String ip;
     @NonNull
-    private final Timestamp now;
+    final Timestamp now;
     @NonNull
-    private final PossiblyActivatedSLLicense sl;
+    final PossiblyActivatedSLLicense sl;
 
     public Remove(@NonNull PossiblyActivatedSLLicense sl, @NonNull Timestamp now, @NonNull String ip) {
       this.sl = sl;
@@ -370,7 +366,7 @@ public class LicenseRequestServlet extends HttpServlet {
     return calendar.getTime();
   }
 
-  void remove(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+  static void remove(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
     final String licStr = req.getParameter(I18N.msg("web.check.param.license"));
     final Timestamp now = new Timestamp(System.currentTimeMillis());
     final String ip = req.getRemoteAddr();
@@ -381,8 +377,7 @@ public class LicenseRequestServlet extends HttpServlet {
         final String result = conn.withTransaction(new Remove(sl, now, ip));
         resp.getWriter().println(result);
       }
-    } else {
-      LOG.info("No license token provided to an install request");
-    }
+    } else
+      SLLogger.getLogger().info(I18N.err(353, "remove", req.getRequestURI()));
   }
 }

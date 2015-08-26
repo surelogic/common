@@ -25,15 +25,21 @@ import com.surelogic.common.license.SignedSLLicense;
 import com.surelogic.server.SiteUtil;
 import com.surelogic.server.jdbc.ServicesDBConnection;
 
-public class CreateLicenseRequestServlet extends HttpServlet {
+public class CreateLicenseServlet extends HttpServlet {
 
-  static private final String PARAM_NAME = "name";
-  static private final String PARAM_EMAIL = "email";
-  static private final String PARAM_COMPANY = "company";
-  static private final String PARAM_COMMUNITY = "community";
+  /*
+   * Duration of licenses. The duration for community license is for renewal
+   * (not expiration).
+   */
+  static private final int DURATION_TRIAL = 60; // days
+  static private final int DURATION_COMMUNITY = 180; // days (~6 months)
 
-  static private final int DURATION_TRIAL_LICENSE = 60; // days
-  static private final int DURATION_COMMUNITY_LICENSE = 180; // days (~6 months)
+  /*
+   * The installation limit (which can be increased in the administration
+   * section of this site) for trial and community licenses.
+   */
+  static private final int INSTALLATION_LIMIT_TRIAL = 2;
+  static private final int INSTALLATION_LIMIT_COMMUNITY = 4;
 
   private static final long serialVersionUID = 5071297227487022607L;
 
@@ -51,11 +57,16 @@ public class CreateLicenseRequestServlet extends HttpServlet {
     resp.setContentType("text/html");
     final PrintWriter out = resp.getWriter();
 
-    out.println("<html>");
-    out.println("<head>");
-    out.println("<title>SureLogic License Request</title>");
-    out.println("</head>");
-    String email = req.getParameter(PARAM_EMAIL);
+    final boolean communityLicense = req.getParameter(I18N.msg("web.license.param.community")) != null;
+    final String licenseType = communityLicense ? "Community" : "Trial";
+
+    // start response
+    out.println(I18N.msg("web.license.response.html.header", licenseType));
+
+    /*
+     * Check inputs passed by the client (don't trust anything)
+     */
+    String email = req.getParameter(I18N.msg("web.license.param.email"));
     email = email == null ? "" : email.trim();
     boolean emailLooksValid = email.contains("@") && email.length() > 2 && email.length() <= 254;
     if (!emailLooksValid) {
@@ -65,7 +76,7 @@ public class CreateLicenseRequestServlet extends HttpServlet {
       return;
     }
 
-    String name = req.getParameter(PARAM_NAME);
+    String name = req.getParameter(I18N.msg("web.license.param.name"));
     name = name == null ? "" : name.trim();
     boolean nameLooksValid = name.length() > 2 && name.length() <= 100;
     if (!nameLooksValid) {
@@ -75,7 +86,7 @@ public class CreateLicenseRequestServlet extends HttpServlet {
       return;
     }
 
-    String company = req.getParameter(PARAM_COMPANY);
+    String company = req.getParameter(I18N.msg("web.license.param.company"));
     company = company == null ? "" : company.trim();
     boolean companyLooksValid = company.length() <= 100;
     if (!companyLooksValid) {
@@ -89,15 +100,13 @@ public class CreateLicenseRequestServlet extends HttpServlet {
     /*
      * Construct information for license and database
      */
-    final boolean communityLicense = req.getParameter(PARAM_COMMUNITY) != null;
-    final String licenseType = communityLicense ? "Community" : "Trial";
     final String holder = name + " (" + email + ") " + (companyEntered ? company + " " : "") + licenseType + " License";
     final String emailForDb = email;
     final String nameForDb = name;
     final String companyForDb = companyEntered ? company : "Personal Copy";
-    final int durationInDays = communityLicense ? DURATION_COMMUNITY_LICENSE : DURATION_TRIAL_LICENSE;
+    final int durationInDays = communityLicense ? DURATION_COMMUNITY : DURATION_TRIAL;
     final SLLicenseType type = communityLicense ? SLLicenseType.PERPETUAL : SLLicenseType.USE;
-    final int installationLimit = communityLicense ? 4 : 2;
+    final int installationLimit = communityLicense ? INSTALLATION_LIMIT_COMMUNITY : INSTALLATION_LIMIT_TRIAL;
 
     final SLLicense license = new SLLicense(UUID.randomUUID(), holder, SLLicenseProduct.ALL_TOOLS, durationInDays, null, type,
         installationLimit, true);
@@ -126,12 +135,10 @@ public class CreateLicenseRequestServlet extends HttpServlet {
       return;
     }
 
-    Email.sendEmail("Your SureLogic " + licenseType + " License", "Your license:\n\n" + licenseHexString, email);
-    out.println(I18N.msg("web.license.success.title"));
-    out.println("<p>We appreciate your interest in SureLogic.</p>");
-    out.println(
-        "<p>Your " + licenseType + " License has been emailed to " + emailForDb + " &mdash; keep an eye on your inbox.</p>");
-    out.println("<p><a href=\"http://surelogic.com\">Return to the SureLogic website</a></p></html>");
+    final String subject = I18N.msg("web.license.email.subject", licenseType);
+    final String text = I18N.msg("web.license.email", nameForDb, emailForDb, companyForDb, licenseType, licenseHexString);
+    Email.sendEmail(subject, text, emailForDb);
+    out.println(I18N.msg("web.license.success", licenseType, emailForDb, SLUtility.SERVICEABILITY_SERVER));
   }
 
   static class AllowLicenseHandler extends NullRowHandler {

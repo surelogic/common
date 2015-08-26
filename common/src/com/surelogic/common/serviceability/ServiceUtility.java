@@ -19,7 +19,7 @@ public final class ServiceUtility {
   /*
    * URL at the SureLogic website to send serviceability requests
    */
-  final static String f_serviceLocation = I18N.msg("web.supportrequest.url", SLUtility.SERVICEABILITY_URL);
+  final static String f_serviceLocation = I18N.msg("web.supportrequest.url", SLUtility.SERVICEABILITY_SERVER);
 
   /**
    * Constructs a job that sends a message over the Internet to SureLogic.

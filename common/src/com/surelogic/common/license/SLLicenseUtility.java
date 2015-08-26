@@ -257,7 +257,7 @@ public final class SLLicenseUtility {
     param.put(I18N.msg("web.check.param.req"), I18N.msg("web.check.param.req.value.actrew"));
     param.put(I18N.msg("web.check.param.license"), l);
     param.put(I18N.msg("web.check.param.macAddresses"), Joiner.on(',').skipNulls().join(macAddresses));
-    final URL url = new URL(I18N.msg("web.licenserequest.url", SLUtility.SERVICEABILITY_URL));
+    final URL url = new URL(I18N.msg("web.licenserequest.url", SLUtility.SERVICEABILITY_SERVER));
     final String response = SLUtility.sendPostToUrl(url, param);
     final List<SignedSLLicenseNetCheck> licenseNetChecks = SLLicensePersistence.readLicenseNetChecksFromString(response);
     final String[] rLines = SLUtility.separateLines(response);
@@ -327,7 +327,7 @@ public final class SLLicenseUtility {
     final Map<String, String> param = new HashMap<>();
     param.put(I18N.msg("web.check.param.req"), I18N.msg("web.check.param.req.value.remove"));
     param.put(I18N.msg("web.check.param.license"), l);
-    final URL url = new URL(I18N.msg("web.licenserequest.url", SLUtility.SERVICEABILITY_URL));
+    final URL url = new URL(I18N.msg("web.licenserequest.url", SLUtility.SERVICEABILITY_SERVER));
     SLUtility.sendPostToUrl(url, param);
   }
 

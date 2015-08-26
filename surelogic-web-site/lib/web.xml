@@ -9,12 +9,12 @@
   </welcome-file-list>
 
   <servlet>
-    <servlet-name>Create License Request</servlet-name>
-    <servlet-class>com.surelogic.server.serviceability.CreateLicenseRequestServlet</servlet-class>
+    <servlet-name>Create License</servlet-name>
+    <servlet-class>com.surelogic.server.serviceability.CreateLicenseServlet</servlet-class>
   </servlet>
 
   <servlet-mapping>
-    <servlet-name>Create License Request</servlet-name>
+    <servlet-name>Create License</servlet-name>
     <url-pattern>/services/createLicenseRequest</url-pattern>
   </servlet-mapping>
 
