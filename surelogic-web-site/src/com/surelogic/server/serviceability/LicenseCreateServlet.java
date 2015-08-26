@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.List;
 import java.util.UUID;
 
 import javax.servlet.ServletException;
@@ -11,13 +12,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.surelogic.Nullable;
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.jdbc.DBQuery;
-import com.surelogic.common.jdbc.NullRowHandler;
 import com.surelogic.common.jdbc.Query;
 import com.surelogic.common.jdbc.Row;
+import com.surelogic.common.jdbc.RowHandler;
 import com.surelogic.common.license.SLLicense;
 import com.surelogic.common.license.SLLicenseProduct;
 import com.surelogic.common.license.SLLicenseType;
@@ -114,23 +114,29 @@ public class LicenseCreateServlet extends HttpServlet {
     final String licenseHexString = SLUtility.wrap(sLicense.getSignedHexString(), 58);
 
     final ServicesDBConnection conn = ServicesDBConnection.getInstance();
-    final AllowLicenseHandler allowLicense = new AllowLicenseHandler();
     final String result = conn.withTransaction(new DBQuery<String>() {
       public String perform(Query q) {
-        q.prepared("WebServices.getLatestLicenseWebRequest", allowLicense).call(emailForDb);
-        if (allowLicense.result) {
-          q.prepared("WebServices.insertLicenseWebRequest").call(license.getUuid().toString(), emailForDb, nameForDb, companyForDb,
-              licenseType);
-          return "okay";
-        } else
-          return "failed due to previous trial";
+        // Restrict multiple trial licenses by email
+        if (!communityLicense) {
+          final List<Timestamp> result = q.prepared("WebServices.getLatestLicenseWebRequest", new AllowLicenseHandler())
+              .call(emailForDb);
+          if (!result.isEmpty()) {
+            Timestamp lastTrialRequestTimestamp = result.get(0);
+            final String pastLicenseDate = (new SimpleDateFormat("dd MMM yyyy")).format(lastTrialRequestTimestamp);
+            // return date of the most recent trial license for this email
+            return pastLicenseDate;
+          }
+        }
+        q.prepared("WebServices.insertLicenseWebRequest").call(license.getUuid().toString(), emailForDb, nameForDb, companyForDb,
+            licenseType);
+        return SLUtility.YES;
       }
     });
 
-    if (result.startsWith("failed")) {
-      final String pastLicenseDate = (new SimpleDateFormat("dd MMM yyyy")).format(allowLicense.last);
+    final boolean pastTrialLicenseRequestByThisEmail = !SLUtility.YES.equals(result);
+    if (pastTrialLicenseRequestByThisEmail) {
       out.println(I18N.msg("web.license.problem.title"));
-      out.println(I18N.msg("web.license.problem.pastTrialLicense", emailForDb, pastLicenseDate));
+      out.println(I18N.msg("web.license.problem.pastTrialLicense", emailForDb, result));
       out.println(I18N.msg("web.license.problem.goBack"));
       return;
     }
@@ -142,18 +148,9 @@ public class LicenseCreateServlet extends HttpServlet {
     out.println(I18N.msg("web.license.success", licenseType, emailForDb, SLUtility.SERVICEABILITY_SERVER));
   }
 
-  static class AllowLicenseHandler extends NullRowHandler {
-    boolean result = false;
-    @Nullable
-    Timestamp last = null;
-
-    @Override
-    protected void doHandle(Row r) {
-      final Timestamp t = r.nextTimestamp();
-      if (t == null)
-        result = true;
-      else
-        last = t;
+  static class AllowLicenseHandler implements RowHandler<Timestamp> {
+    public Timestamp handle(Row r) {
+      return r.nextTimestamp();
     }
   }
 }

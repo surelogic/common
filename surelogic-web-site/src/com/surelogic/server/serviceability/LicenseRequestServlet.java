@@ -71,7 +71,6 @@ public class LicenseRequestServlet extends HttpServlet {
   }
 
   private void handleRequest(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
-    SLLogger.getLogger().info("SureLogic license netcheck: " + req.getRequestURL());
     final String typeStr = req.getParameter(I18N.msg("web.check.param.req"));
     if (I18N.msg("web.check.param.req.value.actrew").equals(typeStr)) {
       install(req, resp);
