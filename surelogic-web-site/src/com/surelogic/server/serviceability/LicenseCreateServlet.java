@@ -121,7 +121,8 @@ public class LicenseCreateServlet extends HttpServlet {
           final List<Timestamp> result = q.prepared("WebServices.getLatestLicenseWebRequest", new AllowLicenseHandler())
               .call(emailForDb);
           if (!result.isEmpty()) {
-            Timestamp lastTrialRequestTimestamp = result.get(0);
+            final Timestamp lastTrialRequestTimestamp = result.get(0);
+            System.out.println("&*$%&$*$% TIMESTAMP is " + lastTrialRequestTimestamp);
             final String pastLicenseDate = (new SimpleDateFormat("dd MMM yyyy")).format(lastTrialRequestTimestamp);
             // return date of the most recent trial license for this email
             return pastLicenseDate;
