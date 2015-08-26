@@ -44,20 +44,6 @@ public class LicenseRequestServlet extends HttpServlet {
 
   static final Logger LOG = SLLogger.getLoggerFor(LicenseRequestServlet.class);
 
-  private static final String PARAM_LIC = "common.serviceability.licenserequest.license";
-  private static final String PARAM_MAC = "common.serviceability.licenserequest.macAddresses";
-
-  private static final String ACK = "common.serviceability.licenserequest.resp.failure.success";
-  private static final String LOGEMAIL = "common.serviceability.licenserequest.logEmail";
-  private static final String REQ = "common.serviceability.licenserequest.req";
-  private static final String ACTREW = "common.serviceability.licenserequest.req.actrew";
-  private static final String REMOVE = "common.serviceability.licenserequest.req.remove";
-  private static final String BLACKLISTED = "common.serviceability.licenserequest.resp.failure.blacklisted";
-  private static final String EXPIRED = "common.serviceability.licenserequest.resp.failure.expired";
-  private static final String INSTALLLIMIT = "common.serviceability.licenserequest.resp.failure.installLimit";
-  private static final String SERVERERROR = "common.serviceability.licenserequest.resp.failure.serverError";
-  private static final String LICENSEURL = "common.serviceability.licenseadmin.url";
-
   enum NetCheckEvent {
     INSTALL_SUCCESS("Successful install", "INSTALL_COUNT"), RENEW_SUCCESS("Successful renewal",
         "RENEWAL_COUNT"), INSTALL_BLACKLISTED("Failed install - on blacklist", "BLACKLIST_COUNT"), INSTALL_LIMIT_EXCEEDED(
@@ -87,10 +73,10 @@ public class LicenseRequestServlet extends HttpServlet {
   }
 
   void handleRequest(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
-    final String typeStr = req.getParameter(I18N.msg(REQ));
-    if (I18N.msg(ACTREW).equals(typeStr)) {
+    final String typeStr = req.getParameter(I18N.msg("web.check.param.req"));
+    if (I18N.msg("web.check.param.req.value.actrew").equals(typeStr)) {
       install(req, resp);
-    } else if (I18N.msg(REMOVE).equals(typeStr)) {
+    } else if (I18N.msg("web.check.param.req.value.remove").equals(typeStr)) {
       remove(req, resp);
     } else {
       resp.getWriter().println(String.format("Unrecognized Request: %s", typeStr));
@@ -238,8 +224,8 @@ public class LicenseRequestServlet extends HttpServlet {
     final String uuid = license.getUuid().toString();
     q.prepared("WebServices.logNetCheck").call(time, ip, uuid.toString(), event.value);
     q.statement("WebServices.updateCheckCount").call(event.getColumn(), uuid.toString());
-    Email.sendSupportEmail(event.toString(), I18N.msg(LOGEMAIL, license.getHolder(), license.getProduct().toString(),
-        time.toString(), ip, uuid, I18N.msg(LICENSEURL, SLUtility.SERVICEABILITY_URL, uuid), event.toString()));
+    Email.sendSupportEmail(event.toString(), I18N.msg("web.check.logEmail", license.getHolder(), license.getProduct().toString(),
+        time.toString(), ip, uuid, I18N.msg("web.admin.license.url", SLUtility.SERVICEABILITY_URL, uuid), event.toString()));
   }
 
   /**
@@ -280,10 +266,11 @@ public class LicenseRequestServlet extends HttpServlet {
       if (checkBlacklist(q, signedLicense)) {
         // This license has been blacklisted
         logCheck(q, now, ip, license, NetCheckEvent.INSTALL_BLACKLISTED);
-        return fail(I18N.msg(BLACKLISTED, license.getProduct(), uuid));
+        return fail(I18N.msg("web.check.response.failure.blacklisted", license.getProduct(), uuid));
       }
       if (sl.isPastInstallBeforeDate()) {
-        return fail(I18N.msg(EXPIRED, license.getProduct(), uuid, SLUtility.toStringHumanDay(license.getInstallBeforeDate())));
+        return fail(I18N.msg("web.check.response.failure.expired", license.getProduct(), uuid,
+            SLUtility.toStringHumanDay(license.getInstallBeforeDate())));
       }
       final SLLicenseNetCheck check = new SLLicenseNetCheck(uuid, calculateNetcheckDate(license), clientMacAddresses);
       final LicenseInfo info = getAndInitInfo(q, license);
@@ -302,7 +289,7 @@ public class LicenseRequestServlet extends HttpServlet {
           logCheck(q, now, ip, license, NetCheckEvent.INSTALL_SUCCESS);
         } else {
           logCheck(q, now, ip, license, NetCheckEvent.INSTALL_LIMIT_EXCEEDED);
-          return fail(I18N.msg(INSTALLLIMIT, license.getProduct(), uuid, license.getMaxActive()));
+          return fail(I18N.msg("web.check.response.failure.installLimit", license.getProduct(), uuid, license.getMaxActive()));
         }
       }
       return performNetCheck(check);
@@ -317,9 +304,9 @@ public class LicenseRequestServlet extends HttpServlet {
 
   void install(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
     @Nullable
-    final String licStr = req.getParameter(I18N.msg(PARAM_LIC));
+    final String licStr = req.getParameter(I18N.msg("web.check.param.license"));
     @Nullable
-    final String macAddressesParam = req.getParameter(I18N.msg(PARAM_MAC));
+    final String macAddressesParam = req.getParameter(I18N.msg("web.check.param.macAddresses"));
     final ImmutableSet<String> clientMacAddresses;
     if (macAddressesParam != null) {
       clientMacAddresses = ImmutableSet.copyOf(Splitter.on(',').trimResults().omitEmptyStrings().split(macAddressesParam));
@@ -337,7 +324,7 @@ public class LicenseRequestServlet extends HttpServlet {
         try {
           result = conn.withTransaction(new Install(sl, now, ip, clientMacAddresses));
         } catch (TransactionException e) {
-          result = fail(I18N.msg(SERVERERROR));
+          result = fail(I18N.msg("web.check.response.failure.serverError"));
         }
         resp.getWriter().println(result);
       }
@@ -368,13 +355,13 @@ public class LicenseRequestServlet extends HttpServlet {
     @Override
     public String perform(final Query q) {
       logCheck(q, now, ip, sl.getSignedSLLicense().getLicense(), NetCheckEvent.REMOVAL_SUCCESS);
-      return I18N.msg(ACK);
+      return I18N.msg("web.check.response.success");
     }
 
   }
 
   static String fail(final String reason) {
-    return I18N.msg("common.serviceability.licenserequest.resp.failure.prefix") + ' ' + reason;
+    return I18N.msg("web.check.response.failure.prefix") + ' ' + reason;
   }
 
   static Date calculateNetcheckDate(final SLLicense license) {
@@ -384,7 +371,7 @@ public class LicenseRequestServlet extends HttpServlet {
   }
 
   void remove(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-    final String licStr = req.getParameter(I18N.msg("common.serviceability.licenserequest.license"));
+    final String licStr = req.getParameter(I18N.msg("web.check.param.license"));
     final Timestamp now = new Timestamp(System.currentTimeMillis());
     final String ip = req.getRemoteAddr();
     if (licStr != null) {

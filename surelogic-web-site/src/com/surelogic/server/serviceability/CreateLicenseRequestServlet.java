@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.surelogic.Nullable;
 import com.surelogic.common.SLUtility;
+import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.jdbc.DBQuery;
 import com.surelogic.common.jdbc.NullRowHandler;
 import com.surelogic.common.jdbc.Query;
@@ -26,15 +27,13 @@ import com.surelogic.server.jdbc.ServicesDBConnection;
 
 public class CreateLicenseRequestServlet extends HttpServlet {
 
-  static final String PARAM_NAME = "name";
-  static final String PARAM_EMAIL = "email";
-  static final String PARAM_COMPANY = "company";
-  static final String PARAM_COMMUNITY = "community";
+  static private final String PARAM_NAME = "name";
+  static private final String PARAM_EMAIL = "email";
+  static private final String PARAM_COMPANY = "company";
+  static private final String PARAM_COMMUNITY = "community";
 
-  static final String PROBLEM = "<h3>There is a problem with your request</h3>";
-  static final String GO_BACK = "<p>Please press the back button and fix your information</p></html>";
-
-  static final String SUCCESS = "<h3>Thanks!</h3>";
+  static private final int DURATION_TRIAL_LICENSE = 60; // days
+  static private final int DURATION_COMMUNITY_LICENSE = 180; // days (~6 months)
 
   private static final long serialVersionUID = 5071297227487022607L;
 
@@ -60,20 +59,19 @@ public class CreateLicenseRequestServlet extends HttpServlet {
     email = email == null ? "" : email.trim();
     boolean emailLooksValid = email.contains("@") && email.length() > 2 && email.length() <= 254;
     if (!emailLooksValid) {
-      out.println(PROBLEM);
-      out.println("The email address you provided <tt>" + email + "</tt> is not syntactically valid.");
-      out.println(GO_BACK);
+      out.println(I18N.msg("web.license.problem.title"));
+      out.println(I18N.msg("web.license.problem.badEmail", email));
+      out.println(I18N.msg("web.license.problem.goBack"));
       return;
     }
-    email = email.trim();
 
     String name = req.getParameter(PARAM_NAME);
     name = name == null ? "" : name.trim();
     boolean nameLooksValid = name.length() > 2 && name.length() <= 100;
     if (!nameLooksValid) {
-      out.println(PROBLEM);
-      out.println("The name you provided <tt>" + name + "</tt> is not valid. Your entry must be less than 100 characters.");
-      out.println(GO_BACK);
+      out.println(I18N.msg("web.license.problem.title"));
+      out.println(I18N.msg("web.license.problem.badName", name));
+      out.println(I18N.msg("web.license.problem.goBack"));
       return;
     }
 
@@ -81,22 +79,23 @@ public class CreateLicenseRequestServlet extends HttpServlet {
     company = company == null ? "" : company.trim();
     boolean companyLooksValid = company.length() <= 100;
     if (!companyLooksValid) {
-      out.println(PROBLEM);
-      out.println(
-          "The company you provided <tt>" + company + "</tt> is is not valid. Your entry must be less than 100 characters.");
-      out.println(GO_BACK);
+      out.println(I18N.msg("web.license.problem.title"));
+      out.println(I18N.msg("web.license.problem.badCompany", company));
+      out.println(I18N.msg("web.license.problem.goBack"));
       return;
     }
     boolean companyEntered = company.length() > 0;
 
+    /*
+     * Construct information for license and database
+     */
     final boolean communityLicense = req.getParameter(PARAM_COMMUNITY) != null;
     final String licenseType = communityLicense ? "Community" : "Trial";
-
     final String holder = name + " (" + email + ") " + (companyEntered ? company + " " : "") + licenseType + " License";
     final String emailForDb = email;
     final String nameForDb = name;
     final String companyForDb = companyEntered ? company : "Personal Copy";
-    final int durationInDays = communityLicense ? 2 : 60;
+    final int durationInDays = communityLicense ? DURATION_COMMUNITY_LICENSE : DURATION_TRIAL_LICENSE;
     final SLLicenseType type = communityLicense ? SLLicenseType.PERPETUAL : SLLicenseType.USE;
     final int installationLimit = communityLicense ? 4 : 2;
 
@@ -120,15 +119,15 @@ public class CreateLicenseRequestServlet extends HttpServlet {
     });
 
     if (result.startsWith("failed")) {
-      out.println(PROBLEM);
-      out.println(
-          emailForDb + " obtained a previous license on " + (new SimpleDateFormat("dd MMM yyyy")).format(allowLicense.last));
-      out.println(GO_BACK);
+      final String pastLicenseDate = (new SimpleDateFormat("dd MMM yyyy")).format(allowLicense.last);
+      out.println(I18N.msg("web.license.problem.title"));
+      out.println(I18N.msg("web.license.problem.pastTrialLicense", emailForDb, pastLicenseDate));
+      out.println(I18N.msg("web.license.problem.goBack"));
       return;
     }
 
     Email.sendEmail("Your SureLogic " + licenseType + " License", "Your license:\n\n" + licenseHexString, email);
-    out.println(SUCCESS);
+    out.println(I18N.msg("web.license.success.title"));
     out.println("<p>We appreciate your interest in SureLogic.</p>");
     out.println(
         "<p>Your " + licenseType + " License has been emailed to " + emailForDb + " &mdash; keep an eye on your inbox.</p>");
