@@ -53,7 +53,7 @@ public class LicenseWebRequestSearchServlet extends HttpServlet {
       writer.println("<h3><a href=\"weblog\">To Recent Web License Request Activity</a></h3>");
       writer.println("<h3><a href=\"websearch\">To Web License Request Search</a></h3>");
       writer.println(String.format(
-          "<form name=\"search\" method=\"post\"><p>Search: <input type=\"test\" name=\"websearch\" value=\"%s\" /></p></form>",
+          "<form name=\"search\" method=\"post\"><p>Search: <input type=\"test\" name=\"search\" value=\"%s\" /></p></form>",
           search == null ? "" : search));
       tableBegin();
       tableRow(DATE.th("Date"), STRING.th("License"), STRING.th("Name"), STRING.th("Email"), STRING.th("Company"),
