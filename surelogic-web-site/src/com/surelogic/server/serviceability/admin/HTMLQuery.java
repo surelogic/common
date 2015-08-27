@@ -13,7 +13,7 @@ public abstract class HTMLQuery extends NullDBQuery {
 
   protected final PrintWriter writer;
 
-  protected final int ROWS = 50;
+  protected final int ROWS = 4;
 
   HTMLQuery(final PrintWriter writer) {
     this.writer = writer;
