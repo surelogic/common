@@ -105,7 +105,7 @@ public class LicenseCreateServlet extends HttpServlet {
      * We need to transfer the information into final variables so that they can
      * be referenced in the database query below.
      */
-    final String holder = name + " [" + licenseType + " License]";
+    final String holder = name + " (" + licenseType + " License)";
     final String emailForDb = email;
     final String nameForDb = name;
     final Object companyForDb = companyEntered ? company : Nulls.STRING;
