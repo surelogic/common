@@ -78,7 +78,7 @@ public class LicenseActivityLogServlet extends HttpServlet {
             tableRow(DATE.td(t), STRING.td(ip(r.nextString())), STRING.td(uuid(r.nextString())), STRING.td(r.nextString()),
                 STRING.td(r.nextString()), STRING.td(r.nextString()), STRING.td(r.nextString()));
           }
-          return rowsRemaining ? latest : -1;
+          return rowsRemaining ? latest : -1; // -1 means no rows remain
         }
       }).call(new Timestamp(time));
       if (latest != -1)
