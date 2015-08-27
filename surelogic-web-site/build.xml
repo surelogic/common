@@ -24,7 +24,7 @@
 	<target name="publish-apache">
 		<echo>apache2 should be shutdown before this publish...</echo>
 		<echo>(pausing just a second so you can ^C if Apache is running)</echo>
-		<sleep seconds="4" />
+		<sleep seconds="2" />
 		<delete quiet="true" dir="${publish.apache.site}" />
 		<copy todir="${publish.apache.site}">
 			<fileset dir="${www}" />
@@ -35,7 +35,7 @@
 	<target name="publish-jetty">
 		<echo>jetty-surelogic should be shutdown before this publish...</echo>
 		<echo>(pausing just a second so you can ^C if Jetty is running)</echo>
-		<sleep seconds="4" />
+		<sleep seconds="2" />
 		<delete quiet="true" dir="${publish.jetty.base}" />
 		<copy todir="${publish.jetty.base}">
 			<fileset dir="${jetty.base}" />
