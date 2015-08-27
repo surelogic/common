@@ -1316,11 +1316,10 @@ public final class SLUtility {
    *          the string to separate lines from.
    * @return a possibly empty array containing the lines within <tt>s</tt>.
    */
-  public static String[] separateLines(final String s) {
-    if (s == null) {
-      return SLUtility.EMPTY_STRING_ARRAY;
-    }
-    final List<String> result = new ArrayList<>();
+  public static ArrayList<String> separateLines(final String s) {
+    final ArrayList<String> result = new ArrayList<>();
+    if (s == null)
+      return result;
 
     final BufferedReader r = new BufferedReader(new StringReader(s));
     while (true) {
@@ -1330,12 +1329,11 @@ public final class SLUtility {
           break;
         }
         result.add(line);
-      } catch (IOException ignore) {
-        break;
+      } catch (IOException ioe) {
+        ioe.printStackTrace(System.err);
       }
-
     }
-    return result.toArray(new String[result.size()]);
+    return result;
   }
 
   /**

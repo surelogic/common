@@ -260,7 +260,7 @@ public final class SLLicenseUtility {
     final URL url = new URL(I18N.msg("web.licenserequest.url", SLUtility.SERVICEABILITY_SERVER));
     final String response = SLUtility.sendPostToUrl(url, param);
     final List<SignedSLLicenseNetCheck> licenseNetChecks = SLLicensePersistence.readLicenseNetChecksFromString(response);
-    final String[] rLines = SLUtility.separateLines(response);
+    final ArrayList<String> rLines = SLUtility.separateLines(response);
 
     SLLicenseManager.getInstance().activateOrRenew(licenseNetChecks);
 
@@ -268,12 +268,12 @@ public final class SLLicenseUtility {
     final StringBuilder b = new StringBuilder();
     for (final String line : rLines) {
       if (line.startsWith(I18N.msg("web.check.response.failure.prefix"))) {
-        if (problemReportedByServer) {
-          b.append('\n').append(line);
-        } else {
-          problemReportedByServer = true;
-          b.append(I18N.err(208)).append('\n').append(line);
-        }
+        problemReportedByServer = true;
+        b.append(I18N.err(208));
+      }
+      // add in all lines after we note the problem
+      if (problemReportedByServer) {
+        b.append('\n').append(line);
       }
     }
     if (problemReportedByServer) {
