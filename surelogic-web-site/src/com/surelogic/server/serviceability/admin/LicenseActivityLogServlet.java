@@ -79,12 +79,15 @@ public class LicenseActivityLogServlet extends HttpServlet {
           return rowsRemaining ? latest : -1; // -1 means no rows remain
         }
       }).call(new Timestamp(time));
-      if (latest == -1 && !useSystemTime)
-        tableRow(STRING.td(""), STRING.td(""), STRING.td(""), STRING.td(""), STRING.td(""), STRING.td(""),
-            STRING.td("<a href=\"log?%s=%d\">&lt;Prev</a>", TIME, time));
-      else if (!useSystemTime)
-        tableRow(STRING.td(""), STRING.td(""), STRING.td(""), STRING.td(""), STRING.td(""), STRING.td(""),
-            STRING.td("<a href=\"log?%s=%d\">&lt;Prev</a>&nbsp;<a href=\"log?%s=%d\">Next&gt;</a>", TIME, time, TIME, latest));
+      StringBuilder b = new StringBuilder();
+      if (!useSystemTime) {
+        b.append("<a href=\"log?").append(TIME).append('=').append(time).append("\">&lt;Prev</a>&nbsp;&nbsp;");
+      }
+      if (latest != -1) {
+        b.append("<a href=\"log?").append(TIME).append('=').append(latest).append("\">Next&gt;</a>");
+      }
+      if (b.length() > 0)
+        tableRow(STRING.td(""), STRING.td(""), STRING.td(""), STRING.td(""), STRING.td(""), STRING.td(""), STRING.td(b.toString()));
       tableEnd();
       finish();
     }
