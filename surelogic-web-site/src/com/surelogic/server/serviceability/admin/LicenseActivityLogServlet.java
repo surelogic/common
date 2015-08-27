@@ -62,6 +62,7 @@ public class LicenseActivityLogServlet extends HttpServlet {
         public Long handle(final Result result) {
           long latest = time;
           int count = 0;
+          boolean rowsRemaining = false;
           for (Row r : result) {
             count++;
             Timestamp t = r.nextTimestamp();
@@ -70,17 +71,19 @@ public class LicenseActivityLogServlet extends HttpServlet {
             if (latest != tTime) {
               latest = tTime;
               if (count > ROWS) {
+                rowsRemaining = true;
                 break;
               }
             }
             tableRow(DATE.td(t), STRING.td(ip(r.nextString())), STRING.td(uuid(r.nextString())), STRING.td(r.nextString()),
                 STRING.td(r.nextString()), STRING.td(r.nextString()), STRING.td(r.nextString()));
           }
-          return latest;
+          return rowsRemaining ? latest : -1;
         }
       }).call(new Timestamp(time));
-      tableRow(STRING.td(""), STRING.td(""), STRING.td(""), STRING.td(""), STRING.td(""), STRING.td(""),
-          STRING.td("<a href=\"log?%s=%d\">Next</a>", TIME, latest));
+      if (latest != -1)
+        tableRow(STRING.td(""), STRING.td(""), STRING.td(""), STRING.td(""), STRING.td(""), STRING.td(""),
+            STRING.td("<a href=\"log?%s=%d\">Next</a>", TIME, latest));
       tableEnd();
       finish();
     }
