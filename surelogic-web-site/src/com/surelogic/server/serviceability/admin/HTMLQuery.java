@@ -26,7 +26,7 @@ public abstract class HTMLQuery extends NullDBQuery {
     private static final ThreadLocal<DateFormat> format = new ThreadLocal<DateFormat>() {
       @Override
       protected DateFormat initialValue() {
-        return new SimpleDateFormat("dd MMM yyyy");
+        return new SimpleDateFormat("dd MMM yyyy HH:mm:ss");
       }
     };
 
