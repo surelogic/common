@@ -38,15 +38,13 @@ public abstract class HTMLQuery extends NullDBQuery {
     }
 
     String td(final Date date) {
-      final String value = date == null ? "null" : format.get().format(date);
+      final String value = date == null ? "&nbsp;" : format.get().format(date);
       return String.format("<td style=\"text-align: %s\">%s</td>", align, value);
     }
 
     String td(final String column, final Object... args) {
-      if (column == null)
-        return "<td>&nbsp;</td>";
-      else
-        return String.format("<td style=\"text-align: %s\">%s</td>", align, String.format(column, args));
+      final String value = column == null ? "&nbsp;" : String.format(column, args);
+      return String.format("<td style=\"text-align: %s\">%s</td>", align, value);
     }
   }
 
