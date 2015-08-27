@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.surelogic.common.jdbc.NullRowHandler;
 import com.surelogic.common.jdbc.Query;
 import com.surelogic.common.jdbc.Row;
+import com.surelogic.server.SiteUtil;
 import com.surelogic.server.jdbc.ServicesDBConnection;
 
 public class LicenseWebRequestSearchServlet extends HttpServlet {
@@ -46,12 +47,7 @@ public class LicenseWebRequestSearchServlet extends HttpServlet {
     @Override
     public void doPerform(final Query q) {
       prequel("Web License Request Search");
-      writer.println("<h3><a href=\"home\">To License Overview</a></h3>");
-      writer.println("<h3><a href=\"log\">To Recent License Activity</a></h3>");
-      writer.println("<h3><a href=\"blacklist\">To Blacklist</a></h3>");
-      writer.println("<h3><a href=\"search\">To License Search</a></h3>");
-      writer.println("<h3><a href=\"weblog\">To Recent Web License Request Activity</a></h3>");
-      writer.println("<h3><a href=\"websearch\">To Web License Request Search</a></h3>");
+      writer.println(SiteUtil.getAdminNavBar());
       writer.println(String.format(
           "<form name=\"search\" method=\"post\"><p>Search: <input type=\"test\" name=\"search\" value=\"%s\" /></p></form>",
           search == null ? "" : search));
