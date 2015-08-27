@@ -23,7 +23,6 @@ public class LicenseActivityLogServlet extends HttpServlet {
 
   private static final long serialVersionUID = 1584106224306833877L;
   private static final String TIME = "t";
-  private static final int ROWS = 20;
 
   @Override
   protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {

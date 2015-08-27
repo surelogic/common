@@ -70,6 +70,5 @@ public class LicenseWebRequestSearchServlet extends HttpServlet {
       tableEnd();
       finish();
     }
-
   }
 }

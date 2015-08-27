@@ -39,32 +39,22 @@
   </servlet-mapping>
 
   <servlet>
-    <servlet-name>Admin Request</servlet-name>
-    <servlet-class>com.surelogic.server.serviceability.admin.AdminServlet</servlet-class>
-  </servlet>
-
-  <servlet-mapping>
-    <servlet-name>Admin Request</servlet-name>
-    <url-pattern>/services/admin/home</url-pattern>
-  </servlet-mapping>
-
-  <servlet>
-    <servlet-name>License Admin Request</servlet-name>
+    <servlet-name>License Admin</servlet-name>
     <servlet-class>com.surelogic.server.serviceability.admin.LicenseAdminServlet</servlet-class>
   </servlet>
 
   <servlet-mapping>
-    <servlet-name>License Admin Request</servlet-name>
+    <servlet-name>License Admin</servlet-name>
     <url-pattern>/services/admin/license</url-pattern>
   </servlet-mapping>
 
   <servlet>
-    <servlet-name>License Activity Log</servlet-name>
+    <servlet-name>Recent License Activity</servlet-name>
     <servlet-class>com.surelogic.server.serviceability.admin.LicenseActivityLogServlet</servlet-class>
   </servlet>
 
   <servlet-mapping>
-    <servlet-name>License Activity Log</servlet-name>
+    <servlet-name>Recent License Activity</servlet-name>
     <url-pattern>/services/admin/log</url-pattern>
   </servlet-mapping>
 
@@ -79,32 +69,32 @@
   </servlet-mapping>
 
   <servlet>
-    <servlet-name>Blacklist</servlet-name>
+    <servlet-name>License Blacklist</servlet-name>
     <servlet-class>com.surelogic.server.serviceability.admin.BlacklistServlet</servlet-class>
   </servlet>
 
   <servlet-mapping>
-    <servlet-name>Blacklist</servlet-name>
+    <servlet-name>License Blacklist</servlet-name>
     <url-pattern>/services/admin/blacklist</url-pattern>
   </servlet-mapping>
 
   <servlet>
-    <servlet-name>License Web Request Activity Log</servlet-name>
+    <servlet-name>Recent Web License Request Activity</servlet-name>
     <servlet-class>com.surelogic.server.serviceability.admin.LicenseWebRequestLogServlet</servlet-class>
   </servlet>
 
   <servlet-mapping>
-    <servlet-name>License Web Request Activity Log</servlet-name>
+    <servlet-name>Recent Web License Request Activity</servlet-name>
     <url-pattern>/services/admin/weblog</url-pattern>
   </servlet-mapping>
 
   <servlet>
-    <servlet-name>License Web Request Search</servlet-name>
+    <servlet-name>Web License Request Search</servlet-name>
     <servlet-class>com.surelogic.server.serviceability.admin.LicenseWebRequestSearchServlet</servlet-class>
   </servlet>
 
   <servlet-mapping>
-    <servlet-name>License Web Request Search</servlet-name>
+    <servlet-name>Web License Request Search</servlet-name>
     <url-pattern>/services/admin/websearch</url-pattern>
   </servlet-mapping>
 
