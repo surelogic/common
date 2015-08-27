@@ -78,8 +78,10 @@ public class LicenseActivityLogServlet extends HttpServlet {
             final long tTime = t.getTime();
             if (tTime == latest)
               skipCountNextTime++;
-            else
+            else {
               latest = tTime;
+              skipCountNextTime = 0; // reset
+            }
             tableRow(DATE.td(t), STRING.td(ip(r.nextString())), STRING.td(uuid(r.nextString())), STRING.td(r.nextString()),
                 STRING.td(r.nextString()), STRING.td(r.nextString()), STRING.td(r.nextString()));
           }
