@@ -15,7 +15,7 @@
 
   <servlet-mapping>
     <servlet-name>License Create</servlet-name>
-    <url-pattern>/services/createLicenseRequest</url-pattern>
+    <url-pattern>/services/licenseCreate</url-pattern>
   </servlet-mapping>
 
   <servlet>
