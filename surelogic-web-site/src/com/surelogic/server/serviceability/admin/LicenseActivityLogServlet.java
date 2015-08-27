@@ -81,9 +81,12 @@ public class LicenseActivityLogServlet extends HttpServlet {
           return rowsRemaining ? latest : -1; // -1 means no rows remain
         }
       }).call(new Timestamp(time));
-      if (latest != -1)
+      if (latest == -1)
         tableRow(STRING.td(""), STRING.td(""), STRING.td(""), STRING.td(""), STRING.td(""), STRING.td(""),
-            STRING.td("<a href=\"log?%s=%d\">Next</a>", TIME, latest));
+            STRING.td("<a href=\"log?%s=%d\">&lt;Prev</a>", TIME, time));
+      else
+        tableRow(STRING.td(""), STRING.td(""), STRING.td(""), STRING.td(""), STRING.td(""), STRING.td(""),
+            STRING.td("<a href=\"log?%s=%d\">&lt;Prev</a>&nbsp;<a href=\"log?%s=%d\">Next&gt;</a>", TIME, time, TIME, latest));
       tableEnd();
       finish();
     }
