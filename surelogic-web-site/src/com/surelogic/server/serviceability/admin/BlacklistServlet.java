@@ -17,6 +17,7 @@ import com.surelogic.common.jdbc.NullRowHandler;
 import com.surelogic.common.jdbc.Query;
 import com.surelogic.common.jdbc.Row;
 import com.surelogic.common.license.SLLicenseProduct;
+import com.surelogic.server.SiteUtil;
 import com.surelogic.server.jdbc.ServicesDBConnection;
 
 public class BlacklistServlet extends HttpServlet {
@@ -46,12 +47,7 @@ public class BlacklistServlet extends HttpServlet {
     @Override
     public void doPerform(final Query q) {
       prequel("License Blacklist");
-      writer.println("<h3><a href=\"home\">To License Overview</a></h3>");
-      writer.println("<h3><a href=\"log\">To Recent License Activity</a></h3>");
-      writer.println("<h3><a href=\"blacklist\">To Blacklist</a></h3>");
-      writer.println("<h3><a href=\"search\">To License Search</a></h3>");
-      writer.println("<h3><a href=\"weblog\">To Recent Web License Request Activity</a></h3>");
-      writer.println("<h3><a href=\"websearch\">To Web License Request Search</a></h3>");
+      writer.println(SiteUtil.getAdminNavBar());
       tableBegin();
       tableRow(DATE.th("Latest Activity"), STRING.th("License"), STRING.th("Holder"), STRING.th("Email"), STRING.th("Company"),
           STRING.th("Product"), NUMBER.th("Installs"), NUMBER.th("Renewals"), NUMBER.th("Removals"), NUMBER.th("Blacklists"),

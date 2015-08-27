@@ -42,17 +42,17 @@ public final class SiteUtil {
     if (result == null) {
       final StringBuilder b = new StringBuilder();
       b.append("( ");
-      b.append("<a href=\"home\">To License Overview</a>");
+      b.append("<a href=\"home\">License Overview</a>");
       b.append(" | ");
-      b.append("<a href=\"log\">To Recent License Activity</a>");
+      b.append("<a href=\"log\">Recent License Activity</a>");
       b.append(" | ");
-      b.append("<a href=\"blacklist\">To Blacklist</a>");
+      b.append("<a href=\"blacklist\">License Blacklist</a>");
       b.append(" | ");
-      b.append("<a href=\"search\">To License Search</a>");
+      b.append("<a href=\"search\">License Search</a>");
       b.append(" | ");
-      b.append("<a href=\"weblog\">To Recent Web License Request Activity</a>");
+      b.append("<a href=\"weblog\">Recent Web License Request Activity</a>");
       b.append(" | ");
-      b.append("<a href=\"websearch\">To Web License Request Search</a>");
+      b.append("<a href=\"websearch\">Web License Request Search</a>");
       b.append(" )");
       result = b.toString();
     }
