@@ -112,6 +112,7 @@ public class LicenseAdminServlet extends HttpServlet {
       writer.println("<h3><a href=\"blacklist\">To Blacklist</a></h3>");
       writer.println("<h3><a href=\"search\">To License Search</a></h3>");
       writer.println("<h3><a href=\"weblog\">To Recent Web License Request Activity</a></h3>");
+      writer.println("<h3><a href=\"websearch\">To Web License Request Search</a></h3>");
       writer.print("<form action=\"license\" method=\"post\" ><input type=\"hidden\" name=\"uuid\" value=\"");
       writer.print(uuid);
       writer.println("\" />");

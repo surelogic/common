@@ -56,9 +56,11 @@ public class LicenseActivityLogServlet extends HttpServlet {
     public void doPerform(final Query q) {
       prequel("Recent License Activity");
       writer.println("<h3><a href=\"home\">To License Overview</a></h3>");
+      writer.println("<h3><a href=\"log\">To Recent License Activity</a></h3>");
       writer.println("<h3><a href=\"blacklist\">To Blacklist</a></h3>");
       writer.println("<h3><a href=\"search\">To License Search</a></h3>");
       writer.println("<h3><a href=\"weblog\">To Recent Web License Request Activity</a></h3>");
+      writer.println("<h3><a href=\"websearch\">To Web License Request Search</a></h3>");
       tableBegin();
       tableRow(DATE.th("Date"), STRING.th("IP"), STRING.th("License"), STRING.th("Event"), STRING.th("Holder"), STRING.th("Email"),
           STRING.th("Company"));
@@ -79,7 +81,7 @@ public class LicenseActivityLogServlet extends HttpServlet {
           return latest;
         }
       }).call(new Timestamp(time));
-      tableRow(STRING.td(""), STRING.td(""), STRING.td(""), STRING.td(""),
+      tableRow(STRING.td(""), STRING.td(""), STRING.td(""), STRING.td(""), STRING.td(""), STRING.td(""),
           STRING.td("<a href=\"log?%s=%d\">Next</a>", TIME, latest));
       tableEnd();
       finish();

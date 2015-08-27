@@ -51,7 +51,9 @@ public class LicenseSearchServlet extends HttpServlet {
       writer.println("<h3><a href=\"home\">To License Overview</a></h3>");
       writer.println("<h3><a href=\"log\">To Recent License Activity</a></h3>");
       writer.println("<h3><a href=\"blacklist\">To Blacklist</a></h3>");
+      writer.println("<h3><a href=\"search\">To License Search</a></h3>");
       writer.println("<h3><a href=\"weblog\">To Recent Web License Request Activity</a></h3>");
+      writer.println("<h3><a href=\"websearch\">To Web License Request Search</a></h3>");
       writer.println(String.format(
           "<form name=\"search\" method=\"post\"><p>Search: <input type=\"test\" name=\"search\" value=\"%s\" /></p></form>",
           search == null ? "" : search));
@@ -79,11 +81,7 @@ public class LicenseSearchServlet extends HttpServlet {
         }
       };
       String jdbcSearch = "%" + search + "%";
-      q.prepared("WebServices.searchBy", handler).call(jdbcSearch, jdbcSearch, jdbcSearch, jdbcSearch);
-      // q.prepared("WebServices.searchByID", handler).call(jdbcSearch);
-      // q.prepared("WebServices.searchByName", handler).call(jdbcSearch);
-      // q.prepared("WebServices.searchByEmail", handler).call(jdbcSearch);
-      // q.prepared("WebServices.searchByCompany", handler).call(jdbcSearch);
+      q.prepared("WebServices.searchLicenses", handler).call(jdbcSearch, jdbcSearch, jdbcSearch, jdbcSearch);
       tableEnd();
       finish();
     }
