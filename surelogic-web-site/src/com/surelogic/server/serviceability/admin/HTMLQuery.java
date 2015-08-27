@@ -67,9 +67,36 @@ public abstract class HTMLQuery extends NullDBQuery {
 
   void prequel(final String title) {
     writer.println("<!DOCTYPE html>");
-    writer.println(String.format(
-        "<html><head><title>%1$s</title><style>table {  border-collapse: collapse; } td, th { border: thin solid grey;} h1 { font-size: 80%; }</style></head><body><h1 align=\"center\">%1$s</h1>",
-        title));
+    writer.println("<html lang=\"en\">");
+    writer.println("<head>");
+    writer.println(String.format("<title>%s</title>", title));
+    style();
+    writer.println("<body>");
+    writer.println(String.format("<h1 align=\"center\">%s</h1>", title));
+    navBar();
+  }
+
+  void style() {
+    writer.println("<style>");
+    writer.println(" table {  border-collapse: collapse; }");
+    writer.println(" td, th { border: thin solid grey; }");
+    writer.println("</style>");
+  }
+
+  void navBar() {
+    writer.print("<hr><p align=\"center\">( ");
+    writer.print("<a href=\"home\">License Overview</a>");
+    writer.print(" | ");
+    writer.print("<a href=\"log\">Recent License Activity</a>");
+    writer.print(" | ");
+    writer.print("<a href=\"blacklist\">License Blacklist</a>");
+    writer.print(" | ");
+    writer.print("<a href=\"search\">License Search</a>");
+    writer.print(" | ");
+    writer.print("<a href=\"weblog\">Recent Web License Request Activity</a>");
+    writer.print(" | ");
+    writer.print("<a href=\"websearch\">Web License Request Search</a>");
+    writer.println(" )</p><hr>");
   }
 
   String uuid(final String license) {

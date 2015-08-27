@@ -16,7 +16,6 @@ import com.surelogic.common.jdbc.NullRowHandler;
 import com.surelogic.common.jdbc.Query;
 import com.surelogic.common.jdbc.Row;
 import com.surelogic.common.license.SLLicenseProduct;
-import com.surelogic.server.SiteUtil;
 import com.surelogic.server.jdbc.ServicesDBConnection;
 
 public class AdminServlet extends HttpServlet {
@@ -46,7 +45,6 @@ public class AdminServlet extends HttpServlet {
     @Override
     public void doPerform(final Query q) {
       prequel("License Overview");
-      writer.println(SiteUtil.getAdminNavBar());
       tableBegin();
       tableRow(DATE.th("Latest Activity"), STRING.th("License"), STRING.th("Holder"), STRING.th("Email"), STRING.th("Company"),
           STRING.th("Product"), NUMBER.th("Installs"), NUMBER.th("Renewals"), NUMBER.th("Removals"), NUMBER.th("Blacklists"),

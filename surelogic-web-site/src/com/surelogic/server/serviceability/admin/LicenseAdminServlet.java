@@ -16,7 +16,6 @@ import com.surelogic.common.jdbc.NullDBQuery;
 import com.surelogic.common.jdbc.NullRowHandler;
 import com.surelogic.common.jdbc.Query;
 import com.surelogic.common.jdbc.Row;
-import com.surelogic.server.SiteUtil;
 import com.surelogic.server.jdbc.ServicesDBConnection;
 
 public class LicenseAdminServlet extends HttpServlet {
@@ -108,7 +107,6 @@ public class LicenseAdminServlet extends HttpServlet {
     @Override
     public void doPerform(final Query q) {
       prequel(String.format("License %s", uuid));
-      writer.println(SiteUtil.getAdminNavBar());
       writer.print("<form action=\"license\" method=\"post\" ><input type=\"hidden\" name=\"uuid\" value=\"");
       writer.print(uuid);
       writer.println("\" />");

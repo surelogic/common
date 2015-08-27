@@ -17,7 +17,6 @@ import com.surelogic.common.jdbc.Query;
 import com.surelogic.common.jdbc.Result;
 import com.surelogic.common.jdbc.ResultHandler;
 import com.surelogic.common.jdbc.Row;
-import com.surelogic.server.SiteUtil;
 import com.surelogic.server.jdbc.ServicesDBConnection;
 
 public class LicenseWebRequestLogServlet extends HttpServlet {
@@ -56,7 +55,6 @@ public class LicenseWebRequestLogServlet extends HttpServlet {
     @Override
     public void doPerform(final Query q) {
       prequel("Recent Web License Request Activity");
-      writer.println(SiteUtil.getAdminNavBar());
       tableBegin();
       tableRow(DATE.th("Date"), STRING.th("License"), STRING.th("Name"), STRING.th("Email"), STRING.th("Company"),
           STRING.th("License Type"));

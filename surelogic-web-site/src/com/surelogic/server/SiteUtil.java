@@ -3,7 +3,6 @@ package com.surelogic.server;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.security.PrivateKey;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -33,30 +32,6 @@ public final class SiteUtil {
       LOG.log(Level.SEVERE, e.getMessage(), e);
     }
     throw new IllegalStateException("The server failed in an unexpected fashion. Check server logs.");
-  }
-
-  public static final AtomicReference<String> bar = new AtomicReference<>(null);
-
-  public static String getAdminNavBar() {
-    String result = bar.get();
-    if (result == null) {
-      final StringBuilder b = new StringBuilder();
-      b.append("<hr><p align=\"center\">( ");
-      b.append("<a href=\"home\">License Overview</a>");
-      b.append(" | ");
-      b.append("<a href=\"log\">Recent License Activity</a>");
-      b.append(" | ");
-      b.append("<a href=\"blacklist\">License Blacklist</a>");
-      b.append(" | ");
-      b.append("<a href=\"search\">License Search</a>");
-      b.append(" | ");
-      b.append("<a href=\"weblog\">Recent Web License Request Activity</a>");
-      b.append(" | ");
-      b.append("<a href=\"websearch\">Web License Request Search</a>");
-      b.append(" )</p><hr>");
-      result = b.toString();
-    }
-    return result;
   }
 
 }
