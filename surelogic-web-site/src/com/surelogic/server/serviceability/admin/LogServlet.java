@@ -59,7 +59,8 @@ public class LogServlet extends HttpServlet {
       writer.println("<h3><a href=\"blacklist\">To Blacklist</a></h3>");
       writer.println("<h3><a href=\"search\">To License Search</a></h3>");
       tableBegin();
-      tableRow(DATE.th("Date"), STRING.th("IP"), STRING.th("License"), STRING.th("Event"), STRING.th("Holder"));
+      tableRow(DATE.th("Date"), STRING.th("IP"), STRING.th("License"), STRING.th("Event"), STRING.th("Holder"), STRING.th("Email"),
+          STRING.th("Company"));
       long latest = q.prepared("WebServices.selectNetChecksBefore", new ResultHandler<Long>() {
         @Override
         public Long handle(final Result result) {
@@ -72,7 +73,7 @@ public class LogServlet extends HttpServlet {
             Timestamp t = r.nextTimestamp();
             latest = t.getTime();
             tableRow(DATE.td(t), STRING.td(ip(r.nextString())), STRING.td(uuid(r.nextString())), STRING.td(r.nextString()),
-                STRING.td(r.nextString()));
+                STRING.td(r.nextString()), STRING.td(r.nextString()), STRING.td(r.nextString()));
           }
           return latest;
         }
