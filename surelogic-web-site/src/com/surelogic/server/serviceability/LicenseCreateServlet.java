@@ -7,7 +7,6 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -100,7 +99,10 @@ public class LicenseCreateServlet extends HttpServlet {
     boolean companyEntered = company.length() > 0;
 
     /*
-     * Construct information for license and database
+     * Construct information for license and database.
+     * 
+     * We need to transfer the information into final variables so that they can
+     * be referenced in the database query below.
      */
     final String holder = name + " (" + email + ") " + (companyEntered ? company + " " : "") + licenseType + " License";
     final String emailForDb = email;
@@ -110,8 +112,8 @@ public class LicenseCreateServlet extends HttpServlet {
     final SLLicenseType type = communityLicense ? SLLicenseType.PERPETUAL : SLLicenseType.USE;
     final int installationLimit = communityLicense ? INSTALLATION_LIMIT_COMMUNITY : INSTALLATION_LIMIT_TRIAL;
 
-    final SLLicense license = new SLLicense(UUID.randomUUID(), holder, SLLicenseProduct.ALL_TOOLS, durationInDays, null, type,
-        installationLimit, true);
+    final SLLicense license = new SLLicense(nameForDb, emailForDb, companyEntered ? company : null, SLLicenseProduct.ALL_TOOLS,
+        durationInDays, null, type, installationLimit, true);
     final SignedSLLicense sLicense = SignedSLLicense.getInstance(license, SiteUtil.getKey());
     final String licenseHexString = SLUtility.wrap(sLicense.getSignedHexString(), 58);
 

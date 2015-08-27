@@ -11,6 +11,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 
 import com.surelogic.NotThreadSafe;
+import com.surelogic.Nullable;
 import com.surelogic.common.FileUtility;
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
@@ -31,6 +32,12 @@ import com.surelogic.common.logging.SLLogger;
  * <li>The string constant {@link #HOLDER_LABEL} followed by
  * <tt>license.getHolder()</tt>.
  * <li>The character {@link #SEP}.
+ * <li>(Optional) The string constant {@link #EMAIL_LABEL} followed by
+ * <tt>license.getEmail()</tt>.
+ * <li>(Optional) The character {@link #SEP}.
+ * <li>(Optional)The string constant {@link #COMPANY_LABEL} followed by
+ * <tt>license.getCompany()</tt>.
+ * <li>(Optional)The character {@link #SEP}.
  * <li>The string constant {@link #PRODUCT_LABEL} followed by
  * <tt>license.getProduct().toString()</tt>.
  * <li>The character {@link #SEP}.
@@ -55,6 +62,8 @@ import com.surelogic.common.logging.SLLogger;
  * <pre>
  * id=58eab27c-e416-4b76-9225-49783707056f
  * holder=Tim
+ * email=hallorant@no.com
+ * company=Surelogic, Inc.
  * product=Flashlight
  * durationInDays=365
  * type=Perpetual
@@ -67,6 +76,8 @@ import com.surelogic.common.logging.SLLogger;
  * <pre>
  * id=58eab27c-e416-4b76-9225-497837070544
  * holder=Tim
+ * email=hallorant@no.com
+ * company=Surelogic, Inc.
  * product=JSure
  * durationInDays=60
  * installationDeadline=2012-06-11
@@ -90,7 +101,7 @@ import com.surelogic.common.logging.SLLogger;
  * format is:
  * 
  * <pre>
- * [sl-#v1.0#(7da088c4b6c9c88097221636d32f5a3ea892b69a757bb4d358fdcd8b4
+ * [sl-#v3.0#(7da088c4b6c9c88097221636d32f5a3ea892b69a757bb4d358fdcd8b4
  * a0190d65b9b4926409affae8c3fb3b5ddc748fbc2e4dd93b7c7c68fb1f1600b30cf0
  * 290d852d696b0aaf082ec78b54ebc1441863ca5b0f0916054b6b22ed6d9675db5490
  * 77e91e35dd869c531031b24b4190d472700cea7629debc788624be16efade18a84da
@@ -146,7 +157,7 @@ import com.surelogic.common.logging.SLLogger;
  * format is:
  * 
  * <pre>
- * [sl-nc-#v1.0#(5f0940e201bce17b785ea73588755f55794dadac635ef6e0735bbd
+ * [sl-nc-#v3.0#(5f0940e201bce17b785ea73588755f55794dadac635ef6e0735bbd
  * aa1edf323b22db461a32a296cac956951d12929cad837af43745c3ffe8e3bb260e5c
  * f7e1bf3e500b0fd6b5019433b6d9c0b2cef6001a81ca1f3a535c22f09055c305a957
  * d08d5454fcbfc62859c6d4ccbbddd96b001bffc0388860f514a9e224dd0819190065
@@ -165,8 +176,10 @@ import com.surelogic.common.logging.SLLogger;
 @NotThreadSafe
 public final class SLLicensePersistence {
 
+  private static final String COMPANY_LABEL = "company=";
   private static final String DATE_LABEL = "date=";
   private static final String DURATION_LABEL = "durationInDays=";
+  private static final String EMAIL_LABEL = "email=";
   private static final String HOLDER_LABEL = "holder=";
   private static final String INSTALLATION_DEADLINE_LABEL = "installationDeadline=";
   private static final String MACADDRESS_LABEL = "macAddress=";
@@ -176,10 +189,10 @@ public final class SLLicensePersistence {
   private static final String TYPE_LABEL = "type=";
   private static final String UUID_LABEL = "id=";
 
-  private static final String BEGIN_LICENSE = "[sl-#v2.0#(7da";
+  private static final String BEGIN_LICENSE = "[sl-#v3.0#(7da";
   private static final String END_LICENSE = "7e1da)]";
 
-  private static final String BEGIN_NET_CHECK = "[sl-nc-#v2.0#(5f0";
+  private static final String BEGIN_NET_CHECK = "[sl-nc-#v3.0#(5f0";
   private static final String END_NET_CHECK = "6ae)]";
 
   private static final String MIDDLE = "O";
@@ -201,8 +214,17 @@ public final class SLLicensePersistence {
     final StringBuilder b = new StringBuilder();
     b.append(UUID_LABEL).append(license.getUuid().toString()).append(SEP);
     b.append(HOLDER_LABEL).append(license.getHolder()).append(SEP);
+    @Nullable
+    final String email = license.getEmail();
+    if (email != null)
+      b.append(EMAIL_LABEL).append(email).append(SEP);
+    @Nullable
+    final String company = license.getCompany();
+    if (company != null)
+      b.append(COMPANY_LABEL).append(company).append(SEP);
     b.append(PRODUCT_LABEL).append(license.getProduct().toString()).append(SEP);
     b.append(DURATION_LABEL).append(Integer.toString(license.getDurationInDays())).append(SEP);
+    @Nullable
     final Date installBeforeDate = license.getInstallBeforeDate();
     if (installBeforeDate != null)
       b.append(INSTALLATION_DEADLINE_LABEL).append(SLUtility.toStringDay(installBeforeDate)).append(SEP);
@@ -240,6 +262,7 @@ public final class SLLicensePersistence {
    *          the string representation of the license.
    * @return the license, or {@code null} if the string is not well-formed.
    */
+  @Nullable
   public static SLLicense toLicense(final String value) {
     /*
      * Parse the the {@link UUID} that identifies this license.
@@ -265,6 +288,20 @@ public final class SLLicensePersistence {
       SLLogger.getLogger().log(Level.WARNING, I18N.err(187, HOLDER_LABEL, value));
       return null;
     }
+
+    /*
+     * Parse email of the license holder. This value is optional so it may not
+     * exist.
+     */
+    @Nullable
+    final String email = getValue(value, EMAIL_LABEL);
+
+    /*
+     * Parse company provided by the license holder. This value is optional so
+     * it may not exist.
+     */
+    @Nullable
+    final String company = getValue(value, COMPANY_LABEL);
 
     /*
      * Parse name of the product being licensed.
@@ -365,7 +402,8 @@ public final class SLLicensePersistence {
      */
     final SLLicense result;
     try {
-      result = new SLLicense(uuid, holder, product, durationInDays, installBeforeDate, type, maxActive, performNetCheck);
+      result = new SLLicense(uuid, holder, email, company, product, durationInDays, installBeforeDate, type, maxActive,
+          performNetCheck);
     } catch (Exception e) {
       SLLogger.getLogger().log(Level.WARNING, I18N.err(193, value), e);
       return null;
@@ -385,6 +423,7 @@ public final class SLLicensePersistence {
    * @return the license net check, or {@code null} if the string is not
    *         well-formed.
    */
+  @Nullable
   public static SLLicenseNetCheck toLicenseNetCheck(final String value) {
     /*
      * Parse the the {@link UUID} that identifies the license this net check
