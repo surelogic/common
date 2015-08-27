@@ -322,7 +322,8 @@ public class LicenseRequestServlet extends HttpServlet {
         try {
           result = conn.withTransaction(new Install(sl, now, ip, clientMacAddresses));
         } catch (TransactionException e) {
-          result = fail(I18N.msg("web.check.response.failure.serverError"));
+
+          result = fail(I18N.msg("web.check.response.failure.serverError", SLUtility.toString(e)));
         }
         resp.getWriter().println(result);
       }

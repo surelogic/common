@@ -1633,6 +1633,21 @@ public final class SLUtility {
     return BaseEncoding.base64().encode(s.getBytes(Charsets.UTF_8));
   }
 
+  /**
+   * Obtains the output of <tt>t.printStackTrace()</tt> as a string. Useful for
+   * logging and other purposes.
+   * 
+   * @param t
+   *          an exception.
+   * @return the output of <tt>t.printStackTrace()</tt>.
+   */
+  public static String toString(Throwable t) {
+    final StringWriter sw = new StringWriter();
+    final PrintWriter pw = new PrintWriter(sw);
+    t.printStackTrace(pw);
+    return sw.toString();
+  }
+
   private SLUtility() {
     // no instances
   }
