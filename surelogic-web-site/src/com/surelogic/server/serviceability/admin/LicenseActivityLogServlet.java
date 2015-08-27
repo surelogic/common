@@ -23,6 +23,7 @@ public class LicenseActivityLogServlet extends HttpServlet {
 
   private static final long serialVersionUID = 1584106224306833877L;
   private static final String TIME = "t";
+  private static final String TIME_PREV = "tp";
 
   @Override
   protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
@@ -35,18 +36,21 @@ public class LicenseActivityLogServlet extends HttpServlet {
   }
 
   private void handle(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-    ServicesDBConnection.getInstance().withReadOnly(new LogQuery(resp.getWriter(), req.getParameter(TIME)));
+    ServicesDBConnection.getInstance()
+        .withReadOnly(new LogQuery(resp.getWriter(), req.getParameter(TIME), req.getParameter(TIME_PREV)));
   }
 
   static class LogQuery extends HTMLQuery {
 
-    final boolean useSystemTime;
+    final boolean useTimePrevious;
+    final long timePrevious;
     final long time;
 
-    public LogQuery(final PrintWriter writer, @Nullable final String time) {
+    public LogQuery(final PrintWriter writer, @Nullable final String time, @Nullable final String timePrevious) {
       super(writer);
-      useSystemTime = time == null;
-      this.time = useSystemTime ? System.currentTimeMillis() : Long.parseLong(time);
+      this.time = time == null ? System.currentTimeMillis() : Long.parseLong(time);
+      useTimePrevious = timePrevious != null;
+      this.timePrevious = useTimePrevious ? Long.parseLong(timePrevious) : -1;
     }
 
     @Override
@@ -80,11 +84,13 @@ public class LicenseActivityLogServlet extends HttpServlet {
         }
       }).call(new Timestamp(time));
       StringBuilder b = new StringBuilder();
-      if (!useSystemTime) {
-        b.append("<a href=\"log?").append(TIME).append('=').append(time).append("\">&lt;Prev</a>&nbsp;&nbsp;");
+      if (useTimePrevious) {
+        b.append("<a href=\"log?").append(TIME).append('=').append(timePrevious).append('&').append(TIME_PREV).append('=')
+            .append(time).append("\">&lt;Prev</a>&nbsp;&nbsp;");
       }
       if (latest != -1) {
-        b.append("<a href=\"log?").append(TIME).append('=').append(latest).append("\">Next&gt;</a>");
+        b.append("<a href=\"log?").append(TIME).append('=').append(latest).append('&').append(TIME_PREV).append('=').append(time)
+            .append("\">Next&gt;</a>");
       }
       if (b.length() > 0)
         tableRow(STRING.td(""), STRING.td(""), STRING.td(""), STRING.td(""), STRING.td(""), STRING.td(""), STRING.td(b.toString()));
