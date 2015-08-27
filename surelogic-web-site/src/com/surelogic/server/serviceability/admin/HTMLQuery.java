@@ -43,7 +43,10 @@ public abstract class HTMLQuery extends NullDBQuery {
     }
 
     String td(final String column, final Object... args) {
-      return String.format("<td style=\"text-align: %s\">%s</td>", align, String.format(column, args));
+      if (column == null)
+        return "<td>&nbsp;</td>";
+      else
+        return String.format("<td style=\"text-align: %s\">%s</td>", align, String.format(column, args));
     }
   }
 
