@@ -87,6 +87,16 @@
     <servlet-name>Blacklist</servlet-name>
     <url-pattern>/services/admin/blacklist</url-pattern>
   </servlet-mapping>
+  
+  <servlet>
+    <servlet-name>License Web Request Activity Log</servlet-name>
+    <servlet-class>com.surelogic.server.serviceability.admin.LicenseWebRequestLogServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>License Web Request Activity Log</servlet-name>
+    <url-pattern>/services/admin/weblog</url-pattern>
+  </servlet-mapping>
 
 
   <filter>

@@ -19,9 +19,9 @@ import com.surelogic.common.jdbc.ResultHandler;
 import com.surelogic.common.jdbc.Row;
 import com.surelogic.server.jdbc.ServicesDBConnection;
 
-public class LicenseActivityLogServlet extends HttpServlet {
+public class LicenseWebRequestLogServlet extends HttpServlet {
 
-  private static final long serialVersionUID = 1584106224306833877L;
+  private static final long serialVersionUID = -9077965307391367048L;
   private static final String TIME = "t";
   private static final int ROWS = 20;
 
@@ -55,14 +55,14 @@ public class LicenseActivityLogServlet extends HttpServlet {
     @Override
     public void doPerform(final Query q) {
       prequel("Recent License Activity");
+      writer.println("<h3><a href=\"log\">To Recent License Activity</a></h3>");
       writer.println("<h3><a href=\"home\">To License Overview</a></h3>");
       writer.println("<h3><a href=\"blacklist\">To Blacklist</a></h3>");
       writer.println("<h3><a href=\"search\">To License Search</a></h3>");
-      writer.println("<h3><a href=\"weblog\">To Recent Web License Request Activity</a></h3>");
       tableBegin();
-      tableRow(DATE.th("Date"), STRING.th("IP"), STRING.th("License"), STRING.th("Event"), STRING.th("Holder"), STRING.th("Email"),
-          STRING.th("Company"));
-      long latest = q.prepared("WebServices.selectNetChecksBefore", new ResultHandler<Long>() {
+      tableRow(DATE.th("Date"), STRING.th("License"), STRING.th("Name"), STRING.th("Email"), STRING.th("Company"),
+          STRING.th("License Type"));
+      long latest = q.prepared("WebServices.selectLicenseWebRequestsBefore", new ResultHandler<Long>() {
         @Override
         public Long handle(final Result result) {
           long latest = time;
@@ -73,7 +73,7 @@ public class LicenseActivityLogServlet extends HttpServlet {
             }
             Timestamp t = r.nextTimestamp();
             latest = t.getTime();
-            tableRow(DATE.td(t), STRING.td(ip(r.nextString())), STRING.td(uuid(r.nextString())), STRING.td(r.nextString()),
+            tableRow(DATE.td(t), STRING.td(uuid(r.nextString())), STRING.td(r.nextString()),
                 STRING.td(r.nextString()), STRING.td(r.nextString()), STRING.td(r.nextString()));
           }
           return latest;
