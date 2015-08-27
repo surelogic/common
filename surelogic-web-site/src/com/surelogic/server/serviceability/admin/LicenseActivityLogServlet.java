@@ -40,15 +40,13 @@ public class LicenseActivityLogServlet extends HttpServlet {
 
   static class LogQuery extends HTMLQuery {
 
+    final boolean useSystemTime;
     final long time;
 
     public LogQuery(final PrintWriter writer, @Nullable final String time) {
       super(writer);
-      if (time == null) {
-        this.time = System.currentTimeMillis();
-      } else {
-        this.time = Long.parseLong(time);
-      }
+      useSystemTime = time == null;
+      this.time = useSystemTime ? System.currentTimeMillis() : Long.parseLong(time);
     }
 
     @Override
@@ -81,10 +79,10 @@ public class LicenseActivityLogServlet extends HttpServlet {
           return rowsRemaining ? latest : -1; // -1 means no rows remain
         }
       }).call(new Timestamp(time));
-      if (latest == -1)
+      if (latest == -1 && !useSystemTime)
         tableRow(STRING.td(""), STRING.td(""), STRING.td(""), STRING.td(""), STRING.td(""), STRING.td(""),
             STRING.td("<a href=\"log?%s=%d\">&lt;Prev</a>", TIME, time));
-      else
+      else if (!useSystemTime)
         tableRow(STRING.td(""), STRING.td(""), STRING.td(""), STRING.td(""), STRING.td(""), STRING.td(""),
             STRING.td("<a href=\"log?%s=%d\">&lt;Prev</a>&nbsp;<a href=\"log?%s=%d\">Next&gt;</a>", TIME, time, TIME, latest));
       tableEnd();
