@@ -59,12 +59,12 @@
   </servlet-mapping>
 
   <servlet>
-    <servlet-name>License Log</servlet-name>
-    <servlet-class>com.surelogic.server.serviceability.admin.LogServlet</servlet-class>
+    <servlet-name>License Activity Log</servlet-name>
+    <servlet-class>com.surelogic.server.serviceability.admin.LicenseActivityLogServlet</servlet-class>
   </servlet>
 
   <servlet-mapping>
-    <servlet-name>License Log</servlet-name>
+    <servlet-name>License Activity Log</servlet-name>
     <url-pattern>/services/admin/log</url-pattern>
   </servlet-mapping>
 

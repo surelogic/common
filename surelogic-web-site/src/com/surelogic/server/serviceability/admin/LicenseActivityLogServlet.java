@@ -19,7 +19,7 @@ import com.surelogic.common.jdbc.ResultHandler;
 import com.surelogic.common.jdbc.Row;
 import com.surelogic.server.jdbc.ServicesDBConnection;
 
-public class LogServlet extends HttpServlet {
+public class LicenseActivityLogServlet extends HttpServlet {
 
   private static final long serialVersionUID = 1584106224306833877L;
   private static final String TIME = "t";
