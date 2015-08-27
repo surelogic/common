@@ -78,10 +78,11 @@ public class LicenseSearchServlet extends HttpServlet {
         }
       };
       String jdbcSearch = "%" + search + "%";
-      q.prepared("WebServices.searchByID", handler).call(jdbcSearch);
-      q.prepared("WebServices.searchByName", handler).call(jdbcSearch);
-      q.prepared("WebServices.searchByEmail", handler).call(jdbcSearch);
-      q.prepared("WebServices.searchByCompany", handler).call(jdbcSearch);
+      q.prepared("WebServices.searchBy", handler).call(jdbcSearch, jdbcSearch, jdbcSearch);
+      // q.prepared("WebServices.searchByID", handler).call(jdbcSearch);
+      // q.prepared("WebServices.searchByName", handler).call(jdbcSearch);
+      // q.prepared("WebServices.searchByEmail", handler).call(jdbcSearch);
+      // q.prepared("WebServices.searchByCompany", handler).call(jdbcSearch);
       tableEnd();
       finish();
     }
