@@ -41,7 +41,7 @@ public final class SiteUtil {
     String result = bar.get();
     if (result == null) {
       final StringBuilder b = new StringBuilder();
-      b.append("( ");
+      b.append("<hr><p>( ");
       b.append("<a href=\"home\">License Overview</a>");
       b.append(" | ");
       b.append("<a href=\"log\">Recent License Activity</a>");
@@ -53,7 +53,7 @@ public final class SiteUtil {
       b.append("<a href=\"weblog\">Recent Web License Request Activity</a>");
       b.append(" | ");
       b.append("<a href=\"websearch\">Web License Request Search</a>");
-      b.append(" )");
+      b.append(" )</p><hr>");
       result = b.toString();
     }
     return result;
