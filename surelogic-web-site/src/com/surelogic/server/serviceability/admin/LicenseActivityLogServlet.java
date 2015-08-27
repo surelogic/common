@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.surelogic.Nullable;
+import com.surelogic.common.Pair;
 import com.surelogic.common.jdbc.Query;
 import com.surelogic.common.jdbc.Result;
 import com.surelogic.common.jdbc.ResultHandler;
@@ -23,6 +24,7 @@ public class LicenseActivityLogServlet extends HttpServlet {
 
   private static final long serialVersionUID = 1584106224306833877L;
   private static final String TIME = "t";
+  private static final String SKIP_COUNT = "skip";
 
   @Override
   protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
@@ -35,20 +37,23 @@ public class LicenseActivityLogServlet extends HttpServlet {
   }
 
   private void handle(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-    ServicesDBConnection.getInstance().withReadOnly(new LogQuery(resp.getWriter(), req.getParameter(TIME)));
+    ServicesDBConnection.getInstance()
+        .withReadOnly(new LogQuery(resp.getWriter(), req.getParameter(TIME), req.getParameter(SKIP_COUNT)));
   }
 
   static class LogQuery extends HTMLQuery {
 
     final long time;
+    long skipThisTime;
 
-    public LogQuery(final PrintWriter writer, @Nullable final String time) {
+    public LogQuery(final PrintWriter writer, @Nullable final String time, @Nullable final String skipCount) {
       super(writer);
       if (time == null) {
         this.time = System.currentTimeMillis();
       } else {
         this.time = Long.parseLong(time);
       }
+      this.skipThisTime = skipCount == null ? 0 : Long.parseLong(skipCount);
     }
 
     @Override
@@ -57,27 +62,35 @@ public class LicenseActivityLogServlet extends HttpServlet {
       tableBegin();
       tableRow(DATE.th("Date"), STRING.th("IP"), STRING.th("License"), STRING.th("Event"), STRING.th("Holder"), STRING.th("Email"),
           STRING.th("Company"));
-      long latest = q.prepared("WebServices.selectNetChecksBefore", new ResultHandler<Long>() {
+      final Pair<Long, Long> result = q.prepared("WebServices.selectNetChecksBefore", new ResultHandler<Pair<Long, Long>>() {
         @Override
-        public Long handle(final Result result) {
+        public Pair<Long, Long> handle(final Result result) {
           long latest = time;
+          long skipCountNextTime = 0;
           int count = 0;
           for (Row r : result) {
+            if (skipThisTime-- > 0)
+              continue;
             if (++count > ROWS) {
               break;
             }
             Timestamp t = r.nextTimestamp();
-            latest = t.getTime();
-            System.out.println("LATEST IN QUERY IS " + latest);
+            final long tTime = t.getTime();
+            if (tTime == latest)
+              skipCountNextTime++;
+            else
+              latest = tTime;
             tableRow(DATE.td(t), STRING.td(ip(r.nextString())), STRING.td(uuid(r.nextString())), STRING.td(r.nextString()),
                 STRING.td(r.nextString()), STRING.td(r.nextString()), STRING.td(r.nextString()));
           }
-          return latest;
+          return new Pair<>(latest, skipCountNextTime);
         }
       }).call(new Timestamp(time));
+      final long latest = result.first();
+      final long skipCount = result.second();
       System.out.println("LATEST TO USE IN LINK IS " + latest);
       tableRow(STRING.td(""), STRING.td(""), STRING.td(""), STRING.td(""), STRING.td(""), STRING.td(""),
-          STRING.td("<a href=\"log?%s=%d\">Next</a>", TIME, latest));
+          STRING.td("<a href=\"log?%s=%d&%s=%d\">Next</a>", TIME, latest, SKIP_COUNT, skipCount));
       tableEnd();
       finish();
     }
