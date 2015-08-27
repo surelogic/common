@@ -78,7 +78,7 @@ public abstract class HTMLQuery extends NullDBQuery {
 
   void style() {
     writer.println("<style>");
-    writer.println(" body {  background-color: #003399; color: #FFFFFF; }");
+    writer.println(" body {  background-color: #000066; color: #FFFFFF; }");
     writer.println(" table {  border-collapse: collapse; }");
     writer.println(" td, th { border: thin solid grey; font: 12px arial, sans-serif; }");
     writer.println(" th { color: #FFFF00; }");
