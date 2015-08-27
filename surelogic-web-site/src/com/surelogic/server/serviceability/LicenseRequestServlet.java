@@ -322,8 +322,9 @@ public class LicenseRequestServlet extends HttpServlet {
         try {
           result = conn.withTransaction(new Install(sl, now, ip, clientMacAddresses));
         } catch (TransactionException e) {
-
-          result = fail(I18N.msg("web.check.response.failure.serverError", SLUtility.toString(e)));
+          final String out = I18N.msg("web.check.response.failure.serverError", SLUtility.toString(e));
+          result = fail(out);
+          SLLogger.getLogger().log(Level.SEVERE, "Failure during net check license install", e);
         }
         resp.getWriter().println(result);
       }
@@ -375,7 +376,14 @@ public class LicenseRequestServlet extends HttpServlet {
       final List<PossiblyActivatedSLLicense> licenses = SLLicensePersistence.readPossiblyActivatedLicensesFromString(licStr);
       final ServicesDBConnection conn = ServicesDBConnection.getInstance();
       for (final PossiblyActivatedSLLicense sl : licenses) {
-        final String result = conn.withTransaction(new Remove(sl, now, ip));
+        String result;
+        try {
+          result = conn.withTransaction(new Remove(sl, now, ip));
+        } catch (TransactionException e) {
+          final String out = I18N.msg("web.check.response.failure.serverError", SLUtility.toString(e));
+          result = fail(out);
+          SLLogger.getLogger().log(Level.SEVERE, "Failure during net check license removal", e);
+        }
         resp.getWriter().println(result);
       }
     } else
