@@ -41,7 +41,7 @@ public final class SiteUtil {
     String result = bar.get();
     if (result == null) {
       final StringBuilder b = new StringBuilder();
-      b.append("<hr><p>( ");
+      b.append("<hr><p align=\"center\">( ");
       b.append("<a href=\"home\">License Overview</a>");
       b.append(" | ");
       b.append("<a href=\"log\">Recent License Activity</a>");
