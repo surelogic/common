@@ -48,11 +48,11 @@ public final class SLUtility {
   public static final boolean is64bit = SystemUtils.OS_ARCH.indexOf("64") >= 0;
 
   /**
-   * This defines the url to get to the serviceability servlets on the website.
-   * Normally the default is used , but for testing a system property can be set
-   * <code>-Dserviceability.url=http://test.com:8080</code>
+   * This defines the server to get to the serviceability servlets on the
+   * SureLogic website. Normally the default is used , but for testing a system
+   * property can be set <code>-Dserviceability.url=http://test.com:8080</code>
    */
-  public static final String SERVICEABILITY_URL = System.getProperty("serviceability.url", "http://surelogic.com");
+  public static final String SERVICEABILITY_SERVER = System.getProperty("serviceability.url", "http://surelogic.com");
 
   /**
    * This is a very JDT friendly constant&mdash;many Eclipse methods recognize
@@ -1316,11 +1316,10 @@ public final class SLUtility {
    *          the string to separate lines from.
    * @return a possibly empty array containing the lines within <tt>s</tt>.
    */
-  public static String[] separateLines(final String s) {
-    if (s == null) {
-      return SLUtility.EMPTY_STRING_ARRAY;
-    }
-    final List<String> result = new ArrayList<>();
+  public static ArrayList<String> separateLines(final String s) {
+    final ArrayList<String> result = new ArrayList<>();
+    if (s == null)
+      return result;
 
     final BufferedReader r = new BufferedReader(new StringReader(s));
     while (true) {
@@ -1330,12 +1329,11 @@ public final class SLUtility {
           break;
         }
         result.add(line);
-      } catch (IOException ignore) {
-        break;
+      } catch (IOException ioe) {
+        ioe.printStackTrace(System.err);
       }
-
     }
-    return result.toArray(new String[result.size()]);
+    return result;
   }
 
   /**
@@ -1612,8 +1610,7 @@ public final class SLUtility {
   }
 
   /**
-   * Decodes a Base64 encoded string to a normal string. This method uses the
-   * Apache Commons Codec library.
+   * Decodes a Base64 encoded string to a normal string.
    * 
    * @param s
    *          the encoded string.
@@ -1624,8 +1621,7 @@ public final class SLUtility {
   }
 
   /**
-   * Encodes a normal string to a Base64 encoded string. This method uses the
-   * Apache Commons Codec library.
+   * Encodes a normal string to a Base64 encoded string.
    * 
    * @param s
    *          the normal string.
@@ -1633,6 +1629,21 @@ public final class SLUtility {
    */
   public static String encodeBase64(String s) {
     return BaseEncoding.base64().encode(s.getBytes(Charsets.UTF_8));
+  }
+
+  /**
+   * Obtains the output of <tt>t.printStackTrace()</tt> as a string. Useful for
+   * logging and other purposes.
+   * 
+   * @param t
+   *          an exception.
+   * @return the output of <tt>t.printStackTrace()</tt>.
+   */
+  public static String toString(Throwable t) {
+    final StringWriter sw = new StringWriter();
+    final PrintWriter pw = new PrintWriter(sw);
+    t.printStackTrace(pw);
+    return sw.toString();
   }
 
   private SLUtility() {

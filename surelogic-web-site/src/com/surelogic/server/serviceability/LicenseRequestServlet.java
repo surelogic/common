@@ -8,7 +8,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -22,6 +21,7 @@ import com.surelogic.Nullable;
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.jdbc.DBQuery;
+import com.surelogic.common.jdbc.Nulls;
 import com.surelogic.common.jdbc.Query;
 import com.surelogic.common.jdbc.Result;
 import com.surelogic.common.jdbc.ResultHandler;
@@ -40,23 +40,8 @@ import com.surelogic.server.SiteUtil;
 import com.surelogic.server.jdbc.ServicesDBConnection;
 
 public class LicenseRequestServlet extends HttpServlet {
+
   private static final long serialVersionUID = 6357187305188901382L;
-
-  static final Logger LOG = SLLogger.getLoggerFor(LicenseRequestServlet.class);
-
-  private static final String PARAM_LIC = "common.serviceability.licenserequest.license";
-  private static final String PARAM_MAC = "common.serviceability.licenserequest.macAddresses";
-
-  private static final String ACK = "common.serviceability.licenserequest.resp.failure.success";
-  private static final String LOGEMAIL = "common.serviceability.licenserequest.logEmail";
-  private static final String REQ = "common.serviceability.licenserequest.req";
-  private static final String ACTREW = "common.serviceability.licenserequest.req.actrew";
-  private static final String REMOVE = "common.serviceability.licenserequest.req.remove";
-  private static final String BLACKLISTED = "common.serviceability.licenserequest.resp.failure.blacklisted";
-  private static final String EXPIRED = "common.serviceability.licenserequest.resp.failure.expired";
-  private static final String INSTALLLIMIT = "common.serviceability.licenserequest.resp.failure.installLimit";
-  private static final String SERVERERROR = "common.serviceability.licenserequest.resp.failure.serverError";
-  private static final String LICENSEURL = "common.serviceability.licenseadmin.url";
 
   enum NetCheckEvent {
     INSTALL_SUCCESS("Successful install", "INSTALL_COUNT"), RENEW_SUCCESS("Successful renewal",
@@ -86,11 +71,11 @@ public class LicenseRequestServlet extends HttpServlet {
     handleRequest(req, resp);
   }
 
-  void handleRequest(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
-    final String typeStr = req.getParameter(I18N.msg(REQ));
-    if (I18N.msg(ACTREW).equals(typeStr)) {
+  private void handleRequest(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
+    final String typeStr = req.getParameter(I18N.msg("web.check.param.req"));
+    if (I18N.msg("web.check.param.req.value.actrew").equals(typeStr)) {
       install(req, resp);
-    } else if (I18N.msg(REMOVE).equals(typeStr)) {
+    } else if (I18N.msg("web.check.param.req.value.remove").equals(typeStr)) {
       remove(req, resp);
     } else {
       resp.getWriter().println(String.format("Unrecognized Request: %s", typeStr));
@@ -153,7 +138,6 @@ public class LicenseRequestServlet extends HttpServlet {
     boolean isInstallAvailable() {
       return installs - removals < maxInstalls;
     }
-
   }
 
   /**
@@ -177,6 +161,8 @@ public class LicenseRequestServlet extends HttpServlet {
           // We don't care about anything but max active here
           r.nextString();
           r.nextString();
+          r.nextString();
+          r.nextString();
           r.nextInt();
           r.nextDate();
           r.nextString();
@@ -188,9 +174,13 @@ public class LicenseRequestServlet extends HttpServlet {
     if (maxInstalls == null) {
       // No license yet
       q.prepared("WebServices.insertCheckCount").call(uuid);
-      q.prepared("WebServices.insertLicenseInfo").call(uuid, license.getProduct().toString(), license.getHolder(),
-          license.getDurationInDays(), new Timestamp(license.getInstallBeforeDate().getTime()), license.getType().toString(),
-          license.getMaxActive());
+      @Nullable
+      final Date installBeforeDate = license.getInstallBeforeDate();
+      final Object installBeforeDateDb = installBeforeDate == null ? Nulls.DATE : new Timestamp(installBeforeDate.getTime());
+      final Object emailDb = license.getEmail() == null ? Nulls.STRING : license.getEmail();
+      final Object companyDb = license.getCompany() == null ? Nulls.STRING : license.getCompany();
+      q.prepared("WebServices.insertLicenseInfo").call(uuid, license.getProduct().toString(), license.getHolder(), emailDb,
+          companyDb, license.getDurationInDays(), installBeforeDateDb, license.getType().toString(), license.getMaxActive());
       maxInstalls = license.getMaxActive();
       return new LicenseInfo(maxInstalls, 0, 0, 0, 0, 0);
     }
@@ -208,7 +198,7 @@ public class LicenseRequestServlet extends HttpServlet {
           return new LicenseInfo(max, installCount, renewCount, removeCount, blacklistcount, tooManyCount);
         }
         // No row was found
-        LOG.log(Level.SEVERE, String.format("The server did not find a row in LICENSE_NETCHECK_COUNTS for %s.", uuid));
+        SLLogger.getLogger().log(Level.SEVERE, I18N.err(354, uuid));
         throw new IllegalStateException();
       }
     }).call(uuid);
@@ -232,8 +222,8 @@ public class LicenseRequestServlet extends HttpServlet {
     final String uuid = license.getUuid().toString();
     q.prepared("WebServices.logNetCheck").call(time, ip, uuid.toString(), event.value);
     q.statement("WebServices.updateCheckCount").call(event.getColumn(), uuid.toString());
-    Email.adminEmail(event.toString(), I18N.msg(LOGEMAIL, license.getHolder(), license.getProduct().toString(), time.toString(), ip,
-        uuid, I18N.msg(LICENSEURL, SLUtility.SERVICEABILITY_URL, uuid), event.toString()));
+    Email.sendSupportEmail(event.toString(), I18N.msg("web.check.logEmail", license.getHolder(), license.getProduct().toString(),
+        time.toString(), ip, uuid, I18N.msg("web.admin.license.url", SLUtility.SERVICEABILITY_SERVER, uuid), event.toString()));
   }
 
   /**
@@ -274,13 +264,14 @@ public class LicenseRequestServlet extends HttpServlet {
       if (checkBlacklist(q, signedLicense)) {
         // This license has been blacklisted
         logCheck(q, now, ip, license, NetCheckEvent.INSTALL_BLACKLISTED);
-        return fail(I18N.msg(BLACKLISTED, license.getProduct(), uuid));
+        return fail(I18N.msg("web.check.response.failure.blacklisted", license.getProduct(), uuid));
       }
-      if ((license.getType() == SLLicenseType.SUPPORT || license.getType() == SLLicenseType.USE) && sl.isPastInstallBeforeDate()) {
-        return fail(I18N.msg(EXPIRED, license.getProduct(), uuid, SLUtility.toStringHumanDay(license.getInstallBeforeDate())));
+      if (sl.isPastInstallBeforeDate()) {
+        return fail(I18N.msg("web.check.response.failure.expired", license.getProduct(), uuid,
+            SLUtility.toStringHumanDay(license.getInstallBeforeDate())));
       }
       final SLLicenseNetCheck check = new SLLicenseNetCheck(uuid, calculateNetcheckDate(license), clientMacAddresses);
-      LicenseInfo info = getAndInitInfo(q, license);
+      final LicenseInfo info = getAndInitInfo(q, license);
       if (license.getType() == SLLicenseType.PERPETUAL && sl.isActivated()) {
         // This is a renewal
         if (info.getInstalls() == 0) {
@@ -296,7 +287,7 @@ public class LicenseRequestServlet extends HttpServlet {
           logCheck(q, now, ip, license, NetCheckEvent.INSTALL_SUCCESS);
         } else {
           logCheck(q, now, ip, license, NetCheckEvent.INSTALL_LIMIT_EXCEEDED);
-          return fail(I18N.msg(INSTALLLIMIT, license.getProduct(), uuid, license.getMaxActive()));
+          return fail(I18N.msg("web.check.response.failure.installLimit", license.getProduct(), uuid, license.getMaxActive()));
         }
       }
       return performNetCheck(check);
@@ -311,9 +302,9 @@ public class LicenseRequestServlet extends HttpServlet {
 
   void install(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
     @Nullable
-    final String licStr = req.getParameter(I18N.msg(PARAM_LIC));
+    final String licStr = req.getParameter(I18N.msg("web.check.param.license"));
     @Nullable
-    final String macAddressesParam = req.getParameter(I18N.msg(PARAM_MAC));
+    final String macAddressesParam = req.getParameter(I18N.msg("web.check.param.macAddresses"));
     final ImmutableSet<String> clientMacAddresses;
     if (macAddressesParam != null) {
       clientMacAddresses = ImmutableSet.copyOf(Splitter.on(',').trimResults().omitEmptyStrings().split(macAddressesParam));
@@ -331,13 +322,14 @@ public class LicenseRequestServlet extends HttpServlet {
         try {
           result = conn.withTransaction(new Install(sl, now, ip, clientMacAddresses));
         } catch (TransactionException e) {
-          result = fail(I18N.msg(SERVERERROR));
+          final String out = I18N.msg("web.check.response.failure.serverError", SLUtility.toString(e));
+          result = fail(out);
+          SLLogger.getLogger().log(Level.SEVERE, "Failure during net check license install", e);
         }
         resp.getWriter().println(result);
       }
-    } else {
-      LOG.info("No license token provided to an install request");
-    }
+    } else
+      SLLogger.getLogger().info(I18N.err(353, "install/renew", req.getRequestURI()));
   }
 
   /**
@@ -345,13 +337,12 @@ public class LicenseRequestServlet extends HttpServlet {
    * database.
    */
   static class Remove implements DBQuery<String> {
-
     @NonNull
-    private final String ip;
+    final String ip;
     @NonNull
-    private final Timestamp now;
+    final Timestamp now;
     @NonNull
-    private final PossiblyActivatedSLLicense sl;
+    final PossiblyActivatedSLLicense sl;
 
     public Remove(@NonNull PossiblyActivatedSLLicense sl, @NonNull Timestamp now, @NonNull String ip) {
       this.sl = sl;
@@ -362,13 +353,13 @@ public class LicenseRequestServlet extends HttpServlet {
     @Override
     public String perform(final Query q) {
       logCheck(q, now, ip, sl.getSignedSLLicense().getLicense(), NetCheckEvent.REMOVAL_SUCCESS);
-      return I18N.msg(ACK);
+      return I18N.msg("web.check.response.success");
     }
 
   }
 
   static String fail(final String reason) {
-    return I18N.msg("common.serviceability.licenserequest.resp.failure.prefix") + ' ' + reason;
+    return I18N.msg("web.check.response.failure.prefix") + ' ' + reason;
   }
 
   static Date calculateNetcheckDate(final SLLicense license) {
@@ -377,19 +368,25 @@ public class LicenseRequestServlet extends HttpServlet {
     return calendar.getTime();
   }
 
-  void remove(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-    final String licStr = req.getParameter(I18N.msg("common.serviceability.licenserequest.license"));
+  static void remove(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+    final String licStr = req.getParameter(I18N.msg("web.check.param.license"));
     final Timestamp now = new Timestamp(System.currentTimeMillis());
     final String ip = req.getRemoteAddr();
     if (licStr != null) {
       final List<PossiblyActivatedSLLicense> licenses = SLLicensePersistence.readPossiblyActivatedLicensesFromString(licStr);
       final ServicesDBConnection conn = ServicesDBConnection.getInstance();
       for (final PossiblyActivatedSLLicense sl : licenses) {
-        final String result = conn.withTransaction(new Remove(sl, now, ip));
+        String result;
+        try {
+          result = conn.withTransaction(new Remove(sl, now, ip));
+        } catch (TransactionException e) {
+          final String out = I18N.msg("web.check.response.failure.serverError", SLUtility.toString(e));
+          result = fail(out);
+          SLLogger.getLogger().log(Level.SEVERE, "Failure during net check license removal", e);
+        }
         resp.getWriter().println(result);
       }
-    } else {
-      LOG.info("No license token provided to an install request");
-    }
+    } else
+      SLLogger.getLogger().info(I18N.err(353, "remove", req.getRequestURI()));
   }
 }

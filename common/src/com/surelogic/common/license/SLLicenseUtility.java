@@ -254,26 +254,26 @@ public final class SLLicenseUtility {
      */
     final String l = SLLicensePersistence.toSignedHexString(licenses, true);
     final Map<String, String> param = new HashMap<>();
-    param.put(I18N.msg("common.serviceability.licenserequest.req"), I18N.msg("common.serviceability.licenserequest.req.actrew"));
-    param.put(I18N.msg("common.serviceability.licenserequest.license"), l);
-    param.put(I18N.msg("common.serviceability.licenserequest.macAddresses"), Joiner.on(',').skipNulls().join(macAddresses));
-    final URL url = new URL(I18N.msg("common.serviceability.licenserequest.url", SLUtility.SERVICEABILITY_URL));
+    param.put(I18N.msg("web.check.param.req"), I18N.msg("web.check.param.req.value.actrew"));
+    param.put(I18N.msg("web.check.param.license"), l);
+    param.put(I18N.msg("web.check.param.macAddresses"), Joiner.on(',').skipNulls().join(macAddresses));
+    final URL url = new URL(I18N.msg("web.licenserequest.url", SLUtility.SERVICEABILITY_SERVER));
     final String response = SLUtility.sendPostToUrl(url, param);
     final List<SignedSLLicenseNetCheck> licenseNetChecks = SLLicensePersistence.readLicenseNetChecksFromString(response);
-    final String[] rLines = SLUtility.separateLines(response);
+    final ArrayList<String> rLines = SLUtility.separateLines(response);
 
     SLLicenseManager.getInstance().activateOrRenew(licenseNetChecks);
 
     boolean problemReportedByServer = false;
     final StringBuilder b = new StringBuilder();
     for (final String line : rLines) {
-      if (line.startsWith(I18N.msg("common.serviceability.licenserequest.resp.failure.prefix"))) {
-        if (problemReportedByServer) {
-          b.append('\n').append(line);
-        } else {
-          problemReportedByServer = true;
-          b.append(I18N.err(208)).append('\n').append(line);
-        }
+      if (line.startsWith(I18N.msg("web.check.response.failure.prefix"))) {
+        problemReportedByServer = true;
+        b.append(I18N.err(208));
+      }
+      // add in all lines after we note the problem
+      if (problemReportedByServer) {
+        b.append('\n').append(line);
       }
     }
     if (problemReportedByServer) {
@@ -325,9 +325,9 @@ public final class SLLicenseUtility {
      */
     final String l = SLLicensePersistence.toSignedHexString(notifyList, true);
     final Map<String, String> param = new HashMap<>();
-    param.put(I18N.msg("common.serviceability.licenserequest.req"), I18N.msg("common.serviceability.licenserequest.req.remove"));
-    param.put(I18N.msg("common.serviceability.licenserequest.license"), l);
-    final URL url = new URL(I18N.msg("common.serviceability.licenserequest.url", SLUtility.SERVICEABILITY_URL));
+    param.put(I18N.msg("web.check.param.req"), I18N.msg("web.check.param.req.value.remove"));
+    param.put(I18N.msg("web.check.param.license"), l);
+    final URL url = new URL(I18N.msg("web.licenserequest.url", SLUtility.SERVICEABILITY_SERVER));
     SLUtility.sendPostToUrl(url, param);
   }
 

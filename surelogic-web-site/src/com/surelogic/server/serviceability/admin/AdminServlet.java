@@ -1,8 +1,8 @@
-package com.surelogic.server.serviceability;
+package com.surelogic.server.serviceability.admin;
 
-import static com.surelogic.server.serviceability.HTMLQuery.HeaderType.DATE;
-import static com.surelogic.server.serviceability.HTMLQuery.HeaderType.NUMBER;
-import static com.surelogic.server.serviceability.HTMLQuery.HeaderType.STRING;
+import static com.surelogic.server.serviceability.admin.HTMLQuery.HeaderType.DATE;
+import static com.surelogic.server.serviceability.admin.HTMLQuery.HeaderType.NUMBER;
+import static com.surelogic.server.serviceability.admin.HTMLQuery.HeaderType.STRING;
 
 import java.io.IOException;
 import java.util.Date;
@@ -46,11 +46,12 @@ public class AdminServlet extends HttpServlet {
     public void doPerform(final Query q) {
       prequel("License Overview");
       writer.println("<h3><a href=\"log\">To Recent License Activity</a></h3>");
-      writer.println("<h3><a href=\"search\">To Blacklist</a></h3>");
+      writer.println("<h3><a href=\"blacklist\">To Blacklist</a></h3>");
       writer.println("<h3><a href=\"search\">To License Search</a></h3>");
       tableBegin();
-      tableRow(DATE.th("Latest Activity"), STRING.th("License"), STRING.th("Holder"), STRING.th("Product"), NUMBER.th("Installs"),
-          NUMBER.th("Renewals"), NUMBER.th("Removals"), NUMBER.th("Blacklists"), NUMBER.th("Too Many Installs"));
+      tableRow(DATE.th("Latest Activity"), STRING.th("License"), STRING.th("Holder"), STRING.th("Email"), STRING.th("Company"),
+          STRING.th("Product"), NUMBER.th("Installs"), NUMBER.th("Renewals"), NUMBER.th("Removals"), NUMBER.th("Blacklists"),
+          NUMBER.th("Too Many Installs"));
       q.prepared("WebServices.licenseSummary", new NullRowHandler() {
         @Override
         protected void doHandle(final Row r) {
@@ -58,19 +59,20 @@ public class AdminServlet extends HttpServlet {
           String uuid = r.nextString();
           SLLicenseProduct p = SLLicenseProduct.fromString(r.nextString());
           String holder = r.nextString();
+          String email = r.nextString();
+          String company = r.nextString();
           String installs = r.nextString();
           String renewals = r.nextString();
           String removals = r.nextString();
           String blacklisted = r.nextString();
           String tooMany = r.nextString();
-          tableRow(DATE.td(latest), STRING.td(uuid(uuid)), STRING.td(holder), STRING.td(p.toString()), NUMBER.td(installs),
-              NUMBER.td(renewals), NUMBER.td(removals), NUMBER.td(blacklisted), NUMBER.td(tooMany));
+          tableRow(DATE.td(latest), STRING.td(uuid(uuid)), STRING.td(holder), STRING.td(email), STRING.td(company),
+              STRING.td(p.toString()), NUMBER.td(installs), NUMBER.td(renewals), NUMBER.td(removals), NUMBER.td(blacklisted),
+              NUMBER.td(tooMany));
         }
       }).call();
       tableEnd();
       finish();
     }
-
   }
-
 }

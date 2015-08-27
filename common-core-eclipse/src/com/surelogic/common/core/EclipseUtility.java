@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -368,8 +369,11 @@ public class EclipseUtility {
    */
   public static File getInstallationDirectoryOf(final String pluginId) {
     try {
-      URL commonPathURL = getInstallationURLOf(pluginId);
-      File result = new File(commonPathURL.toURI());
+      final Bundle bundle = Platform.getBundle(pluginId);
+      if (bundle == null) {
+    	throw new IllegalArgumentException(I18N.err(343, pluginId));
+      }
+      File result = FileLocator.getBundleFile(bundle);
       return result;
     } catch (Exception e) {
       throw new IllegalArgumentException(I18N.err(344, pluginId), e);
@@ -389,16 +393,12 @@ public class EclipseUtility {
    *           identifier, or there is some problem determining the URL.
    */
   public static URL getInstallationURLOf(final String pluginId) {
-    final Bundle bundle = Platform.getBundle(pluginId);
-    if (bundle == null) {
-      throw new IllegalArgumentException(I18N.err(343, pluginId));
-    }
-    try {
-      URL result = FileLocator.resolve(bundle.getEntry("/"));
-      return result;
-    } catch (Exception e) {
-      throw new IllegalArgumentException(I18N.err(344, pluginId), e);
-    }
+	  final File f = getInstallationDirectoryOf(pluginId);
+	  try {
+		return f.toURI().toURL();
+	  } catch (MalformedURLException e) {
+		throw new IllegalArgumentException(I18N.err(344, pluginId), e);
+	  }
   }
 
   /**

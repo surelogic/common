@@ -24,23 +24,23 @@
 	<target name="publish-apache">
 		<echo>apache2 should be shutdown before this publish...</echo>
 		<echo>(pausing just a second so you can ^C if Apache is running)</echo>
-		<sleep seconds="4" />
+		<sleep seconds="2" />
 		<delete quiet="true" dir="${publish.apache.site}" />
 		<copy todir="${publish.apache.site}">
 			<fileset dir="${www}" />
 		</copy>
 		<echo>Publish completed...apache2 may now be restarted...</echo>
 	</target>
-		
+
 	<target name="publish-jetty">
-			<echo>jetty-surelogic should be shutdown before this publish...</echo>
-			<echo>(pausing just a second so you can ^C if Jetty is running)</echo>
-			<sleep seconds="4" />
+		<echo>jetty-surelogic should be shutdown before this publish...</echo>
+		<echo>(pausing just a second so you can ^C if Jetty is running)</echo>
+		<sleep seconds="2" />
 		<delete quiet="true" dir="${publish.jetty.base}" />
 		<copy todir="${publish.jetty.base}">
 			<fileset dir="${jetty.base}" />
 		</copy>
-		<mkdir dir="${publish.jetty.base}/logs"/>
+		<mkdir dir="${publish.jetty.base}/logs" />
 		<copy file="${root.war}" todir="${publish.jetty.base}/webapps" />
 		<copy file="${key.jar}" todir="${publish.jetty.base}/lib/ext" />
 		<echo>Publish completed...jetty-surelogic may now be restarted...</echo>
@@ -58,7 +58,7 @@
 				<include name="*.jar" />
 			</fileset>
 		</path>
-		<javac srcdir="${common}/src" destdir="${build.bin}" classpathref="common.class.path" source="1.8" target="1.8" includeAntRuntime="false" />
+		<javac srcdir="${common}/src" destdir="${build.bin}" classpathref="common.class.path" debug="true" source="1.8" target="1.8" includeAntRuntime="false" />
 		<copy todir="${build.bin}">
 			<fileset dir="${common}/src">
 				<exclude name="**/*.java" />
@@ -93,4 +93,7 @@
 			</lib>
 		</war>
 	</target>
+
+	<!-- convenience to make website work simpler -->
+	<target name="j" depends="build-root-war, publish-jetty" />
 </project>

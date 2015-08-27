@@ -1,4 +1,4 @@
-package com.surelogic.server.serviceability;
+package com.surelogic.server.serviceability.admin;
 
 import java.io.PrintWriter;
 import java.net.InetAddress;
@@ -38,11 +38,13 @@ public abstract class HTMLQuery extends NullDBQuery {
     }
 
     String td(final Date date) {
-      return String.format("<td style=\"text-align: %s\">%s</td>", align, format.get().format(date));
+      final String value = date == null ? "&nbsp;" : format.get().format(date);
+      return String.format("<td style=\"text-align: %s\">%s</td>", align, value);
     }
 
     String td(final String column, final Object... args) {
-      return String.format("<td style=\"text-align: %s\">%s</td>", align, String.format(column, args));
+      final String value = column == null ? "&nbsp;" : String.format(column, args);
+      return String.format("<td style=\"text-align: %s\">%s</td>", align, value);
     }
   }
 
@@ -64,11 +66,9 @@ public abstract class HTMLQuery extends NullDBQuery {
   }
 
   void prequel(final String title) {
-    writer
-        .println(String
-            .format(
-                "<html><head><title>%1$s</title><style>table {  border-collapse: collapse; } td, th { border: thin solid grey;}</style></head><body><h1 align=\"center\">%1$s</h1>",
-                title));
+    writer.println(String.format(
+        "<html><head><title>%1$s</title><style>table {  border-collapse: collapse; } td, th { border: thin solid grey;}</style></head><body><h1 align=\"center\">%1$s</h1>",
+        title));
   }
 
   String uuid(final String license) {
