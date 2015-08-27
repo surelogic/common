@@ -16,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.jdbc.DBQuery;
+import com.surelogic.common.jdbc.Nulls;
 import com.surelogic.common.jdbc.Query;
 import com.surelogic.common.jdbc.Row;
 import com.surelogic.common.jdbc.RowHandler;
@@ -104,15 +105,15 @@ public class LicenseCreateServlet extends HttpServlet {
      * We need to transfer the information into final variables so that they can
      * be referenced in the database query below.
      */
-    final String holder = name + " (" + email + ") " + (companyEntered ? company + " " : "") + licenseType + " License";
+    final String holder = name + " [" + licenseType + " License]";
     final String emailForDb = email;
     final String nameForDb = name;
-    final String companyForDb = companyEntered ? company : "Personal Copy";
+    final Object companyForDb = companyEntered ? company : Nulls.STRING;
     final int durationInDays = communityLicense ? DURATION_COMMUNITY : DURATION_TRIAL;
     final SLLicenseType type = communityLicense ? SLLicenseType.PERPETUAL : SLLicenseType.USE;
     final int installationLimit = communityLicense ? INSTALLATION_LIMIT_COMMUNITY : INSTALLATION_LIMIT_TRIAL;
 
-    final SLLicense license = new SLLicense(nameForDb, emailForDb, companyEntered ? company : null, SLLicenseProduct.ALL_TOOLS,
+    final SLLicense license = new SLLicense(holder, emailForDb, companyEntered ? company : null, SLLicenseProduct.ALL_TOOLS,
         durationInDays, null, type, installationLimit, true);
     final SignedSLLicense sLicense = SignedSLLicense.getInstance(license, SiteUtil.getKey());
     final String licenseHexString = SLUtility.wrap(sLicense.getSignedHexString(), 58);
