@@ -68,12 +68,14 @@ public class LicenseActivityLogServlet extends HttpServlet {
             }
             Timestamp t = r.nextTimestamp();
             latest = t.getTime();
+            System.out.println("LATEST IN QUERY IS " + latest);
             tableRow(DATE.td(t), STRING.td(ip(r.nextString())), STRING.td(uuid(r.nextString())), STRING.td(r.nextString()),
                 STRING.td(r.nextString()), STRING.td(r.nextString()), STRING.td(r.nextString()));
           }
           return latest;
         }
       }).call(new Timestamp(time));
+      System.out.println("LATEST TO USE IN LINK IS " + latest);
       tableRow(STRING.td(""), STRING.td(""), STRING.td(""), STRING.td(""), STRING.td(""), STRING.td(""),
           STRING.td("<a href=\"log?%s=%d\">Next</a>", TIME, latest));
       tableEnd();
