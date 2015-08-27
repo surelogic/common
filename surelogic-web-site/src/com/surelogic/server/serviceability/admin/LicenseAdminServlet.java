@@ -116,14 +116,14 @@ public class LicenseAdminServlet extends HttpServlet {
       writer.println("\" />");
       writer.println("<h3>Description</h3>");
       tableBegin();
-      tableRow(STRING.th("Product"), STRING.th("Holder"), NUMBER.th("Duration"), DATE.th("Install Before"), STRING.th("Type"),
-          NUMBER.th("Max Active"), STRING.th("Blacklist"));
+      tableRow(STRING.th("Product"), STRING.th("Holder"), STRING.th("Email"), STRING.th("Company"), NUMBER.th("Duration"),
+          DATE.th("Install Before"), STRING.th("Type"), NUMBER.th("Max Active"), STRING.th("Blacklist"));
       q.prepared("WebServices.selectLicenseInfoById", new NullRowHandler() {
 
         @Override
         protected void doHandle(final Row r) {
-          tableRow(STRING.td(r.nextString()), STRING.td(r.nextString()), NUMBER.td(r.nextString()), DATE.td(r.nextTimestamp()),
-              STRING.td(r.nextString()),
+          tableRow(STRING.td(r.nextString()), STRING.td(r.nextString()), STRING.td(r.nextString()), STRING.td(r.nextString()),
+              NUMBER.td(r.nextString()), DATE.td(r.nextTimestamp()), STRING.td(r.nextString()),
               NUMBER.td(String.format(
                   "<input style=\"text-align: right\" type=\"text\" name=\"installs\" value=\"%d\" /><input type=\"submit\" value=\"Change\" />",
                   r.nextInt())),

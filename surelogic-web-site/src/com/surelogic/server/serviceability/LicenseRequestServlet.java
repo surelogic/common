@@ -21,6 +21,7 @@ import com.surelogic.Nullable;
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.jdbc.DBQuery;
+import com.surelogic.common.jdbc.Nulls;
 import com.surelogic.common.jdbc.Query;
 import com.surelogic.common.jdbc.Result;
 import com.surelogic.common.jdbc.ResultHandler;
@@ -160,6 +161,8 @@ public class LicenseRequestServlet extends HttpServlet {
           // We don't care about anything but max active here
           r.nextString();
           r.nextString();
+          r.nextString();
+          r.nextString();
           r.nextInt();
           r.nextDate();
           r.nextString();
@@ -173,13 +176,11 @@ public class LicenseRequestServlet extends HttpServlet {
       q.prepared("WebServices.insertCheckCount").call(uuid);
       @Nullable
       final Date installBeforeDate = license.getInstallBeforeDate();
-      if (installBeforeDate != null)
-        q.prepared("WebServices.insertLicenseInfo").call(uuid, license.getProduct().toString(), license.getHolder(),
-            license.getDurationInDays(), new Timestamp(installBeforeDate.getTime()), license.getType().toString(),
-            license.getMaxActive());
-      else
-        q.prepared("WebServices.insertLicenseInfoNoInstallDeadline").call(uuid, license.getProduct().toString(),
-            license.getHolder(), license.getDurationInDays(), license.getType().toString(), license.getMaxActive());
+      final Object installBeforeDateDb = installBeforeDate == null ? Nulls.DATE : new Timestamp(installBeforeDate.getTime());
+      final Object emailDb = license.getEmail() == null ? Nulls.STRING : license.getEmail();
+      final Object companyDb = license.getCompany() == null ? Nulls.STRING : license.getCompany();
+      q.prepared("WebServices.insertLicenseInfo").call(uuid, license.getProduct().toString(), license.getHolder(), emailDb,
+          companyDb, license.getDurationInDays(), installBeforeDateDb, license.getType().toString(), license.getMaxActive());
       maxInstalls = license.getMaxActive();
       return new LicenseInfo(maxInstalls, 0, 0, 0, 0, 0);
     }
