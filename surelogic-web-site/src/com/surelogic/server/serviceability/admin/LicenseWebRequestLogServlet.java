@@ -75,7 +75,7 @@ public class LicenseWebRequestLogServlet extends HttpServlet {
         }
       }).call(new Timestamp(time));
       tableRow(STRING.td(""), STRING.td(""), STRING.td(""), STRING.td(""), STRING.td(""),
-          STRING.td("<a href=\"log?%s=%d\">Next</a>", TIME, latest));
+          STRING.td("<a href=\"weblog?%s=%d\">Next</a>", TIME, latest));
       tableEnd();
       finish();
     }
