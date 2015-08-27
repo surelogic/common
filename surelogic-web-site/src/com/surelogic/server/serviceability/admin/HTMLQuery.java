@@ -66,8 +66,9 @@ public abstract class HTMLQuery extends NullDBQuery {
   }
 
   void prequel(final String title) {
+    writer.println("<!DOCTYPE html>");
     writer.println(String.format(
-        "<html><head><title>%1$s</title><style>table {  border-collapse: collapse; } td, th { border: thin solid grey;}</style></head><body><h1 align=\"center\">%1$s</h1>",
+        "<html><head><title>%1$s</title><style>table {  border-collapse: collapse; } td, th { border: thin solid grey;} h1 { font-size: 80%; }</style></head><body><h1 align=\"center\">%1$s</h1>",
         title));
   }
 
