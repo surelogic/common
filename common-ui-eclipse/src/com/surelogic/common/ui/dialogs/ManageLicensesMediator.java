@@ -41,8 +41,8 @@ final class ManageLicensesMediator implements ILifecycle {
   private final Button f_renewButton;
   private final Button f_uninstallButton;
 
-  ManageLicensesMediator(Table licenseTable, Button installFromFileButton, Button installFromClipboardButton,
-      Button activateButton, Button renewButton, Button uninstallButton) {
+  ManageLicensesMediator(Table licenseTable, Button installFromFileButton, Button installFromClipboardButton, Button activateButton,
+      Button renewButton, Button uninstallButton) {
     f_licenseTable = licenseTable;
     f_installFromFileButton = installFromFileButton;
     f_installFromClipboardButton = installFromClipboardButton;
@@ -129,6 +129,7 @@ final class ManageLicensesMediator implements ILifecycle {
 
       item.setData(installedLicense);
     }
+    f_licenseTable.select(0);
     for (TableColumn c : f_licenseTable.getColumns())
       c.pack();
     f_licenseTable.setRedraw(true);
@@ -262,8 +263,8 @@ final class ManageLicensesMediator implements ILifecycle {
         break;
       }
     }
-    String confirmMsg = I18N.msg("common.manage.licenses.dialog.uninstall.msg", count > 1 ? count + " licenses" : "\""
-        + selection.get(0).getSignedSLLicense().getLicense().getProduct().toString() + "\" license");
+    String confirmMsg = I18N.msg("common.manage.licenses.dialog.uninstall.msg", count > 1 ? count + " licenses"
+        : "\"" + selection.get(0).getSignedSLLicense().getLicense().getProduct().toString() + "\" license");
     if (anyActivatedWithANetCheck)
       confirmMsg = confirmMsg + I18N.msg("common.manage.licenses.dialog.uninstall.netcheckwarn");
     if (!MessageDialog.openConfirm(getShell(), I18N.msg("common.manage.licenses.dialog.uninstall.title"), confirmMsg)) {
@@ -299,12 +300,9 @@ final class ManageLicensesMediator implements ILifecycle {
     final String passive = activation ? "Activation" : "Renewal";
     final String active = activation ? "Activate" : "Renew";
 
-    if (!MessageDialog.openConfirm(
-        getShell(),
-        I18N.msg("common.manage.licenses.dialog.activaterenew.title", passive),
-        I18N.msg("common.manage.licenses.dialog.activaterenew.msg", active,
-            count > 1 ? count + " licenses" : "\"" + selection.get(0).getSignedSLLicense().getLicense().getProduct().toString()
-                + "\" license"))) {
+    if (!MessageDialog.openConfirm(getShell(), I18N.msg("common.manage.licenses.dialog.activaterenew.title", passive),
+        I18N.msg("common.manage.licenses.dialog.activaterenew.msg", active, count > 1 ? count + " licenses"
+            : "\"" + selection.get(0).getSignedSLLicense().getLicense().getProduct().toString() + "\" license"))) {
       return; // bail
     }
 
