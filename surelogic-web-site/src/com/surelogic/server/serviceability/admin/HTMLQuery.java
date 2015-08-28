@@ -7,6 +7,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import com.surelogic.common.SLUtility;
 import com.surelogic.common.jdbc.NullDBQuery;
 
 public abstract class HTMLQuery extends NullDBQuery {
@@ -70,6 +71,11 @@ public abstract class HTMLQuery extends NullDBQuery {
     String td(String value, final Object... args) {
       final String s = value == null ? "&nbsp;" : String.format(value, args);
       return String.format("<td style=\"text-align: %s\">%s</td>", align, s);
+    }
+
+    String tdL(long value) {
+      final String s = value == 0 ? "" : SLUtility.toStringHumanWithCommas(value);
+      return td(s);
     }
   }
 

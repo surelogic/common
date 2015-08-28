@@ -8,13 +8,15 @@ import java.io.PrintWriter;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.LinkedList;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.surelogic.common.SLUtility;
+import com.surelogic.NonNull;
 import com.surelogic.common.jdbc.Query;
 import com.surelogic.common.jdbc.Result;
 import com.surelogic.common.jdbc.ResultHandler;
@@ -26,6 +28,13 @@ public class LicenseCountsServlet extends HttpServlet {
   private static final long serialVersionUID = -667963344728794256L;
 
   static class Counts {
+
+    Counts(@NonNull String month) {
+      this.month = month;
+    }
+
+    @NonNull
+    final String month;
     long activeLicenses; // not just web
     long totalWebLicenseRequests;
     long activatedWebLicenseRequests;
@@ -33,6 +42,22 @@ public class LicenseCountsServlet extends HttpServlet {
     long activatedWebTrialLicenseRequests;
     long totalWebCommunityLicenseRequests;
     long activatedWebCommunityLicenseRequests;
+    // calculated
+    long totalWebLicenseRequestsThisMonth;
+    long activatedWebLicenseRequestsThisMonth;
+    long totalWebTrialLicenseRequestsThisMonth;
+    long activatedWebTrialLicenseRequestsThisMonth;
+    long totalWebCommunityLicenseRequestsThisMonth;
+    long activatedWebCommunityLicenseRequestsThisMonth;
+
+    void lastMonth(@NonNull Counts p) {
+      totalWebLicenseRequestsThisMonth = totalWebLicenseRequests = p.totalWebLicenseRequests;
+      activatedWebLicenseRequestsThisMonth = activatedWebLicenseRequests - p.activatedWebLicenseRequests;
+      totalWebTrialLicenseRequestsThisMonth = totalWebTrialLicenseRequests - p.totalWebTrialLicenseRequests;
+      activatedWebTrialLicenseRequestsThisMonth = activatedWebTrialLicenseRequests - p.activatedWebTrialLicenseRequests;
+      totalWebCommunityLicenseRequestsThisMonth = totalWebCommunityLicenseRequests = p.totalWebCommunityLicenseRequests;
+      activatedWebCommunityLicenseRequestsThisMonth = activatedWebCommunityLicenseRequests - p.activatedWebCommunityLicenseRequests;
+    }
   }
 
   @Override
@@ -60,10 +85,12 @@ public class LicenseCountsServlet extends HttpServlet {
       final CountHandler handler = new CountHandler();
       prequel("License Counts");
       tableBegin();
-      tableRow(CENTER.thRowspan("Date", 3), RIGHT.thRowspan("Active", 3), CENTER.thColspan("Website Requests", 6));
-      tableRow(CENTER.thColspan("Total", 2), CENTER.thColspan("Trial", 2), CENTER.thColspan("Community", 2));
-      tableRow(RIGHT.th("Total"), RIGHT.th("Activated"), RIGHT.th("Total"), RIGHT.th("Activated"), RIGHT.th("Total"),
-          RIGHT.th("Activated"));
+      tableRow(CENTER.thRowspan("Date", 4), RIGHT.thRowspan("In Use", 4), CENTER.thColspan("Website Requests", 12));
+      tableRow(CENTER.thColspan("Trial", 4), CENTER.thColspan("Community", 4), CENTER.thColspan("Total", 4));
+      tableRow(CENTER.thColspan("This Month", 2), CENTER.thColspan("All Time", 2), CENTER.thColspan("This Month", 2),
+          CENTER.thColspan("All Time", 2), CENTER.thColspan("This Month", 2), CENTER.thColspan("All Time", 2));
+      tableRow(RIGHT.th("#"), RIGHT.th("Activated"), RIGHT.th("#"), RIGHT.th("Activated"), RIGHT.th("#"), RIGHT.th("Activated"),
+          RIGHT.th("#"), RIGHT.th("Activated"), RIGHT.th("#"), RIGHT.th("Activated"), RIGHT.th("#"), RIGHT.th("Activated"));
 
       final SimpleDateFormat sdf = new SimpleDateFormat("MMM yyyy");
       Calendar c = Calendar.getInstance();
@@ -74,9 +101,10 @@ public class LicenseCountsServlet extends HttpServlet {
       c.set(Calendar.YEAR, year);
       c.add(Calendar.MONTH, 1);
       c.add(Calendar.MILLISECOND, -1); // last instant of month
+      final LinkedList<Counts> countsList = new LinkedList<>();
       do {
         Timestamp ts = new Timestamp(c.getTimeInMillis());
-        final Counts counts = new Counts();
+        final Counts counts = new Counts(sdf.format(ts));
         counts.activeLicenses = q.prepared("WebServices.activeLicensesOn", handler).call(ts);
         counts.totalWebLicenseRequests = q.prepared("WebServices.totalWebLicenseRequestsOn", handler).call(ts);
         counts.activatedWebLicenseRequests = q.prepared("WebServices.activatedWebLicenseRequestsOn", handler).call(ts);
@@ -85,15 +113,31 @@ public class LicenseCountsServlet extends HttpServlet {
         counts.totalWebCommunityLicenseRequests = q.prepared("WebServices.totalWebCommunityLicenseRequestsOn", handler).call(ts);
         counts.activatedWebCommunityLicenseRequests = q.prepared("WebServices.activatedWebCommunityLicenseRequestsOn", handler)
             .call(ts);
-        tableRow(RIGHT.td(sdf.format(ts)), RIGHT.td(SLUtility.toStringHumanWithCommas(counts.activeLicenses)),
-            RIGHT.td(SLUtility.toStringHumanWithCommas(counts.totalWebLicenseRequests)),
-            RIGHT.td(SLUtility.toStringHumanWithCommas(counts.activatedWebLicenseRequests)),
-            RIGHT.td(SLUtility.toStringHumanWithCommas(counts.totalWebTrialLicenseRequests)),
-            RIGHT.td(SLUtility.toStringHumanWithCommas(counts.activatedWebTrialLicenseRequests)),
-            RIGHT.td(SLUtility.toStringHumanWithCommas(counts.totalWebCommunityLicenseRequests)),
-            RIGHT.td(SLUtility.toStringHumanWithCommas(counts.activatedWebCommunityLicenseRequests)));
+        countsList.addFirst(counts);
         c.add(Calendar.MONTH, -1);
       } while (c.get(Calendar.MONTH) != month);
+      // calculate this month values where we can
+      Counts prev = null;
+      for (Counts curr : countsList) {
+        if (prev != null)
+          curr.lastMonth(prev);
+        prev = curr;
+      }
+      Collections.reverse(countsList);
+      for (Counts counts : countsList) {
+        tableRow(RIGHT.td(counts.month), RIGHT.tdL(counts.activeLicenses),
+
+        RIGHT.tdL(counts.totalWebTrialLicenseRequestsThisMonth), RIGHT.tdL(counts.activatedWebTrialLicenseRequestsThisMonth),
+            RIGHT.tdL(counts.totalWebTrialLicenseRequests), RIGHT.tdL(counts.activatedWebTrialLicenseRequests),
+
+        RIGHT.tdL(counts.totalWebCommunityLicenseRequestsThisMonth),
+            RIGHT.tdL(counts.activatedWebCommunityLicenseRequestsThisMonth), RIGHT.tdL(counts.totalWebCommunityLicenseRequests),
+            RIGHT.tdL(counts.activatedWebCommunityLicenseRequests),
+
+        RIGHT.tdL(counts.totalWebLicenseRequestsThisMonth), RIGHT.tdL(counts.activatedWebLicenseRequestsThisMonth),
+            RIGHT.tdL(counts.totalWebLicenseRequests), RIGHT.tdL(counts.activatedWebLicenseRequests));
+      }
+
       tableEnd();
       finish();
     }
