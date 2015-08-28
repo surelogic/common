@@ -21,7 +21,7 @@ public abstract class HTMLQuery extends NullDBQuery {
 
   enum HeaderType {
 
-    STRING("left"), NUMBER("right"), DATE("center");
+    LEFT("left"), RIGHT("right"), CENTER("center");
 
     private static final ThreadLocal<DateFormat> format = new ThreadLocal<DateFormat>() {
       @Override

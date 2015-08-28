@@ -1,7 +1,7 @@
 package com.surelogic.server.serviceability.admin;
 
-import static com.surelogic.server.serviceability.admin.HTMLQuery.HeaderType.DATE;
-import static com.surelogic.server.serviceability.admin.HTMLQuery.HeaderType.STRING;
+import static com.surelogic.server.serviceability.admin.HTMLQuery.HeaderType.CENTER;
+import static com.surelogic.server.serviceability.admin.HTMLQuery.HeaderType.*;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -23,7 +23,6 @@ public class LicenseActivityLogServlet extends HttpServlet {
 
   private static final long serialVersionUID = 1584106224306833877L;
   private static final String TIME = "t";
-  private static final String TIME_PREV = "tp";
 
   @Override
   protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
@@ -36,29 +35,24 @@ public class LicenseActivityLogServlet extends HttpServlet {
   }
 
   private void handle(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-    ServicesDBConnection.getInstance()
-        .withReadOnly(new LogQuery(resp.getWriter(), req.getParameter(TIME), req.getParameter(TIME_PREV)));
+    ServicesDBConnection.getInstance().withReadOnly(new LogQuery(resp.getWriter(), req.getParameter(TIME)));
   }
 
   static class LogQuery extends HTMLQuery {
 
-    final boolean useTimePrevious;
-    final long timePrevious;
     final long time;
 
-    public LogQuery(final PrintWriter writer, @Nullable final String time, @Nullable final String timePrevious) {
+    public LogQuery(final PrintWriter writer, @Nullable final String time) {
       super(writer);
       this.time = time == null ? System.currentTimeMillis() : Long.parseLong(time);
-      useTimePrevious = timePrevious != null;
-      this.timePrevious = useTimePrevious ? Long.parseLong(timePrevious) : -1;
     }
 
     @Override
     public void doPerform(final Query q) {
       prequel("Recent License Activity");
       tableBegin();
-      tableRow(DATE.th("Date"), STRING.th("IP"), STRING.th("License"), STRING.th("Event"), STRING.th("Holder"), STRING.th("Email"),
-          STRING.th("Company"));
+      tableRow(CENTER.th("Date"), LEFT.th("IP"), LEFT.th("License"), LEFT.th("Event"), LEFT.th("Holder"), LEFT.th("Email"),
+          LEFT.th("Company"));
       final long latest = q.prepared("WebServices.selectNetChecksBefore", new ResultHandler<Long>() {
         @Override
         public Long handle(final Result result) {
@@ -69,7 +63,11 @@ public class LicenseActivityLogServlet extends HttpServlet {
             count++;
             Timestamp t = r.nextTimestamp();
             final long tTime = t.getTime();
-            // continue output until we see a distinct time
+            /*
+             * Continue output until we see a new distinct time. Otherwise the
+             * next page will repeat all the rows with the current "latest"
+             * time.
+             */
             if (latest != tTime) {
               latest = tTime;
               if (count > ROWS) {
@@ -77,23 +75,16 @@ public class LicenseActivityLogServlet extends HttpServlet {
                 break;
               }
             }
-            tableRow(DATE.td(t), STRING.td(ip(r.nextString())), STRING.td(uuid(r.nextString())), STRING.td(r.nextString()),
-                STRING.td(r.nextString()), STRING.td(r.nextString()), STRING.td(r.nextString()));
+            tableRow(CENTER.td(t), LEFT.td(ip(r.nextString())), LEFT.td(uuid(r.nextString())), LEFT.td(r.nextString()),
+                LEFT.td(r.nextString()), LEFT.td(r.nextString()), LEFT.td(r.nextString()));
           }
           return rowsRemaining ? latest : -1; // -1 means no rows remain
         }
       }).call(new Timestamp(time));
-      StringBuilder b = new StringBuilder();
-      if (useTimePrevious) {
-        b.append("<a href=\"log?").append(TIME).append('=').append(timePrevious).append('&').append(TIME_PREV).append('=')
-            .append(time).append("\">&lt;Prev</a>&nbsp;&nbsp;");
-      }
       if (latest != -1) {
-        b.append("<a href=\"log?").append(TIME).append('=').append(latest).append('&').append(TIME_PREV).append('=').append(time)
-            .append("\">Next&gt;</a>");
+        tableRow(LEFT.td(""), LEFT.td(""), LEFT.td(""), LEFT.td(""), LEFT.td(""), LEFT.td(""),
+            RIGHT.td("<a href=\"weblog?%s=%d\">Next&gt;</a>", TIME, latest));
       }
-      if (b.length() > 0)
-        tableRow(STRING.td(""), STRING.td(""), STRING.td(""), STRING.td(""), STRING.td(""), STRING.td(""), STRING.td(b.toString()));
       tableEnd();
       finish();
     }

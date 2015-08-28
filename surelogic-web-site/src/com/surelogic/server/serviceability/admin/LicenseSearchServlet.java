@@ -1,8 +1,8 @@
 package com.surelogic.server.serviceability.admin;
 
-import static com.surelogic.server.serviceability.admin.HTMLQuery.HeaderType.DATE;
-import static com.surelogic.server.serviceability.admin.HTMLQuery.HeaderType.NUMBER;
-import static com.surelogic.server.serviceability.admin.HTMLQuery.HeaderType.STRING;
+import static com.surelogic.server.serviceability.admin.HTMLQuery.HeaderType.CENTER;
+import static com.surelogic.server.serviceability.admin.HTMLQuery.HeaderType.RIGHT;
+import static com.surelogic.server.serviceability.admin.HTMLQuery.HeaderType.LEFT;
 
 import java.io.IOException;
 import java.util.Date;
@@ -52,9 +52,9 @@ public class LicenseSearchServlet extends HttpServlet {
           "<form name=\"search\" method=\"post\"><p>Search: <input type=\"test\" name=\"search\" value=\"%s\" /></p></form>",
           search == null ? "" : search));
       tableBegin();
-      tableRow(DATE.th("Latest Activity"), STRING.th("License"), STRING.th("Holder"), STRING.th("Email"), STRING.th("Company"),
-          STRING.th("Product"), NUMBER.th("Installs"), NUMBER.th("Renewals"), NUMBER.th("Removals"), NUMBER.th("Blacklists"),
-          NUMBER.th("Too Many Installs"));
+      tableRow(CENTER.th("Latest Activity"), LEFT.th("License"), LEFT.th("Holder"), LEFT.th("Email"), LEFT.th("Company"),
+          LEFT.th("Product"), RIGHT.th("Installs"), RIGHT.th("Renewals"), RIGHT.th("Removals"), RIGHT.th("Blacklists"),
+          RIGHT.th("Too Many Installs"));
       NullRowHandler handler = new NullRowHandler() {
         @Override
         protected void doHandle(final Row r) {
@@ -69,9 +69,9 @@ public class LicenseSearchServlet extends HttpServlet {
           String removals = r.nextString();
           String blacklisted = r.nextString();
           String tooMany = r.nextString();
-          tableRow(DATE.td(latest), STRING.td(uuid(uuid)), STRING.td(holder), STRING.td(email), STRING.td(company),
-              STRING.td(p.toString()), NUMBER.td(installs), NUMBER.td(renewals), NUMBER.td(removals), NUMBER.td(blacklisted),
-              NUMBER.td(tooMany));
+          tableRow(CENTER.td(latest), LEFT.td(uuid(uuid)), LEFT.td(holder), LEFT.td(email), LEFT.td(company),
+              LEFT.td(p.toString()), RIGHT.td(installs), RIGHT.td(renewals), RIGHT.td(removals), RIGHT.td(blacklisted),
+              RIGHT.td(tooMany));
         }
       };
       String jdbcSearch = "%" + search + "%";

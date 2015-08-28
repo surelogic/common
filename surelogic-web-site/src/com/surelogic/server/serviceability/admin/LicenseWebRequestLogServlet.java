@@ -1,7 +1,8 @@
 package com.surelogic.server.serviceability.admin;
 
-import static com.surelogic.server.serviceability.admin.HTMLQuery.HeaderType.DATE;
-import static com.surelogic.server.serviceability.admin.HTMLQuery.HeaderType.STRING;
+import static com.surelogic.server.serviceability.admin.HTMLQuery.HeaderType.CENTER;
+import static com.surelogic.server.serviceability.admin.HTMLQuery.HeaderType.LEFT;
+import static com.surelogic.server.serviceability.admin.HTMLQuery.HeaderType.RIGHT;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -55,27 +56,40 @@ public class LicenseWebRequestLogServlet extends HttpServlet {
     public void doPerform(final Query q) {
       prequel("Recent Web License Request Activity");
       tableBegin();
-      tableRow(DATE.th("Date"), STRING.th("License"), STRING.th("Name"), STRING.th("Email"), STRING.th("Company"),
-          STRING.th("License Type"));
+      tableRow(CENTER.th("Date"), LEFT.th("License"), LEFT.th("Name"), LEFT.th("Email"), LEFT.th("Company"),
+          LEFT.th("License Type"));
       long latest = q.prepared("WebServices.selectLicenseWebRequestsBefore", new ResultHandler<Long>() {
         @Override
         public Long handle(final Result result) {
           long latest = time;
           int count = 0;
+          boolean rowsRemaining = false;
           for (Row r : result) {
-            if (++count > ROWS) {
-              break;
-            }
+            count++;
             Timestamp t = r.nextTimestamp();
-            latest = t.getTime();
-            tableRow(DATE.td(t), STRING.td(uuid(r.nextString())), STRING.td(r.nextString()), STRING.td(r.nextString()),
-                STRING.td(r.nextString()), STRING.td(r.nextString()));
+            final long tTime = t.getTime();
+            /*
+             * Continue output until we see a new distinct time. Otherwise the
+             * next page will repeat all the rows with the current "latest"
+             * time.
+             */
+            if (latest != tTime) {
+              latest = tTime;
+              if (count > ROWS) {
+                rowsRemaining = true;
+                break;
+              }
+            }
+            tableRow(CENTER.td(t), LEFT.td(uuid(r.nextString())), LEFT.td(r.nextString()), LEFT.td(r.nextString()),
+                LEFT.td(r.nextString()), LEFT.td(r.nextString()));
           }
-          return latest;
+          return rowsRemaining ? latest : -1; // -1 means no rows remain
         }
       }).call(new Timestamp(time));
-      tableRow(STRING.td(""), STRING.td(""), STRING.td(""), STRING.td(""), STRING.td(""),
-          STRING.td("<a href=\"weblog?%s=%d\">Next</a>", TIME, latest));
+      if (latest != -1) {
+        tableRow(LEFT.td(""), LEFT.td(""), LEFT.td(""), LEFT.td(""), LEFT.td(""),
+            RIGHT.td("<a href=\"weblog?%s=%d\">Next&gt;</a>", TIME, latest));
+      }
       tableEnd();
       finish();
     }

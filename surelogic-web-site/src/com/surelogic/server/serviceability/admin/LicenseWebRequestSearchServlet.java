@@ -1,7 +1,7 @@
 package com.surelogic.server.serviceability.admin;
 
-import static com.surelogic.server.serviceability.admin.HTMLQuery.HeaderType.DATE;
-import static com.surelogic.server.serviceability.admin.HTMLQuery.HeaderType.STRING;
+import static com.surelogic.server.serviceability.admin.HTMLQuery.HeaderType.CENTER;
+import static com.surelogic.server.serviceability.admin.HTMLQuery.HeaderType.LEFT;
 
 import java.io.IOException;
 import java.util.Date;
@@ -50,8 +50,8 @@ public class LicenseWebRequestSearchServlet extends HttpServlet {
           "<form name=\"search\" method=\"post\"><p>Search: <input type=\"test\" name=\"search\" value=\"%s\" /></p></form>",
           search == null ? "" : search));
       tableBegin();
-      tableRow(DATE.th("Date"), STRING.th("License"), STRING.th("Name"), STRING.th("Email"), STRING.th("Company"),
-          STRING.th("License Type"));
+      tableRow(CENTER.th("Date"), LEFT.th("License"), LEFT.th("Name"), LEFT.th("Email"), LEFT.th("Company"),
+          LEFT.th("License Type"));
       NullRowHandler handler = new NullRowHandler() {
         @Override
         protected void doHandle(final Row r) {
@@ -61,8 +61,8 @@ public class LicenseWebRequestSearchServlet extends HttpServlet {
           String email = r.nextString();
           String company = r.nextString();
           String licenseType = r.nextString();
-          tableRow(DATE.td(latest), STRING.td(uuid(uuid)), STRING.td(name), STRING.td(email), STRING.td(company),
-              STRING.td(licenseType));
+          tableRow(CENTER.td(latest), LEFT.td(uuid(uuid)), LEFT.td(name), LEFT.td(email), LEFT.td(company),
+              LEFT.td(licenseType));
         }
       };
       String jdbcSearch = "%" + search + "%";
