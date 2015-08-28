@@ -87,6 +87,8 @@ public class LicenseWebRequestLogServlet extends HttpServlet {
             String company = r.nextString();
             String licenseType = r.nextString();
             String ignoreTrial = r.nextString();
+            if ("false".equals(ignoreTrial) || "Community".equals(licenseType))
+              ignoreTrial = "";
             String noEmail = r.nextString();
             if ("false".equals(noEmail))
               noEmail = "";
