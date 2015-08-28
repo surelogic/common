@@ -44,14 +44,14 @@ public abstract class HTMLQuery extends NullDBQuery {
      * Use to span rows (empty value)
      */
     String thRowspan(int span) {
-      return String.format("<td rowspan\"%d\"></td>", span);
+      return String.format("<td rowspan=\"%d\"></td>", span);
     }
 
     /**
      * Use to span columns
      */
     String thColspan(String value, int span) {
-      return String.format("<th colspan\"%d\">%s</th>", span, value);
+      return String.format("<th colspan=\"%d\">%s</th>", span, value);
     }
 
     String td(Date value) {
