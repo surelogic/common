@@ -1,6 +1,8 @@
 package com.surelogic.server.serviceability.admin;
 
-import static com.surelogic.server.serviceability.admin.HTMLQuery.HeaderType.*;
+import static com.surelogic.server.serviceability.admin.HTMLQuery.HeaderType.CENTER;
+import static com.surelogic.server.serviceability.admin.HTMLQuery.HeaderType.LEFT;
+import static com.surelogic.server.serviceability.admin.HTMLQuery.HeaderType.RIGHT;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -18,10 +20,10 @@ import com.surelogic.common.jdbc.ResultHandler;
 import com.surelogic.common.jdbc.Row;
 import com.surelogic.server.jdbc.ServicesDBConnection;
 
-public class LicenseActivityLogServlet extends HttpServlet {
+public class LicenseWebRequestLogServlet extends HttpServlet {
 
-  private static final long serialVersionUID = 1584106224306833877L;
-  private static final String PAGE = "log";
+  private static final long serialVersionUID = -9077965307391367048L;
+  private static final String PAGE = "weblog";
   private static final String TIME = "t";
 
   @Override
@@ -44,16 +46,20 @@ public class LicenseActivityLogServlet extends HttpServlet {
 
     public LogQuery(final PrintWriter writer, @Nullable final String time) {
       super(writer);
-      this.time = time == null ? System.currentTimeMillis() : Long.parseLong(time);
+      if (time == null) {
+        this.time = System.currentTimeMillis();
+      } else {
+        this.time = Long.parseLong(time);
+      }
     }
 
     @Override
     public void doPerform(final Query q) {
-      prequel("Recent License Activity");
+      prequel("Recent Web License Request Activity");
       tableBegin();
-      tableRow(CENTER.th("Date"), LEFT.th("IP"), LEFT.th("License"), LEFT.th("Event"), LEFT.th("Holder"), LEFT.th("Email"),
-          LEFT.th("Company"));
-      final long latest = q.prepared("WebServices.selectNetChecksBefore", new ResultHandler<Long>() {
+      tableRow(CENTER.th("Date"), LEFT.th("License"), LEFT.th("Name"), LEFT.th("Email"), LEFT.th("Company"),
+          LEFT.th("License Type"), CENTER.th("Ignore Trial"), CENTER.th("No Email"));
+      long latest = q.prepared("WebServices.selectLicenseWebRequestsBefore", new ResultHandler<Long>() {
         @Override
         public Long handle(final Result result) {
           long latest = time;
@@ -75,14 +81,25 @@ public class LicenseActivityLogServlet extends HttpServlet {
                 break;
               }
             }
-            tableRow(CENTER.td(t), LEFT.td(ip(r.nextString())), LEFT.td(uuid(r.nextString())), LEFT.td(r.nextString()),
-                LEFT.td(r.nextString()), LEFT.td(r.nextString()), LEFT.td(r.nextString()));
+            String uuid = r.nextString();
+            String name = r.nextString();
+            String email = r.nextString();
+            String company = r.nextString();
+            String licenseType = r.nextString();
+            String ignoreTrial = r.nextString();
+            if ("false".equals(ignoreTrial) || "Community".equals(licenseType))
+              ignoreTrial = "";
+            String noEmail = r.nextString();
+            if ("false".equals(noEmail))
+              noEmail = "";
+            tableRow(CENTER.td(t), LEFT.td(uuid(uuid)), LEFT.td(name), LEFT.td(email), LEFT.td(company), LEFT.td(licenseType),
+                CENTER.td(ignoreTrial), CENTER.td(noEmail));
           }
           return rowsRemaining ? latest : -1; // -1 means no rows remain
         }
       }).call(new Timestamp(time));
       if (latest != -1) {
-        tableRow(LEFT.td(""), LEFT.td(""), LEFT.td(""), LEFT.td(""), LEFT.td(""), LEFT.td(""),
+        tableRow(LEFT.td(""), LEFT.td(""), LEFT.td(""), LEFT.td(""), LEFT.td(""), LEFT.td(""), LEFT.td(""),
             RIGHT.td("<a href=\"%s?%s=%d\">Next&gt;</a>", PAGE, TIME, latest));
       }
       tableEnd();

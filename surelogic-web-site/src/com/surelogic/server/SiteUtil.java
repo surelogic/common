@@ -7,11 +7,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.surelogic.common.logging.SLLogger;
-import com.surelogic.server.serviceability.LicenseRequestServlet;
+import com.surelogic.server.serviceability.LicenseNetcheckServlet;
 
 public final class SiteUtil {
 
-  static final Logger LOG = SLLogger.getLoggerFor(LicenseRequestServlet.class);
+  static final Logger LOG = SLLogger.getLoggerFor(LicenseNetcheckServlet.class);
 
   static public final PrivateKey getKey() {
     try {

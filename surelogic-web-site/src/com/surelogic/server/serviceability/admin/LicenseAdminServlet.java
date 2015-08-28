@@ -1,11 +1,12 @@
 package com.surelogic.server.serviceability.admin;
 
-import static com.surelogic.server.serviceability.admin.HTMLQuery.HeaderType.DATE;
-import static com.surelogic.server.serviceability.admin.HTMLQuery.HeaderType.NUMBER;
-import static com.surelogic.server.serviceability.admin.HTMLQuery.HeaderType.STRING;
+import static com.surelogic.server.serviceability.admin.HTMLQuery.HeaderType.CENTER;
+import static com.surelogic.server.serviceability.admin.HTMLQuery.HeaderType.RIGHT;
+import static com.surelogic.server.serviceability.admin.HTMLQuery.HeaderType.LEFT;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Date;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -107,27 +108,23 @@ public class LicenseAdminServlet extends HttpServlet {
     @Override
     public void doPerform(final Query q) {
       prequel(String.format("License %s", uuid));
-      writer.println("<h3><a href=\"home\">To License Overview</a></h3>");
-      writer.println("<h3><a href=\"log\">To Recent License Activity</a></h3>");
-      writer.println("<h3><a href=\"blacklist\">To Blacklist</a></h3>");
-      writer.println("<h3><a href=\"search\">To License Search</a></h3>");
       writer.print("<form action=\"license\" method=\"post\" ><input type=\"hidden\" name=\"uuid\" value=\"");
       writer.print(uuid);
       writer.println("\" />");
       writer.println("<h3>Description</h3>");
       tableBegin();
-      tableRow(STRING.th("Product"), STRING.th("Holder"), STRING.th("Email"), STRING.th("Company"), NUMBER.th("Duration"),
-          DATE.th("Install Before"), STRING.th("Type"), NUMBER.th("Max Active"), STRING.th("Blacklist"));
+      tableRow(LEFT.th("Product"), LEFT.th("Holder"), LEFT.th("Email"), LEFT.th("Company"), RIGHT.th("Duration"),
+          CENTER.th("Install Before"), LEFT.th("Type"), RIGHT.th("Max Active"), LEFT.th("Blacklist"));
       q.prepared("WebServices.selectLicenseInfoById", new NullRowHandler() {
 
         @Override
         protected void doHandle(final Row r) {
-          tableRow(STRING.td(r.nextString()), STRING.td(r.nextString()), STRING.td(r.nextString()), STRING.td(r.nextString()),
-              NUMBER.td(r.nextString()), DATE.td(r.nextTimestamp()), STRING.td(r.nextString()),
-              NUMBER.td(String.format(
+          tableRow(LEFT.td(r.nextString()), LEFT.td(r.nextString()), LEFT.td(r.nextString()), LEFT.td(r.nextString()),
+              RIGHT.td(r.nextString()), CENTER.td(r.nextTimestamp()), LEFT.td(r.nextString()),
+              RIGHT.td(String.format(
                   "<input style=\"text-align: right\" type=\"text\" name=\"installs\" value=\"%d\" /><input type=\"submit\" value=\"Change\" />",
                   r.nextInt())),
-              STRING.td(blacklistLink(r.nextString())));
+              LEFT.td(blacklistLink(r.nextString())));
         }
       }).call(uuid);
       tableEnd();
@@ -135,22 +132,45 @@ public class LicenseAdminServlet extends HttpServlet {
 
       writer.println("<h3>Counts</h3>");
       tableBegin();
-      tableRow(NUMBER.th("Installs"), NUMBER.th("Renewals"), NUMBER.th("Removals"), NUMBER.th("Blacklists"), NUMBER.th("Too Many"));
+      tableRow(RIGHT.th("Installs"), RIGHT.th("Renewals"), RIGHT.th("Removals"), RIGHT.th("Blacklists"), RIGHT.th("Too Many"));
       q.prepared("WebServices.selectCheckCount", new NullRowHandler() {
         @Override
         protected void doHandle(final Row r) {
-          tableRow(NUMBER.td(r.nextString()), NUMBER.td(r.nextString()), NUMBER.td(r.nextString()), NUMBER.td(r.nextString()),
-              NUMBER.td(r.nextString()));
+          tableRow(RIGHT.td(r.nextString()), RIGHT.td(r.nextString()), RIGHT.td(r.nextString()), RIGHT.td(r.nextString()),
+              RIGHT.td(r.nextString()));
         }
       }).call(uuid);
       tableEnd();
       writer.println("<h3>Activity</h3>");
       tableBegin();
-      tableRow(DATE.th("Date"), STRING.th("IP"), STRING.th("Event"));
+      tableRow(CENTER.th("Date"), LEFT.th("IP"), LEFT.th("Event"));
       q.prepared("WebServices.selectNetChecksByID", new NullRowHandler() {
         @Override
         protected void doHandle(final Row r) {
-          tableRow(STRING.td(r.nextTimestamp()), STRING.td(ip(r.nextString())), STRING.td(r.nextString()));
+          tableRow(LEFT.td(r.nextTimestamp()), LEFT.td(ip(r.nextString())), LEFT.td(r.nextString()));
+        }
+      }).call(uuid);
+      tableEnd();
+      writer.println("<h3>Web License Requests</h3>");
+      tableRow(CENTER.th("Date"), LEFT.th("License"), LEFT.th("Name"), LEFT.th("Email"), LEFT.th("Company"),
+          LEFT.th("License Type"), CENTER.th("Ignore Trial"), CENTER.th("No Email"));
+      q.prepared("WebServices.selectWebLicenseRequestByID", new NullRowHandler() {
+        @Override
+        protected void doHandle(final Row r) {
+          Date latest = r.nextTimestamp();
+          String uuid = r.nextString();
+          String name = r.nextString();
+          String email = r.nextString();
+          String company = r.nextString();
+          String licenseType = r.nextString();
+          String ignoreTrial = r.nextString();
+          if ("false".equals(ignoreTrial) || "Community".equals(licenseType))
+            ignoreTrial = "";
+          String noEmail = r.nextString();
+          if ("false".equals(noEmail))
+            noEmail = "";
+          tableRow(CENTER.td(latest), LEFT.td(uuid(uuid)), LEFT.td(name), LEFT.td(email), LEFT.td(company), LEFT.td(licenseType),
+              CENTER.td(ignoreTrial), CENTER.td(noEmail));
         }
       }).call(uuid);
       tableEnd();

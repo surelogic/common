@@ -1,7 +1,6 @@
 package com.surelogic.server.serviceability.admin;
 
 import static com.surelogic.server.serviceability.admin.HTMLQuery.HeaderType.CENTER;
-import static com.surelogic.server.serviceability.admin.HTMLQuery.HeaderType.RIGHT;
 import static com.surelogic.server.serviceability.admin.HTMLQuery.HeaderType.LEFT;
 
 import java.io.IOException;
@@ -15,12 +14,11 @@ import javax.servlet.http.HttpServletResponse;
 import com.surelogic.common.jdbc.NullRowHandler;
 import com.surelogic.common.jdbc.Query;
 import com.surelogic.common.jdbc.Row;
-import com.surelogic.common.license.SLLicenseProduct;
 import com.surelogic.server.jdbc.ServicesDBConnection;
 
-public class LicenseSearchServlet extends HttpServlet {
+public class LicenseWebRequestSearchServlet extends HttpServlet {
 
-  private static final long serialVersionUID = 658112454144528107L;
+  private static final long serialVersionUID = 481802527198080240L;
 
   @Override
   protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
@@ -47,38 +45,36 @@ public class LicenseSearchServlet extends HttpServlet {
 
     @Override
     public void doPerform(final Query q) {
-      prequel("License Search");
+      prequel("Web License Request Search");
       writer.println(String.format(
           "<form name=\"search\" method=\"post\"><p>Search: <input type=\"test\" name=\"search\" value=\"%s\" /></p></form>",
           search == null ? "" : search));
       tableBegin();
-      tableRow(CENTER.th("Latest Activity"), LEFT.th("License"), LEFT.th("Holder"), LEFT.th("Email"), LEFT.th("Company"),
-          LEFT.th("Product"), RIGHT.th("Installs"), RIGHT.th("Renewals"), RIGHT.th("Removals"), RIGHT.th("Blacklists"),
-          RIGHT.th("Too Many Installs"));
+      tableRow(CENTER.th("Date"), LEFT.th("License"), LEFT.th("Name"), LEFT.th("Email"), LEFT.th("Company"),
+          LEFT.th("License Type"), CENTER.th("Ignore Trial"), CENTER.th("No Email"));
       NullRowHandler handler = new NullRowHandler() {
         @Override
         protected void doHandle(final Row r) {
           Date latest = r.nextTimestamp();
           String uuid = r.nextString();
-          SLLicenseProduct p = SLLicenseProduct.fromString(r.nextString());
-          String holder = r.nextString();
+          String name = r.nextString();
           String email = r.nextString();
           String company = r.nextString();
-          String installs = r.nextString();
-          String renewals = r.nextString();
-          String removals = r.nextString();
-          String blacklisted = r.nextString();
-          String tooMany = r.nextString();
-          tableRow(CENTER.td(latest), LEFT.td(uuid(uuid)), LEFT.td(holder), LEFT.td(email), LEFT.td(company),
-              LEFT.td(p.toString()), RIGHT.td(installs), RIGHT.td(renewals), RIGHT.td(removals), RIGHT.td(blacklisted),
-              RIGHT.td(tooMany));
+          String licenseType = r.nextString();
+          String ignoreTrial = r.nextString();
+          if ("false".equals(ignoreTrial) || "Community".equals(licenseType))
+            ignoreTrial = "";
+          String noEmail = r.nextString();
+          if ("false".equals(noEmail))
+            noEmail = "";
+          tableRow(CENTER.td(latest), LEFT.td(uuid(uuid)), LEFT.td(name), LEFT.td(email), LEFT.td(company), LEFT.td(licenseType),
+              CENTER.td(ignoreTrial), CENTER.td(noEmail));
         }
       };
       String jdbcSearch = "%" + search + "%";
-      q.prepared("WebServices.searchLicenses", handler).call(jdbcSearch, jdbcSearch, jdbcSearch, jdbcSearch);
+      q.prepared("WebServices.searchLicenseWebRequests", handler).call(jdbcSearch, jdbcSearch, jdbcSearch, jdbcSearch);
       tableEnd();
       finish();
     }
-
   }
 }
