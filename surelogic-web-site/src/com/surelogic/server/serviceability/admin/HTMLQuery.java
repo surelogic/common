@@ -50,7 +50,7 @@ public abstract class HTMLQuery extends NullDBQuery {
         b.append(" rowspan=\"").append(rowspan).append("\"");
       if (colspan > 1)
         b.append(" colspan=\"").append(colspan).append("\"");
-      b.append('<').append(value).append("</th>");
+      b.append('>').append(value).append("</th>");
       return b.toString();
     }
 
