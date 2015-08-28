@@ -41,17 +41,25 @@ public abstract class HTMLQuery extends NullDBQuery {
     }
 
     /**
-     * Use to span rows (empty value)
+     * Use to span columns and rows
      */
-    String thRowspan(int span) {
-      return String.format("<td rowspan=\"%d\"></td>", span);
+    String thSpan(String value, int rowspan, int colspan) {
+      final StringBuilder b = new StringBuilder();
+      b.append("<th");
+      if (rowspan > 1)
+        b.append(" rowspan=\"").append(rowspan).append("\"");
+      if (colspan > 1)
+        b.append(" colspan=\"").append(colspan).append("\"");
+      b.append('<').append(value).append("</th>");
+      return b.toString();
     }
 
-    /**
-     * Use to span columns
-     */
-    String thColspan(String value, int span) {
-      return String.format("<th colspan=\"%d\">%s</th>", span, value);
+    String thRowspan(String value, int rowspan) {
+      return thSpan(value, rowspan, 1);
+    }
+
+    String thColspan(String value, int colspan) {
+      return thSpan(value, 1, colspan);
     }
 
     String td(Date value) {

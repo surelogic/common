@@ -58,10 +58,10 @@ public class LicenseCountsServlet extends HttpServlet {
       final CountHandler handler = new CountHandler();
       prequel("License Counts");
       tableBegin();
-      tableRow(CENTER.thRowspan(2), RIGHT.thRowspan(2), CENTER.thColspan("Web Requests", 2), CENTER.thColspan("Trial Requests", 2),
-          CENTER.thColspan("Community Requests", 2));
-      tableRow(CENTER.th("Date"), RIGHT.th("Active"), RIGHT.th("Total"), RIGHT.th("Activated"), RIGHT.th("Total"),
-          RIGHT.th("Activated"), RIGHT.th("Total"), RIGHT.th("Activated"));
+      tableRow(CENTER.thRowspan("Date", 2), RIGHT.thRowspan("Active", 2), CENTER.thColspan("Web Requests", 2),
+          CENTER.thColspan("Trial Requests", 2), CENTER.thColspan("Community Requests", 2));
+      tableRow(RIGHT.th("Total"), RIGHT.th("Activated"), RIGHT.th("Total"), RIGHT.th("Activated"), RIGHT.th("Total"),
+          RIGHT.th("Activated"));
       final Timestamp ts = new Timestamp(System.currentTimeMillis());
       final Counts counts = new Counts();
       counts.activeLicenses = q.prepared("WebServices.activeLicensesOn", handler).call(ts);
