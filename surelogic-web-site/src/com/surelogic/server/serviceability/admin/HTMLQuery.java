@@ -13,7 +13,7 @@ public abstract class HTMLQuery extends NullDBQuery {
 
   protected final PrintWriter writer;
 
-  protected final int ROWS = 4;
+  protected final int ROWS = 30;
 
   HTMLQuery(final PrintWriter writer) {
     this.writer = writer;
@@ -74,7 +74,8 @@ public abstract class HTMLQuery extends NullDBQuery {
     writer.println("<head>");
     writer.println(String.format("<title>%s</title>", title));
     style();
-    writer.println("<body><p class=\"header\">SURELOGIC LICENSE ADMINSTRATION</p>");
+    writer.println("<body>");
+    writer.println("<p class=\"header\">SURELOGIC LICENSE ADMINSTRATION</p>");
     writer.println(String.format("<h1>%s</h1>", title));
     navBar();
   }
