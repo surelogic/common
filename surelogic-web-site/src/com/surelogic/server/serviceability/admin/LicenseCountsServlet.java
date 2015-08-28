@@ -60,8 +60,8 @@ public class LicenseCountsServlet extends HttpServlet {
       final CountHandler handler = new CountHandler();
       prequel("License Counts");
       tableBegin();
-      tableRow(CENTER.thRowspan("Date", 2), RIGHT.thRowspan("Active", 2), CENTER.thColspan("Web Requests", 2),
-          CENTER.thColspan("Trial Requests", 2), CENTER.thColspan("Community Requests", 2));
+      tableRow(CENTER.thRowspan("Date", 3), RIGHT.thRowspan("Active", 3), CENTER.thColspan("Website Requests", 6));
+      tableRow(CENTER.thColspan("Total", 2), CENTER.thColspan("Trial", 2), CENTER.thColspan("Community", 2));
       tableRow(RIGHT.th("Total"), RIGHT.th("Activated"), RIGHT.th("Total"), RIGHT.th("Activated"), RIGHT.th("Total"),
           RIGHT.th("Activated"));
 
