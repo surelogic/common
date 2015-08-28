@@ -164,8 +164,10 @@ public class LicenseAdminServlet extends HttpServlet {
           String company = r.nextString();
           String licenseType = r.nextString();
           String ignoreTrial = r.nextString();
-          if ("false".equals(ignoreTrial) || "Community".equals(licenseType))
+          if ("Community".equals(licenseType))
             ignoreTrial = "";
+          else
+            ignoreTrial = ignoreTrialLink(ignoreTrial);
           String noEmail = r.nextString();
           if ("false".equals(noEmail))
             noEmail = "";
@@ -181,6 +183,12 @@ public class LicenseAdminServlet extends HttpServlet {
       boolean blacklist = YES.equals(blString);
       return String.format("<a href=\"license?uuid=%s&blacklist=%s\">%s</a>", uuid, blacklist ? NO : YES,
           blacklist ? "Remove from Blacklist" : "Add to Blacklist");
+    }
+
+    String ignoreTrialLink(final String ignoreTrial) {
+      boolean ignore = "true".equals(ignoreTrial);
+      return String.format("<a href=\"license?uuid=%s&ignoreTrial=%s\">%2$s (press to toggle)</a>", uuid,
+          ignore ? "true" : "false");
     }
   }
 }
