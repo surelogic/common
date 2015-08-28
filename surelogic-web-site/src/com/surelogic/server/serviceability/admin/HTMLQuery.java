@@ -95,6 +95,8 @@ public abstract class HTMLQuery extends NullDBQuery {
 
   void navBar() {
     writer.print("<hr><p align=\"center\">( ");
+    writer.print("<a href=\"counts\">License Counts</a>");
+    writer.print(" | ");
     writer.print("<a href=\"log\">Recent License Activity</a>");
     writer.print(" | ");
     writer.print("<a href=\"search\">License Search</a>");
