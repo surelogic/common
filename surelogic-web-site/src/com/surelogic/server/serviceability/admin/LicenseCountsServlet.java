@@ -6,6 +6,8 @@ import static com.surelogic.server.serviceability.admin.HTMLQuery.HeaderType.RIG
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -62,23 +64,36 @@ public class LicenseCountsServlet extends HttpServlet {
           CENTER.thColspan("Trial Requests", 2), CENTER.thColspan("Community Requests", 2));
       tableRow(RIGHT.th("Total"), RIGHT.th("Activated"), RIGHT.th("Total"), RIGHT.th("Activated"), RIGHT.th("Total"),
           RIGHT.th("Activated"));
-      final Timestamp ts = new Timestamp(System.currentTimeMillis());
-      final Counts counts = new Counts();
-      counts.activeLicenses = q.prepared("WebServices.activeLicensesOn", handler).call(ts);
-      counts.totalWebLicenseRequests = q.prepared("WebServices.totalWebLicenseRequestsOn", handler).call(ts);
-      counts.activatedWebLicenseRequests = q.prepared("WebServices.activatedWebLicenseRequestsOn", handler).call(ts);
-      counts.totalWebTrialLicenseRequests = q.prepared("WebServices.totalWebTrialLicenseRequestsOn", handler).call(ts);
-      counts.activatedWebTrialLicenseRequests = q.prepared("WebServices.activatedWebTrialLicenseRequestsOn", handler).call(ts);
-      counts.totalWebCommunityLicenseRequests = q.prepared("WebServices.totalWebCommunityLicenseRequestsOn", handler).call(ts);
-      counts.activatedWebCommunityLicenseRequests = q.prepared("WebServices.activatedWebCommunityLicenseRequestsOn", handler)
-          .call(ts);
-      tableRow(CENTER.td(ts), RIGHT.td(SLUtility.toStringHumanWithCommas(counts.activeLicenses)),
-          RIGHT.td(SLUtility.toStringHumanWithCommas(counts.totalWebLicenseRequests)),
-          RIGHT.td(SLUtility.toStringHumanWithCommas(counts.activatedWebLicenseRequests)),
-          RIGHT.td(SLUtility.toStringHumanWithCommas(counts.totalWebTrialLicenseRequests)),
-          RIGHT.td(SLUtility.toStringHumanWithCommas(counts.activatedWebTrialLicenseRequests)),
-          RIGHT.td(SLUtility.toStringHumanWithCommas(counts.totalWebCommunityLicenseRequests)),
-          RIGHT.td(SLUtility.toStringHumanWithCommas(counts.activatedWebCommunityLicenseRequests)));
+
+      final SimpleDateFormat sdf = new SimpleDateFormat("MMM yyyy");
+      Calendar c = Calendar.getInstance();
+      final int year = c.get(Calendar.YEAR);
+      final int month = c.get(Calendar.MONTH);
+      c.clear();
+      c.set(Calendar.MONTH, month);
+      c.set(Calendar.YEAR, year);
+      c.add(Calendar.MONTH, 1);
+      c.add(Calendar.MILLISECOND, -1); // last instant of month
+      do {
+        Timestamp ts = new Timestamp(c.getTimeInMillis());
+        final Counts counts = new Counts();
+        counts.activeLicenses = q.prepared("WebServices.activeLicensesOn", handler).call(ts);
+        counts.totalWebLicenseRequests = q.prepared("WebServices.totalWebLicenseRequestsOn", handler).call(ts);
+        counts.activatedWebLicenseRequests = q.prepared("WebServices.activatedWebLicenseRequestsOn", handler).call(ts);
+        counts.totalWebTrialLicenseRequests = q.prepared("WebServices.totalWebTrialLicenseRequestsOn", handler).call(ts);
+        counts.activatedWebTrialLicenseRequests = q.prepared("WebServices.activatedWebTrialLicenseRequestsOn", handler).call(ts);
+        counts.totalWebCommunityLicenseRequests = q.prepared("WebServices.totalWebCommunityLicenseRequestsOn", handler).call(ts);
+        counts.activatedWebCommunityLicenseRequests = q.prepared("WebServices.activatedWebCommunityLicenseRequestsOn", handler)
+            .call(ts);
+        tableRow(RIGHT.td(sdf.format(ts)), RIGHT.td(SLUtility.toStringHumanWithCommas(counts.activeLicenses)),
+            RIGHT.td(SLUtility.toStringHumanWithCommas(counts.totalWebLicenseRequests)),
+            RIGHT.td(SLUtility.toStringHumanWithCommas(counts.activatedWebLicenseRequests)),
+            RIGHT.td(SLUtility.toStringHumanWithCommas(counts.totalWebTrialLicenseRequests)),
+            RIGHT.td(SLUtility.toStringHumanWithCommas(counts.activatedWebTrialLicenseRequests)),
+            RIGHT.td(SLUtility.toStringHumanWithCommas(counts.totalWebCommunityLicenseRequests)),
+            RIGHT.td(SLUtility.toStringHumanWithCommas(counts.activatedWebCommunityLicenseRequests)));
+        c.add(Calendar.MONTH, -1);
+      } while (c.get(Calendar.MONTH) != month);
       tableEnd();
       finish();
     }
