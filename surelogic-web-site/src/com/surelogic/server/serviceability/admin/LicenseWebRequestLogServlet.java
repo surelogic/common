@@ -23,6 +23,7 @@ import com.surelogic.server.jdbc.ServicesDBConnection;
 public class LicenseWebRequestLogServlet extends HttpServlet {
 
   private static final long serialVersionUID = -9077965307391367048L;
+  private static final String PAGE = "weblog";
   private static final String TIME = "t";
 
   @Override
@@ -88,7 +89,7 @@ public class LicenseWebRequestLogServlet extends HttpServlet {
       }).call(new Timestamp(time));
       if (latest != -1) {
         tableRow(LEFT.td(""), LEFT.td(""), LEFT.td(""), LEFT.td(""), LEFT.td(""),
-            RIGHT.td("<a href=\"weblog?%s=%d\">Next&gt;</a>", TIME, latest));
+            RIGHT.td("<a href=\"%s?%s=%d\">Next&gt;</a>", PAGE, TIME, latest));
       }
       tableEnd();
       finish();

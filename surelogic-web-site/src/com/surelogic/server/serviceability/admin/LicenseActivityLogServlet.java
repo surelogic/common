@@ -1,6 +1,5 @@
 package com.surelogic.server.serviceability.admin;
 
-import static com.surelogic.server.serviceability.admin.HTMLQuery.HeaderType.CENTER;
 import static com.surelogic.server.serviceability.admin.HTMLQuery.HeaderType.*;
 
 import java.io.IOException;
@@ -22,6 +21,7 @@ import com.surelogic.server.jdbc.ServicesDBConnection;
 public class LicenseActivityLogServlet extends HttpServlet {
 
   private static final long serialVersionUID = 1584106224306833877L;
+  private static final String PAGE = "log";
   private static final String TIME = "t";
 
   @Override
@@ -83,7 +83,7 @@ public class LicenseActivityLogServlet extends HttpServlet {
       }).call(new Timestamp(time));
       if (latest != -1) {
         tableRow(LEFT.td(""), LEFT.td(""), LEFT.td(""), LEFT.td(""), LEFT.td(""), LEFT.td(""),
-            RIGHT.td("<a href=\"weblog?%s=%d\">Next&gt;</a>", TIME, latest));
+            RIGHT.td("<a href=\"%s?%s=%d\">Next&gt;</a>", PAGE, TIME, latest));
       }
       tableEnd();
       finish();
