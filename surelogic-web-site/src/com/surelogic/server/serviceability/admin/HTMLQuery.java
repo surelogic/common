@@ -74,8 +74,8 @@ public abstract class HTMLQuery extends NullDBQuery {
     writer.println("<head>");
     writer.println(String.format("<title>%s</title>", title));
     style();
-    writer.println("<body>");
-    writer.println(String.format("<h1 align=\"center\">%s</h1>", title));
+    writer.println("<body><p class=\"header\">SURELOGIC LICENSE ADMINSTRATION</p>");
+    writer.println(String.format("<h1>%s</h1>", title));
     navBar();
   }
 
@@ -87,7 +87,8 @@ public abstract class HTMLQuery extends NullDBQuery {
     writer.println(" th { color: #FFFF00; }");
     writer.println(" a { color: #CCCCCC; }");
     writer.println(" p { font: 15px arial, sans-serif; }");
-    writer.println(" h1 { font: 20px arial, sans-serif; color: #FFFF00; }");
+    writer.println(" p.header { text-align: center; font: 10px arial, sans-serif; color: #AAAAAA; }");
+    writer.println(" h1 { text-align: center; font: 20px arial, sans-serif; color: #FFFF00; }");
     writer.println("</style>");
   }
 
