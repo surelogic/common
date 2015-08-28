@@ -116,7 +116,7 @@ public class LicenseAdminServlet extends HttpServlet {
 
     @Override
     public void doPerform(final Query q) {
-      q.prepared("WebServices.updateIngoreTrial").call(value, uuid);
+      q.prepared("WebServices.updateIgnoreTrial").call(value, uuid);
     }
   }
 
