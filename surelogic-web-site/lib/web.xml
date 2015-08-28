@@ -43,6 +43,16 @@
   <!-- Administration pages all under /services/admin -->
 
   <servlet>
+    <servlet-name>License Counts</servlet-name>
+    <servlet-class>com.surelogic.server.serviceability.admin.LicenseCountsServlet</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>License Counts</servlet-name>
+    <url-pattern>/services/admin/counts</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
     <servlet-name>License Admin</servlet-name>
     <servlet-class>com.surelogic.server.serviceability.admin.LicenseAdminServlet</servlet-class>
   </servlet>
