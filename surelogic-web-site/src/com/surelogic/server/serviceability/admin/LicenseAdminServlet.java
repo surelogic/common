@@ -152,13 +152,13 @@ public class LicenseAdminServlet extends HttpServlet {
       }).call(uuid);
       tableEnd();
       writer.println("<h3>Web License Requests</h3>");
-      tableRow(CENTER.th("Date"), LEFT.th("License"), LEFT.th("Name"), LEFT.th("Email"), LEFT.th("Company"),
-          LEFT.th("License Type"), CENTER.th("Ignore Trial"), CENTER.th("No Email"));
+      tableBegin();
+      tableRow(CENTER.th("Date"), LEFT.th("Name"), LEFT.th("Email"), LEFT.th("Company"), LEFT.th("License Type"),
+          CENTER.th("Ignore Trial"), CENTER.th("No Email"));
       q.prepared("WebServices.selectWebLicenseRequestByID", new NullRowHandler() {
         @Override
         protected void doHandle(final Row r) {
           Date latest = r.nextTimestamp();
-          String uuid = r.nextString();
           String name = r.nextString();
           String email = r.nextString();
           String company = r.nextString();
@@ -169,8 +169,8 @@ public class LicenseAdminServlet extends HttpServlet {
           String noEmail = r.nextString();
           if ("false".equals(noEmail))
             noEmail = "";
-          tableRow(CENTER.td(latest), LEFT.td(uuid(uuid)), LEFT.td(name), LEFT.td(email), LEFT.td(company), LEFT.td(licenseType),
-              CENTER.td(ignoreTrial), CENTER.td(noEmail));
+          tableRow(CENTER.td(latest), LEFT.td(name), LEFT.td(email), LEFT.td(company), LEFT.td(licenseType), CENTER.td(ignoreTrial),
+              CENTER.td(noEmail));
         }
       }).call(uuid);
       tableEnd();
