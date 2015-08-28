@@ -51,11 +51,11 @@ public class LicenseCountsServlet extends HttpServlet {
     long activatedWebCommunityLicenseRequestsThisMonth;
 
     void lastMonth(@NonNull Counts p) {
-      totalWebLicenseRequestsThisMonth = totalWebLicenseRequests = p.totalWebLicenseRequests;
+      totalWebLicenseRequestsThisMonth = totalWebLicenseRequests - p.totalWebLicenseRequests;
       activatedWebLicenseRequestsThisMonth = activatedWebLicenseRequests - p.activatedWebLicenseRequests;
       totalWebTrialLicenseRequestsThisMonth = totalWebTrialLicenseRequests - p.totalWebTrialLicenseRequests;
       activatedWebTrialLicenseRequestsThisMonth = activatedWebTrialLicenseRequests - p.activatedWebTrialLicenseRequests;
-      totalWebCommunityLicenseRequestsThisMonth = totalWebCommunityLicenseRequests = p.totalWebCommunityLicenseRequests;
+      totalWebCommunityLicenseRequestsThisMonth = totalWebCommunityLicenseRequests - p.totalWebCommunityLicenseRequests;
       activatedWebCommunityLicenseRequestsThisMonth = activatedWebCommunityLicenseRequests - p.activatedWebCommunityLicenseRequests;
     }
   }
