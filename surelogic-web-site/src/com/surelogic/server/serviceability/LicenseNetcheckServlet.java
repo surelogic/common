@@ -39,7 +39,7 @@ import com.surelogic.common.logging.SLLogger;
 import com.surelogic.server.SiteUtil;
 import com.surelogic.server.jdbc.ServicesDBConnection;
 
-public class LicenseRequestServlet extends HttpServlet {
+public class LicenseNetcheckServlet extends HttpServlet {
 
   private static final long serialVersionUID = 6357187305188901382L;
 
