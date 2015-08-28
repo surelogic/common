@@ -89,8 +89,9 @@ public class LicenseCountsServlet extends HttpServlet {
       tableRow(CENTER.thColspan("Trial", 4), CENTER.thColspan("Community", 4), CENTER.thColspan("Total", 4));
       tableRow(CENTER.thColspan("This Month", 2), CENTER.thColspan("All Time", 2), CENTER.thColspan("This Month", 2),
           CENTER.thColspan("All Time", 2), CENTER.thColspan("This Month", 2), CENTER.thColspan("All Time", 2));
-      tableRow(RIGHT.th("#"), RIGHT.th("Activated"), RIGHT.th("#"), RIGHT.th("Activated"), RIGHT.th("#"), RIGHT.th("Activated"),
-          RIGHT.th("#"), RIGHT.th("Activated"), RIGHT.th("#"), RIGHT.th("Activated"), RIGHT.th("#"), RIGHT.th("Activated"));
+      tableRow(RIGHT.th("Requested"), RIGHT.th("Activated"), RIGHT.th("Requested"), RIGHT.th("Activated"), RIGHT.th("Requested"),
+          RIGHT.th("Activated"), RIGHT.th("Requested"), RIGHT.th("Activated"), RIGHT.th("Requested"), RIGHT.th("Activated"),
+          RIGHT.th("Requested"), RIGHT.th("Activated"));
 
       final SimpleDateFormat sdf = new SimpleDateFormat("MMM yyyy");
       Calendar c = Calendar.getInstance();
