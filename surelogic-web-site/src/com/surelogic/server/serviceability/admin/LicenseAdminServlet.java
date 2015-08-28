@@ -177,7 +177,7 @@ public class LicenseAdminServlet extends HttpServlet {
       tableEnd();
       writer.println("<h3>Web License Requests</h3>");
       tableBegin();
-      tableRow(CENTER.th("Date"), LEFT.th("Name"), LEFT.th("Email"), LEFT.th("Company"), LEFT.th("License Type"),
+      tableRow(CENTER.th("Date"), LEFT.th("Name"), LEFT.th("Email"), LEFT.th("Company"), CENTER.th("License Type"),
           CENTER.th("Ignore Trial"), CENTER.th("No Email"));
       q.prepared("WebServices.selectWebLicenseRequestByID", new NullRowHandler() {
         @Override
@@ -193,8 +193,8 @@ public class LicenseAdminServlet extends HttpServlet {
           else
             ignoreTrial = ignoreTrialLink(ignoreTrial);
           String noEmail = "true".equals(r.nextString()) ? "X" : "";
-          tableRow(CENTER.td(latest), LEFT.td(name), LEFT.td(email), LEFT.td(company), LEFT.td(licenseType), CENTER.td(ignoreTrial),
-              CENTER.td(noEmail));
+          tableRow(CENTER.td(latest), LEFT.td(name), LEFT.td(email), LEFT.td(company), CENTER.td(licenseType),
+              CENTER.td(ignoreTrial), CENTER.td(noEmail));
         }
       }).call(uuid);
       tableEnd();

@@ -58,7 +58,7 @@ public class LicenseWebRequestLogServlet extends HttpServlet {
       prequel("Recent Web License Request Activity");
       tableBegin();
       tableRow(CENTER.th("Date"), LEFT.th("License"), LEFT.th("Name"), LEFT.th("Email"), LEFT.th("Company"),
-          LEFT.th("License Type"), CENTER.th("Ignore Trial"), CENTER.th("No Email"));
+          CENTER.th("License Type"), CENTER.th("Ignore Trial"), CENTER.th("No Email"));
       long latest = q.prepared("WebServices.selectLicenseWebRequestsBefore", new ResultHandler<Long>() {
         @Override
         public Long handle(final Result result) {
@@ -88,7 +88,7 @@ public class LicenseWebRequestLogServlet extends HttpServlet {
             String licenseType = r.nextString();
             String ignoreTrial = "true".equals(r.nextString()) && "Trial".equals(licenseType) ? "X" : "";
             String noEmail = "true".equals(r.nextString()) ? "X" : "";
-            tableRow(CENTER.td(t), LEFT.td(uuid(uuid)), LEFT.td(name), LEFT.td(email), LEFT.td(company), LEFT.td(licenseType),
+            tableRow(CENTER.td(t), LEFT.td(uuid(uuid)), LEFT.td(name), LEFT.td(email), LEFT.td(company), CENTER.td(licenseType),
                 CENTER.td(ignoreTrial), CENTER.td(noEmail));
           }
           return rowsRemaining ? latest : -1; // -1 means no rows remain
