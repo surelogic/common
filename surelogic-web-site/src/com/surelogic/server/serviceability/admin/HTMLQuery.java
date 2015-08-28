@@ -36,18 +36,32 @@ public abstract class HTMLQuery extends NullDBQuery {
       this.align = align;
     }
 
-    String th(final String column) {
-      return String.format("<th>%s</th>", column);
+    String th(final String value) {
+      return String.format("<th>%s</th>", value);
     }
 
-    String td(final Date date) {
-      final String value = date == null ? "&nbsp;" : format.get().format(date);
-      return String.format("<td style=\"text-align: %s\">%s</td>", align, value);
+    /**
+     * Use to span rows (empty value)
+     */
+    String thRowspan(int span) {
+      return String.format("<td rowspan\"%d\"></td>", span);
     }
 
-    String td(final String column, final Object... args) {
-      final String value = column == null ? "&nbsp;" : String.format(column, args);
-      return String.format("<td style=\"text-align: %s\">%s</td>", align, value);
+    /**
+     * Use to span columns
+     */
+    String thColspan(String value, int span) {
+      return String.format("<th colspan\"%d\">%s</th>", span, value);
+    }
+
+    String td(Date value) {
+      final String s = value == null ? "&nbsp;" : format.get().format(value);
+      return String.format("<td style=\"text-align: %s\">%s</td>", align, s);
+    }
+
+    String td(String value, final Object... args) {
+      final String s = value == null ? "&nbsp;" : String.format(value, args);
+      return String.format("<td style=\"text-align: %s\">%s</td>", align, s);
     }
   }
 
