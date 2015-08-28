@@ -81,8 +81,17 @@ public class LicenseWebRequestLogServlet extends HttpServlet {
                 break;
               }
             }
-            tableRow(CENTER.td(t), LEFT.td(uuid(r.nextString())), LEFT.td(r.nextString()), LEFT.td(r.nextString()),
-                LEFT.td(r.nextString()), LEFT.td(r.nextString()), CENTER.td(r.nextString()), CENTER.td(r.nextString()));
+            String uuid = r.nextString();
+            String name = r.nextString();
+            String email = r.nextString();
+            String company = r.nextString();
+            String licenseType = r.nextString();
+            String ignoreTrial = r.nextString();
+            String noEmail = r.nextString();
+            if ("false".equals(noEmail))
+              noEmail = "";
+            tableRow(CENTER.td(t), LEFT.td(uuid(uuid)), LEFT.td(name), LEFT.td(email), LEFT.td(company), LEFT.td(licenseType),
+                CENTER.td(ignoreTrial), CENTER.td(noEmail));
           }
           return rowsRemaining ? latest : -1; // -1 means no rows remain
         }
