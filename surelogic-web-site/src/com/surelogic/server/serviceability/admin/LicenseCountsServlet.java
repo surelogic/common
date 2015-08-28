@@ -55,23 +55,40 @@ public class LicenseCountsServlet extends HttpServlet {
 
     @Override
     public void doPerform(final Query q) {
+      final CountHandler handler = new CountHandler();
       prequel("License Counts");
       tableBegin();
-      tableRow(CENTER.th("Date"), RIGHT.th("Active Licenses"));
+      tableRow(CENTER.th("Date"), RIGHT.th("Active"), RIGHT.th("Web"), RIGHT.th("Activated Web"), RIGHT.th("Trial"),
+          RIGHT.th("Activated Trial"), RIGHT.th("Community"), RIGHT.th("Activated Community"));
       final Timestamp ts = new Timestamp(System.currentTimeMillis());
       final Counts counts = new Counts();
-      counts.activeLicenses = q.prepared("WebServices.activeLicensesOn", new ResultHandler<Long>() {
-        @Override
-        public Long handle(final Result result) {
-          for (Row r : result) {
-            return r.nextLong();
-          }
-          return 0L;
-        }
-      }).call(ts);
-      tableRow(CENTER.td(ts), RIGHT.td(SLUtility.toStringHumanWithCommas(counts.activeLicenses)));
+      counts.activeLicenses = q.prepared("WebServices.activeLicensesOn", handler).call(ts);
+      counts.totalWebLicenseRequests = q.prepared("WebServices.totalWebLicenseRequestsOn", handler).call(ts);
+      counts.activatedWebLicenseRequests = q.prepared("WebServices.activatedWebLicenseRequestsOn", handler).call(ts);
+      counts.totalWebTrialLicenseRequests = q.prepared("WebServices.totalWebTrialLicenseRequestsOn", handler).call(ts);
+      counts.activatedWebTrialLicenseRequests = q.prepared("WebServices.activatedWebTrialLicenseRequestsOn", handler).call(ts);
+      counts.totalWebCommunityLicenseRequests = q.prepared("WebServices.totalWebCommunityLicenseRequestsOn", handler).call(ts);
+      counts.activatedWebCommunityLicenseRequests = q.prepared("WebServices.activatedWebCommunityLicenseRequestsOn", handler)
+          .call(ts);
+      tableRow(CENTER.td(ts), RIGHT.td(SLUtility.toStringHumanWithCommas(counts.activeLicenses)),
+          RIGHT.td(SLUtility.toStringHumanWithCommas(counts.totalWebLicenseRequests)),
+          RIGHT.td(SLUtility.toStringHumanWithCommas(counts.activatedWebLicenseRequests)),
+          RIGHT.td(SLUtility.toStringHumanWithCommas(counts.totalWebTrialLicenseRequests)),
+          RIGHT.td(SLUtility.toStringHumanWithCommas(counts.activatedWebTrialLicenseRequests)),
+          RIGHT.td(SLUtility.toStringHumanWithCommas(counts.totalWebCommunityLicenseRequests)),
+          RIGHT.td(SLUtility.toStringHumanWithCommas(counts.activatedWebCommunityLicenseRequests)));
       tableEnd();
       finish();
+    }
+  }
+
+  static class CountHandler implements ResultHandler<Long> {
+    @Override
+    public Long handle(final Result result) {
+      for (Row r : result) {
+        return r.nextLong();
+      }
+      return 0L;
     }
   }
 
