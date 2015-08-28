@@ -58,7 +58,7 @@ public class LicenseWebRequestLogServlet extends HttpServlet {
       prequel("Recent Web License Request Activity");
       tableBegin();
       tableRow(CENTER.th("Date"), LEFT.th("License"), LEFT.th("Name"), LEFT.th("Email"), LEFT.th("Company"),
-          LEFT.th("License Type"));
+          LEFT.th("License Type"), CENTER.th("Ignore Trial"), CENTER.th("No Email"));
       long latest = q.prepared("WebServices.selectLicenseWebRequestsBefore", new ResultHandler<Long>() {
         @Override
         public Long handle(final Result result) {
@@ -82,13 +82,13 @@ public class LicenseWebRequestLogServlet extends HttpServlet {
               }
             }
             tableRow(CENTER.td(t), LEFT.td(uuid(r.nextString())), LEFT.td(r.nextString()), LEFT.td(r.nextString()),
-                LEFT.td(r.nextString()), LEFT.td(r.nextString()));
+                LEFT.td(r.nextString()), LEFT.td(r.nextString()), CENTER.td(r.nextString()), CENTER.td(r.nextString()));
           }
           return rowsRemaining ? latest : -1; // -1 means no rows remain
         }
       }).call(new Timestamp(time));
       if (latest != -1) {
-        tableRow(LEFT.td(""), LEFT.td(""), LEFT.td(""), LEFT.td(""), LEFT.td(""),
+        tableRow(LEFT.td(""), LEFT.td(""), LEFT.td(""), LEFT.td(""), LEFT.td(""), LEFT.td(""), LEFT.td(""),
             RIGHT.td("<a href=\"%s?%s=%d\">Next&gt;</a>", PAGE, TIME, latest));
       }
       tableEnd();

@@ -51,7 +51,7 @@ public class LicenseWebRequestSearchServlet extends HttpServlet {
           search == null ? "" : search));
       tableBegin();
       tableRow(CENTER.th("Date"), LEFT.th("License"), LEFT.th("Name"), LEFT.th("Email"), LEFT.th("Company"),
-          LEFT.th("License Type"));
+          LEFT.th("License Type"), CENTER.th("Ignore Trial"), CENTER.th("No Email"));
       NullRowHandler handler = new NullRowHandler() {
         @Override
         protected void doHandle(final Row r) {
@@ -61,8 +61,10 @@ public class LicenseWebRequestSearchServlet extends HttpServlet {
           String email = r.nextString();
           String company = r.nextString();
           String licenseType = r.nextString();
-          tableRow(CENTER.td(latest), LEFT.td(uuid(uuid)), LEFT.td(name), LEFT.td(email), LEFT.td(company),
-              LEFT.td(licenseType));
+          String ignoreTrial = r.nextString();
+          String noEmail = r.nextString();
+          tableRow(CENTER.td(latest), LEFT.td(uuid(uuid)), LEFT.td(name), LEFT.td(email), LEFT.td(company), LEFT.td(licenseType),
+              CENTER.td(ignoreTrial), CENTER.td(noEmail));
         }
       };
       String jdbcSearch = "%" + search + "%";
