@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.surelogic.NonNull;
 import com.surelogic.common.jdbc.NullDBQuery;
 import com.surelogic.common.jdbc.NullRowHandler;
 import com.surelogic.common.jdbc.Query;
@@ -57,15 +58,37 @@ public class LicenseAdminServlet extends HttpServlet {
     if (blacklist != null && (YES.equals(blacklist) || NO.equals(blacklist))) {
       ServicesDBConnection.getInstance().withTransaction(new UpdateBlacklisted(uuid, YES.equals(blacklist)));
     }
+    String ignoreTrial = req.getParameter("ignoreTrial");
+    if (ignoreTrial != null && ("true".equals(ignoreTrial) || "false".equals(ignoreTrial))) {
+      ServicesDBConnection.getInstance().withTransaction(new UpdateIngoreTrial(uuid, ignoreTrial));
+    }
     ServicesDBConnection.getInstance().withReadOnly(new ShowLicense(uuid, resp.getWriter()));
   }
 
-  private static class UpdateBlacklisted extends NullDBQuery {
+  static class UpdateInstallCount extends NullDBQuery {
 
-    private final boolean blacklist;
-    private final String uuid;
+    @NonNull
+    final String uuid;
+    final int parseInt;
 
-    UpdateBlacklisted(final String uuid, final boolean blacklist) {
+    public UpdateInstallCount(@NonNull String uuid, final int parseInt) {
+      this.uuid = uuid;
+      this.parseInt = parseInt;
+    }
+
+    @Override
+    public void doPerform(final Query q) {
+      q.prepared("WebServices.updateInstallCount").call(parseInt, uuid);
+    }
+  }
+
+  static class UpdateBlacklisted extends NullDBQuery {
+
+    @NonNull
+    final String uuid;
+    final boolean blacklist;
+
+    UpdateBlacklisted(@NonNull String uuid, final boolean blacklist) {
       this.blacklist = blacklist;
       this.uuid = uuid;
     }
@@ -77,30 +100,31 @@ public class LicenseAdminServlet extends HttpServlet {
         q.prepared("WebServices.addToBlacklist").call(uuid);
       }
     }
-
   }
 
-  private static class UpdateInstallCount extends NullDBQuery {
+  static class UpdateIngoreTrial extends NullDBQuery {
 
-    private final int parseInt;
-    private final String uuid;
+    @NonNull
+    final String uuid;
+    @NonNull
+    final String value;
 
-    public UpdateInstallCount(final String uuid, final int parseInt) {
+    UpdateIngoreTrial(@NonNull String uuid, @NonNull String value) {
+      this.value = value;
       this.uuid = uuid;
-      this.parseInt = parseInt;
     }
 
     @Override
     public void doPerform(final Query q) {
-      q.prepared("WebServices.updateInstallCount").call(parseInt, uuid);
+      q.prepared("WebServices.updateIngoreTrial").call(value, uuid);
     }
-
   }
 
   private static class ShowLicense extends HTMLQuery {
-    private final String uuid;
+    @NonNull
+    final String uuid;
 
-    ShowLicense(final String uuid, final PrintWriter writer) {
+    ShowLicense(@NonNull String uuid, @NonNull PrintWriter writer) {
       super(writer);
       this.uuid = uuid;
     }
