@@ -64,9 +64,7 @@ public class LicenseWebRequestSearchServlet extends HttpServlet {
           String ignoreTrial = r.nextString();
           if ("false".equals(ignoreTrial) || "Community".equals(licenseType))
             ignoreTrial = "";
-          String noEmail = r.nextString();
-          if ("false".equals(noEmail))
-            noEmail = "";
+          String noEmail = "true".equals(r.nextString()) ? "X" : "";
           tableRow(CENTER.td(latest), LEFT.td(uuid(uuid)), LEFT.td(name), LEFT.td(email), LEFT.td(company), LEFT.td(licenseType),
               CENTER.td(ignoreTrial), CENTER.td(noEmail));
         }

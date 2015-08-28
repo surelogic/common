@@ -168,9 +168,7 @@ public class LicenseAdminServlet extends HttpServlet {
             ignoreTrial = "";
           else
             ignoreTrial = ignoreTrialLink(ignoreTrial);
-          String noEmail = r.nextString();
-          if ("false".equals(noEmail))
-            noEmail = "";
+          String noEmail = "true".equals(r.nextString()) ? "X" : "";
           tableRow(CENTER.td(latest), LEFT.td(name), LEFT.td(email), LEFT.td(company), LEFT.td(licenseType), CENTER.td(ignoreTrial),
               CENTER.td(noEmail));
         }
@@ -187,7 +185,7 @@ public class LicenseAdminServlet extends HttpServlet {
 
     String ignoreTrialLink(final String ignoreTrial) {
       boolean ignore = "true".equals(ignoreTrial);
-      return String.format("<a href=\"license?uuid=%s&ignoreTrial=%s\">%2$s (press to toggle)</a>", uuid,
+      return String.format("<a href=\"license?uuid=%s&ignoreTrial=%s\">%s (press to toggle)</a>", uuid, ignore ? "false" : "true",
           ignore ? "true" : "false");
     }
   }
