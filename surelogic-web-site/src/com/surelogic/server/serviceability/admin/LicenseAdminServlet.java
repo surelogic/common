@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.surelogic.NonNull;
 import com.surelogic.common.jdbc.NullDBQuery;
 import com.surelogic.common.jdbc.NullRowHandler;
 import com.surelogic.common.jdbc.Query;
@@ -57,15 +58,37 @@ public class LicenseAdminServlet extends HttpServlet {
     if (blacklist != null && (YES.equals(blacklist) || NO.equals(blacklist))) {
       ServicesDBConnection.getInstance().withTransaction(new UpdateBlacklisted(uuid, YES.equals(blacklist)));
     }
+    String ignoreTrial = req.getParameter("ignoreTrial");
+    if (ignoreTrial != null && ("true".equals(ignoreTrial) || "false".equals(ignoreTrial))) {
+      ServicesDBConnection.getInstance().withTransaction(new UpdateIngoreTrial(uuid, ignoreTrial));
+    }
     ServicesDBConnection.getInstance().withReadOnly(new ShowLicense(uuid, resp.getWriter()));
   }
 
-  private static class UpdateBlacklisted extends NullDBQuery {
+  static class UpdateInstallCount extends NullDBQuery {
 
-    private final boolean blacklist;
-    private final String uuid;
+    @NonNull
+    final String uuid;
+    final int parseInt;
 
-    UpdateBlacklisted(final String uuid, final boolean blacklist) {
+    public UpdateInstallCount(@NonNull String uuid, final int parseInt) {
+      this.uuid = uuid;
+      this.parseInt = parseInt;
+    }
+
+    @Override
+    public void doPerform(final Query q) {
+      q.prepared("WebServices.updateInstallCount").call(parseInt, uuid);
+    }
+  }
+
+  static class UpdateBlacklisted extends NullDBQuery {
+
+    @NonNull
+    final String uuid;
+    final boolean blacklist;
+
+    UpdateBlacklisted(@NonNull String uuid, final boolean blacklist) {
       this.blacklist = blacklist;
       this.uuid = uuid;
     }
@@ -77,30 +100,31 @@ public class LicenseAdminServlet extends HttpServlet {
         q.prepared("WebServices.addToBlacklist").call(uuid);
       }
     }
-
   }
 
-  private static class UpdateInstallCount extends NullDBQuery {
+  static class UpdateIngoreTrial extends NullDBQuery {
 
-    private final int parseInt;
-    private final String uuid;
+    @NonNull
+    final String uuid;
+    @NonNull
+    final String value;
 
-    public UpdateInstallCount(final String uuid, final int parseInt) {
+    UpdateIngoreTrial(@NonNull String uuid, @NonNull String value) {
+      this.value = value;
       this.uuid = uuid;
-      this.parseInt = parseInt;
     }
 
     @Override
     public void doPerform(final Query q) {
-      q.prepared("WebServices.updateInstallCount").call(parseInt, uuid);
+      q.prepared("WebServices.updateIgnoreTrial").call(value, uuid);
     }
-
   }
 
   private static class ShowLicense extends HTMLQuery {
-    private final String uuid;
+    @NonNull
+    final String uuid;
 
-    ShowLicense(final String uuid, final PrintWriter writer) {
+    ShowLicense(@NonNull String uuid, @NonNull PrintWriter writer) {
       super(writer);
       this.uuid = uuid;
     }
@@ -152,24 +176,24 @@ public class LicenseAdminServlet extends HttpServlet {
       }).call(uuid);
       tableEnd();
       writer.println("<h3>Web License Requests</h3>");
-      tableRow(CENTER.th("Date"), LEFT.th("License"), LEFT.th("Name"), LEFT.th("Email"), LEFT.th("Company"),
-          LEFT.th("License Type"), CENTER.th("Ignore Trial"), CENTER.th("No Email"));
+      tableBegin();
+      tableRow(CENTER.th("Date"), LEFT.th("Name"), LEFT.th("Email"), LEFT.th("Company"), CENTER.th("License Type"),
+          CENTER.th("Ignore Trial"), CENTER.th("No Email"));
       q.prepared("WebServices.selectWebLicenseRequestByID", new NullRowHandler() {
         @Override
         protected void doHandle(final Row r) {
           Date latest = r.nextTimestamp();
-          String uuid = r.nextString();
           String name = r.nextString();
           String email = r.nextString();
           String company = r.nextString();
           String licenseType = r.nextString();
           String ignoreTrial = r.nextString();
-          if ("false".equals(ignoreTrial) || "Community".equals(licenseType))
+          if ("Community".equals(licenseType))
             ignoreTrial = "";
-          String noEmail = r.nextString();
-          if ("false".equals(noEmail))
-            noEmail = "";
-          tableRow(CENTER.td(latest), LEFT.td(uuid(uuid)), LEFT.td(name), LEFT.td(email), LEFT.td(company), LEFT.td(licenseType),
+          else
+            ignoreTrial = ignoreTrialLink(ignoreTrial);
+          String noEmail = "true".equals(r.nextString()) ? "X" : "";
+          tableRow(CENTER.td(latest), LEFT.td(name), LEFT.td(email), LEFT.td(company), CENTER.td(licenseType),
               CENTER.td(ignoreTrial), CENTER.td(noEmail));
         }
       }).call(uuid);
@@ -181,6 +205,12 @@ public class LicenseAdminServlet extends HttpServlet {
       boolean blacklist = YES.equals(blString);
       return String.format("<a href=\"license?uuid=%s&blacklist=%s\">%s</a>", uuid, blacklist ? NO : YES,
           blacklist ? "Remove from Blacklist" : "Add to Blacklist");
+    }
+
+    String ignoreTrialLink(final String ignoreTrial) {
+      boolean ignore = "true".equals(ignoreTrial);
+      return String.format("<a href=\"license?uuid=%s&ignoreTrial=%s\">%s (press to toggle)</a>", uuid, ignore ? "false" : "true",
+          ignore ? "true" : "false");
     }
   }
 }
