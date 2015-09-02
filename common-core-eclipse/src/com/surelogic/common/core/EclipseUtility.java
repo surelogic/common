@@ -753,7 +753,6 @@ public class EclipseUtility {
     String result = null;
     @NonNull
     final String product = System.getProperty("eclipse.product", "org.eclipse.platform.ide");
-    System.out.println(product);
     final IExtensionPoint point = Platform.getExtensionRegistry().getExtensionPoint("org.eclipse.core.runtime.products");
     if (point != null) {
       final IExtension[] extensions = point.getExtensions();

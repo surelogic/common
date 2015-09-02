@@ -226,11 +226,13 @@ public final class SLLicenseUtility {
    *          the MAC addresses of this machine, used to prevent moving
    *          activated license files. May be empty (or {@code null} which means
    *          empty).
+   * @param eclipseVersion
+   *          the Eclipse version or {@code null} if unknown.
    * @throws Exception
    *           should anything go wrong.
    */
   public static void tryToActivateRenewLicenses(@Nullable List<PossiblyActivatedSLLicense> licenses,
-      @Nullable Iterable<String> macAddresses) throws Exception {
+      @Nullable Iterable<String> macAddresses, @Nullable String eclipseVersion) throws Exception {
     if (licenses == null || licenses.isEmpty())
       return;
     if (macAddresses == null)
@@ -249,6 +251,9 @@ public final class SLLicenseUtility {
       }
     }
 
+    if (eclipseVersion == null)
+      eclipseVersion = "unknown";
+
     /*
      * Build the message to send to surelogic.com.
      */
@@ -257,6 +262,9 @@ public final class SLLicenseUtility {
     param.put(I18N.msg("web.check.param.req"), I18N.msg("web.check.param.req.value.actrew"));
     param.put(I18N.msg("web.check.param.license"), l);
     param.put(I18N.msg("web.check.param.macAddresses"), Joiner.on(',').skipNulls().join(macAddresses));
+    param.put(I18N.msg("web.check.param.osVersion"), System.getProperty("os.name", "unknown"));
+    param.put(I18N.msg("web.check.param.javaVersion"), System.getProperty("java.version", "unknown"));
+    param.put(I18N.msg("web.check.param.eclipseVersion"), eclipseVersion);
     final URL url = new URL(I18N.msg("web.netcheck.url", SLUtility.SERVICEABILITY_SERVER));
     final String response = SLUtility.sendPostToUrl(url, param);
     final List<SignedSLLicenseNetCheck> licenseNetChecks = SLLicensePersistence.readLicenseNetChecksFromString(response);
@@ -294,7 +302,8 @@ public final class SLLicenseUtility {
    * @throws Exception
    *           should anything go wrong.
    */
-  public static void tryToUninstallLicenses(final List<PossiblyActivatedSLLicense> licenses) throws Exception {
+  public static void tryToUninstallLicenses(final List<PossiblyActivatedSLLicense> licenses, @Nullable String eclipseVersion)
+      throws Exception {
     if (licenses.isEmpty()) {
       return;
     }
@@ -327,6 +336,9 @@ public final class SLLicenseUtility {
     final Map<String, String> param = new HashMap<>();
     param.put(I18N.msg("web.check.param.req"), I18N.msg("web.check.param.req.value.remove"));
     param.put(I18N.msg("web.check.param.license"), l);
+    param.put(I18N.msg("web.check.param.osVersion"), System.getProperty("os.name", "unknown"));
+    param.put(I18N.msg("web.check.param.javaVersion"), System.getProperty("java.version", "unknown"));
+    param.put(I18N.msg("web.check.param.eclipseVersion"), eclipseVersion);
     final URL url = new URL(I18N.msg("web.netcheck.url", SLUtility.SERVICEABILITY_SERVER));
     SLUtility.sendPostToUrl(url, param);
   }
