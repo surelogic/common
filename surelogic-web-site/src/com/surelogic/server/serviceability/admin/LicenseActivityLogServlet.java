@@ -52,7 +52,7 @@ public class LicenseActivityLogServlet extends HttpServlet {
       prequel("Recent License Activity");
       tableBegin();
       tableRow(CENTER.th("Date"), LEFT.th("IP"), LEFT.th("License"), LEFT.th("Event"), LEFT.th("Holder"), LEFT.th("Email"),
-          LEFT.th("Company"));
+          LEFT.th("Company"), LEFT.th("OS"), LEFT.th("Java Version"), LEFT.th("Eclipse Version"));
       final long latest = q.prepared("WebServices.selectNetChecksBefore", new ResultHandler<Long>() {
         @Override
         public Long handle(final Result result) {
@@ -76,14 +76,15 @@ public class LicenseActivityLogServlet extends HttpServlet {
               }
             }
             tableRow(CENTER.td(t), LEFT.td(ip(r.nextString())), LEFT.td(uuid(r.nextString())), LEFT.td(r.nextString()),
-                LEFT.td(r.nextString()), LEFT.td(r.nextString()), LEFT.td(r.nextString()));
+                LEFT.td(r.nextString()), LEFT.td(r.nextString()), LEFT.td(r.nextString()), LEFT.td(r.nextString()),
+                LEFT.td(r.nextString()), LEFT.td(r.nextString()));
           }
           return rowsRemaining ? latest : -1; // -1 means no rows remain
         }
       }).call(new Timestamp(time));
       if (latest != -1) {
-        tableRow(LEFT.td(""), LEFT.td(""), LEFT.td(""), LEFT.td(""), LEFT.td(""), LEFT.td(""),
-            RIGHT.td("<a href=\"%s?%s=%d\">Next&gt;</a>", PAGE, TIME, latest));
+        tableRow(LEFT.td(""), LEFT.td(""), LEFT.td(""), LEFT.td(""), LEFT.td(""), LEFT.td(""), LEFT.td(""), LEFT.td(""),
+            LEFT.td(""), RIGHT.td("<a href=\"%s?%s=%d\">Next&gt;</a>", PAGE, TIME, latest));
       }
       tableEnd();
       finish();
