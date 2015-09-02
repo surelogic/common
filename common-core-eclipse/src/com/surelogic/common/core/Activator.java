@@ -1,5 +1,7 @@
 package com.surelogic.common.core;
 
+import java.io.File;
+
 import org.eclipse.core.runtime.Plugin;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
@@ -18,6 +20,8 @@ public class Activator extends Plugin {
   public Activator() {
     if (plugin != null)
       throw new IllegalStateException(Activator.class.getName() + " instance already exits, it should be a singleton.");
+    // change derby.log location to the workspace
+    System.setProperty("derby.stream.error.file", new File(EclipseUtility.getWorkspacePath(), "derby.log").getAbsolutePath());
     plugin = this;
   }
 
