@@ -38,6 +38,10 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IContributor;
+import org.eclipse.core.runtime.IExtension;
+import org.eclipse.core.runtime.IExtensionPoint;
+import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -737,15 +741,36 @@ public class EclipseUtility {
   }
 
   /**
-   * Gets the version of Eclipse, such as <tt>4.5.0</tt>. Currently this method
-   * uses the version of the org.eclipse.platform plug-in which should match.
+   * Gets the version of Eclipse, such as <tt>"4.4.0.20140612-0500"</tt>.
+   * Currently this method looks for the definition of the Eclipse product, and
+   * if that fails it uses the version of the org.eclipse.platform plug-in which
+   * should match.
    * 
-   * @return the version of the org.eclipse.platform bundle, such as
-   *         <tt>4.5.0</tt>, or <tt>unknown</tt> if the version cannot be
-   *         determined or the passed bundle is {@code null}.
+   * @return the version of the org.eclipse.platform bundle or <tt>unknown</tt>
+   *         if the version cannot be determined.
    */
   public static String getEclipseVersion() {
-    return getVersion(Platform.getBundle("org.eclipse.platform"));
+    String result = null;
+    String product = System.getProperty("eclipse.product");
+    IExtensionRegistry registry = Platform.getExtensionRegistry();
+    IExtensionPoint point = registry.getExtensionPoint("org.eclipse.core.runtime.products");
+    if (point != null) {
+      IExtension[] extensions = point.getExtensions();
+      for (IExtension ext : extensions) {
+        if (product.equals(ext.getUniqueIdentifier())) {
+          IContributor contributor = ext.getContributor();
+          if (contributor != null) {
+            Bundle bundle = Platform.getBundle(contributor.getName());
+            if (bundle != null) {
+              result = bundle.getVersion().toString();
+            }
+          }
+        }
+      }
+    }
+    if (result == null)
+      result = getVersion(Platform.getBundle("org.eclipse.platform"));
+    return result;
   }
 
   /**
