@@ -262,9 +262,9 @@ public final class SLLicenseUtility {
     param.put(I18N.msg("web.check.param.req"), I18N.msg("web.check.param.req.value.actrew"));
     param.put(I18N.msg("web.check.param.license"), l);
     param.put(I18N.msg("web.check.param.macAddresses"), Joiner.on(',').skipNulls().join(macAddresses));
-    param.put(I18N.msg("web.check.param.osVersion"), System.getProperty("os.name", "unknown"));
-    param.put(I18N.msg("web.check.param.javaVersion"), System.getProperty("java.version", "unknown"));
-    param.put(I18N.msg("web.check.param.eclipseVersion"), eclipseVersion);
+    param.put(I18N.msg("web.check.param.os"), System.getProperty("os.name", "unknown"));
+    param.put(I18N.msg("web.check.param.java"), System.getProperty("java.version", "unknown"));
+    param.put(I18N.msg("web.check.param.eclipse"), eclipseVersion);
     final URL url = new URL(I18N.msg("web.netcheck.url", SLUtility.SERVICEABILITY_SERVER));
     final String response = SLUtility.sendPostToUrl(url, param);
     final List<SignedSLLicenseNetCheck> licenseNetChecks = SLLicensePersistence.readLicenseNetChecksFromString(response);
@@ -336,9 +336,9 @@ public final class SLLicenseUtility {
     final Map<String, String> param = new HashMap<>();
     param.put(I18N.msg("web.check.param.req"), I18N.msg("web.check.param.req.value.remove"));
     param.put(I18N.msg("web.check.param.license"), l);
-    param.put(I18N.msg("web.check.param.osVersion"), System.getProperty("os.name", "unknown"));
-    param.put(I18N.msg("web.check.param.javaVersion"), System.getProperty("java.version", "unknown"));
-    param.put(I18N.msg("web.check.param.eclipseVersion"), eclipseVersion);
+    param.put(I18N.msg("web.check.param.os"), System.getProperty("os.name", "unknown"));
+    param.put(I18N.msg("web.check.param.java"), System.getProperty("java.version", "unknown"));
+    param.put(I18N.msg("web.check.param.eclipse"), eclipseVersion);
     final URL url = new URL(I18N.msg("web.netcheck.url", SLUtility.SERVICEABILITY_SERVER));
     SLUtility.sendPostToUrl(url, param);
   }
