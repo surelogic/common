@@ -750,8 +750,10 @@ public class EclipseUtility {
    *         if the version cannot be determined.
    */
   public static String getEclipseVersion() {
+    @Nullable
     String result = null;
-    String product = System.getProperty("eclipse.product");
+    final String product = System.getProperty("eclipse.product", "org.eclipse.platform.ide");
+    System.out.println(product);
     IExtensionRegistry registry = Platform.getExtensionRegistry();
     IExtensionPoint point = registry.getExtensionPoint("org.eclipse.core.runtime.products");
     if (point != null) {
