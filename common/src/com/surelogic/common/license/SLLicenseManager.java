@@ -10,7 +10,9 @@ import java.util.UUID;
 import java.util.logging.Level;
 
 import com.google.common.collect.ImmutableSet;
+import com.surelogic.Nullable;
 import com.surelogic.common.FileUtility;
+import com.surelogic.common.Pair;
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.logging.SLLogger;
@@ -46,10 +48,31 @@ public final class SLLicenseManager {
    * 
    * @return a copy of the list of possibly installed licenses.
    */
-  public List<PossiblyActivatedSLLicense> getLicenses() {
+  public ArrayList<PossiblyActivatedSLLicense> getLicenses() {
     synchronized (SLLicenseManager.class) {
       return new ArrayList<>(f_licenses);
     }
+  }
+
+  /**
+   * Gets a name and email from the first license that has one that managed. If
+   * none, {@code null} is returned.
+   * <p>
+   * This method is intended to be used by serviceability code to get something
+   * to fill in the name and email on a report.
+   * 
+   * @return a pair containing the name and email from a license, or
+   *         {@code null} if none.
+   */
+  @Nullable
+  public Pair<String, String> getNameAndEmail() {
+    final ArrayList<PossiblyActivatedSLLicense> licenses = getLicenses();
+    for (PossiblyActivatedSLLicense license : licenses) {
+      final String name = license.getSignedSLLicense().getLicense().getHolder();
+      final String email = license.getSignedSLLicense().getLicense().getEmail();
+      return new Pair<>(name, email);
+    }
+    return null;
   }
 
   /**
