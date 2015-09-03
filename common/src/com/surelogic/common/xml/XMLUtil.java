@@ -33,13 +33,16 @@ public class XMLUtil {
     return sp;
   }
 
-  public static void parseResource(Logger log, SAXParser sp, InputStream in, DefaultHandler handler, String errMsg) {
+  public static boolean parseResource(Logger log, SAXParser sp, InputStream in, DefaultHandler handler, String errMsg) {
     try {
       sp.parse(in, handler);
+      return true;
     } catch (SAXException e) {
       log.log(Level.WARNING, errMsg, e);
+      return false;
     } catch (IOException e) {
       log.log(Level.WARNING, errMsg, e);
+      return false;
     }
   }
 
