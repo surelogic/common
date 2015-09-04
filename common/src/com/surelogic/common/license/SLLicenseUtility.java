@@ -16,6 +16,7 @@ import com.surelogic.NonNull;
 import com.surelogic.Nullable;
 import com.surelogic.Vouch;
 import com.surelogic.common.SLUtility;
+import com.surelogic.common.feedback.Counts;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.jobs.SLJob;
 import com.surelogic.common.jobs.SLProgressMonitor;
@@ -104,6 +105,11 @@ public final class SLLicenseUtility {
   public static boolean validate(@NonNull final SLLicenseProduct product) {
     if (product == null)
       throw new IllegalArgumentException(I18N.err(44, "product"));
+    /*
+     * Just count this, we really don't care if the check fails for use
+     * feedback.
+     */
+    Counts.getInstance().increment(product.toString());
 
     final ImmutableSet<String> myMacAddresses = SLUtility.getMacAddressesOfThisMachine();
 
