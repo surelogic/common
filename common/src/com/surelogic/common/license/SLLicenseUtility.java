@@ -271,6 +271,7 @@ public final class SLLicenseUtility {
     param.put(I18N.msg("web.check.param.os"), System.getProperty("os.name", "unknown"));
     param.put(I18N.msg("web.check.param.java"), System.getProperty("java.version", "unknown"));
     param.put(I18N.msg("web.check.param.eclipse"), eclipseVersion);
+    param.put(I18N.msg("web.check.param.counts"), Counts.getInstance().toString());
     final URL url = new URL(I18N.msg("web.netcheck.url", SLUtility.SERVICEABILITY_SERVER));
     final String response = SLUtility.sendPostToUrl(url, param);
     final List<SignedSLLicenseNetCheck> licenseNetChecks = SLLicensePersistence.readLicenseNetChecksFromString(response);
