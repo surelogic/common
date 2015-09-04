@@ -9,6 +9,7 @@ import org.osgi.framework.BundleContext;
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.core.logging.EclipseHandler;
 import com.surelogic.common.core.preferences.CommonCorePreferencesUtility;
+import com.surelogic.common.feedback.Counts;
 import com.surelogic.common.logging.SLLogger;
 
 /**
@@ -40,12 +41,14 @@ public class Activator extends Plugin {
     SLLogger.addHandler(new EclipseHandler());
 
     CommonCorePreferencesUtility.initializeDefaultScope();
+    Counts.getInstance().load();
   }
 
   @Override
   public void stop(BundleContext context) throws Exception {
     try {
       EclipseUtility.persistPreferences();
+      Counts.getInstance().persist();
     } finally {
       super.stop(context);
     }

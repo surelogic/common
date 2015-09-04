@@ -2,14 +2,12 @@ package com.surelogic.common;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,6 +20,7 @@ import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.FileChannel;
+import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collections;
@@ -33,6 +32,7 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import com.google.common.io.Files;
 import com.surelogic.NonNull;
 import com.surelogic.Nullable;
 import com.surelogic.Utility;
@@ -803,10 +803,28 @@ public final class FileUtility {
    */
   public static void putStringIntoAFile(final File textFile, final String text) {
     try {
-      final BufferedWriter r = new BufferedWriter(new FileWriter(textFile));
-      r.write(text);
-      r.close();
+      Files.write(text, textFile, Charset.defaultCharset());
     } catch (final IOException e) {
+      final String msg = I18N.err(31, textFile.getAbsolutePath());
+      SLLogger.getLogger().log(Level.SEVERE, msg, e);
+      throw new IllegalStateException(msg, e);
+    }
+  }
+
+  /**
+   * Appends the passed string into the passed file.
+   * 
+   * @param textFile
+   *          a text file.
+   * @param text
+   *          the text to append.
+   * @throws IllegalStateException
+   *           if something goes wrong.
+   */
+  public static void appendStringIntoAFile(final File textFile, final String text) {
+    try {
+      Files.append(text, textFile, Charset.defaultCharset());
+    } catch (IOException e) {
       final String msg = I18N.err(31, textFile.getAbsolutePath());
       SLLogger.getLogger().log(Level.SEVERE, msg, e);
       throw new IllegalStateException(msg, e);

@@ -10,6 +10,7 @@ import java.util.UUID;
 import java.util.logging.Level;
 
 import com.google.common.collect.ImmutableSet;
+import com.surelogic.NonNull;
 import com.surelogic.Nullable;
 import com.surelogic.common.FileUtility;
 import com.surelogic.common.Pair;
@@ -38,6 +39,17 @@ public final class SLLicenseManager {
   }
 
   private final File f_licenseFile = new File(System.getProperty("user.home") + File.separator + ".surelogic-licenses");
+
+  /**
+   * Gets the tool user's license file. This method is used to add license use
+   * counts to the file.
+   * 
+   * @return the tool user's license file.
+   */
+  @NonNull
+  public File getLicenseFile() {
+    return f_licenseFile;
+  }
 
   private final String f_pluginLicenseFile = "/lib/.surelogic-licenses";
 

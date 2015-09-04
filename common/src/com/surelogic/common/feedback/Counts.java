@@ -12,7 +12,9 @@ import com.surelogic.NonNull;
 import com.surelogic.Nullable;
 import com.surelogic.Singleton;
 import com.surelogic.ThreadSafe;
+import com.surelogic.common.FileUtility;
 import com.surelogic.common.i18n.I18N;
+import com.surelogic.common.license.SLLicenseManager;
 
 /**
  * Used to count things that happen in the tool for feedback to SureLogic.
@@ -99,6 +101,35 @@ public final class Counts {
           f_counts.put(key, Long.valueOf(count));
         }
       }
+    }
+  }
+
+  private static final String UNLIKELY_DELIM = "\nSureLogic:Ver:2015-09-04:";
+
+  /**
+   * Persists the counts to the end of the license file using an unlikely
+   * delimiter.
+   */
+  public void persist() {
+    /*
+     * append our information at the end of the file
+     */
+    FileUtility.appendStringIntoAFile(SLLicenseManager.getInstance().getLicenseFile(),
+        UNLIKELY_DELIM + Counts.getInstance().toString());
+  }
+
+  /**
+   * Reads the license file and tries to get persisted counts, if any, that are
+   * written in it.
+   */
+  public void load() {
+    final String contents = FileUtility.getFileContentsAsString(SLLicenseManager.getInstance().getLicenseFile());
+    int i = contents.indexOf(UNLIKELY_DELIM);
+    if (i != -1) {
+      final String value = contents.substring(i + UNLIKELY_DELIM.length());
+      if (value.length() > 2)
+        Counts.getInstance().set(value);
+
     }
   }
 }
