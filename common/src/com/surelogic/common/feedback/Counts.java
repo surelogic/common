@@ -13,6 +13,7 @@ import com.surelogic.Nullable;
 import com.surelogic.Singleton;
 import com.surelogic.ThreadSafe;
 import com.surelogic.common.FileUtility;
+import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.license.SLLicenseManager;
 
@@ -111,11 +112,12 @@ public final class Counts {
    * delimiter.
    */
   public void persist() {
+    final String info = Counts.getInstance().toString();
+    final String infoForFile = SLUtility.encodeBase64(info);
     /*
      * append our information at the end of the file
      */
-    FileUtility.appendStringIntoAFile(SLLicenseManager.getInstance().getLicenseFile(),
-        UNLIKELY_DELIM + Counts.getInstance().toString());
+    FileUtility.appendStringIntoAFile(SLLicenseManager.getInstance().getLicenseFile(), UNLIKELY_DELIM + infoForFile);
   }
 
   /**
@@ -126,10 +128,11 @@ public final class Counts {
     final String contents = FileUtility.getFileContentsAsString(SLLicenseManager.getInstance().getLicenseFile());
     int i = contents.indexOf(UNLIKELY_DELIM);
     if (i != -1) {
-      final String value = contents.substring(i + UNLIKELY_DELIM.length());
-      if (value.length() > 2)
-        Counts.getInstance().set(value);
-
+      final String infoFromFile = contents.substring(i + UNLIKELY_DELIM.length());
+      if (infoFromFile.length() > 2) {
+        final String info = SLUtility.decodeBase64(infoFromFile);
+        Counts.getInstance().set(info);
+      }
     }
   }
 }
