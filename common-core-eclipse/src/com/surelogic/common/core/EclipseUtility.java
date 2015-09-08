@@ -48,7 +48,6 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Plugin;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.IJobManager;
 import org.eclipse.core.runtime.jobs.Job;
@@ -72,8 +71,6 @@ import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.jobs.AggregateSLJob;
 import com.surelogic.common.jobs.SLJob;
 import com.surelogic.common.jobs.SLStatus;
-import com.surelogic.common.license.SLLicenseProduct;
-import com.surelogic.common.license.SLLicenseUtility;
 import com.surelogic.common.logging.SLLogger;
 
 @Utility
@@ -794,11 +791,10 @@ public class EclipseUtility {
   }
 
   /**
-   * Gets the date that the version of the passed activator was released or
-   * today's date.
+   * Gets the date that the current revision of this plugin was released or
+   * today's date. This is used as the release date of the SureLogic tools.
    * <p>
-   * This method uses {@link #getVersion(AbstractUIPlugin)} to obtain a version
-   * string similar to
+   * This method gets the bundle version which is a string similar to
    * 
    * <pre>
    * 3.1.1.201001151440
@@ -807,11 +803,9 @@ public class EclipseUtility {
    * The <tt>"20100115"</tt> portion of the string (after the last <tt>"."</tt>)
    * is then parsed as a date using the pattern <tt>"yyyyMMdd"</tt>.
    * 
-   * @param activator
-   *          a plug-in to query.
    * @return the date the version was released or today's date.
    */
-  public static Date getReleaseDate(final Plugin activator) {
+  public static Date getReleaseDate() {
     final String rawVersionS = (String) Activator.getDefault().getBundle().getHeaders().get(BUNDLE_VERSION);
     if (rawVersionS.endsWith(DOT_QUALIFIER))
       return new Date();
@@ -831,43 +825,6 @@ public class EclipseUtility {
     } catch (ParseException ignore) {
     }
     return new Date();
-  }
-
-  /**
-   * Constructs an Eclipse job to lookup the release date of the passed plug-in
-   * and set it as the product release date of the passed product.
-   * 
-   * @param product
-   *          a product.
-   * @param activator
-   *          a plug-in.
-   * @return an Eclipse job.
-   */
-  public static Job getProductReleaseDateJob(final SLLicenseProduct product, final Plugin activator) {
-    if (product == null)
-      throw new IllegalArgumentException(I18N.err(44, "product"));
-    if (activator == null)
-      throw new IllegalArgumentException(I18N.err(44, "activator"));
-
-    final Job job = new Job("Looking up " + product + " release date") {
-      @Override
-      protected IStatus run(IProgressMonitor monitor) {
-        monitor.beginTask(getName(), 2);
-        try {
-          Date releaseDate = getReleaseDate(activator);
-          monitor.worked(1);
-          SLLicenseUtility.setReleaseDateFor(product, releaseDate);
-          // special handling for Flashlight for Android version
-          if (product == SLLicenseProduct.FLASHLIGHT)
-            SLLicenseUtility.setReleaseDateFor(SLLicenseProduct.FLASHLIGHT_ANDROID, releaseDate);
-          monitor.worked(1);
-        } finally {
-          monitor.done();
-        }
-        return Status.OK_STATUS;
-      }
-    };
-    return job;
   }
 
   public static IProject unzipToWorkspace(final File projectZip) throws CoreException, IOException {

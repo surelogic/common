@@ -207,17 +207,18 @@ public final class PossiblyActivatedSLLicense {
   public boolean licensesUseOf(@NonNull final SLLicenseProduct product, @Nullable Iterable<String> macAddresses) {
     if (product == null)
       throw new IllegalArgumentException(I18N.err(44, "product"));
+    if (!product.isProduct())
+      throw new IllegalArgumentException(I18N.err(356, product));
+
+    if (product == SLLicenseProduct.EXEMPT)
+      return true;
+
+    if (!isActivated())
+      return false;
 
     if (macAddresses == null)
       macAddresses = ImmutableSet.of(); // null means empty
-
-    /*
-     * Some products don't require checks
-     */
-    if (!product.needsLicense())
-      return true;
-
-    if (!isActivated() || !getSignedSLLicenseNetCheck().getLicenseNetCheck().containsAtLeastOneMacAddress(macAddresses))
+    if (!getSignedSLLicenseNetCheck().getLicenseNetCheck().containsAtLeastOneMacAddress(macAddresses))
       return false;
 
     final SLLicense license = f_license.getLicense();
@@ -226,16 +227,15 @@ public final class PossiblyActivatedSLLicense {
     /*
      * USE licenses expire on the date specified.
      */
-    if (isExpired() && type == SLLicenseType.USE) {
+    if (isExpired() && type == SLLicenseType.USE)
       return false;
-    }
 
     /*
      * SUPPORT and PERPETUAL licenses allow use of versions released before
      * their expiration date or renewal deadline, respectively.
      */
     if (type == SLLicenseType.SUPPORT || type == SLLicenseType.PERPETUAL) {
-      final Date releaseDate = SLLicenseUtility.getReleaseDateFor(product);
+      final Date releaseDate = SLLicenseUtility.getToolReleaseDate();
       if (isExpiredOn(releaseDate))
         return false;
     }

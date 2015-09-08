@@ -13,36 +13,42 @@ import com.surelogic.RegionEffects;
 @Immutable
 public enum SLLicenseProduct {
 
-  ALL_TOOLS("All Tools"),
+  ALL_TOOLS("All Tools", false),
 
-  FLASHLIGHT("Flashlight"),
+  FLASHLIGHT("Flashlight", true),
 
-  FLASHLIGHT_ANDROID("Flashlight (Android)"),
+  FLASHLIGHT_ANDROID("Flashlight (Android)", true),
 
-  JSURE("JSure"),
+  JSURE("JSure", true),
 
-  SIERRA("Sierra"),
+  SIERRA("Sierra", true),
 
-  EXEMPT("Exempt");
+  EXEMPT("Exempt", true);
 
+  /**
+   * A text representation for this product.
+   */
   private final String f_symbol;
 
-  SLLicenseProduct(String symbol) {
+  /**
+   * {@code true} if this represents a licensed product that a license check can
+   * be done on, {@code false} otherwise.
+   */
+  private final boolean f_isProduct;
+
+  SLLicenseProduct(String symbol, boolean isProduct) {
     f_symbol = symbol;
+    f_isProduct = isProduct;
   }
 
   /**
-   * Checks if this product requires a license for use.
+   * Checks if this represents a licensed product.
    * 
-   * @return {@code true} if a license is required to use this product,
-   *         {@code false} otherwise.
+   * @return {@code true} if this represents a licensed product that a license
+   *         check can be done on, {@code false} otherwise.
    */
-  public boolean needsLicense() {
-    if (this == EXEMPT)
-      return false;
-    if (this == ALL_TOOLS)
-      return false;
-    return true;
+  public boolean isProduct() {
+    return f_isProduct;
   }
 
   /**

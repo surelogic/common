@@ -7,14 +7,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.atomic.AtomicReference;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableSet;
 import com.surelogic.NonNull;
 import com.surelogic.Nullable;
-import com.surelogic.Vouch;
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.feedback.Counts;
 import com.surelogic.common.i18n.I18N;
@@ -26,6 +25,38 @@ import com.surelogic.common.jobs.SLStatus;
  * A utility to help manage licenses to use SureLogic tools.
  */
 public final class SLLicenseUtility {
+
+  private static final AtomicReference<Date> f_toolReleaseDate = new AtomicReference<>(new Date());
+
+  /**
+   * Gets the release date for the SureLogic tools, or todays date if unknown.
+   * 
+   * @return the release date for the SureLogic tools, or todays date if
+   *         unknown.
+   */
+  @NonNull
+  public static Date getToolReleaseDate() {
+    return f_toolReleaseDate.get();
+  }
+
+  /**
+   * Sets the release date for the SureLogic tools.
+   * <p>
+   * <b>Implementation note:</b> This method should only be invoked from the
+   * <tt>start</tt> method within the <tt>Activator</tt> in the
+   * <i>common-core-eclipse</i> project. This is because the <i>common</i>
+   * project cannot query Eclipse for the needed information, so the
+   * <i>common-core-eclipse</i> project does it and invokes this method with the
+   * value.
+   * 
+   * @param value
+   *          the release date for the SureLogic tools. The call is ignored if
+   *          this parameter is {@code null}.
+   */
+  public static void setToolReleaseDate(@Nullable Date value) {
+    if (value != null)
+      f_toolReleaseDate.set(value);
+  }
 
   private static final Set<ILicenseObserver> f_observers = new CopyOnWriteArraySet<>();
 
@@ -49,42 +80,6 @@ public final class SLLicenseUtility {
    */
   public static void removeObserver(final ILicenseObserver observer) {
     f_observers.remove(observer);
-  }
-
-  @Vouch("ThreadSafe")
-  private static final Map<SLLicenseProduct, Date> f_knownReleaseDates = new ConcurrentHashMap<>();
-
-  /**
-   * Sets the release date for the passed product. This method would typically
-   * be called from the Eclipse activator for that product.
-   * 
-   * @param product
-   *          a product.
-   * @param value
-   *          the release date for the running version of <tt>product</tt>.
-   */
-  public static void setReleaseDateFor(SLLicenseProduct product, Date value) {
-    if (product == null || value == null)
-      return;
-    f_knownReleaseDates.put(product, new Date(value.getTime()));
-  }
-
-  /**
-   * Gets the release date for the passed product. If the release date is not
-   * known then today's date is returned.
-   * 
-   * @param product
-   *          a product.
-   * @return the release date for <tt>product</tt> if it is known, today's date
-   *         otherwise.
-   */
-  public static Date getReleaseDateFor(SLLicenseProduct product) {
-    if (product != null) {
-      final Date releaseDate = f_knownReleaseDates.get(product);
-      if (releaseDate != null)
-        return new Date(releaseDate.getTime());
-    }
-    return new Date();
   }
 
   /**

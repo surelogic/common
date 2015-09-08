@@ -1,6 +1,8 @@
 package com.surelogic.common.core;
 
 import java.io.File;
+import java.util.Date;
+import java.util.logging.Level;
 
 import org.eclipse.core.runtime.Plugin;
 import org.osgi.framework.Bundle;
@@ -10,6 +12,7 @@ import com.surelogic.common.SLUtility;
 import com.surelogic.common.core.logging.EclipseHandler;
 import com.surelogic.common.core.preferences.CommonCorePreferencesUtility;
 import com.surelogic.common.feedback.Counts;
+import com.surelogic.common.license.SLLicenseUtility;
 import com.surelogic.common.logging.SLLogger;
 
 /**
@@ -41,6 +44,10 @@ public class Activator extends Plugin {
     SLLogger.addHandler(new EclipseHandler());
 
     CommonCorePreferencesUtility.initializeDefaultScope();
+
+    final Date toolReleaseDate = EclipseUtility.getReleaseDate();
+    SLLogger.getLogger().log(Level.INFO, "SureLogic tools released on " + toolReleaseDate);
+    SLLicenseUtility.setToolReleaseDate(toolReleaseDate);
     Counts.getInstance().load();
   }
 
