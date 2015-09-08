@@ -1,21 +1,27 @@
 package com.surelogic.common.feedback;
 
+import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
+import java.util.logging.Level;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
+import com.google.common.io.Files;
 import com.surelogic.GuardedBy;
 import com.surelogic.NonNull;
 import com.surelogic.Nullable;
 import com.surelogic.Singleton;
 import com.surelogic.ThreadSafe;
-import com.surelogic.common.FileUtility;
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.license.SLLicenseManager;
+import com.surelogic.common.logging.SLLogger;
 
 /**
  * Used to count things that happen in the tool for feedback to SureLogic.
@@ -105,7 +111,12 @@ public final class Counts {
     }
   }
 
-  private static final String UNLIKELY_DELIM = "\nSureLogic:Ver:2015-09-04:";
+  /*
+   * This is a bit messy but we add the counts information to the end of the
+   * license file. It base64 encodes the counts.
+   */
+
+  private static final String UNLIKELY_DELIM = "SureLogic:Ver:2015-09-04:";
 
   /**
    * Persists the counts to the end of the license file using an unlikely
@@ -114,10 +125,26 @@ public final class Counts {
   public void persist() {
     final String info = Counts.getInstance().toString();
     final String infoForFile = SLUtility.encodeBase64(info);
-    /*
-     * append our information at the end of the file
-     */
-    FileUtility.appendStringIntoAFile(SLLicenseManager.getInstance().getLicenseFile(), UNLIKELY_DELIM + infoForFile);
+    try {
+      boolean replaced = false;
+      final List<String> lines = Files.readLines(SLLicenseManager.getInstance().getLicenseFile(), Charset.defaultCharset());
+      for (ListIterator<String> iterator = lines.listIterator(); iterator.hasNext();) {
+        final String line = iterator.next();
+        if (line.startsWith(UNLIKELY_DELIM)) {
+          // replace counts in file
+          iterator.set(UNLIKELY_DELIM + infoForFile);
+          replaced = true;
+          break;
+        }
+      }
+      if (!replaced) // no counts existed
+        lines.add(UNLIKELY_DELIM + infoForFile);
+      Files.asCharSink(SLLicenseManager.getInstance().getLicenseFile(), Charset.defaultCharset()).writeLines(lines);
+
+    } catch (IOException e) {
+      SLLogger.getLogger().log(Level.WARNING,
+          I18N.err(367, "persist", SLLicenseManager.getInstance().getLicenseFile().getAbsolutePath()), e);
+    }
   }
 
   /**
@@ -125,14 +152,25 @@ public final class Counts {
    * written in it.
    */
   public void load() {
-    final String contents = FileUtility.getFileContentsAsString(SLLicenseManager.getInstance().getLicenseFile());
-    int i = contents.indexOf(UNLIKELY_DELIM);
-    if (i != -1) {
-      final String infoFromFile = contents.substring(i + UNLIKELY_DELIM.length());
-      if (infoFromFile.length() > 2) {
-        final String info = SLUtility.decodeBase64(infoFromFile);
-        Counts.getInstance().set(info);
+    try {
+      final List<String> lines = Files.readLines(SLLicenseManager.getInstance().getLicenseFile(), Charset.defaultCharset());
+      for (String line : lines) {
+        if (line.startsWith(UNLIKELY_DELIM)) {
+          final String infoFromFile = line.substring(UNLIKELY_DELIM.length());
+          if (infoFromFile.length() > 2) {
+            try {
+              final String info = SLUtility.decodeBase64(infoFromFile);
+              Counts.getInstance().set(info);
+            } catch (Exception decodeFailure) {
+              SLLogger.getLogger().log(Level.WARNING,
+                  I18N.err(368, infoFromFile, SLLicenseManager.getInstance().getLicenseFile().getAbsolutePath()), decodeFailure);
+            }
+          }
+        }
       }
+    } catch (IOException e) {
+      SLLogger.getLogger().log(Level.WARNING,
+          I18N.err(367, "load", SLLicenseManager.getInstance().getLicenseFile().getAbsolutePath()), e);
     }
   }
 }

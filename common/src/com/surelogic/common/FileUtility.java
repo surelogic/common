@@ -1,20 +1,17 @@
 package com.surelogic.common;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
-import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.ByteBuffer;
@@ -32,6 +29,7 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import com.google.common.io.CharStreams;
 import com.google.common.io.Files;
 import com.surelogic.NonNull;
 import com.surelogic.Nullable;
@@ -666,28 +664,11 @@ public final class FileUtility {
    *         reading the file, <tt>value</tt>.
    */
   public static String getFileContentsAsStringOrDefaultValue(final File textFile, final String value) {
-    final String lf = SLUtility.PLATFORM_LINE_SEPARATOR;
-    final StringBuilder b = new StringBuilder();
     try {
-      final BufferedReader r = new BufferedReader(new FileReader(textFile));
-      boolean first = true;
-      while (true) {
-        final String s = r.readLine();
-        if (s == null) {
-          break;
-        }
-        if (first) {
-          first = false;
-        } else {
-          b.append(lf);
-        }
-        b.append(s);
-      }
-      r.close();
+      return Files.toString(textFile, Charset.defaultCharset());
     } catch (final IOException e) {
       return value;
     }
-    return b.toString();
   }
 
   /**
@@ -697,12 +678,11 @@ public final class FileUtility {
    *          a text file.
    * @return the file's contents.
    * @throws IllegalStateException
-   *           if something goes wrong.
+   *           if something goes wrong trying to read the passed file.
    */
   public static String getFileContentsAsString(final File textFile) {
     try {
-      final Reader r = new FileReader(textFile);
-      return getReaderContentsAsString(r);
+      return Files.toString(textFile, Charset.defaultCharset());
     } catch (final IOException e) {
       final String msg = I18N.err(117, textFile.getAbsolutePath());
       SLLogger.getLogger().log(Level.SEVERE, msg, e);
@@ -711,83 +691,25 @@ public final class FileUtility {
   }
 
   /**
-   * Reads the text contents of the stream and returns it.
+   * Reads and returns the text contents of the stream. Optionally closes the
+   * stream.
    * 
-   * @param fileNameBeingRead
-   *          a name for error logging if something goes wrong, unused if
-   *          everything goes okay.
-   * @param input
+   * @param is
    *          the stream to read.
+   * @param closeStream
+   *          {@code true} if the stream should be closed, {@code false} if it
+   *          should not be closed.
    * @return the stream's contents.
-   * @throws IllegalStateException
+   * @throws IOException
    *           if something goes wrong.
    */
-  public static String getStreamContentsAsString(String fileNameBeingRead, InputStream input) {
+  public static String getStreamContentsAsString(InputStream is, boolean closeStream) throws IOException {
     try {
-      return getReaderContentsAsString(new InputStreamReader(input));
-    } catch (final IOException e) {
-      final String msg = I18N.err(117, fileNameBeingRead);
-      SLLogger.getLogger().log(Level.SEVERE, msg, e);
-      throw new IllegalStateException(msg, e);
+      return CharStreams.toString(new InputStreamReader(is));
+    } finally {
+      if (closeStream)
+        is.close();
     }
-  }
-
-  /**
-   * Reads the text contents of the stream and returns it.
-   * 
-   * @param input
-   *          the stream to read.
-   * @return the stream's contents.
-   * @throws IOException
-   *           if something goes wrong.
-   */
-  public static String getStreamContentsAsString(InputStream input) throws IOException {
-    return getReaderContentsAsString_private(new InputStreamReader(input));
-  }
-
-  private static String getReaderContentsAsString_private(Reader reader) throws IOException {
-    final StringBuilder b = new StringBuilder();
-    final BufferedReader r = new BufferedReader(reader);
-    final char[] buf = new char[1024];
-    while (true) {
-      final int read = r.read(buf);
-      if (read < 0) {
-        break;
-      }
-      b.append(buf, 0, read);
-    }
-    r.close();
-    return b.toString();
-  }
-
-  /**
-   * Reads the text contents of the passed reader and returns it
-   * 
-   * @param reader
-   *          to read.
-   * @return the reader's contents.
-   * @throws IOException
-   *           if something goes wrong
-   */
-  public static String getReaderContentsAsString(Reader reader) throws IOException {
-    final String lf = SLUtility.PLATFORM_LINE_SEPARATOR;
-    final StringBuilder b = new StringBuilder();
-    final BufferedReader r = new BufferedReader(reader);
-    boolean first = true;
-    while (true) {
-      final String s = r.readLine();
-      if (s == null) {
-        break;
-      }
-      if (first) {
-        first = false;
-      } else {
-        b.append(lf);
-      }
-      b.append(s);
-    }
-    r.close();
-    return b.toString();
   }
 
   /**
@@ -805,26 +727,6 @@ public final class FileUtility {
     try {
       Files.write(text, textFile, Charset.defaultCharset());
     } catch (final IOException e) {
-      final String msg = I18N.err(31, textFile.getAbsolutePath());
-      SLLogger.getLogger().log(Level.SEVERE, msg, e);
-      throw new IllegalStateException(msg, e);
-    }
-  }
-
-  /**
-   * Appends the passed string into the passed file.
-   * 
-   * @param textFile
-   *          a text file.
-   * @param text
-   *          the text to append.
-   * @throws IllegalStateException
-   *           if something goes wrong.
-   */
-  public static void appendStringIntoAFile(final File textFile, final String text) {
-    try {
-      Files.append(text, textFile, Charset.defaultCharset());
-    } catch (IOException e) {
       final String msg = I18N.err(31, textFile.getAbsolutePath());
       SLLogger.getLogger().log(Level.SEVERE, msg, e);
       throw new IllegalStateException(msg, e);
