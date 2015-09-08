@@ -104,8 +104,9 @@ public final class SLEclipseStatusUtility {
     }
     if ("".equals(permGenArg))
       permGenArg = "-XX:MaxPermSize=NO SETTING";
-    SLLogger.getLogger().info(
-        "SureLogic : " + System.getProperty("java.vm.vendor", "(unknown Vendor)") + " Java "
+    SLLogger.getLogger()
+        .info("SureLogic tools release date " + SLUtility.toStringDay(SLLicenseUtility.getToolReleaseDate()) + "; "
+            + System.getProperty("java.vm.vendor", "(unknown Vendor)") + " Java "
             + System.getProperty("java.version", "(unknown version)") + "; maxMemory=" + maxMemoryMB + " MB; totalMemory="
             + totalMemoryMB + " MB; freeMemory=" + freeMemoryMB + " MB; " + permGenArg + "; availableProcessors="
             + rt.availableProcessors());

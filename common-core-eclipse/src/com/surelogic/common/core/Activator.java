@@ -1,8 +1,6 @@
 package com.surelogic.common.core;
 
 import java.io.File;
-import java.util.Date;
-import java.util.logging.Level;
 
 import org.eclipse.core.runtime.Plugin;
 import org.osgi.framework.Bundle;
@@ -45,9 +43,8 @@ public class Activator extends Plugin {
 
     CommonCorePreferencesUtility.initializeDefaultScope();
 
-    final Date toolReleaseDate = EclipseUtility.getReleaseDate();
-    SLLogger.getLogger().log(Level.INFO, "SureLogic tools released on " + toolReleaseDate);
-    SLLicenseUtility.setToolReleaseDate(toolReleaseDate);
+    SLLicenseUtility.setToolReleaseDate(EclipseUtility.getReleaseDate());
+
     Counts.getInstance().load();
   }
 
