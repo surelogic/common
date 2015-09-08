@@ -666,13 +666,14 @@ public final class FileUtility {
   public static String getFileContentsAsStringOrDefaultValue(final File textFile, final String value) {
     try {
       return Files.toString(textFile, Charset.defaultCharset());
-    } catch (final IOException e) {
+    } catch (final Exception e) {
       return value;
     }
   }
 
   /**
-   * Gets the contents of a text file and returns it as a string.
+   * Gets the contents of a text file and returns it as a string. If something
+   * goes wrong a log entry is made and {@link IllegalStateException} is thrown.
    * 
    * @param textFile
    *          a text file.
@@ -683,7 +684,7 @@ public final class FileUtility {
   public static String getFileContentsAsString(final File textFile) {
     try {
       return Files.toString(textFile, Charset.defaultCharset());
-    } catch (final IOException e) {
+    } catch (final Exception e) {
       final String msg = I18N.err(117, textFile.getAbsolutePath());
       SLLogger.getLogger().log(Level.SEVERE, msg, e);
       throw new IllegalStateException(msg, e);
