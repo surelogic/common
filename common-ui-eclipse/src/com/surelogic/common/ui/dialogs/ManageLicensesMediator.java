@@ -22,6 +22,7 @@ import com.surelogic.common.CommonImages;
 import com.surelogic.common.FileUtility;
 import com.surelogic.common.ILifecycle;
 import com.surelogic.common.SLUtility;
+import com.surelogic.common.core.EclipseUtility;
 import com.surelogic.common.core.logging.SLEclipseStatusUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.jobs.SLStatus;
@@ -271,7 +272,7 @@ final class ManageLicensesMediator implements ILifecycle {
       return; // bail
     }
     try {
-      SLLicenseUtility.tryToUninstallLicenses(selection);
+      SLLicenseUtility.tryToUninstallLicenses(selection, EclipseUtility.getEclipseVersion());
     } catch (Exception e) {
       final int code = 142;
       final String msg = I18N.err(code, e.getMessage());
@@ -307,7 +308,8 @@ final class ManageLicensesMediator implements ILifecycle {
     }
 
     try {
-      SLLicenseUtility.tryToActivateRenewLicenses(selection, SLUtility.getMacAddressesOfThisMachine());
+      SLLicenseUtility.tryToActivateRenewLicenses(selection, SLUtility.getMacAddressesOfThisMachine(),
+          EclipseUtility.getEclipseVersion());
     } catch (Exception e) {
       final int code = 144;
       final String msg = I18N.err(code, e.getMessage());

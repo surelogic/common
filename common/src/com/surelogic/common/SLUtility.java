@@ -98,6 +98,8 @@ public final class SLUtility {
 
   public static final String LOG_NAME = "log.txt";
 
+  public static final String DERBY_LOG_NAME = ".surelogic-derby-log.txt";
+
   /*
    * Constants for special ad hoc query meta variables
    */

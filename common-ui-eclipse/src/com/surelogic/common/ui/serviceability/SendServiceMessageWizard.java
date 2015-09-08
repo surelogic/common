@@ -234,7 +234,7 @@ public class SendServiceMessageWizard extends Wizard {
   private SendServiceMessageWizard(Message data) {
     f_data = data;
     f_data.setDirty();
-    f_data.setIdeVersion(JDTUtility.getProductInfo());
+    f_data.setIdeVersion(EclipseUtility.getEclipseVersion());
     String title = I18N.msg(f_data.propPfx() + "title");
     setWindowTitle(f_data.getProduct() + " " + title);
     setNeedsProgressMonitor(true);

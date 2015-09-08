@@ -13,8 +13,11 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 
+import com.surelogic.Nullable;
+import com.surelogic.common.Pair;
 import com.surelogic.common.core.preferences.CommonCorePreferencesUtility;
 import com.surelogic.common.i18n.I18N;
+import com.surelogic.common.license.SLLicenseManager;
 import com.surelogic.common.serviceability.Message;
 import com.surelogic.common.serviceability.MessageWithLog;
 import com.surelogic.common.ui.EclipseUIUtility;
@@ -36,6 +39,9 @@ public class SendServiceMessageCollectInformationPage extends WizardPage {
     final Composite panel = new Composite(parent, SWT.NONE);
     setControl(panel);
 
+    @Nullable
+    Pair<String, String> nameEmail = SLLicenseManager.getInstance().getNameAndEmail();
+
     GridLayout gridLayout = new GridLayout();
     gridLayout.numColumns = 2;
     panel.setLayout(gridLayout);
@@ -50,14 +56,21 @@ public class SendServiceMessageCollectInformationPage extends WizardPage {
     email.setText(I18N.msg(f_data.propPfx() + "email"));
     email.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, false, false));
     final Text emailText = new Text(panel, SWT.SINGLE | SWT.BORDER);
-    emailText.setText(CommonCorePreferencesUtility.getServicabilityEmail());
+    String emailValue = CommonCorePreferencesUtility.getServicabilityEmail();
+    if (nameEmail != null && "".equals(emailValue))
+      emailValue = nameEmail.second();
+    emailText.setText(emailValue);
     emailText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
     final Label name = new Label(panel, SWT.RIGHT);
     name.setText(I18N.msg(f_data.propPfx() + "name"));
     name.setLayoutData(new GridData(SWT.FILL, SWT.DEFAULT, false, false));
     final Text nameText = new Text(panel, SWT.SINGLE | SWT.BORDER);
-    nameText.setText(CommonCorePreferencesUtility.getServicabilityName());
+    // Use name preference if set (otherwise get from license)
+    String nameValue = CommonCorePreferencesUtility.getServicabilityName();
+    if (nameEmail != null && "".equals(nameValue))
+      nameValue = nameEmail.first();
+    nameText.setText(nameValue);
     nameText.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
     final Button sendVersion = new Button(panel, SWT.CHECK);

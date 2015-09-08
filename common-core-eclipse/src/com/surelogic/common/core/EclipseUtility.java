@@ -38,6 +38,9 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IContributor;
+import org.eclipse.core.runtime.IExtension;
+import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -54,9 +57,11 @@ import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.framework.Bundle;
+import org.osgi.framework.Version;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.surelogic.NonNull;
+import com.surelogic.Nullable;
 import com.surelogic.Utility;
 import com.surelogic.common.FileUtility;
 import com.surelogic.common.SLUtility;
@@ -371,7 +376,7 @@ public class EclipseUtility {
     try {
       final Bundle bundle = Platform.getBundle(pluginId);
       if (bundle == null) {
-    	throw new IllegalArgumentException(I18N.err(343, pluginId));
+        throw new IllegalArgumentException(I18N.err(343, pluginId));
       }
       File result = FileLocator.getBundleFile(bundle);
       return result;
@@ -393,12 +398,12 @@ public class EclipseUtility {
    *           identifier, or there is some problem determining the URL.
    */
   public static URL getInstallationURLOf(final String pluginId) {
-	  final File f = getInstallationDirectoryOf(pluginId);
-	  try {
-		return f.toURI().toURL();
-	  } catch (MalformedURLException e) {
-		throw new IllegalArgumentException(I18N.err(344, pluginId), e);
-	  }
+    final File f = getInstallationDirectoryOf(pluginId);
+    try {
+      return f.toURI().toURL();
+    } catch (MalformedURLException e) {
+      throw new IllegalArgumentException(I18N.err(344, pluginId), e);
+    }
   }
 
   /**
@@ -735,37 +740,57 @@ public class EclipseUtility {
   }
 
   /**
-   * Gets the major, minor, and dot version of the passed activator as read from
-   * its bundle headers.
-   * <p>
-   * So for a real release, such as <tt>3.1.1.201001151440</tt>, this call
-   * returns <tt>3.1.1</tt>.
-   * <p>
-   * However, in a development or meta-Eclipse the complete version string
-   * similar to <tt>12.45.6.qualifier</tt>, this call again returns
-   * <tt>12.45.6</tt>.
+   * Gets the version of Eclipse, such as <tt>"4.4.0.20140612-0500"</tt>.
+   * Currently this method looks for the definition of the Eclipse product in
+   * the extension registry, and if that fails it uses the version of the
+   * org.eclipse.platform plug-in which should match.
    * 
-   * @param activator
-   *          a plug-in to query.
-   * @return a string that represents the major, minor, and dot version of the
-   *         passed activator, such as <tt>4.4.2</tt>.
+   * @return the version of the Eclipse or <tt>unknown</tt> if the version
+   *         cannot be determined.
    */
-  public static String getMajorMinorDotVersion(final Plugin activator) {
-    String result = getVersion(activator);
-    int counter = 0;
-    int endIndex = 0;
-    for (int index = 0; index < result.length(); index++) {
-      if (result.charAt(index) == '.') {
-        counter++;
-        // we need to save the position of the third period
-        if (counter == 3)
-          endIndex = index;
-      }
+  public static String getEclipseVersion() {
+    @Nullable
+    String result = null;
+    @NonNull
+    final String product = System.getProperty("eclipse.product", "org.eclipse.platform.ide");
+    final IExtensionPoint point = Platform.getExtensionRegistry().getExtensionPoint("org.eclipse.core.runtime.products");
+    if (point != null) {
+      final IExtension[] extensions = point.getExtensions();
+      if (extensions != null)
+        for (IExtension ext : extensions) {
+          if (product.equals(ext.getUniqueIdentifier())) {
+            final IContributor contributor = ext.getContributor();
+            if (contributor != null) {
+              Bundle bundle = Platform.getBundle(contributor.getName());
+              if (bundle != null) {
+                result = bundle.getVersion().toString();
+              }
+            }
+          }
+        }
     }
-    if (counter < 3)
-      return result;
-    else
-      return result.substring(0, endIndex);
+    if (result == null) // if all of the above didn't work
+      result = getVersion(Platform.getBundle("org.eclipse.platform"));
+    return result;
+  }
+
+  /**
+   * Gets the version of the passed bundle, such as <tt>4.5.0</tt>.
+   * 
+   * @param bundle
+   *          a bundle.
+   * @return the version of the passed bundle, such as <tt>4.5.0</tt>, or
+   *         <tt>unknown</tt> if the version cannot be determined or the passed
+   *         bundle is {@code null}.
+   */
+  public static String getVersion(@Nullable Bundle bundle) {
+    String result = "unknown";
+    if (bundle != null) {
+      Version v = bundle.getVersion();
+      if (v != null)
+        result = v.getMajor() + "." + v.getMinor() + "." + v.getMicro();
+    }
+    return result;
   }
 
   /**

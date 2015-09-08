@@ -1,11 +1,15 @@
 package com.surelogic.common.core;
 
+import java.io.File;
+
 import org.eclipse.core.runtime.Plugin;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
+import com.surelogic.common.SLUtility;
 import com.surelogic.common.core.logging.EclipseHandler;
 import com.surelogic.common.core.preferences.CommonCorePreferencesUtility;
+import com.surelogic.common.feedback.Counts;
 import com.surelogic.common.logging.SLLogger;
 
 /**
@@ -18,6 +22,9 @@ public class Activator extends Plugin {
   public Activator() {
     if (plugin != null)
       throw new IllegalStateException(Activator.class.getName() + " instance already exits, it should be a singleton.");
+    // change derby.log location to the workspace
+    System.setProperty("derby.stream.error.file",
+        new File(EclipseUtility.getWorkspacePath(), SLUtility.DERBY_LOG_NAME).getAbsolutePath());
     plugin = this;
   }
 
@@ -34,12 +41,14 @@ public class Activator extends Plugin {
     SLLogger.addHandler(new EclipseHandler());
 
     CommonCorePreferencesUtility.initializeDefaultScope();
+    Counts.getInstance().load();
   }
 
   @Override
   public void stop(BundleContext context) throws Exception {
     try {
       EclipseUtility.persistPreferences();
+      Counts.getInstance().persist();
     } finally {
       super.stop(context);
     }

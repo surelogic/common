@@ -628,6 +628,8 @@ public final class SLLicensePersistence {
    * Converts a list of {@link PossiblyActivatedSLLicense} objects to a string
    * that contains a set of licenses and license net checks as digitally signed
    * encoded hex strings and outputs the string to a file.
+   * <p>
+   * This method is primarily used in the tool to persist license.
    * 
    * @param newFile
    *          a text file. If this file exists its contents will be replaced, if
@@ -651,6 +653,8 @@ public final class SLLicensePersistence {
    * Converts a single {@link PossiblyActivatedSLLicense} object to a string
    * that contains a licenses and, optionally, a license net check as digitally
    * signed encoded hex strings and outputs the string to a file.
+   * <p>
+   * This method is primarily used to write out a new license to a file.
    * 
    * @param newFile
    *          a text file. If this file exists its contents will be replaced, if

@@ -73,10 +73,13 @@ public class LicenseNetcheckServlet extends HttpServlet {
 
   private void handleRequest(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
     final String typeStr = req.getParameter(I18N.msg("web.check.param.req"));
+    final String os = req.getParameter(I18N.msg("web.check.param.os"));
+    final String javaVersion = req.getParameter(I18N.msg("web.check.param.java"));
+    final String eclipseVersion = req.getParameter(I18N.msg("web.check.param.eclipse"));
     if (I18N.msg("web.check.param.req.value.actrew").equals(typeStr)) {
-      install(req, resp);
+      install(req, resp, os, javaVersion, eclipseVersion);
     } else if (I18N.msg("web.check.param.req.value.remove").equals(typeStr)) {
-      remove(req, resp);
+      remove(req, resp, os, javaVersion, eclipseVersion);
     } else {
       resp.getWriter().println(String.format("Unrecognized Request: %s", typeStr));
     }
@@ -218,9 +221,13 @@ public class LicenseNetcheckServlet extends HttpServlet {
    * @param event
    *          the type of check event that occurred
    */
-  static void logCheck(final Query q, final Timestamp time, final String ip, final SLLicense license, final NetCheckEvent event) {
+  static void logCheck(final Query q, final Timestamp time, final String ip, final SLLicense license, final NetCheckEvent event,
+      @Nullable String os, @Nullable String javaVersion, @Nullable String eclipseVersion) {
     final String uuid = license.getUuid().toString();
-    q.prepared("WebServices.logNetCheck").call(time, ip, uuid.toString(), event.value);
+    final Object osDb = os == null ? Nulls.STRING : os;
+    final Object javaVersionDb = javaVersion == null ? Nulls.STRING : javaVersion;
+    final Object eclipseVersionDb = eclipseVersion == null ? Nulls.STRING : eclipseVersion;
+    q.prepared("WebServices.logNetCheck").call(time, ip, uuid.toString(), event.value, osDb, javaVersionDb, eclipseVersionDb);
     q.statement("WebServices.updateCheckCount").call(event.getColumn(), uuid.toString());
     Email.sendSupportEmail(event.toString(), I18N.msg("web.check.logEmail", license.getHolder(), license.getProduct().toString(),
         time.toString(), ip, uuid, I18N.msg("web.admin.license.url", SLUtility.SERVICEABILITY_SERVER, uuid), event.toString()));
@@ -247,13 +254,23 @@ public class LicenseNetcheckServlet extends HttpServlet {
     private final String ip;
     @NonNull
     private final ImmutableSet<String> clientMacAddresses;
+    @Nullable
+    private final String os;
+    @Nullable
+    private final String javaVersion;
+    @Nullable
+    private final String eclipseVersion;
 
     Install(@NonNull PossiblyActivatedSLLicense sl, @NonNull Timestamp now, @NonNull String ip,
-        @NonNull ImmutableSet<String> clientMacAddresses) {
+        @NonNull ImmutableSet<String> clientMacAddresses, @Nullable String os, @Nullable String javaVersion,
+        @Nullable String eclipseVersion) {
       this.sl = sl;
       this.now = now;
       this.ip = ip;
       this.clientMacAddresses = clientMacAddresses;
+      this.os = os;
+      this.javaVersion = javaVersion;
+      this.eclipseVersion = eclipseVersion;
     }
 
     @Override
@@ -263,7 +280,7 @@ public class LicenseNetcheckServlet extends HttpServlet {
       final UUID uuid = license.getUuid();
       if (checkBlacklist(q, signedLicense)) {
         // This license has been blacklisted
-        logCheck(q, now, ip, license, NetCheckEvent.INSTALL_BLACKLISTED);
+        logCheck(q, now, ip, license, NetCheckEvent.INSTALL_BLACKLISTED, os, javaVersion, eclipseVersion);
         return fail(I18N.msg("web.check.response.failure.blacklisted", license.getProduct(), uuid));
       }
       if (sl.isPastInstallBeforeDate()) {
@@ -278,15 +295,15 @@ public class LicenseNetcheckServlet extends HttpServlet {
           // We are probably missing some data, or have a
           // badly behaving client. We'll go ahead and tick the
           // install count as well.
-          logCheck(q, now, ip, license, NetCheckEvent.INSTALL_SUCCESS);
+          logCheck(q, now, ip, license, NetCheckEvent.INSTALL_SUCCESS, os, javaVersion, eclipseVersion);
         }
-        logCheck(q, now, ip, license, NetCheckEvent.RENEW_SUCCESS);
+        logCheck(q, now, ip, license, NetCheckEvent.RENEW_SUCCESS, os, javaVersion, eclipseVersion);
       } else {
         // This is an install
         if (info.isInstallAvailable()) {
-          logCheck(q, now, ip, license, NetCheckEvent.INSTALL_SUCCESS);
+          logCheck(q, now, ip, license, NetCheckEvent.INSTALL_SUCCESS, os, javaVersion, eclipseVersion);
         } else {
-          logCheck(q, now, ip, license, NetCheckEvent.INSTALL_LIMIT_EXCEEDED);
+          logCheck(q, now, ip, license, NetCheckEvent.INSTALL_LIMIT_EXCEEDED, os, javaVersion, eclipseVersion);
           return fail(I18N.msg("web.check.response.failure.installLimit", license.getProduct(), uuid, license.getMaxActive()));
         }
       }
@@ -300,7 +317,8 @@ public class LicenseNetcheckServlet extends HttpServlet {
     }
   }
 
-  void install(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+  void install(final HttpServletRequest req, final HttpServletResponse resp, @Nullable String os, @Nullable String javaVersion,
+      @Nullable String eclipseVersion) throws IOException {
     @Nullable
     final String licStr = req.getParameter(I18N.msg("web.check.param.license"));
     @Nullable
@@ -320,7 +338,7 @@ public class LicenseNetcheckServlet extends HttpServlet {
       for (final PossiblyActivatedSLLicense sl : licenses) {
         String result;
         try {
-          result = conn.withTransaction(new Install(sl, now, ip, clientMacAddresses));
+          result = conn.withTransaction(new Install(sl, now, ip, clientMacAddresses, os, javaVersion, eclipseVersion));
         } catch (TransactionException e) {
           final String out = I18N.msg("web.check.response.failure.serverError", SLUtility.toString(e));
           result = fail(out);
@@ -343,16 +361,26 @@ public class LicenseNetcheckServlet extends HttpServlet {
     final Timestamp now;
     @NonNull
     final PossiblyActivatedSLLicense sl;
+    @Nullable
+    private final String os;
+    @Nullable
+    private final String javaVersion;
+    @Nullable
+    private final String eclipseVersion;
 
-    public Remove(@NonNull PossiblyActivatedSLLicense sl, @NonNull Timestamp now, @NonNull String ip) {
+    public Remove(@NonNull PossiblyActivatedSLLicense sl, @NonNull Timestamp now, @NonNull String ip, @Nullable String os,
+        @Nullable String javaVersion, @Nullable String eclipseVersion) {
       this.sl = sl;
       this.now = now;
       this.ip = ip;
+      this.os = os;
+      this.javaVersion = javaVersion;
+      this.eclipseVersion = eclipseVersion;
     }
 
     @Override
     public String perform(final Query q) {
-      logCheck(q, now, ip, sl.getSignedSLLicense().getLicense(), NetCheckEvent.REMOVAL_SUCCESS);
+      logCheck(q, now, ip, sl.getSignedSLLicense().getLicense(), NetCheckEvent.REMOVAL_SUCCESS, os, javaVersion, eclipseVersion);
       return I18N.msg("web.check.response.success");
     }
 
@@ -368,7 +396,8 @@ public class LicenseNetcheckServlet extends HttpServlet {
     return calendar.getTime();
   }
 
-  static void remove(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+  static void remove(final HttpServletRequest req, final HttpServletResponse resp, @Nullable String os,
+      @Nullable String javaVersion, @Nullable String eclipseVersion) throws IOException {
     final String licStr = req.getParameter(I18N.msg("web.check.param.license"));
     final Timestamp now = new Timestamp(System.currentTimeMillis());
     final String ip = req.getRemoteAddr();
@@ -378,7 +407,7 @@ public class LicenseNetcheckServlet extends HttpServlet {
       for (final PossiblyActivatedSLLicense sl : licenses) {
         String result;
         try {
-          result = conn.withTransaction(new Remove(sl, now, ip));
+          result = conn.withTransaction(new Remove(sl, now, ip, os, javaVersion, eclipseVersion));
         } catch (TransactionException e) {
           final String out = I18N.msg("web.check.response.failure.serverError", SLUtility.toString(e));
           result = fail(out);
