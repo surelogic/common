@@ -857,6 +857,9 @@ public class EclipseUtility {
           Date releaseDate = getReleaseDate(activator);
           monitor.worked(1);
           SLLicenseUtility.setReleaseDateFor(product, releaseDate);
+          // special handling for Flashlight for Android version
+          if (product == SLLicenseProduct.FLASHLIGHT)
+            SLLicenseUtility.setReleaseDateFor(SLLicenseProduct.FLASHLIGHT_ANDROID, releaseDate);
           monitor.worked(1);
         } finally {
           monitor.done();
