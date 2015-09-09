@@ -175,7 +175,7 @@ public class LicenseCountsServlet extends HttpServlet {
       q.prepared("WebServices.osDistribution", new NullRowHandler() {
         @Override
         protected void doHandle(final Row r) {
-          tableRow(LEFT.td(r.nextString()), RIGHT.tdL(r.nextLong()));
+          tableRow(CENTER.td(r.nextString()), RIGHT.tdL(r.nextLong()));
         }
       }).call(yearAgoTs);
       tableEnd();
