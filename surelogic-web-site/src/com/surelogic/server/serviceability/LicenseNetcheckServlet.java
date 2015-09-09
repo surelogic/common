@@ -293,7 +293,8 @@ public class LicenseNetcheckServlet extends HttpServlet {
         return fail(I18N.msg("web.check.response.failure.expired", license.getProduct(), uuid,
             SLUtility.toStringHumanDay(license.getInstallBeforeDate())));
       }
-      final SLLicenseNetCheck check = new SLLicenseNetCheck(uuid, calculateNetcheckDate(license), clientMacAddresses);
+      final SLLicenseNetCheck check = new SLLicenseNetCheck(uuid, calculateNetcheckDate(license, sl.isActivated()),
+          clientMacAddresses);
       final LicenseInfo info = getAndInitInfo(q, license);
       if (license.getType() == SLLicenseType.PERPETUAL && sl.isActivated()) {
         // This is a renewal
@@ -313,10 +314,10 @@ public class LicenseNetcheckServlet extends HttpServlet {
           return fail(I18N.msg("web.check.response.failure.installLimit", license.getProduct(), uuid, license.getMaxActive()));
         }
       }
-      return performNetCheck(check);
+      return toStringNetCheckAfterEncoding(check);
     }
 
-    private String performNetCheck(final SLLicenseNetCheck check) {
+    private String toStringNetCheckAfterEncoding(final SLLicenseNetCheck check) {
       final PrivateKey key = SiteUtil.getKey();
       final SignedSLLicenseNetCheck signed = SignedSLLicenseNetCheck.getInstance(check, key);
       return signed.getSignedHexString();
@@ -400,9 +401,14 @@ public class LicenseNetcheckServlet extends HttpServlet {
     return I18N.msg("web.check.response.failure.prefix") + ' ' + reason;
   }
 
-  static Date calculateNetcheckDate(final SLLicense license) {
+  static Date calculateNetcheckDate(final SLLicense license, final boolean isActivated) {
+    final int durationInDays;
+    if (!isActivated && license.getType() == SLLicenseType.PERPETUAL)
+      durationInDays = Math.min(license.getDurationInDays(), SLUtility.DURATION_IN_DAYS_OF_PERPETUAL_LICENSE_FIRST_INSTALL);
+    else
+      durationInDays = license.getDurationInDays();
     final Calendar calendar = Calendar.getInstance();
-    calendar.add(Calendar.DAY_OF_YEAR, license.getDurationInDays());
+    calendar.add(Calendar.DAY_OF_YEAR, durationInDays);
     return calendar.getTime();
   }
 

@@ -109,6 +109,13 @@ public final class SLUtility {
   public static final String ADHOC_META_VALUE = "defined";
 
   /**
+   * The first install of a perpetual license is shorter than all other renewals
+   * so that we get quick feedback and an indication if the license was
+   * abandoned (no renewal).
+   */
+  public static int DURATION_IN_DAYS_OF_PERPETUAL_LICENSE_FIRST_INSTALL = 30; // days
+
+  /**
    * This method returns a list of the string version of all non-loopback,
    * non-system hardware addresses on the computer. There might be more than on,
    * for example, if the computer has both wired and wireless network
