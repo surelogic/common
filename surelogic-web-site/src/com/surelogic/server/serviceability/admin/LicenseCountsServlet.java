@@ -12,6 +12,7 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.TreeMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -194,7 +195,8 @@ public class LicenseCountsServlet extends HttpServlet {
       writer.println("<h3>SureLogic Tool Scan/Launch Counts</h3>");
       tableBegin();
       tableRow(CENTER.th("Tool"), LEFT.th("This Year"));
-      for (Map.Entry<String, Long> e : useCounts.getCounts().entrySet()) {
+      final TreeMap<String, Long> sorted = new TreeMap<>(useCounts.getCounts());
+      for (Map.Entry<String, Long> e : sorted.entrySet()) {
         tableRow(CENTER.td(e.getKey()), RIGHT.tdL(e.getValue()));
       }
       tableEnd();
