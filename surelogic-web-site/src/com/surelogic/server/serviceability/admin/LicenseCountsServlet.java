@@ -85,7 +85,7 @@ public class LicenseCountsServlet extends HttpServlet {
     @Override
     public void doPerform(final Query q) {
       final CountHandler handler = new CountHandler();
-      prequel("License Counts");
+      prequel("Counts");
       writer.println("<h3>License Installation Counts</h3>");
       tableBegin();
       tableRow(CENTER.thRowspan("Date", 4), RIGHT.thRowspan("In Use", 4), CENTER.thColspan("Website Requests", 12));
@@ -146,13 +146,36 @@ public class LicenseCountsServlet extends HttpServlet {
       final Calendar yearAgo = Calendar.getInstance();
       yearAgo.add(Calendar.YEAR, -1);
       final Timestamp yearAgoTs = new Timestamp(yearAgo.getTimeInMillis());
-      writer.println("<h3>Operating System Use</h3>");
+      
+      writer.println("<h3>Eclipse Version Use Counts</h3>");
       tableBegin();
-      tableRow(CENTER.th("OS"), LEFT.th("#"));
+      tableRow(CENTER.th("Ecilpse"), LEFT.th("This Year"));
+      q.prepared("WebServices.eclipseDistribution", new NullRowHandler() {
+        @Override
+        protected void doHandle(final Row r) {
+          tableRow(LEFT.td(r.nextString()), RIGHT.tdL(r.nextLong()));
+        }
+      }).call(yearAgoTs);
+      tableEnd();
+      
+      writer.println("<h3>Java Version Use Counts</h3>");
+      tableBegin();
+      tableRow(CENTER.th("Java"), LEFT.th("This Year"));
+      q.prepared("WebServices.javaDistribution", new NullRowHandler() {
+        @Override
+        protected void doHandle(final Row r) {
+          tableRow(LEFT.td(r.nextString()), RIGHT.tdL(r.nextLong()));
+        }
+      }).call(yearAgoTs);
+      tableEnd();
+      
+      writer.println("<h3>Operating System Use Counts</h3>");
+      tableBegin();
+      tableRow(CENTER.th("OS"), LEFT.th("This Year"));
       q.prepared("WebServices.osDistribution", new NullRowHandler() {
         @Override
         protected void doHandle(final Row r) {
-          tableRow(LEFT.td(r.nextString()), RIGHT.td(r.nextString()));
+          tableRow(LEFT.td(r.nextString()), RIGHT.tdL(r.nextLong()));
         }
       }).call(yearAgoTs);
       tableEnd();
