@@ -191,7 +191,7 @@ public class LicenseCountsServlet extends HttpServlet {
             useCounts.add(persistedCounts);
         }
       }).call(yearAgoTs);
-      writer.println("<h3>SureLogic Tool Counts</h3>");
+      writer.println("<h3>SureLogic Tool Scan/Launch Counts</h3>");
       tableBegin();
       tableRow(CENTER.th("Tool"), LEFT.th("This Year"));
       for (Map.Entry<String, Long> e : useCounts.getCounts().entrySet()) {
