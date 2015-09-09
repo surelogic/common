@@ -1,6 +1,7 @@
 package com.surelogic.server.serviceability.admin;
 
 import static com.surelogic.server.serviceability.admin.HTMLQuery.HeaderType.CENTER;
+import static com.surelogic.server.serviceability.admin.HTMLQuery.HeaderType.LEFT;
 import static com.surelogic.server.serviceability.admin.HTMLQuery.HeaderType.RIGHT;
 
 import java.io.IOException;
@@ -17,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.surelogic.NonNull;
+import com.surelogic.common.jdbc.NullRowHandler;
 import com.surelogic.common.jdbc.Query;
 import com.surelogic.common.jdbc.Result;
 import com.surelogic.common.jdbc.ResultHandler;
@@ -84,6 +86,7 @@ public class LicenseCountsServlet extends HttpServlet {
     public void doPerform(final Query q) {
       final CountHandler handler = new CountHandler();
       prequel("License Counts");
+      writer.println("<h3>License Installation Counts</h3>");
       tableBegin();
       tableRow(CENTER.thRowspan("Date", 4), RIGHT.thRowspan("In Use", 4), CENTER.thColspan("Website Requests", 12));
       tableRow(CENTER.thColspan("Trial", 4), CENTER.thColspan("Community", 4), CENTER.thColspan("Total", 4));
@@ -139,6 +142,19 @@ public class LicenseCountsServlet extends HttpServlet {
             RIGHT.tdL(counts.totalWebLicenseRequests), RIGHT.tdL(counts.activatedWebLicenseRequests));
       }
 
+      tableEnd();
+      final Calendar yearAgo = Calendar.getInstance();
+      yearAgo.add(Calendar.YEAR, -1);
+      final Timestamp yearAgoTs = new Timestamp(yearAgo.getTimeInMillis());
+      writer.println("<h3>Operating System Use</h3>");
+      tableBegin();
+      tableRow(CENTER.th("OS"), LEFT.th("#"));
+      q.prepared("WebServices.osDistribution", new NullRowHandler() {
+        @Override
+        protected void doHandle(final Row r) {
+          tableRow(LEFT.td(r.nextString()), RIGHT.td(r.nextString()));
+        }
+      }).call(yearAgoTs);
       tableEnd();
       finish();
     }
