@@ -134,6 +134,7 @@ final class ManageLicensesMediator implements ILifecycle {
     for (TableColumn c : f_licenseTable.getColumns())
       c.pack();
     f_licenseTable.setRedraw(true);
+    updateButtonState();
   }
 
   private void setLicenseImage(final TableItem item, final PossiblyActivatedSLLicense installedLicense) {

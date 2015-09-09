@@ -272,13 +272,11 @@ public final class SLLicenseManager {
       final URL url = Thread.currentThread().getContextClassLoader().getResource(f_pluginLicenseFile);
       if (url == null)
         return; // no /lib/.surelogic-licenses file exists
-      final InputStream in = url.openStream();
-      try {
-        final String contents = FileUtility.getStreamContentsAsString(in);
+
+      try (InputStream in = url.openStream()) {
+        final String contents = FileUtility.getStreamContentsAsString(in, false);
         if (SLUtility.isNotEmptyOrNull(contents))
           f_licenses.addAll(SLLicensePersistence.readPossiblyActivatedLicensesFromString(contents));
-      } finally {
-        in.close();
       }
     } catch (Exception ignore) {
       // we just go on

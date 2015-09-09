@@ -10,6 +10,7 @@ import com.surelogic.common.SLUtility;
 import com.surelogic.common.core.logging.EclipseHandler;
 import com.surelogic.common.core.preferences.CommonCorePreferencesUtility;
 import com.surelogic.common.feedback.Counts;
+import com.surelogic.common.license.SLLicenseUtility;
 import com.surelogic.common.logging.SLLogger;
 
 /**
@@ -41,6 +42,9 @@ public class Activator extends Plugin {
     SLLogger.addHandler(new EclipseHandler());
 
     CommonCorePreferencesUtility.initializeDefaultScope();
+
+    SLLicenseUtility.setToolReleaseDate(EclipseUtility.getReleaseDate());
+
     Counts.getInstance().load();
   }
 

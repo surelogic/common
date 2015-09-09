@@ -167,11 +167,13 @@ public class LicenseAdminServlet extends HttpServlet {
       tableEnd();
       writer.println("<h3>Activity</h3>");
       tableBegin();
-      tableRow(CENTER.th("Date"), LEFT.th("IP"), LEFT.th("Event"));
+      tableRow(CENTER.th("Date"), LEFT.th("IP"), LEFT.th("Event"), LEFT.th("OS"), LEFT.th("Java Version"),
+          LEFT.th("Eclipse Version"), LEFT.th("Use Counts"));
       q.prepared("WebServices.selectNetChecksByID", new NullRowHandler() {
         @Override
         protected void doHandle(final Row r) {
-          tableRow(LEFT.td(r.nextTimestamp()), LEFT.td(ip(r.nextString())), LEFT.td(r.nextString()));
+          tableRow(LEFT.td(r.nextTimestamp()), LEFT.td(ip(r.nextString())), LEFT.td(r.nextString()), LEFT.td(r.nextString()),
+              LEFT.td(r.nextString()), LEFT.td(r.nextString()), LEFT.td(r.nextString()));
         }
       }).call(uuid);
       tableEnd();
