@@ -146,8 +146,8 @@ public class LicenseCountsServlet extends HttpServlet {
       final Calendar yearAgo = Calendar.getInstance();
       yearAgo.add(Calendar.YEAR, -1);
       final Timestamp yearAgoTs = new Timestamp(yearAgo.getTimeInMillis());
-      
-      writer.println("<h3>Eclipse Version Use Counts</h3>");
+
+      writer.println("<h3>Eclipse Version Counts</h3>");
       tableBegin();
       tableRow(CENTER.th("Ecilpse"), LEFT.th("This Year"));
       q.prepared("WebServices.eclipseDistribution", new NullRowHandler() {
@@ -157,8 +157,8 @@ public class LicenseCountsServlet extends HttpServlet {
         }
       }).call(yearAgoTs);
       tableEnd();
-      
-      writer.println("<h3>Java Version Use Counts</h3>");
+
+      writer.println("<h3>Java Version Counts</h3>");
       tableBegin();
       tableRow(CENTER.th("Java"), LEFT.th("This Year"));
       q.prepared("WebServices.javaDistribution", new NullRowHandler() {
@@ -168,8 +168,8 @@ public class LicenseCountsServlet extends HttpServlet {
         }
       }).call(yearAgoTs);
       tableEnd();
-      
-      writer.println("<h3>Operating System Use Counts</h3>");
+
+      writer.println("<h3>Operating System Counts</h3>");
       tableBegin();
       tableRow(CENTER.th("OS"), LEFT.th("This Year"));
       q.prepared("WebServices.osDistribution", new NullRowHandler() {
