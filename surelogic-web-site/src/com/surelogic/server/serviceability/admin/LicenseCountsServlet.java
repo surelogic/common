@@ -11,6 +11,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.LinkedList;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -18,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.surelogic.NonNull;
+import com.surelogic.common.feedback.Counts;
 import com.surelogic.common.jdbc.NullRowHandler;
 import com.surelogic.common.jdbc.Query;
 import com.surelogic.common.jdbc.Result;
@@ -29,9 +31,9 @@ public class LicenseCountsServlet extends HttpServlet {
 
   private static final long serialVersionUID = -667963344728794256L;
 
-  static class Counts {
+  static class LicenseCounts {
 
-    Counts(@NonNull String month) {
+    LicenseCounts(@NonNull String month) {
       this.month = month;
     }
 
@@ -52,7 +54,7 @@ public class LicenseCountsServlet extends HttpServlet {
     long totalWebCommunityLicenseRequestsThisMonth;
     long activatedWebCommunityLicenseRequestsThisMonth;
 
-    void lastMonth(@NonNull Counts p) {
+    void lastMonth(@NonNull LicenseCounts p) {
       totalWebLicenseRequestsThisMonth = totalWebLicenseRequests - p.totalWebLicenseRequests;
       activatedWebLicenseRequestsThisMonth = activatedWebLicenseRequests - p.activatedWebLicenseRequests;
       totalWebTrialLicenseRequestsThisMonth = totalWebTrialLicenseRequests - p.totalWebTrialLicenseRequests;
@@ -105,10 +107,10 @@ public class LicenseCountsServlet extends HttpServlet {
       c.set(Calendar.YEAR, year);
       c.add(Calendar.MONTH, 1);
       c.add(Calendar.MILLISECOND, -1); // last instant of month
-      final LinkedList<Counts> countsList = new LinkedList<>();
+      final LinkedList<LicenseCounts> countsList = new LinkedList<>();
       do {
         Timestamp ts = new Timestamp(c.getTimeInMillis());
-        final Counts counts = new Counts(sdf.format(ts));
+        final LicenseCounts counts = new LicenseCounts(sdf.format(ts));
         counts.activeLicenses = q.prepared("WebServices.activeLicensesOn", handler).call(ts);
         counts.totalWebLicenseRequests = q.prepared("WebServices.totalWebLicenseRequestsOn", handler).call(ts);
         counts.activatedWebLicenseRequests = q.prepared("WebServices.activatedWebLicenseRequestsOn", handler).call(ts);
@@ -121,14 +123,14 @@ public class LicenseCountsServlet extends HttpServlet {
         c.add(Calendar.MONTH, -1);
       } while (c.get(Calendar.MONTH) != month);
       // calculate this month values where we can
-      Counts prev = null;
-      for (Counts curr : countsList) {
+      LicenseCounts prev = null;
+      for (LicenseCounts curr : countsList) {
         if (prev != null)
           curr.lastMonth(prev);
         prev = curr;
       }
       Collections.reverse(countsList);
-      for (Counts counts : countsList) {
+      for (LicenseCounts counts : countsList) {
         tableRow(RIGHT.td(counts.month), RIGHT.tdL(counts.activeLicenses),
 
         RIGHT.tdL(counts.totalWebTrialLicenseRequestsThisMonth), RIGHT.tdL(counts.activatedWebTrialLicenseRequestsThisMonth),
@@ -178,6 +180,23 @@ public class LicenseCountsServlet extends HttpServlet {
           tableRow(CENTER.td(r.nextString()), RIGHT.tdL(r.nextLong()));
         }
       }).call(yearAgoTs);
+      tableEnd();
+
+      final Counts useCounts = new Counts();
+      q.prepared("WebServices.useCounts", new NullRowHandler() {
+        @Override
+        protected void doHandle(final Row r) {
+          final String persistedCounts = r.nextString();
+          if (persistedCounts != null)
+            useCounts.add(persistedCounts);
+        }
+      }).call(yearAgoTs);
+      writer.println("<h3>SureLogic Tool Counts</h3>");
+      tableBegin();
+      tableRow(CENTER.th("Tool"), LEFT.th("This Year"));
+      for (Map.Entry<String, Long> e : useCounts.getCounts().entrySet()) {
+        tableRow(CENTER.td(e.getKey()), RIGHT.tdL(e.getValue()));
+      }
       tableEnd();
       finish();
     }

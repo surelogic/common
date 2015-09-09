@@ -47,6 +47,17 @@ public final class Counts {
   final Map<String, Long> f_counts = new HashMap<>();
 
   /**
+   * Gets a copy of counts for this object.
+   * 
+   * @return a copy of counts for this object.
+   */
+  public Map<String, Long> getCounts() {
+    synchronized (f_counts) {
+      return new HashMap<>(f_counts);
+    }
+  }
+
+  /**
    * Increments the count for the passed key.
    * 
    * @param key
@@ -98,13 +109,53 @@ public final class Counts {
   public void set(@NonNull final String persistedEntries) {
     if (persistedEntries == null)
       throw new IllegalArgumentException(I18N.err(44, "persistedEntries"));
+    parseHelper(persistedEntries, true);
+  }
+
+  /**
+   * Parses the passed string to add all key/count values to this instance. The
+   * passed string should have been created by a call to {@link #toString()} for
+   * a {@link Counts} instance.
+   * <p>
+   * This method is primarily used for persistence.
+   * 
+   * @param persistedEntries
+   *          key/count values; should have been created by a call to
+   *          {@link #toString()} for a {@link Counts} instance.
+   * 
+   * @throws IllegalArgumentException
+   *           if persistedEntries is {@code null}.
+   */
+  public void add(@NonNull final String persistedEntries) {
+    if (persistedEntries == null)
+      throw new IllegalArgumentException(I18N.err(44, "persistedEntries"));
+    parseHelper(persistedEntries, false);
+  }
+
+  /**
+   * Parses the passed persisted entries and adds them to this counts instance.
+   * Optionally the counts may be cleared.
+   * 
+   * @param persistedEntries
+   *          key/count values; should have been created by a call to
+   *          {@link #toString()} for a {@link Counts} instance.
+   * @param clear
+   *          {@code true} if counts for this instance should be cleared before
+   *          parsing the passed persisted entries, {@code false} if the
+   *          existing counts should be added to.
+   */
+  private void parseHelper(@NonNull final String persistedEntries, final boolean clear) {
     synchronized (f_counts) {
-      f_counts.clear();
+      if (clear)
+        f_counts.clear();
       for (String sEntry : Splitter.on(";").trimResults().omitEmptyStrings().split(persistedEntries)) {
         final int ei = sEntry.indexOf('=');
         if (ei != -1) {
           final String key = sEntry.substring(0, ei);
-          final long count = Long.parseLong(sEntry.substring(ei + 1));
+          long count = Long.parseLong(sEntry.substring(ei + 1));
+          Long value = f_counts.get(key);
+          if (value != null)
+            count += value.longValue();
           f_counts.put(key, Long.valueOf(count));
         }
       }
