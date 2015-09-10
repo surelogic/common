@@ -4,11 +4,10 @@ import java.io.InputStream;
 import java.net.URL;
 
 import com.surelogic.common.jdbc.AbstractSchemaData;
-import com.surelogic.common.license.SLLicenseProduct;
 
 public class ServicesSchemaData extends AbstractSchemaData {
   public ServicesSchemaData() {
-    super("com.surelogic.server.jdbc.schema", Thread.currentThread().getContextClassLoader(), SLLicenseProduct.EXEMPT);
+    super("com.surelogic.server.jdbc.schema", Thread.currentThread().getContextClassLoader());
   }
 
   protected Object newInstance(String qname) throws InstantiationException, IllegalAccessException, ClassNotFoundException {

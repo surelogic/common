@@ -28,7 +28,7 @@ import com.surelogic.common.jdbc.ResultHandler;
 import com.surelogic.common.jdbc.Row;
 import com.surelogic.server.jdbc.ServicesDBConnection;
 
-public class LicenseCountsServlet extends HttpServlet {
+public class CountsServlet extends HttpServlet {
 
   private static final long serialVersionUID = -667963344728794256L;
 
@@ -192,7 +192,7 @@ public class LicenseCountsServlet extends HttpServlet {
             useCounts.add(persistedCounts);
         }
       }).call(yearAgoTs);
-      writer.println("<h3>SureLogic Tool Scan/Launch Counts</h3>");
+      writer.println("<h3>SureLogic Tool Scan/Prep Counts</h3>");
       tableBegin();
       tableRow(CENTER.th("Tool"), LEFT.th("This Year"));
       final TreeMap<String, Long> sorted = new TreeMap<>(useCounts.getCounts());

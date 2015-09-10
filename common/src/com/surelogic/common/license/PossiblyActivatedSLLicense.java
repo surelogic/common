@@ -207,11 +207,8 @@ public final class PossiblyActivatedSLLicense {
   public boolean licensesUseOf(@NonNull final SLLicenseProduct product, @Nullable Iterable<String> macAddresses) {
     if (product == null)
       throw new IllegalArgumentException(I18N.err(44, "product"));
-    if (!product.isProduct())
+    if (!product.isALicensedProduct())
       throw new IllegalArgumentException(I18N.err(356, product));
-
-    if (product == SLLicenseProduct.EXEMPT)
-      return true;
 
     if (!isActivated())
       return false;

@@ -97,7 +97,7 @@ public final class SLLicenseUtility {
    * @return {@code true} if a license exists that allows use of
    *         <tt>product</tt>, {@code false} otherwise.
    */
-  public static boolean validate(@NonNull final SLLicenseProduct product) {
+  private static boolean validate(@NonNull final SLLicenseProduct product) {
     if (product == null)
       throw new IllegalArgumentException(I18N.err(44, "product"));
     /*

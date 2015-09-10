@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.surelogic.Immutable;
-import com.surelogic.Vouch;
 import com.surelogic.RegionEffects;
+import com.surelogic.Vouch;
 
 /**
  * The products licensed by SureLogic.
@@ -21,9 +21,7 @@ public enum SLLicenseProduct {
 
   JSURE("JSure", true),
 
-  SIERRA("Sierra", true),
-
-  EXEMPT("Exempt", true);
+  SIERRA("Sierra", true);
 
   /**
    * A text representation for this product.
@@ -47,7 +45,7 @@ public enum SLLicenseProduct {
    * @return {@code true} if this represents a licensed product that a license
    *         check can be done on, {@code false} otherwise.
    */
-  public boolean isProduct() {
+  public boolean isALicensedProduct() {
     return f_isProduct;
   }
 
