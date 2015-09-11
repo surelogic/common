@@ -232,8 +232,8 @@ public class LicenseNetcheckServlet extends HttpServlet {
     q.prepared("WebServices.logNetCheck").call(time, ip, uuid.toString(), event.value, osDb, javaVersionDb, eclipseVersionDb,
         countsDb);
     q.statement("WebServices.updateCheckCount").call(event.getColumn(), uuid.toString());
-    Email.sendSupportEmail(event.toString(), I18N.msg("web.check.logEmail", license.getHolder(), license.getProduct().toString(),
-        time.toString(), ip, uuid, I18N.msg("web.admin.license.url", SLUtility.SERVICEABILITY_SERVER, uuid), event.toString()));
+//    Email.sendSupportEmail(event.toString(), I18N.msg("web.check.logEmail", license.getHolder(), license.getProduct().toString(),
+//        time.toString(), ip, uuid, I18N.msg("web.admin.license.url", SLUtility.SERVICEABILITY_SERVER, uuid), event.toString()));
   }
 
   /**
