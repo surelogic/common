@@ -11,13 +11,27 @@
   <!-- License and support pages, some are accessed in-tool others via surelogic.com -->
 
   <servlet>
-    <servlet-name>Trial and Community License Creation</servlet-name>
+    <servlet-name>Trial License Creation</servlet-name>
     <servlet-class>com.surelogic.server.serviceability.LicenseCreateServlet</servlet-class>
   </servlet>
 
   <servlet-mapping>
-    <servlet-name>Trial and Community License Creation</servlet-name>
-    <url-pattern>/services/create</url-pattern>
+    <servlet-name>Trial License Creation</servlet-name>
+    <url-pattern>/services/trial</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>Community License Creation</servlet-name>
+    <servlet-class>com.surelogic.server.serviceability.LicenseCreateServlet</servlet-class>
+    <init-param>
+      <param-name>community</param-name>
+      <param-value>yes</param-value>
+    </init-param>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>Community License Creation</servlet-name>
+    <url-pattern>/services/community</url-pattern>
   </servlet-mapping>
 
   <servlet>
