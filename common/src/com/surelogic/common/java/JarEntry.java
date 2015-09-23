@@ -150,7 +150,7 @@ public class JarEntry extends AbstractClassPathEntry {
 					loader.map(jp.getName(), new JarredClassFile(qname, jar, project.getProject(), name));
 				}
 			}
-			System.out.println(jp.getName()+": Done initializing with "+jar);
+			System.out.println(jp.getName()+": Done initializing with "+jar+" : "+jar.length());
 			zf.close();
 		} catch(ZipException e) {
 			System.out.println("Zip exception with "+jar);
