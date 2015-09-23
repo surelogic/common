@@ -32,7 +32,7 @@ public final class ServiceUtility {
   }
 
   public static SLJob sendToSureLogic(final String msg, final Runnable after) {
-    return new AbstractSLJob("Sending a servicability message to SureLogic") {
+    return new AbstractSLJob("Sending to SureLogic...please be patient this may take a minute or two") {
 
       @Override
       public SLStatus run(final SLProgressMonitor monitor) {
