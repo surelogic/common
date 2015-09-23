@@ -100,6 +100,8 @@ public final class SLUtility {
 
   public static final String DERBY_LOG_NAME = ".surelogic-derby-log.txt";
 
+  public static final String SUPPORT_EMAIL = System.getProperty("serviceability.reply-to-email", "support@surelogic.com");
+
   /*
    * Constants for special ad hoc query meta variables
    */
