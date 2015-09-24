@@ -144,15 +144,4 @@
     <listener-class>com.surelogic.server.jdbc.NetworkServerContextListener</listener-class>
   </listener>
 
-  <!-- Allows server to email as tim.halloran@surelogic.com through Google -->
-
-  <context-param>
-    <param-name>emailAs</param-name>
-    <param-value>tim.halloran@surelogic.com</param-value>
-  </context-param>
-  <context-param>
-    <param-name>emailSecret</param-name>
-    <param-value>bGFyYS5jcm9mdA==</param-value>
-  </context-param>
-
 </web-app>

@@ -49,10 +49,19 @@ public final class SLUtility {
 
   /**
    * This defines the server to get to the serviceability servlets on the
-   * SureLogic website. Normally the default is used , but for testing a system
-   * property can be set <code>-Dserviceability.url=http://test.com:8080</code>
+   * SureLogic website. Normally the default of <tt>http://surelogic.com</tt> is
+   * used , but for testing a system property can be set
+   * <code>-Dserviceability.url=http://test.com:8080</code>
    */
   public static final String SERVICEABILITY_SERVER = System.getProperty("serviceability.url", "http://surelogic.com");
+
+  /**
+   * This defines the SureLogic email address used for the serviceability
+   * servlets on the SureLogic website. Normally the default of
+   * <tt>support@surelogic.com</tt> is used , but for testing a system property
+   * can be set <code>-Dserviceability.email=tim@myserver.com</code>
+   */
+  public static final String SERVICEABILITY_EMAIL = System.getProperty("serviceability.email", "support@surelogic.com");
 
   /**
    * This is a very JDT friendly constant&mdash;many Eclipse methods recognize
