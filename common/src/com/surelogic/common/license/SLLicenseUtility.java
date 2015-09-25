@@ -26,17 +26,40 @@ import com.surelogic.common.jobs.SLStatus;
  */
 public final class SLLicenseUtility {
 
-  private static final AtomicReference<Date> f_toolReleaseDate = new AtomicReference<>(new Date());
+  /**
+   * The installed tool release date or {@code null} if it cannot be determined.
+   */
+  @Nullable
+  private static final AtomicReference<Date> f_toolReleaseDate = new AtomicReference<>(null);
 
   /**
-   * Gets the release date for the SureLogic tools, or todays date if unknown.
+   * Gets the release date for the installed SureLogic tools, or todays date if
+   * unknown.
    * 
-   * @return the release date for the SureLogic tools, or todays date if
+   * @return the release date for the installed SureLogic tools, or {@code null}
    *         unknown.
    */
-  @NonNull
-  public static Date getToolReleaseDate() {
+  @Nullable
+  public static Date getToolReleaseDateOrNull() {
     return f_toolReleaseDate.get();
+  }
+
+  /**
+   * Gets a string version of the release date for the installed SureLogic
+   * tools, or <tt>(in development -- not a release)</tt> if what is installed
+   * is not a release.
+   * 
+   * @return a string version of the release date for the installed SureLogic
+   *         tools, or <tt>(in development -- not a release)</tt> if what is
+   *         installed is not a release.
+   */
+  @NonNull
+  public static String getToolReleaseDateAsString() {
+    final Date release = getToolReleaseDateOrNull();
+    if (release != null)
+      return SLUtility.toStringDay(release);
+    else
+      return "(in development -- not a release)";
   }
 
   /**
@@ -50,12 +73,10 @@ public final class SLLicenseUtility {
    * value.
    * 
    * @param value
-   *          the release date for the SureLogic tools. The call is ignored if
-   *          this parameter is {@code null}.
+   *          the release date for the SureLogic tools.
    */
   public static void setToolReleaseDate(@Nullable Date value) {
-    if (value != null)
-      f_toolReleaseDate.set(value);
+    f_toolReleaseDate.set(value);
   }
 
   private static final Set<ILicenseObserver> f_observers = new CopyOnWriteArraySet<>();

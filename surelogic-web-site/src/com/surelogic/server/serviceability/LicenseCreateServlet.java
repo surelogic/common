@@ -33,7 +33,7 @@ public class LicenseCreateServlet extends HttpServlet {
    * Duration of licenses. The duration for community license is for renewal
    * (not expiration).
    */
-  static private final int DURATION_TRIAL = 30; // days
+  static private final int DURATION_TRIAL = 45; // days
   static private final int DURATION_COMMUNITY = 180; // days (~6 months)
 
   /*

@@ -47,6 +47,8 @@ import com.surelogic.common.logging.SLLogger;
 public final class SLUtility {
   public static final boolean is64bit = SystemUtils.OS_ARCH.indexOf("64") >= 0;
 
+  public static final String COMMON_PLUGIN_ID = "com.surelogic.common";
+
   /**
    * This defines the server to get to the serviceability servlets on the
    * SureLogic website. Normally the default of <tt>http://surelogic.com</tt> is

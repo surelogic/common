@@ -50,11 +50,6 @@ public final class FileUtility {
   public static final String GZIP_SUFFIX = ".gz";
 
   /**
-   * The string name of the JSecure data directory.
-   */
-  public static final String JSECURE_DATA_PATH_FRAGMENT = ".jsecure-data";
-
-  /**
    * The string name of the JSure data directory.
    */
   public static final String JSURE_DATA_PATH_FRAGMENT = ".jsure-data";

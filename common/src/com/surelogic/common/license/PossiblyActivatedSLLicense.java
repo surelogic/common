@@ -232,8 +232,9 @@ public final class PossiblyActivatedSLLicense {
      * their expiration date or renewal deadline, respectively.
      */
     if (type == SLLicenseType.SUPPORT || type == SLLicenseType.PERPETUAL) {
-      final Date releaseDate = SLLicenseUtility.getToolReleaseDate();
-      if (isExpiredOn(releaseDate))
+      @Nullable
+      final Date releaseDate = SLLicenseUtility.getToolReleaseDateOrNull();
+      if (releaseDate != null && isExpiredOn(releaseDate))
         return false;
     }
 
