@@ -4,7 +4,7 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
-import com.surelogic.common.ui.jobs.CheckForUpdate;
+import com.surelogic.common.ui.jobs.CheckForUpdates;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -18,7 +18,7 @@ public class Activator extends AbstractUIPlugin {
       throw new IllegalStateException(Activator.class.getName() + " instance already exits, it should be a singleton.");
     }
     plugin = this;
-    CheckForUpdate.go();
+    CheckForUpdates.go();
   }
 
   @Override

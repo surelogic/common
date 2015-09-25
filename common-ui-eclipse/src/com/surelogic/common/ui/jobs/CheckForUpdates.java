@@ -19,9 +19,9 @@ import com.surelogic.common.core.EclipseUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.logging.SLLogger;
 
-public final class CheckForUpdate extends Job {
+public final class CheckForUpdates extends Job {
 
-  public CheckForUpdate() {
+  public CheckForUpdates() {
     super("Checking if updates are available for the SureLogic tools");
   }
 
@@ -52,7 +52,7 @@ public final class CheckForUpdate extends Job {
   }
 
   public static void go() {
-    final Job job = new CheckForUpdate();
+    final Job job = new CheckForUpdates();
     job.setSystem(true);
     job.schedule(TimeUnit.MILLISECONDS.convert(5, TimeUnit.SECONDS));
   }
