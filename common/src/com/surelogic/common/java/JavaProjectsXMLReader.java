@@ -91,6 +91,7 @@ implements IXmlResultListener, PersistenceConstants {
     final String location = e.getAttribute(LOCATION);
     final boolean isExported = "true".equals(e.getAttribute(IS_EXPORTED));
     final boolean hasJLO = "true".equals(e.getAttribute(HAS_JLO));
+    final boolean isReal = "true".equals(e.getAttribute(REAL)) || e.getAttribute(REAL) == null;
     setupDefaultJRE(proj);
     /*
     if (proj.startsWith(Config.JRE_NAME)) {
@@ -99,7 +100,7 @@ implements IXmlResultListener, PersistenceConstants {
     }
     */
 
-    final P p = projects.add(new Config(proj, location == null ? null : new File(location), isExported, hasJLO));
+    final P p = projects.add(new Config(proj, isReal, location == null ? null : new File(location), isExported, hasJLO));
     final boolean isSource = "true".equals(e.getAttribute(Config.AS_SOURCE));
     if (isSource) {
       p.getConfig().setAsSource();

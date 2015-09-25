@@ -22,13 +22,13 @@ import com.surelogic.common.java.*;
 
 public class ZippedConfig extends Config {
 	private static final boolean useSourceZipsDirectly = !XUtil.runJSureInMemory || SystemUtils.IS_OS_WINDOWS;
-	public ZippedConfig(String name, File location, boolean isExported, boolean hasJLO) {
-		super(name, location, isExported, hasJLO);
+	public ZippedConfig(String name, boolean isReal, File location, boolean isExported, boolean hasJLO) {
+		super(name, isReal, location, isExported, hasJLO);
 	}
 
 	@Override
-	protected Config newConfig(String name, File location, boolean isExported, boolean hasJLO) {
-		return new ZippedConfig(name, location, isExported, hasJLO);
+	protected Config newConfig(String name, boolean isReal, File location, boolean isExported, boolean hasJLO) {
+		return new ZippedConfig(name, isReal, location, isExported, hasJLO);
 	}
 
 	@Override

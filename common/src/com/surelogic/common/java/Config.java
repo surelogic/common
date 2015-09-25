@@ -83,14 +83,20 @@ public class Config extends AbstractClassPathEntry {
   private final Map<URI, JavaSourceFile> pathMapping = new HashMap<>();
   private Config requiringConfig = null;
   private final boolean containsJavaLangObject;
-
-  public Config(String name, File loc, boolean isExported, boolean hasJLO) {
+  private final boolean isReal;
+  
+  public Config(String name, boolean real, File loc, boolean isExported, boolean hasJLO) {
     super(isExported);
+    isReal = real;
     this.name = name;
     location = loc;
     containsJavaLangObject = hasJLO;
   }
 
+  public boolean isReal() {
+	return isReal;
+  }
+  
   @Override
   public void outputToXML(XmlCreator.Builder proj) {
     // Just the reference to this
@@ -354,8 +360,8 @@ public class Config extends AbstractClassPathEntry {
   // }
   // }
 
-  protected Config newConfig(String name, File location, boolean isExported, boolean hasJLO) {
-    return new Config(name, location, isExported, hasJLO);
+  protected Config newConfig(String name, boolean isReal, File location, boolean isExported, boolean hasJLO) {
+    return new Config(name, isReal, location, isExported, hasJLO);
   }
 
   public Config merge(Config delta) throws MergeException {
@@ -369,7 +375,7 @@ public class Config extends AbstractClassPathEntry {
     } else if (!location.equals(delta.location)) {
       throw new IllegalStateException("Locations don't match: " + location + " != " + delta.location);
     }
-    final Config merged = newConfig(name, location, isExported(), containsJavaLangObject());
+    final Config merged = newConfig(name, isReal(), location, isExported(), containsJavaLangObject());
     mergeClasspath(delta, merged);
     mergeFiles(delta, merged);
     merged.pkgs.addAll(this.pkgs);
