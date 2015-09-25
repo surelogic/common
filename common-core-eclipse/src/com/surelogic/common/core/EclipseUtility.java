@@ -47,7 +47,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.Plugin;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.IJobManager;
 import org.eclipse.core.runtime.jobs.Job;
@@ -542,18 +541,6 @@ public class EclipseUtility {
   }
 
   /**
-   * Gets the {@link File} for the JSecure data directory.
-   * 
-   * @return the JSecure data directory.
-   * @throws Exception
-   *           if something goes wrong.
-   */
-  @NonNull
-  public static File getJSecureDataDirectory() {
-    return EclipseUtility.getWorkspaceRelativeAsFile(FileUtility.JSECURE_DATA_PATH_FRAGMENT);
-  }
-
-  /**
    * Gets the {@link File} for the Sierra data directory.
    * 
    * @return the Sierra data directory.
@@ -702,38 +689,56 @@ public class EclipseUtility {
     }
   }
 
-  private static final String BUNDLE_VERSION = "Bundle-Version";
-  private static final String DOT_QUALIFIER = ".qualifier";
+  /**
+   * Gets the simple bundle version for the passed bundle, or {@code null} if
+   * none. In development and production the result should look something like
+   * 
+   * <pre>
+   * 5.7.0
+   * </pre>
+   * 
+   * @param bundle
+   *          an Eclipse bundle (usually a plug-in)
+   * @return the simple bundle version for the passed bundle, or {@code null} if
+   *         none.
+   */
+  @Nullable
+  public static String getBundleSimpleVersionOrNull(@Nullable Bundle bundle) {
+    String result = null;
+    if (bundle != null) {
+      final Version v = bundle.getVersion();
+      if (v != null && v != Version.emptyVersion)
+        result = v.getMajor() + "." + v.getMinor() + "." + v.getMicro();
+    }
+    return result;
+  }
 
   /**
-   * Gets the version of the passed activator as read from its bundle headers.
-   * <p>
-   * This method is a bit of a hack in the sense that a complete version number
-   * is only returned outside of development, i.e., in a real release. So for a
-   * real release expect a string similar to
+   * Gets the full bundle version for the passed bundle, or {@code null} if
+   * none. In a production release the result should look something like
    * 
    * <pre>
-   * 3.1.1.201001151440
+   * 5.6.1.201509151131
    * </pre>
    * 
-   * However, in a development or meta-Eclipse a string similar to
-   * <tt>3.1.1.qualifier</tt> is returned from the bundle headers which we
-   * truncate to
+   * in development it will look something like
    * 
    * <pre>
-   * 3.1.1
+   * 5.7.0.qualifier
    * </pre>
    * 
-   * @param activator
-   *          a plug-in to query.
-   * @return a string that represents the version of the passed activator.
+   * @param bundle
+   *          an Eclipse bundle (usually a plug-in)
+   * @return the full bundle version for the passed bundle, or {@code null} if
+   *         none.
    */
-  public static String getVersion(final Plugin activator) {
-    final String rawVersionS = (String) Activator.getDefault().getBundle().getHeaders().get(BUNDLE_VERSION);
-    if (rawVersionS.endsWith(DOT_QUALIFIER)) {
-      return rawVersionS.substring(0, rawVersionS.length() - DOT_QUALIFIER.length());
+  @Nullable
+  public static String getBundleVersionOrNull(@Nullable Bundle bundle) {
+    String result = null;
+    if (bundle != null) {
+      result = bundle.getHeaders().get("Bundle-Version");
     }
-    return rawVersionS;
+    return result;
   }
 
   /**
@@ -745,6 +750,7 @@ public class EclipseUtility {
    * @return the version of the Eclipse or <tt>unknown</tt> if the version
    *         cannot be determined.
    */
+  @NonNull
   public static String getEclipseVersion() {
     @Nullable
     String result = null;
@@ -767,64 +773,89 @@ public class EclipseUtility {
         }
     }
     if (result == null) // if all of the above didn't work
-      result = getVersion(Platform.getBundle("org.eclipse.platform"));
+      result = getBundleVersionOrNull(Platform.getBundle("org.eclipse.platform"));
+    if (result == null)
+      result = "unknown";
     return result;
   }
 
   /**
-   * Gets the version of the passed bundle, such as <tt>4.5.0</tt>.
-   * 
-   * @param bundle
-   *          a bundle.
-   * @return the version of the passed bundle, such as <tt>4.5.0</tt>, or
-   *         <tt>unknown</tt> if the version cannot be determined or the passed
-   *         bundle is {@code null}.
-   */
-  public static String getVersion(@Nullable Bundle bundle) {
-    String result = "unknown";
-    if (bundle != null) {
-      Version v = bundle.getVersion();
-      if (v != null)
-        result = v.getMajor() + "." + v.getMinor() + "." + v.getMicro();
-    }
-    return result;
-  }
-
-  /**
-   * Gets the date that the current revision of this plugin was released or
-   * today's date. This is used as the release date of the SureLogic tools.
-   * <p>
-   * This method gets the bundle version which is a string similar to
+   * Gets the simple SureLogic tools version. In development and production the
+   * result should look something like
    * 
    * <pre>
-   * 3.1.1.201001151440
+   * 5.6.1
    * </pre>
    * 
-   * The <tt>"20100115"</tt> portion of the string (after the last <tt>"."</tt>)
-   * is then parsed as a date using the pattern <tt>"yyyyMMdd"</tt>.
+   * @return the simple SureLogic tools version.
    * 
-   * @return the date the version was released or today's date.
+   * @throws IllegalStateException
+   *           if the lookup fails.
    */
-  public static Date getReleaseDate() {
-    final String rawVersionS = (String) Activator.getDefault().getBundle().getHeaders().get(BUNDLE_VERSION);
-    if (rawVersionS.endsWith(DOT_QUALIFIER))
-      return new Date();
+  @NonNull
+  public static String getSureLogicToolsSimpleVersion() {
+    final String result = getBundleSimpleVersionOrNull(Platform.getBundle(SLUtility.COMMON_PLUGIN_ID));
+    if (result == null)
+      throw new IllegalStateException(I18N.err(371));
+    return result;
+  }
 
-    final int lastDotIndex = rawVersionS.lastIndexOf('.');
-    if (lastDotIndex == -1)
-      return new Date();
-    if (lastDotIndex + 9 > rawVersionS.length())
-      return new Date();
+  /**
+   * Gets the full SureLogic tools version. In a production release the result
+   * should look something like
+   * 
+   * <pre>
+   * 5.6.1.201509151131
+   * </pre>
+   * 
+   * in development it will look something like
+   * 
+   * <pre>
+   * 5.7.0.qualifier
+   * </pre>
+   * 
+   * @return the full SureLogic tools version.
+   * 
+   * @throws IllegalStateException
+   *           if the lookup fails.
+   */
+  @NonNull
+  public static String getSureLogicToolsVersion() {
+    final String result = getBundleVersionOrNull(Platform.getBundle(SLUtility.COMMON_PLUGIN_ID));
+    if (result == null)
+      throw new IllegalStateException(I18N.err(371));
+    return result;
+  }
 
-    final String dateS = rawVersionS.substring(lastDotIndex + 1, lastDotIndex + 9);
+  /**
+   * Gets the release date of the installed version of the SureLogic tools or
+   * {@code null} if this is unknown. The date is unknown, for example, in
+   * development.
+   * 
+   * @return the release date of the installed version of the SureLogic tools or
+   *         {@code null} if this is unknown.
+   */
+  @Nullable
+  public static Date getSureLogicToolsReleaseDateOrNull() {
+    final String rawVersionS = getSureLogicToolsVersion();
+    // are we in development?
+    if (!rawVersionS.endsWith(".qualifier")) {
+      final int lastDotIndex = rawVersionS.lastIndexOf('.');
+      if (lastDotIndex == -1)
+        return new Date();
+      if (lastDotIndex + 9 > rawVersionS.length())
+        return new Date();
 
-    final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-    try {
-      final Date result = dateFormat.parse(dateS);
-      return result;
-    } catch (ParseException ignore) {
+      final String dateS = rawVersionS.substring(lastDotIndex + 1, lastDotIndex + 9);
+
+      final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+      try {
+        final Date result = dateFormat.parse(dateS);
+        return result;
+      } catch (ParseException ignore) {
+      }
     }
-    return new Date();
+    return null;
   }
 
   public static IProject unzipToWorkspace(final File projectZip) throws CoreException, IOException {

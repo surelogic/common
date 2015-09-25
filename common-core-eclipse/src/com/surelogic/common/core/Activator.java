@@ -43,7 +43,7 @@ public class Activator extends Plugin {
 
     CommonCorePreferencesUtility.initializeDefaultScope();
 
-    SLLicenseUtility.setToolReleaseDate(EclipseUtility.getReleaseDate());
+    SLLicenseUtility.setToolReleaseDate(EclipseUtility.getSureLogicToolsReleaseDateOrNull());
 
     Counts.getInstance().load();
   }

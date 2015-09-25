@@ -43,7 +43,6 @@ import com.surelogic.common.logging.SLLogger;
 @Region("LocalState")
 @RegionLock("LocalLock is this protects LocalState")
 public abstract class AbstractLocalSLJob<C extends ILocalConfig> extends AbstractSLJob {
-  public static final String COMMON_PLUGIN_ID = "com.surelogic.common";
   protected static final boolean usePrivateJRE = false;
   protected static final String JRE_HOME = "/home/edwin/work/jre1.7.0_75/";
 
