@@ -690,6 +690,29 @@ public class EclipseUtility {
   }
 
   /**
+   * Constructs an integer value from the passed version that can be compared
+   * using simple integer comparisons. We use 10 bits for each portion of the
+   * version.
+   * <p>
+   * Comparisons should only be done to other integer values constructed by this
+   * method.
+   * 
+   * @param value
+   *          a version.
+   * @return a comparable integer value.
+   * @throws IllegalArgumentException
+   *           if value is null.
+   */
+  public static int getCompariableValueFor(@NonNull Version value) {
+    if (value == null)
+      throw new IllegalArgumentException(I18N.err(44, "value"));
+    int result = value.getMajor() << 20;
+    result += value.getMinor() << 10;
+    result += value.getMicro();
+    return result;
+  }
+
+  /**
    * Gets the simple bundle version for the passed bundle, or {@code null} if
    * none. In development and production the result should look something like
    * 
