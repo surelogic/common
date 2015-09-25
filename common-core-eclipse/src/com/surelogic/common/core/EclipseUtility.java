@@ -713,6 +713,27 @@ public class EclipseUtility {
   }
 
   /**
+   * Creates a string from the passed version that contains the major, minor,
+   * and micro values separated by a period. The result should look something
+   * like
+   * 
+   * <pre>
+   * 5.7.40
+   * </pre>
+   * 
+   * @param value
+   *          a version.
+   * @return a string of the version, such as <tt>5.7.4</tt>
+   * @throws IllegalArgumentException
+   *           if value is null.
+   */
+  public static String toString(@NonNull Version value) {
+    if (value == null)
+      throw new IllegalArgumentException(I18N.err(44, "value"));
+    return value.getMajor() + "." + value.getMinor() + "." + value.getMicro();
+  }
+
+  /**
    * Gets the simple bundle version for the passed bundle, or {@code null} if
    * none. In development and production the result should look something like
    * 
@@ -731,7 +752,7 @@ public class EclipseUtility {
     if (bundle != null) {
       final Version v = bundle.getVersion();
       if (v != null && v != Version.emptyVersion)
-        result = v.getMajor() + "." + v.getMinor() + "." + v.getMicro();
+        result = toString(v);
     }
     return result;
   }

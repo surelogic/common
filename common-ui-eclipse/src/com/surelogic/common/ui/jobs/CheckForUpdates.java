@@ -69,9 +69,8 @@ public final class CheckForUpdates extends Job {
           /*
            * An update is available at the SureLogic website.
            */
-          final String simpleWebRelease = web.getMajor() + "." + web.getMinor() + "." + web.getMicro();
           final String title = I18N.msg("web.check-for-update.title");
-          final String msg = I18N.msg("web.check-for-update.msg", simpleWebRelease);
+          final String msg = I18N.msg("web.check-for-update.msg", EclipseUtility.toString(web), EclipseUtility.toString(installed));
           BalloonUtility.showMessage(title, msg);
         }
       }
