@@ -118,7 +118,7 @@ public abstract class ProjectInfo<P extends ISLJavaProject> {
     scanForJDK(projects, jp);
 
     final File location = EclipseUtility.resolveIPath(project.getLocation());
-    Config config = new ZippedConfig(project.getName(), location, false, containsJavaLangObject(jp));
+    Config config = new ZippedConfig(project.getName(), true, location, false, containsJavaLangObject(jp));
     setOptions(config);
     projects.add(config);
 
@@ -164,6 +164,7 @@ public abstract class ProjectInfo<P extends ISLJavaProject> {
     final boolean hasSourceForJLO = containsJavaLangObject(jp);
     System.out.println("Project " + jp);
 
+    P lastMappedJar = null;
     for (IClasspathEntry cpe : jp.getResolvedClasspath(true)) {
       System.out.println("\tCPE = " + cpe);
       // TODO ignorable since they'll be handled by the compiler
@@ -201,9 +202,10 @@ public abstract class ProjectInfo<P extends ISLJavaProject> {
           P mappedProj = projects.get(mapped);
           if (mappedProj == null) {
             // Make project for jar
-            mappedProj = makeJarConfig(projects, f, mapped);
+            mappedProj = makeJarConfig(projects, f, mapped, jre, lastMappedJar);
           }
           config.addToClassPath(mappedProj.getConfig());
+          lastMappedJar = mappedProj;
         } else {
           config.addJar(f, cpe.isExported());
         }
@@ -224,7 +226,7 @@ public abstract class ProjectInfo<P extends ISLJavaProject> {
           dep = info.makeConfig(projects, hasDeltas);
         } else {
           final File location = EclipseUtility.resolveIPath(proj.getLocation());
-          dep = new ZippedConfig(projName, location, cpe.isExported(), containsJavaLangObject(JDTUtility.getJavaProject(projName)));
+          dep = new ZippedConfig(projName, true, location, cpe.isExported(), containsJavaLangObject(JDTUtility.getJavaProject(projName)));
           projects.add(dep);
           setOptions(dep);
         }
@@ -337,12 +339,19 @@ public abstract class ProjectInfo<P extends ISLJavaProject> {
 
   /**
    * Create a project/config for a shared jar
+ * @param lastMappedJar 
    */
-  private P makeJarConfig(JavaProjectSet<P> projects, File f, String name) {
+  private P makeJarConfig(JavaProjectSet<P> projects, File f, String name, P jre, P lastMappedJar) {
     System.out.println("Creating shared jar: " + name);
     // Use its containing directory as a location
-    final Config config = new Config(name, f.getParentFile(), true, false);
+    final Config config = new Config(name, false, f.getParentFile(), true, false);    
+    if (lastMappedJar != null) {
+    	config.addToClassPath(lastMappedJar.getConfig());
+    }
     config.addJar(f, true);
+    if (jre != null) {
+    	config.addToClassPath(jre.getConfig());
+    }
     return projects.add(config);
   }
 
@@ -368,7 +377,7 @@ public abstract class ProjectInfo<P extends ISLJavaProject> {
               final String classpath = System.getProperty("sun.boot.class.path");
               System.out.println("sun.boot.class.path = " + classpath);
 
-              final Config config = new Config(path, null, true, true);
+              final Config config = new Config(path, false, null, true, true);
               for (String jar : classpath.split(File.pathSeparator)) {
                 final File f = new File(jar);
                 config.addJar(f, true);
@@ -397,6 +406,8 @@ public abstract class ProjectInfo<P extends ISLJavaProject> {
     // Nothing to do
   }
 
+
+  
   private P findJRE(JavaProjectSet<P> projects, final IClasspathContainer cc) {
     final String name = cc.getPath().toPortableString();
     P jcp = projects.get(name);
@@ -443,7 +454,7 @@ public abstract class ProjectInfo<P extends ISLJavaProject> {
    */
   private Config makeConfig(JavaProjectSet<P> projects, final IClasspathContainer cc) {
     final String name = cc.getPath().toPortableString();
-    final Config config = new Config(name, null, true, true);
+    final Config config = new Config(name, false, null, true, true);
     for (IClasspathEntry cpe : cc.getClasspathEntries()) {
       switch (cpe.getEntryKind()) {
       case IClasspathEntry.CPE_LIBRARY:

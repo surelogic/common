@@ -29,6 +29,7 @@ public class JavaProjectsXMLCreator extends XmlCreator implements PersistenceCon
       b.addAttribute(DATE, SLUtility.toStringForDir(projs.getDate()));
       for (ISLJavaProject p : projs) {
         final Builder pb = b.nest(PROJECT);
+        pb.addAttribute(REAL, p.isReal());
         pb.addAttribute("id", i);
         pb.addAttribute(NAME, p.getName());
         if (p.getConfig().getLocation() != null) {
