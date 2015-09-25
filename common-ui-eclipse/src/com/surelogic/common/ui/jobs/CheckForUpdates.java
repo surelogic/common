@@ -19,6 +19,13 @@ import com.surelogic.common.core.EclipseUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.logging.SLLogger;
 
+/**
+ * This job checks the published tool release date on the SureLogic website and
+ * compares it to the installed tool release date and then, if their is an
+ * update available, notifies the tool user with a dialog.
+ * <p>
+ * Calling code should simply invoke the {@link #go()} convenience method.
+ */
 public final class CheckForUpdates extends Job {
 
   public CheckForUpdates() {
@@ -51,10 +58,14 @@ public final class CheckForUpdates extends Job {
     return Status.OK_STATUS;
   }
 
+  /**
+   * Schedules a check for updates job 20 seconds from the call. This call does
+   * not block, it will return immediately. Will prompt the tool user if a newer
+   * version exists.
+   */
   public static void go() {
     final Job job = new CheckForUpdates();
     job.setSystem(true);
-    job.schedule(TimeUnit.MILLISECONDS.convert(5, TimeUnit.SECONDS));
+    job.schedule(TimeUnit.MILLISECONDS.convert(20, TimeUnit.SECONDS));
   }
-
 }
