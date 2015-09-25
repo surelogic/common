@@ -37,7 +37,8 @@ public final class ServiceUtility {
 
       @Override
       public SLStatus run(final SLProgressMonitor monitor) {
-        monitor.begin(msg.length);
+        final int endWork = Math.max(20, msg.length / 20);
+        monitor.begin(msg.length + (2 * endWork));
         try {
           // Prepare the URL connection
           final URL url = new URL(f_serviceLocation);
@@ -64,10 +65,12 @@ public final class ServiceUtility {
             // Check the response
             final InputStream is = conn.getInputStream();
             is.close();
+            monitor.worked(endWork);
 
             if (after != null) {
               after.run();
             }
+            monitor.worked(endWork);
           } finally {
             if (wr != null) {
               wr.close();
