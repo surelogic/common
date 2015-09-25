@@ -73,10 +73,12 @@ public class SupportRequestServlet extends HttpServlet {
       final String emailBodyText = emailBody.toString();
 
       final StringBuilder emailSubject = new StringBuilder("SUPPORT_REQUEST ");
+      final String summary = requestFields.get("summary");
+      emailSubject.append(summary == null ? "No Summary" : summary);
       final String subject = requestFields.get("subject");
-      emailSubject.append(subject == null ? "No Subject" : subject);
-      final String from = requestFields.get("from");
-      emailSubject.append(from == null ? "" : " from " + from);
+      if (subject != null) {
+        emailSubject.append(" (").append(subject).append(')');
+      }
       Email.sendEmail(emailSubject.toString(), emailBodyText, null, tryToGetEmail(requestFields));
     } catch (final Exception e) {
       SLLogger.getLogger().log(Level.SEVERE, "Error processing SureLogic support request", e);
@@ -89,7 +91,7 @@ public class SupportRequestServlet extends HttpServlet {
    * used as the key with a null value.
    * 
    * @param fields
-   *          the map that stores key/value pairs
+   *          from the top of the message
    * @param line
    *          the line to parse
    * @param fieldSeparator
@@ -106,6 +108,14 @@ public class SupportRequestServlet extends HttpServlet {
     }
   }
 
+  /**
+   * Tries to find a reply-to email address. If none can be dtermined null is
+   * returned.
+   * 
+   * @param fields
+   *          from the top of the message
+   * @return a reply-to address or null
+   */
   @Nullable
   private String tryToGetEmail(final Map<String, String> fields) {
     final String from = fields.get("from");
