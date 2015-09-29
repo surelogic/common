@@ -25,6 +25,8 @@ public class LicenseWebRequestLogServlet extends HttpServlet {
   private static final long serialVersionUID = -9077965307391367048L;
   private static final String PAGE = "weblog";
   private static final String TIME = "t";
+  private static final String DELETE_ABANDONED = "deleteAbandoned";
+  private static final String YES = "yes";
 
   @Override
   protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
@@ -37,29 +39,34 @@ public class LicenseWebRequestLogServlet extends HttpServlet {
   }
 
   private void handle(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-    ServicesDBConnection.getInstance().withReadOnly(new LogQuery(resp.getWriter(), req.getParameter(TIME)));
+    ServicesDBConnection.getInstance()
+        .withReadOnly(new LogQuery(resp.getWriter(), req.getParameter(TIME), req.getParameter(DELETE_ABANDONED)));
   }
 
   static class LogQuery extends HTMLQuery {
 
     final long time;
+    final boolean deleteAbandoned;
 
-    public LogQuery(final PrintWriter writer, @Nullable final String time) {
+    public LogQuery(final PrintWriter writer, @Nullable final String time, @Nullable final String deleteAbandoned) {
       super(writer);
       if (time == null) {
         this.time = System.currentTimeMillis();
       } else {
         this.time = Long.parseLong(time);
       }
+      this.deleteAbandoned = deleteAbandoned != null && YES.equals(deleteAbandoned);
     }
 
     @Override
     public void doPerform(final Query q) {
       prequel("Recent Web License Request Activity");
-      writer.print("<form action=\"weblog\" method=\"post\" >");
-      writer.print("<input type=\"hidden\" name=\"cleanup\" value=\"yes\" />");
+      if (deleteAbandoned)
+        writer.println("<p>Deleted abandoned licenses...</p>");
+      writer.print("<form align=\"right\" action=\"weblog\" method=\"post\" >");
+      writer.print("<input type=\"hidden\" name=\"" + DELETE_ABANDONED + "\" value=\"" + YES + "\" />");
       writer.print("<input type=\"submit\" value=\"Delete abandoned web license requests older than two weeks\" />");
-      writer.print("</form>");
+      writer.print("</form><p>");
       tableBegin();
       tableRow(CENTER.th("Date"), LEFT.th("License"), LEFT.th("Name"), LEFT.th("Email"), LEFT.th("Company"),
           CENTER.th("License Type"), CENTER.th("Ignore Trial"), CENTER.th("No Email"));
