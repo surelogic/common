@@ -1,0 +1,315 @@
+body {
+  background-color: rgb(255, 255, 255);
+  font: 400 1em/1.38 Helvetica;
+  color: rgb(27, 83, 120);
+}
+
+.description {
+  float: left;
+  clear: both;
+  width: 98%;
+  margin: 10px 0 0 0.99526%;
+  font-size: 1em;
+  font-weight: 400;
+  line-height: 1.38;
+  color: rgb(27, 83, 120);
+}
+
+.download {
+  display: block;
+  position: relative;
+  float: left;
+  clear: both;
+  z-index: 1;
+  width: 40%;
+  margin: 20px 0 0 30%;
+}
+
+.flashlight {
+  position: relative;
+  float: left;
+  clear: both;
+  z-index: 19;
+  width: 25.5833333333%;
+  margin: 25px 0 0 10%;
+  border: 2px solid rgb(27, 83, 120);
+  border-radius: 5px;
+}
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 24;
+  width: 100%;
+  height: 30px;
+  background-color: rgba(204, 204, 204, 0.9);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, .5);
+}
+
+.jsure {
+  position: relative;
+  float: left;
+  z-index: 13;
+  width: 25.5833333333%;
+  margin: 25px 0 0 1.61589%;
+  border: 2px solid rgb(27, 83, 120);
+  border-radius: 5px;
+}
+
+.jsure .toolname {
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.logo {
+  display: block;
+  height: auto;
+  overflow: hidden;
+}
+
+.menu {
+  float: right;
+  margin: 5px 10% 0 0;
+  font-size: 1em;
+  line-height: 1.38;
+  color: rgb(27, 83, 120);
+}
+
+.more {
+  float: left;
+  clear: both;
+  width: 100%;
+  margin-top: 10px;
+  font: 300 1em/1.38 Oswald;
+  text-align: center;
+  color: rgb(0, 0, 0);
+}
+
+.oseclipse {
+  display: block;
+  float: left;
+  width: 100%;
+  height: auto;
+  overflow: hidden;
+}
+
+.sierra {
+  position: relative;
+  float: left;
+  z-index: 7;
+  width: 25.5833333333%;
+  margin: 25px 0 0 1.61719%;
+  border: 2px solid rgb(27, 83, 120);
+  border-radius: 5px;
+}
+
+.flashlight .logo,
+.jsure .logo,
+.sierra .logo {
+  width: 58px;
+  margin: 10px auto 0;
+}
+
+.flashlight .toolname,
+.sierra .toolname {
+  float: left;
+  clear: both;
+}
+
+.surelogic-logo {
+  display: block;
+  position: absolute;
+  top: 4px;
+  left: 10%;
+  z-index: 23;
+  width: 144px;
+  height: 24px;
+}
+
+.surelogic-logo .logo {
+  float: left;
+  width: 144px;
+  margin-left: -0.61849%;
+}
+
+.thumb {
+  display: block;
+  float: left;
+  clear: both;
+  width: 60%;
+  height: auto;
+  margin: 10px 0 0 19.99794%;
+  overflow: hidden;
+}
+
+.title {
+  position: relative;
+  float: left;
+  z-index: 20;
+  width: 80%;
+  margin: 70px 0 0 10%;
+  font-size: 2em;
+  font-weight: 400;
+  line-height: 1.38;
+  color: rgb(0, 0, 0);
+}
+
+.toolname {
+  width: 100%;
+  margin-top: 10px;
+  font-size: 1.625em;
+  font-weight: 400;
+  line-height: 1.38;
+  text-align: center;
+  color: rgb(0, 0, 0);
+}
+
+.menu a {
+  border-top-width: 0;
+  border-right-width: 0;
+  border-bottom-width: 0;
+  border-left-width: 0;
+  border-color: transparent;
+  border-style: none;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+  background-color: transparent;
+  font-family: inherit;
+  font-style: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  text-transform: inherit;
+  text-decoration: inherit;
+  letter-spacing: inherit;
+  word-spacing: inherit;
+  color: inherit;
+  opacity: 1;
+  word-break: normal;
+  word-wrap: normal;
+  white-space: normal;
+}
+
+.menu a:hover {
+  text-decoration: underline;
+}
+
+.more a {
+  border-top-width: 0;
+  border-right-width: 0;
+  border-bottom-width: 0;
+  border-left-width: 0;
+  border-color: transparent;
+  border-style: none;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+  background-color: transparent;
+  font-family: inherit;
+  font-style: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  text-transform: inherit;
+  text-decoration: underline;
+  letter-spacing: inherit;
+  word-spacing: inherit;
+  color: inherit;
+  opacity: 1;
+  word-break: normal;
+  word-wrap: normal;
+  white-space: normal;
+}
+
+@media(max-width: 700px) {
+  .download {
+    position: relative;
+    z-index: 1;
+    width: 60%;
+    margin-left: 20%;
+  }
+
+  .download .oseclipse,
+  .flashlight .logo,
+  .jsure .logo,
+  .sierra .logo {
+    height: auto;
+  }
+
+  .flashlight {
+    position: relative;
+    z-index: 19;
+    width: 80%;
+  }
+
+  .header {
+    height: 50px;
+  }
+
+  .header .menu {
+    float: left;
+    margin-top: 30px;
+    margin-right: 0;
+    margin-left: 10%;
+    font-size: 0.813em;
+  }
+
+  .jsure {
+    position: relative;
+    clear: both;
+    z-index: 13;
+    width: 80%;
+    margin-top: 10px;
+    margin-left: 10%;
+  }
+
+  .flashlight .description,
+  .jsure .description {
+    margin-left: 0.99764%;
+  }
+
+  .flashlight .thumb,
+  .jsure .thumb {
+    height: auto;
+    margin-left: 19.98932%;
+  }
+
+  .jsure .toolname {
+    float: left;
+    clear: both;
+    margin-right: 0;
+    margin-left: 0;
+  }
+
+  .sierra {
+    position: relative;
+    clear: both;
+    z-index: 7;
+    width: 81.1428571428%;
+    margin-top: 10px;
+    margin-left: 10%;
+  }
+
+  .sierra .description {
+    margin-left: 0.99457%;
+  }
+
+  .sierra .thumb {
+    height: auto;
+    margin-left: 19.99945%;
+  }
+
+  .surelogic-logo .logo {
+    height: auto;
+    margin-left: 0;
+  }
+
+  .title {
+    position: relative;
+    z-index: 20;
+    margin-top: 75px;
+    font-size: 1.563em;
+  }
+}

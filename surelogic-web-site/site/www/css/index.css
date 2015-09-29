@@ -1,0 +1,201 @@
+body {
+  background-color: rgb(255, 255, 255);
+  font: 400 1em/1.38 Helvetica;
+  color: rgb(27, 83, 120);
+}
+
+.free {
+  display: block;
+  position: absolute;
+  top: 60px;
+  right: 10.015625%;
+  z-index: 4;
+  padding: 5px;
+  border: 1px solid rgb(27, 83, 120);
+  border-radius: 8px;
+  background-color: rgb(248, 255, 50);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, .5);
+  font-size: 0.875em;
+  font-weight: 700;
+  line-height: 1.38;
+  text-align: center;
+  color: rgb(29, 106, 14);
+}
+
+.free:hover {
+  border-top-width: 0;
+  border-right-width: 0;
+  border-bottom-width: 0;
+  border-left-width: 0;
+  border-style: none;
+  background-color: rgb(27, 83, 120);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, .5);
+  color: rgb(248, 255, 50);
+}
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 8;
+  width: 100%;
+  height: 30px;
+  background-color: rgba(204, 204, 204, 0.9);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, .5);
+}
+
+.logo {
+  display: block;
+  float: left;
+  width: 144px;
+  height: auto;
+  margin-left: -0.61849%;
+  overflow: hidden;
+}
+
+.menu {
+  float: right;
+  margin: 5px 10% 0 0;
+  font-size: 1em;
+  line-height: 1.38;
+  color: rgb(27, 83, 120);
+}
+
+.pitch {
+  position: relative;
+  z-index: 2;
+  width: 54.4166666666%;
+  min-height: 70px;
+  margin: 30px auto 0;
+  font-size: 1em;
+  font-weight: 400;
+  line-height: 1.38;
+  text-align: center;
+  color: rgb(27, 83, 120);
+}
+
+.slogen {
+  position: relative;
+  z-index: 3;
+  width: 80%;
+  min-height: 50px;
+  margin: 120px auto 0;
+  font-size: 2em;
+  font-weight: 400;
+  line-height: 1.38;
+  text-align: center;
+  color: rgb(0, 0, 0);
+}
+
+.splash {
+  display: block;
+  float: left;
+}
+
+.splash .splash {
+  width: 100%;
+  height: auto;
+  overflow: hidden;
+}
+
+.surelogic-logo {
+  display: block;
+  position: absolute;
+  top: 4px;
+  left: 10%;
+  z-index: 7;
+  width: 144px;
+  height: 24px;
+}
+
+.splash-1 {
+  position: relative;
+  clear: both;
+  z-index: 1;
+  width: 60%;
+  margin: 30px 0 0 20%;
+}
+
+.menu a {
+  border-top-width: 0;
+  border-right-width: 0;
+  border-bottom-width: 0;
+  border-left-width: 0;
+  border-color: transparent;
+  border-style: none;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+  background-color: transparent;
+  font-family: inherit;
+  font-style: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  text-transform: inherit;
+  text-decoration: inherit;
+  letter-spacing: inherit;
+  word-spacing: inherit;
+  color: inherit;
+  opacity: 1;
+  word-break: normal;
+  word-wrap: normal;
+  white-space: normal;
+}
+
+.menu a:hover {
+  text-decoration: underline;
+}
+
+@media(max-width: 700px) {
+  body {
+    font-size: 0.813em;
+  }
+
+  .free {
+    font-size: 1em;
+  }
+
+  .header {
+    height: 50px;
+  }
+
+  .header .menu {
+    float: left;
+    margin-top: 30px;
+    margin-right: 0;
+    margin-left: 10%;
+    font-size: 13px;
+  }
+
+  .pitch {
+    position: relative;
+    z-index: 2;
+    font-size: 13px;
+  }
+
+  .slogen {
+    position: relative;
+    z-index: 3;
+    font-size: 1.923em;
+  }
+
+  .splash {
+    width: 80%;
+  }
+
+  .splash .splash {
+    height: auto;
+  }
+
+  .surelogic-logo .logo {
+    height: auto;
+    margin-left: 0;
+  }
+
+  .splash-1 {
+    position: relative;
+    z-index: 1;
+    margin-left: 10%;
+  }
+}

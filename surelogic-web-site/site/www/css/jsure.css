@@ -1,0 +1,583 @@
+body {
+  background-color: rgb(255, 255, 255);
+  font: 400 1em/1.38 Helvetica;
+  color: rgb(27, 83, 120);
+}
+
+.desc1 {
+  position: relative;
+  float: left;
+  clear: both;
+  z-index: 4;
+  width: 66.3333333333%;
+  margin: 10px 0 0 16.79948%;
+  font-size: 1em;
+  font-weight: 400;
+  line-height: 1.38;
+  color: rgb(27, 83, 120);
+}
+
+.desc2 {
+  position: relative;
+  float: left;
+  clear: both;
+  z-index: 2;
+  width: 66.3333333333%;
+  margin: 15px 0 0 16.79948%;
+  font-size: 1em;
+  font-weight: 400;
+  line-height: 1.38;
+  color: rgb(27, 83, 120);
+}
+
+.desc2 p,
+.description-1 p {
+  margin-bottom: 1em;
+}
+
+.description {
+  float: left;
+  font-size: 1em;
+  line-height: 1.38;
+  color: rgb(27, 83, 120);
+}
+
+.download {
+  display: block;
+}
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 38;
+  width: 100%;
+  height: 30px;
+  background-color: rgba(204, 204, 204, 0.9);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, .5);
+}
+
+.logo {
+  display: block;
+  float: left;
+  width: 144px;
+  height: auto;
+  margin-left: -0.61849%;
+  overflow: hidden;
+}
+
+.menu {
+  float: right;
+  margin: 5px 10% 0 0;
+  font-size: 1em;
+  line-height: 1.38;
+  color: rgb(27, 83, 120);
+}
+
+.oseclipse {
+  display: block;
+  float: left;
+  width: 100%;
+  height: auto;
+  overflow: hidden;
+}
+
+.row1 {
+  position: relative;
+  float: left;
+  clear: both;
+  z-index: 28;
+  width: 80%;
+  margin: 10px 0 0 10%;
+}
+
+.row2 {
+  position: relative;
+  float: left;
+  clear: both;
+  z-index: 19;
+  width: 80%;
+  margin: 10px 0 0 10%;
+}
+
+.row3 {
+  position: relative;
+  float: left;
+  clear: both;
+  z-index: 10;
+  width: 80%;
+  margin: 10px 0 0 10%;
+}
+
+.splash {
+  display: block;
+  position: relative;
+  float: left;
+  clear: both;
+  z-index: 31;
+  width: 90%;
+  height: auto;
+  margin: 10px 0 0 5%;
+  overflow: hidden;
+}
+
+.stayingray {
+  position: relative;
+  float: left;
+  clear: both;
+}
+
+.surelogic-logo {
+  display: block;
+  position: absolute;
+  top: 4px;
+  left: 10%;
+  z-index: 37;
+  width: 144px;
+  height: 24px;
+}
+
+.title {
+  float: left;
+  font-weight: 400;
+  line-height: 1.38;
+  color: rgb(0, 0, 0);
+}
+
+.video-android {
+  float: left;
+  width: 49%;
+  padding: 5px;
+  border: 1px solid rgb(27, 83, 120);
+  border-radius: 5px;
+}
+
+.video-android .description {
+  width: 96%;
+  margin: 5px 0 0 1.99748%;
+  font-weight: 700;
+}
+
+.video-android .title {
+  clear: both;
+  width: 96%;
+  margin: 5px 0 0 1.99748%;
+  font-size: 0.75em;
+}
+
+.video-android .wrapper {
+  margin-left: 1.99748%;
+}
+
+.video-jcip,
+.video-logging {
+  float: left;
+  width: 48.9995659722%;
+  padding: 5px;
+  border: 1px solid rgb(27, 83, 120);
+  border-radius: 5px;
+}
+
+.video-boundedfifo,
+.video-security {
+  float: right;
+  width: 48.9995659722%;
+  padding: 5px;
+  border: 1px solid rgb(27, 83, 120);
+  border-radius: 5px;
+}
+
+.video-boundedfifo .description,
+.video-jcip .description,
+.video-logging .description,
+.video-security .description {
+  width: 96%;
+  margin: 5px 0 0 1.99407%;
+  font-weight: 700;
+}
+
+.video-boundedfifo .title,
+.video-jcip .title,
+.video-logging .title,
+.video-security .title {
+  clear: both;
+  width: 96%;
+  margin: 5px 0 0 1.99407%;
+  font-size: 0.75em;
+}
+
+.video-boundedfifo .wrapper,
+.video-jcip .wrapper,
+.video-logging .wrapper,
+.video-security .wrapper {
+  margin-left: 1.99407%;
+}
+
+.videos {
+  position: relative;
+  float: left;
+  clear: both;
+  z-index: 30;
+  width: 80%;
+  margin: 10px 0 0 10%;
+  font-size: 2em;
+  font-weight: 400;
+  line-height: 1.38;
+  color: rgb(0, 0, 0);
+}
+
+.wrapper {
+  float: left;
+  clear: both;
+  width: 96%;
+  height: 220px;
+  margin-top: 5px;
+  overflow: hidden;
+}
+
+.description-1 {
+  position: relative;
+  clear: both;
+  z-index: 32;
+  width: 66.3333333333%;
+  margin: 10px 0 0 16.79948%;
+  font-weight: 400;
+}
+
+.description-2 {
+  position: relative;
+  clear: both;
+  z-index: 29;
+  width: 66.3333333333%;
+  margin: 10px 0 0 16.79948%;
+  font-weight: 400;
+}
+
+.download-1 {
+  position: absolute;
+  top: 40px;
+  right: 1%;
+  z-index: 34;
+  padding: 5px;
+  border: 1px solid rgb(27, 83, 120);
+  border-radius: 8px;
+  background-color: rgb(248, 255, 50);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, .5);
+  font-size: 0.875em;
+  font-weight: 700;
+  line-height: 1.38;
+  text-align: center;
+  color: rgb(29, 106, 14);
+}
+
+.download-2 {
+  position: relative;
+  float: left;
+  clear: both;
+  z-index: 1;
+  width: 40%;
+  margin: 20px 0 0 30%;
+}
+
+.stayingray-1 {
+  z-index: 5;
+  width: 80%;
+  margin: 30px 0 0 10%;
+  font-size: 2em;
+  font-weight: 400;
+  line-height: 1.38;
+  color: rgb(0, 0, 0);
+}
+
+.stayingray-2 {
+  display: block;
+  z-index: 3;
+  width: 436px;
+  height: auto;
+  margin: 15px 0 0 16.83073%;
+  overflow: hidden;
+}
+
+.title-1 {
+  position: relative;
+  z-index: 33;
+  width: 80%;
+  margin: 70px 0 0 10%;
+  font-size: 2em;
+}
+
+.desc1 a,
+.menu a {
+  border-top-width: 0;
+  border-right-width: 0;
+  border-bottom-width: 0;
+  border-left-width: 0;
+  border-color: transparent;
+  border-style: none;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+  background-color: transparent;
+  font-family: inherit;
+  font-style: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  text-transform: inherit;
+  text-decoration: inherit;
+  letter-spacing: inherit;
+  word-spacing: inherit;
+  color: inherit;
+  opacity: 1;
+  word-break: normal;
+  word-wrap: normal;
+  white-space: normal;
+}
+
+.desc2 a,
+.description a,
+.title a {
+  border-top-width: 0;
+  border-right-width: 0;
+  border-bottom-width: 0;
+  border-left-width: 0;
+  border-color: transparent;
+  border-style: none;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+  background-color: transparent;
+  font-family: inherit;
+  font-style: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  text-transform: inherit;
+  text-decoration: underline;
+  letter-spacing: inherit;
+  word-spacing: inherit;
+  color: inherit;
+  opacity: 1;
+  word-break: normal;
+  word-wrap: normal;
+  white-space: normal;
+}
+
+.desc1 a:hover,
+.desc2 a:hover,
+.description-1 a:hover,
+.menu a:hover {
+  text-decoration: underline;
+}
+
+.desc1 em,
+.desc2 em,
+.description em {
+  border-top-width: 0;
+  border-right-width: 0;
+  border-bottom-width: 0;
+  border-left-width: 0;
+  border-color: transparent;
+  border-style: none;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+  background-color: transparent;
+  font-family: inherit;
+  font-style: inherit;
+  font-size: inherit;
+  font-weight: 700;
+  text-transform: inherit;
+  text-decoration: inherit;
+  letter-spacing: inherit;
+  word-spacing: inherit;
+  color: inherit;
+  opacity: 1;
+  word-break: normal;
+  word-wrap: normal;
+  white-space: normal;
+}
+
+@media(max-width: 700px) {
+  body {
+    font-size: 0.813em;
+  }
+
+  .desc1 {
+    position: relative;
+    z-index: 4;
+    width: 66.3325892857%;
+    margin-left: 16.79911%;
+    font-size: 13px;
+  }
+
+  .desc2 {
+    position: relative;
+    z-index: 2;
+    width: 66.3325892857%;
+    margin-top: 10px;
+    margin-left: 16.79911%;
+    font-size: 13px;
+  }
+
+  .description {
+    width: 66.3325892857%;
+    margin-left: 16.79911%;
+    font-size: 13px;
+  }
+
+  .download .oseclipse {
+    height: auto;
+  }
+
+  .header {
+    height: 50px;
+  }
+
+  .header .menu {
+    float: left;
+    margin-top: 30px;
+    margin-right: 0;
+    margin-left: 10%;
+    font-size: 13px;
+  }
+
+  .row1 {
+    position: relative;
+    z-index: 28;
+    margin-top: 5px;
+  }
+
+  .row2 {
+    position: relative;
+    z-index: 19;
+    margin-top: 5px;
+  }
+
+  .row1 .video-boundedfifo,
+  .row2 .video-security {
+    float: left;
+    clear: both;
+    width: 100%;
+    margin-top: 5px;
+  }
+
+  .row3 {
+    position: relative;
+    z-index: 10;
+    margin-top: 5px;
+  }
+
+  .row1 .video-logging,
+  .row2 .video-jcip,
+  .row3 .video-android {
+    width: 100%;
+  }
+
+  .splash {
+    position: relative;
+    z-index: 31;
+    height: auto;
+  }
+
+  .stayingray {
+    position: relative;
+  }
+
+  .surelogic-logo .logo {
+    height: auto;
+    margin-left: 0;
+  }
+
+  .title {
+    width: 60%;
+    margin-top: 75px;
+    font-size: 1.923em;
+  }
+
+  .video-android .description,
+  .video-jcip .description,
+  .video-security .description {
+    margin-left: 1.98449%;
+    font-size: 1.231em;
+  }
+
+  .video-android .title,
+  .video-jcip .title,
+  .video-security .title {
+    margin-left: 1.98449%;
+    font-size: 0.923em;
+  }
+
+  .video-android .wrapper,
+  .video-jcip .wrapper,
+  .video-security .wrapper {
+    height: 200px;
+    margin-left: 1.98449%;
+  }
+
+  .video-boundedfifo .description,
+  .video-logging .description {
+    margin-left: 1.96168%;
+    font-size: 1.231em;
+  }
+
+  .video-boundedfifo .title,
+  .video-logging .title {
+    margin-left: 1.96168%;
+    font-size: 0.923em;
+  }
+
+  .video-boundedfifo .wrapper,
+  .video-logging .wrapper {
+    height: 200px;
+    margin-left: 1.96168%;
+  }
+
+  .videos {
+    position: relative;
+    z-index: 30;
+    font-size: 1.923em;
+  }
+
+  .description-1 {
+    position: relative;
+    z-index: 32;
+  }
+
+  .description-2 {
+    position: relative;
+    z-index: 29;
+  }
+
+  .download-1 {
+    top: 60px;
+    font-size: 1.077em;
+  }
+
+  .download-2 {
+    position: relative;
+    z-index: 1;
+    width: 60%;
+    margin-left: 20%;
+  }
+
+  .stayingray-1 {
+    z-index: 5;
+    font-size: 1.923em;
+  }
+
+  .stayingray-2 {
+    z-index: 3;
+    width: 60%;
+    height: auto;
+    margin-top: 10px;
+    margin-left: 20%;
+  }
+
+  .title-1 {
+    position: relative;
+    z-index: 33;
+  }
+}
