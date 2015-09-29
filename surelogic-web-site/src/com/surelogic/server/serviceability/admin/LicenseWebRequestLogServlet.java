@@ -7,6 +7,7 @@ import static com.surelogic.server.serviceability.admin.HTMLQuery.HeaderType.RIG
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Timestamp;
+import java.util.Calendar;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -14,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.surelogic.Nullable;
+import com.surelogic.common.jdbc.NullDBQuery;
 import com.surelogic.common.jdbc.Query;
 import com.surelogic.common.jdbc.Result;
 import com.surelogic.common.jdbc.ResultHandler;
@@ -39,31 +41,47 @@ public class LicenseWebRequestLogServlet extends HttpServlet {
   }
 
   private void handle(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
-    ServicesDBConnection.getInstance()
-        .withReadOnly(new LogQuery(resp.getWriter(), req.getParameter(TIME), req.getParameter(DELETE_ABANDONED)));
+    final String pda = req.getParameter(DELETE_ABANDONED);
+    final boolean deleteAbandoned = pda != null && YES.equals(pda);
+    if (deleteAbandoned) {
+      ServicesDBConnection.getInstance().withTransaction(new DeleteAbandonedWebRequests());
+    }
+    ServicesDBConnection.getInstance().withReadOnly(new LogQuery(resp.getWriter(), req.getParameter(TIME)));
+  }
+
+  static class DeleteAbandonedWebRequests extends NullDBQuery {
+
+    final Timestamp twoWeeksAgo;
+
+    public DeleteAbandonedWebRequests() {
+      Calendar c = Calendar.getInstance();
+      c.add(Calendar.WEEK_OF_MONTH, -2);
+      twoWeeksAgo = new Timestamp(c.getTimeInMillis());
+    }
+
+    @Override
+    public void doPerform(final Query q) {
+      q.prepared("WebServices.deleteAbandonedWebLicenseRequests").call(twoWeeksAgo);
+    }
   }
 
   static class LogQuery extends HTMLQuery {
 
     final long time;
-    final boolean deleteAbandoned;
 
-    public LogQuery(final PrintWriter writer, @Nullable final String time, @Nullable final String deleteAbandoned) {
+    public LogQuery(final PrintWriter writer, @Nullable final String time) {
       super(writer);
       if (time == null) {
         this.time = System.currentTimeMillis();
       } else {
         this.time = Long.parseLong(time);
       }
-      this.deleteAbandoned = deleteAbandoned != null && YES.equals(deleteAbandoned);
     }
 
     @Override
     public void doPerform(final Query q) {
       prequel("Recent Web License Request Activity");
-      if (deleteAbandoned)
-        writer.println("<p>Deleted abandoned licenses...</p>");
-      writer.print("<form align=\"right\" action=\"weblog\" method=\"post\" >");
+      writer.print("<form align=\"center\" action=\"weblog\" method=\"post\" >");
       writer.print("<input type=\"hidden\" name=\"" + DELETE_ABANDONED + "\" value=\"" + YES + "\" />");
       writer.print("<input type=\"submit\" value=\"Delete abandoned web license requests older than two weeks\" />");
       writer.print("</form><p>");
