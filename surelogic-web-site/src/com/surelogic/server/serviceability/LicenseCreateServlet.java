@@ -61,8 +61,16 @@ public class LicenseCreateServlet extends HttpServlet {
 
     out.println(req.getRequestURI());
 
-    // set to anything for community license (alternative is trial license)
-    final boolean communityLicense = false;
+    final String servletPath = req.getRequestURI().toString();
+    /*
+     * We use the servlet path for community versus trial.
+     * 
+     * Community license path: /services/community
+     * 
+     * Trial license path: /services/trial
+     */
+    final boolean communityLicense = servletPath.contains("services/community");
+
     final String licenseType = communityLicense ? "Community" : "Trial";
 
     // start response
