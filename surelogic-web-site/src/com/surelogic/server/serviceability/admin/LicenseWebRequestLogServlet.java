@@ -56,6 +56,10 @@ public class LicenseWebRequestLogServlet extends HttpServlet {
     @Override
     public void doPerform(final Query q) {
       prequel("Recent Web License Request Activity");
+      writer.print("<form action=\"weblog\" method=\"post\" >");
+      writer.print("<input type=\"hidden\" name=\"cleanup\" value=\"yes\" />");
+      writer.print("<input type=\"submit\" value=\"Delete abandoned web license requests older than two weeks\" />");
+      writer.print("</form>");
       tableBegin();
       tableRow(CENTER.th("Date"), LEFT.th("License"), LEFT.th("Name"), LEFT.th("Email"), LEFT.th("Company"),
           CENTER.th("License Type"), CENTER.th("Ignore Trial"), CENTER.th("No Email"));
