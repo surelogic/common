@@ -63,9 +63,6 @@ public class LicenseCreateServlet extends HttpServlet {
     final boolean communityLicense = req.getParameter(I18N.msg("web.license.param.community")) != null;
     final String licenseType = communityLicense ? "Community" : "Trial";
 
-    // set to anything to indicate preference for no email from SureLogic, ever.
-    final boolean noEmail = req.getParameter(I18N.msg("web.license.param.noemail")) != null;
-
     // start response
     out.println(I18N.msg("web.license.response.html.header", licenseType));
 
@@ -116,7 +113,6 @@ public class LicenseCreateServlet extends HttpServlet {
     final int durationInDays = communityLicense ? DURATION_COMMUNITY : DURATION_TRIAL;
     final SLLicenseType type = communityLicense ? SLLicenseType.PERPETUAL : SLLicenseType.USE;
     final int installationLimit = communityLicense ? INSTALLATION_LIMIT_COMMUNITY : INSTALLATION_LIMIT_TRIAL;
-    final String noEmailForDB = noEmail ? "true" : "false";
 
     final SLLicense license = new SLLicense(holder, emailForDb, companyEntered ? company : null, SLLicenseProduct.ALL_TOOLS,
         durationInDays, null, type, installationLimit, true);
@@ -154,7 +150,7 @@ public class LicenseCreateServlet extends HttpServlet {
           }
         }
         q.prepared("WebServices.insertLicenseWebRequest").call(license.getUuid().toString(), emailForDb, nameForDb, companyForDb,
-            licenseType, noEmailForDB);
+            licenseType);
         return SLUtility.YES;
       }
     });
