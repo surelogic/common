@@ -59,8 +59,6 @@ public class LicenseCreateServlet extends HttpServlet {
     resp.setContentType("text/html");
     final PrintWriter out = resp.getWriter();
 
-    out.println(req.getRequestURI());
-
     final String servletPath = req.getRequestURI().toString();
     /*
      * We use the servlet path for community versus trial.
