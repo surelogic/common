@@ -59,8 +59,10 @@ public class LicenseCreateServlet extends HttpServlet {
     resp.setContentType("text/html");
     final PrintWriter out = resp.getWriter();
 
+    out.println(req.getRequestURI());
+
     // set to anything for community license (alternative is trial license)
-    final boolean communityLicense = req.getParameter(I18N.msg("web.license.param.community")) != null;
+    final boolean communityLicense = false;
     final String licenseType = communityLicense ? "Community" : "Trial";
 
     // start response
