@@ -18,7 +18,7 @@ public class JarEntry extends AbstractClassPathEntry {
 	private File origPath;
 	
 	JarEntry(Config p, File f, boolean isExported) {
-		this(p, f, f, isExported);
+		this(p, f, f, true/*isExported*/);
 	}
 	
 	public JarEntry(Config p, File f, File orig, boolean isExported) {
