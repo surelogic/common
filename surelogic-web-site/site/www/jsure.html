@@ -1,148 +1,71 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
-	  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
-  <head>
-    <title>JSure&nbsp;-&nbsp;SureLogic - For Software that Matters</title>
-    <meta name="description" content="SureLogic - For Software that Matters" />
-    <meta name="keywords" content="advanced,analysis,applications,assurance,assure,bug-finding,capabilities,complex,consulting,critical,defects,deliver,design,developers,development,develops,empower,engineering,intent,issues,language,novel,powerful,prevention,provides,providing,quality,reliable,services,software,solutions,SureLogic,teams,technology,tools,troublesome,verification,works" />
-    <meta name="robots" content="index, follow" />
-    <link rel="shortcut icon" href="images/favicon.ico" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
-    <link rel="stylesheet" type="text/css" href="css/reset.css" /> 
-    <link rel="stylesheet" type="text/css" href="css/text.css" />
-    <link rel="stylesheet" type="text/css" href="css/960.css" />
-    <link rel="stylesheet" type="text/css" href="css/style.css" />
-    <script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
-    <script type="text/javascript">
-      var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-      document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-    </script>
-    <script type="text/javascript">
-      try {
-      var pageTracker = _gat._getTracker("UA-10066288-1");
-      pageTracker._trackPageview();
-      } catch(err) {}</script>
-  </head>
-  <body>
-    <div id="container" class="container_16">
-      <div id="header" class="grid_16">
-	<a id="header-logo" href="index.html">
-	  <img src="images/logo_top_left.png" width="200" height="45" alt="SureLogic&reg;" title="SureLogic&reg;" />
-	</a>
-	<ul>
-	  <li><a href="index.html">Home</a></li>
-	  <li><a href="advanced-tools-for-developers.html">Products</a></li>
-	  <li><a href="bugzilla/index.cgi" target="_blank">Bugzilla</a></li>
-	  <li><a href="about-us/surelogic-inc.html">About Us</a></li>
-	</ul>
-      </div>
-      <div class="clear"></div>
-      <div id="masthead" class="grid_16" ></div>
-      <div class="clear"></div>
-      <div id="lower-masthead" class="grid_16" >
-	<img src="images/masthead_lower.png" alt="For Software that Matters&trade;" title="" />
-      </div>
-      <div class="clear"></div>
-      <div id="content-container" class="grid_16">
-	<div class="grid_5 alpha">
-	  <div id="left-sidebar" class="left-sidebar">
-	    <ul>
-	      <li><a href="advanced-tools-for-developers.html">Overview</a></li>
-	      <li><a href="sierra-platform.html">Sierra</a></li>
-              <li><a href="jsure.html" id="active">JSure</a></li>
-              <li><a href="flashlight.html">Flashlight</a></li>
-	      <li><a href="faststart.html">Comments from users</a></li>
-	    </ul>	
-	  </div>
-	</div>
-	<div id="content" class="grid_11 omega">
-	  <div class="grid_7 alpha">
-	    <h1>JSure for Concurrency</h1>
-	    <p>
-	      <em><strong>Java on multi-core -- speed with safety</strong></em>
-	    </p>
-	    <p>
-	      JSure is a model-based static analysis tool that helps developers answer this question-- 
-	    </p>
-	    <blockquote>
-	      <p>
-		<em><strong>"Are my threads accessing shared state in a safe way?"</strong></em> 
-	      </p>
-	    </blockquote>
-	    <p>
-	      JSure provides positive assurance (sound analysis, not rule-based)
-	      that correct locks are held when shared state is accessed. This
-	      enables programmers to develop confidence that their code is
-	      "thread safe" -- it satisfies state consistency
-	      requirements. Because it is composable, the JSure analysis is
-	      scalable to the largest Java systems, and has been proven on large
-	      existing code bases. It is supported by a lightweight
-	      developer-friendly annotation language that is compatible with JSR
-	      305. JSure is an IDE plug-in, living with developers to provide
-	      rapid feedback concerning locking policies as code is
-	      written. JSure acts as a safety net as developers work to
-	      aggressively parallelize their code for multi-core processors,
-	      removing the fear of introducing hard-to-debug race conditions.
-	    </p>
-	  </div>
-	  <div class="grid_4 omega">
-	    <div id="sidebar">
-	      <p>
-		<strong>The Multi-Core Challenge</strong>
-	      </p>
-	      <p>
-		It is reported that fewer than 10% of Intel processors shipped
-		are single-core. Over the next few years, billions of multi-core
-		processors will be embedded in mobile phones, TVs, PCs, and
-		other appliances worldwide.
-	      </p>
-	      <p>
-		Writing concurrent applications that fully exploit the
-		power of multi-core processors is hard to do correctly,
-		but applications <em>must </em>be multi-threaded in
-		order to keep up with rapidly increasing demand for
-		greater performance.
-	      </p>
-	      <p>
-		<em>"For the past 30 years, computer performance has
-		been driven by Moore's Law; from now on, it will be
-		driven by Amdahl's Law"</em>
-		<br />
-		-- Doron Rajwan, Intel
-	      </p>
-	      <p>
-		JSure and Flashlight were created to help Java
-		developers deal with the multi-core challenge.
-	      </p>
-	      <p>
-		<em>"Writing thread-safe code is, at its core, about
-		managing access to state, and in particular, to shared,
-		mutable state."</em>
-	      </p>
-	      <p>
-		-- <strong>Java Concurrency in Practice</strong>, Brian
-		Goetz et al.
-	      </p>
-	    </div>
-	  </div>
-	</div>
-      </div>
-      <div class="clear"></div>
-      <div id="footer" class="grid_16">
-	<ul>
-	  <li><a href="about-us/contact-us.html">Contact</a></li>
-	  <li><a href="site-policy/privacy.html">Privacy</a></li>
-	</ul>
-	<div id="copyright">&copy; 2014 SureLogic, Inc.</div>
-      </div>
-      <div class="clear"></div>
-      <div id="disclaimer" class="grid_16">
-	<p>
-	  Java is a registered trademark of Oracle in the United States and
-	  other countries.
-	</p>
-      </div>
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="initial-scale=1.0">
+  <title>JSure - SureLogic.com</title>
+  <link rel="stylesheet" href="css/standardize.css">
+  <link rel="stylesheet" href="css/jsure-grid.css">
+  <link rel="stylesheet" href="css/jsure.css">
+</head>
+<body class="body page-jsure clearfix">
+  <div class="header clearfix">
+    <a href="index.html" class="surelogic-logo clearfix">
+      <img class="logo" src="images/surelogic-logo.png">
+    </a>
+    <p class="menu"><a href="./products.html">Products</a>&nbsp; &nbsp;<a href="./download.html">Download</a>&nbsp; &nbsp;<a href="./licensing.html">Licensing</a>&nbsp; &nbsp;<a href="./support.html">Support</a>&nbsp; &nbsp;<a href="./company.html">Company</a></p>
+  </div>
+  <p class="title title-1">JSure: Annotate, verify, and evolve with confidence</p>
+  <button onClick="window.location='download.html';" class="download download-1">Download Now!</button>
+  <div class="description description-1">
+    <p>JSure helps keep your <em>code consistent</em> with your <em>design intent</em>. JSure supports almost&nbsp;<a href="/static/eclipse/docs/promises/">50 open-source annotations</a> to <em>tersely</em> (typically one or two lines) express non-trivial design intent in safe concurrency (including lock use), null references, mutability, internal access to state, abstraction bypass, API/structural pattern compliance, and many other properties.</p>
+    <p><em>What can JSure do for you?</em> &nbsp;JSure can</p>
+    <p>• Verify <em>concurrency design intent</em>: <a href="/static/eclipse/docs/promises/com/surelogic/ThreadSafe.html">@ThreadSafe</a>, <a href="/static/eclipse/docs/promises/com/surelogic/GuardedBy.html">@GuardedBy</a>, <a href="/static/eclipse/docs/promises/com/surelogic/Immutable.html">@Immutable</a>, <a href="/static/eclipse/docs/promises/com/surelogic/RegionLock.html">@RegionLock</a><br>• Verify <em>null reference intent</em>: <a href="/static/eclipse/docs/promises/com/surelogic/NonNull.html">@NonNull</a>, <a href="/static/eclipse/docs/promises/com/surelogic/Nullable.html">@Nullable</a>, <a href="/static/eclipse/docs/promises/com/surelogic/TrackPartiallyInitialized.html">@TrackPartiallyInitialized</a>, <a href="/static/eclipse/docs/promises/com/surelogic/Initialized.html">@Initialized</a><br>• Verify <em>patterns</em>: <a href="/static/eclipse/docs/promises/com/surelogic/Singleton.html">@Singleton</a>, <a href="/static/eclipse/docs/promises/com/surelogic/Utility.html">@Utility</a>, <a href="/static/eclipse/docs/promises/com/surelogic/ValueObject.html">@ValueObject</a>, <a href="/static/eclipse/docs/promises/com/surelogic/ReferenceObject.html">@ReferenceObject</a><br>• Verify <em>static structure</em>: <a href="/static/eclipse/docs/promises/com/surelogic/Layer.html">@Layer</a>, <a href="/static/eclipse/docs/promises/com/surelogic/AllowsReferencesFrom.html">@AllowsReferencesFrom</a>, <a href="/static/eclipse/docs/promises/com/surelogic/MayReferTo.html">@MayReferTo</a><br>• Verify <em>effects</em> and <em>aliasing</em>: <a href="/static/eclipse/docs/promises/com/surelogic/RegionEffects.html">@RegionEffects</a>, <a href="/static/eclipse/docs/promises/com/surelogic/Unique.html">@Unique</a><br>• And <a href="/static/eclipse/docs/promises/">more</a>...<br>• Focus annotation effort on <em>critical code</em>, no need to annotate your entire codebase<br>• Annotate libraries with a full-featured library annotation editor (many Java libraries have already been annotated)<br>• Ensure annotations are kept consistent as your <span>code evolves</span><br></p>
+    <p>JSure is designed for <em>scale</em>, <em>soundness</em> (in most cases), <em>usability</em>, and straightforward <em>integration</em> into your development and evaluation process. It has been used on large open-source systems such as <a href="https://youtu.be/v-lnqV-NkTk" target="_blank">SE for Android</a>&nbsp;(~2.8 million lines of Java code) and&nbsp;<a href="https://developer.yahoo.com/blogs/hadoop/stomping-java-concurrency-cockroaches-surelogic-flashlight-jsure-tools-441.html" target="_blank">Hadoop</a>&nbsp;(~1.7 million lines of Java code).</p>
+</div>
+  <img class="splash" src="images/jsure-splash.png">
+  <p class="videos">Videos</p>
+  <p class="description description-2">The videos below show JSure in use. Often on widely used open source and commercial software. These videos give a sense of JSure's capabilities and how you interact with it in Eclipse. (Note that some of the videos might have been shot with an older version of the tool so please consult the documentation if something looks different.) The <a href="/static/eclipse/docs/jsure-guide/jsure-guide.html" target="_blank">JSure user guide</a> contains further documentation including a quick start, tutorials, and reference information. All the JSure annotations contain <a href="/static/eclipse/docs/promises/" target="_blank">Javadoc</a> that give several examples of their use. Our <a href="/mediawiki/" target="_blank">wiki</a> contains further information on effective <a href="/mediawiki/index.php/JSure_annotation_guide" target="_blank">use of JSure annotations in your code</a> and you can ask questions on our <a href="/forum/" target="_blank">forum</a>.</p>
+  <div class="row1 clearfix">
+    <div class="video-logging clearfix">
+      <p class="description">Introducting JSure: java.util.logging</p>
+      <p class="title">An introduction to running the JSure tool demonstrating finding and fixing a check-then-act race condition in Logger class. The Logger class is part of the Java standard library (i.e., java.util.logging) and the <a href="http://bugs.java.com/bugdatabase/view_bug.do?bug_id=4779253">bug described in this video</a> was found with the JSure tool, reported to Sun/Oracle, and fixed in JDK 7.</p>
+      <div class="wrapper"><iframe width="100%" height="100%" src="http://www.youtube.com/embed/r60RELmh3J0" frameborder="0" allowfullscreen></iframe></div>
     </div>
-  </body>
+    <div class="video-boundedfifo clearfix">
+      <p class="description">Modeling in JSure: Apache Log4j's BoundedFIFO</p>
+      <p class="title">Using JSure annotations to model the client-side locking policy used by the Apache Log4j BoundedFIFO class. In addition to showing how to manually add annotations, abductive inference of annotations by the JSure tool is demonstrated.<br></p>
+      <div class="wrapper"><iframe width="100%" height="100%" src="http://www.youtube.com/embed/lXULA-V18fU" frameborder="0" allowfullscreen></iframe></div>
+    </div>
+  </div>
+  <div class="row2 clearfix">
+    <div class="video-jcip clearfix">
+      <p class="description">Using JSure to verify annotations from the book Java Concurrency In Practice</p>
+      <p class="title">This video presents how JSure supports the verification of the annotations proposed by Goetz et al. in the book Java Concurrency In Practice: @ThreadSafe, @NotThreadSafe, @Immutable, and @GuardedBy. Examples from the open source Timing Framework project are presented, as well as from SE for Android / Android Open Source Project (AOSP). The examples highlight the fact that only a small number of annotations are needed to enable verification results, even at large scale (i.e., no false negatives) -- and that these annotations almost completely eliminate false positives.<br></p>
+      <div class="wrapper"><iframe width="100%" height="100%" src="http://www.youtube.com/embed/YloWmyT-c9Y" frameborder="0" allowfullscreen></iframe></div>
+    </div>
+    <div class="video-security clearfix">
+      <p class="description">Software Security Assurance with JSure</p>
+      <p class="title">Using the JSure tool to specify and contingently verify security properties of a software system. This video presents JSure capabilities such as unique references and static structure that can assure restrictions on data flows are respected, along with other safeguards regarding internal attack surfaces. Further, the role of JSure to improve robustness of the system, therefore making it "harder" to exploit, is also presented.<br></p>
+      <div class="wrapper"><iframe width="100%" height="100%" src="http://www.youtube.com/embed/iImUikxtMRU" frameborder="0" allowfullscreen></iframe></div>
+    </div>
+  </div>
+  <div class="row3 clearfix">
+    <div class="video-android clearfix">
+      <p class="description">JSure use on Security Enhancements (SE) for Android</p>
+      <p class="title">A demonstration of using the JSure tool to verify annotations from the Java Concurrency in Practice book placed in the Android codebase by the project's own developers. This codebase is just under 3 million lines of Java code and demonstrates scalability of the JSure tool.<br></p>
+      <div class="wrapper"><iframe width="100%" height="100%" src="http://www.youtube.com/embed/v-lnqV-NkTk" frameborder="0" allowfullscreen></iframe></div>
+    </div>
+  </div>
+  <p class="stayingray stayingray-1">Analysis-based verification: Stay in the gray!</p>
+  <p class="desc1">Analysis-based verification is different from today's crop of static analysis tools. Those tools scan code and match known bug or style patterns. While useful, this approach has a problem: the tools are guessing if code is really defective. When they guess wrong they report a <em>false positive</em> (where the tool says there is a fault and the code has none). Rarely do vendors of these tools discuss the insidious issue of&nbsp;<em>false negatives</em> (where the code has a fault and the tool is silent).</p>
+  <img class="stayingray stayingray-2" src="images/stayingray.png">
+  <div class="desc2">
+    <p>JSure does not guess about your program or use pattern-based analysis. It knows your intent because you expressed it as one or more annotations. JSure "stays in the gray" and avoids <em>false negatives</em> through the use of annotations. It may be surprising that JSure can still report false positives, however this is rare in practice and has to do with the theoretical limitations of static analysis (i.e., the verifying analyses used by JSure are conservative).</p>
+    <p>To distinguish JSure from other static analysis tools we refer to it as an <em>analysis-based verification</em> tool. We use the term <em>heuristic static analysis</em> tool for analysis tools that find bugs or style problems based upon known anti-patterns. &nbsp;Both are useful in practice. Our offering in heuristic static analysis is the <a href="./sierra.html">Sierra</a> tool.</p>
+</div>
+  <a href="./download.html" class="download download-2 clearfix">
+    <img class="oseclipse" src="images/oseclipse.png">
+  </a>
+</body>
 </html>

@@ -7,6 +7,7 @@ import static com.surelogic.server.serviceability.admin.HTMLQuery.HeaderType.RIG
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Timestamp;
+import java.util.Calendar;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -14,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.surelogic.Nullable;
+import com.surelogic.common.jdbc.NullDBQuery;
 import com.surelogic.common.jdbc.Query;
 import com.surelogic.common.jdbc.Result;
 import com.surelogic.common.jdbc.ResultHandler;
@@ -25,6 +27,8 @@ public class LicenseWebRequestLogServlet extends HttpServlet {
   private static final long serialVersionUID = -9077965307391367048L;
   private static final String PAGE = "weblog";
   private static final String TIME = "t";
+  private static final String DELETE_ABANDONED = "deleteAbandoned";
+  private static final String YES = "yes";
 
   @Override
   protected void doGet(final HttpServletRequest req, final HttpServletResponse resp) throws ServletException, IOException {
@@ -37,7 +41,28 @@ public class LicenseWebRequestLogServlet extends HttpServlet {
   }
 
   private void handle(final HttpServletRequest req, final HttpServletResponse resp) throws IOException {
+    final String pda = req.getParameter(DELETE_ABANDONED);
+    final boolean deleteAbandoned = pda != null && YES.equals(pda);
+    if (deleteAbandoned) {
+      ServicesDBConnection.getInstance().withTransaction(new DeleteAbandonedWebRequests());
+    }
     ServicesDBConnection.getInstance().withReadOnly(new LogQuery(resp.getWriter(), req.getParameter(TIME)));
+  }
+
+  static class DeleteAbandonedWebRequests extends NullDBQuery {
+
+    final Timestamp twoWeeksAgo;
+
+    public DeleteAbandonedWebRequests() {
+      Calendar c = Calendar.getInstance();
+      c.add(Calendar.WEEK_OF_MONTH, -2);
+      twoWeeksAgo = new Timestamp(c.getTimeInMillis());
+    }
+
+    @Override
+    public void doPerform(final Query q) {
+      q.prepared("WebServices.deleteAbandonedWebLicenseRequests").call(twoWeeksAgo);
+    }
   }
 
   static class LogQuery extends HTMLQuery {
@@ -56,9 +81,13 @@ public class LicenseWebRequestLogServlet extends HttpServlet {
     @Override
     public void doPerform(final Query q) {
       prequel("Recent Web License Request Activity");
+      writer.print("<form align=\"center\" action=\"weblog\" method=\"post\" >");
+      writer.print("<input type=\"hidden\" name=\"" + DELETE_ABANDONED + "\" value=\"" + YES + "\" />");
+      writer.print("<input type=\"submit\" value=\"Delete abandoned web license requests older than two weeks\" />");
+      writer.print("</form><p>");
       tableBegin();
       tableRow(CENTER.th("Date"), LEFT.th("License"), LEFT.th("Name"), LEFT.th("Email"), LEFT.th("Company"),
-          CENTER.th("License Type"), CENTER.th("Ignore Trial"), CENTER.th("No Email"));
+          CENTER.th("License Type"), CENTER.th("Ignore Trial"));
       long latest = q.prepared("WebServices.selectLicenseWebRequestsBefore", new ResultHandler<Long>() {
         @Override
         public Long handle(final Result result) {
@@ -87,15 +116,14 @@ public class LicenseWebRequestLogServlet extends HttpServlet {
             String company = r.nextString();
             String licenseType = r.nextString();
             String ignoreTrial = "true".equals(r.nextString()) && "Trial".equals(licenseType) ? "X" : "";
-            String noEmail = "true".equals(r.nextString()) ? "X" : "";
             tableRow(CENTER.td(t), LEFT.td(uuid(uuid)), LEFT.td(name), LEFT.td(email), LEFT.td(company), CENTER.td(licenseType),
-                CENTER.td(ignoreTrial), CENTER.td(noEmail));
+                CENTER.td(ignoreTrial));
           }
           return rowsRemaining ? latest : -1; // -1 means no rows remain
         }
       }).call(new Timestamp(time));
       if (latest != -1) {
-        tableRow(LEFT.td(""), LEFT.td(""), LEFT.td(""), LEFT.td(""), LEFT.td(""), LEFT.td(""), LEFT.td(""),
+        tableRow(LEFT.td(""), LEFT.td(""), LEFT.td(""), LEFT.td(""), LEFT.td(""), LEFT.td(""),
             RIGHT.td("<a href=\"%s?%s=%d\">Next&gt;</a>", PAGE, TIME, latest));
       }
       tableEnd();

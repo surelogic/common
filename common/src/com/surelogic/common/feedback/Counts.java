@@ -224,4 +224,14 @@ public final class Counts {
           I18N.err(367, "load", SLLicenseManager.getInstance().getLicenseFile().getAbsolutePath()), e);
     }
   }
+
+  /**
+   * Removes all counts. Typically done after they are successfully sent to
+   * SureLogic.
+   */
+  public void clear() {
+    synchronized (f_counts) {
+      f_counts.clear();
+    }
+  }
 }

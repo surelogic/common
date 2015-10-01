@@ -24,19 +24,21 @@ public final class ServiceUtility {
   /**
    * Constructs a job that sends a message over the Internet to SureLogic.
    * 
-   * @param msg
+   * @param message
    *          the message for SureLogic.
    */
-  public static SLJob sendToSureLogic(final String msg) {
-    return sendToSureLogic(msg, null);
+  public static SLJob sendToSureLogic(final String message) {
+    return sendToSureLogic(message, null);
   }
 
-  public static SLJob sendToSureLogic(final String msg, final Runnable after) {
+  public static SLJob sendToSureLogic(String message, final Runnable after) {
+    final char[] msg = message.toCharArray();
     return new AbstractSLJob("Sending to SureLogic...please be patient this may take a minute or two") {
 
       @Override
       public SLStatus run(final SLProgressMonitor monitor) {
-        monitor.begin();
+        final int endWork = Math.max(20, msg.length / 20);
+        monitor.begin(msg.length + (2 * endWork));
         try {
           // Prepare the URL connection
           final URL url = new URL(f_serviceLocation);
@@ -50,16 +52,25 @@ public final class ServiceUtility {
           try {
             // Send the request
             wr = new OutputStreamWriter(conn.getOutputStream());
-            wr.write(msg);
+            int off = 0;
+            final int blk = 512; // characters
+            while (off < msg.length) {
+              final int len = Math.min(blk, msg.length - off);
+              wr.write(msg, off, len);
+              monitor.worked(len);
+              off += blk;
+            }
             wr.flush();
 
             // Check the response
             final InputStream is = conn.getInputStream();
             is.close();
+            monitor.worked(endWork);
 
             if (after != null) {
               after.run();
             }
+            monitor.worked(endWork);
           } finally {
             if (wr != null) {
               wr.close();

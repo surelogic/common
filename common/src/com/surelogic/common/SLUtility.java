@@ -1666,6 +1666,26 @@ public final class SLUtility {
     return sw.toString();
   }
 
+  /**
+   * Returns a string that is clipped to a maximum length. All characters above
+   * the maximum length are removed.
+   * 
+   * @param value
+   *          the string to clip
+   * @param length
+   *          the maximum number of characters in the returned string.
+   * @return the clipped string. If it is less than the maximum length than the
+   *         string reference passed is returned. If null is passed, null is
+   *         always returned.
+   */
+  @Nullable
+  public static String clipString(@Nullable final String value, final int length) {
+    if (value == null || value.length() <= length) {
+      return value;
+    }
+    return value.substring(0, length);
+  }
+
   private SLUtility() {
     // no instances
   }

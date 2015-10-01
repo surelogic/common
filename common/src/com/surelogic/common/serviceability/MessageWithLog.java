@@ -77,6 +77,9 @@ public abstract class MessageWithLog extends Message {
     f_sendLog = value;
   }
 
+  private static final String TITLE_PREFIX = "--- Contents of ";
+  private static final String TITLE_SUFFIX = " ---";
+
   @Override
   protected void generateMessageHelper(StringBuilder b) {
     super.generateMessageHelper(b);
@@ -84,9 +87,9 @@ public abstract class MessageWithLog extends Message {
     if (getSendLog()) {
       final String lf = SLUtility.PLATFORM_LINE_SEPARATOR;
       b.append(lf).append(lf);
-      b.append(ServiceabilityConstants.TITLE_PREFIX);
+      b.append(TITLE_PREFIX);
       b.append(getLogFile().getAbsolutePath());
-      b.append(ServiceabilityConstants.TITLE_SUFFIX);
+      b.append(TITLE_SUFFIX);
       b.append(lf).append(lf);
       b.append(getLogFileContents());
     }

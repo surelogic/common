@@ -11,4 +11,8 @@ public interface ISLJavaProject {
 	void mapJar(File path, File origPath);
 	Config getConfig();
 	void clear();
+	/**
+	 * Real vs generated
+	 */
+	boolean isReal();
 }

@@ -25,6 +25,10 @@ public class JavaProject implements ISLJavaProject {
 		return parent;
 	}
 
+	public boolean isReal() {
+		return config.isReal();
+	}
+	
 	public final String getName() {
 		return name;
 	}

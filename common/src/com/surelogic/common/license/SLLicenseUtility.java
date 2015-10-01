@@ -294,7 +294,11 @@ public final class SLLicenseUtility {
     final ArrayList<String> rLines = SLUtility.separateLines(response);
 
     SLLicenseManager.getInstance().activateOrRenew(licenseNetChecks);
+    Counts.getInstance().clear();
 
+    /*
+     * Note any issues reported, but if we got this far the server did respond.
+     */
     boolean problemReportedByServer = false;
     final StringBuilder b = new StringBuilder();
     for (final String line : rLines) {
@@ -313,7 +317,6 @@ public final class SLLicenseUtility {
       throw new Exception(I18N.err(209, licenses));
     }
 
-    SLLicenseManager.getInstance().activateOrRenew(licenseNetChecks);
   }
 
   /**
@@ -362,8 +365,10 @@ public final class SLLicenseUtility {
     param.put(I18N.msg("web.check.param.os"), System.getProperty("os.name", "unknown"));
     param.put(I18N.msg("web.check.param.java"), System.getProperty("java.version", "unknown"));
     param.put(I18N.msg("web.check.param.eclipse"), eclipseVersion);
+    param.put(I18N.msg("web.check.param.counts"), Counts.getInstance().toString());
     final URL url = new URL(I18N.msg("web.netcheck.url", SLUtility.SERVICEABILITY_SERVER));
     SLUtility.sendPostToUrl(url, param);
+    Counts.getInstance().clear();
   }
 
   private SLLicenseUtility() {
