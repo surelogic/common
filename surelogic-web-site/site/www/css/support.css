@@ -10,7 +10,6 @@ body {
 .forum,
 .wiki {
   float: left;
-  overflow: hidden;
 }
 
 .description {
@@ -21,10 +20,15 @@ body {
   font-weight: 400;
   line-height: 1.38;
   color: rgb(0, 0, 0);
+  overflow: auto;
 }
 
 .docs .description {
   z-index: 16;
+}
+
+.docs .link {
+  height: 75px;
 }
 
 .faq .description {
@@ -44,6 +48,7 @@ body {
   height: 30px;
   background-color: rgba(204, 204, 204, 0.9);
   box-shadow: 0 2px 5px rgba(0, 0, 0, .5);
+  overflow: auto;
 }
 
 .link {
@@ -57,17 +62,12 @@ body {
 .link .bugzilla,
 .link .docs,
 .link .faq,
-.link .forum {
-  display: block;
-  width: 104px;
-  height: auto;
-}
-
+.link .forum,
 .link .wiki {
   display: block;
   width: 104px;
   height: auto;
-  margin-left: -0.48077%;
+  overflow: hidden;
 }
 
 .logo {
@@ -75,7 +75,6 @@ body {
   float: left;
   width: 144px;
   height: auto;
-  margin-left: -0.61849%;
   overflow: hidden;
 }
 
@@ -132,6 +131,7 @@ body {
   z-index: 3;
   width: 54.3333333333%;
   margin: 25px 0 0 22%;
+  overflow: auto;
 }
 
 .docs-1 {
@@ -140,6 +140,7 @@ body {
   z-index: 19;
   width: 54.3333333333%;
   margin: 25px 0 0 22%;
+  overflow: auto;
 }
 
 .faq-1 {
@@ -148,6 +149,7 @@ body {
   z-index: 15;
   width: 54.3333333333%;
   margin: 25px 0 0 22%;
+  overflow: auto;
 }
 
 .forum-1 {
@@ -156,6 +158,7 @@ body {
   z-index: 11;
   width: 54.3333333333%;
   margin: 25px 0 0 22%;
+  overflow: auto;
 }
 
 .wiki-1 {
@@ -164,6 +167,7 @@ body {
   z-index: 7;
   width: 54.3333333333%;
   margin: 25px 0 0 22%;
+  overflow: auto;
 }
 
 .description a,
@@ -242,6 +246,7 @@ body {
 
   .header {
     height: 50px;
+    overflow: visible;
   }
 
   .header .menu {
@@ -256,7 +261,8 @@ body {
   .link .docs,
   .link .faq,
   .link .forum,
-  .link .wiki {
+  .link .wiki,
+  .surelogic-logo .logo {
     height: auto;
   }
 
@@ -264,11 +270,6 @@ body {
     position: relative;
     z-index: 20;
     margin-left: 16.82143%;
-  }
-
-  .surelogic-logo .logo {
-    height: auto;
-    margin-left: 0;
   }
 
   .title {

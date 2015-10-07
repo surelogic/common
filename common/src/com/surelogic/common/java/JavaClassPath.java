@@ -17,6 +17,9 @@ public class JavaClassPath<PS extends JavaProjectSet<?>> implements IJavacClassP
   private final Map<Pair<String, String>, IJavaFile> classToFile = new HashMap<>();
   private final Set<String> warningsForPackages = new HashSet<>();
   
+  private final Map<String, IJavaFile> globalClassToFile = new HashMap<>();
+  private final Set<String> potentiallyDuplicatedClassesAcrossProjects = new HashSet<>();
+  
   protected final PS projects;
   /**
    * Only use binary; ignore sources
@@ -46,7 +49,7 @@ public class JavaClassPath<PS extends JavaProjectSet<?>> implements IJavacClassP
   /*
    * Checking for a duplicate effectively simulates searching the classpath
    */
-  public final void map(String destProj, IJavaFile file) {
+  public final void map(final String destProj, final IJavaFile file) {
     if (useBinaries && file.isSource()) {
       // System.out.println("Ignoring "+destProj+" :
       // "+file.getQualifiedName());
@@ -70,6 +73,15 @@ public class JavaClassPath<PS extends JavaProjectSet<?>> implements IJavacClassP
         SLLogger.getLogger().warning(file+" overrides "+old+" for type '"+file.getQualifiedName()+"' in "+destProj);
       }
     }
+    // TODO use packages instead to reduce table size?
+    final IJavaFile old = globalClassToFile.put(file.getQualifiedName(), file);
+    if (old != null && !old.equals(file)) {
+    	potentiallyDuplicatedClassesAcrossProjects.add(file.getQualifiedName());
+    }
+  }
+  
+  protected final boolean generateMD5Hash(String qname) {
+	  return potentiallyDuplicatedClassesAcrossProjects.contains(qname);
   }
 
   /**
