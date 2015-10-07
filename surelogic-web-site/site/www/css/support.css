@@ -75,7 +75,6 @@ body {
   float: left;
   width: 144px;
   height: auto;
-  margin-left: -0.61849%;
   overflow: hidden;
 }
 
@@ -262,7 +261,8 @@ body {
   .link .docs,
   .link .faq,
   .link .forum,
-  .link .wiki {
+  .link .wiki,
+  .surelogic-logo .logo {
     height: auto;
   }
 
@@ -270,11 +270,6 @@ body {
     position: relative;
     z-index: 20;
     margin-left: 16.82143%;
-  }
-
-  .surelogic-logo .logo {
-    height: auto;
-    margin-left: 0;
   }
 
   .title {
