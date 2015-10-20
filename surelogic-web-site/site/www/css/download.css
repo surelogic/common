@@ -34,7 +34,7 @@ body {
   width: 40%;
   margin: 15px 0 0 30%;
   padding: 5px;
-  border: 1px solid rgb(0, 0, 0);
+  border: 1px solid rgb(27, 83, 120);
   border-radius: 8px;
   background-color: rgb(248, 255, 50);
   box-shadow: 0 2px 5px rgba(0, 0, 0, .5);
@@ -43,6 +43,13 @@ body {
   line-height: 1.38;
   text-align: center;
   color: rgb(27, 83, 120);
+}
+
+.installinstr:hover {
+  border-color: rgb(27, 83, 120);
+  background-color: rgb(27, 83, 120);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, .5);
+  color: rgb(248, 255, 50);
 }
 
 .instr1 {

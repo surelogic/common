@@ -202,6 +202,12 @@ body {
   color: rgb(29, 106, 14);
 }
 
+.download-1:hover {
+  background-color: rgb(27, 83, 120);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, .5);
+  color: rgb(248, 255, 50);
+}
+
 .download-2 {
   position: relative;
   float: left;
