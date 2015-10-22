@@ -62,11 +62,18 @@ body {
 .link .bugzilla,
 .link .docs,
 .link .faq,
-.link .forum,
+.link .forum {
+  display: block;
+  width: 104px;
+  height: auto;
+  overflow: hidden;
+}
+
 .link .wiki {
   display: block;
   width: 104px;
   height: auto;
+  margin-left: -0.48077%;
   overflow: hidden;
 }
 
