@@ -70,7 +70,7 @@ public class JavaClassPath<PS extends JavaProjectSet<?>> implements IJavacClassP
     } else {
       final IJavaFile old = classToFile.get(key);
       if (!old.equals(file) && canGenerateWarning(file)) {    	
-        SLLogger.getLogger().warning(file+" overrides "+old+" for type '"+file.getQualifiedName()+"' in "+destProj);
+        SLLogger.getLogger().info(file+" overrides "+old+" for type '"+file.getQualifiedName()+"' in "+destProj);
       }
     }
     // TODO use packages instead to reduce table size?
