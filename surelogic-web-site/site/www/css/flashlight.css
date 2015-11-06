@@ -1,0 +1,427 @@
+.description-1 a:hover,
+.menu a:hover,
+.querydesc a:hover {
+  text-decoration: underline;
+}
+
+body {
+  background-color: rgb(255, 255, 255);
+  font: 400 1em/1.38 Helvetica;
+  color: rgb(27, 83, 120);
+}
+
+.description {
+  float: left;
+  font-size: 1em;
+  line-height: 1.38;
+  color: rgb(27, 83, 120);
+}
+
+.description-1 p {
+  margin-bottom: 1em;
+}
+
+.download {
+  display: block;
+}
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 18;
+  width: 100%;
+  height: 30px;
+  background-color: rgba(204, 204, 204, 0.9);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, .5);
+}
+
+.logo {
+  display: block;
+  float: left;
+  width: 144px;
+  height: auto;
+  margin-left: -0.61849%;
+  overflow: hidden;
+}
+
+.menu {
+  float: right;
+  margin: 5px 10% 0 0;
+  font-size: 1em;
+  line-height: 1.38;
+  color: rgb(27, 83, 120);
+}
+
+.oseclipse {
+  display: block;
+  float: left;
+  width: 100%;
+  height: auto;
+  overflow: hidden;
+}
+
+.query {
+  display: block;
+  position: relative;
+  float: left;
+  clear: both;
+  z-index: 9;
+  width: 90%;
+  height: auto;
+  margin: 10px 0 0 5%;
+  overflow: hidden;
+}
+
+.querydesc {
+  position: relative;
+  float: left;
+  clear: both;
+  z-index: 10;
+  width: 66.3333333333%;
+  margin: 10px 0 0 16.79948%;
+  font-size: 1em;
+  font-weight: 400;
+  line-height: 1.38;
+  color: rgb(27, 83, 120);
+}
+
+.row1 {
+  position: relative;
+  float: left;
+  clear: both;
+  z-index: 6;
+  width: 80%;
+  margin: 10px 0 0 10%;
+}
+
+.splash {
+  display: block;
+  position: relative;
+  float: left;
+  clear: both;
+  z-index: 11;
+  width: 90%;
+  height: auto;
+  margin: 10px 0 0 5%;
+  overflow: hidden;
+}
+
+.surelogic-logo {
+  display: block;
+  position: absolute;
+  top: 4px;
+  left: 10%;
+  z-index: 17;
+  width: 144px;
+  height: 24px;
+}
+
+.title {
+  float: left;
+  font-weight: 400;
+  line-height: 1.38;
+  color: rgb(0, 0, 0);
+}
+
+.video-android {
+  float: left;
+  width: 49%;
+  padding: 5px;
+  border: 1px solid rgb(27, 83, 120);
+  border-radius: 5px;
+}
+
+.video-android .description {
+  width: 96%;
+  margin: 5px 0 0 1.99748%;
+  font-weight: 700;
+}
+
+.video-android .title {
+  clear: both;
+  width: 96%;
+  margin: 5px 0 0 1.99748%;
+  font-size: 0.75em;
+}
+
+.videos {
+  position: relative;
+  float: left;
+  clear: both;
+  z-index: 8;
+  width: 80%;
+  margin: 10px 0 0 10%;
+  font-size: 2em;
+  font-weight: 400;
+  line-height: 1.38;
+  color: rgb(0, 0, 0);
+}
+
+.wrapper {
+  float: left;
+  clear: both;
+  width: 96%;
+  height: 220px;
+  margin: 5px 0 0 1.99748%;
+  overflow: hidden;
+}
+
+.description-1 {
+  position: relative;
+  clear: both;
+  z-index: 12;
+  width: 66.3333333333%;
+  margin: 10px 0 0 16.79948%;
+  font-weight: 400;
+}
+
+.description-2 {
+  position: relative;
+  clear: both;
+  z-index: 7;
+  width: 66.3333333333%;
+  margin: 10px 0 0 16.79948%;
+  font-weight: 400;
+}
+
+.download-1 {
+  position: absolute;
+  top: 40px;
+  right: 1%;
+  z-index: 14;
+  padding: 5px;
+  border: 1px solid rgb(27, 83, 120);
+  border-radius: 8px;
+  background-color: rgb(248, 255, 50);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, .5);
+  font-size: 0.875em;
+  font-weight: 700;
+  line-height: 1.38;
+  text-align: center;
+  color: rgb(29, 106, 14);
+}
+
+.download-1:hover {
+  background-color: rgb(27, 83, 120);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, .5);
+  color: rgb(248, 255, 50);
+}
+
+.download-2 {
+  position: relative;
+  float: left;
+  clear: both;
+  z-index: 1;
+  width: 40%;
+  margin: 20px 0 0 30%;
+}
+
+.title-1 {
+  position: relative;
+  z-index: 13;
+  width: 80%;
+  margin: 70px 0 0 10%;
+  font-size: 2em;
+}
+
+.description em {
+  border-top-width: 0;
+  border-right-width: 0;
+  border-bottom-width: 0;
+  border-left-width: 0;
+  border-color: transparent;
+  border-style: none;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+  background-color: transparent;
+  font-family: inherit;
+  font-style: inherit;
+  font-size: inherit;
+  font-weight: 700;
+  text-transform: inherit;
+  text-decoration: inherit;
+  letter-spacing: inherit;
+  word-spacing: inherit;
+  color: inherit;
+  opacity: 1;
+  word-break: normal;
+  word-wrap: normal;
+  white-space: normal;
+}
+
+.menu a {
+  border-top-width: 0;
+  border-right-width: 0;
+  border-bottom-width: 0;
+  border-left-width: 0;
+  border-color: transparent;
+  border-style: none;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+  background-color: transparent;
+  font-family: inherit;
+  font-style: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  text-transform: inherit;
+  text-decoration: inherit;
+  letter-spacing: inherit;
+  word-spacing: inherit;
+  color: inherit;
+  opacity: 1;
+  word-break: normal;
+  word-wrap: normal;
+  white-space: normal;
+}
+
+.description a,
+.querydesc a,
+.title a {
+  border-top-width: 0;
+  border-right-width: 0;
+  border-bottom-width: 0;
+  border-left-width: 0;
+  border-color: transparent;
+  border-style: none;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+  background-color: transparent;
+  font-family: inherit;
+  font-style: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  text-transform: inherit;
+  text-decoration: underline;
+  letter-spacing: inherit;
+  word-spacing: inherit;
+  color: inherit;
+  opacity: 1;
+  word-break: normal;
+  word-wrap: normal;
+  white-space: normal;
+}
+
+@media(max-width: 700px) {
+  body {
+    font-size: 0.813em;
+  }
+
+  .description {
+    width: 66.3325892857%;
+    margin-left: 16.79911%;
+    font-size: 13px;
+  }
+
+  .download .oseclipse {
+    height: auto;
+  }
+
+  .header {
+    height: 50px;
+  }
+
+  .header .menu {
+    float: left;
+    margin-top: 30px;
+    margin-right: 0;
+    margin-left: 10%;
+    font-size: 13px;
+  }
+
+  .query {
+    position: relative;
+    z-index: 9;
+    height: auto;
+  }
+
+  .querydesc {
+    position: relative;
+    z-index: 10;
+    width: 66.3325892857%;
+    margin-left: 16.79911%;
+    font-size: 13px;
+  }
+
+  .row1 {
+    position: relative;
+    clear: none;
+    z-index: 6;
+  }
+
+  .row1 .video-android {
+    width: 100%;
+  }
+
+  .splash {
+    position: relative;
+    z-index: 11;
+    height: auto;
+  }
+
+  .surelogic-logo .logo {
+    height: auto;
+    margin-left: 0;
+  }
+
+  .title {
+    width: 60%;
+    margin-top: 75px;
+    font-size: 1.923em;
+  }
+
+  .video-android .description {
+    margin-left: 1.98449%;
+    font-size: 1.231em;
+  }
+
+  .video-android .title {
+    margin-left: 1.98449%;
+    font-size: 0.923em;
+  }
+
+  .video-android .wrapper {
+    height: 200px;
+    margin-left: 1.98449%;
+  }
+
+  .videos {
+    position: relative;
+    z-index: 8;
+    font-size: 1.923em;
+  }
+
+  .description-1 {
+    position: relative;
+    z-index: 12;
+  }
+
+  .description-2 {
+    position: relative;
+    z-index: 7;
+    margin-top: -2322px;
+  }
+
+  .download-1 {
+    top: 60px;
+    font-size: 1.077em;
+  }
+
+  .download-2 {
+    position: relative;
+    z-index: 1;
+    width: 60%;
+    margin-left: 20%;
+  }
+
+  .title-1 {
+    position: relative;
+    z-index: 13;
+  }
+}

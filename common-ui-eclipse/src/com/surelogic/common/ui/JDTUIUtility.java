@@ -58,9 +58,9 @@ public class JDTUIUtility {
         if (lineNumber > 1) { // only move if not the first line
           final IMarker location = ResourcesPlugin.getWorkspace().getRoot().createMarker(SLUtility.ECLIPSE_MARKER_TYPE_NAME);
           if (location != null) {
-            location.setAttribute(IMarker.LINE_NUMBER, lineNumber);            
+            location.setAttribute(IMarker.LINE_NUMBER, lineNumber);
             IDE.gotoMarker(editorPart, location);
-            location.delete();            
+            location.delete();
             return true;
           }
         } else {
@@ -88,52 +88,52 @@ public class JDTUIUtility {
    *         was opened in an external editor.
    */
   public static boolean tryToOpenInEditor(final IJavaElement element, final int lineNumber0, final int lineNumber1) {
-	// check order and use locals to do the actual highlight
-	final int start, end;
-	if (lineNumber1 < lineNumber0) {
-		start = lineNumber1;
-		end = lineNumber0;
-	} else {
-		start = lineNumber0;
-		end = lineNumber1;
-	}
+    // check order and use locals to do the actual highlight
+    final int start, end;
+    if (lineNumber1 < lineNumber0) {
+      start = lineNumber1;
+      end = lineNumber0;
+    } else {
+      start = lineNumber0;
+      end = lineNumber1;
+    }
     if (element instanceof ISourceReference) {
-        try {
-          final IEditorPart editorPart = JavaUI.openInEditor(element, false, true);
+      try {
+        final IEditorPart editorPart = JavaUI.openInEditor(element, false, true);
 
-          if (start > 1) { // only move if not the first line
-            final IMarker location = ResourcesPlugin.getWorkspace().getRoot().createMarker(SLUtility.ECLIPSE_MARKER_TYPE_NAME);
-            if (location != null) {
-              if (editorPart.getEditorInput() instanceof IStorageEditorInput) {
-            	final IStorageEditorInput in = (IStorageEditorInput) editorPart.getEditorInput();            	
-            	final IDocument doc = makeDocumentFromContents(in.getStorage());
-            	// Adjusted from 1-based to 0-based
-            	int startOffset = doc.getLineOffset(start-1);
-            	int endOffset = doc.getLineOffset(end-1);
-            	location.setAttribute(IMarker.CHAR_START, startOffset);
-            	location.setAttribute(IMarker.CHAR_END, endOffset);
-              } else {
-            	location.setAttribute(IMarker.LINE_NUMBER, start);            
-              }
-              IDE.gotoMarker(editorPart, location);
-              location.delete();            
-              return true;
+        if (start > 1) { // only move if not the first line
+          final IMarker location = ResourcesPlugin.getWorkspace().getRoot().createMarker(SLUtility.ECLIPSE_MARKER_TYPE_NAME);
+          if (location != null) {
+            if (editorPart.getEditorInput() instanceof IStorageEditorInput) {
+              final IStorageEditorInput in = (IStorageEditorInput) editorPart.getEditorInput();
+              final IDocument doc = makeDocumentFromContents(in.getStorage());
+              // Adjusted from 1-based to 0-based
+              int startOffset = doc.getLineOffset(start - 1);
+              int endOffset = doc.getLineOffset(end - 1);
+              location.setAttribute(IMarker.CHAR_START, startOffset);
+              location.setAttribute(IMarker.CHAR_END, endOffset);
+            } else {
+              location.setAttribute(IMarker.LINE_NUMBER, start);
             }
-          } else {
-            return editorPart != null;
+            IDE.gotoMarker(editorPart, location);
+            location.delete();
+            return true;
           }
-        } catch (final Exception e) {
-          SLLogger.getLogger().log(Level.SEVERE, I18N.err(132, element, "line " + start+'-'+end), e);
+        } else {
+          return editorPart != null;
         }
+      } catch (final Exception e) {
+        SLLogger.getLogger().log(Level.SEVERE, I18N.err(132, element, "line " + start + '-' + end), e);
       }
-      return false;
-  }  
-  
-  private static IDocument makeDocumentFromContents(IStorage stor) throws Exception {
-	  String contents = FileUtility.getStreamContentsAsString(stor.getContents());
-	  return new StringDocument(contents);
+    }
+    return false;
   }
-  
+
+  private static IDocument makeDocumentFromContents(IStorage stor) throws Exception {
+    String contents = FileUtility.getStreamContentsAsString(stor.getContents(), true);
+    return new StringDocument(contents);
+  }
+
   /**
    * Tries to open the specified Java code reference in the editor and highlight
    * the referenced code.
@@ -281,7 +281,7 @@ public class JDTUIUtility {
    */
   public static boolean tryToOpenInEditor(final String projectName, final String packageName, final String typeName,
       final int lineNumber0, final int lineNumber1) {
-	final IType element = JDTUtility.findIType(projectName, packageName, typeName);
+    final IType element = JDTUtility.findIType(projectName, packageName, typeName);
     if (lineNumber1 == lineNumber0) {
       return tryToOpenInEditor(element, lineNumber0);
     } else {

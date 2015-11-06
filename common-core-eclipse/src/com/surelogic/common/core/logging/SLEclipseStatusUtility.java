@@ -13,6 +13,7 @@ import org.osgi.framework.Bundle;
 
 import com.surelogic.common.SLUtility;
 import com.surelogic.common.core.Activator;
+import com.surelogic.common.core.EclipseUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.jobs.SLSeverity;
 import com.surelogic.common.jobs.SLStatus;
@@ -104,11 +105,12 @@ public final class SLEclipseStatusUtility {
     }
     if ("".equals(permGenArg))
       permGenArg = "-XX:MaxPermSize=NO SETTING";
-    SLLogger.getLogger().info(
-        "SureLogic : " + System.getProperty("java.vm.vendor", "(unknown Vendor)") + " Java "
-            + System.getProperty("java.version", "(unknown version)") + "; maxMemory=" + maxMemoryMB + " MB; totalMemory="
-            + totalMemoryMB + " MB; freeMemory=" + freeMemoryMB + " MB; " + permGenArg + "; availableProcessors="
-            + rt.availableProcessors());
+    SLLogger.getLogger()
+        .info("SureLogic tools " + EclipseUtility.getSureLogicToolsSimpleVersion() + " date released was "
+            + SLLicenseUtility.getToolReleaseDateAsString() + "; " + System.getProperty("java.vm.vendor", "(unknown Vendor)")
+            + " Java " + System.getProperty("java.version", "(unknown version)") + "; maxMemory=" + maxMemoryMB
+            + " MB; totalMemory=" + totalMemoryMB + " MB; freeMemory=" + freeMemoryMB + " MB; " + permGenArg
+            + "; availableProcessors=" + rt.availableProcessors());
   }
 
   /**

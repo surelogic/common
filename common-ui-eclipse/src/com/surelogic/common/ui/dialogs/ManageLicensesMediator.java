@@ -22,6 +22,7 @@ import com.surelogic.common.CommonImages;
 import com.surelogic.common.FileUtility;
 import com.surelogic.common.ILifecycle;
 import com.surelogic.common.SLUtility;
+import com.surelogic.common.core.EclipseUtility;
 import com.surelogic.common.core.logging.SLEclipseStatusUtility;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.jobs.SLStatus;
@@ -41,8 +42,8 @@ final class ManageLicensesMediator implements ILifecycle {
   private final Button f_renewButton;
   private final Button f_uninstallButton;
 
-  ManageLicensesMediator(Table licenseTable, Button installFromFileButton, Button installFromClipboardButton,
-      Button activateButton, Button renewButton, Button uninstallButton) {
+  ManageLicensesMediator(Table licenseTable, Button installFromFileButton, Button installFromClipboardButton, Button activateButton,
+      Button renewButton, Button uninstallButton) {
     f_licenseTable = licenseTable;
     f_installFromFileButton = installFromFileButton;
     f_installFromClipboardButton = installFromClipboardButton;
@@ -129,9 +130,11 @@ final class ManageLicensesMediator implements ILifecycle {
 
       item.setData(installedLicense);
     }
+    f_licenseTable.select(0);
     for (TableColumn c : f_licenseTable.getColumns())
       c.pack();
     f_licenseTable.setRedraw(true);
+    updateButtonState();
   }
 
   private void setLicenseImage(final TableItem item, final PossiblyActivatedSLLicense installedLicense) {
@@ -262,15 +265,15 @@ final class ManageLicensesMediator implements ILifecycle {
         break;
       }
     }
-    String confirmMsg = I18N.msg("common.manage.licenses.dialog.uninstall.msg", count > 1 ? count + " licenses" : "\""
-        + selection.get(0).getSignedSLLicense().getLicense().getProduct().toString() + "\" license");
+    String confirmMsg = I18N.msg("common.manage.licenses.dialog.uninstall.msg", count > 1 ? count + " licenses"
+        : "\"" + selection.get(0).getSignedSLLicense().getLicense().getProduct().toString() + "\" license");
     if (anyActivatedWithANetCheck)
       confirmMsg = confirmMsg + I18N.msg("common.manage.licenses.dialog.uninstall.netcheckwarn");
     if (!MessageDialog.openConfirm(getShell(), I18N.msg("common.manage.licenses.dialog.uninstall.title"), confirmMsg)) {
       return; // bail
     }
     try {
-      SLLicenseUtility.tryToUninstallLicenses(selection);
+      SLLicenseUtility.tryToUninstallLicenses(selection, EclipseUtility.getEclipseVersion());
     } catch (Exception e) {
       final int code = 142;
       final String msg = I18N.err(code, e.getMessage());
@@ -299,17 +302,15 @@ final class ManageLicensesMediator implements ILifecycle {
     final String passive = activation ? "Activation" : "Renewal";
     final String active = activation ? "Activate" : "Renew";
 
-    if (!MessageDialog.openConfirm(
-        getShell(),
-        I18N.msg("common.manage.licenses.dialog.activaterenew.title", passive),
-        I18N.msg("common.manage.licenses.dialog.activaterenew.msg", active,
-            count > 1 ? count + " licenses" : "\"" + selection.get(0).getSignedSLLicense().getLicense().getProduct().toString()
-                + "\" license"))) {
+    if (!MessageDialog.openConfirm(getShell(), I18N.msg("common.manage.licenses.dialog.activaterenew.title", passive),
+        I18N.msg("common.manage.licenses.dialog.activaterenew.msg", active, count > 1 ? count + " licenses"
+            : "\"" + selection.get(0).getSignedSLLicense().getLicense().getProduct().toString() + "\" license"))) {
       return; // bail
     }
 
     try {
-      SLLicenseUtility.tryToActivateRenewLicenses(selection, SLUtility.getMacAddressesOfThisMachine());
+      SLLicenseUtility.tryToActivateRenewLicenses(selection, SLUtility.getMacAddressesOfThisMachine(),
+          EclipseUtility.getEclipseVersion());
     } catch (Exception e) {
       final int code = 144;
       final String msg = I18N.err(code, e.getMessage());

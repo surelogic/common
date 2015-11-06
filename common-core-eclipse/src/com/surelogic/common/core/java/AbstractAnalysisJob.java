@@ -98,9 +98,12 @@ public abstract class AbstractAnalysisJob<P extends JavaProjectSet<?>> extends A
 			return true;
 		} else if (status != SLStatus.CANCEL_STATUS && status.getSeverity() == SLSeverity.ERROR) {
 			handleCrash(monitor, status);
+			return false;
 		} else if (status.getSeverity() == SLSeverity.CANCEL) {					
 			handleCancel(status);
+			return false;
 		}
-		return false;
+		// WARNING ... what else?
+		return true;
 	}
 }

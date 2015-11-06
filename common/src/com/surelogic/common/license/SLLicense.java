@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import com.surelogic.Immutable;
 import com.surelogic.NonNull;
+import com.surelogic.Nullable;
 import com.surelogic.Unique;
 import com.surelogic.Vouch;
 import com.surelogic.common.i18n.I18N;
@@ -50,6 +51,39 @@ public final class SLLicense {
   }
 
   /**
+   * The email of the license holder.
+   */
+  @Nullable
+  private final String f_email;
+
+  /**
+   * Gets the email of the license holder.
+   * 
+   * @return the email of the license holder, or {@code null} if unknown.
+   */
+  @Nullable
+  public String getEmail() {
+    return f_email;
+  }
+
+  /**
+   * The company of the license holder.
+   */
+  @Nullable
+  private final String f_company;
+
+  /**
+   * Gets the company provided by the license holder.
+   * 
+   * @return the company provided by the license holder, or {@code null} if
+   *         none.
+   */
+  @Nullable
+  public String getCompany() {
+    return f_company;
+  }
+
+  /**
    * The name of the product being licensed. May not be <tt>null</tt>.
    */
   @NonNull
@@ -88,18 +122,22 @@ public final class SLLicense {
    */
   @Vouch("Immutable")
   @Unique
-  @NonNull
+  @Nullable
   private final Date f_installBeforeDate;
 
   /**
    * Gets installation deadline, or install before date, for this license.
    * Installations and activations after this date will fail.
    * 
-   * @return the non-<tt>null</tt> installation deadline for this license.
+   * @return the installation deadline for this license, or <tt>null</tt> to
+   *         indicate no deadline.
    */
-  @NonNull
+  @Nullable
   public Date getInstallBeforeDate() {
-    return new Date(f_installBeforeDate.getTime());
+    if (f_installBeforeDate == null)
+      return null;
+    else
+      return new Date(f_installBeforeDate.getTime());
   }
 
   /**
@@ -154,21 +192,28 @@ public final class SLLicense {
   }
 
   /**
-   * Constructs a new SureLogic license.
+   * Constructs a new SureLogic license with a random identity via
+   * {@link UUID#randomUUID()}.
    * 
-   * @param uuid
-   *          a non-<tt>null</tt> {@link UUID} for the license.
    * @param holder
-   *          a non-<tt>null</tt> name of the license holder.
+   *          a non-<tt>null</tt> name of the license holder. Limited to 100
+   *          characters.
+   * @param email
+   *          the email of the license holder, or {@code null} if not known.
+   *          Limited to 254 characters.
+   * @param company
+   *          the company provided by the license holder, or {@code null} if
+   *          none. Limited to 100 characters.
    * @param product
-   *          a non-<tt>null</tt> name of the product licensed.
+   *          the product to be licensed.
    * @param durationInDays
    *          the license duration in days from installation until expiration or
    *          renewal. This value must be greater than one.
    * @param installBeforeDate
-   *          the non-<tt>null</tt> installation deadline for this license.
+   *          the installation deadline for this license, may be {@code null} to
+   *          indicate no deadline.
    * @param type
-   *          a non-<tt>null</tt> type for the license.
+   *          type of license.
    * @param maxActive
    *          the number of active installations allowed before an attempted
    *          installation fails. This value must be greater than zero.
@@ -177,19 +222,70 @@ public final class SLLicense {
    *          {@code false} otherwise.
    * 
    * @throws IllegalArgumentException
-   *           if any of the parameters are null that should not be.
+   *           if any of the parameters are {@code null} that should not be or
+   *           if the license is {@link SLLicenseType#PERPETUAL} and no net
+   *           check is required (which is not allowed).
    */
-  public SLLicense(final @NonNull UUID uuid, final @NonNull String holder, final @NonNull SLLicenseProduct product,
-      final int durationInDays, final @NonNull @Unique Date installBeforeDate, final @NonNull SLLicenseType type,
-      final int maxActive, final boolean performNetCheck) {
+  public SLLicense(final @NonNull String holder, @Nullable final String email, @Nullable final String company,
+      final @NonNull SLLicenseProduct product, final int durationInDays, final @Nullable @Unique Date installBeforeDate,
+      final @NonNull SLLicenseType type, final int maxActive, final boolean performNetCheck) {
+    this(UUID.randomUUID(), holder, email, company, product, durationInDays, installBeforeDate, type, maxActive, performNetCheck);
+  }
+
+  /**
+   * Constructs a new SureLogic license.
+   * 
+   * @param uuid
+   *          a non-<tt>null</tt> {@link UUID} for the license.
+   * @param holder
+   *          a non-<tt>null</tt> name of the license holder. Limited to 100
+   *          characters.
+   * @param email
+   *          the email of the license holder, or {@code null} if not known.
+   *          Limited to 254 characters.
+   * @param company
+   *          the company provided by the license holder, or {@code null} if
+   *          none. Limited to 100 characters.
+   * @param product
+   *          the product to be licensed.
+   * @param durationInDays
+   *          the license duration in days from installation until expiration or
+   *          renewal. This value must be greater than one.
+   * @param installBeforeDate
+   *          the installation deadline for this license, may be {@code null} to
+   *          indicate no deadline.
+   * @param type
+   *          type of license.
+   * @param maxActive
+   *          the number of active installations allowed before an attempted
+   *          installation fails. This value must be greater than zero.
+   * @param performNetCheck
+   *          {@code true} if net checks are required for the license,
+   *          {@code false} otherwise.
+   * 
+   * @throws IllegalArgumentException
+   *           if any of the parameters are {@code null} that should not be or
+   *           too long. Also if the license is {@link SLLicenseType#PERPETUAL}
+   *           and no net check is required (which is not allowed).
+   */
+  public SLLicense(@NonNull UUID uuid, @NonNull String holder, @Nullable String email, @Nullable String company,
+      @NonNull SLLicenseProduct product, int durationInDays, @Nullable @Unique Date installBeforeDate, @NonNull SLLicenseType type,
+      int maxActive, boolean performNetCheck) {
     if (uuid == null) {
       throw new IllegalArgumentException(I18N.err(44, "uuid"));
     }
     f_uuid = uuid;
-    if (holder == null) {
+    if (holder == null)
       throw new IllegalArgumentException(I18N.err(44, "holder"));
-    }
+    else if (holder.length() > 100)
+      throw new IllegalArgumentException(I18N.err(355, "holder", 100, holder.length()));
     f_holder = holder;
+    if (email != null && email.length() > 254)
+      throw new IllegalArgumentException(I18N.err(355, "email", 254, email.length()));
+    f_email = email;
+    if (company != null && company.length() > 100)
+      throw new IllegalArgumentException(I18N.err(355, "company", 100, company.length()));
+    f_company = company;
     if (product == null) {
       throw new IllegalArgumentException(I18N.err(44, "product"));
     }
@@ -198,9 +294,6 @@ public final class SLLicense {
       throw new IllegalArgumentException(I18N.err(196, durationInDays));
     }
     f_durationInDays = durationInDays;
-    if (installBeforeDate == null) {
-      throw new IllegalArgumentException(I18N.err(44, "installBeforeDate"));
-    }
     f_installBeforeDate = installBeforeDate;
     if (type == null) {
       throw new IllegalArgumentException(I18N.err(44, "type"));

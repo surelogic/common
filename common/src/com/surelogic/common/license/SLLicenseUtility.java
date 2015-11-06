@@ -7,15 +7,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.atomic.AtomicReference;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableSet;
 import com.surelogic.NonNull;
 import com.surelogic.Nullable;
-import com.surelogic.Vouch;
 import com.surelogic.common.SLUtility;
+import com.surelogic.common.feedback.Counts;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.jobs.SLJob;
 import com.surelogic.common.jobs.SLProgressMonitor;
@@ -25,6 +25,59 @@ import com.surelogic.common.jobs.SLStatus;
  * A utility to help manage licenses to use SureLogic tools.
  */
 public final class SLLicenseUtility {
+
+  /**
+   * The installed tool release date or {@code null} if it cannot be determined.
+   */
+  @Nullable
+  private static final AtomicReference<Date> f_toolReleaseDate = new AtomicReference<>(null);
+
+  /**
+   * Gets the release date for the installed SureLogic tools, or todays date if
+   * unknown.
+   * 
+   * @return the release date for the installed SureLogic tools, or {@code null}
+   *         unknown.
+   */
+  @Nullable
+  public static Date getToolReleaseDateOrNull() {
+    return f_toolReleaseDate.get();
+  }
+
+  /**
+   * Gets a string version of the release date for the installed SureLogic
+   * tools, or <tt>(in development -- not a release)</tt> if what is installed
+   * is not a release.
+   * 
+   * @return a string version of the release date for the installed SureLogic
+   *         tools, or <tt>(in development -- not a release)</tt> if what is
+   *         installed is not a release.
+   */
+  @NonNull
+  public static String getToolReleaseDateAsString() {
+    final Date release = getToolReleaseDateOrNull();
+    if (release != null)
+      return SLUtility.toStringDay(release);
+    else
+      return "(in development -- not a release)";
+  }
+
+  /**
+   * Sets the release date for the SureLogic tools.
+   * <p>
+   * <b>Implementation note:</b> This method should only be invoked from the
+   * <tt>start</tt> method within the <tt>Activator</tt> in the
+   * <i>common-core-eclipse</i> project. This is because the <i>common</i>
+   * project cannot query Eclipse for the needed information, so the
+   * <i>common-core-eclipse</i> project does it and invokes this method with the
+   * value.
+   * 
+   * @param value
+   *          the release date for the SureLogic tools.
+   */
+  public static void setToolReleaseDate(@Nullable Date value) {
+    f_toolReleaseDate.set(value);
+  }
 
   private static final Set<ILicenseObserver> f_observers = new CopyOnWriteArraySet<>();
 
@@ -50,42 +103,6 @@ public final class SLLicenseUtility {
     f_observers.remove(observer);
   }
 
-  @Vouch("ThreadSafe")
-  private static final Map<SLLicenseProduct, Date> f_knownReleaseDates = new ConcurrentHashMap<>();
-
-  /**
-   * Sets the release date for the passed product. This method would typically
-   * be called from the Eclipse activator for that product.
-   * 
-   * @param product
-   *          a product.
-   * @param value
-   *          the release date for the running version of <tt>product</tt>.
-   */
-  public static void setReleaseDateFor(SLLicenseProduct product, Date value) {
-    if (product == null || value == null)
-      return;
-    f_knownReleaseDates.put(product, new Date(value.getTime()));
-  }
-
-  /**
-   * Gets the release date for the passed product. If the release date is not
-   * known then today's date is returned.
-   * 
-   * @param product
-   *          a product.
-   * @return the release date for <tt>product</tt> if it is known, today's date
-   *         otherwise.
-   */
-  public static Date getReleaseDateFor(SLLicenseProduct product) {
-    if (product != null) {
-      final Date releaseDate = f_knownReleaseDates.get(product);
-      if (releaseDate != null)
-        return new Date(releaseDate.getTime());
-    }
-    return new Date();
-  }
-
   /**
    * Checks if a license that allows use of the passed product is installed.
    * <p>
@@ -101,9 +118,14 @@ public final class SLLicenseUtility {
    * @return {@code true} if a license exists that allows use of
    *         <tt>product</tt>, {@code false} otherwise.
    */
-  public static boolean validate(@NonNull final SLLicenseProduct product) {
+  private static boolean validate(@NonNull final SLLicenseProduct product) {
     if (product == null)
       throw new IllegalArgumentException(I18N.err(44, "product"));
+    /*
+     * Just count this, we really don't care if the check fails for use
+     * feedback.
+     */
+    Counts.getInstance().increment(product.toString());
 
     final ImmutableSet<String> myMacAddresses = SLUtility.getMacAddressesOfThisMachine();
 
@@ -226,11 +248,13 @@ public final class SLLicenseUtility {
    *          the MAC addresses of this machine, used to prevent moving
    *          activated license files. May be empty (or {@code null} which means
    *          empty).
+   * @param eclipseVersion
+   *          the Eclipse version or {@code null} if unknown.
    * @throws Exception
    *           should anything go wrong.
    */
   public static void tryToActivateRenewLicenses(@Nullable List<PossiblyActivatedSLLicense> licenses,
-      @Nullable Iterable<String> macAddresses) throws Exception {
+      @Nullable Iterable<String> macAddresses, @Nullable String eclipseVersion) throws Exception {
     if (licenses == null || licenses.isEmpty())
       return;
     if (macAddresses == null)
@@ -249,31 +273,42 @@ public final class SLLicenseUtility {
       }
     }
 
+    if (eclipseVersion == null)
+      eclipseVersion = "unknown";
+
     /*
      * Build the message to send to surelogic.com.
      */
     final String l = SLLicensePersistence.toSignedHexString(licenses, true);
     final Map<String, String> param = new HashMap<>();
-    param.put(I18N.msg("common.serviceability.licenserequest.req"), I18N.msg("common.serviceability.licenserequest.req.actrew"));
-    param.put(I18N.msg("common.serviceability.licenserequest.license"), l);
-    param.put(I18N.msg("common.serviceability.licenserequest.macAddresses"), Joiner.on(',').skipNulls().join(macAddresses));
-    final URL url = new URL(I18N.msg("common.serviceability.licenserequest.url", SLUtility.SERVICEABILITY_URL));
+    param.put(I18N.msg("web.check.param.req"), I18N.msg("web.check.param.req.value.actrew"));
+    param.put(I18N.msg("web.check.param.license"), l);
+    param.put(I18N.msg("web.check.param.macAddresses"), Joiner.on(',').skipNulls().join(macAddresses));
+    param.put(I18N.msg("web.check.param.os"), System.getProperty("os.name", "unknown"));
+    param.put(I18N.msg("web.check.param.java"), System.getProperty("java.version", "unknown"));
+    param.put(I18N.msg("web.check.param.eclipse"), eclipseVersion);
+    param.put(I18N.msg("web.check.param.counts"), Counts.getInstance().toString());
+    final URL url = new URL(I18N.msg("web.netcheck.url", SLUtility.SERVICEABILITY_SERVER));
     final String response = SLUtility.sendPostToUrl(url, param);
     final List<SignedSLLicenseNetCheck> licenseNetChecks = SLLicensePersistence.readLicenseNetChecksFromString(response);
-    final String[] rLines = SLUtility.separateLines(response);
+    final ArrayList<String> rLines = SLUtility.separateLines(response);
 
     SLLicenseManager.getInstance().activateOrRenew(licenseNetChecks);
+    Counts.getInstance().clear();
 
+    /*
+     * Note any issues reported, but if we got this far the server did respond.
+     */
     boolean problemReportedByServer = false;
     final StringBuilder b = new StringBuilder();
     for (final String line : rLines) {
-      if (line.startsWith(I18N.msg("common.serviceability.licenserequest.resp.failure.prefix"))) {
-        if (problemReportedByServer) {
-          b.append('\n').append(line);
-        } else {
-          problemReportedByServer = true;
-          b.append(I18N.err(208)).append('\n').append(line);
-        }
+      if (line.startsWith(I18N.msg("web.check.response.failure.prefix"))) {
+        problemReportedByServer = true;
+        b.append(I18N.err(208));
+      }
+      // add in all lines after we note the problem
+      if (problemReportedByServer) {
+        b.append('\n').append(line);
       }
     }
     if (problemReportedByServer) {
@@ -282,7 +317,6 @@ public final class SLLicenseUtility {
       throw new Exception(I18N.err(209, licenses));
     }
 
-    SLLicenseManager.getInstance().activateOrRenew(licenseNetChecks);
   }
 
   /**
@@ -294,7 +328,8 @@ public final class SLLicenseUtility {
    * @throws Exception
    *           should anything go wrong.
    */
-  public static void tryToUninstallLicenses(final List<PossiblyActivatedSLLicense> licenses) throws Exception {
+  public static void tryToUninstallLicenses(final List<PossiblyActivatedSLLicense> licenses, @Nullable String eclipseVersion)
+      throws Exception {
     if (licenses.isEmpty()) {
       return;
     }
@@ -325,10 +360,15 @@ public final class SLLicenseUtility {
      */
     final String l = SLLicensePersistence.toSignedHexString(notifyList, true);
     final Map<String, String> param = new HashMap<>();
-    param.put(I18N.msg("common.serviceability.licenserequest.req"), I18N.msg("common.serviceability.licenserequest.req.remove"));
-    param.put(I18N.msg("common.serviceability.licenserequest.license"), l);
-    final URL url = new URL(I18N.msg("common.serviceability.licenserequest.url", SLUtility.SERVICEABILITY_URL));
+    param.put(I18N.msg("web.check.param.req"), I18N.msg("web.check.param.req.value.remove"));
+    param.put(I18N.msg("web.check.param.license"), l);
+    param.put(I18N.msg("web.check.param.os"), System.getProperty("os.name", "unknown"));
+    param.put(I18N.msg("web.check.param.java"), System.getProperty("java.version", "unknown"));
+    param.put(I18N.msg("web.check.param.eclipse"), eclipseVersion);
+    param.put(I18N.msg("web.check.param.counts"), Counts.getInstance().toString());
+    final URL url = new URL(I18N.msg("web.netcheck.url", SLUtility.SERVICEABILITY_SERVER));
     SLUtility.sendPostToUrl(url, param);
+    Counts.getInstance().clear();
   }
 
   private SLLicenseUtility() {

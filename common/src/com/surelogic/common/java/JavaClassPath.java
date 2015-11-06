@@ -15,7 +15,11 @@ public class JavaClassPath<PS extends JavaProjectSet<?>> implements IJavacClassP
   // Key: project, qualified name
   // TODO not thread-safe?
   private final Map<Pair<String, String>, IJavaFile> classToFile = new HashMap<>();
-
+  private final Set<String> warningsForPackages = new HashSet<>();
+  
+  private final Map<String, IJavaFile> globalClassToFile = new HashMap<>();
+  private final Set<String> potentiallyDuplicatedClassesAcrossProjects = new HashSet<>();
+  
   protected final PS projects;
   /**
    * Only use binary; ignore sources
@@ -45,7 +49,7 @@ public class JavaClassPath<PS extends JavaProjectSet<?>> implements IJavacClassP
   /*
    * Checking for a duplicate effectively simulates searching the classpath
    */
-  public final void map(String destProj, IJavaFile file) {
+  public final void map(final String destProj, final IJavaFile file) {
     if (useBinaries && file.isSource()) {
       // System.out.println("Ignoring "+destProj+" :
       // "+file.getQualifiedName());
@@ -65,10 +69,34 @@ public class JavaClassPath<PS extends JavaProjectSet<?>> implements IJavacClassP
       classToFile.put(key, file);
     } else {
       final IJavaFile old = classToFile.get(key);
-      SLLogger.getLogger().warning(file+" overrides "+old+" for type '"+file.getQualifiedName()+"' in "+destProj);
+      if (!old.equals(file) && canGenerateWarning(file)) {    	
+        SLLogger.getLogger().info(file+" overrides "+old+" for type '"+file.getQualifiedName()+"' in "+destProj);
+      }
+    }
+    // TODO use packages instead to reduce table size?
+    final IJavaFile old = globalClassToFile.put(file.getQualifiedName(), file);
+    if (old != null && !old.equals(file)) {
+    	potentiallyDuplicatedClassesAcrossProjects.add(file.getQualifiedName());
     }
   }
+  
+  protected final boolean generateMD5Hash(String qname) {
+	  return potentiallyDuplicatedClassesAcrossProjects.contains(qname);
+  }
 
+  /**
+   * Marks true if not already generated
+   */
+  private boolean canGenerateWarning(IJavaFile file) {
+	String key = file.toString();
+	int lastSlash = key.lastIndexOf(File.separatorChar);
+	if (lastSlash > 0) {
+		key = key.substring(0, lastSlash);
+	}
+	// Returning true if added
+	return warningsForPackages.add(key);
+  }
+  
   protected final boolean isMapped(String destProj, String qname) {
     /*
      * if ("com.surelogic.common.ref.Decl".equals(qname)) { System.out.println(

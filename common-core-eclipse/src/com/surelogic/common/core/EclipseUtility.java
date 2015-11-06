@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -37,14 +38,15 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.core.runtime.IContributor;
+import org.eclipse.core.runtime.IExtension;
+import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.Plugin;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.IJobManager;
 import org.eclipse.core.runtime.jobs.Job;
@@ -53,9 +55,11 @@ import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences.IPreferenceChangeListener;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.osgi.framework.Bundle;
+import org.osgi.framework.Version;
 import org.osgi.service.prefs.BackingStoreException;
 
 import com.surelogic.NonNull;
+import com.surelogic.Nullable;
 import com.surelogic.Utility;
 import com.surelogic.common.FileUtility;
 import com.surelogic.common.SLUtility;
@@ -66,8 +70,6 @@ import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.jobs.AggregateSLJob;
 import com.surelogic.common.jobs.SLJob;
 import com.surelogic.common.jobs.SLStatus;
-import com.surelogic.common.license.SLLicenseProduct;
-import com.surelogic.common.license.SLLicenseUtility;
 import com.surelogic.common.logging.SLLogger;
 
 @Utility
@@ -368,8 +370,11 @@ public class EclipseUtility {
    */
   public static File getInstallationDirectoryOf(final String pluginId) {
     try {
-      URL commonPathURL = getInstallationURLOf(pluginId);
-      File result = new File(commonPathURL.toURI());
+      final Bundle bundle = Platform.getBundle(pluginId);
+      if (bundle == null) {
+        throw new IllegalArgumentException(I18N.err(343, pluginId));
+      }
+      File result = FileLocator.getBundleFile(bundle);
       return result;
     } catch (Exception e) {
       throw new IllegalArgumentException(I18N.err(344, pluginId), e);
@@ -389,14 +394,10 @@ public class EclipseUtility {
    *           identifier, or there is some problem determining the URL.
    */
   public static URL getInstallationURLOf(final String pluginId) {
-    final Bundle bundle = Platform.getBundle(pluginId);
-    if (bundle == null) {
-      throw new IllegalArgumentException(I18N.err(343, pluginId));
-    }
+    final File f = getInstallationDirectoryOf(pluginId);
     try {
-      URL result = FileLocator.resolve(bundle.getEntry("/"));
-      return result;
-    } catch (Exception e) {
+      return f.toURI().toURL();
+    } catch (MalformedURLException e) {
       throw new IllegalArgumentException(I18N.err(344, pluginId), e);
     }
   }
@@ -537,18 +538,6 @@ public class EclipseUtility {
   @NonNull
   public static File getJSureDataDirectory() {
     return EclipseUtility.getWorkspaceRelativeAsFile(FileUtility.JSURE_DATA_PATH_FRAGMENT);
-  }
-
-  /**
-   * Gets the {@link File} for the JSecure data directory.
-   * 
-   * @return the JSecure data directory.
-   * @throws Exception
-   *           if something goes wrong.
-   */
-  @NonNull
-  public static File getJSecureDataDirectory() {
-    return EclipseUtility.getWorkspaceRelativeAsFile(FileUtility.JSECURE_DATA_PATH_FRAGMENT);
   }
 
   /**
@@ -700,146 +689,217 @@ public class EclipseUtility {
     }
   }
 
-  private static final String BUNDLE_VERSION = "Bundle-Version";
-  private static final String DOT_QUALIFIER = ".qualifier";
-
   /**
-   * Gets the version of the passed activator as read from its bundle headers.
+   * Constructs an integer value from the passed version that can be compared
+   * using simple integer comparisons. We use 10 bits for each portion of the
+   * version.
    * <p>
-   * This method is a bit of a hack in the sense that a complete version number
-   * is only returned outside of development, i.e., in a real release. So for a
-   * real release expect a string similar to
+   * Comparisons should only be done to other integer values constructed by this
+   * method.
    * 
-   * <pre>
-   * 3.1.1.201001151440
-   * </pre>
-   * 
-   * However, in a development or meta-Eclipse a string similar to
-   * <tt>3.1.1.qualifier</tt> is returned from the bundle headers which we
-   * truncate to
-   * 
-   * <pre>
-   * 3.1.1
-   * </pre>
-   * 
-   * @param activator
-   *          a plug-in to query.
-   * @return a string that represents the version of the passed activator.
+   * @param value
+   *          a version.
+   * @return a comparable integer value.
+   * @throws IllegalArgumentException
+   *           if value is null.
    */
-  public static String getVersion(final Plugin activator) {
-    final String rawVersionS = (String) Activator.getDefault().getBundle().getHeaders().get(BUNDLE_VERSION);
-    if (rawVersionS.endsWith(DOT_QUALIFIER)) {
-      return rawVersionS.substring(0, rawVersionS.length() - DOT_QUALIFIER.length());
-    }
-    return rawVersionS;
+  public static int getCompariableValueFor(@NonNull Version value) {
+    if (value == null)
+      throw new IllegalArgumentException(I18N.err(44, "value"));
+    int result = value.getMajor() << 20;
+    result += value.getMinor() << 10;
+    result += value.getMicro();
+    return result;
   }
 
   /**
-   * Gets the major, minor, and dot version of the passed activator as read from
-   * its bundle headers.
-   * <p>
-   * So for a real release, such as <tt>3.1.1.201001151440</tt>, this call
-   * returns <tt>3.1.1</tt>.
-   * <p>
-   * However, in a development or meta-Eclipse the complete version string
-   * similar to <tt>12.45.6.qualifier</tt>, this call again returns
-   * <tt>12.45.6</tt>.
-   * 
-   * @param activator
-   *          a plug-in to query.
-   * @return a string that represents the major, minor, and dot version of the
-   *         passed activator, such as <tt>4.4.2</tt>.
-   */
-  public static String getMajorMinorDotVersion(final Plugin activator) {
-    String result = getVersion(activator);
-    int counter = 0;
-    int endIndex = 0;
-    for (int index = 0; index < result.length(); index++) {
-      if (result.charAt(index) == '.') {
-        counter++;
-        // we need to save the position of the third period
-        if (counter == 3)
-          endIndex = index;
-      }
-    }
-    if (counter < 3)
-      return result;
-    else
-      return result.substring(0, endIndex);
-  }
-
-  /**
-   * Gets the date that the version of the passed activator was released or
-   * today's date.
-   * <p>
-   * This method uses {@link #getVersion(AbstractUIPlugin)} to obtain a version
-   * string similar to
+   * Creates a string from the passed version that contains the major, minor,
+   * and micro values separated by a period. The result should look something
+   * like
    * 
    * <pre>
-   * 3.1.1.201001151440
+   * 5.7.40
    * </pre>
    * 
-   * The <tt>"20100115"</tt> portion of the string (after the last <tt>"."</tt>)
-   * is then parsed as a date using the pattern <tt>"yyyyMMdd"</tt>.
-   * 
-   * @param activator
-   *          a plug-in to query.
-   * @return the date the version was released or today's date.
+   * @param value
+   *          a version.
+   * @return a string of the version, such as <tt>5.7.4</tt>
+   * @throws IllegalArgumentException
+   *           if value is null.
    */
-  public static Date getReleaseDate(final Plugin activator) {
-    final String rawVersionS = (String) Activator.getDefault().getBundle().getHeaders().get(BUNDLE_VERSION);
-    if (rawVersionS.endsWith(DOT_QUALIFIER))
-      return new Date();
-
-    final int lastDotIndex = rawVersionS.lastIndexOf('.');
-    if (lastDotIndex == -1)
-      return new Date();
-    if (lastDotIndex + 9 > rawVersionS.length())
-      return new Date();
-
-    final String dateS = rawVersionS.substring(lastDotIndex + 1, lastDotIndex + 9);
-
-    final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-    try {
-      final Date result = dateFormat.parse(dateS);
-      return result;
-    } catch (ParseException ignore) {
-    }
-    return new Date();
+  public static String toString(@NonNull Version value) {
+    if (value == null)
+      throw new IllegalArgumentException(I18N.err(44, "value"));
+    return value.getMajor() + "." + value.getMinor() + "." + value.getMicro();
   }
 
   /**
-   * Constructs an Eclipse job to lookup the release date of the passed plug-in
-   * and set it as the product release date of the passed product.
+   * Gets the simple bundle version for the passed bundle, or {@code null} if
+   * none. In development and production the result should look something like
    * 
-   * @param product
-   *          a product.
-   * @param activator
-   *          a plug-in.
-   * @return an Eclipse job.
+   * <pre>
+   * 5.7.0
+   * </pre>
+   * 
+   * @param bundle
+   *          an Eclipse bundle (usually a plug-in)
+   * @return the simple bundle version for the passed bundle, or {@code null} if
+   *         none.
    */
-  public static Job getProductReleaseDateJob(final SLLicenseProduct product, final Plugin activator) {
-    if (product == null)
-      throw new IllegalArgumentException(I18N.err(44, "product"));
-    if (activator == null)
-      throw new IllegalArgumentException(I18N.err(44, "activator"));
+  @Nullable
+  public static String getBundleSimpleVersionOrNull(@Nullable Bundle bundle) {
+    String result = null;
+    if (bundle != null) {
+      final Version v = bundle.getVersion();
+      if (v != null && v != Version.emptyVersion)
+        result = toString(v);
+    }
+    return result;
+  }
 
-    final Job job = new Job("Looking up " + product + " release date") {
-      @Override
-      protected IStatus run(IProgressMonitor monitor) {
-        monitor.beginTask(getName(), 2);
-        try {
-          Date releaseDate = getReleaseDate(activator);
-          monitor.worked(1);
-          SLLicenseUtility.setReleaseDateFor(product, releaseDate);
-          monitor.worked(1);
-        } finally {
-          monitor.done();
+  /**
+   * Gets the full bundle version for the passed bundle, or {@code null} if
+   * none. In a production release the result should look something like
+   * 
+   * <pre>
+   * 5.6.1.201509151131
+   * </pre>
+   * 
+   * in development it will look something like
+   * 
+   * <pre>
+   * 5.7.0.qualifier
+   * </pre>
+   * 
+   * @param bundle
+   *          an Eclipse bundle (usually a plug-in)
+   * @return the full bundle version for the passed bundle, or {@code null} if
+   *         none.
+   */
+  @Nullable
+  public static String getBundleVersionOrNull(@Nullable Bundle bundle) {
+    String result = null;
+    if (bundle != null) {
+      result = bundle.getHeaders().get("Bundle-Version");
+    }
+    return result;
+  }
+
+  /**
+   * Gets the version of Eclipse, such as <tt>"4.4.0.20140612-0500"</tt>.
+   * Currently this method looks for the definition of the Eclipse product in
+   * the extension registry, and if that fails it uses the version of the
+   * org.eclipse.platform plug-in which should match.
+   * 
+   * @return the version of the Eclipse or <tt>unknown</tt> if the version
+   *         cannot be determined.
+   */
+  @NonNull
+  public static String getEclipseVersion() {
+    @Nullable
+    String result = null;
+    @NonNull
+    final String product = System.getProperty("eclipse.product", "org.eclipse.platform.ide");
+    final IExtensionPoint point = Platform.getExtensionRegistry().getExtensionPoint("org.eclipse.core.runtime.products");
+    if (point != null) {
+      final IExtension[] extensions = point.getExtensions();
+      if (extensions != null)
+        for (IExtension ext : extensions) {
+          if (product.equals(ext.getUniqueIdentifier())) {
+            final IContributor contributor = ext.getContributor();
+            if (contributor != null) {
+              Bundle bundle = Platform.getBundle(contributor.getName());
+              if (bundle != null) {
+                result = bundle.getVersion().toString();
+              }
+            }
+          }
         }
-        return Status.OK_STATUS;
+    }
+    if (result == null) // if all of the above didn't work
+      result = getBundleVersionOrNull(Platform.getBundle("org.eclipse.platform"));
+    if (result == null)
+      result = "unknown";
+    return result;
+  }
+
+  /**
+   * Gets the simple SureLogic tools version. In development and production the
+   * result should look something like
+   * 
+   * <pre>
+   * 5.6.1
+   * </pre>
+   * 
+   * @return the simple SureLogic tools version.
+   * 
+   * @throws IllegalStateException
+   *           if the lookup fails.
+   */
+  @NonNull
+  public static String getSureLogicToolsSimpleVersion() {
+    final String result = getBundleSimpleVersionOrNull(Platform.getBundle(SLUtility.COMMON_PLUGIN_ID));
+    if (result == null)
+      throw new IllegalStateException(I18N.err(371));
+    return result;
+  }
+
+  /**
+   * Gets the full SureLogic tools version. In a production release the result
+   * should look something like
+   * 
+   * <pre>
+   * 5.6.1.201509151131
+   * </pre>
+   * 
+   * in development it will look something like
+   * 
+   * <pre>
+   * 5.7.0.qualifier
+   * </pre>
+   * 
+   * @return the full SureLogic tools version.
+   * 
+   * @throws IllegalStateException
+   *           if the lookup fails.
+   */
+  @NonNull
+  public static String getSureLogicToolsVersion() {
+    final String result = getBundleVersionOrNull(Platform.getBundle(SLUtility.COMMON_PLUGIN_ID));
+    if (result == null)
+      throw new IllegalStateException(I18N.err(371));
+    return result;
+  }
+
+  /**
+   * Gets the release date of the installed version of the SureLogic tools or
+   * {@code null} if this is unknown. The date is unknown, for example, in
+   * development.
+   * 
+   * @return the release date of the installed version of the SureLogic tools or
+   *         {@code null} if this is unknown.
+   */
+  @Nullable
+  public static Date getSureLogicToolsReleaseDateOrNull() {
+    final String rawVersionS = getSureLogicToolsVersion();
+    // are we in development?
+    if (!rawVersionS.endsWith(".qualifier")) {
+      final int lastDotIndex = rawVersionS.lastIndexOf('.');
+      if (lastDotIndex == -1)
+        return new Date();
+      if (lastDotIndex + 9 > rawVersionS.length())
+        return new Date();
+
+      final String dateS = rawVersionS.substring(lastDotIndex + 1, lastDotIndex + 9);
+
+      final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+      try {
+        final Date result = dateFormat.parse(dateS);
+        return result;
+      } catch (ParseException ignore) {
       }
-    };
-    return job;
+    }
+    return null;
   }
 
   public static IProject unzipToWorkspace(final File projectZip) throws CoreException, IOException {

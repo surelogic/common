@@ -27,10 +27,8 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IProduct;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IAccessRule;
 import org.eclipse.jdt.core.IClassFile;
@@ -259,26 +257,6 @@ public final class JDTUtility {
   }
 
   /**
-   * This is a method that tries to read the Eclipse or RAD product version
-   * information so that it can be included in a report. The build id is also
-   * included if it is not {@code null}.
-   * 
-   * @return information about the Eclipse or RAD product version.
-   */
-  public static String getProductInfo() {
-    String result = "unknown";
-    final IProduct product = Platform.getProduct();
-    if (product != null) {
-      result = product.getName();
-    }
-    final String eclipseBuildId = System.getProperty("eclipse.buildId");
-    if (eclipseBuildId != null) {
-      result = result + " " + eclipseBuildId;
-    }
-    return result;
-  }
-
-  /**
    * Gets a reference to the Eclipse log file. This file is under the workspace
    * in <tt>.metadata/.log</tt>.
    * <p>
@@ -320,13 +298,13 @@ public final class JDTUtility {
   }
 
   public static int getMajorJavaSourceVersionFromJVM() {
-	final String javaVersion = System.getProperty("java.version");
-	if (!javaVersion.startsWith("1.")) {
-		throw new IllegalStateException("Unknown Java version: "+javaVersion);
-	}
-	return Integer.parseInt(javaVersion.substring(2, 3));
+    final String javaVersion = System.getProperty("java.version");
+    if (!javaVersion.startsWith("1.")) {
+      throw new IllegalStateException("Unknown Java version: " + javaVersion);
+    }
+    return Integer.parseInt(javaVersion.substring(2, 3));
   }
-  
+
   /**
    * Gets the {@link ICompilationUnit} associated with the passed information or
    * {@code null} if neither can be found.
@@ -745,7 +723,8 @@ public final class JDTUtility {
               continue;
             }
             if (it.isClass() && node.getKind() == IDecl.Kind.CLASS || it.isInterface() && node.getKind() == IDecl.Kind.INTERFACE
-                || it.isEnum() && node.getKind() == IDecl.Kind.ENUM || it.isAnnotation() && node.getKind() == IDecl.Kind.ANNOTATION) {
+                || it.isEnum() && node.getKind() == IDecl.Kind.ENUM
+                || it.isAnnotation() && node.getKind() == IDecl.Kind.ANNOTATION) {
               if (node.getName().equals(it.getElementName())) {
                 current = it;
                 return true;
@@ -1178,7 +1157,7 @@ public final class JDTUtility {
 
   private static boolean noCompilationErrors(final IResource resource, final IProgressMonitor monitor) throws CoreException {
     final IMarker[] problems = resource.findMarkers(
-    // IMarker.PROBLEM,
+        // IMarker.PROBLEM,
         IJavaModelMarker.JAVA_MODEL_PROBLEM_MARKER, true, IResource.DEPTH_INFINITE);
 
     // check if any of these have a severity attribute that indicates an
@@ -1624,7 +1603,8 @@ public final class JDTUtility {
     }
   }
 
-  public static Collection<ICompilationUnit> modifiedCompUnits(final Map<IJavaProject, Date> times, final IProgressMonitor monitor) {
+  public static Collection<ICompilationUnit> modifiedCompUnits(final Map<IJavaProject, Date> times,
+      final IProgressMonitor monitor) {
     final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
     try {
       final Map<IJavaProject, Boolean> status = new HashMap<>();
@@ -1807,8 +1787,8 @@ public final class JDTUtility {
     for (IType t : icu.getTypes()) {
       qname = t.getFullyQualifiedName();
       /*
-       * if (qname.endsWith("SingleSignOnEntry")) {
-       * System.out.println("Looking at "+qname); }
+       * if (qname.endsWith("SingleSignOnEntry")) { System.out.println(
+       * "Looking at "+qname); }
        */
       final int flags = t.getFlags();
       if (Flags.isPublic(flags)) {

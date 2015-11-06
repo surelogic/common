@@ -84,7 +84,8 @@ public final class PossiblyActivatedSLLicense {
     } else {
       b.append(SLUtility.NO);
       final SLLicense license = getSignedSLLicense().getLicense();
-      if (license.getType() != SLLicenseType.PERPETUAL) {
+      final boolean deadline = license.getInstallBeforeDate() != null && license.getType() != SLLicenseType.PERPETUAL;
+      if (deadline) {
         final String date = SLUtility.toStringHumanDay(license.getInstallBeforeDate());
         b.append(" (activate before ").append(date).append(")");
       }
@@ -104,19 +105,19 @@ public final class PossiblyActivatedSLLicense {
   }
 
   /**
-   * Flags if this license is within two weeks of expiration. The type of the
+   * Flags if this license is within a week of expiration. The type of the
    * license is not taken into consideration just the date in the license net
    * check. This method returns {@code false} if the license has not been
    * activated.
    * 
-   * @return {@code true} if this license is within two weeks of expiration,
-   *         {@code false} otherwise.
+   * @return {@code true} if this license is close to expiration, {@code false}
+   *         otherwise.
    */
   public boolean isCloseToBeingExpired() {
     final Calendar cal = Calendar.getInstance();
-    cal.add(Calendar.DAY_OF_MONTH, 14);
-    final Date inTwoWeeks = cal.getTime();
-    return isExpiredOn(inTwoWeeks);
+    cal.add(Calendar.DAY_OF_MONTH, 7);
+    final Date inAWeek = cal.getTime();
+    return isExpiredOn(inAWeek);
   }
 
   /**
@@ -169,18 +170,22 @@ public final class PossiblyActivatedSLLicense {
   }
 
   /**
-   * Flags if this license is past its installation deadline.
+   * Flags if this license is past its installation deadline if it has one. if
+   * checking a perpetual license this method always returns {@code false}.
    * 
    * @return {@code true} if this license is past its installation deadline,
-   *         {@code false} otherwise.
+   *         {@code false} otherwise (does not have a deadline or this license
+   *         is perpetual).
    */
   public boolean isPastInstallBeforeDate() {
-    final Date now = new Date();
     final SLLicense license = f_license.getLicense();
-    if (license.getType() != SLLicenseType.PERPETUAL) {
-      final Date deadline = license.getInstallBeforeDate();
-      final boolean pastDeadline = now.after(deadline);
-      return pastDeadline;
+    final Date deadline = license.getInstallBeforeDate();
+    if (deadline != null) {
+      final Date now = new Date();
+      if (license.getType() != SLLicenseType.PERPETUAL) {
+        final boolean pastDeadline = now.after(deadline);
+        return pastDeadline;
+      }
     }
     return false;
   }
@@ -202,17 +207,15 @@ public final class PossiblyActivatedSLLicense {
   public boolean licensesUseOf(@NonNull final SLLicenseProduct product, @Nullable Iterable<String> macAddresses) {
     if (product == null)
       throw new IllegalArgumentException(I18N.err(44, "product"));
+    if (!product.isALicensedProduct())
+      throw new IllegalArgumentException(I18N.err(356, product));
+
+    if (!isActivated())
+      return false;
 
     if (macAddresses == null)
       macAddresses = ImmutableSet.of(); // null means empty
-
-    /*
-     * Some products don't require checks
-     */
-    if (!product.needsLicense())
-      return true;
-
-    if (!isActivated() || !getSignedSLLicenseNetCheck().getLicenseNetCheck().containsAtLeastOneMacAddress(macAddresses))
+    if (!getSignedSLLicenseNetCheck().getLicenseNetCheck().containsAtLeastOneMacAddress(macAddresses))
       return false;
 
     final SLLicense license = f_license.getLicense();
@@ -221,17 +224,17 @@ public final class PossiblyActivatedSLLicense {
     /*
      * USE licenses expire on the date specified.
      */
-    if (isExpired() && type == SLLicenseType.USE) {
+    if (isExpired() && type == SLLicenseType.USE)
       return false;
-    }
 
     /*
      * SUPPORT and PERPETUAL licenses allow use of versions released before
      * their expiration date or renewal deadline, respectively.
      */
     if (type == SLLicenseType.SUPPORT || type == SLLicenseType.PERPETUAL) {
-      final Date releaseDate = SLLicenseUtility.getReleaseDateFor(product);
-      if (isExpiredOn(releaseDate))
+      @Nullable
+      final Date releaseDate = SLLicenseUtility.getToolReleaseDateOrNull();
+      if (releaseDate != null && isExpiredOn(releaseDate))
         return false;
     }
 

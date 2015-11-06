@@ -14,6 +14,7 @@ public interface PersistenceConstants {
 	String DATE = "date";
 	
 	String PROJECT = "project";
+	String REAL = "real";
 	String NAME = "name";
 	String IS_EXPORTED = "is-exported";
 	String HAS_JLO = "contains-java-lang-object";
