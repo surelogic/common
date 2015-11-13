@@ -6,6 +6,7 @@ package com.surelogic.common.jobs.remote;
 import java.io.*;
 import java.net.*;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -60,9 +61,8 @@ public abstract class AbstractRemoteSLJob {
     }
     /*
      * out.println("java.system.class.loader = "+System.getProperty(
-     * "java.system.class.loader"
-     * ));out.println("System classloader = "+ClassLoader.
-     * getSystemClassLoader()); final String auxPathFile =
+     * "java.system.class.loader" ));out.println("System classloader = "
+     * +ClassLoader. getSystemClassLoader()); final String auxPathFile =
      * System.getProperty(SierraToolConstants.AUX_PATH_PROPERTY); if
      * (auxPathFile != null) { out.println(SierraToolConstants.AUX_PATH_PROPERTY
      * +"="+auxPathFile); File auxFile = new File(auxPathFile); if
@@ -110,7 +110,9 @@ public abstract class AbstractRemoteSLJob {
       } else {
         out.println("Got null status after the job returned");
       }
-      checkInput(br, mon, "Scanning complete (" + (end - start) + " ms)");
+      final long duration = end - start;
+      checkInput(br, mon, "Scanning complete in " + SLUtility.toStringDurationMS(duration, TimeUnit.MILLISECONDS) + " ("
+          + SLUtility.toStringHumanWithCommas(duration) + " ms)");
 
       if (socket == null) {
         out.println("No socket to close");
