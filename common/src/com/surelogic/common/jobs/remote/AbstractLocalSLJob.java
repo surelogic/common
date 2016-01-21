@@ -331,7 +331,7 @@ public abstract class AbstractLocalSLJob<C extends ILocalConfig> extends Abstrac
             }
             switch (cmd) {
             case TASK:
-              println(line);
+              remotePrintLn(line);
               final String task = st.nextToken();
               final String work = st.nextToken();
               // LOG.info(task+": "+work);
@@ -340,15 +340,15 @@ public abstract class AbstractLocalSLJob<C extends ILocalConfig> extends Abstrac
               mon.begin(Integer.valueOf(work.trim()));
               break;
             case SUBTASK:
-              println(line);
+              remotePrintLn(line);
               monitor.subTask(st.nextToken());
               break;
             case SUBTASK_DONE:
-              println(line);
+              remotePrintLn(line);
               monitor.subTaskDone();
               break;
             case WORK:
-              println(line);
+              remotePrintLn(line);
               try {
                 monitor.worked(Integer.valueOf(st.nextToken().trim()));
               } catch (NumberFormatException e) {
@@ -367,7 +367,7 @@ public abstract class AbstractLocalSLJob<C extends ILocalConfig> extends Abstrac
             case FAILED:
               printErr(Level.SEVERE, getRest(line));
               ExceptionalResult e = copyException(cmd, st.nextToken(), br);
-              println(e.nextLine);
+              remotePrintLn(e.nextLine);
               printErr(Level.SEVERE, "Terminating run");
               remoteVM.destroy();
               if (e.errorMsg.contains("FAILED:  java.lang.OutOfMemoryError")) {
@@ -378,17 +378,17 @@ public abstract class AbstractLocalSLJob<C extends ILocalConfig> extends Abstrac
               printErr(Level.WARNING, "Cancelling run: " + getRest(line));
               throw new CancellationException(getRest(line));
             case DONE:
-              println(line);
+              remotePrintLn(line);
               tasks.pop();
               /*
                * if (tasks.isEmpty()) { monitor.done(); break loop; }
                */
               break;
             default:
-              println(line);
+              remotePrintLn(line);
             } // end of switch
           } else {
-            println(line);
+        	remotePrintLn(line);
           } // end of check for more tokens
 
           numConsecutiveGCs = 0;
@@ -401,13 +401,13 @@ public abstract class AbstractLocalSLJob<C extends ILocalConfig> extends Abstrac
           } else {
             numConsecutiveGCs = 0;
           }
-          println(line);
+          remotePrintLn(line);
         } // end of check for ##
         line = br.readLine();
       }
       line = br.readLine();
       if (line != null) {
-        println(line);
+    	remotePrintLn(line);
       }
       // See if the process already died?
       int value = handleExitValue(remoteVM);
@@ -613,6 +613,10 @@ public abstract class AbstractLocalSLJob<C extends ILocalConfig> extends Abstrac
     }
   }
 
+  protected final void remotePrintLn(String msg) {
+	println("REMOTE: "+msg);
+  }
+  
   protected final void println(String msg) {
     if (verbose) {
       System.out.println(msg);

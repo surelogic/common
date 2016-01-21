@@ -99,11 +99,10 @@ implements IXmlResultListener, PersistenceConstants {
       Javac.getDefault().setPreference(IDEPreferences.DEFAULT_JRE, proj);
     }
     */
-
-    final P p = projects.add(new Config(proj, isReal, location == null ? null : new File(location), isExported, hasJLO));
+    final Config config = new Config(proj, isReal, location == null ? null : new File(location), isExported, hasJLO);
     final boolean isSource = "true".equals(e.getAttribute(Config.AS_SOURCE));
     if (isSource) {
-      p.getConfig().setAsSource();
+      config.setAsSource();
     }
 
     for (Entity nested : e.getReferences()) {
@@ -114,50 +113,57 @@ implements IXmlResultListener, PersistenceConstants {
         String qname = nested.getAttributeByAliasIfPossible(QNAME);
         String asBinary = nested.getAttribute(AS_BINARY);
         // System.out.println(proj + " has source: " + path);
-        p.getConfig().addFile(new JavaSourceFile(qname, new File(file), path, "true".equals(asBinary), p.getName()));
+        config.addFile(new JavaSourceFile(qname, new File(file), path, "true".equals(asBinary), config.getProject()));
       } else if (JAR.equals(name)) {
         String path = nested.getAttributeByAliasIfPossible(PATH);
         String orig = nested.getAttribute(ORIG_PATH);
         final boolean jarIsExported = "true".equals(nested.getAttribute(IS_EXPORTED));
         // System.out.println(proj + " has jar: " + path);
-        p.getConfig().addToClassPath(new JarEntry(p.getConfig(), new File(path), new File(orig), jarIsExported));
+        config.addToClassPath(new JarEntry(config, new File(path), new File(orig), jarIsExported));
       } else if (SRC.equals(name)) {
         String srcPath = nested.getAttribute(PATH);
         String binPath = nested.getAttribute(BIN_PATH);
         final boolean srcIsExported = "true".equals(nested.getAttribute(IS_EXPORTED));
         // System.out.println(proj + " has jar: " + path);
-        p.getConfig().addToClassPath(new SrcEntry(srcIsExported, p.getConfig(), srcPath, binPath));
+        config.addToClassPath(new SrcEntry(srcIsExported, config, srcPath, binPath));
       } else if (PROJECT.equals(name)) {
         String pRefName = nested.getAttribute(NAME);
         // System.out.println(proj + " has ref to project " + pRefName);
+        // Shortcut needed since we delay creating a project for this config until later
+        if (config.getProject().equals(pRefName)) {          
+          config.addToClassPath(config);
+          continue;
+        }
         final P pRef = projects.get(pRefName);
         if (pRef != null) {
-          p.getConfig().addToClassPath(pRef.getConfig());
+          config.addToClassPath(pRef.getConfig());
         } else {
           SLLogger.getLogger().warning("Couldn't find project named '" + pRefName + "'");
         }
       } else if (PACKAGE.equals(name)) {
         String pkg = nested.getAttribute(NAME);
-        p.getConfig().addPackage(pkg);
+        config.addPackage(pkg);
       } else if (OPTION.equals(name)) {
         String key = nested.getAttribute(NAME);
         String val = nested.getAttribute(VALUE);
         if (val == null) {
           // Nothing to do
         } else if ("false".equals(val) || "true".equals(val)) {
-          p.getConfig().setOption(key, Boolean.parseBoolean(val));
+          config.setOption(key, Boolean.parseBoolean(val));
         } else if (val.indexOf(',') >= 0) {
-          p.getConfig().setOption(key, val);
+          config.setOption(key, val);
         } else {
           try {
-            p.getConfig().setOption(key, Integer.parseInt(val));
+        	config.setOption(key, Integer.parseInt(val));
           } catch (NumberFormatException ex) {
-            p.getConfig().setOption(key, val);
+            config.setOption(key, val);
           }
         }
       } else
         throw new IllegalStateException("Unexpected entity: " + name);
     }
+    final P p = projects.add(config);
+    System.out.println("Created project "+p.getName()+" from XML");
   }
 
   @Override

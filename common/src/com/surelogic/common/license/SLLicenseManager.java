@@ -241,6 +241,7 @@ public final class SLLicenseManager {
 
   private void forThisMachineHelper() {
     final ImmutableSet<String> macAddresses = SLUtility.getMacAddressesOfThisMachine();
+    System.out.println("My MAC addresses : "+macAddresses);
     for (Iterator<PossiblyActivatedSLLicense> iterator = f_licenses.iterator(); iterator.hasNext();) {
       PossiblyActivatedSLLicense license = iterator.next();
       if (license.isActivated()

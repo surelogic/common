@@ -122,6 +122,8 @@ public class Config extends AbstractClassPathEntry {
     Object replaced = options.put(key, value);
     if (replaced != null && !replaced.equals(value)) {
       SLLogger.getLogger().warning(key + ": replaced " + replaced);
+    } else {
+      //System.out.println(name+": setting "+key+" to "+value);
     }
   }
 
