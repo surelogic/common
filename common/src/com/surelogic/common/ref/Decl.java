@@ -243,7 +243,7 @@ public abstract class Decl implements IDecl {
           anonymousType = TypeRef.JAVA_LANG_OBJECT;
         f_name = anonymousType.getCompact() + "$" + anonymousDeclPosition;
       } else {
-        if (!SLUtility.isValidJavaIdentifier(f_name) && !"[]".equals(f_name))
+        if (!SLUtility.isValidJavaIdentifier(f_name) && !ARRAY_BRACKETS.equals(f_name))
           throw new IllegalArgumentException(I18N.err(275, f_name));
       }
 
