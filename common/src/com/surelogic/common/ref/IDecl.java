@@ -40,6 +40,7 @@ import com.surelogic.common.SLUtility;
  */
 @Immutable(appliesTo = Part.Instance)
 public interface IDecl {
+  public static final String ARRAY_BRACKETS = "[]";
 
   /**
    * The kind of declaration.

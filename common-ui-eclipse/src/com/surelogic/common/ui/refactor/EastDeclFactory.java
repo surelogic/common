@@ -148,7 +148,7 @@ public class EastDeclFactory {
 		if (enclosingType != null) {
 			name = computeRelativeNameNoBounds(enclosingType.getErasure())+'.'+type.getName();
 		} else if (type.isArray()) {
-			return computeRelativeName(type.getComponentType())+"[]";
+			return computeRelativeName(type.getComponentType())+IDecl.ARRAY_BRACKETS;
 		} else {
 			name = type.getName();
 		}
