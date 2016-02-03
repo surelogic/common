@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 
 import com.surelogic.common.SLUtility;
+import com.surelogic.common.XUtil;
 import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.logging.SLLogger;
 
@@ -101,7 +102,9 @@ public final class ParallelArray<E> {
       }
       final String duration = SLUtility.toStringDurationMS(System.nanoTime() - start, TimeUnit.NANOSECONDS);
       if (ifInterrupted == null) {
-        SLLogger.getLogger().log(Level.INFO, I18N.err(350, duration));
+    	if (!XUtil.runJSureInMemory) {
+    	  SLLogger.getLogger().log(Level.INFO, I18N.err(350, duration));
+    	}
       } else {
         SLLogger.getLogger().log(Level.INFO, I18N.err(350, duration), ifInterrupted);
         ifInterrupted = null;

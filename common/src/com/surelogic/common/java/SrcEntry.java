@@ -48,7 +48,7 @@ public class SrcEntry extends AbstractClassPathEntry {
 				while (e.hasMoreElements()) {
 					ZipEntry ze = e.nextElement();
 					String name = ze.getName();
-					//System.out.println("Looking at "+name);
+					//System.out.println("SrcEntry Looking at "+name);
 					if (name.endsWith(".class")) {    			
 						final String qname = JarEntry.convertClassToQname(name);
 						//int lastDot  = qname.lastIndexOf('.');
