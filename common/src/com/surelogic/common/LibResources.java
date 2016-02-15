@@ -16,23 +16,41 @@ import com.surelogic.common.i18n.I18N;
 import com.surelogic.common.logging.SLLogger;
 
 public class LibResources {
+
   /**
-   * The name of the current promises Jar file.
+   * The current version of the promises Jar files. *
    * <p>
    * If you change this you <i>must</i> add the current name to the
-   * {@code PROMISES_JAR_OLD_VERSIONS} array.
+   * {@link #PROMISES_JAR_OLD_VERSIONS} and {@link #PROMISES8_JAR_OLD_VERSIONS}
+   * array.
    */
-  public static final String PROMISES_JAR = "promises-5.6.0.jar";
+  public static final String PROMISES_VERSION = "5.6.0";
+
+  /**
+   * The name of the current promises Jar file for Java 1.5 and above.
+   */
+  public static final String PROMISES_JAR = "promises-" + PROMISES_VERSION + ".jar";
+
+  /**
+   * The name of the current promises Jar file for Java 8 and above.
+   */
+  public static final String PROMISES8_JAR = "promises8-" + PROMISES_VERSION + ".jar";
 
   /**
    * Holds the names of the old library files that may need to be upgraded to
-   * the new promises Jar file.
+   * the new promises Jar file for Java 1.5 and above.
    */
   public static final String[] PROMISES_JAR_OLD_VERSIONS = { "promises.jar", "promises-3.0.0.jar", "promises-3.1.0.jar",
       "promises-3.2.0.jar", "promises-3.2.1.jar", "promises-3.2.2.jar", "promises-4.0.0.jar", "promises-4.0.1.jar",
       "promises-4.0.2.jar", "promises-4.3.0.jar", "promises-4.3.1.jar", "promises-4.3.3.jar", "promises-4.3.4.jar",
       "promises-4.4.0.jar", "promises-5.0.0.jar", "promises-5.1.0.jar", "promises-5.2.0.jar", "promises-5.5.0.jar",
       "promises-5.5.1.jar" };
+
+  /**
+   * Holds the names of the old library files that may need to be upgraded to
+   * the new promises Jar file for Java 8 and above.
+   */
+  public static final String[] PROMISES8_JAR_OLD_VERSIONS = {};
 
   public static final String PATH = "/lib/runtime/";
   public static final String PROMISES_JAR_PATHNAME = PATH + PROMISES_JAR;
