@@ -71,6 +71,12 @@ public class LibResources {
     return is;
   }
 
+  public static InputStream getPromises8Jar() throws IOException {
+    final URL url = getPromises8JarURL();
+    final InputStream is = url.openStream();
+    return is;
+  }
+
   /**
    * Gets all the promise annotation classes declared in the package
    * <tt>com.surelogic</tt> within the promises JAR that ships with the
