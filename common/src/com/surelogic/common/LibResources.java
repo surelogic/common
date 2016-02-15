@@ -54,10 +54,15 @@ public class LibResources {
 
   public static final String PATH = "/lib/runtime/";
   public static final String PROMISES_JAR_PATHNAME = PATH + PROMISES_JAR;
+  public static final String PROMISES8_JAR_PATHNAME = PATH + PROMISES8_JAR;
   public static final String PROMISES_PKG = "com.surelogic";
 
   public static URL getPromisesJarURL() {
     return LibResources.class.getResource(PROMISES_JAR_PATHNAME);
+  }
+
+  public static URL getPromises8JarURL() {
+    return LibResources.class.getResource(PROMISES8_JAR_PATHNAME);
   }
 
   public static InputStream getPromisesJar() throws IOException {
