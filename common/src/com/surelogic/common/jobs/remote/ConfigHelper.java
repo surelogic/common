@@ -85,8 +85,8 @@ public final class ConfigHelper {
     }
   }
 
-  public void addAllPluginJarsToPath(final String pluginId, String libPath) {
-    findJarsAndAddToPathIn(new File(config.getPluginDirectory(pluginId), libPath));
+  public void addAllPluginJarsToPath(final String pluginId, String libPath, String... excludes) {
+    findJarsAndAddToPathIn(new File(config.getPluginDirectory(pluginId), libPath), excludes);
   }
 
   public boolean addToPath(String name) {
@@ -118,13 +118,19 @@ public final class ConfigHelper {
     return exists;
   }
 
-  void findJarsAndAddToPathIn(File folder) {
+  void findJarsAndAddToPathIn(File folder, String... excludes) {
     if (!folder.exists()) {
       SLLogger.getLogger().warning("Unable to find jars in non-existent folder: " + folder);
     }
+    outer:
     for (File f : folder.listFiles()) {
       String name = f.getName();
       if (name.endsWith(".jar")) {
+    	for(String exclude : excludes) {
+    	  if (name.equals(exclude)) {
+    		continue outer;
+    	  }
+    	}
         path.add(f);
       }
     }
@@ -133,9 +139,9 @@ public final class ConfigHelper {
   /**
    * Add the plugin and all the jars on the associated path
    */
-  public void addPluginAndJarsToPath(String pluginId, String jarPath) {
+  public void addPluginAndJarsToPath(String pluginId, String jarPath, String... excludes) {
     addPluginToPath(pluginId);
-    addAllPluginJarsToPath(pluginId, jarPath);
+    addAllPluginJarsToPath(pluginId, jarPath, excludes);
   }
 
   public Collection<File> getPath() {
