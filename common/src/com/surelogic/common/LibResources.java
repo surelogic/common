@@ -24,7 +24,7 @@ public class LibResources {
    * {@link #PROMISES_JAR_OLD_VERSIONS} and {@link #PROMISES8_JAR_OLD_VERSIONS}
    * array.
    */
-  public static final String PROMISES_VERSION = "5.6.0";
+  public static final String PROMISES_VERSION = "6.0.0";
 
   /**
    * The name of the current promises Jar file for Java 1.5 and above.
@@ -44,7 +44,7 @@ public class LibResources {
       "promises-3.2.0.jar", "promises-3.2.1.jar", "promises-3.2.2.jar", "promises-4.0.0.jar", "promises-4.0.1.jar",
       "promises-4.0.2.jar", "promises-4.3.0.jar", "promises-4.3.1.jar", "promises-4.3.3.jar", "promises-4.3.4.jar",
       "promises-4.4.0.jar", "promises-5.0.0.jar", "promises-5.1.0.jar", "promises-5.2.0.jar", "promises-5.5.0.jar",
-      "promises-5.5.1.jar" };
+      "promises-5.5.1.jar", "promises-5.6.0.jar" };
 
   /**
    * Holds the names of the old library files that may need to be upgraded to

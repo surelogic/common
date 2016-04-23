@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: SureLogic Common Code
 Bundle-SymbolicName: com.surelogic.common
-Bundle-Version: 5.7.1.qualifier
+Bundle-Version: 6.0.0.qualifier
 Bundle-Vendor: SureLogic, Inc.
 Export-Package: com.carrotsearch.hppc,
  com.carrotsearch.hppc.cursors,
@@ -253,5 +253,5 @@ Bundle-ClassPath: .,
  lib/runtime/antlr-3.5.2-runtime.jar,
  lib/runtime/commons-lang3-3.4.jar,
  lib/runtime/javax.servlet-api-3.1.0.jar,
- lib/runtime/promises-5.6.0.jar
+ lib/runtime/promises-6.0.0.jar
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
