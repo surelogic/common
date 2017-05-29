@@ -1,7 +1,3 @@
-/*
- * Created on Jun 13, 2003
- *  
- */
 package com.surelogic.common.ui.views;
 
 import java.util.logging.Logger;
@@ -38,6 +34,12 @@ public interface ITableContentProvider
 	 * @return The relative size of the column
 	 */
   int getColumnWeight(int column);
+  
+  /**
+   * By default do nothing.
+   */
+  default public void dispose() {
+  }
 
   // TODO send event if layout changes
 }
